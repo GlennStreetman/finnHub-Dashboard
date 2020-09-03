@@ -1,6 +1,7 @@
 import React from "react";
 import StockDataList from "./stockDataList.js";
 
+//compnent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
 class StockSearchPane extends React.Component {
   //EXPECTED PROPS
   // availableStocks: list of all available stocks. Used to auto fill search.
@@ -29,7 +30,7 @@ class StockSearchPane extends React.Component {
           className="form-inline"
           onSubmit={(e) => {
             if (this.props.availableStocks[this.state.inputText.slice(0, this.state.inputText.indexOf(":"))]) {
-              console.log(this.props.availableStocks[e]);
+              //console.log(this.props.availableStocks[e]);
               this.props.UpdateStockTrackingList(e, this.state.inputText);
               this.props.showSearchPane();
               this.props.getStockPrice(this.state.inputText);
@@ -37,7 +38,7 @@ class StockSearchPane extends React.Component {
                 this.props.updateWidgetList(this.state.inputText);
               }
             } else {
-              console.log(this.state.inputText);
+              //console.log(this.state.inputText);
               alert("invalid stock selection");
             }
           }}

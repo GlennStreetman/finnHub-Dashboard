@@ -62,7 +62,7 @@ label {
   /* height: 100%; Full-height: remove this if you want "auto" height */
   width: 15%; /* Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
-  z-index: 1; /* Stay on top */
+  z-index: 2; /* Stay on top */
   /* top: 0; Stay at the top */
   left: 0;
   background-color: #111; /* Black */
@@ -101,22 +101,37 @@ label {
 }
 
 .widgetBox {
+  overflow: hidden;
   position: absolute;
-  z-index: 9;
-  background-color: #f1f1f1;
-  border: 1px solid #d3d3d3;
-  text-align: center;
+  z-index: 1;
+  border: 2px solid black;
+  border-radius: 10px;
 }
 
 .widgetHeader {
   padding: 10px;
-  /* cursor: move; */
-  z-index: 10;
+  z-index: 1;
   background-color: #2196f3;
   color: #fff;
-  display: flex;
+  /* display: flex; */
   flex-direction: row;
 }
+
+.headerButtons {
+  float: right;
+}
+
+.widgetFooter {
+  /* overflow: hidden; */
+  padding: 10px;
+  /* cursor: move; */
+  z-index: 1;
+  background-color: #2196f3;
+  color: #fff;
+  flex-direction: row;
+  text-align: right;
+}
+
 .dropDiv {
   display: inline-flex;
   flex-direction: column;
@@ -144,7 +159,7 @@ label {
   background-color: #ddd;
   min-width: 160px;
   box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1;
+  z-index: 2;
 }
 
 .dropdown-content a {
@@ -152,4 +167,9 @@ label {
   padding: 12px 16px;
   text-decoration: none;
   display: block;
+}
+
+.widgetBodyTable {
+  color: black;
+  background-color: white;
 }

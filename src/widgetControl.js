@@ -1,7 +1,7 @@
 import React from "react";
 
+//creates widget container. Used by all widgets.
 class WidgetControl extends React.Component {
-  //creates widget container.
   constructor(props) {
     super(props);
 
@@ -10,22 +10,33 @@ class WidgetControl extends React.Component {
       yAxis: "40px",
       renderHeader: this.props.widgetList["widgetHeader"],
       renderBody: this.props.widgetList["widgetType"],
-      showEditPane: 0,
+      showEditPane: 1,
     };
 
     this.dragElement = this.dragElement.bind(this);
     this.showPane = this.showPane.bind(this);
     this.updateHeader = this.updateHeader.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+  }
+
+  componentDidUpdate(prevProps) {
+    if (this.props.widgetLockDown !== prevProps.widgetLockDown) {
+      this.setState({ showEditPane: 0 });
+    }
   }
 
   showPane(stateRef) {
-    console.log("showpress");
+    //console.log("showpress");
     let showMenu = this.state[stateRef] === 0 ? 1 : 0;
     this.setState({ [stateRef]: showMenu });
   }
 
   updateHeader(newHeader) {
     this.setState({ renderHeader: newHeader });
+  }
+
+  handleChange(e) {
+    this.setState({ renderHeader: e.target.value });
   }
 
   dragElement() {
@@ -36,8 +47,11 @@ class WidgetControl extends React.Component {
     let pos4 = 0;
 
     document.getElementById(this.props.widgetList["widgetID"]).onmousedown = dragMouseDown;
+    let widgetWidth = document.getElementById(this.props.widgetKey + "box").clientWidth;
+    // console.log(widgetWidth);
 
     function dragMouseDown(e) {
+      that.setState({ showEditPane: 0 });
       e = e || window.event;
       e.preventDefault();
       // get the mouse cursor position at startup:
@@ -57,7 +71,7 @@ class WidgetControl extends React.Component {
       pos3 = e.clientX;
       pos4 = e.clientY;
       // set the element's new position:
-      let newX = pos3;
+      let newX = pos3 - widgetWidth;
       let newY = pos4;
       that.setState({ yAxis: newY });
       that.setState({ xAxis: newX });
@@ -78,14 +92,17 @@ class WidgetControl extends React.Component {
     };
     const that = this;
     return (
-      <div className="widgetBox" style={compStyle}>
-        <div className="widgetHeader">
-          <div>{this.state.renderHeader} </div>
-          <div>
-            <button onClick={() => this.showPane("showEditPane")}>
-              <i className="fa fa-pencil-square-o" aria-hidden="true"></i>
-            </button>
+      <div key={this.props.widgetKey + "container"} id={this.props.widgetKey + "box"} className="widgetBox" style={compStyle}>
+        {this.props.widgetLockDown === 0 ? (
+          <div className="widgetHeader">
+            {this.state.showEditPane === 0 ? (
+              <>{this.state.renderHeader}</>
+            ) : (
+              <input type="text" id={this.props.widgetKey + "HeaderValue"} value={this.state.renderHeader} onChange={this.handleChange} />
+            )}
+
             <button
+              className="headerButtons"
               id={this.props.widgetList["widgetID"]}
               onMouseOver={() => {
                 this.dragElement();
@@ -93,8 +110,14 @@ class WidgetControl extends React.Component {
             >
               <i className="fa fa-arrows" aria-hidden="true"></i>
             </button>
+
+            <button className="headerButtons" onClick={() => this.showPane("showEditPane")}>
+              <i className="fa fa-pencil-square-o" aria-hidden="true"></i>
+            </button>
           </div>
-        </div>
+        ) : (
+          <div className="widgetHeader">{this.state.renderHeader}</div>
+        )}
 
         {React.createElement(this.props.widgetList["widgetType"], {
           availableStocks: that.props.availableStocks,
@@ -104,7 +127,18 @@ class WidgetControl extends React.Component {
           showPane: that.showPane,
           updateHeader: that.updateHeader,
           trackedStockData: that.props.trackedStockData,
+          widgetKey: that.props.widgetKey,
         })}
+
+        {this.props.widgetLockDown === 0 ? (
+          <div className="widgetFooter">
+            <button onClick={() => this.props.removeWidget(this.props.widgetKey)}>
+              <i className="fa fa-times" aria-hidden="true"></i>
+            </button>
+          </div>
+        ) : (
+          <></>
+        )}
       </div>
     );
   }

@@ -1,6 +1,7 @@
 import React from "react";
 
-class StockDataList extends React.Component {
+//list of stock data used for auto complete on stock search.
+class StockDataList extends React.PureComponent {
   constructor(props) {
     super(props);
     this.createDataList = this.createDataList.bind(this);
@@ -19,7 +20,7 @@ class StockDataList extends React.Component {
   }
 
   render() {
-    console.log("rendering");
+    // console.log("rendering");
     return <>{this.createDataList()}</>;
   }
 }

@@ -1,35 +1,117 @@
 import React from "react";
 import StockSearchPane from "./stockSearchPane.js";
 
+//Widget body component. Shows stock detail info and recent news. Maybe a graph?
 class StockDetailWidget extends React.Component {
-  //Widget body component. Shows stock detail info and recent news. Maybe a graph?
   constructor(props) {
     super(props);
     this.state = {
-      widgetList: "",
+      // widgetList: "",
+      widgetList: [],
     };
 
     this.updateWidgetList = this.updateWidgetList.bind(this);
     this.renderStockData = this.renderStockData.bind(this);
+    this.buildForm = this.buildForm.bind(this);
   }
 
-  componentDidUpdate(prevProps, prevState) {
-    if (this.state.widgetList !== prevState.widgetList) {
-      this.props.updateHeader(this.state.widgetList);
-    }
-  }
+  // componentDidUpdate(prevProps, prevState) {
+  //   if (this.state.widgetList !== prevState.widgetList) {
+  //     this.state.widgetList.length === 1 ? this.props.updateHeader(this.state.widgetList[0]) : this.props.updateHeader("Multiple Stocks");
+  //   }
+  // }
 
   updateWidgetList(stock) {
-    this.setState({ widgetList: stock });
+    var stockSymbole = stock.slice(0, stock.indexOf(":"));
+    var newWidgetList = this.state.widgetList.slice();
+    newWidgetList.push(stockSymbole);
+    this.setState({ widgetList: newWidgetList });
   }
 
   renderStockData() {
     let trackedStockData = this.props.trackedStockData;
     let thisStock = this.state.widgetList;
-    let thisStockSymbol = thisStock.slice(0, thisStock.indexOf(":"));
-    let thisStockData = trackedStockData[thisStockSymbol];
-    console.log(thisStockData);
-    return thisStockData;
+    // let thisStockSymbol = thisStock.slice(0, thisStock.indexOf(":"));
+    // let thisStockData = trackedStockData[thisStockSymbol];
+    let stockDetailRow = thisStock.map((el) =>
+      trackedStockData[el] ? (
+        <tr key={el + "st"}>
+          <td key={el + "id"}>{el}</td>
+          <td key={el + "currentPrice"}>
+            {trackedStockData[el]["currentPrice"].toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </td>
+          <td key={el + "dayHighPrice"}>
+            {trackedStockData[el]["dayHighPrice"].toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </td>
+          <td key={el + "dayLowPrice"}>
+            {trackedStockData[el]["dayLowPrice"].toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </td>
+          <td key={el + "dayOpenPrice"}>
+            {trackedStockData[el]["dayOpenPrice"].toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </td>
+          <td key={el + "prevClosePrice"}>
+            {trackedStockData[el]["prevClosePrice"].toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </td>
+
+          {this.props.showEditPane === 1 ? (
+            <td>
+              <button
+                onClick={() => {
+                  let oldList = Array.from(this.state.widgetList);
+                  oldList.splice(oldList.indexOf({ el }), 1);
+                  this.setState({ widgetList: oldList });
+                }}
+              >
+                <i className="fa fa-times" aria-hidden="true"></i>
+              </button>
+            </td>
+          ) : (
+            <></>
+          )}
+        </tr>
+      ) : (
+        // {this.props.showEditPane === 1 ? </form> : <></> }
+        <></>
+      )
+    );
+    let buildTable = (
+      <table className="widgetBodyTable" key={this.props.widgetKey + "id"}>
+        <thead key={this.props.widgetKey + "head"}>
+          <tr key={this.props.widgetKey + "tr"}>
+            <td key={this.props.widgetKey + "stock"}>Stock</td>
+            <td key={this.props.widgetKey + "price"}>Price</td>
+            <td key={this.props.widgetKey + "high"}>Day High</td>
+            <td key={this.props.widgetKey + "low"}>Day Low</td>
+            <td key={this.props.widgetKey + "open"}>Day Open</td>
+            <td key={this.props.widgetKey + "close"}>Prev Close</td>
+            {this.props.showEditPane === 1 ? <td>Remove</td> : <></>}
+          </tr>
+        </thead>
+        <tbody key={this.props.widgetKey + "body"}>{stockDetailRow}</tbody>
+      </table>
+    );
+    //console.log(stockDetailRow);
+    return buildTable;
+  }
+
+  buildForm() {
+    let editForm = <>{this.props.showEditPane === 1 ? <form>{this.renderStockData()}</form> : <>{this.renderStockData()}</>}</>;
+    return editForm;
   }
 
   render() {
@@ -44,8 +126,7 @@ class StockDetailWidget extends React.Component {
             updateWidgetList={this.updateWidgetList}
           />
         )}
-        Test Body
-        {this.renderStockData}
+        {Object.keys(this.props.trackedStockData).length > 0 ? this.renderStockData() : <></>}
       </>
     );
   }
