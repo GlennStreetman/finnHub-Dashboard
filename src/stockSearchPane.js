@@ -32,7 +32,7 @@ class StockSearchPane extends React.Component {
             if (this.props.availableStocks[this.state.inputText.slice(0, this.state.inputText.indexOf(":"))]) {
               //console.log(this.props.availableStocks[e]);
               this.props.UpdateStockTrackingList(e, this.state.inputText);
-              this.props.showSearchPane();
+              // this.props.showSearchPane();
               this.props.getStockPrice(this.state.inputText);
               if (this.props.updateWidgetList) {
                 this.props.updateWidgetList(this.state.inputText);

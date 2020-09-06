@@ -3,6 +3,7 @@ import StockWatchList from "./stockWatchList.js";
 import StockSearchPane from "./stockSearchPane.js";
 import StockDetailWidget from "./stockDetailWidget.js";
 import WidgetControl from "./widgetControl.js";
+import NewsWidget from "./newsWidget.js";
 // import { render } from "@testing-library/react";
 
 class TopNav extends React.Component {
@@ -83,7 +84,7 @@ class TopNav extends React.Component {
         });
       })
       .then(() => {
-        console.log("done");
+        // console.log("done");
         this.updateTickerSockets();
       });
     // return stockPriceData
@@ -135,12 +136,19 @@ class TopNav extends React.Component {
                   <a
                     href="#1"
                     onClick={() => {
-                      this.props.newStockWidget(StockDetailWidget, "Stock Tracker: ");
+                      this.props.newStockWidget(StockDetailWidget, "Widget Name: ");
                     }}
                   >
                     Stock Detail Widget
                   </a>
-                  <a href="#2">Link 2</a>
+                  <a
+                    href="#1"
+                    onClick={() => {
+                      this.props.newStockWidget(NewsWidget, "Widget Name: ");
+                    }}
+                  >
+                    News Widget
+                  </a>
                   <a href="#3">Link 3</a>
                 </div>
               </div>

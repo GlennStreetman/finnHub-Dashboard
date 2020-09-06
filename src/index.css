@@ -43,7 +43,7 @@ code {
   align-items: center;
   padding: 10px;
   margin-inline: 25px;
-  margin-bottom: 25px;
+  /* margin-bottom: 25px; */
   color: white;
 }
 
@@ -109,7 +109,7 @@ label {
 }
 
 .widgetHeader {
-  padding: 10px;
+  padding: 5px;
   z-index: 1;
   background-color: #2196f3;
   color: #fff;
@@ -123,7 +123,7 @@ label {
 
 .widgetFooter {
   /* overflow: hidden; */
-  padding: 10px;
+  padding: 2px;
   /* cursor: move; */
   z-index: 1;
   background-color: #2196f3;
