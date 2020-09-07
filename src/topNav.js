@@ -136,7 +136,7 @@ class TopNav extends React.Component {
                   <a
                     href="#1"
                     onClick={() => {
-                      this.props.newStockWidget(StockDetailWidget, "Widget Name: ");
+                      this.props.newStockWidget(StockDetailWidget, "Stock Values: ");
                     }}
                   >
                     Stock Detail Widget
@@ -144,7 +144,7 @@ class TopNav extends React.Component {
                   <a
                     href="#1"
                     onClick={() => {
-                      this.props.newStockWidget(NewsWidget, "Widget Name: ");
+                      this.props.newStockWidget(NewsWidget, "Recent News: ");
                     }}
                   >
                     News Widget

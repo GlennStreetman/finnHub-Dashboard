@@ -25,18 +25,42 @@ class NewsWidget extends React.Component {
     this.changeNewsSelection = this.changeNewsSelection.bind(this);
     this.newsTable = this.newsTable.bind(this);
     this.changeIncrememnt = this.changeIncrememnt.bind(this);
+    this.formatSourceName = this.formatSourceName.bind(this);
+    this.shortHeadline = this.shortHeadline.bind(this);
+  }
+
+  formatSourceName(source) {
+    let formattedSource = source;
+    formattedSource = formattedSource.replace(".com", "");
+    formattedSource = formattedSource.replace("http:", "");
+    formattedSource = formattedSource.replace("https:", "");
+    formattedSource = formattedSource.replace("//", "");
+    formattedSource = formattedSource.replace("www.", "");
+    formattedSource = formattedSource.replace("wsj", "Wall Street Journal");
+    formattedSource = formattedSource.replace(formattedSource[0], formattedSource[0].toUpperCase());
+
+    return formattedSource;
+  }
+
+  shortHeadline(headline) {
+    let shortHeadLine = headline.slice(0, 48) + "...";
+    return shortHeadLine;
   }
 
   getCompanyNews(symbol, fromDate, toDate) {
-    // console.log("https://finnhub.io/api/v1/company-news?symbol=" + symbol + "&from=" + fromDate + "&to=" + toDate + "&token=bsuu7qv48v6qu589jlj0")
     fetch("https://finnhub.io/api/v1/company-news?symbol=" + symbol + "&from=" + fromDate + "&to=" + toDate + "&token=bsuu7qv48v6qu589jlj0")
       .then((response) => response.json())
       .then((data) => {
-        // console.log("Grabbing stock data");
-        // console.log(data.slice(0, 99));
-        console.log(symbol + " : " + fromDate + " : " + toDate);
-        const newList = data.slice(0, 99);
-        this.setState({ companyNews: newList });
+        //filter spam from seekingAlpha.com. They format article dates to always return first blocking out all other sources.
+        let filteredNews = [];
+        let newsCount = 0;
+        for (var news in data) {
+          if (data[news]["source"] !== "seekingalpha.com" && newsCount < 100) {
+            filteredNews.push(data[news]);
+            newsCount += 1;
+          }
+        }
+        this.setState({ companyNews: filteredNews });
       });
   }
 
@@ -112,10 +136,10 @@ class NewsWidget extends React.Component {
     let newsSlice = this.state.companyNews.slice(newStart, newsEnd);
     let mapNews = newsSlice.map((el) => (
       <tr>
-        <td>{el["source"]}</td>
+        <td>{this.formatSourceName(el["source"])}</td>
         <td>
           <a href={el["url"]} target="_blank">
-            {el["headline"]}
+            {this.shortHeadline(el["headline"])}
           </a>
         </td>
       </tr>
