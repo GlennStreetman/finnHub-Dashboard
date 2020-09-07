@@ -36,7 +36,7 @@ class TopNav extends React.Component {
     // Listen for messages
     socket.addEventListener("message", function (event) {
       var tickerReponse = JSON.parse(event.data);
-      //   console.log("Message from server ", event.data);
+      console.log("Message from server ", event.data);
       if (tickerReponse.data) {
         self.setState((prevState) => {
           let stockTickData = Object.assign({}, prevState.trackedStockData);
@@ -149,7 +149,7 @@ class TopNav extends React.Component {
                   >
                     News Widget
                   </a>
-                  <a href="#3">Link 3</a>
+                  <a href="#3">Stock Candles</a>
                 </div>
               </div>
             )}

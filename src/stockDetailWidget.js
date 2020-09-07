@@ -69,8 +69,9 @@ class StockDetailWidget extends React.Component {
           </td>
 
           {this.props.showEditPane === 1 ? (
-            <td>
+            <td key={el + "buttonBox"}>
               <button
+                key={el + "button"}
                 onClick={() => {
                   let oldList = Array.from(this.state.widgetList);
                   oldList.splice(oldList.indexOf({ el }), 1);
@@ -86,7 +87,7 @@ class StockDetailWidget extends React.Component {
         </tr>
       ) : (
         // {this.props.showEditPane === 1 ? </form> : <></> }
-        <></>
+        <tr key={el + "cat"}></tr>
       )
     );
     let buildTable = (
@@ -99,7 +100,7 @@ class StockDetailWidget extends React.Component {
             <td key={this.props.widgetKey + "low"}>Day Low</td>
             <td key={this.props.widgetKey + "open"}>Day Open</td>
             <td key={this.props.widgetKey + "close"}>Prev Close</td>
-            {this.props.showEditPane === 1 ? <td>Remove</td> : <></>}
+            {this.props.showEditPane === 1 ? <td key={this.props.widgetKey + "remove"}>Remove</td> : <></>}
           </tr>
         </thead>
         <tbody key={this.props.widgetKey + "body"}>{stockDetailRow}</tbody>

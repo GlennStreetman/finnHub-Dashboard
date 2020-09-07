@@ -101,24 +101,23 @@ class NewsWidget extends React.Component {
 
     let stockNewsRow = newsList.map((el) =>
       this.props.showEditPane === 1 ? (
-        <>
-          <tr>
-            <td>{el}</td>
-            <td>
-              <button
-                onClick={() => {
-                  let oldList = Array.from(this.state.widgetList);
-                  oldList.splice(oldList.indexOf({ el }), 1);
-                  this.setState({ widgetList: oldList });
-                }}
-              >
-                <i className="fa fa-times" aria-hidden="true"></i>
-              </button>
-            </td>
-          </tr>
-        </>
+        <tr key={el + "container"}>
+          <td key={el + "name"}>{el}</td>
+          <td key={el + "buttonC"}>
+            <button
+              key={el + "button"}
+              onClick={() => {
+                let oldList = Array.from(this.state.widgetList);
+                oldList.splice(oldList.indexOf({ el }), 1);
+                this.setState({ widgetList: oldList });
+              }}
+            >
+              <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
+            </button>
+          </td>
+        </tr>
       ) : (
-        <></>
+        <tr key={el + "pass"}></tr>
       )
     );
     let stockNewsTable = (
@@ -134,11 +133,11 @@ class NewsWidget extends React.Component {
     let newStart = increment - 10;
     let newsEnd = increment;
     let newsSlice = this.state.companyNews.slice(newStart, newsEnd);
-    let mapNews = newsSlice.map((el) => (
-      <tr>
-        <td>{this.formatSourceName(el["source"])}</td>
-        <td>
-          <a href={el["url"]} target="_blank">
+    let mapNews = newsSlice.map((el, index) => (
+      <tr key={el + "newsRow" + index}>
+        <td key={el + "newsSource"}>{this.formatSourceName(el["source"])}</td>
+        <td key={el + "newsHeadline"}>
+          <a key={el + "newsUrl"} href={el["url"]} target="_blank">
             {this.shortHeadline(el["headline"])}
           </a>
         </td>
