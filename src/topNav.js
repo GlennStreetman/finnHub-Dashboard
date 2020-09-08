@@ -4,6 +4,7 @@ import StockSearchPane from "./stockSearchPane.js";
 import StockDetailWidget from "./stockDetailWidget.js";
 import WidgetControl from "./widgetControl.js";
 import NewsWidget from "./newsWidget.js";
+import CandleWidget from "./candleWidget.js";
 // import { render } from "@testing-library/react";
 
 class TopNav extends React.Component {
@@ -36,7 +37,7 @@ class TopNav extends React.Component {
     // Listen for messages
     socket.addEventListener("message", function (event) {
       var tickerReponse = JSON.parse(event.data);
-      console.log("Message from server ", event.data);
+      // console.log("Message from server ", event.data);
       if (tickerReponse.data) {
         self.setState((prevState) => {
           let stockTickData = Object.assign({}, prevState.trackedStockData);
@@ -142,14 +143,21 @@ class TopNav extends React.Component {
                     Stock Detail Widget
                   </a>
                   <a
-                    href="#1"
+                    href="#2"
                     onClick={() => {
                       this.props.newStockWidget(NewsWidget, "Recent News: ");
                     }}
                   >
                     News Widget
                   </a>
-                  <a href="#3">Stock Candles</a>
+                  <a
+                    href="#3"
+                    onClick={() => {
+                      this.props.newStockWidget(CandleWidget, "Candle Data: ");
+                    }}
+                  >
+                    Stock Candles
+                  </a>
                 </div>
               </div>
             )}
