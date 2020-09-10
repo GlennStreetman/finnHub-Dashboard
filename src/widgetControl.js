@@ -125,7 +125,7 @@ class WidgetControl extends React.Component {
           getStockPrice: that.props.getStockPrice,
           showEditPane: that.state.showEditPane,
           showPane: that.showPane,
-          updateHeader: that.updateHeader,
+          // updateHeader: that.updateHeader,
           trackedStockData: that.props.trackedStockData,
           widgetKey: that.props.widgetKey,
         })}

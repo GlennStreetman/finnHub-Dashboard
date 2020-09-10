@@ -98,7 +98,7 @@ class TopNav extends React.Component {
         key={el}
         widgetKey={el}
         widgetList={widgetState[el]}
-        availableStocks={this.props.availableStocks}
+        // availableStocks={this.props.availableStocks}
         UpdateStockTrackingList={this.props.UpdateStockTrackingList}
         getStockPrice={this.getStockPrice}
         trackedStockData={this.state.trackedStockData}
@@ -167,7 +167,7 @@ class TopNav extends React.Component {
         <div>
           {this.state.showAddWatchlistMenu === 1 && (
             <StockSearchPane
-              availableStocks={this.props.availableStocks}
+              // availableStocks={this.props.availableStocks}
               // stockTrackingList={this.props.stockTrackingList}
               UpdateStockTrackingList={this.props.UpdateStockTrackingList}
               showSearchPane={() => this.showPane("showAddWatchlistMenu")}
@@ -180,7 +180,7 @@ class TopNav extends React.Component {
           {this.state.showWatchlistMenu === 1 && (
             <StockWatchList
               stockTrackingList={this.props.stockTrackingList}
-              availableStocks={this.props.availableStocks}
+              // availableStocks={this.props.availableStocks}
               showWatchListPane={() => this.showPane("showWatchlistMenu")}
               trackedStockData={this.state.trackedStockData}
             />

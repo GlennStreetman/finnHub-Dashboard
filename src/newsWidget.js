@@ -137,7 +137,7 @@ class NewsWidget extends React.Component {
       <tr key={el + "newsRow" + index}>
         <td key={el + "newsSource"}>{this.formatSourceName(el["source"])}</td>
         <td key={el + "newsHeadline"}>
-          <a key={el + "newsUrl"} href={el["url"]} target="_blank">
+          <a key={el + "newsUrl"} href={el["url"]} target="_blank" rel="noopener noreferrer">
             {this.shortHeadline(el["headline"])}
           </a>
         </td>
@@ -193,7 +193,7 @@ class NewsWidget extends React.Component {
           <>
             <div>
               <StockSearchPane
-                availableStocks={this.props.availableStocks}
+                // availableStocks={this.props.availableStocks}
                 UpdateStockTrackingList={this.props.UpdateStockTrackingList}
                 showSearchPane={() => this.props.showPane("showEditPane")}
                 getStockPrice={this.props.getStockPrice}

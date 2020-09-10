@@ -1,5 +1,6 @@
 import React from "react";
 import StockSearchPane from "./stockSearchPane.js";
+import CreateCandleStickChart from "./createCandleStickChart.js";
 
 class CandleWidget extends React.Component {
   constructor(props) {
@@ -14,6 +15,7 @@ class CandleWidget extends React.Component {
       startDate: lastMonth,
       endDate: new Date().toISOString().slice(0, 10),
       candleSelection: 1,
+      candleData: { 0: "blank" },
     };
     this.updateWidgetList = this.updateWidgetList.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -23,8 +25,14 @@ class CandleWidget extends React.Component {
     this.changeStockSelection = this.changeStockSelection.bind(this);
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.candleSelection !== prevState.candleSelection) {
+      this.getCandleData(this.state.candleSelection, this.state.startDate, this.state.endDate);
+    }
+  }
+
   updateWidgetList(stock) {
-    console.log("it ran");
+    // console.log("it ran");
     var stockSymbole = stock.slice(0, stock.indexOf(":"));
     var newWidgetList = this.state.widgetList.slice();
     newWidgetList.push(stockSymbole);
@@ -37,9 +45,38 @@ class CandleWidget extends React.Component {
   }
 
   handleChange(e) {
+    // console.log("handle change");
     const target = e.target;
     const name = target.name;
     this.setState({ [name]: e.target.value });
+  }
+
+  getCandleData() {
+    const s = this.state.startDate;
+    const e = this.state.endDate;
+    console.log(this.state.startDate);
+    const startDateUnix = new Date(s.slice(0, 4), s.slice(5, 7), s.slice(8, 10)).getTime() / 1000;
+    const endDateUnix = new Date(e.slice(0, 4), e.slice(5, 7), e.slice(8, 10)).getTime() / 1000;
+    console.log(startDateUnix, " ", endDateUnix, " ", this.state.candleSelection);
+    fetch(
+      "https://finnhub.io/api/v1/stock/candle?symbol=" +
+        this.state.candleSelection +
+        "&resolution=W&from=" +
+        startDateUnix +
+        "&to=" +
+        endDateUnix +
+        "&token=bsuu7qv48v6qu589jlj0"
+    )
+      .then((response) => response.json())
+      .then((data) => {
+        this.setState({ candleData: data });
+        // console.log(data);
+      });
+  }
+
+  changeStockSelection(e) {
+    const target = e.target.value;
+    this.setState({ candleSelection: target });
   }
 
   editCandleListForm() {
@@ -74,33 +111,6 @@ class CandleWidget extends React.Component {
     return stockCandleTable;
   }
 
-  getCandleData() {
-    const s = this.state.startDate;
-    const e = this.state.endDate;
-    const startDateUnix = new Date(s.slice(0, 4), s.slice(5, 7), s.slice(8, 10)).getTime() / 1000;
-    const endDateUnit = new Date(e.slice(0, 4), e.slice(5, 7), e.slice(8, 10)).getTime() / 1000;
-    console.log(startDateUnix, " ", endDateUnit, " ", this.state.candleSelection);
-    fetch(
-      "https://finnhub.io/api/v1/stock/candle?symbol=" +
-        this.state.candleSelection +
-        "&resolution=1&from=" +
-        startDateUnix +
-        "&to=" +
-        endDateUnit +
-        "&token=bsuu7qv48v6qu589jlj0"
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        console.log(data);
-      });
-  }
-
-  changeStockSelection(e) {
-    const target = e.target.value;
-    this.setState({ candleSelection: target });
-    this.getCandleData(this.state.candleSelection, this.state.startDate, this.state.endDate);
-  }
-
   displayCandleGraph() {
     let newSymbolList = this.state.widgetList.map((el) => (
       <option key={el + "ddl"} value={el}>
@@ -115,7 +125,10 @@ class CandleWidget extends React.Component {
             {newSymbolList}
           </select>
         </div>
-        {/* <div>{this.newsTable()}</div> */}
+        <div>
+          <CreateCandleStickChart candleData={this.state.candleData} />
+          {/* <CreateCandleStickChart candleData={this.state.candleData} type="svg" width="400px" /> */}
+        </div>
       </>
     );
     return symbolSelectorDropDown;
@@ -128,7 +141,7 @@ class CandleWidget extends React.Component {
           <>
             <div>
               <StockSearchPane
-                availableStocks={this.props.availableStocks}
+                // availableStocks={this.props.availableStocks}
                 UpdateStockTrackingList={this.props.UpdateStockTrackingList}
                 showSearchPane={() => this.props.showPane("showEditPane")}
                 getStockPrice={this.props.getStockPrice}
