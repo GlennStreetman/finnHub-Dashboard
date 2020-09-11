@@ -81,12 +81,12 @@ class StockSearchPane extends React.Component {
           }}
         >
           <label htmlFor="stockSearch">Search For Stock Symbol: </label>
-          <input type="text" id="stockSearch" list="stockSearch1" value={this.state.inputText} onChange={this.handleChange} />
+          <input className="btn" type="text" id="stockSearch" list="stockSearch1" value={this.state.inputText} onChange={this.handleChange} />
           {/* <datalist id="stockSearch1">{this.createDataList()}</datalist> */}
           <datalist id="stockSearch1">
             <StockDataList availableStocks={this.state.availableStocks} />
           </datalist>
-          <input type="submit" value="Submit" />
+          <input className="btn" type="submit" value="Submit" />
         </form>
       </div>
     );

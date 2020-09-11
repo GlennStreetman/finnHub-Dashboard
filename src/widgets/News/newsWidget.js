@@ -1,5 +1,5 @@
 import React from "react";
-import StockSearchPane from "./stockSearchPane.js";
+import StockSearchPane from "../../stockSearchPane.js";
 // import Moment from "react-moment";
 
 class NewsWidget extends React.Component {
@@ -9,12 +9,14 @@ class NewsWidget extends React.Component {
     let currentMonth = new Date().getMonth();
     let currentyDay = new Date().getDay();
     let lastMonth = new Date(currentYear, currentMonth - 1, currentyDay).toISOString().slice(0, 10);
+    let startList = this.props.stockTrackingList.length > 0 ? this.props.stockTrackingList : [];
+    let startStock = startList.length > 0 ? startList[0] : 1;
     this.state = {
-      widgetList: [],
+      widgetList: startList,
       companyNews: [],
       startDate: lastMonth,
       endDate: new Date().toISOString().slice(0, 10),
-      newsSelection: 1,
+      newsSelection: startStock,
       newsIncrementor: 1,
     };
     this.getCompanyNews = this.getCompanyNews.bind(this);
@@ -27,6 +29,14 @@ class NewsWidget extends React.Component {
     this.changeIncrememnt = this.changeIncrememnt.bind(this);
     this.formatSourceName = this.formatSourceName.bind(this);
     this.shortHeadline = this.shortHeadline.bind(this);
+  }
+
+  componentDidMount() {
+    if (this.props.stockTrackingList.length > 0) {
+      // console.log("getnews");
+      // console.log(this.state.newsSelection, this.state.startDate, this.state.endDate);
+      this.getCompanyNews(this.state.newsSelection, this.state.startDate, this.state.endDate);
+    }
   }
 
   formatSourceName(source) {
@@ -48,10 +58,13 @@ class NewsWidget extends React.Component {
   }
 
   getCompanyNews(symbol, fromDate, toDate) {
+    // console.log("getCompanyNews");
+    // console.log(symbol);
     fetch("https://finnhub.io/api/v1/company-news?symbol=" + symbol + "&from=" + fromDate + "&to=" + toDate + "&token=bsuu7qv48v6qu589jlj0")
       .then((response) => response.json())
       .then((data) => {
         //filter spam from seekingAlpha.com. They format article dates to always return first blocking out all other sources.
+        // console.log(data);
         let filteredNews = [];
         let newsCount = 0;
         for (var news in data) {
@@ -76,9 +89,11 @@ class NewsWidget extends React.Component {
   }
 
   changeNewsSelection(e) {
+    // console.log("changeNewsSelection");
+    // console.log(e.target.value);
     const target = e.target.value;
     this.setState({ newsSelection: target });
-    this.getCompanyNews(this.state.newsSelection, this.state.startDate, this.state.endDate);
+    this.getCompanyNews(target, this.state.startDate, this.state.endDate);
     this.setState({ newsIncrementor: 1 });
   }
 
@@ -202,9 +217,9 @@ class NewsWidget extends React.Component {
               <div className="stockSearch">
                 <form className="form-inline">
                   <label htmlFor="start">Start date:</label>
-                  <input id="start" type="date" name="startDate" onChange={this.handleChange} value={this.state.startDate}></input>
+                  <input className="btn" id="start" type="date" name="startDate" onChange={this.handleChange} value={this.state.startDate}></input>
                   <label htmlFor="end">End date:</label>
-                  <input id="end" type="date" name="endDate" onChange={this.handleChange} value={this.state.endDate}></input>
+                  <input className="btn" id="end" type="date" name="endDate" onChange={this.handleChange} value={this.state.endDate}></input>
                 </form>
               </div>
             </div>

@@ -41,8 +41,6 @@ class WidgetControl extends React.Component {
 
   dragElement() {
     let that = this;
-    // let pos1 = 0;
-    // let pos2 = 0;
     let pos3 = 0;
     let pos4 = 0;
 
@@ -65,9 +63,7 @@ class WidgetControl extends React.Component {
     function elementDrag(e) {
       e = e || window.event;
       e.preventDefault();
-      // calculate the new cursor position:
-      // letpos1 = pos3 - e.clientX;
-      // pos2 = pos4 - e.clientY;
+
       pos3 = e.clientX;
       pos4 = e.clientY;
       // set the element's new position:
@@ -128,6 +124,7 @@ class WidgetControl extends React.Component {
           // updateHeader: that.updateHeader,
           trackedStockData: that.props.trackedStockData,
           widgetKey: that.props.widgetKey,
+          stockTrackingList: that.props.stockTrackingList,
         })}
 
         {this.props.widgetLockDown === 0 ? (

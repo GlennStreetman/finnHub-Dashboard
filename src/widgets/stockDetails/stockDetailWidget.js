@@ -1,5 +1,5 @@
 import React from "react";
-import StockSearchPane from "./stockSearchPane.js";
+import StockSearchPane from "../../stockSearchPane.js";
 
 //Widget body component. Shows stock detail info and recent news. Maybe a graph?
 class StockDetailWidget extends React.Component {
@@ -14,12 +14,6 @@ class StockDetailWidget extends React.Component {
     this.renderStockData = this.renderStockData.bind(this);
     this.buildForm = this.buildForm.bind(this);
   }
-
-  // componentDidUpdate(prevProps, prevState) {
-  //   if (this.state.widgetList !== prevState.widgetList) {
-  //     this.state.widgetList.length === 1 ? this.props.updateHeader(this.state.widgetList[0]) : this.props.updateHeader("Multiple Stocks");
-  //   }
-  // }
 
   updateWidgetList(stock) {
     var stockSymbole = stock.slice(0, stock.indexOf(":"));

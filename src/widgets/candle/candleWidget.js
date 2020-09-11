@@ -1,5 +1,5 @@
 import React from "react";
-import StockSearchPane from "./stockSearchPane.js";
+import StockSearchPane from "../../stockSearchPane.js";
 import CreateCandleStickChart from "./createCandleStickChart.js";
 
 class CandleWidget extends React.Component {
@@ -9,13 +9,19 @@ class CandleWidget extends React.Component {
     let currentMonth = new Date().getMonth();
     let currentyDay = new Date().getDay();
     let lastMonth = new Date(currentYear - 1, currentMonth, currentyDay).toISOString().slice(0, 10);
+    let startList = this.props.stockTrackingList.length > 0 ? this.props.stockTrackingList : [];
+    let startStock = startList.length > 0 ? startList[0] : 1;
 
     this.state = {
-      widgetList: [],
+      widgetList: startList,
       startDate: lastMonth,
       endDate: new Date().toISOString().slice(0, 10),
-      candleSelection: 1,
+      candleSelection: startStock,
       candleData: { 0: "blank" },
+      charData: [],
+      options: {},
+      resolution: "W",
+      selectResolution: [1, 5, 15, 30, 60, "D", "W", "M"],
     };
     this.updateWidgetList = this.updateWidgetList.bind(this);
     this.handleChange = this.handleChange.bind(this);
@@ -23,10 +29,19 @@ class CandleWidget extends React.Component {
     this.editCandleListForm = this.editCandleListForm.bind(this);
     this.displayCandleGraph = this.displayCandleGraph.bind(this);
     this.changeStockSelection = this.changeStockSelection.bind(this);
+    this.createCandleDataList = this.createCandleDataList.bind(this);
+    this.createChartOptions = this.createChartOptions.bind(this);
+    this.changeResolutionSelection = this.changeResolutionSelection.bind(this);
+  }
+
+  componentDidMount() {
+    if (this.props.stockTrackingList.length > 0) {
+      this.getCandleData(this.state.candleSelection, this.state.startDate, this.state.endDate);
+    }
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.candleSelection !== prevState.candleSelection) {
+    if (this.state.candleSelection !== prevState.candleSelection || this.props.showEditPane !== prevProps.showEditPane) {
       this.getCandleData(this.state.candleSelection, this.state.startDate, this.state.endDate);
     }
   }
@@ -54,14 +69,16 @@ class CandleWidget extends React.Component {
   getCandleData() {
     const s = this.state.startDate;
     const e = this.state.endDate;
-    console.log(this.state.startDate);
+    // console.log(this.state.startDate);
     const startDateUnix = new Date(s.slice(0, 4), s.slice(5, 7), s.slice(8, 10)).getTime() / 1000;
     const endDateUnix = new Date(e.slice(0, 4), e.slice(5, 7), e.slice(8, 10)).getTime() / 1000;
-    console.log(startDateUnix, " ", endDateUnix, " ", this.state.candleSelection);
+    // console.log(startDateUnix, " ", endDateUnix, " ", this.state.candleSelection);
     fetch(
       "https://finnhub.io/api/v1/stock/candle?symbol=" +
         this.state.candleSelection +
-        "&resolution=W&from=" +
+        "&resolution=" +
+        this.state.resolution +
+        "&from=" +
         startDateUnix +
         "&to=" +
         endDateUnix +
@@ -70,13 +87,66 @@ class CandleWidget extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         this.setState({ candleData: data });
-        // console.log(data);
+        this.createCandleDataList(data);
       });
+    // .then(this.createCandleDataList(this.state.candleData));
+  }
+
+  createCandleDataList(data) {
+    let nodeCount = data["c"].length;
+    // this.setState({ showChart: 0 });
+    this.setState({ chartData: [] });
+    for (let nodei = 0; nodei < nodeCount; nodei++) {
+      let newNode = {
+        x: new Date(data["t"][nodei] * 1000),
+        y: [data["o"][nodei], data["h"][nodei], data["l"][nodei], data["c"][nodei]], //open, high, low, close
+      };
+      let updateChartData = this.state.chartData;
+      updateChartData.push(newNode);
+      this.setState({ chartData: updateChartData });
+      this.createChartOptions();
+    }
+  }
+
+  createChartOptions() {
+    const options = {
+      theme: "light2", // "light1", "light2", "dark1", "dark2"
+      animationEnabled: true,
+      exportEnabled: false,
+      title: {
+        text: this.state.candleSelection + ": " + this.state.startDate + " - " + this.state.endDate,
+      },
+      axisX: {
+        valueFormatString: "YYYY-MM-DD",
+      },
+      axisY: {
+        prefix: "$",
+        title: "Price (in USD)",
+      },
+      data: [
+        {
+          type: "candlestick",
+          showInLegend: true,
+          name: this.state.candleSelection,
+          yValueFormatString: "$###0.00",
+          xValueFormatString: "YYYY-MM-DD",
+          dataPoints: this.state.chartData,
+        },
+      ],
+    };
+    this.setState({ options: options });
+
+    // this.setState({ showChart: 1 });
   }
 
   changeStockSelection(e) {
     const target = e.target.value;
     this.setState({ candleSelection: target });
+  }
+
+  changeResolutionSelection(e) {
+    const target = e.target.value;
+    this.setState({ resolution: target });
   }
 
   editCandleListForm() {
@@ -120,14 +190,14 @@ class CandleWidget extends React.Component {
 
     let symbolSelectorDropDown = (
       <>
-        <div>
-          <select value={this.state.candleSelection} onChange={this.changeStockSelection}>
+        <div className="div-inline">
+          {"  Selection:  "}
+          <select className="btn" value={this.state.candleSelection} onChange={this.changeStockSelection}>
             {newSymbolList}
           </select>
         </div>
         <div>
-          <CreateCandleStickChart candleData={this.state.candleData} />
-          {/* <CreateCandleStickChart candleData={this.state.candleData} type="svg" width="400px" /> */}
+          <CreateCandleStickChart candleData={this.state.options} candleSelection={this.state.candleSelection} />
         </div>
       </>
     );
@@ -135,6 +205,12 @@ class CandleWidget extends React.Component {
   }
 
   render() {
+    let resolutionList = this.state.selectResolution.map((el) => (
+      <option key={el + "rsl"} value={el}>
+        {el}
+      </option>
+    ));
+
     return (
       <>
         {this.props.showEditPane === 1 && (
@@ -150,9 +226,13 @@ class CandleWidget extends React.Component {
               <div className="stockSearch">
                 <form className="form-inline">
                   <label htmlFor="start">Start date:</label>
-                  <input id="start" type="date" name="startDate" onChange={this.handleChange} value={this.state.startDate}></input>
+                  <input className="btn" id="start" type="date" name="startDate" onChange={this.handleChange} value={this.state.startDate}></input>
                   <label htmlFor="end">End date:</label>
-                  <input id="end" type="date" name="endDate" onChange={this.handleChange} value={this.state.endDate}></input>
+                  <input className="btn" id="end" type="date" name="endDate" onChange={this.handleChange} value={this.state.endDate}></input>
+                  <label htmlFor="resBtn">Resolution:</label>
+                  <select id="resBtn" className="btn" value={this.state.resolution} onChange={this.changeResolutionSelection}>
+                    {resolutionList}
+                  </select>
                 </form>
               </div>
             </div>

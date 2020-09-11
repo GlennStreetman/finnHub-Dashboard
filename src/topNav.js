@@ -1,10 +1,10 @@
 import React from "react";
 import StockWatchList from "./stockWatchList.js";
 import StockSearchPane from "./stockSearchPane.js";
-import StockDetailWidget from "./stockDetailWidget.js";
-import WidgetControl from "./widgetControl.js";
-import NewsWidget from "./newsWidget.js";
-import CandleWidget from "./candleWidget.js";
+import StockDetailWidget from "./widgets/stockDetails/stockDetailWidget.js";
+import WidgetControl from "./widgets/widgetControl.js";
+import NewsWidget from "./widgets/News/newsWidget.js";
+import CandleWidget from "./widgets/candle/candleWidget.js";
 // import { render } from "@testing-library/react";
 
 class TopNav extends React.Component {
@@ -98,7 +98,7 @@ class TopNav extends React.Component {
         key={el}
         widgetKey={el}
         widgetList={widgetState[el]}
-        // availableStocks={this.props.availableStocks}
+        stockTrackingList={this.props.stockTrackingList}
         UpdateStockTrackingList={this.props.UpdateStockTrackingList}
         getStockPrice={this.getStockPrice}
         trackedStockData={this.state.trackedStockData}
@@ -140,7 +140,7 @@ class TopNav extends React.Component {
                       this.props.newStockWidget(StockDetailWidget, "Stock Values: ");
                     }}
                   >
-                    Stock Detail Widget
+                    Price Stream
                   </a>
                   <a
                     href="#2"
@@ -168,7 +168,7 @@ class TopNav extends React.Component {
           {this.state.showAddWatchlistMenu === 1 && (
             <StockSearchPane
               // availableStocks={this.props.availableStocks}
-              // stockTrackingList={this.props.stockTrackingList}
+              stockTrackingList={this.props.stockTrackingList}
               UpdateStockTrackingList={this.props.UpdateStockTrackingList}
               showSearchPane={() => this.showPane("showAddWatchlistMenu")}
               getStockPrice={this.getStockPrice}

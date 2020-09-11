@@ -7,7 +7,6 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      // availableStocks: [],
       stockTrackingList: [],
       widgetList: {},
     };
@@ -34,44 +33,9 @@ class App extends React.Component {
     this.setState({ widgetList: newWidgetList });
   }
 
-  // getSymbolList() {
-  //   fetch("https://finnhub.io/api/v1/stock/symbol?exchange=US&token=bsuu7qv48v6qu589jlj0")
-  //     .then((response) => response.json())
-  //     .then((data) => {
-  //       let transformData = {};
-  //       for (const [, stockValues] of Object.entries(data)) {
-  //         //deconstruct API object
-  //         const {
-  //           // currency: a,
-  //           description: b,
-  //           displaySymbol: c,
-  //           // symbol: d,
-  //           // type: e
-  //         } = stockValues;
-  //         //set API object keys equal to stock symbol value instad of numeric value
-  //         transformData[c] = {
-  //           // currency: a,
-  //           description: b,
-  //           displaySymbol: c,
-  //           // symbol: d,
-  //           // type: e,
-  //         };
-  //       }
-  //       this.setState({ availableStocks: transformData });
-  //       console.log("Success retrieving stock symbols");
-  //     })
-  //     .catch((error) => {
-  //       console.error("Error retrieving stock symbols", error);
-  //     });
-  // }
-
-  // componentDidMount() {
-  //   this.getSymbolList();
-  // }
-
   UpdateStockTrackingList(event, stockDescription) {
     const addStockID = stockDescription.slice(0, stockDescription.indexOf(":"));
-    console.log(addStockID);
+    // console.log(addStockID);
     var currentStockList = Array.from(this.state.stockTrackingList);
 
     if (currentStockList.includes(addStockID) === false) {
@@ -88,7 +52,7 @@ class App extends React.Component {
     return (
       <>
         <TopNav
-          // availableStocks={this.state.availableStocks}
+          availableStocks={this.state.availableStocks}
           stockTrackingList={this.state.stockTrackingList}
           widgetList={this.state.widgetList}
           UpdateStockTrackingList={this.UpdateStockTrackingList}

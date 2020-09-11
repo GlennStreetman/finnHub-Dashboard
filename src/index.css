@@ -47,6 +47,21 @@ code {
   color: white;
 }
 
+.div-inline {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  padding: 10px;
+  margin-inline: 25px;
+  /* margin-bottom: 25px; */
+  /* color: white; */
+  /* border-bottom: 2px solid black; */
+}
+
+.btn {
+  margin: 5px;
+}
+
 .stockSearch {
   background-color: #333;
   /* width: 25%; */
@@ -106,6 +121,7 @@ label {
   z-index: 1;
   border: 2px solid black;
   border-radius: 10px;
+  background-color: white;
 }
 
 .widgetHeader {
