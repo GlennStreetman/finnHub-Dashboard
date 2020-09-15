@@ -116,7 +116,7 @@ class StockDetailWidget extends React.Component {
           <StockSearchPane
             // availableStocks={this.props.availableStocks}
             UpdateStockTrackingList={this.props.UpdateStockTrackingList}
-            showSearchPane={() => this.props.showPane("showEditPane")}
+            showSearchPane={() => this.props.showPane("showEditPane", 1)}
             getStockPrice={this.props.getStockPrice}
             updateWidgetList={this.updateWidgetList}
           />

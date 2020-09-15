@@ -49,8 +49,9 @@ class TopNav extends React.Component {
     });
   }
 
-  showPane(stateRef) {
+  showPane(stateRef, fixState: 0) {
     let showMenu = this.state[stateRef] === 0 ? 1 : 0;
+    fixState === 1 ? (showMenu = 1) : (showMenu = showMenu);
     this.setState({ [stateRef]: showMenu });
   }
 
@@ -112,12 +113,12 @@ class TopNav extends React.Component {
           <a href="#home">About</a>
           <div>
             <a href="#contact" onClick={() => this.showPane("showWatchlistMenu")}>
-              View Watchlist
+              {this.state.showWatchlistMenu === 0 ? "View Watchlist" : "Close Watchlist"}
             </a>
           </div>
           <div>
             <a href="#cat" onClick={() => this.showPane("showAddWatchlistMenu")}>
-              Add Stock to Watchlist
+              {this.state.showAddWatchlistMenu === 0 ? "Add Stock to Watchlist" : "Hide Search"}
             </a>
           </div>
 
@@ -170,7 +171,7 @@ class TopNav extends React.Component {
               // availableStocks={this.props.availableStocks}
               stockTrackingList={this.props.stockTrackingList}
               UpdateStockTrackingList={this.props.UpdateStockTrackingList}
-              showSearchPane={() => this.showPane("showAddWatchlistMenu")}
+              showSearchPane={() => this.showPane("showWatchlistMenu", 1)}
               getStockPrice={this.getStockPrice}
             />
           )}

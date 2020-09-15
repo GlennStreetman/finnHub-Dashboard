@@ -25,9 +25,10 @@ class WidgetControl extends React.Component {
     }
   }
 
-  showPane(stateRef) {
+  showPane(stateRef, fixState: -1) {
     //console.log("showpress");
     let showMenu = this.state[stateRef] === 0 ? 1 : 0;
+    fixState !== -1 ? (showMenu = fixState) : (fixState = fixState);
     this.setState({ [stateRef]: showMenu });
   }
 
@@ -107,7 +108,7 @@ class WidgetControl extends React.Component {
               <i className="fa fa-arrows" aria-hidden="true"></i>
             </button>
 
-            <button className="headerButtons" onClick={() => this.showPane("showEditPane")}>
+            <button className="headerButtons" onClick={() => this.showPane("showEditPane", -1)}>
               <i className="fa fa-pencil-square-o" aria-hidden="true"></i>
             </button>
           </div>

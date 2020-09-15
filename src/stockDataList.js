@@ -7,6 +7,14 @@ class StockDataList extends React.PureComponent {
     this.createDataList = this.createDataList.bind(this);
   }
 
+  componentDidMount() {
+    console.log("mounted");
+  }
+
+  componentDidUpdate() {
+    console.log("updating");
+  }
+
   createDataList() {
     //creates datalist used for autocomplete of stock names.
     const availableStocks = this.props.availableStocks;
