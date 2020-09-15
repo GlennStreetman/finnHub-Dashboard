@@ -49,7 +49,7 @@ class TopNav extends React.Component {
     });
   }
 
-  showPane(stateRef, fixState: 0) {
+  showPane(stateRef, fixState = 0) {
     let showMenu = this.state[stateRef] === 0 ? 1 : 0;
     fixState === 1 ? (showMenu = 1) : (showMenu = showMenu);
     this.setState({ [stateRef]: showMenu });
