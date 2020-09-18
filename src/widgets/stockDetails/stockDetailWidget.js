@@ -5,28 +5,24 @@ import StockSearchPane from "../../stockSearchPane.js";
 class StockDetailWidget extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {
-      // widgetList: "",
-      widgetList: [],
-    };
+    this.state = {};
 
     this.updateWidgetList = this.updateWidgetList.bind(this);
     this.renderStockData = this.renderStockData.bind(this);
-    this.buildForm = this.buildForm.bind(this);
   }
 
   updateWidgetList(stock) {
-    var stockSymbole = stock.slice(0, stock.indexOf(":"));
-    var newWidgetList = this.state.widgetList.slice();
-    newWidgetList.push(stockSymbole);
-    this.setState({ widgetList: newWidgetList });
+    if (stock.indexOf(":") > 0) {
+      const stockSymbole = stock.slice(0, stock.indexOf(":"));
+      this.props.updateWidgetStockList(this.props.widgetKey, stockSymbole);
+    } else {
+      this.props.updateWidgetStockList(this.props.widgetKey, stock);
+    }
   }
 
   renderStockData() {
     let trackedStockData = this.props.trackedStockData;
-    let thisStock = this.state.widgetList;
-    // let thisStockSymbol = thisStock.slice(0, thisStock.indexOf(":"));
-    // let thisStockData = trackedStockData[thisStockSymbol];
+    let thisStock = this.props.trackedStocks;
     let stockDetailRow = thisStock.map((el) =>
       trackedStockData[el] ? (
         <tr key={el + "st"}>
@@ -67,9 +63,7 @@ class StockDetailWidget extends React.Component {
               <button
                 key={el + "button"}
                 onClick={() => {
-                  let oldList = Array.from(this.state.widgetList);
-                  oldList.splice(oldList.indexOf({ el }), 1);
-                  this.setState({ widgetList: oldList });
+                  this.updateWidgetList(el);
                 }}
               >
                 <i className="fa fa-times" aria-hidden="true"></i>
@@ -80,7 +74,6 @@ class StockDetailWidget extends React.Component {
           )}
         </tr>
       ) : (
-        // {this.props.showEditPane === 1 ? </form> : <></> }
         <tr key={el + "cat"}></tr>
       )
     );
@@ -100,13 +93,8 @@ class StockDetailWidget extends React.Component {
         <tbody key={this.props.widgetKey + "body"}>{stockDetailRow}</tbody>
       </table>
     );
-    //console.log(stockDetailRow);
-    return buildTable;
-  }
 
-  buildForm() {
-    let editForm = <>{this.props.showEditPane === 1 ? <form>{this.renderStockData()}</form> : <>{this.renderStockData()}</>}</>;
-    return editForm;
+    return buildTable;
   }
 
   render() {
@@ -114,11 +102,12 @@ class StockDetailWidget extends React.Component {
       <>
         {this.props.showEditPane === 1 && (
           <StockSearchPane
-            // availableStocks={this.props.availableStocks}
-            UpdateStockTrackingList={this.props.UpdateStockTrackingList}
+            updateGlobalStockList={this.props.updateGlobalStockList}
             showSearchPane={() => this.props.showPane("showEditPane", 1)}
             getStockPrice={this.props.getStockPrice}
-            updateWidgetList={this.updateWidgetList}
+            apiKey={this.props.apiKey}
+            updateWidgetStockList={this.props.updateWidgetStockList}
+            widgetKey={this.props.widgetKey}
           />
         )}
         {Object.keys(this.props.trackedStockData).length > 0 ? this.renderStockData() : <></>}

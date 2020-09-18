@@ -3,13 +3,6 @@ import StockDataList from "./stockDataList.js";
 
 //compnent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
 class StockSearchPane extends React.PureComponent {
-  //EXPECTED PROPS
-  // availableStocks: list of all available stocks. Used to auto fill search.
-  // UpdateStockTrackingList: Function updates APP stock tracking list. Runs on submit.
-  // showSearchPane: Function that toggles search pane closed on submit.
-  // getStockPrice: Function that updates stock detail info. Runs on submit.
-  //widgetList: Info to be updated for widget.
-
   constructor(props) {
     super(props);
     this.state = {
@@ -31,7 +24,7 @@ class StockSearchPane extends React.PureComponent {
   }
 
   getSymbolList() {
-    fetch("https://finnhub.io/api/v1/stock/symbol?exchange=US&token=bsuu7qv48v6qu589jlj0")
+    fetch("https://finnhub.io/api/v1/stock/symbol?exchange=US&token=" + this.props.apiKey)
       .then((response) => response.json())
       .then((data) => {
         let transformData = {};
@@ -62,6 +55,9 @@ class StockSearchPane extends React.PureComponent {
   }
 
   render() {
+    let widgetKey = this.props.widgetKey;
+    let stockSymbol = this.state.inputText.slice(0, this.state.inputText.indexOf(":"));
+
     return (
       <div className="stockSearch">
         <form
@@ -69,11 +65,11 @@ class StockSearchPane extends React.PureComponent {
           onSubmit={(e) => {
             if (this.state.availableStocks[this.state.inputText.slice(0, this.state.inputText.indexOf(":"))]) {
               //console.log(this.props.availableStocks[e]);
-              this.props.UpdateStockTrackingList(e, this.state.inputText);
+              this.props.updateGlobalStockList(e, this.state.inputText);
               this.props.showSearchPane();
               this.props.getStockPrice(this.state.inputText);
-              if (this.props.updateWidgetList) {
-                this.props.updateWidgetList(this.state.inputText);
+              if (this.props.updateWidgetStockList) {
+                this.props.updateWidgetStockList(widgetKey, stockSymbol);
               }
             } else {
               //console.log(this.state.inputText);

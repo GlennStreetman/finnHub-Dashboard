@@ -24,14 +24,13 @@ class TopNav extends React.Component {
   }
 
   updateTickerSockets() {
+    //opens a series of socket connections to live stream stock prices
     const self = this;
-    // Connection opened -> Subscribe
-    const stockTrackingList = this.props.stockTrackingList;
-    const socket = new WebSocket("wss://ws.finnhub.io?token=bsuu7qv48v6qu589jlj0");
-    //console.log(stockTrackingList);
+    const globalStockList = this.props.globalStockList;
+    const socket = new WebSocket("wss://ws.finnhub.io?token=" + this.props.apiKey);
 
     socket.addEventListener("open", function (event) {
-      stockTrackingList.map((el) => socket.send(JSON.stringify({ type: "subscribe", symbol: el })));
+      globalStockList.map((el) => socket.send(JSON.stringify({ type: "subscribe", symbol: el })));
     });
 
     // Listen for messages
@@ -50,8 +49,9 @@ class TopNav extends React.Component {
   }
 
   showPane(stateRef, fixState = 0) {
+    //toggles view of specified menu. 1 = open 0 = closed
     let showMenu = this.state[stateRef] === 0 ? 1 : 0;
-    fixState === 1 ? (showMenu = 1) : (showMenu = showMenu);
+    fixState === 1 && (showMenu = 1);
     this.setState({ [stateRef]: showMenu });
   }
 
@@ -59,7 +59,7 @@ class TopNav extends React.Component {
     //takes stock symbol, returns object containing days basic stock price info.
     const stockSymbol = stockDescription.slice(0, stockDescription.indexOf(":"));
     let stockPriceData = {};
-    fetch("https://finnhub.io/api/v1/quote?symbol=" + stockSymbol + "&token=bsuu7qv48v6qu589jlj0")
+    fetch("https://finnhub.io/api/v1/quote?symbol=" + stockSymbol + "&token=" + this.props.apiKey)
       .then((response) => response.json())
       .then((data) => {
         //destructure data returned from fetch.
@@ -99,12 +99,15 @@ class TopNav extends React.Component {
         key={el}
         widgetKey={el}
         widgetList={widgetState[el]}
-        stockTrackingList={this.props.stockTrackingList}
-        UpdateStockTrackingList={this.props.UpdateStockTrackingList}
+        globalStockList={this.props.globalStockList}
+        updateGlobalStockList={this.props.updateGlobalStockList}
         getStockPrice={this.getStockPrice}
         trackedStockData={this.state.trackedStockData}
+        moveWidget={this.props.moveWidget}
         removeWidget={this.props.removeWidget}
         widgetLockDown={this.state.widgetLockDown}
+        apiKey={this.props.apiKey}
+        updateWidgetStockList={this.props.updateWidgetStockList}
       />
     ));
     return (
@@ -127,7 +130,10 @@ class TopNav extends React.Component {
               {this.state.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}
             </a>
           </div>
-
+          <div>
+            {/* add onclick */}
+            <a href="#contact">Save Setup</a>
+          </div>
           <div className="dropDiv" onMouseLeave={() => this.showPane("showAddWidgetDropdown")}>
             <a href="#test" className="dropbtn" onMouseOver={() => this.showPane("showAddWidgetDropdown")}>
               Add Widget
@@ -141,7 +147,7 @@ class TopNav extends React.Component {
                       this.props.newStockWidget(StockDetailWidget, "Stock Values: ");
                     }}
                   >
-                    Price Stream
+                    Days Price
                   </a>
                   <a
                     href="#2"
@@ -168,11 +174,11 @@ class TopNav extends React.Component {
         <div>
           {this.state.showAddWatchlistMenu === 1 && (
             <StockSearchPane
-              // availableStocks={this.props.availableStocks}
-              stockTrackingList={this.props.stockTrackingList}
-              UpdateStockTrackingList={this.props.UpdateStockTrackingList}
+              globalStockList={this.props.globalStockList}
+              updateGlobalStockList={this.props.updateGlobalStockList}
               showSearchPane={() => this.showPane("showWatchlistMenu", 1)}
               getStockPrice={this.getStockPrice}
+              apiKey={this.props.apiKey}
             />
           )}
         </div>
@@ -180,8 +186,7 @@ class TopNav extends React.Component {
         <div>
           {this.state.showWatchlistMenu === 1 && (
             <StockWatchList
-              stockTrackingList={this.props.stockTrackingList}
-              // availableStocks={this.props.availableStocks}
+              globalStockList={this.props.globalStockList}
               showWatchListPane={() => this.showPane("showWatchlistMenu")}
               trackedStockData={this.state.trackedStockData}
             />

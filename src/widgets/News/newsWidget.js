@@ -9,10 +9,9 @@ class NewsWidget extends React.Component {
     let currentMonth = new Date().getMonth();
     let currentyDay = new Date().getDay();
     let lastMonth = new Date(currentYear, currentMonth - 1, currentyDay).toISOString().slice(0, 10);
-    let startList = this.props.stockTrackingList.length > 0 ? this.props.stockTrackingList : [];
+    let startList = this.props.trackedStocks.length > 0 ? this.props.trackedStocks : [];
     let startStock = startList.length > 0 ? startList[0] : 1;
     this.state = {
-      widgetList: startList,
       companyNews: [],
       startDate: lastMonth,
       endDate: new Date().toISOString().slice(0, 10),
@@ -32,14 +31,22 @@ class NewsWidget extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.stockTrackingList.length > 0) {
-      // console.log("getnews");
-      // console.log(this.state.newsSelection, this.state.startDate, this.state.endDate);
+    if (this.props.trackedStocks.length > 0) {
       this.getCompanyNews(this.state.newsSelection, this.state.startDate, this.state.endDate);
     }
   }
 
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.newsSelection !== prevState.newsSelection || this.props.showEditPane !== prevProps.showEditPane) {
+      this.getCompanyNews(this.state.newsSelection, this.state.startDate, this.state.endDate);
+    }
+    if (this.state.newsSelection === 1 && this.props.trackedStocks.length) {
+      this.setState({ newsSelection: this.props.trackedStocks[0] });
+    }
+  }
+
   formatSourceName(source) {
+    //clean up source names for news articles.
     let formattedSource = source;
     formattedSource = formattedSource.replace(".com", "");
     formattedSource = formattedSource.replace("http:", "");
@@ -58,13 +65,9 @@ class NewsWidget extends React.Component {
   }
 
   getCompanyNews(symbol, fromDate, toDate) {
-    // console.log("getCompanyNews");
-    // console.log(symbol);
     fetch("https://finnhub.io/api/v1/company-news?symbol=" + symbol + "&from=" + fromDate + "&to=" + toDate + "&token=bsuu7qv48v6qu589jlj0")
       .then((response) => response.json())
       .then((data) => {
-        //filter spam from seekingAlpha.com. They format article dates to always return first blocking out all other sources.
-        // console.log(data);
         let filteredNews = [];
         let newsCount = 0;
         for (var news in data) {
@@ -89,8 +92,6 @@ class NewsWidget extends React.Component {
   }
 
   changeNewsSelection(e) {
-    // console.log("changeNewsSelection");
-    // console.log(e.target.value);
     const target = e.target.value;
     this.setState({ newsSelection: target });
     this.getCompanyNews(target, this.state.startDate, this.state.endDate);
@@ -98,21 +99,16 @@ class NewsWidget extends React.Component {
   }
 
   updateWidgetList(stock) {
-    // console.log("it ran");
-    var stockSymbole = stock.slice(0, stock.indexOf(":"));
-    var newWidgetList = this.state.widgetList.slice();
-    newWidgetList.push(stockSymbole);
-    this.setState({ widgetList: newWidgetList });
-
-    if (this.state.newsSelection === 1) {
-      // console.log("working");
-      this.setState({ newsSelection: stockSymbole });
-      this.getCompanyNews(stockSymbole, this.state.startDate, this.state.endDate);
+    if (stock.indexOf(":") > 0) {
+      const stockSymbole = stock.slice(0, stock.indexOf(":"));
+      this.props.updateWidgetStockList(this.props.widgetKey, stockSymbole);
+    } else {
+      this.props.updateWidgetStockList(this.props.widgetKey, stock);
     }
   }
 
   editNewsListForm() {
-    let newsList = this.state.widgetList;
+    let newsList = this.props.trackedStocks;
 
     let stockNewsRow = newsList.map((el) =>
       this.props.showEditPane === 1 ? (
@@ -122,9 +118,7 @@ class NewsWidget extends React.Component {
             <button
               key={el + "button"}
               onClick={() => {
-                let oldList = Array.from(this.state.widgetList);
-                oldList.splice(oldList.indexOf({ el }), 1);
-                this.setState({ widgetList: oldList });
+                this.updateWidgetList(el);
               }}
             >
               <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
@@ -176,7 +170,7 @@ class NewsWidget extends React.Component {
   }
 
   displayNews() {
-    let newSymbolList = this.state.widgetList.map((el) => (
+    let newSymbolList = this.props.trackedStocks.map((el) => (
       <option key={el + "ddl"} value={el}>
         {el}
       </option>
@@ -208,11 +202,13 @@ class NewsWidget extends React.Component {
           <>
             <div>
               <StockSearchPane
-                // availableStocks={this.props.availableStocks}
-                UpdateStockTrackingList={this.props.UpdateStockTrackingList}
+                updateWidgetStockList={this.props.updateWidgetStockList}
+                widgetKey={this.props.widgetKey}
+                updateGlobalStockList={this.props.updateGlobalStockList}
                 showSearchPane={() => this.props.showPane("showEditPane", 1)}
                 getStockPrice={this.props.getStockPrice}
                 updateWidgetList={this.updateWidgetList}
+                apiKey={this.props.apiKey}
               />
               <div className="stockSearch">
                 <form className="form-inline">
@@ -223,15 +219,13 @@ class NewsWidget extends React.Component {
                 </form>
               </div>
             </div>
-            <div>{Object.keys(this.state.widgetList).length > 0 ? this.editNewsListForm() : <></>}</div>
+            <div>{Object.keys(this.props.trackedStocks).length > 0 ? this.editNewsListForm() : <></>}</div>
           </>
         )}
 
-        {this.props.showEditPane === 0 && <div>{Object.keys(this.state.widgetList).length > 0 ? this.displayNews() : <></>}</div>}
+        {this.props.showEditPane === 0 && <div>{Object.keys(this.props.trackedStocks).length > 0 ? this.displayNews() : <></>}</div>}
       </>
     );
   }
 }
 export default NewsWidget;
-
-//date, source, Headline(underlying hyperlink)

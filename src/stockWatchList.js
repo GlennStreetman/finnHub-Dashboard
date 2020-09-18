@@ -48,7 +48,7 @@ class StockWatchList extends React.Component {
 
   renderWatchedStocks() {
     //console.log("rendering watched stocks");
-    const watchListStocks = this.props.stockTrackingList;
+    const watchListStocks = this.props.globalStockList;
     const stockListKey = watchListStocks.map((el) => (
       <a key={el + "WL"} href="#watchList">
         {el + ": "}

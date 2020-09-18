@@ -6,8 +6,6 @@ class WidgetControl extends React.Component {
     super(props);
 
     this.state = {
-      xAxis: "40px",
-      yAxis: "40px",
       renderHeader: this.props.widgetList["widgetHeader"],
       renderBody: this.props.widgetList["widgetType"],
       showEditPane: 1,
@@ -26,13 +24,13 @@ class WidgetControl extends React.Component {
   }
 
   showPane(stateRef, fixState: -1) {
-    //console.log("showpress");
     let showMenu = this.state[stateRef] === 0 ? 1 : 0;
-    fixState !== -1 ? (showMenu = fixState) : (fixState = fixState);
+    fixState !== -1 && (showMenu = fixState);
     this.setState({ [stateRef]: showMenu });
   }
 
   updateHeader(newHeader) {
+    //changes widget name.
     this.setState({ renderHeader: newHeader });
   }
 
@@ -47,7 +45,6 @@ class WidgetControl extends React.Component {
 
     document.getElementById(this.props.widgetList["widgetID"]).onmousedown = dragMouseDown;
     let widgetWidth = document.getElementById(this.props.widgetKey + "box").clientWidth;
-    // console.log(widgetWidth);
 
     function dragMouseDown(e) {
       that.setState({ showEditPane: 0 });
@@ -70,8 +67,9 @@ class WidgetControl extends React.Component {
       // set the element's new position:
       let newX = pos3 - widgetWidth;
       let newY = pos4;
-      that.setState({ yAxis: newY });
-      that.setState({ xAxis: newX });
+      // that.setState({ yAxis: newY });
+      // that.setState({ xAxis: newX });
+      that.props.moveWidget(that.props.widgetKey, newY, newX);
     }
 
     function closeDragElement() {
@@ -84,8 +82,8 @@ class WidgetControl extends React.Component {
   render() {
     const compStyle = {
       display: "block",
-      top: this.state.yAxis,
-      left: this.state.xAxis,
+      top: this.props.widgetList["xAxis"],
+      left: this.props.widgetList["yAxis"],
     };
     const that = this;
     return (
@@ -117,15 +115,17 @@ class WidgetControl extends React.Component {
         )}
 
         {React.createElement(this.props.widgetList["widgetType"], {
-          availableStocks: that.props.availableStocks,
-          UpdateStockTrackingList: that.props.UpdateStockTrackingList,
+          apiKey: that.props.apiKey,
+          // availableStocks: that.props.availableStocks,
+          updateGlobalStockList: that.props.updateGlobalStockList,
           getStockPrice: that.props.getStockPrice,
           showEditPane: that.state.showEditPane,
           showPane: that.showPane,
-          // updateHeader: that.updateHeader,
           trackedStockData: that.props.trackedStockData,
           widgetKey: that.props.widgetKey,
-          stockTrackingList: that.props.stockTrackingList,
+          globalStockList: that.props.globalStockList,
+          updateWidgetStockList: that.props.updateWidgetStockList,
+          trackedStocks: that.props.widgetList["trackedStocks"],
         })}
 
         {this.props.widgetLockDown === 0 ? (
