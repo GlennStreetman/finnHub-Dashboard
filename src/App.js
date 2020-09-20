@@ -19,6 +19,7 @@ class App extends React.Component {
     this.processLogin = this.processLogin.bind(this);
     this.moveWidget = this.moveWidget.bind(this);
     this.updateWidgetStockList = this.updateWidgetStockList.bind(this);
+    this.loadDashBoard = this.loadDashBoard.bind(this);
   }
 
   processLogin(setKey, setLogin) {
@@ -71,13 +72,28 @@ class App extends React.Component {
 
   updateGlobalStockList(event, stockDescription) {
     //Adds stock to global tracking list.
-    const addStockID = stockDescription.slice(0, stockDescription.indexOf(":"));
-    var currentStockList = Array.from(this.state.globalStockList);
-    if (currentStockList.includes(addStockID) === false) {
-      currentStockList.push(addStockID);
-      this.setState({ globalStockList: currentStockList });
+    let addStockId = stockDescription;
+    if (stockDescription.indexOf(":") > 0) {
+      addStockId = stockDescription.slice(0, stockDescription.indexOf(":"));
     }
+    // const addStockID = stockDescription.slice(0, stockDescription.indexOf(":"));
+    var currentStockList = Array.from(this.state.globalStockList);
+    if (currentStockList.includes(addStockId) === false) {
+      currentStockList.push(addStockId);
+    } else {
+      currentStockList.splice(currentStockList.indexOf(addStockId), 1);
+    }
+    this.setState({ globalStockList: currentStockList });
     event.preventDefault();
+  }
+
+  loadDashBoard(newGlobalList, newWidgetList) {
+    let updateGlobalList = [newGlobalList];
+    let updateWidgetList = JSON.parse(newWidgetList);
+    console.log(updateWidgetList);
+    console.log(this.state.widgetList);
+    this.setState({ globalStockList: updateGlobalList });
+    this.setState({ widgetList: updateWidgetList });
   }
 
   render() {
@@ -94,6 +110,7 @@ class App extends React.Component {
           removeWidget={this.removeWidget}
           apiKey={this.state.apiKey}
           updateWidgetStockList={this.updateWidgetStockList}
+          loadDashBoard={this.loadDashBoard}
         />
       </>
     ) : (

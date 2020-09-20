@@ -1,10 +1,8 @@
 import React from "react";
 import StockWatchList from "./stockWatchList.js";
 import StockSearchPane from "./stockSearchPane.js";
-import StockDetailWidget from "./widgets/stockDetails/stockDetailWidget.js";
 import WidgetControl from "./widgets/widgetControl.js";
-import NewsWidget from "./widgets/News/newsWidget.js";
-import CandleWidget from "./widgets/candle/candleWidget.js";
+import DashBoardMenu from "./dashBoardMenu.js";
 // import { render } from "@testing-library/react";
 
 class TopNav extends React.Component {
@@ -16,12 +14,31 @@ class TopNav extends React.Component {
       showAddWidgetDropdown: 0,
       trackedStockData: {},
       widgetLockDown: 0,
+      showDashBoardMenu: 0,
     };
 
     this.showPane = this.showPane.bind(this);
     this.getStockPrice = this.getStockPrice.bind(this);
     this.updateTickerSockets = this.updateTickerSockets.bind(this);
   }
+
+  // // widgetFactoryFunction() {
+  //   //replaces text references to widget type with Object
+  //   //objects cannot be stored as JSON in the dashBoard database.
+  //   // console.log("Widget Factory");
+  //   // let widgetList = {
+  //   //   StockDetailWidget: StockDetailWidget,
+  //   //   NewsWidget: NewsWidget,
+  //   //   CandleWidget: CandleWidget,
+  //   // };
+
+  //   let buildFactory = this.props.widgetFactory;
+  //   for (const widget in buildFactory) {
+  //     buildFactory[widget]["widgetType"] = widgetList[buildFactory[widget]["widgetType"]];
+  //   }
+  //   this.setState({ widgetFactory: buildFactory });
+  //   console.log(this.state.widgetFactory);
+  // // }
 
   updateTickerSockets() {
     //opens a series of socket connections to live stream stock prices
@@ -92,6 +109,8 @@ class TopNav extends React.Component {
     // return stockPriceData
   }
 
+  saveDashBoardSetup() {}
+
   render() {
     let widgetState = this.props.widgetList;
     let widgetRender = Object.keys(widgetState).map((el) => (
@@ -132,7 +151,9 @@ class TopNav extends React.Component {
           </div>
           <div>
             {/* add onclick */}
-            <a href="#contact">Save Setup</a>
+            <a href="#contact" onClick={() => this.showPane("showDashBoardMenu")}>
+              Save Setup
+            </a>
           </div>
           <div className="dropDiv" onMouseLeave={() => this.showPane("showAddWidgetDropdown")}>
             <a href="#test" className="dropbtn" onMouseOver={() => this.showPane("showAddWidgetDropdown")}>
@@ -144,7 +165,7 @@ class TopNav extends React.Component {
                   <a
                     href="#1"
                     onClick={() => {
-                      this.props.newStockWidget(StockDetailWidget, "Stock Values: ");
+                      this.props.newStockWidget("StockDetailWidget", "Stock Values: ");
                     }}
                   >
                     Days Price
@@ -152,7 +173,7 @@ class TopNav extends React.Component {
                   <a
                     href="#2"
                     onClick={() => {
-                      this.props.newStockWidget(NewsWidget, "Recent News: ");
+                      this.props.newStockWidget("NewsWidget", "Recent News: ");
                     }}
                   >
                     News Widget
@@ -160,7 +181,7 @@ class TopNav extends React.Component {
                   <a
                     href="#3"
                     onClick={() => {
-                      this.props.newStockWidget(CandleWidget, "Candle Data: ");
+                      this.props.newStockWidget("CandleWidget", "Candle Data: ");
                     }}
                   >
                     Stock Candles
@@ -189,7 +210,13 @@ class TopNav extends React.Component {
               globalStockList={this.props.globalStockList}
               showWatchListPane={() => this.showPane("showWatchlistMenu")}
               trackedStockData={this.state.trackedStockData}
+              updateGlobalStockList={this.props.updateGlobalStockList}
             />
+          )}
+        </div>
+        <div>
+          {this.state.showDashBoardMenu === 1 && (
+            <DashBoardMenu globalStockList={this.props.globalStockList} widgetList={this.props.widgetList} loadDashBoard={this.props.loadDashBoard} />
           )}
         </div>
 

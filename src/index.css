@@ -53,9 +53,14 @@ code {
   align-items: center;
   padding: 10px;
   margin-inline: 25px;
-  /* margin-bottom: 25px; */
-  /* color: white; */
-  /* border-bottom: 2px solid black; */
+}
+
+.div-side {
+  display: flex;
+  /* flex-flow: row wrap; */
+  /* align-items: center; */
+  /* padding: 10px; */
+  margin-inline: 2px;
 }
 
 .btn {
@@ -75,7 +80,7 @@ label {
 /* The sidebar menu */
 .sidenav {
   /* height: 100%; Full-height: remove this if you want "auto" height */
-  width: 15%; /* Set the width of the sidebar */
+  /* width: 15%; Set the width of the sidebar */
   position: fixed; /* Fixed Sidebar (stay in place on scroll) */
   z-index: 2; /* Stay on top */
   /* top: 0; Stay at the top */

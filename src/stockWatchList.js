@@ -50,13 +50,22 @@ class StockWatchList extends React.Component {
     //console.log("rendering watched stocks");
     const watchListStocks = this.props.globalStockList;
     const stockListKey = watchListStocks.map((el) => (
-      <a key={el + "WL"} href="#watchList">
-        {el + ": "}
-        {this.state.availableStocks[el] ? this.state.availableStocks[el]["description"] : <></>}
-        {": "}
-        {this.props.trackedStockData[el] ? this.props.trackedStockData[el]["currentPrice"].toFixed(2) : <></>}
-        {/* {<OpenTicketConnect stockSymbol={el} />} */}
-      </a>
+      <div key={el + "div"} className="div-side">
+        <a key={el + "WL"} href="#watchList">
+          {el + ": "}
+          {this.state.availableStocks[el] ? this.state.availableStocks[el]["description"] : <></>}
+          {": "}
+          {this.props.trackedStockData[el] ? this.props.trackedStockData[el]["currentPrice"].toFixed(2) : <></>}
+          {/* {<OpenTicketConnect stockSymbol={el} />} */}
+        </a>
+        <button
+          onClick={(e) => {
+            this.props.updateGlobalStockList(e, el);
+          }}
+        >
+          <i className="fa fa-times" aria-hidden="true"></i>
+        </button>
+      </div>
     ));
 
     return <div className="sidenav">{stockListKey}</div>;

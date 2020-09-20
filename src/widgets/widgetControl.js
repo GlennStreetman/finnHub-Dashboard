@@ -1,4 +1,7 @@
 import React from "react";
+import StockDetailWidget from "./stockDetails/stockDetailWidget.js";
+import NewsWidget from "./News/newsWidget.js";
+import CandleWidget from "./candle/candleWidget.js";
 
 //creates widget container. Used by all widgets.
 class WidgetControl extends React.Component {
@@ -85,6 +88,13 @@ class WidgetControl extends React.Component {
       top: this.props.widgetList["xAxis"],
       left: this.props.widgetList["yAxis"],
     };
+
+    let widgetList = {
+      StockDetailWidget: StockDetailWidget,
+      NewsWidget: NewsWidget,
+      CandleWidget: CandleWidget,
+    };
+
     const that = this;
     return (
       <div key={this.props.widgetKey + "container"} id={this.props.widgetKey + "box"} className="widgetBox" style={compStyle}>
@@ -114,9 +124,8 @@ class WidgetControl extends React.Component {
           <div className="widgetHeader">{this.state.renderHeader}</div>
         )}
 
-        {React.createElement(this.props.widgetList["widgetType"], {
+        {React.createElement(widgetList[this.props.widgetList["widgetType"]], {
           apiKey: that.props.apiKey,
-          // availableStocks: that.props.availableStocks,
           updateGlobalStockList: that.props.updateGlobalStockList,
           getStockPrice: that.props.getStockPrice,
           showEditPane: that.state.showEditPane,
