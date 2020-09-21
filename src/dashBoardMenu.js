@@ -18,8 +18,6 @@ class DashBoardMenu extends React.PureComponent {
     this.getSavedDashBoards();
   }
 
-  componentDidUpdate() {}
-
   handleChange(e) {
     this.setState({ inputText: e.target.value.toUpperCase() });
   }
@@ -39,7 +37,7 @@ class DashBoardMenu extends React.PureComponent {
 
   saveCurrentDashboard(e) {
     // console.log("logging data");
-    // console.log(this.props.widgetList);
+    console.log(this.props.globalStockList);
     const data = {
       dashBoardName: this.state.inputText,
       globalStockList: this.props.globalStockList,

@@ -12,6 +12,7 @@ class App extends React.Component {
       widgetList: {}, //lists of all widgets
       login: 0, //login state. 0 logged out, 1 logged in.
       apiKey: "", //API key retrieved from sqlite3 login database.
+      refreshStockData: 0,
     };
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
     this.newStockWidget = this.newStockWidget.bind(this);
@@ -20,6 +21,7 @@ class App extends React.Component {
     this.moveWidget = this.moveWidget.bind(this);
     this.updateWidgetStockList = this.updateWidgetStockList.bind(this);
     this.loadDashBoard = this.loadDashBoard.bind(this);
+    this.toggleRefreshStockData = this.toggleRefreshStockData.bind(this);
   }
 
   processLogin(setKey, setLogin) {
@@ -88,12 +90,17 @@ class App extends React.Component {
   }
 
   loadDashBoard(newGlobalList, newWidgetList) {
-    let updateGlobalList = [newGlobalList];
+    let updateGlobalList = JSON.parse(newGlobalList);
     let updateWidgetList = JSON.parse(newWidgetList);
-    console.log(updateWidgetList);
-    console.log(this.state.widgetList);
+    // console.log(updateGlobalList);
+    // console.log(this.state.widgetList);
     this.setState({ globalStockList: updateGlobalList });
     this.setState({ widgetList: updateWidgetList });
+    this.setState({ refreshStockData: 1 });
+  }
+
+  toggleRefreshStockData() {
+    this.setState({ refreshStockData: 0 });
   }
 
   render() {
@@ -111,6 +118,8 @@ class App extends React.Component {
           apiKey={this.state.apiKey}
           updateWidgetStockList={this.updateWidgetStockList}
           loadDashBoard={this.loadDashBoard}
+          refreshStockData={this.state.refreshStockData}
+          toggleRefreshStockData={this.toggleRefreshStockData}
         />
       </>
     ) : (

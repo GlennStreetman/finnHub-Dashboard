@@ -72,8 +72,9 @@ app.get("/dashboard", (req, res) => {
 // trackedStocks, widgetList, dashName;
 app.post("/dashboard", (req, res) => {
   let dashBoardName = req.body.dashBoardName;
-  let globalStockList = req.body.globalStockList;
-  console.log(req.body.widgetList);
+  let globalStockList = JSON.stringify(req.body.globalStockList);
+  console.log(req.body.globalStockList);
+  console.log(typeof globalStockList);
   let widgetList = JSON.stringify(req.body.widgetList);
   let userName = req.session.userName;
   getUserIdQuery = "SELECT id FROM user WHERE loginName ='" + userName + "'";
@@ -84,20 +85,20 @@ app.post("/dashboard", (req, res) => {
       res.json((userID = -1));
       //return negative 1 if error
     } else {
-      console.log("found it");
+      // console.log("found it");
       rows.forEach((row) => {
         userID = row.id;
       });
 
-      console.log(userID);
+      // console.log(userID);
       let saveDashBoardSetupQuery = `INSERT INTO dashBoard (userID, dashBoardName, globalStockList, widgetList) VALUES (${userID}, '${dashBoardName}','${globalStockList}','${widgetList}')`;
-
+      console.log(saveDashBoardSetupQuery);
       db.all(saveDashBoardSetupQuery, [], (err, rows) => {
         if (err) {
           res.json("Failed to save", err);
           //return negative 1 if error
         } else {
-          console.log("success");
+          // console.log("success");
         }
       });
     }

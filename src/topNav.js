@@ -13,7 +13,7 @@ class TopNav extends React.Component {
       showWatchlistMenu: 0,
       showAddWidgetDropdown: 0,
       trackedStockData: {},
-      widgetLockDown: 0,
+      widgetLockDown: 0, //1: Hide buttons, 0: Show buttons
       showDashBoardMenu: 0,
     };
 
@@ -22,23 +22,20 @@ class TopNav extends React.Component {
     this.updateTickerSockets = this.updateTickerSockets.bind(this);
   }
 
-  // // widgetFactoryFunction() {
-  //   //replaces text references to widget type with Object
-  //   //objects cannot be stored as JSON in the dashBoard database.
-  //   // console.log("Widget Factory");
-  //   // let widgetList = {
-  //   //   StockDetailWidget: StockDetailWidget,
-  //   //   NewsWidget: NewsWidget,
-  //   //   CandleWidget: CandleWidget,
-  //   // };
+  componentDidUpdate(prevProps) {
+    if (prevProps.refreshStockData === 1) {
+      console.log("updating stock connections");
+      this.setState({ widgetLockDown: 1 });
+      this.props.toggleRefreshStockData();
+      // console.log("updating");
+      // console.log(this.props.globalStockList);
 
-  //   let buildFactory = this.props.widgetFactory;
-  //   for (const widget in buildFactory) {
-  //     buildFactory[widget]["widgetType"] = widgetList[buildFactory[widget]["widgetType"]];
-  //   }
-  //   this.setState({ widgetFactory: buildFactory });
-  //   console.log(this.state.widgetFactory);
-  // // }
+      for (const stock in this.props.globalStockList) {
+        // console.log(this.props.globalStockList[stock]);
+        this.getStockPrice(this.props.globalStockList[stock]);
+      }
+    }
+  }
 
   updateTickerSockets() {
     //opens a series of socket connections to live stream stock prices
@@ -74,7 +71,10 @@ class TopNav extends React.Component {
 
   getStockPrice(stockDescription) {
     //takes stock symbol, returns object containing days basic stock price info.
-    const stockSymbol = stockDescription.slice(0, stockDescription.indexOf(":"));
+    // console.log(stockDescription);
+    // console.log(stockDescription.indexOf(":"));
+    const stockSymbol = stockDescription.indexOf(":") > 0 ? stockDescription.slice(0, stockDescription.indexOf(":")) : stockDescription;
+    // console.log(stockSymbol);
     let stockPriceData = {};
     fetch("https://finnhub.io/api/v1/quote?symbol=" + stockSymbol + "&token=" + this.props.apiKey)
       .then((response) => response.json())

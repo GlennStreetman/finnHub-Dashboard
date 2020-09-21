@@ -7,11 +7,12 @@ import CandleWidget from "./candle/candleWidget.js";
 class WidgetControl extends React.Component {
   constructor(props) {
     super(props);
+    let showEditPaneOnRender = this.props.widgetLockDown === 0 ? 0 : 1;
 
     this.state = {
       renderHeader: this.props.widgetList["widgetHeader"],
       renderBody: this.props.widgetList["widgetType"],
-      showEditPane: 1,
+      showEditPane: showEditPaneOnRender, //0: Hide, 1: Show
     };
 
     this.dragElement = this.dragElement.bind(this);

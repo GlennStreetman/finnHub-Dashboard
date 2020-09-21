@@ -11,6 +11,13 @@ class StockDetailWidget extends React.Component {
     this.renderStockData = this.renderStockData.bind(this);
   }
 
+  // componentDidMount() {
+  //   console.log(this.props.trackedStocks);
+  //   for (const stock in this.props.trackedStocks) {
+  //     this.updateWidgetList(stock);
+  //   }
+  // }
+
   updateWidgetList(stock) {
     if (stock.indexOf(":") > 0) {
       const stockSymbole = stock.slice(0, stock.indexOf(":"));
