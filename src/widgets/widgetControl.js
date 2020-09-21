@@ -2,6 +2,7 @@ import React from "react";
 import StockDetailWidget from "./stockDetails/stockDetailWidget.js";
 import NewsWidget from "./News/newsWidget.js";
 import CandleWidget from "./candle/candleWidget.js";
+import DashBoardMenu from "./dashBoardMenu/dashBoardMenu.js";
 
 //creates widget container. Used by all widgets.
 class WidgetControl extends React.Component {
@@ -94,6 +95,7 @@ class WidgetControl extends React.Component {
       StockDetailWidget: StockDetailWidget,
       NewsWidget: NewsWidget,
       CandleWidget: CandleWidget,
+      DashBoardMenu: DashBoardMenu,
     };
 
     const that = this;
@@ -116,10 +118,11 @@ class WidgetControl extends React.Component {
             >
               <i className="fa fa-arrows" aria-hidden="true"></i>
             </button>
-
-            <button className="headerButtons" onClick={() => this.showPane("showEditPane", -1)}>
-              <i className="fa fa-pencil-square-o" aria-hidden="true"></i>
-            </button>
+            {this.props.widgetList["widgetConfig"] === "stockWidget" && (
+              <button className="headerButtons" onClick={() => this.showPane("showEditPane", -1)}>
+                <i className="fa fa-pencil-square-o" aria-hidden="true"></i>
+              </button>
+            )}
           </div>
         ) : (
           <div className="widgetHeader">{this.state.renderHeader}</div>

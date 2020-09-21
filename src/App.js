@@ -15,7 +15,7 @@ class App extends React.Component {
       refreshStockData: 0,
     };
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
-    this.newStockWidget = this.newStockWidget.bind(this);
+    this.newWidgetContainer = this.newWidgetContainer.bind(this);
     this.removeWidget = this.removeWidget.bind(this);
     this.processLogin = this.processLogin.bind(this);
     this.moveWidget = this.moveWidget.bind(this);
@@ -29,7 +29,7 @@ class App extends React.Component {
     this.setState({ apiKey: setKey });
   }
 
-  newStockWidget(widgetDescription, widgetHeader) {
+  newWidgetContainer(widgetDescription, widgetHeader, widgetConfig) {
     //creates a new widget
     const widgetName = new Date().getTime();
     var newWidgetList = Object.assign({}, this.state.widgetList);
@@ -40,6 +40,7 @@ class App extends React.Component {
       xAxis: "40px",
       yAxis: "40px",
       trackedStocks: this.state.globalStockList,
+      widgetConfig: widgetConfig,
     };
     this.setState({ widgetList: newWidgetList });
   }
@@ -112,7 +113,7 @@ class App extends React.Component {
           globalStockList={this.state.globalStockList}
           widgetList={this.state.widgetList}
           updateGlobalStockList={this.updateGlobalStockList}
-          newStockWidget={this.newStockWidget}
+          newWidgetContainer={this.newWidgetContainer}
           moveWidget={this.moveWidget}
           removeWidget={this.removeWidget}
           apiKey={this.state.apiKey}

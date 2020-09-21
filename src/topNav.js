@@ -2,7 +2,7 @@ import React from "react";
 import StockWatchList from "./stockWatchList.js";
 import StockSearchPane from "./stockSearchPane.js";
 import WidgetControl from "./widgets/widgetControl.js";
-import DashBoardMenu from "./dashBoardMenu.js";
+// import DashBoardMenu from "./dashBoardMenu.js";
 // import { render } from "@testing-library/react";
 
 class TopNav extends React.Component {
@@ -127,8 +127,20 @@ class TopNav extends React.Component {
         widgetLockDown={this.state.widgetLockDown}
         apiKey={this.props.apiKey}
         updateWidgetStockList={this.props.updateWidgetStockList}
+        // config="stockWidget"
       />
     ));
+    // let controlRender = (
+    //   <WidgetControl
+    //     key="DashBoardMenu"
+    //     widgetKey="DashBoardMenu"
+    //     widgetList={"Dashboard Menu"}
+    //     moveWidget={this.props.moveWidget}
+    //     removeWidget={this.props.removeWidget}
+    //     widgetLockDown={this.state.widgetLockDown}
+    //     config="menuWidget"
+    //   />
+    // );
     return (
       <>
         <div className="topnav">
@@ -151,8 +163,10 @@ class TopNav extends React.Component {
           </div>
           <div>
             {/* add onclick */}
-            <a href="#contact" onClick={() => this.showPane("showDashBoardMenu")}>
-              Save Setup
+
+            <a href="#contact" onClick={() => this.props.newWidgetContainer("DashBoardMenu", "Saved Dashboards: ", "menuWidget")}>
+              {/* <a href="#contact" onClick={() => this.showPane("showDashBoardMenu")}> */}
+              Manage Dashboards
             </a>
           </div>
           <div className="dropDiv" onMouseLeave={() => this.showPane("showAddWidgetDropdown")}>
@@ -165,15 +179,15 @@ class TopNav extends React.Component {
                   <a
                     href="#1"
                     onClick={() => {
-                      this.props.newStockWidget("StockDetailWidget", "Stock Values: ");
+                      this.props.newWidgetContainer("StockDetailWidget", "Stock Values: ", "stockWidget");
                     }}
                   >
-                    Days Price
+                    Day Stock Price
                   </a>
                   <a
                     href="#2"
                     onClick={() => {
-                      this.props.newStockWidget("NewsWidget", "Recent News: ");
+                      this.props.newWidgetContainer("NewsWidget", "Recent News: ", "stockWidget");
                     }}
                   >
                     News Widget
@@ -181,7 +195,7 @@ class TopNav extends React.Component {
                   <a
                     href="#3"
                     onClick={() => {
-                      this.props.newStockWidget("CandleWidget", "Candle Data: ");
+                      this.props.newWidgetContainer("CandleWidget", "Candle Data: ", "stockWidget");
                     }}
                   >
                     Stock Candles
@@ -214,13 +228,14 @@ class TopNav extends React.Component {
             />
           )}
         </div>
-        <div>
+        {/* <div>
           {this.state.showDashBoardMenu === 1 && (
             <DashBoardMenu globalStockList={this.props.globalStockList} widgetList={this.props.widgetList} loadDashBoard={this.props.loadDashBoard} />
           )}
-        </div>
+        </div> */}
 
         {widgetRender}
+        {/* {/* {this.state.showDashBoardMenu === 1 && controlRender} */}
       </>
     );
   }
