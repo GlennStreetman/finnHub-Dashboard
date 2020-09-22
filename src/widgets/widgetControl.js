@@ -143,11 +143,17 @@ class WidgetControl extends React.Component {
           trackedStocks: that.props.widgetList["trackedStocks"],
           loadDashBoard: that.props.loadDashBoard,
           saveCurrentDashboard: that.props.saveCurrentDashboard,
+          dashBoardToggle: that.props.dashBoardToggle,
         })}
 
         {this.props.widgetLockDown === 0 ? (
           <div className="widgetFooter">
-            <button onClick={() => this.props.removeWidget(this.props.stateRef, this.props.widgetKey)}>
+            <button
+              onClick={() => {
+                this.props.removeWidget(this.props.stateRef, this.props.widgetKey);
+                this.props.dashBoardToggle && this.props.dashBoardToggle();
+              }}
+            >
               <i className="fa fa-times" aria-hidden="true"></i>
             </button>
           </div>

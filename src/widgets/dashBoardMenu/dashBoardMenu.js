@@ -90,7 +90,7 @@ class DashBoardMenu extends React.PureComponent {
           <form
             className="form-inline"
             onSubmit={(e) => {
-              this.props.saveCurrentDashboard(e, this.state.inputText);
+              this.props.saveCurrentDashboard(e, this.state.inputText, this.getSavedDashBoards);
             }}
           >
             <input type="text" value={this.state.inputText} onChange={this.handleChange}></input>

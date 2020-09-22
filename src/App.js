@@ -126,7 +126,8 @@ class App extends React.Component {
     this.setState({ refreshStockData: 0 });
   }
 
-  saveCurrentDashboard(e, dashboardName) {
+  saveCurrentDashboard(e, dashboardName, updateDashBoards) {
+    console.log("updating dashboard");
     const data = {
       dashBoardName: dashboardName,
       globalStockList: this.state.globalStockList,
@@ -139,7 +140,12 @@ class App extends React.Component {
       body: JSON.stringify(data),
     };
 
-    fetch("/dashBoard", options).then((data) => console.log(data));
+    fetch("/dashBoard", options)
+      .then((data) => console.log(data))
+      .then(() => {
+        console.log("updating dashboard");
+        updateDashBoards();
+      });
     e.preventDefault();
   }
 

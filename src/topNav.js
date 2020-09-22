@@ -162,6 +162,7 @@ class TopNav extends React.Component {
         stateRef="menuList"
         saveCurrentDashboard={this.props.saveCurrentDashboard}
         showDashBoardMenu={this.state.showDashBoardMenu}
+        dashBoardToggle={this.dashBoardToggle}
       />
     ));
 
@@ -171,7 +172,7 @@ class TopNav extends React.Component {
           <a href="#home">About</a>
           <div>
             <a href="#contact" onClick={() => this.showPane("showWatchlistMenu")}>
-              {this.state.showWatchlistMenu === 0 ? "View Watchlist" : "Close Watchlist"}
+              {this.state.showWatchlistMenu === 0 ? "View Watchlist Hide" : "Hide Watchlist Menu"}
             </a>
           </div>
           <div>
@@ -190,7 +191,7 @@ class TopNav extends React.Component {
 
             <a href="#contact" onClick={() => this.dashBoardToggle()}>
               {/* <a href="#contact" onClick={() => this.showPane("showDashBoardMenu")}> */}
-              {this.state.showDashBoardMenu === 0 ? "Manage Dashboards" : "Hide Dashboard Menu"}
+              {this.state.showDashBoardMenu === 0 ? "Show Dashboard Menu" : "Hide Dashboard Menu"}
             </a>
           </div>
           <div className="dropDiv" onMouseLeave={() => this.showPane("showAddWidgetDropdown")}>

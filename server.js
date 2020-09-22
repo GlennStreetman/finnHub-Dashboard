@@ -97,7 +97,7 @@ app.post("/dashboard", (req, res) => {
           res.json("Failed to save", err);
           //return negative 1 if error
         } else {
-          // console.log("success");
+          res.json("complete");
         }
       });
     }
