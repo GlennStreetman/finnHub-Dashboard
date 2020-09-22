@@ -36,7 +36,6 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/public/");
 });
 
-// create the login get and post routes
 app.get("/login", (req, res) => {
   thisRequest = req.query;
   newQuery = "SELECT id, apiKey FROM user WHERE loginName ='" + thisRequest["loginText"] + "' AND password = '" + md5(thisRequest["pwText"]) + "'";
@@ -102,6 +101,19 @@ app.post("/dashboard", (req, res) => {
         }
       });
     }
+  });
+});
+
+app.get("/deleteSavedDashboard", (req, res) => {
+  let uId = req.session.uID;
+  let thisRequest = req.query;
+  let deleteSQL = `DELETE FROM dashBoard WHERE userID=${uId} AND id=${thisRequest["dashID"]}`;
+  console.log(uId, deleteSQL);
+  db.exec(deleteSQL, (err, rows) => {
+    if (err) {
+      res.json("Failed to delete");
+    }
+    res.json("success");
   });
 });
 

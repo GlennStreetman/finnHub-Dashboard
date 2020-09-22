@@ -1,6 +1,5 @@
 import React from "react";
 
-//compnent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
 class DashBoardMenu extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -9,8 +8,8 @@ class DashBoardMenu extends React.PureComponent {
       dashBoardData: [],
     };
     this.handleChange = this.handleChange.bind(this);
-    // this.saveCurrentDashboard = this.saveCurrentDashboard.bind(this);
     this.getSavedDashBoards = this.getSavedDashBoards.bind(this);
+    this.deleteDashBoard = this.deleteDashBoard.bind(this);
   }
 
   componentDidMount() {
@@ -35,12 +34,28 @@ class DashBoardMenu extends React.PureComponent {
       });
   }
 
+  deleteDashBoard(dashBoardId) {
+    console.log("dashboard");
+    console.log(dashBoardId);
+    console.log(`/deleteSavedDashboard?dashID=${dashBoardId}`);
+    fetch(`/deleteSavedDashboard?dashID=${dashBoardId}`)
+      .then((response) => response.json())
+      .then((data) => {
+        console.log(data);
+        this.getSavedDashBoards();
+      })
+      .catch((error) => {
+        console.error("Failed to dashboard" + error);
+      });
+  }
+
   render() {
     let dashBoardData = this.state.dashBoardData;
     let savedDashBoards = dashBoardData.map((el) => (
       <tr key={el.id + "tr"}>
         <td>
-          <button>
+          <button onClick={() => this.deleteDashBoard(el.id)}>
+            {/* <button onClick={() => this.props.loadDashBoard(el.globalStockList, el.widgetList)}> */}
             <i className="fa fa-times" aria-hidden="true"></i>
           </button>
         </td>
@@ -52,7 +67,6 @@ class DashBoardMenu extends React.PureComponent {
         </td>
       </tr>
     ));
-    // console.log(savedDashBoards);
 
     return (
       <div className="dashBoardMenu">
