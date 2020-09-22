@@ -127,20 +127,32 @@ class TopNav extends React.Component {
         widgetLockDown={this.state.widgetLockDown}
         apiKey={this.props.apiKey}
         updateWidgetStockList={this.props.updateWidgetStockList}
-        // config="stockWidget"
+        loadDashBoard={this.props.loadDashBoard}
+        stateRef="widgetList"
+        saveCurrentDashboard={this.props.saveCurrentDashboard}
       />
     ));
-    // let controlRender = (
-    //   <WidgetControl
-    //     key="DashBoardMenu"
-    //     widgetKey="DashBoardMenu"
-    //     widgetList={"Dashboard Menu"}
-    //     moveWidget={this.props.moveWidget}
-    //     removeWidget={this.props.removeWidget}
-    //     widgetLockDown={this.state.widgetLockDown}
-    //     config="menuWidget"
-    //   />
-    // );
+    let menuState = this.props.menuList;
+    let menuRender = Object.keys(menuState).map((el) => (
+      <WidgetControl
+        key={el}
+        widgetKey={el}
+        widgetList={menuState[el]}
+        globalStockList={this.props.globalStockList}
+        updateGlobalStockList={this.props.updateGlobalStockList}
+        getStockPrice={this.getStockPrice}
+        trackedStockData={this.state.trackedStockData}
+        moveWidget={this.props.moveWidget}
+        removeWidget={this.props.removeWidget}
+        widgetLockDown={this.state.widgetLockDown}
+        apiKey={this.props.apiKey}
+        updateWidgetStockList={this.props.updateWidgetStockList}
+        loadDashBoard={this.props.loadDashBoard}
+        stateRef="menuList"
+        saveCurrentDashboard={this.props.saveCurrentDashboard}
+      />
+    ));
+
     return (
       <>
         <div className="topnav">
@@ -228,14 +240,8 @@ class TopNav extends React.Component {
             />
           )}
         </div>
-        {/* <div>
-          {this.state.showDashBoardMenu === 1 && (
-            <DashBoardMenu globalStockList={this.props.globalStockList} widgetList={this.props.widgetList} loadDashBoard={this.props.loadDashBoard} />
-          )}
-        </div> */}
-
         {widgetRender}
-        {/* {/* {this.state.showDashBoardMenu === 1 && controlRender} */}
+        {menuRender}
       </>
     );
   }

@@ -9,7 +9,7 @@ class DashBoardMenu extends React.PureComponent {
       dashBoardData: [],
     };
     this.handleChange = this.handleChange.bind(this);
-    this.saveCurrentDashboard = this.saveCurrentDashboard.bind(this);
+    // this.saveCurrentDashboard = this.saveCurrentDashboard.bind(this);
     this.getSavedDashBoards = this.getSavedDashBoards.bind(this);
   }
 
@@ -35,32 +35,6 @@ class DashBoardMenu extends React.PureComponent {
       });
   }
 
-  saveCurrentDashboard(e) {
-    // console.log("logging data");
-    console.log(this.props.globalStockList);
-    const data = {
-      dashBoardName: this.state.inputText,
-      globalStockList: this.props.globalStockList,
-      widgetList: this.props.widgetList,
-    };
-    // console.log(this.props.widgetList);
-    // console.log(data.widgetList);
-    console.log(data);
-    const options = {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        // 'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: JSON.stringify(data),
-    };
-    console.log(options.body);
-
-    // console.log(data);
-    fetch("/dashBoard", options).then((data) => console.log(data));
-    e.preventDefault();
-  }
-
   render() {
     let dashBoardData = this.state.dashBoardData;
     let savedDashBoards = dashBoardData.map((el) => (
@@ -82,7 +56,6 @@ class DashBoardMenu extends React.PureComponent {
 
     return (
       <div className="dashBoardMenu">
-        <div className="dashBoardHeader">DashBoard Menu</div>
         <div>
           {savedDashBoards.length > 0 ? (
             <table>
@@ -103,7 +76,7 @@ class DashBoardMenu extends React.PureComponent {
           <form
             className="form-inline"
             onSubmit={(e) => {
-              this.saveCurrentDashboard(e);
+              this.props.saveCurrentDashboard(e, this.state.inputText);
             }}
           >
             <input type="text" value={this.state.inputText} onChange={this.handleChange}></input>

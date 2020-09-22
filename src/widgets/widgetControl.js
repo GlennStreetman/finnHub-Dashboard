@@ -8,12 +8,12 @@ import DashBoardMenu from "./dashBoardMenu/dashBoardMenu.js";
 class WidgetControl extends React.Component {
   constructor(props) {
     super(props);
-    let showEditPaneOnRender = this.props.widgetLockDown === 0 ? 0 : 1;
+    // let showEditPaneOnRender = this.props.widgetLockDown === 0 ? 0 : 1;
 
     this.state = {
       renderHeader: this.props.widgetList["widgetHeader"],
       renderBody: this.props.widgetList["widgetType"],
-      showEditPane: showEditPaneOnRender, //0: Hide, 1: Show
+      showEditPane: 0, //0: Hide, 1: Show
     };
 
     this.dragElement = this.dragElement.bind(this);
@@ -74,7 +74,7 @@ class WidgetControl extends React.Component {
       let newY = pos4;
       // that.setState({ yAxis: newY });
       // that.setState({ xAxis: newX });
-      that.props.moveWidget(that.props.widgetKey, newY, newX);
+      that.props.moveWidget(that.props.stateRef, that.props.widgetKey, newY, newX);
     }
 
     function closeDragElement() {
@@ -139,11 +139,13 @@ class WidgetControl extends React.Component {
           globalStockList: that.props.globalStockList,
           updateWidgetStockList: that.props.updateWidgetStockList,
           trackedStocks: that.props.widgetList["trackedStocks"],
+          loadDashBoard: that.props.loadDashBoard,
+          saveCurrentDashboard: that.props.saveCurrentDashboard,
         })}
 
         {this.props.widgetLockDown === 0 ? (
           <div className="widgetFooter">
-            <button onClick={() => this.props.removeWidget(this.props.widgetKey)}>
+            <button onClick={() => this.props.removeWidget(this.props.stateRef, this.props.widgetKey)}>
               <i className="fa fa-times" aria-hidden="true"></i>
             </button>
           </div>
