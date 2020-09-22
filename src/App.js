@@ -13,7 +13,7 @@ class App extends React.Component {
       menuList: {}, //lists of all menu widgets.
       login: 0, //login state. 0 logged out, 1 logged in.
       apiKey: "", //API key retrieved from sqlite3 login database.
-      refreshStockData: 0,
+      refreshStockData: 0, //if set to 1 stock data should be updated from globalStockList
     };
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
     this.newWidgetContainer = this.newWidgetContainer.bind(this);

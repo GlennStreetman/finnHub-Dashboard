@@ -20,12 +20,13 @@ class TopNav extends React.Component {
     this.showPane = this.showPane.bind(this);
     this.getStockPrice = this.getStockPrice.bind(this);
     this.updateTickerSockets = this.updateTickerSockets.bind(this);
+    this.dashBoardToggle = this.dashBoardToggle.bind(this);
   }
 
-  componentDidUpdate(prevProps) {
-    if (prevProps.refreshStockData === 1) {
+  componentDidUpdate() {
+    if (this.props.refreshStockData === 1) {
       console.log("updating stock connections");
-      this.setState({ widgetLockDown: 1 });
+      // this.setState({ widgetLockDown: 1 });
       this.props.toggleRefreshStockData();
       // console.log("updating");
       // console.log(this.props.globalStockList);
@@ -109,7 +110,17 @@ class TopNav extends React.Component {
     // return stockPriceData
   }
 
-  saveDashBoardSetup() {}
+  dashBoardToggle() {
+    if (this.state.showDashBoardMenu === 0 && this.props.menuList["menuWidget"] === undefined) {
+      console.log("new container");
+      this.props.newWidgetContainer("DashBoardMenu", "Saved Dashboards: ", "menuWidget");
+      this.setState({ showDashBoardMenu: 1 });
+    } else if (this.state.showDashBoardMenu === 0 && this.props.menuList["menuWidget"] !== undefined) {
+      this.setState({ showDashBoardMenu: 1 });
+    } else {
+      this.setState({ showDashBoardMenu: 0 });
+    }
+  }
 
   render() {
     let widgetState = this.props.widgetList;
@@ -150,6 +161,7 @@ class TopNav extends React.Component {
         loadDashBoard={this.props.loadDashBoard}
         stateRef="menuList"
         saveCurrentDashboard={this.props.saveCurrentDashboard}
+        showDashBoardMenu={this.state.showDashBoardMenu}
       />
     ));
 
@@ -176,9 +188,9 @@ class TopNav extends React.Component {
           <div>
             {/* add onclick */}
 
-            <a href="#contact" onClick={() => this.props.newWidgetContainer("DashBoardMenu", "Saved Dashboards: ", "menuWidget")}>
+            <a href="#contact" onClick={() => this.dashBoardToggle()}>
               {/* <a href="#contact" onClick={() => this.showPane("showDashBoardMenu")}> */}
-              Manage Dashboards
+              {this.state.showDashBoardMenu === 0 ? "Manage Dashboards" : "Hide Dashboard Menu"}
             </a>
           </div>
           <div className="dropDiv" onMouseLeave={() => this.showPane("showAddWidgetDropdown")}>

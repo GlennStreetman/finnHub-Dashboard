@@ -76,7 +76,11 @@ class NewsWidget extends React.Component {
             newsCount += 1;
           }
         }
-        this.setState({ companyNews: filteredNews });
+        try {
+          this.setState({ companyNews: filteredNews });
+        } catch (err) {
+          console.log("Could not update news. Component not mounted.");
+        }
       });
   }
 

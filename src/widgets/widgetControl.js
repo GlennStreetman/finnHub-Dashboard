@@ -85,10 +85,12 @@ class WidgetControl extends React.Component {
   }
 
   render() {
+    // console.log("rendering");
     const compStyle = {
       display: "block",
       top: this.props.widgetList["xAxis"],
       left: this.props.widgetList["yAxis"],
+      opacity: this.state.renderBody === "DashBoardMenu" && this.props.showDashBoardMenu === 0 ? 0 : 100,
     };
 
     let widgetList = {
