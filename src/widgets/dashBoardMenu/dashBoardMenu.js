@@ -5,52 +5,49 @@ class DashBoardMenu extends React.PureComponent {
     super(props);
     this.state = {
       inputText: "dashboard name",
-      dashBoardData: [],
+      // dashBoardData: [],
     };
     this.handleChange = this.handleChange.bind(this);
-    this.getSavedDashBoards = this.getSavedDashBoards.bind(this);
+    // this.getSavedDashBoards = this.getSavedDashBoards.bind(this);
     this.deleteDashBoard = this.deleteDashBoard.bind(this);
   }
 
   componentDidMount() {
     // console.log("mounted");
-    this.getSavedDashBoards();
+    this.props.getSavedDashBoards(); //might not be needed
   }
 
   handleChange(e) {
     this.setState({ inputText: e.target.value.toUpperCase() });
   }
 
-  getSavedDashBoards() {
-    // console.log("running");
-    fetch("/dashBoard")
-      .then((response) => response.json())
-      .then((data) => {
-        // console.log(data);
-        this.setState({ dashBoardData: data }); // this.props.updateLogin(data["key"], data["login"]);
-      })
-      .catch((error) => {
-        // console.error("Failed to recover dashboards", error);
-      });
-  }
+  // getSavedDashBoards() {
+  //   // console.log("running");
+  //   fetch("/dashBoard")
+  //     .then((response) => response.json())
+  //     .then((data) => {
+  //       console.log(data);
+  //       this.setState({ dashBoardData: data["savedDashBoards"] }); // this.props.updateLogin(data["key"], data["login"]);
+  //     })
+  //     .catch((error) => {
+  //       console.error("Failed to recover dashboards", error);
+  //     });
+  // }
 
   deleteDashBoard(dashBoardId) {
-    console.log("dashboard");
-    console.log(dashBoardId);
-    console.log(`/deleteSavedDashboard?dashID=${dashBoardId}`);
     fetch(`/deleteSavedDashboard?dashID=${dashBoardId}`)
       .then((response) => response.json())
       .then((data) => {
-        console.log(data);
-        this.getSavedDashBoards();
+        // console.log(data);
+        this.props.getSavedDashBoards();
       })
       .catch((error) => {
-        console.error("Failed to dashboard" + error);
+        console.error("Failed to delete dashboard" + error);
       });
   }
 
   render() {
-    let dashBoardData = this.state.dashBoardData;
+    let dashBoardData = this.props.dashBoardData;
     let savedDashBoards = dashBoardData.map((el) => (
       <tr key={el.id + "tr"}>
         <td>
@@ -90,7 +87,7 @@ class DashBoardMenu extends React.PureComponent {
           <form
             className="form-inline"
             onSubmit={(e) => {
-              this.props.saveCurrentDashboard(e, this.state.inputText, this.getSavedDashBoards);
+              this.props.saveCurrentDashboard(e, this.state.inputText);
             }}
           >
             <input type="text" value={this.state.inputText} onChange={this.handleChange}></input>

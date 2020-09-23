@@ -14,6 +14,7 @@ class App extends React.Component {
       login: 0, //login state. 0 logged out, 1 logged in.
       apiKey: "", //API key retrieved from sqlite3 login database.
       refreshStockData: 0, //if set to 1 stock data should be updated from globalStockList
+      dashBoardData: [],
     };
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
     this.newWidgetContainer = this.newWidgetContainer.bind(this);
@@ -24,6 +25,7 @@ class App extends React.Component {
     this.loadDashBoard = this.loadDashBoard.bind(this);
     this.toggleRefreshStockData = this.toggleRefreshStockData.bind(this);
     this.saveCurrentDashboard = this.saveCurrentDashboard.bind(this);
+    this.getSavedDashBoards = this.getSavedDashBoards.bind(this);
   }
 
   processLogin(setKey, setLogin) {
@@ -112,11 +114,28 @@ class App extends React.Component {
     event.preventDefault();
   }
 
+  getSavedDashBoards() {
+    // console.log("running");
+    fetch("/dashBoard")
+      .then((response) => response.json())
+      .then((data) => {
+        // console.log(data);
+        // console.log(this.state.menuList);
+        // console.log(JSON.parse(data["menuSetup"][0]["menuList"]));
+        this.setState({ dashBoardData: data["savedDashBoards"] });
+        this.setState({ menuList: JSON.parse(data["menuSetup"][0]["menuList"]) });
+        // console.log();
+      })
+      .catch((error) => {
+        console.error("Failed to recover dashboards", error);
+      });
+  }
+
   loadDashBoard(newGlobalList, newWidgetList) {
     let updateGlobalList = JSON.parse(newGlobalList);
     let updateWidgetList = JSON.parse(newWidgetList);
-    console.log(updateGlobalList);
-    console.log(this.state.widgetList);
+    // console.log(updateGlobalList);
+    // console.log(this.state.widgetList);
     this.setState({ globalStockList: updateGlobalList });
     this.setState({ widgetList: updateWidgetList });
     this.setState({ refreshStockData: 1 });
@@ -126,12 +145,13 @@ class App extends React.Component {
     this.setState({ refreshStockData: 0 });
   }
 
-  saveCurrentDashboard(e, dashboardName, updateDashBoards) {
-    console.log("updating dashboard");
+  saveCurrentDashboard(e, dashboardName) {
+    // console.log("updating dashboard");
     const data = {
       dashBoardName: dashboardName,
       globalStockList: this.state.globalStockList,
       widgetList: this.state.widgetList,
+      menuList: this.state.menuList,
     };
 
     const options = {
@@ -144,7 +164,7 @@ class App extends React.Component {
       .then((data) => console.log(data))
       .then(() => {
         console.log("updating dashboard");
-        updateDashBoards();
+        this.getSavedDashBoards();
       });
     e.preventDefault();
   }
@@ -168,6 +188,8 @@ class App extends React.Component {
           refreshStockData={this.state.refreshStockData}
           toggleRefreshStockData={this.toggleRefreshStockData}
           saveCurrentDashboard={this.saveCurrentDashboard}
+          getSavedDashBoards={this.getSavedDashBoards}
+          dashBoardData={this.state.dashBoardData}
         />
       </>
     ) : (

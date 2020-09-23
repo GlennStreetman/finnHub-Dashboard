@@ -2,8 +2,6 @@ import React from "react";
 import StockWatchList from "./stockWatchList.js";
 import StockSearchPane from "./stockSearchPane.js";
 import WidgetControl from "./widgets/widgetControl.js";
-// import DashBoardMenu from "./dashBoardMenu.js";
-// import { render } from "@testing-library/react";
 
 class TopNav extends React.Component {
   constructor(props) {
@@ -23,9 +21,13 @@ class TopNav extends React.Component {
     this.dashBoardToggle = this.dashBoardToggle.bind(this);
   }
 
+  // componentDidMount() {
+  //   this.props.getSavedDashBoards();
+  // }
+
   componentDidUpdate() {
     if (this.props.refreshStockData === 1) {
-      console.log("updating stock connections");
+      // console.log("updating stock connections");
       // this.setState({ widgetLockDown: 1 });
       this.props.toggleRefreshStockData();
       // console.log("updating");
@@ -112,7 +114,7 @@ class TopNav extends React.Component {
 
   dashBoardToggle() {
     if (this.state.showDashBoardMenu === 0 && this.props.menuList["menuWidget"] === undefined) {
-      console.log("new container");
+      // console.log("new container");
       this.props.newWidgetContainer("DashBoardMenu", "Saved Dashboards: ", "menuWidget");
       this.setState({ showDashBoardMenu: 1 });
     } else if (this.state.showDashBoardMenu === 0 && this.props.menuList["menuWidget"] !== undefined) {
@@ -141,6 +143,7 @@ class TopNav extends React.Component {
         loadDashBoard={this.props.loadDashBoard}
         stateRef="widgetList"
         saveCurrentDashboard={this.props.saveCurrentDashboard}
+        getSavedDashBoards={this.props.getSavedDashBoards}
       />
     ));
     let menuState = this.props.menuList;
@@ -163,6 +166,8 @@ class TopNav extends React.Component {
         saveCurrentDashboard={this.props.saveCurrentDashboard}
         showDashBoardMenu={this.state.showDashBoardMenu}
         dashBoardToggle={this.dashBoardToggle}
+        getSavedDashBoards={this.props.getSavedDashBoards}
+        dashBoardData={this.props.dashBoardData}
       />
     ));
 

@@ -35,7 +35,15 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             userID INTEGER, 
             dashBoardName text,
             globalStockList text,
-            widgetList text
+            widgetList text,
+            CONSTRAINT dashBoardID UNIQUE (userid, dashBoardName) 
+            )`);
+          db.run(`CREATE TABLE menuSetup (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            userID INTEGER, 
+            menuList text,
+            defaultMenu text,
+            CONSTRAINT onePerUser UNIQUE (userID)
             )`);
         }
       }

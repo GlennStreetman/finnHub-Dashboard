@@ -86,7 +86,7 @@ class CandleWidget extends React.Component {
           this.setState({ candleData: data });
           this.createCandleDataList(data);
         } catch (err) {
-          console.log("Could not update candles. Component not mounted.");
+          // console.log("Could not update candles. Component not mounted.");
         }
       });
   }
