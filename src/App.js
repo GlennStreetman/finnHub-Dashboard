@@ -2,6 +2,7 @@ import React from "react";
 import "./App.css";
 import TopNav from "./topNav.js";
 import Login from "./login.js";
+import { isCompositeComponent } from "react-dom/test-utils";
 
 class App extends React.Component {
   constructor(props) {
@@ -15,6 +16,7 @@ class App extends React.Component {
       apiKey: "", //API key retrieved from sqlite3 login database.
       refreshStockData: 0, //if set to 1 stock data should be updated from globalStockList
       dashBoardData: [],
+      currentDashBoard: "",
     };
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
     this.newWidgetContainer = this.newWidgetContainer.bind(this);
@@ -119,11 +121,19 @@ class App extends React.Component {
     fetch("/dashBoard")
       .then((response) => response.json())
       .then((data) => {
-        // console.log(data);
-        // console.log(this.state.menuList);
-        // console.log(JSON.parse(data["menuSetup"][0]["menuList"]));
-        this.setState({ dashBoardData: data["savedDashBoards"] });
+        let x = data["savedDashBoards"];
+        let newList = {};
+        for (const oldKey in x) {
+          let newKey = x[oldKey]["dashBoardName"];
+          let newData = x[oldKey];
+          newList[newKey] = newData;
+        }
+        console.log(newList);
+
+        // this.setState({ dashBoardData: data["savedDashBoards"] });
+        this.setState({ dashBoardData: newList });
         this.setState({ menuList: JSON.parse(data["menuSetup"][0]["menuList"]) });
+        this.setState({ currentDashBoard: data["menuSetup"][0]["defaultMenu"] });
         // console.log();
       })
       .catch((error) => {

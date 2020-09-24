@@ -21,9 +21,9 @@ class TopNav extends React.Component {
     this.dashBoardToggle = this.dashBoardToggle.bind(this);
   }
 
-  // componentDidMount() {
-  //   this.props.getSavedDashBoards();
-  // }
+  componentDidMount() {
+    this.props.getSavedDashBoards();
+  }
 
   componentDidUpdate() {
     if (this.props.refreshStockData === 1) {

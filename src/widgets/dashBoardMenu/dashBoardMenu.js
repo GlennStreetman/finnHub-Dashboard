@@ -48,17 +48,17 @@ class DashBoardMenu extends React.PureComponent {
 
   render() {
     let dashBoardData = this.props.dashBoardData;
-    let savedDashBoards = dashBoardData.map((el) => (
-      <tr key={el.id + "tr"}>
+    let savedDashBoards = Object.keys(dashBoardData).map((el) => (
+      <tr key={dashBoardData[el].id + "tr"}>
         <td>
-          <button onClick={() => this.deleteDashBoard(el.id)}>
+          <button onClick={() => this.deleteDashBoard(dashBoardData[el].id)}>
             {/* <button onClick={() => this.props.loadDashBoard(el.globalStockList, el.widgetList)}> */}
             <i className="fa fa-times" aria-hidden="true"></i>
           </button>
         </td>
-        <td key={el.id + "te"}>{el.dashBoardName}</td>
+        <td key={dashBoardData[el].id + "te"}>{dashBoardData[el].dashBoardName}</td>
         <td>
-          <button onClick={() => this.props.loadDashBoard(el.globalStockList, el.widgetList)}>
+          <button onClick={() => this.props.loadDashBoard(dashBoardData[el].globalStockList, dashBoardData[el].widgetList)}>
             <i className="fa fa-check-square-o" aria-hidden="true"></i>
           </button>
         </td>
