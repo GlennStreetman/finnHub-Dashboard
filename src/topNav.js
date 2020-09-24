@@ -42,10 +42,14 @@ class TopNav extends React.Component {
 
     if (this.state.loadStartingDashBoard === 0 && this.props.currentDashBoard !== "") {
       this.setState({ loadStartingDashBoard: 1 });
-      let loadWidgetList = this.props.dashBoardData[this.props.currentDashBoard]["widgetList"];
-      let loadGlobal = this.props.dashBoardData[this.props.currentDashBoard]["globalStockList"];
-      this.props.loadDashBoard(loadGlobal, loadWidgetList);
-      this.setState({ showDashBoardMenu: 1 });
+      try {
+        let loadWidget = this.props.dashBoardData[this.props.currentDashBoard]["widgetList"];
+        let loadGlobal = this.props.dashBoardData[this.props.currentDashBoard]["globalStockList"];
+        this.props.loadDashBoard(loadGlobal, loadWidget);
+        this.setState({ showDashBoardMenu: 1 });
+      } catch (err) {
+        console.log(err);
+      }
     }
   }
 
@@ -153,6 +157,7 @@ class TopNav extends React.Component {
         stateRef="widgetList"
         saveCurrentDashboard={this.props.saveCurrentDashboard}
         getSavedDashBoards={this.props.getSavedDashBoards}
+        currentDashBoard={this.props.currentDashBoard}
       />
     ));
     let menuState = this.props.menuList;
@@ -177,6 +182,7 @@ class TopNav extends React.Component {
         dashBoardToggle={this.dashBoardToggle}
         getSavedDashBoards={this.props.getSavedDashBoards}
         dashBoardData={this.props.dashBoardData}
+        currentDashBoard={this.props.currentDashBoard}
       />
     ));
 

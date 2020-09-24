@@ -31,12 +31,6 @@ code {
   color: black;
 }
 
-/* Add a color to the active/current link */
-/* .topnav a.active {
-  background-color: #4caf50;
-  color: white;
-} */
-
 .form-inline {
   display: flex;
   flex-flow: row wrap;
@@ -193,4 +187,29 @@ label {
 .widgetBodyTable {
   color: black;
   background-color: white;
+}
+
+.faIcon {
+  color: white;
+  visibility: auto;
+  opacity: 1;
+}
+
+.faIconFade {
+  color: green;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 2s, opacity 2s linear;
+}
+
+.centerTE {
+  text-align: center;
+}
+
+.rightTE {
+  text-align: right;
+}
+
+.leftTE {
+  text-align: left;
 }

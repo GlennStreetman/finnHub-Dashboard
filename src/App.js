@@ -128,24 +128,10 @@ class App extends React.Component {
           let newData = x[oldKey];
           newList[newKey] = newData;
         }
-        // console.log(newList);
 
-        // this.setState({ dashBoardData: data["savedDashBoards"] });
         this.setState({ dashBoardData: newList });
         this.setState({ menuList: JSON.parse(data["menuSetup"][0]["menuList"]) });
-
-        // console.log("Loading first dashboard?");
-        // let dashBoardDat = this.state.currentDashBoard;
-        // console.log(dashBoardDat);
         this.setState({ currentDashBoard: data["menuSetup"][0]["defaultMenu"] });
-        // console.log(this.state.currentDashBoard);
-        // let startingDash = this.state.currentDashBoard;
-        // let loadDash = this.state.currentDashBoard;
-        // console.log(dashBoardDat[loadDash]["globalStockList"]);
-        // console.log(dashBoardDat[loadDash]["widgetList"]);
-        // startingDash === "" &&
-        //   this.state.currentDashBoard !== "" &&
-        //   this.loadDashBoard(dashBoardDat[loadDash]["globalStockList"], dashBoardDat[loadDash]["widgetList"]);
       })
       .catch((error) => {
         console.error("Failed to recover dashboards", error);
@@ -154,10 +140,9 @@ class App extends React.Component {
 
   loadDashBoard(newGlobalList, newWidgetList) {
     console.log("running");
+
     let updateGlobalList = JSON.parse(newGlobalList);
     let updateWidgetList = JSON.parse(newWidgetList);
-    // console.log(updateGlobalList);
-    // console.log(this.state.widgetList);
     this.setState({ globalStockList: updateGlobalList });
     this.setState({ widgetList: updateWidgetList });
     this.setState({ refreshStockData: 1 });
@@ -167,7 +152,7 @@ class App extends React.Component {
     this.setState({ refreshStockData: 0 });
   }
 
-  saveCurrentDashboard(e, dashboardName) {
+  saveCurrentDashboard(dashboardName) {
     // console.log("updating dashboard");
     const data = {
       dashBoardName: dashboardName,
@@ -188,7 +173,7 @@ class App extends React.Component {
         console.log("updating dashboard");
         this.getSavedDashBoards();
       });
-    e.preventDefault();
+    // e.preventDefault();
   }
 
   render() {

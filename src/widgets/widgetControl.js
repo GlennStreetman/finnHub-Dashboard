@@ -146,6 +146,7 @@ class WidgetControl extends React.Component {
           dashBoardToggle: that.props.dashBoardToggle,
           getSavedDashBoards: that.props.getSavedDashBoards,
           dashBoardData: that.props.dashBoardData,
+          currentDashBoard: that.props.currentDashBoard,
         })}
 
         {this.props.widgetLockDown === 0 ? (
