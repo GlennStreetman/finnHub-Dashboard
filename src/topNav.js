@@ -13,6 +13,7 @@ class TopNav extends React.Component {
       trackedStockData: {},
       widgetLockDown: 0, //1: Hide buttons, 0: Show buttons
       showDashBoardMenu: 0,
+      loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
     };
 
     this.showPane = this.showPane.bind(this);
@@ -37,6 +38,14 @@ class TopNav extends React.Component {
         // console.log(this.props.globalStockList[stock]);
         this.getStockPrice(this.props.globalStockList[stock]);
       }
+    }
+
+    if (this.state.loadStartingDashBoard === 0 && this.props.currentDashBoard !== "") {
+      this.setState({ loadStartingDashBoard: 1 });
+      let loadWidgetList = this.props.dashBoardData[this.props.currentDashBoard]["widgetList"];
+      let loadGlobal = this.props.dashBoardData[this.props.currentDashBoard]["globalStockList"];
+      this.props.loadDashBoard(loadGlobal, loadWidgetList);
+      this.setState({ showDashBoardMenu: 1 });
     }
   }
 
