@@ -20,6 +20,7 @@ class App extends React.Component {
     };
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
     this.newWidgetContainer = this.newWidgetContainer.bind(this);
+    this.newMenuContainer = this.newMenuContainer.bind(this);
     this.removeWidget = this.removeWidget.bind(this);
     this.processLogin = this.processLogin.bind(this);
     this.moveWidget = this.moveWidget.bind(this);
@@ -36,35 +37,33 @@ class App extends React.Component {
   }
 
   newWidgetContainer(widgetDescription, widgetHeader, widgetConfig) {
-    //creates a new widget.
-    //Multiple instances of each stockWidget allowed. Single instance of each menu widget
-    if (widgetConfig === "stockWidget") {
-      const widgetName = new Date().getTime();
-      var newWidgetList = Object.assign({}, this.state.widgetList);
-      newWidgetList[widgetName] = {
-        widgetID: widgetName,
-        widgetType: widgetDescription,
-        widgetHeader: widgetHeader,
-        xAxis: "40px",
-        yAxis: "40px",
-        trackedStocks: this.state.globalStockList,
-        widgetConfig: widgetConfig,
-      };
-      this.setState({ widgetList: newWidgetList });
-    } else {
-      const widgetName = widgetConfig;
-      var newMenuList = Object.assign({}, this.state.menuList);
-      newMenuList[widgetName] = {
-        widgetID: widgetName,
-        widgetType: widgetDescription,
-        widgetHeader: widgetHeader,
-        xAxis: "40px",
-        yAxis: "40px",
-        trackedStocks: this.state.globalStockList,
-        widgetConfig: widgetConfig,
-      };
-      this.setState({ menuList: newMenuList });
-    }
+    const widgetName = new Date().getTime();
+    var newWidgetList = Object.assign({}, this.state.widgetList);
+    newWidgetList[widgetName] = {
+      widgetID: widgetName,
+      widgetType: widgetDescription,
+      widgetHeader: widgetHeader,
+      xAxis: "40px",
+      yAxis: "40px",
+      trackedStocks: this.state.globalStockList,
+      widgetConfig: widgetConfig,
+    };
+    this.setState({ widgetList: newWidgetList });
+  }
+
+  newMenuContainer(widgetDescription, widgetHeader, widgetConfig) {
+    const widgetName = widgetDescription;
+    var newMenuList = Object.assign({}, this.state.menuList);
+    newMenuList[widgetName] = {
+      widgetID: widgetName,
+      widgetType: widgetDescription,
+      widgetHeader: widgetHeader,
+      xAxis: "40px",
+      yAxis: "40px",
+      trackedStocks: this.state.globalStockList,
+      widgetConfig: widgetConfig,
+    };
+    this.setState({ menuList: newMenuList });
   }
 
   moveWidget(stateRef, widgetId, xxAxis, yyAxis) {
@@ -139,8 +138,6 @@ class App extends React.Component {
   }
 
   loadDashBoard(newGlobalList, newWidgetList) {
-    console.log("running");
-
     let updateGlobalList = JSON.parse(newGlobalList);
     let updateWidgetList = JSON.parse(newWidgetList);
     this.setState({ globalStockList: updateGlobalList });
@@ -187,6 +184,7 @@ class App extends React.Component {
           menuList={this.state.menuList}
           updateGlobalStockList={this.updateGlobalStockList}
           newWidgetContainer={this.newWidgetContainer}
+          newMenuContainer={this.newMenuContainer}
           moveWidget={this.moveWidget}
           removeWidget={this.removeWidget}
           apiKey={this.state.apiKey}

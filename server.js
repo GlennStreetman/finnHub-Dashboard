@@ -125,6 +125,12 @@ app.post("/dashboard", (req, res) => {
   });
 });
 
+app.get("setDefaultDashBoard", (req, res) => {
+  let uId = req.session.uID;
+  let thisRequest = req.query;
+  let updateSQL = `UPDATE menuSetup SET defaultMenu = `;
+});
+
 app.get("/deleteSavedDashboard", (req, res) => {
   let uId = req.session.uID;
   let thisRequest = req.query;

@@ -3,6 +3,7 @@ import StockDetailWidget from "./stockDetails/stockDetailWidget.js";
 import NewsWidget from "./News/newsWidget.js";
 import CandleWidget from "./candle/candleWidget.js";
 import DashBoardMenu from "./dashBoardMenu/dashBoardMenu.js";
+import WatchListMenu from "./watchListMenu/watchListMenu.js";
 
 //creates widget container. Used by all widgets.
 class WidgetControl extends React.Component {
@@ -90,7 +91,7 @@ class WidgetControl extends React.Component {
       display: "block",
       top: this.props.widgetList["xAxis"],
       left: this.props.widgetList["yAxis"],
-      opacity: this.state.renderBody === "DashBoardMenu" && this.props.showDashBoardMenu === 0 ? 0 : 100,
+      opacity: ["DashBoardMenu", "WatchListMenu"].indexOf(this.state.renderBody) > -1 && this.props.showMenu === 0 ? 0 : 100,
     };
 
     let widgetList = {
@@ -98,6 +99,7 @@ class WidgetControl extends React.Component {
       NewsWidget: NewsWidget,
       CandleWidget: CandleWidget,
       DashBoardMenu: DashBoardMenu,
+      WatchListMenu: WatchListMenu,
     };
 
     const that = this;
@@ -143,7 +145,7 @@ class WidgetControl extends React.Component {
           trackedStocks: that.props.widgetList["trackedStocks"],
           loadDashBoard: that.props.loadDashBoard,
           saveCurrentDashboard: that.props.saveCurrentDashboard,
-          dashBoardToggle: that.props.dashBoardToggle,
+          menuWidgetToggle: that.props.menuWidgetToggle,
           getSavedDashBoards: that.props.getSavedDashBoards,
           dashBoardData: that.props.dashBoardData,
           currentDashBoard: that.props.currentDashBoard,
@@ -153,8 +155,11 @@ class WidgetControl extends React.Component {
           <div className="widgetFooter">
             <button
               onClick={() => {
-                this.props.removeWidget(this.props.stateRef, this.props.widgetKey);
-                this.props.dashBoardToggle && this.props.dashBoardToggle();
+                if (this.props.stateRef === "widgetList") {
+                  this.props.removeWidget(this.props.stateRef, this.props.widgetKey);
+                } else {
+                  this.props.menuWidgetToggle(this.props.widgetKey);
+                }
               }}
             >
               <i className="fa fa-times" aria-hidden="true"></i>

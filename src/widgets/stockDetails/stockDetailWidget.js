@@ -11,13 +11,6 @@ class StockDetailWidget extends React.Component {
     this.renderStockData = this.renderStockData.bind(this);
   }
 
-  // componentDidMount() {
-  //   console.log(this.props.trackedStocks);
-  //   for (const stock in this.props.trackedStocks) {
-  //     this.updateWidgetList(stock);
-  //   }
-  // }
-
   updateWidgetList(stock) {
     if (stock.indexOf(":") > 0) {
       const stockSymbole = stock.slice(0, stock.indexOf(":"));
@@ -34,39 +27,39 @@ class StockDetailWidget extends React.Component {
       trackedStockData[el] ? (
         <tr key={el + "st"}>
           <td key={el + "id"}>{el}</td>
-          <td key={el + "currentPrice"}>
-            {trackedStockData[el]["currentPrice"].toLocaleString(undefined, {
+          <td className="rightTE" key={el + "prevClosePrice"}>
+            {trackedStockData[el]["prevClosePrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
           </td>
-          <td key={el + "dayHighPrice"}>
-            {trackedStockData[el]["dayHighPrice"].toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </td>
-          <td key={el + "dayLowPrice"}>
-            {trackedStockData[el]["dayLowPrice"].toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })}
-          </td>
-          <td key={el + "dayOpenPrice"}>
+          <td className="rightTE" key={el + "dayOpenPrice"}>
             {trackedStockData[el]["dayOpenPrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
           </td>
-          <td key={el + "prevClosePrice"}>
-            {trackedStockData[el]["prevClosePrice"].toLocaleString(undefined, {
+          <td className="rightTE" key={el + "dayLowPrice"}>
+            {trackedStockData[el]["dayLowPrice"].toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </td>
+          <td className="rightTE" key={el + "dayHighPrice"}>
+            {trackedStockData[el]["dayHighPrice"].toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })}
+          </td>
+          <td className="rightTE" key={el + "currentPrice"}>
+            {trackedStockData[el]["currentPrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
           </td>
 
           {this.props.showEditPane === 1 ? (
-            <td key={el + "buttonBox"}>
+            <td className="rightTE" key={el + "buttonBox"}>
               <button
                 key={el + "button"}
                 onClick={() => {
@@ -89,11 +82,22 @@ class StockDetailWidget extends React.Component {
         <thead key={this.props.widgetKey + "head"}>
           <tr key={this.props.widgetKey + "tr"}>
             <td key={this.props.widgetKey + "stock"}>Stock</td>
-            <td key={this.props.widgetKey + "price"}>Price</td>
-            <td key={this.props.widgetKey + "high"}>Day High</td>
-            <td key={this.props.widgetKey + "low"}>Day Low</td>
-            <td key={this.props.widgetKey + "open"}>Day Open</td>
-            <td key={this.props.widgetKey + "close"}>Prev Close</td>
+            <td className="centerTE" key={this.props.widgetKey + "close"}>
+              Prev Close
+            </td>
+            <td className="centerTE" key={this.props.widgetKey + "open"}>
+              Day Open
+            </td>
+            <td className="centerTE" key={this.props.widgetKey + "low"}>
+              Day Low
+            </td>
+            <td className="centerTE" key={this.props.widgetKey + "high"}>
+              Day High
+            </td>
+            <td className="centerTE" key={this.props.widgetKey + "price"}>
+              Price
+            </td>
+
             {this.props.showEditPane === 1 ? <td key={this.props.widgetKey + "remove"}>Remove</td> : <></>}
           </tr>
         </thead>

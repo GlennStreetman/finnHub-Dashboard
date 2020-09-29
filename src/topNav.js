@@ -1,25 +1,26 @@
 import React from "react";
-import StockWatchList from "./stockWatchList.js";
-import StockSearchPane from "./stockSearchPane.js";
+// import StockWatchList from "./stockWatchList.js";
+// import StockSearchPane from "./stockSearchPane.js";
 import WidgetControl from "./widgets/widgetControl.js";
 
 class TopNav extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      showAddWatchlistMenu: 0,
-      showWatchlistMenu: 0,
-      showAddWidgetDropdown: 0,
+      // showAddWatchlistMenu: 0,
+      // showWatchlistMenu: 0,
+      // showAddWidgetDropdown: 0,
       trackedStockData: {},
       widgetLockDown: 0, //1: Hide buttons, 0: Show buttons
-      showDashBoardMenu: 0,
+      DashBoardMenu: 0, //1 = show, 0 = hide
+      WatchListMenu: 0, //1 = show, 0 = hide
       loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
     };
 
     this.showPane = this.showPane.bind(this);
     this.getStockPrice = this.getStockPrice.bind(this);
     this.updateTickerSockets = this.updateTickerSockets.bind(this);
-    this.dashBoardToggle = this.dashBoardToggle.bind(this);
+    this.menuWidgetToggle = this.menuWidgetToggle.bind(this);
   }
 
   componentDidMount() {
@@ -46,7 +47,7 @@ class TopNav extends React.Component {
         let loadWidget = this.props.dashBoardData[this.props.currentDashBoard]["widgetList"];
         let loadGlobal = this.props.dashBoardData[this.props.currentDashBoard]["globalStockList"];
         this.props.loadDashBoard(loadGlobal, loadWidget);
-        this.setState({ showDashBoardMenu: 1 });
+        this.setState({ DashBoardMenu: 1 });
       } catch (err) {
         console.log(err);
       }
@@ -125,15 +126,13 @@ class TopNav extends React.Component {
     // return stockPriceData
   }
 
-  dashBoardToggle() {
-    if (this.state.showDashBoardMenu === 0 && this.props.menuList["menuWidget"] === undefined) {
-      // console.log("new container");
-      this.props.newWidgetContainer("DashBoardMenu", "Saved Dashboards: ", "menuWidget");
-      this.setState({ showDashBoardMenu: 1 });
-    } else if (this.state.showDashBoardMenu === 0 && this.props.menuList["menuWidget"] !== undefined) {
-      this.setState({ showDashBoardMenu: 1 });
+  menuWidgetToggle(menuName, dashName = "pass") {
+    //Create dashboard menu if first time looking at, else toggle visability
+    if (this.props.menuList[menuName] === undefined) {
+      this.props.newMenuContainer(menuName, dashName, "menuWidget");
+      this.setState({ [menuName]: 1 });
     } else {
-      this.setState({ showDashBoardMenu: 0 });
+      this.state[menuName] === 1 ? this.setState({ [menuName]: 0 }) : this.setState({ [menuName]: 1 });
     }
   }
 
@@ -154,7 +153,7 @@ class TopNav extends React.Component {
         apiKey={this.props.apiKey}
         updateWidgetStockList={this.props.updateWidgetStockList}
         loadDashBoard={this.props.loadDashBoard}
-        stateRef="widgetList"
+        stateRef="widgetList" //used by app.js to move and remove widgets.
         saveCurrentDashboard={this.props.saveCurrentDashboard}
         getSavedDashBoards={this.props.getSavedDashBoards}
         currentDashBoard={this.props.currentDashBoard}
@@ -163,26 +162,26 @@ class TopNav extends React.Component {
     let menuState = this.props.menuList;
     let menuRender = Object.keys(menuState).map((el) => (
       <WidgetControl
-        key={el}
-        widgetKey={el}
-        widgetList={menuState[el]}
+        apiKey={this.props.apiKey}
+        currentDashBoard={this.props.currentDashBoard}
+        dashBoardData={this.props.dashBoardData}
+        menuWidgetToggle={this.menuWidgetToggle}
         globalStockList={this.props.globalStockList}
-        updateGlobalStockList={this.props.updateGlobalStockList}
+        getSavedDashBoards={this.props.getSavedDashBoards}
         getStockPrice={this.getStockPrice}
-        trackedStockData={this.state.trackedStockData}
+        key={el}
+        loadDashBoard={this.props.loadDashBoard}
         moveWidget={this.props.moveWidget}
         removeWidget={this.props.removeWidget}
-        widgetLockDown={this.state.widgetLockDown}
-        apiKey={this.props.apiKey}
-        updateWidgetStockList={this.props.updateWidgetStockList}
-        loadDashBoard={this.props.loadDashBoard}
-        stateRef="menuList"
+        stateRef="menuList" //used by app.js to move and remove widgets.
         saveCurrentDashboard={this.props.saveCurrentDashboard}
-        showDashBoardMenu={this.state.showDashBoardMenu}
-        dashBoardToggle={this.dashBoardToggle}
-        getSavedDashBoards={this.props.getSavedDashBoards}
-        dashBoardData={this.props.dashBoardData}
-        currentDashBoard={this.props.currentDashBoard}
+        showMenu={this.state[el]}
+        trackedStockData={this.state.trackedStockData}
+        updateGlobalStockList={this.props.updateGlobalStockList}
+        updateWidgetStockList={this.props.updateWidgetStockList}
+        widgetKey={el}
+        widgetList={menuState[el]}
+        widgetLockDown={this.state.widgetLockDown}
       />
     ));
 
@@ -190,28 +189,32 @@ class TopNav extends React.Component {
       <>
         <div className="topnav">
           <a href="#home">About</a>
-          <div>
+          {/* <div>
             <a href="#contact" onClick={() => this.showPane("showWatchlistMenu")}>
-              {this.state.showWatchlistMenu === 0 ? "View Watchlist Hide" : "Hide Watchlist Menu"}
+              {this.state.showWatchlistMenu === 0 ? "View Watchlist" : "Hide Watchlist Menu"}
             </a>
+          </div> */}
+          <div>
+            {/* <a href="#cat" onClick={() => this.showPane("showAddWatchlistMenu")}>
+              {this.state.WatchListMenu === 0 ? "Add Stock to Watchlist" : "Hide Search"}
+            </a> */}
           </div>
           <div>
-            <a href="#cat" onClick={() => this.showPane("showAddWatchlistMenu")}>
-              {this.state.showAddWatchlistMenu === 0 ? "Add Stock to Watchlist" : "Hide Search"}
+            <a href="#contact" onClick={() => this.menuWidgetToggle("WatchListMenu", "WatchList")}>
+              {/* <a href="#contact" onClick={() => this.showPane("showDashBoardMenu")}> */}
+              {this.state.WatchListMenu === 0 ? "Show Watchlist Menu" : "Hide Watchlist Menu"}
             </a>
           </div>
 
+          <div>
+            <a href="#contact" onClick={() => this.menuWidgetToggle("DashBoardMenu", "Saved Dashboards")}>
+              {/* <a href="#contact" onClick={() => this.showPane("showDashBoardMenu")}> */}
+              {this.state.DashBoardMenu === 0 ? "Show Dashboard Menu" : "Hide Dashboard Menu"}
+            </a>
+          </div>
           <div>
             <a href="#contact" onClick={() => (this.state.widgetLockDown === 0 ? this.setState({ widgetLockDown: 1 }) : this.setState({ widgetLockDown: 0 }))}>
               {this.state.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}
-            </a>
-          </div>
-          <div>
-            {/* add onclick */}
-
-            <a href="#contact" onClick={() => this.dashBoardToggle()}>
-              {/* <a href="#contact" onClick={() => this.showPane("showDashBoardMenu")}> */}
-              {this.state.showDashBoardMenu === 0 ? "Show Dashboard Menu" : "Hide Dashboard Menu"}
             </a>
           </div>
           <div className="dropDiv" onMouseLeave={() => this.showPane("showAddWidgetDropdown")}>
@@ -251,7 +254,7 @@ class TopNav extends React.Component {
           </div>
         </div>
 
-        <div>
+        {/* <div>
           {this.state.showAddWatchlistMenu === 1 && (
             <StockSearchPane
               globalStockList={this.props.globalStockList}
@@ -272,7 +275,7 @@ class TopNav extends React.Component {
               updateGlobalStockList={this.props.updateGlobalStockList}
             />
           )}
-        </div>
+        </div> */}
         {widgetRender}
         {menuRender}
       </>
