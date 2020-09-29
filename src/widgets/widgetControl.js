@@ -46,8 +46,8 @@ class WidgetControl extends React.Component {
 
   dragElement() {
     let that = this;
-    let pos3 = 0;
-    let pos4 = 0;
+    let xAxis = 0;
+    let yAxis = 0;
 
     document.getElementById(this.props.widgetList["widgetID"]).onmousedown = dragMouseDown;
     let widgetWidth = document.getElementById(this.props.widgetKey + "box").clientWidth;
@@ -57,8 +57,8 @@ class WidgetControl extends React.Component {
       e = e || window.event;
       e.preventDefault();
       // get the mouse cursor position at startup:
-      pos3 = e.clientX;
-      pos4 = e.clientY;
+      xAxis = e.clientX;
+      yAxis = e.clientY;
       document.onmouseup = closeDragElement;
       // call a function whenever the cursor moves:
       document.onmousemove = elementDrag;
@@ -68,11 +68,11 @@ class WidgetControl extends React.Component {
       e = e || window.event;
       e.preventDefault();
 
-      pos3 = e.clientX;
-      pos4 = e.clientY;
+      xAxis = e.clientX;
+      yAxis = e.clientY;
       // set the element's new position:
-      let newX = pos3 - widgetWidth;
-      let newY = pos4;
+      let newX = xAxis - widgetWidth;
+      let newY = yAxis;
       // that.setState({ yAxis: newY });
       // that.setState({ xAxis: newX });
       that.props.moveWidget(that.props.stateRef, that.props.widgetKey, newY, newX);
@@ -122,7 +122,7 @@ class WidgetControl extends React.Component {
             >
               <i className="fa fa-arrows" aria-hidden="true"></i>
             </button>
-            {this.props.widgetList["widgetConfig"] === "stockWidget" && (
+            {this.props.widgetKey !== "DashBoardMenu" && (
               <button className="headerButtons" onClick={() => this.showPane("showEditPane", -1)}>
                 <i className="fa fa-pencil-square-o" aria-hidden="true"></i>
               </button>

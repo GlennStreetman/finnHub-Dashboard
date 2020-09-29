@@ -1,4 +1,5 @@
 import React from "react";
+import StockSearchPane from "../../stockSearchPane.js";
 
 class WatchListMenu extends React.PureComponent {
   constructor(props) {
@@ -73,16 +74,29 @@ class WatchListMenu extends React.PureComponent {
 
   render() {
     return (
-      <table>
-        <thead>
-          <tr>
-            <td className="centerTE">Description</td>
-            <td className="centerTE">Price</td>
-            <td className="centerTE">Remove</td>
-          </tr>
-        </thead>
-        <tbody>{this.renderWatchedStocks()}</tbody>
-      </table>
+      <>
+        {this.props.showEditPane === 1 && (
+          <StockSearchPane
+            updateWidgetStockList={this.props.updateWidgetStockList}
+            widgetKey={this.props.widgetKey}
+            updateGlobalStockList={this.props.updateGlobalStockList}
+            showSearchPane={() => this.props.showPane("showEditPane", 1)}
+            getStockPrice={this.props.getStockPrice}
+            apiKey={this.props.apiKey}
+          />
+        )}
+
+        <table>
+          <thead>
+            <tr>
+              <td className="centerTE">Description</td>
+              <td className="centerTE">Price</td>
+              <td className="centerTE">Remove</td>
+            </tr>
+          </thead>
+          <tbody>{this.renderWatchedStocks()}</tbody>
+        </table>
+      </>
     );
   }
 }

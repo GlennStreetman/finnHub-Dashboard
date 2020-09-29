@@ -78,16 +78,19 @@ class App extends React.Component {
 
   updateWidgetStockList(widgetId, symbol) {
     //adds if not present, else removes stock from widget specific stock list.
-    let updateWidgetStockList = Object.assign(this.state.widgetList);
-    const trackingSymbolList = updateWidgetStockList[widgetId]["trackedStocks"];
+    console.log(widgetId);
+    if (isNaN(widgetId) === false) {
+      let updateWidgetStockList = Object.assign(this.state.widgetList);
+      const trackingSymbolList = updateWidgetStockList[widgetId]["trackedStocks"];
 
-    if (trackingSymbolList.indexOf(symbol) === -1) {
-      updateWidgetStockList[widgetId]["widgetList"] = trackingSymbolList.push(symbol);
-    } else {
-      updateWidgetStockList[widgetId]["widgetList"] = trackingSymbolList.splice(trackingSymbolList.indexOf(symbol), 1);
+      if (trackingSymbolList.indexOf(symbol) === -1) {
+        updateWidgetStockList[widgetId]["widgetList"] = trackingSymbolList.push(symbol);
+      } else {
+        updateWidgetStockList[widgetId]["widgetList"] = trackingSymbolList.splice(trackingSymbolList.indexOf(symbol), 1);
+      }
+
+      this.setState({ widgetList: updateWidgetStockList });
     }
-
-    this.setState({ widgetList: updateWidgetStockList });
   }
 
   removeWidget(stateRef, widgetID) {

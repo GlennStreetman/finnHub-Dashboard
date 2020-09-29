@@ -7,21 +7,12 @@ class StockDataList extends React.PureComponent {
     this.createDataList = this.createDataList.bind(this);
   }
 
-  // componentDidMount() {
-  //   console.log("mounted");
-  // }
-
-  // componentDidUpdate() {
-  //   console.log("updating");
-  // }
-
   createDataList() {
     //creates datalist used for autocomplete of stock names.
     const availableStocks = this.props.availableStocks;
-    //should i consider chaning the available stock prop into a map to begin with?
-    const stockListKey = Object.values(availableStocks).map((el, ke) => (
-      <option key={ke + "op"} value={el["displaySymbol"] + ": " + el["description"]}>
-        {el["displaySymbol"] + ": " + el["description"]}
+    const stockListKey = availableStocks.map((el) => (
+      <option key={el + "op"} value={el}>
+        {el}
       </option>
     ));
     return stockListKey;
