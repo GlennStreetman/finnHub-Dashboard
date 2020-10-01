@@ -5,6 +5,7 @@ import { watchListMenuProps } from "./widgets/watchListMenu/watchListMenu.js";
 import { candleWidgetProps } from "./widgets/candle/candleWidget.js";
 import { newsWidgetProps } from "./widgets/News/newsWidget.js";
 import { stockDetailWidgetProps } from "./widgets/stockDetails/stockDetailWidget.js";
+import { accountMenu } from "./widgets/AccountMenu/accountMenu.js";
 
 class TopNav extends React.Component {
   constructor(props) {
@@ -14,6 +15,7 @@ class TopNav extends React.Component {
       widgetLockDown: 0, //1: Hide buttons, 0: Show buttons
       DashBoardMenu: 0, //1 = show, 0 = hide
       WatchListMenu: 0, //1 = show, 0 = hide
+      AccountMenu: 0, //1 = show, 0 = hide
       loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
     };
 
@@ -32,6 +34,7 @@ class TopNav extends React.Component {
       CandleWidget: () => candleWidgetProps(that, ref),
       NewsWidget: () => newsWidgetProps(that, ref),
       StockDetailWidget: () => stockDetailWidgetProps(that, ref),
+      AccountMenu: () => accountMenu(that, ref),
     };
     let renderBodyProps = widgetBodyProps[key];
     // console.log(renderBodyProps);
@@ -205,6 +208,11 @@ class TopNav extends React.Component {
           <div>
             <a href="#contact" onClick={() => (this.state.widgetLockDown === 0 ? this.setState({ widgetLockDown: 1 }) : this.setState({ widgetLockDown: 0 }))}>
               {this.state.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}
+            </a>
+          </div>
+          <div>
+            <a href="#contact" onClick={() => this.menuWidgetToggle("AccountMenu", "Your Account")}>
+              Manage Account
             </a>
           </div>
           <div className="dropDiv" onMouseLeave={() => this.showPane("showAddWidgetDropdown")}>

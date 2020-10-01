@@ -4,6 +4,7 @@ import NewsWidget from "./News/newsWidget.js";
 import CandleWidget from "./candle/candleWidget.js";
 import DashBoardMenu from "./dashBoardMenu/dashBoardMenu.js";
 import WatchListMenu from "./watchListMenu/watchListMenu.js";
+import AccountMenu from "./AccountMenu/accountMenu.js";
 
 //creates widget container. Used by all widgets.
 class WidgetControl extends React.Component {
@@ -87,10 +88,12 @@ class WidgetControl extends React.Component {
 
   render() {
     const compStyle = {
-      display: "block",
+      // display: "block",
+      display: this.props.stateRef === "menuList" && this.props.showMenu === 0 ? "none" : "block",
       top: this.props.widgetList["xAxis"],
       left: this.props.widgetList["yAxis"],
-      opacity: ["DashBoardMenu", "WatchListMenu"].indexOf(this.state.renderBody) > -1 && this.props.showMenu === 0 ? 0 : 100,
+      // opacity: ["DashBoardMenu", "WatchListMenu", "AccountMenu"].indexOf(this.state.renderBody) > -1 && this.props.showMenu === 0 ? 0 : 100,
+      // opacity: this.props.stateRef === "menuList" && this.props.showMenu === 0 ? 0 : 100,
     };
 
     let widgetList = {
@@ -99,6 +102,7 @@ class WidgetControl extends React.Component {
       CandleWidget: CandleWidget,
       DashBoardMenu: DashBoardMenu,
       WatchListMenu: WatchListMenu,
+      AccountMenu: AccountMenu,
     };
 
     const that = this;
@@ -128,7 +132,8 @@ class WidgetControl extends React.Component {
             >
               <i className="fa fa-arrows" aria-hidden="true"></i>
             </button>
-            {this.props.widgetKey !== "DashBoardMenu" && (
+            {/* {this.props.widgetKey !== "DashBoardMenu" && ( */}
+            {["DashBoardMenu", "AccountMenu"].indexOf(this.props.widgetKey) < 0 && (
               <button className="headerButtons" onClick={() => this.showPane("showEditPane", -1)}>
                 <i className="fa fa-pencil-square-o" aria-hidden="true"></i>
               </button>
@@ -164,16 +169,3 @@ class WidgetControl extends React.Component {
 }
 
 export default WidgetControl;
-
-// let widgetProps = {
-//   WatchListMenu: watchListMenuProps(that),
-// };
-
-//add show/edit stock pane to all widgets except dashboardmenu.
-// for (const key in Object.keys(widgetProps)) {
-//   console.log(Object.keys(widgetProps)[key]);
-//   if (Object.keys(widgetProps)[key] !== "DashBoardMenu") {
-//     widgetProps[Object.keys(widgetProps)[key]]["showEditPane"] = that.state.showEditPane;
-//     widgetProps[Object.keys(widgetProps)[key]]["showPane"] = that.showPane;
-//   }
-// }

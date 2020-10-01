@@ -57,6 +57,35 @@ app.get("/login", (req, res) => {
   });
 });
 
+app.get("/accountData", (req, res) => {
+  // console.log(req);
+  thisRequest = req.query;
+  newQuery = `SELECT loginName, email, apiKey, webHook FROM user WHERE id =${req.session.uID}`;
+  // console.log(newQuery);
+  resultSet = {};
+  db.all(newQuery, [], (err, rows) => {
+    if (err) {
+      res.json("Could not retrieve user data");
+    }
+    resultSet["userData"] = rows;
+    res.json(resultSet);
+  });
+});
+
+app.post("/accountData", (req, res) => {
+  console.log("updating user info");
+
+  let updateField = req.body.field;
+  let newValue = req.body.newValue;
+  let updateQuery = `UPDATE user SET ${updateField}='${newValue}' WHERE id=${req.session.uID}`;
+  db.all(updateQuery, [], (err, rows) => {
+    if (err) {
+      res.json(`Failed to update ${updateField}`);
+    }
+    res.json(`Update complete`);
+  });
+});
+
 app.get("/dashboard", (req, res) => {
   getSavedDashBoards = `SELECT id, dashBoardName, globalStockList, widgetList FROM dashBoard WHERE userID =${req.session.uID}`;
   getMenuSetup = `SELECT menuList, defaultMenu FROM menuSetup WHERE userID =${req.session.uID}`;
@@ -125,11 +154,11 @@ app.post("/dashboard", (req, res) => {
   });
 });
 
-app.get("setDefaultDashBoard", (req, res) => {
-  let uId = req.session.uID;
-  let thisRequest = req.query;
-  let updateSQL = `UPDATE menuSetup SET defaultMenu = `;
-});
+// app.get("setDefaultDashBoard", (req, res) => {
+//   let uId = req.session.uID;
+//   let thisRequest = req.query;
+//   let updateSQL = `UPDATE menuSetup SET defaultMenu = `;
+// });
 
 app.get("/deleteSavedDashboard", (req, res) => {
   let uId = req.session.uID;
