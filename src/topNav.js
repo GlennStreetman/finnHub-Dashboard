@@ -66,9 +66,12 @@ class TopNav extends React.Component {
 
   updateTickerSockets() {
     //opens a series of socket connections to live stream stock prices
+    //update limited to once every 5 seconds to have mercy on dom rendering.
     const self = this;
     const globalStockList = this.props.globalStockList;
     const socket = new WebSocket("wss://ws.finnhub.io?token=" + this.props.apiKey);
+    let streamingStockData = {};
+    let lastUpdate = new Date().getTime();
 
     socket.addEventListener("open", function (event) {
       globalStockList.map((el) => socket.send(JSON.stringify({ type: "subscribe", symbol: el })));
@@ -79,12 +82,17 @@ class TopNav extends React.Component {
       var tickerReponse = JSON.parse(event.data);
       // console.log("Message from server ", event.data);
       if (tickerReponse.data) {
-        self.setState((prevState) => {
-          let stockTickData = Object.assign({}, prevState.trackedStockData);
-          let stockSymbol = tickerReponse.data[0]["s"];
-          stockTickData[stockSymbol]["currentPrice"] = tickerReponse.data[0]["p"];
-          return { trackedStockData: stockTickData };
-        });
+        streamingStockData[tickerReponse.data[0]["s"]] = [tickerReponse.data[0]["p"]];
+        let checkTime = new Date().getTime();
+
+        if (checkTime - lastUpdate > 5000) {
+          lastUpdate = new Date().getTime();
+          let updatedPrice = Object.assign({}, self.state.trackedStockData);
+          for (const prop in streamingStockData) {
+            updatedPrice[prop]["currentPrice"] = streamingStockData[prop][0];
+          }
+          self.setState({ trackedStockData: updatedPrice });
+        }
       }
     });
   }
@@ -159,17 +167,6 @@ class TopNav extends React.Component {
         widgetKey={el}
         widgetList={widgetState[el]}
         widgetLockDown={this.state.widgetLockDown}
-        //remove below?
-        // globalStockList={this.props.globalStockList}
-        // updateGlobalStockList={this.props.updateGlobalStockList}
-        // getStockPrice={this.getStockPrice}
-        // trackedStockData={this.state.trackedStockData}
-        // apiKey={this.props.apiKey}
-        // updateWidgetStockList={this.props.updateWidgetStockList}
-        // loadDashBoard={this.props.loadDashBoard}
-        // saveCurrentDashboard={this.props.saveCurrentDashboard}
-        // getSavedDashBoards={this.props.getSavedDashBoards}
-        // currentDashBoard={this.props.currentDashBoard}
       />
     ));
 

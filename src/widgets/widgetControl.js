@@ -141,8 +141,8 @@ class WidgetControl extends React.Component {
         {/* {React.createElement(widgetList[this.props.widgetList["widgetType"]], widgetProps[this.props.widgetList["widgetType"]])} */}
         {React.createElement(widgetList[this.props.widgetList["widgetType"]], widgetProps)}
 
-        {this.props.widgetLockDown === 0 ? (
-          <div className="widgetFooter">
+        <div className="widgetFooter">
+          {this.props.widgetLockDown === 0 ? (
             <button
               onClick={() => {
                 if (this.props.stateRef === "widgetList") {
@@ -154,10 +154,10 @@ class WidgetControl extends React.Component {
             >
               <i className="fa fa-times" aria-hidden="true"></i>
             </button>
-          </div>
-        ) : (
-          <></>
-        )}
+          ) : (
+            <>-</>
+          )}
+        </div>
       </div>
     );
   }

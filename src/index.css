@@ -151,7 +151,7 @@ label {
   /* cursor: move; */
   z-index: 1;
   background-color: #2196f3;
-  color: #fff;
+  color: #2196f3;
   flex-direction: row;
   text-align: right;
 }
