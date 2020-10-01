@@ -2,7 +2,7 @@ import React from "react";
 import StockDataList from "./stockDataList.js";
 
 //compnent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
-class StockSearchPane extends React.PureComponent {
+class StockSearchPane extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -11,9 +11,7 @@ class StockSearchPane extends React.PureComponent {
       filteredStocks: [],
     };
     this.handleChange = this.handleChange.bind(this);
-    // this.createDataList = this.createDataList.bind(this);
   }
-  //updates text in search box with uppercase on each keypress.
 
   componentDidMount() {
     // console.log("mounted");
@@ -40,7 +38,7 @@ class StockSearchPane extends React.PureComponent {
       .then((response) => response.json())
       .then((data) => {
         let transformData = [];
-        for (const [key, stockValues] of Object.entries(data)) {
+        for (const [, stockValues] of Object.entries(data)) {
           //deconstruct API object
           const {
             // currency: a,
@@ -76,8 +74,8 @@ class StockSearchPane extends React.PureComponent {
         <form
           className="form-inline"
           onSubmit={(e) => {
-            if (this.state.availableStocks[this.state.inputText.slice(0, this.state.inputText.indexOf(":"))]) {
-              //console.log(this.props.availableStocks[e]);
+            if (this.state.availableStocks.includes(this.state.inputText)) {
+              // console.log(this.props.availableStocks[e]);
               this.props.updateGlobalStockList(e, this.state.inputText);
               this.props.showSearchPane();
               this.props.getStockPrice(this.state.inputText);

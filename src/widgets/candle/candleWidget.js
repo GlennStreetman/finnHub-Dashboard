@@ -244,4 +244,23 @@ class CandleWidget extends React.Component {
     );
   }
 }
+
+export function candleWidgetProps(that, key = "CandleWidget") {
+  let propList = {
+    apiKey: that.props.apiKey,
+    // dashBoardData: that.props.getSavedDashBoards,
+    // currentDashBoard: that.props.currentDashBoard,
+    getStockPrice: that.getStockPrice,
+    // getSavedDashBoards: that.props.getSavedDashBoards,
+    // loadDashBoard: that.props.loadDashBoard,
+    // saveCurrentDashboard: that.props.saveCurrentDashboard,
+    showPane: that.showPane,
+    trackedStocks: that.props.widgetList[key]["trackedStocks"],
+    updateGlobalStockList: that.props.updateGlobalStockList,
+    updateWidgetStockList: that.props.updateWidgetStockList,
+    widgetKey: key,
+  };
+  return propList;
+}
+
 export default CandleWidget;

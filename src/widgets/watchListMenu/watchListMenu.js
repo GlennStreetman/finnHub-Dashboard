@@ -101,4 +101,18 @@ class WatchListMenu extends React.PureComponent {
   }
 }
 
+export function watchListMenuProps(that, key = "WatchListMenu") {
+  let propList = {
+    apiKey: that.props.apiKey,
+    globalStockList: that.props.globalStockList,
+    getStockPrice: that.getStockPrice,
+    showPane: that.props.showPane,
+    trackedStockData: that.state.trackedStockData,
+    updateGlobalStockList: that.props.updateGlobalStockList,
+    updateWidgetStockList: that.props.updateWidgetStockList,
+    widgetKey: key,
+  };
+  return propList;
+}
+
 export default WatchListMenu;

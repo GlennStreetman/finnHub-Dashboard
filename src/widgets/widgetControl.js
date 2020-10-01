@@ -53,7 +53,7 @@ class WidgetControl extends React.Component {
     let widgetWidth = document.getElementById(this.props.widgetKey + "box").clientWidth;
 
     function dragMouseDown(e) {
-      that.setState({ showEditPane: 0 });
+      // that.setState({ showEditPane: 0 });
       e = e || window.event;
       e.preventDefault();
       // get the mouse cursor position at startup:
@@ -86,7 +86,6 @@ class WidgetControl extends React.Component {
   }
 
   render() {
-    // console.log("rendering");
     const compStyle = {
       display: "block",
       top: this.props.widgetList["xAxis"],
@@ -103,6 +102,13 @@ class WidgetControl extends React.Component {
     };
 
     const that = this;
+    let widgetProps = this.props.widgetBodyProps();
+
+    if (this.props.widgetKey !== "dashBoardMenu") {
+      widgetProps["showEditPane"] = that.state.showEditPane;
+      widgetProps["showPane"] = that.showPane;
+    }
+
     return (
       <div key={this.props.widgetKey + "container"} id={this.props.widgetKey + "box"} className="widgetBox" style={compStyle}>
         {this.props.widgetLockDown === 0 ? (
@@ -132,24 +138,8 @@ class WidgetControl extends React.Component {
           <div className="widgetHeader">{this.state.renderHeader}</div>
         )}
 
-        {React.createElement(widgetList[this.props.widgetList["widgetType"]], {
-          apiKey: that.props.apiKey,
-          updateGlobalStockList: that.props.updateGlobalStockList,
-          getStockPrice: that.props.getStockPrice,
-          showEditPane: that.state.showEditPane,
-          showPane: that.showPane,
-          trackedStockData: that.props.trackedStockData,
-          widgetKey: that.props.widgetKey,
-          globalStockList: that.props.globalStockList,
-          updateWidgetStockList: that.props.updateWidgetStockList,
-          trackedStocks: that.props.widgetList["trackedStocks"],
-          loadDashBoard: that.props.loadDashBoard,
-          saveCurrentDashboard: that.props.saveCurrentDashboard,
-          menuWidgetToggle: that.props.menuWidgetToggle,
-          getSavedDashBoards: that.props.getSavedDashBoards,
-          dashBoardData: that.props.dashBoardData,
-          currentDashBoard: that.props.currentDashBoard,
-        })}
+        {/* {React.createElement(widgetList[this.props.widgetList["widgetType"]], widgetProps[this.props.widgetList["widgetType"]])} */}
+        {React.createElement(widgetList[this.props.widgetList["widgetType"]], widgetProps)}
 
         {this.props.widgetLockDown === 0 ? (
           <div className="widgetFooter">
@@ -174,3 +164,16 @@ class WidgetControl extends React.Component {
 }
 
 export default WidgetControl;
+
+// let widgetProps = {
+//   WatchListMenu: watchListMenuProps(that),
+// };
+
+//add show/edit stock pane to all widgets except dashboardmenu.
+// for (const key in Object.keys(widgetProps)) {
+//   console.log(Object.keys(widgetProps)[key]);
+//   if (Object.keys(widgetProps)[key] !== "DashBoardMenu") {
+//     widgetProps[Object.keys(widgetProps)[key]]["showEditPane"] = that.state.showEditPane;
+//     widgetProps[Object.keys(widgetProps)[key]]["showPane"] = that.showPane;
+//   }
+// }

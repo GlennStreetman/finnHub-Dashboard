@@ -60,7 +60,7 @@ class App extends React.Component {
       widgetHeader: widgetHeader,
       xAxis: "40px",
       yAxis: "40px",
-      trackedStocks: this.state.globalStockList,
+      // trackedStocks: this.state.globalStockList,
       widgetConfig: widgetConfig,
     };
     this.setState({ menuList: newMenuList });
@@ -78,7 +78,7 @@ class App extends React.Component {
 
   updateWidgetStockList(widgetId, symbol) {
     //adds if not present, else removes stock from widget specific stock list.
-    console.log(widgetId);
+    // console.log(widgetId);
     if (isNaN(widgetId) === false) {
       let updateWidgetStockList = Object.assign(this.state.widgetList);
       const trackingSymbolList = updateWidgetStockList[widgetId]["trackedStocks"];
@@ -170,7 +170,7 @@ class App extends React.Component {
     fetch("/dashBoard", options)
       .then((data) => console.log(data))
       .then(() => {
-        console.log("updating dashboard");
+        // console.log("updating dashboard");
         this.getSavedDashBoards();
       });
     // e.preventDefault();

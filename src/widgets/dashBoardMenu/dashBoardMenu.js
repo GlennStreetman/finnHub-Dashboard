@@ -35,10 +35,8 @@ class DashBoardMenu extends React.PureComponent {
   }
 
   showCheckMark() {
-    console.log("it started");
     this.setState({ checkMark: "faIconFade" });
     setTimeout(() => this.setState({ checkMark: "faIcon" }), 3000);
-    console.log("it finished");
   }
 
   render() {
@@ -110,4 +108,16 @@ class DashBoardMenu extends React.PureComponent {
     );
   }
 }
+
+export function dashBoardMenuProps(that, key = "DashBoardMenu") {
+  let propList = {
+    getSavedDashBoards: that.props.getSavedDashBoards,
+    dashBoardData: that.props.dashBoardData,
+    loadDashBoard: that.props.loadDashBoard,
+    currentDashBoard: that.props.currentDashBoard,
+    saveCurrentDashboard: that.props.saveCurrentDashboard,
+  };
+  return propList;
+}
+
 export default DashBoardMenu;

@@ -123,6 +123,15 @@ label {
   background-color: white;
 }
 
+.widgetBox:hover {
+  overflow: hidden;
+  position: absolute;
+  z-index: 2;
+  border: 2px solid black;
+  border-radius: 10px;
+  background-color: white;
+}
+
 .widgetHeader {
   padding: 5px;
   z-index: 1;

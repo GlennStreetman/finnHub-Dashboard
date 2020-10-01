@@ -1,15 +1,15 @@
 import React from "react";
-// import StockWatchList from "./stockWatchList.js";
-// import StockSearchPane from "./stockSearchPane.js";
 import WidgetControl from "./widgets/widgetControl.js";
+import { dashBoardMenuProps } from "./widgets/dashBoardMenu/dashBoardMenu.js";
+import { watchListMenuProps } from "./widgets/watchListMenu/watchListMenu.js";
+import { candleWidgetProps } from "./widgets/candle/candleWidget.js";
+import { newsWidgetProps } from "./widgets/News/newsWidget.js";
+import { stockDetailWidgetProps } from "./widgets/stockDetails/stockDetailWidget.js";
 
 class TopNav extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      // showAddWatchlistMenu: 0,
-      // showWatchlistMenu: 0,
-      // showAddWidgetDropdown: 0,
       trackedStockData: {},
       widgetLockDown: 0, //1: Hide buttons, 0: Show buttons
       DashBoardMenu: 0, //1 = show, 0 = hide
@@ -21,6 +21,21 @@ class TopNav extends React.Component {
     this.getStockPrice = this.getStockPrice.bind(this);
     this.updateTickerSockets = this.updateTickerSockets.bind(this);
     this.menuWidgetToggle = this.menuWidgetToggle.bind(this);
+    this.returnBodyProps = this.returnBodyProps.bind(this);
+  }
+
+  returnBodyProps(that, key, ref = "pass") {
+    // console.log(key);
+    let widgetBodyProps = {
+      WatchListMenu: () => watchListMenuProps(that, key),
+      DashBoardMenu: () => dashBoardMenuProps(that, key),
+      CandleWidget: () => candleWidgetProps(that, ref),
+      NewsWidget: () => newsWidgetProps(that, ref),
+      StockDetailWidget: () => stockDetailWidgetProps(that, ref),
+    };
+    let renderBodyProps = widgetBodyProps[key];
+    // console.log(renderBodyProps);
+    return renderBodyProps;
   }
 
   componentDidMount() {
@@ -29,14 +44,9 @@ class TopNav extends React.Component {
 
   componentDidUpdate() {
     if (this.props.refreshStockData === 1) {
-      // console.log("updating stock connections");
-      // this.setState({ widgetLockDown: 1 });
       this.props.toggleRefreshStockData();
-      // console.log("updating");
-      // console.log(this.props.globalStockList);
 
       for (const stock in this.props.globalStockList) {
-        // console.log(this.props.globalStockList[stock]);
         this.getStockPrice(this.props.globalStockList[stock]);
       }
     }
@@ -49,7 +59,7 @@ class TopNav extends React.Component {
         this.props.loadDashBoard(loadGlobal, loadWidget);
         this.setState({ DashBoardMenu: 1 });
       } catch (err) {
-        console.log(err);
+        // console.log("failed to load dashboards");
       }
     }
   }
@@ -87,11 +97,7 @@ class TopNav extends React.Component {
   }
 
   getStockPrice(stockDescription) {
-    //takes stock symbol, returns object containing days basic stock price info.
-    // console.log(stockDescription);
-    // console.log(stockDescription.indexOf(":"));
     const stockSymbol = stockDescription.indexOf(":") > 0 ? stockDescription.slice(0, stockDescription.indexOf(":")) : stockDescription;
-    // console.log(stockSymbol);
     let stockPriceData = {};
     fetch("https://finnhub.io/api/v1/quote?symbol=" + stockSymbol + "&token=" + this.props.apiKey)
       .then((response) => response.json())
@@ -128,6 +134,7 @@ class TopNav extends React.Component {
 
   menuWidgetToggle(menuName, dashName = "pass") {
     //Create dashboard menu if first time looking at, else toggle visability
+
     if (this.props.menuList[menuName] === undefined) {
       this.props.newMenuContainer(menuName, dashName, "menuWidget");
       this.setState({ [menuName]: 1 });
@@ -138,47 +145,43 @@ class TopNav extends React.Component {
 
   render() {
     let widgetState = this.props.widgetList;
+    let menuState = this.props.menuList;
+    let that = this;
+
     let widgetRender = Object.keys(widgetState).map((el) => (
       <WidgetControl
+        //Required for widget Control.
         key={el}
-        widgetKey={el}
-        widgetList={widgetState[el]}
-        globalStockList={this.props.globalStockList}
-        updateGlobalStockList={this.props.updateGlobalStockList}
-        getStockPrice={this.getStockPrice}
-        trackedStockData={this.state.trackedStockData}
         moveWidget={this.props.moveWidget}
         removeWidget={this.props.removeWidget}
-        widgetLockDown={this.state.widgetLockDown}
-        apiKey={this.props.apiKey}
-        updateWidgetStockList={this.props.updateWidgetStockList}
-        loadDashBoard={this.props.loadDashBoard}
         stateRef="widgetList" //used by app.js to move and remove widgets.
-        saveCurrentDashboard={this.props.saveCurrentDashboard}
-        getSavedDashBoards={this.props.getSavedDashBoards}
-        currentDashBoard={this.props.currentDashBoard}
+        widgetBodyProps={this.returnBodyProps(that, widgetState[el]["widgetType"], el)}
+        widgetKey={el}
+        widgetList={widgetState[el]}
+        widgetLockDown={this.state.widgetLockDown}
+        //remove below?
+        // globalStockList={this.props.globalStockList}
+        // updateGlobalStockList={this.props.updateGlobalStockList}
+        // getStockPrice={this.getStockPrice}
+        // trackedStockData={this.state.trackedStockData}
+        // apiKey={this.props.apiKey}
+        // updateWidgetStockList={this.props.updateWidgetStockList}
+        // loadDashBoard={this.props.loadDashBoard}
+        // saveCurrentDashboard={this.props.saveCurrentDashboard}
+        // getSavedDashBoards={this.props.getSavedDashBoards}
+        // currentDashBoard={this.props.currentDashBoard}
       />
     ));
-    let menuState = this.props.menuList;
+
     let menuRender = Object.keys(menuState).map((el) => (
       <WidgetControl
-        apiKey={this.props.apiKey}
-        currentDashBoard={this.props.currentDashBoard}
-        dashBoardData={this.props.dashBoardData}
-        menuWidgetToggle={this.menuWidgetToggle}
-        globalStockList={this.props.globalStockList}
-        getSavedDashBoards={this.props.getSavedDashBoards}
-        getStockPrice={this.getStockPrice}
         key={el}
-        loadDashBoard={this.props.loadDashBoard}
+        menuWidgetToggle={this.menuWidgetToggle}
         moveWidget={this.props.moveWidget}
         removeWidget={this.props.removeWidget}
         stateRef="menuList" //used by app.js to move and remove widgets.
-        saveCurrentDashboard={this.props.saveCurrentDashboard}
         showMenu={this.state[el]}
-        trackedStockData={this.state.trackedStockData}
-        updateGlobalStockList={this.props.updateGlobalStockList}
-        updateWidgetStockList={this.props.updateWidgetStockList}
+        widgetBodyProps={this.returnBodyProps(that, el)}
         widgetKey={el}
         widgetList={menuState[el]}
         widgetLockDown={this.state.widgetLockDown}
@@ -189,19 +192,9 @@ class TopNav extends React.Component {
       <>
         <div className="topnav">
           <a href="#home">About</a>
-          {/* <div>
-            <a href="#contact" onClick={() => this.showPane("showWatchlistMenu")}>
-              {this.state.showWatchlistMenu === 0 ? "View Watchlist" : "Hide Watchlist Menu"}
-            </a>
-          </div> */}
-          <div>
-            {/* <a href="#cat" onClick={() => this.showPane("showAddWatchlistMenu")}>
-              {this.state.WatchListMenu === 0 ? "Add Stock to Watchlist" : "Hide Search"}
-            </a> */}
-          </div>
+
           <div>
             <a href="#contact" onClick={() => this.menuWidgetToggle("WatchListMenu", "WatchList")}>
-              {/* <a href="#contact" onClick={() => this.showPane("showDashBoardMenu")}> */}
               {this.state.WatchListMenu === 0 ? "Show Watchlist Menu" : "Hide Watchlist Menu"}
             </a>
           </div>
@@ -254,28 +247,6 @@ class TopNav extends React.Component {
           </div>
         </div>
 
-        {/* <div>
-          {this.state.showAddWatchlistMenu === 1 && (
-            <StockSearchPane
-              globalStockList={this.props.globalStockList}
-              updateGlobalStockList={this.props.updateGlobalStockList}
-              showSearchPane={() => this.showPane("showWatchlistMenu", 1)}
-              getStockPrice={this.getStockPrice}
-              apiKey={this.props.apiKey}
-            />
-          )}
-        </div>
-
-        <div>
-          {this.state.showWatchlistMenu === 1 && (
-            <StockWatchList
-              globalStockList={this.props.globalStockList}
-              showWatchListPane={() => this.showPane("showWatchlistMenu")}
-              trackedStockData={this.state.trackedStockData}
-              updateGlobalStockList={this.props.updateGlobalStockList}
-            />
-          )}
-        </div> */}
         {widgetRender}
         {menuRender}
       </>
@@ -284,3 +255,18 @@ class TopNav extends React.Component {
 }
 
 export default TopNav;
+
+//removed from menuProps
+// getStockPrice={this.getStockPrice}
+//required for widget body.
+//remove below
+// apiKey={this.props.apiKey}
+// currentDashBoard={this.props.currentDashBoard}
+// dashBoardData={this.props.dashBoardData}
+// globalStockList={this.props.globalStockList}
+// getSavedDashBoards={this.props.getSavedDashBoards}
+// loadDashBoard={this.props.loadDashBoard}
+// saveCurrentDashboard={this.props.saveCurrentDashboard}
+// trackedStockData={this.state.trackedStockData}
+// updateGlobalStockList={this.props.updateGlobalStockList}
+// updateWidgetStockList={this.props.updateWidgetStockList}
