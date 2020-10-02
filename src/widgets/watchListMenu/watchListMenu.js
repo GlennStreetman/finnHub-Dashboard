@@ -54,7 +54,14 @@ class WatchListMenu extends React.PureComponent {
           {this.state.availableStocks[el] ? this.state.availableStocks[el]["description"] : <></>}
         </td>
         <td className="rightTE" key={el + "prc"}>
-          {this.props.trackedStockData[el] ? this.props.trackedStockData[el]["currentPrice"].toFixed(2) : <></>}
+          {this.props.trackedStockData[el] ? (
+            this.props.trackedStockData[el]["currentPrice"].toLocaleString(undefined, {
+              minimumFractionDigits: 2,
+              maximumFractionDigits: 2,
+            })
+          ) : (
+            <></>
+          )}
         </td>
         <td className="centerTE" key={el + "rmv"}>
           <button

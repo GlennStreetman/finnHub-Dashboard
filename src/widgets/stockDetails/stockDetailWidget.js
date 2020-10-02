@@ -12,6 +12,7 @@ class StockDetailWidget extends React.Component {
   }
 
   updateWidgetList(stock) {
+    console.log("updating");
     if (stock.indexOf(":") > 0) {
       const stockSymbole = stock.slice(0, stock.indexOf(":"));
       this.props.updateWidgetStockList(this.props.widgetKey, stockSymbole);
@@ -130,12 +131,7 @@ class StockDetailWidget extends React.Component {
 export function stockDetailWidgetProps(that, key = "StockDetailWidget") {
   let propList = {
     apiKey: that.props.apiKey,
-    // dashBoardData: that.props.getSavedDashBoards,
-    // currentDashBoard: that.props.currentDashBoard,
     getStockPrice: that.getStockPrice,
-    // getSavedDashBoards: that.props.getSavedDashBoards,
-    // loadDashBoard: that.props.loadDashBoard,
-    // saveCurrentDashboard: that.props.saveCurrentDashboard,
     showPane: that.showPane,
     trackedStocks: that.props.widgetList[key]["trackedStocks"],
     trackedStockData: that.state.trackedStockData,

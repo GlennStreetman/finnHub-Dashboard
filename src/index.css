@@ -222,3 +222,28 @@ label {
 .leftTE {
   text-align: left;
 }
+
+tr:nth-child(even) {
+  background-color: #f0f0f0;
+  /* border-bottom: 1px solid black; */
+}
+
+thead {
+  /* border-bottom: 1px solid #000; */
+  font-weight: bold;
+  padding: 2px;
+}
+
+table {
+  border-collapse: collapse;
+  margin: 2px;
+  border: 5px;
+}
+
+td {
+  padding: 2px;
+}
+
+th {
+  padding: 2px;
+}

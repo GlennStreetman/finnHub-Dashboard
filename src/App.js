@@ -78,10 +78,10 @@ class App extends React.Component {
 
   updateWidgetStockList(widgetId, symbol) {
     //adds if not present, else removes stock from widget specific stock list.
-    // console.log(widgetId);
+
     if (isNaN(widgetId) === false) {
-      let updateWidgetStockList = Object.assign(this.state.widgetList);
-      const trackingSymbolList = updateWidgetStockList[widgetId]["trackedStocks"];
+      let updateWidgetStockList = Object.assign({}, this.state.widgetList);
+      const trackingSymbolList = updateWidgetStockList[widgetId]["trackedStocks"].slice();
 
       if (trackingSymbolList.indexOf(symbol) === -1) {
         updateWidgetStockList[widgetId]["widgetList"] = trackingSymbolList.push(symbol);
@@ -89,6 +89,7 @@ class App extends React.Component {
         updateWidgetStockList[widgetId]["widgetList"] = trackingSymbolList.splice(trackingSymbolList.indexOf(symbol), 1);
       }
 
+      updateWidgetStockList[widgetId]["trackedStocks"] = trackingSymbolList;
       this.setState({ widgetList: updateWidgetStockList });
     }
   }

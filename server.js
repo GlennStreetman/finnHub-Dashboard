@@ -42,7 +42,7 @@ app.get("/login", (req, res) => {
   let myKey = { key: "", login: 0 };
   db.all(newQuery, [], (err, rows) => {
     if (err) {
-      res.json(myKey);
+      res.json("invalid login");
     }
     rows.forEach((row) => {
       myKey["key"] = row.apiKey;
