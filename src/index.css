@@ -11,7 +11,7 @@ code {
 
 /* Add a black background color to the top navigation */
 .topnav {
-  background-color: #333;
+  background-color: #1d69ab;
   /* overflow: hidden; */
 }
 
@@ -43,6 +43,7 @@ code {
 
 .div-inline {
   display: flex;
+  /* flex-grow: auto; */
   flex-flow: row wrap;
   align-items: center;
   padding: 10px;
@@ -62,7 +63,7 @@ code {
 }
 
 .stockSearch {
-  background-color: #333;
+  background-color: #1d69ab;
   /* width: 25%; */
   align-items: center;
 }
@@ -79,7 +80,7 @@ label {
   z-index: 2; /* Stay on top */
   /* top: 0; Stay at the top */
   left: 0;
-  background-color: #111; /* Black */
+  background-color: #1d69ab; /* Black */
   overflow-x: hidden; /* Disable horizontal scroll */
   padding-top: 1px;
 }
@@ -135,7 +136,7 @@ label {
 .widgetHeader {
   padding: 5px;
   z-index: 1;
-  background-color: #2196f3;
+  background-color: #1d69ab;
   color: #fff;
   /* display: flex; */
   flex-direction: row;
@@ -150,8 +151,8 @@ label {
   padding: 2px;
   /* cursor: move; */
   z-index: 1;
-  background-color: #2196f3;
-  color: #2196f3;
+  background-color: #1d69ab;
+  color: #1d69ab;
   flex-direction: row;
   text-align: right;
 }
@@ -164,7 +165,7 @@ label {
 
 .dropbtn {
   text-align: left;
-  background-color: #333;
+  background-color: #1d69ab;
   color: white;
   padding: 16px;
   font-size: 16px;
@@ -230,6 +231,7 @@ tr:nth-child(even) {
 
 thead {
   /* border-bottom: 1px solid #000; */
+  background-color: #dcdcdc;
   font-weight: bold;
   padding: 2px;
 }
@@ -246,4 +248,69 @@ td {
 
 th {
   padding: 2px;
+}
+
+.login-splash {
+  display: flex;
+  justify-content: center;
+  padding: 5%;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-style: solid;
+  border-width: 5px;
+  /* padding: 5px; */
+  border-radius: 10px;
+  border-color: #1d69ab;
+  box-sizing: border-box;
+  /* width: 20%; */
+}
+
+.login-div {
+  display: flex;
+  flex-direction: column;
+  font-size: 20px;
+  justify-content: center;
+  margin: auto;
+  text-align: center;
+  flex-wrap: nowarp;
+  flex-grow: auto;
+  padding: 0px;
+  margin: 2px;
+}
+
+.login-div-options {
+  display: flex;
+  font-size: 20px;
+  flex-wrap: nowarp;
+  padding: 10px;
+  color: #1d69ab;
+}
+
+.login-div-options > a {
+  color: #1d69ab;
+}
+.div-inline-login {
+  display: flex;
+  flex-direction: row;
+
+  flex-flow: row wrap;
+  align-items: center;
+  padding: 10px;
+  flex-wrap: nowrap;
+}
+.login-text {
+  margin: auto;
+  color: #1d69ab;
+}
+
+.loginBtn {
+  color: white;
+  background-color: #1d69ab;
+  font-size: 16px;
+  width: 100%;
 }

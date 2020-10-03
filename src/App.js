@@ -29,6 +29,7 @@ class App extends React.Component {
     this.toggleRefreshStockData = this.toggleRefreshStockData.bind(this);
     this.saveCurrentDashboard = this.saveCurrentDashboard.bind(this);
     this.getSavedDashBoards = this.getSavedDashBoards.bind(this);
+    this.changeWidgetName = this.changeWidgetName.bind(this);
   }
 
   processLogin(setKey, setLogin) {
@@ -70,7 +71,7 @@ class App extends React.Component {
     //updates x and y pixel location of target widget.
     //stateref should be "widgetList" or "menuList"
 
-    let updatedWidgetLocation = Object.assign(this.state[stateRef]);
+    let updatedWidgetLocation = Object.assign({}, this.state[stateRef]);
     updatedWidgetLocation[widgetId]["xAxis"] = xxAxis;
     updatedWidgetLocation[widgetId]["yAxis"] = yyAxis;
     this.setState({ [stateRef]: updatedWidgetLocation });
@@ -94,8 +95,13 @@ class App extends React.Component {
     }
   }
 
+  changeWidgetName(stateRef, widgetID, newName) {
+    let newWidgetList = Object.assign(this.state[stateRef]);
+    newWidgetList[widgetID]["widgetHeader"] = newName;
+    this.setState({ stateRef: newWidgetList });
+  }
+
   removeWidget(stateRef, widgetID) {
-    //removes widget from stateRef list.
     //stateref should be "widgetList" or "menuList"
     let newWidgetList = Object.assign(this.state[stateRef]);
     delete newWidgetList[widgetID];
@@ -200,6 +206,7 @@ class App extends React.Component {
           getSavedDashBoards={this.getSavedDashBoards}
           dashBoardData={this.state.dashBoardData}
           currentDashBoard={this.state.currentDashBoard}
+          changeWidgetName={this.removeWidget}
         />
       </>
     ) : (

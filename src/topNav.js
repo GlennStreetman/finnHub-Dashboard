@@ -170,6 +170,7 @@ class TopNav extends React.Component {
         widgetKey={el}
         widgetList={widgetState[el]}
         widgetLockDown={this.state.widgetLockDown}
+        changeWidgetName={this.props.changeWidgetName}
       />
     ));
 
@@ -185,13 +186,14 @@ class TopNav extends React.Component {
         widgetKey={el}
         widgetList={menuState[el]}
         widgetLockDown={this.state.widgetLockDown}
+        changeWidgetName={this.props.changeWidgetName}
       />
     ));
 
     return (
       <>
         <div className="topnav">
-          <a href="#home">About</a>
+          <a href="#home">About FinnDash</a>
 
           <div>
             <a href="#contact" onClick={() => this.menuWidgetToggle("WatchListMenu", "WatchList")}>
