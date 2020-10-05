@@ -262,18 +262,3 @@ class TopNav extends React.Component {
 }
 
 export default TopNav;
-
-//removed from menuProps
-// getStockPrice={this.getStockPrice}
-//required for widget body.
-//remove below
-// apiKey={this.props.apiKey}
-// currentDashBoard={this.props.currentDashBoard}
-// dashBoardData={this.props.dashBoardData}
-// globalStockList={this.props.globalStockList}
-// getSavedDashBoards={this.props.getSavedDashBoards}
-// loadDashBoard={this.props.loadDashBoard}
-// saveCurrentDashboard={this.props.saveCurrentDashboard}
-// trackedStockData={this.state.trackedStockData}
-// updateGlobalStockList={this.props.updateGlobalStockList}
-// updateWidgetStockList={this.props.updateWidgetStockList}

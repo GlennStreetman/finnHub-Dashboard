@@ -8,6 +8,7 @@ const { v4: uuidv4 } = require("uuid");
 const session = require("express-session");
 const FileStore = require("session-file-store")(session);
 const bodyParser = require("body-parser");
+
 // const passport = require("passport");
 // const LocalStrategy = require("passport-local").Strategy;
 // const axios = require("axios");
@@ -37,23 +38,84 @@ app.get("/", (req, res) => {
 });
 
 app.get("/login", (req, res) => {
-  thisRequest = req.query;
+  thisRequest = req.query; //.query contains all query string parameters.
   newQuery = "SELECT id, apiKey FROM user WHERE loginName ='" + thisRequest["loginText"] + "' AND password = '" + md5(thisRequest["pwText"]) + "'";
   let myKey = { key: "", login: 0 };
   db.all(newQuery, [], (err, rows) => {
     if (err) {
       res.json("invalid login");
-    }
-    rows.forEach((row) => {
-      myKey["key"] = row.apiKey;
-      myKey["login"] = 1;
-      // console.log(myKey);
-      req.session.uID = row.id;
-    });
+    } else {
+      rows.forEach((row) => {
+        myKey["key"] = row.apiKey;
+        myKey["login"] = 1;
+        // console.log(myKey);
+        req.session.uID = row.id;
+      });
 
-    req.session.userName = thisRequest["loginText"];
-    // console.log(req.session.userName);
-    res.json(myKey);
+      req.session.userName = thisRequest["loginText"];
+      // console.log(req.session.userName);
+      res.json(myKey);
+    }
+  });
+});
+
+app.get("/forgot", (req, res) => {
+  thisRequest = req.query; //.query contains all query string parameters.
+  newQuery = "SELECT loginName, secretQuestion FROM user WHERE email ='" + thisRequest["loginText"] + "'";
+  console.log(newQuery);
+  let userName = {};
+  db.get(newQuery, [], (err, rows) => {
+    if (err) {
+      res.json("Email not found");
+    } else {
+      console.log(rows);
+      console.log(rows.length);
+      if (rows !== undefined) {
+        req.session.userName = rows.loginName;
+        userName["user"] = rows.loginName;
+        userName["question"] = rows.secretQuestion;
+        res.json(userName);
+      } else {
+        console.log("failed email");
+        res.json("false");
+      }
+    }
+  });
+});
+
+app.get("/secretQuestion", (req, res) => {
+  thisRequest = req.query; //.query contains all query string parameters.
+  newQuery = "SELECT id FROM user WHERE secretAnswer ='" + md5(thisRequest["loginText"]) + "' AND loginName = '" + req.session.userName + "'";
+  console.log(newQuery);
+  let userName = {};
+  db.get(newQuery, [], (err, rows) => {
+    if (err) {
+      res.json("Secret question did not match.");
+    } else {
+      console.log(rows);
+      if (rows !== undefined) {
+        console.log("reset ready");
+        req.session.reset = 1;
+        res.json("true");
+      } else {
+        console.log("reset NOT ready");
+        res.json("false");
+      }
+    }
+  });
+});
+
+app.get("/newPW", (req, res) => {
+  thisRequest = req.query; //.query contains all query string parameters.
+  newQuery = `UPDATE user SET password = '${md5(thisRequest.newPassword)}' WHERE loginName = '${req.session.userName}' AND 1 = ${req.session.reset}`;
+  console.log(newQuery);
+  db.exec(newQuery, (err, rows) => {
+    if (err) {
+      res.json("Could not reset password");
+    } else {
+      console.log("success");
+      res.json("updated");
+    }
   });
 });
 
@@ -66,9 +128,10 @@ app.get("/accountData", (req, res) => {
   db.all(newQuery, [], (err, rows) => {
     if (err) {
       res.json("Could not retrieve user data");
+    } else {
+      resultSet["userData"] = rows;
+      res.json(resultSet);
     }
-    resultSet["userData"] = rows;
-    res.json(resultSet);
   });
 });
 
@@ -81,8 +144,9 @@ app.post("/accountData", (req, res) => {
   db.all(updateQuery, [], (err, rows) => {
     if (err) {
       res.json(`Failed to update ${updateField}`);
+    } else {
+      res.json(`Update complete`);
     }
-    res.json(`Update complete`);
   });
 });
 
@@ -94,15 +158,13 @@ app.get("/dashboard", (req, res) => {
   db.all(getSavedDashBoards, [], (err, rows) => {
     if (err) {
       res.json("Failed to retrieve dashboards");
+    } else {
+      resultSet["savedDashBoards"] = rows;
+      db.all(getMenuSetup, [], (err, rows) => {
+        resultSet["menuSetup"] = rows;
+        res.json(resultSet);
+      });
     }
-    resultSet["savedDashBoards"] = rows;
-    db.all(getMenuSetup, [], (err, rows) => {
-      if (err) {
-        res.json("Failed to retrieve menu setup");
-      }
-      resultSet["menuSetup"] = rows;
-      res.json(resultSet);
-    });
   });
 });
 

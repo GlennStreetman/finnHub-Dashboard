@@ -15,8 +15,10 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
       `CREATE TABLE user (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             loginName text UNIQUE, 
-            email text, 
+            email text UNIQUE, 
             password text,
+            secretQuestion text,
+            secretAnswer text,
             apiKey text,
             webHook text
             )`,
@@ -27,9 +29,25 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
         } else {
           // Table just created, creating some rows
           console.log("inserting rows");
-          var insert = "INSERT INTO user (loginName, email, password, apiKey, webHook) VALUES (?,?,?,?,?)";
-          db.run(insert, ["admin", "glennstreetman@gmail.com", md5("admin"), "bsuu7qv48v6qu589jlj0", "bss698f48v6u62sfqlog"]);
-          db.run(insert, ["guest", "glennstreetman@gmail.com", md5("guest"), "bsuu7qv48v6qu589jlj0", "bss698f48v6u62sfqlog"]);
+          var insert = "INSERT INTO user (loginName, email, password, secretQuestion, secretAnswer, apiKey, webHook) VALUES (?,?,?,?,?,?,?)";
+          db.run(insert, [
+            "admin",
+            "glennstreetmanadmin@gmail.com",
+            md5("admin"),
+            "This is my secret question",
+            md5("answer"),
+            "bsuu7qv48v6qu589jlj0",
+            "bss698f48v6u62sfqlog",
+          ]);
+          db.run(insert, [
+            "guest",
+            "glennstreetman@gmail.com",
+            md5("guest"),
+            "This is my secret question",
+            md5("answer"),
+            "bsuu7qv48v6qu589jlj0",
+            "bss698f48v6u62sfqlog",
+          ]);
           db.run(`CREATE TABLE dashBoard (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             userID INTEGER, 
