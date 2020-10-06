@@ -37,50 +37,101 @@ app.get("/", (req, res) => {
   res.sendFile(__dirname + "/public/");
 });
 
+app.post("/register", (req, res) => {
+  let loginText = req.body.loginText;
+  let pwText = req.body.pwText;
+  let emailText = req.body.emailText;
+  let secretQuestion = req.body.secretQuestion;
+  let secretAnswer = req.body.secretAnswer;
+
+  const checkUser = "SELECT loginName FROM user WHERE loginName ='" + loginText + "'";
+  const checkEamil = "SELECT email FROM user WHERE email ='" + emailText + "'";
+  const createuser = `INSERT INTO user (loginName, password, email, secretQuestion, secretAnswer) VALUES ('${loginText}','${pwText}','${emailText}','${secretQuestion}','${secretAnswer}')`;
+  console.log(checkUser);
+  console.log(checkEamil);
+  console.log(createuser);
+  let failedCheck = 0; //stop if set to 1
+  db.get(checkUser, (err, rows) => {
+    if (err) {
+      console.log("user check error");
+      failedCheck = 1;
+      res.json("User check error");
+    } else if (rows !== undefined) {
+      res.json("user");
+      failedCheck = 1;
+    } else {
+      console.log("user name not taken");
+    }
+  });
+  if (failedCheck === 0) {
+    db.get(checkEamil, (err, rows) => {
+      if (err) {
+        console.log("email check error");
+        failedCheck = 1;
+        res.json("email check error");
+      } else if (rows !== undefined) {
+        res.json("email");
+        failedCheck = 1;
+      } else {
+        console.log("email not taken");
+      }
+    });
+  }
+
+  if (failedCheck === 0) {
+    db.exec(createuser, (rows) => {
+      if (rows === null) {
+        res.json("true");
+      } else {
+        res.json("failed to register");
+      }
+    });
+  }
+});
+
 app.get("/login", (req, res) => {
   thisRequest = req.query; //.query contains all query string parameters.
   newQuery = "SELECT id, apiKey FROM user WHERE loginName ='" + thisRequest["loginText"] + "' AND password = '" + md5(thisRequest["pwText"]) + "'";
   let myKey = { key: "", login: 0 };
-  db.all(newQuery, [], (err, rows) => {
+  db.get(newQuery, (err, rows) => {
     if (err) {
-      res.json("invalid login");
-    } else {
-      rows.forEach((row) => {
-        myKey["key"] = row.apiKey;
-        myKey["login"] = 1;
-        // console.log(myKey);
-        req.session.uID = row.id;
-      });
-
+      res.json("false");
+    } else if (rows !== undefined) {
+      myKey["key"] = rows.apiKey;
+      myKey["login"] = 1;
+      console.log(myKey);
+      req.session.uID = rows.id;
       req.session.userName = thisRequest["loginText"];
-      // console.log(req.session.userName);
       res.json(myKey);
+    } else {
+      res.json("false");
     }
   });
 });
 
 app.get("/forgot", (req, res) => {
+  console.log("forgot");
   thisRequest = req.query; //.query contains all query string parameters.
   newQuery = "SELECT loginName, secretQuestion FROM user WHERE email ='" + thisRequest["loginText"] + "'";
   console.log(newQuery);
   let userName = {};
-  db.get(newQuery, [], (err, rows) => {
+  db.get(newQuery, (err, rows) => {
+    console.log(rows);
     if (err) {
+      console.log("email not found");
       res.json("Email not found");
+    } else if (rows !== undefined) {
+      console.log("generating rows for forgot password");
+      req.session.userName = rows.loginName;
+      userName["user"] = rows.loginName;
+      userName["question"] = rows.secretQuestion;
+      res.json(userName);
     } else {
-      console.log(rows);
-      console.log(rows.length);
-      if (rows !== undefined) {
-        req.session.userName = rows.loginName;
-        userName["user"] = rows.loginName;
-        userName["question"] = rows.secretQuestion;
-        res.json(userName);
-      } else {
-        console.log("failed email");
-        res.json("false");
-      }
+      console.log("failed email");
+      res.json("false");
     }
   });
+  // console.log("done");
 });
 
 app.get("/secretQuestion", (req, res) => {
@@ -114,7 +165,7 @@ app.get("/newPW", (req, res) => {
       res.json("Could not reset password");
     } else {
       console.log("success");
-      res.json("updated");
+      res.json("true");
     }
   });
 });
@@ -215,12 +266,6 @@ app.post("/dashboard", (req, res) => {
     }
   });
 });
-
-// app.get("setDefaultDashBoard", (req, res) => {
-//   let uId = req.session.uID;
-//   let thisRequest = req.query;
-//   let updateSQL = `UPDATE menuSetup SET defaultMenu = `;
-// });
 
 app.get("/deleteSavedDashboard", (req, res) => {
   let uId = req.session.uID;

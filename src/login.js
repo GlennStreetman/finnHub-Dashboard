@@ -1,25 +1,70 @@
 import React from "react";
+const md5 = require("md5");
 
 class login extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      loginText: "guest",
-      pwText: "guest",
+      loginText: "",
+      pwText: "",
+      emailText: "",
       loginState: 0, //0 = login, 1 = recover, 2 = register, 3 = secret question, 4 reset password
-      secretQuestion: "test",
+      secretQuestion: "",
+      secretAnswer: "",
       serverResponse: "",
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.checkPassword = this.checkPassword.bind(this);
     this.forgotLogin = this.forgotLogin.bind(this);
-    this.resetPW = this.resetPW.bind(this);
+    this.secretQuestion = this.secretQuestion.bind(this);
     this.newPW = this.newPW.bind(this);
+    this.clearText = this.clearText.bind(this);
+    this.registerAccount = this.registerAccount.bind(this);
   }
 
   handleChange(e) {
     this.setState({ [e.target.name]: e.target.value });
+  }
+
+  clearText(loginStateRef) {
+    this.setState({ loginText: "" });
+    this.setState({ pwText: "" });
+    this.setState({ serverResponse: "" });
+    this.setState({ emailText: "" });
+    this.setState({ secretQuestion: "" });
+    this.setState({ loginState: loginStateRef });
+  }
+
+  registerAccount() {
+    const data = {
+      loginText: this.state.loginText,
+      pwText: md5(this.state.pwText),
+      emailText: this.state.emailText,
+      secretQuestion: this.state.secretQuestion,
+      secretAnswer: md5(this.state.secretAnswer),
+    };
+
+    const options = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    };
+
+    fetch("/register", options)
+      .then((response) => response.json())
+      .then((data) => {
+        // console.log(data);
+        if (data === "true") {
+          // console.log("its true");
+          this.clearText(0);
+        } else {
+          this.setState({ serverResponse: data });
+        }
+      })
+      .catch((error) => {
+        // console.error("No server response", error);
+      });
   }
 
   checkPassword() {
@@ -28,7 +73,11 @@ class login extends React.Component {
     fetch("/login?loginText=" + this.state.loginText + "&pwText=" + this.state.pwText)
       .then((response) => response.json())
       .then((data) => {
-        this.props.updateLogin(data["key"], data["login"]);
+        if (data !== "false") {
+          this.props.updateLogin(data["key"], data["login"]);
+        } else {
+          this.setState({ serverResponse: "Login/Password did not match" });
+        }
       })
       .catch((error) => {
         // console.error("No server response", error);
@@ -36,14 +85,15 @@ class login extends React.Component {
   }
 
   forgotLogin() {
-    // console.log("recover login request sent");
+    console.log("recover login request sent");
     fetch("/forgot?loginText=" + this.state.loginText)
       .then((response) => response.json())
       .then((data) => {
         if (data["user"] !== undefined) {
+          console.log("userFound");
           this.setState({ serverResponse: "username: " + data["user"] });
           this.setState({ secretQuestion: data["question"] });
-          this.setState({ loginState: 3 });
+          this.clearText(3);
         } else {
           this.setState({ serverResponse: "Email not found" });
         }
@@ -53,8 +103,8 @@ class login extends React.Component {
       });
   }
 
-  resetPW() {
-    //checks secret question then.
+  secretQuestion() {
+    //checks secret question before allowing pw reset.
     console.log("reset password request sent");
     fetch("/secretQuestion?loginText=" + this.state.loginText)
       .then((response) => response.json())
@@ -64,9 +114,9 @@ class login extends React.Component {
         if (data === "true") {
           this.setState({ serverResponse: "username: " + data["user"] });
           this.setState({ secretQuestion: data["question"] });
-          this.setState({ loginState: 4 });
+          this.clearText(4);
         } else {
-          this.setState({ serverResponse: "Answer did not match." });
+          this.setState({ serverResponse: "Wrong answer, try again." });
         }
       })
       .catch((error) => {
@@ -86,7 +136,7 @@ class login extends React.Component {
             this.setState({ serverResponse: "Password Updated." });
             this.setState({ loginState: 0 });
           } else {
-            this.setState({ serverResponse: "Answer did not match." });
+            this.setState({ serverResponse: "Passwords did not match." });
           }
         })
         .catch((error) => {
@@ -102,15 +152,15 @@ class login extends React.Component {
     let submitFunctionLookup = {
       0: () => this.checkPassword(),
       1: () => this.forgotLogin(),
-      2: () => this.checkPassword(),
-      3: () => this.resetPW(),
+      2: () => this.registerAccount(),
+      3: () => this.secretQuestion(),
       4: () => this.newPW(),
     };
     let topTextLookup = {
       0: "Login to FinnDash",
       1: "Recover login name",
       2: "Register Finndash Account",
-      3: "Reset Password?",
+      3: "Answer Secret Question:",
       4: "New Password",
     };
 
@@ -145,18 +195,18 @@ class login extends React.Component {
       4: "Register",
     };
     let leftFunctionLookup = {
-      0: () => this.setState({ loginState: 1 }),
-      1: () => this.setState({ loginState: 0 }),
-      2: () => this.setState({ loginState: 0 }),
-      3: () => this.setState({ loginState: 0 }),
-      4: () => this.setState({ loginState: 0 }),
+      0: () => this.clearText(1),
+      1: () => this.clearText(0),
+      2: () => this.clearText(0),
+      3: () => this.clearText(0),
+      4: () => this.clearText(0),
     };
     let rightFunctionLookup = {
-      0: () => this.setState({ loginState: 2 }),
-      1: () => this.setState({ loginState: 2 }),
-      2: () => this.setState({ loginState: 1 }),
-      3: () => this.setState({ loginState: 2 }),
-      4: () => this.setState({ loginState: 2 }),
+      0: () => this.clearText(2),
+      1: () => this.clearText(2),
+      2: () => this.clearText(1),
+      3: () => this.clearText(2),
+      4: () => this.clearText(2),
     };
 
     let field1 = field1Lookup[this.state.loginState];
@@ -187,7 +237,6 @@ class login extends React.Component {
                 <input type="text" name="loginText" value={this.state.loginText} onChange={this.handleChange} />
               </div>
               {/* bottom text field. Show for login or register */}
-              {/* {this.state.loginState !== 1 ? ( */}
               {[0, 2, 4].indexOf(this.state.loginState) > -1 ? (
                 <>
                   <div className="login-div">
@@ -200,7 +249,46 @@ class login extends React.Component {
               ) : (
                 <></>
               )}
-
+              {/* 3rd text field used when registering */}
+              {/* eamil */}
+              {[2].indexOf(this.state.loginState) > -1 ? (
+                <>
+                  <div className="login-div">
+                    <b className="login-text">Email</b>
+                  </div>
+                  <div className="login-div">
+                    <input name="emailText" value={this.state.emailText} onChange={this.handleChange} />
+                  </div>
+                </>
+              ) : (
+                <></>
+              )}
+              {/* secret question */}
+              {[2].indexOf(this.state.loginState) > -1 ? (
+                <>
+                  <div className="login-div">
+                    <b className="login-text">Secret Question</b>
+                  </div>
+                  <div className="login-div">
+                    <input name="secretQuestion" value={this.state.secretQuestion} onChange={this.handleChange} />
+                  </div>
+                </>
+              ) : (
+                <></>
+              )}
+              {/* secret answer */}
+              {[2].indexOf(this.state.loginState) > -1 ? (
+                <>
+                  <div className="login-div">
+                    <b className="login-text">Secret Answer</b>
+                  </div>
+                  <div className="login-div">
+                    <input name="secretAnswer" value={this.state.secretAnswer} onChange={this.handleChange} />
+                  </div>
+                </>
+              ) : (
+                <></>
+              )}
               {/* submit button */}
               <div className="login-div">
                 <input className="loginBtn" type="submit" value="Submit" onClick={submitFunction} />
