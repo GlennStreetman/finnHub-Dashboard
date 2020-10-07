@@ -33,6 +33,7 @@ class login extends React.Component {
     this.setState({ serverResponse: "" });
     this.setState({ emailText: "" });
     this.setState({ secretQuestion: "" });
+    this.setState({ secretAnswer: "" });
     this.setState({ loginState: loginStateRef });
   }
 

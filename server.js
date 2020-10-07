@@ -45,48 +45,42 @@ app.post("/register", (req, res) => {
   let secretAnswer = req.body.secretAnswer;
 
   const checkUser = "SELECT loginName FROM user WHERE loginName ='" + loginText + "'";
-  const checkEamil = "SELECT email FROM user WHERE email ='" + emailText + "'";
-  const createuser = `INSERT INTO user (loginName, password, email, secretQuestion, secretAnswer) VALUES ('${loginText}','${pwText}','${emailText}','${secretQuestion}','${secretAnswer}')`;
-  console.log(checkUser);
-  console.log(checkEamil);
-  console.log(createuser);
-  let failedCheck = 0; //stop if set to 1
+  const checkEmail = "SELECT email FROM user WHERE email ='" + emailText + "'";
+  const createUser = `INSERT INTO user (loginName, password, email, secretQuestion, secretAnswer) VALUES ('${loginText}','${pwText}','${emailText}','${secretQuestion}','${secretAnswer}')`;
+
+  //nodes util api might be able to clean this up by using util.promisify.
+  //this should get us out of a callback pyramid.
   db.get(checkUser, (err, rows) => {
     if (err) {
       console.log("user check error");
-      failedCheck = 1;
       res.json("User check error");
     } else if (rows !== undefined) {
-      res.json("user");
-      failedCheck = 1;
+      console.log("user check error2");
+      res.json("User Name Already Taken");
     } else {
       console.log("user name not taken");
+      db.get(checkEmail, (err, rows) => {
+        console.log(rows);
+        if (err) {
+          console.log("email check error");
+          failedCheck = 1;
+          res.json("email check error");
+        } else if (rows !== undefined) {
+          res.json("Email already taken");
+          failedCheck = 1;
+        } else {
+          console.log("email not taken");
+          db.exec(createUser, (rows) => {
+            if (rows === null) {
+              res.json("true");
+            } else {
+              res.json("failed to register");
+            }
+          });
+        }
+      });
     }
   });
-  if (failedCheck === 0) {
-    db.get(checkEamil, (err, rows) => {
-      if (err) {
-        console.log("email check error");
-        failedCheck = 1;
-        res.json("email check error");
-      } else if (rows !== undefined) {
-        res.json("email");
-        failedCheck = 1;
-      } else {
-        console.log("email not taken");
-      }
-    });
-  }
-
-  if (failedCheck === 0) {
-    db.exec(createuser, (rows) => {
-      if (rows === null) {
-        res.json("true");
-      } else {
-        res.json("failed to register");
-      }
-    });
-  }
 });
 
 app.get("/login", (req, res) => {
