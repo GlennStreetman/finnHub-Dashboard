@@ -96,6 +96,8 @@ class App extends React.Component {
   }
 
   changeWidgetName(stateRef, widgetID, newName) {
+    //stateref should equal widgetlist or menulist.
+    console.log(stateRef + ":" + widgetID + ":" + newName);
     let newWidgetList = Object.assign(this.state[stateRef]);
     newWidgetList[widgetID]["widgetHeader"] = newName;
     this.setState({ stateRef: newWidgetList });
@@ -206,7 +208,7 @@ class App extends React.Component {
           getSavedDashBoards={this.getSavedDashBoards}
           dashBoardData={this.state.dashBoardData}
           currentDashBoard={this.state.currentDashBoard}
-          changeWidgetName={this.removeWidget}
+          changeWidgetName={this.changeWidgetName}
         />
       </>
     ) : (

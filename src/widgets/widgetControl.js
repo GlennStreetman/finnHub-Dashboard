@@ -36,9 +36,13 @@ class WidgetControl extends React.Component {
     this.setState({ [stateRef]: showMenu });
   }
 
-  updateHeader(newHeader) {
+  updateHeader(e) {
     //changes widget name.
-    this.setState({ renderHeader: newHeader });
+    this.setState({ renderHeader: e.target.value });
+    console.log(e.target.value);
+    console.log(this.props.stateRef);
+    console.log(this.props.widgetKey);
+    this.props.changeWidgetName(this.props.stateRef, this.props.widgetKey, e.target.value);
   }
 
   handleChange(e) {
@@ -120,7 +124,7 @@ class WidgetControl extends React.Component {
             {this.state.showEditPane === 0 ? (
               <>{this.state.renderHeader}</>
             ) : (
-              <input type="text" id={this.props.widgetKey + "HeaderValue"} value={this.state.renderHeader} onChange={this.handleChange} />
+              <input type="text" id={this.props.widgetKey + "HeaderValue"} value={this.state.renderHeader} onChange={this.updateHeader} />
             )}
 
             <button

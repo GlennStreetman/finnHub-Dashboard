@@ -15,7 +15,7 @@ class DashBoardMenu extends React.PureComponent {
 
   componentDidMount() {
     // console.log("mounted");
-    this.props.getSavedDashBoards(); //might not be needed
+    this.props.getSavedDashBoards();
   }
 
   handleChange(e) {
@@ -51,7 +51,12 @@ class DashBoardMenu extends React.PureComponent {
         </td>
         <td key={dashBoardData[el].id + "te"}>{dashBoardData[el].dashBoardName}</td>
         <td className="centerTE">
-          <button onClick={() => this.props.loadDashBoard(dashBoardData[el].globalStockList, dashBoardData[el].widgetList)}>
+          <button
+            onClick={() => {
+              this.props.loadDashBoard(dashBoardData[el].globalStockList, dashBoardData[el].widgetList);
+              this.setState({ inputText: dashBoardData[el].dashBoardName });
+            }}
+          >
             <i className="fa fa-check-square-o" aria-hidden="true"></i>
           </button>
         </td>
