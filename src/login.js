@@ -59,6 +59,7 @@ class login extends React.Component {
         if (data === "true") {
           // console.log("its true");
           this.clearText(0);
+          this.setState({ serverResponse: "Thank you for registering, please login." });
         } else {
           this.setState({ serverResponse: data });
         }
@@ -93,8 +94,8 @@ class login extends React.Component {
         if (data["user"] !== undefined) {
           console.log("userFound");
           this.setState({ serverResponse: "username: " + data["user"] });
-          this.setState({ secretQuestion: data["question"] });
           this.clearText(3);
+          this.setState({ secretQuestion: data["question"] });
         } else {
           this.setState({ serverResponse: "Email not found" });
         }
@@ -126,16 +127,13 @@ class login extends React.Component {
   }
 
   newPW() {
-    // console.log("--------");
-    // console.log("setting new pw");
     if (this.state.loginText === this.state.pwText) {
       fetch("/newPW?newPassword=" + this.state.loginText)
         .then((response) => response.json())
         .then((data) => {
-          console.log(data);
-          if (data === "updated") {
+          if (data === "true") {
+            this.clearText(0);
             this.setState({ serverResponse: "Password Updated." });
-            this.setState({ loginState: 0 });
           } else {
             this.setState({ serverResponse: "Passwords did not match." });
           }
@@ -167,7 +165,7 @@ class login extends React.Component {
 
     let field1Lookup = {
       0: "UserName",
-      1: "Email",
+      1: "Enter Email",
       2: "UserName",
       3: this.state.secretQuestion,
       4: "Enter New Password",
