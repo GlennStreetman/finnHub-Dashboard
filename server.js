@@ -9,18 +9,11 @@ const session = require("express-session");
 const FileStore = require("session-file-store")(session);
 const bodyParser = require("body-parser");
 
-// const passport = require("passport");
-// const LocalStrategy = require("passport-local").Strategy;
-// const axios = require("axios");
 const app = express();
-
-// let UserSessions = {};
 let fileStoreOptions = {};
-//build required in order to render react. Always place after session definition.
+
 app.use(cookieParser());
 app.use(bodyParser.json()); // support json encoded bodies
-// app.use(bodyParser.urlencoded({ extended: true })); // support encoded bodies
-// app.use(express.json({ limit: "1mb" }));
 
 app.use(
   session({
@@ -31,11 +24,14 @@ app.use(
     cookie: { secure: false, sameSite: true },
   })
 );
-// app.use(express.static(path.join(__dirname, "/build")));
 
 app.get("/", (req, res) => {
   res.sendFile(__dirname + "/public/");
 });
+
+function emailIsValid(email) {
+  return /\S+@\S+\.\S+/.test(email);
+}
 
 app.post("/register", (req, res) => {
   let loginText = req.body.loginText;
@@ -50,37 +46,42 @@ app.post("/register", (req, res) => {
 
   //nodes util api might be able to clean this up by using util.promisify.
   //this should get us out of a callback pyramid.
-  db.get(checkUser, (err, rows) => {
-    if (err) {
-      console.log("user check error");
-      res.json("User check error");
-    } else if (rows !== undefined) {
-      console.log("user check error2");
-      res.json("User Name Already Taken");
-    } else {
-      console.log("user name not taken");
-      db.get(checkEmail, (err, rows) => {
-        console.log(rows);
-        if (err) {
-          console.log("email check error");
-          failedCheck = 1;
-          res.json("email check error");
-        } else if (rows !== undefined) {
-          res.json("Email already taken");
-          failedCheck = 1;
-        } else {
-          console.log("email not taken");
-          db.exec(createUser, (rows) => {
-            if (rows === null) {
-              res.json("true");
-            } else {
-              res.json("failed to register");
-            }
-          });
-        }
-      });
-    }
-  });
+
+  if (emailIsValid(emailText) === true) {
+    db.get(checkUser, (err, rows) => {
+      if (err) {
+        console.log("user check error");
+        res.json("User check error");
+      } else if (rows !== undefined) {
+        console.log("user check error2");
+        res.json("User Name Already Taken");
+      } else {
+        console.log("user name not taken");
+        db.get(checkEmail, (err, rows) => {
+          console.log(rows);
+          if (err) {
+            console.log("email check error");
+            failedCheck = 1;
+            res.json("email check error");
+          } else if (rows !== undefined) {
+            res.json("Email already taken");
+            failedCheck = 1;
+          } else {
+            console.log("email not taken");
+            db.exec(createUser, (rows) => {
+              if (rows === null) {
+                res.json("true");
+              } else {
+                res.json("failed to register");
+              }
+            });
+          }
+        });
+      }
+    });
+  } else {
+    res.json("Enter a valid email address");
+  }
 });
 
 app.get("/login", (req, res) => {
