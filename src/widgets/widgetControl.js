@@ -147,7 +147,6 @@ class WidgetControl extends React.Component {
           <div className="widgetHeader">{this.state.renderHeader}</div>
         )}
 
-        {/* {React.createElement(widgetList[this.props.widgetList["widgetType"]], widgetProps[this.props.widgetList["widgetType"]])} */}
         {React.createElement(widgetList[this.props.widgetList["widgetType"]], widgetProps)}
 
         <div className="widgetFooter">

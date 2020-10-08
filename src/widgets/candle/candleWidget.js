@@ -16,7 +16,7 @@ class CandleWidget extends React.Component {
       endDate: new Date().toISOString().slice(0, 10), //default to today.
       candleSelection: startStock, //current stock to be graphed.
       candleData: { 0: "blank" }, //graph data.
-      // charData: [],
+      chartData: [],
       options: {}, //graph options
       resolution: "W",
       selectResolution: [1, 5, 15, 30, 60, "D", "W", "M"],
@@ -101,11 +101,11 @@ class CandleWidget extends React.Component {
           x: new Date(data["t"][nodei] * 1000),
           y: [data["o"][nodei], data["h"][nodei], data["l"][nodei], data["c"][nodei]], //open, high, low, close
         };
-        let updateChartData = this.state.chartData;
+        let updateChartData = this.state.chartData.slice();
         updateChartData.push(newNode);
         this.setState({ chartData: updateChartData });
-        this.createChartOptions();
       }
+      this.createChartOptions();
     }
   }
 
@@ -114,6 +114,8 @@ class CandleWidget extends React.Component {
       theme: "light2", // "light1", "light2", "dark1", "dark2"
       animationEnabled: true,
       exportEnabled: false,
+      height: 400,
+      width: 400,
       title: {
         text: this.state.candleSelection + ": " + this.state.startDate + " - " + this.state.endDate,
       },
@@ -195,7 +197,7 @@ class CandleWidget extends React.Component {
             {newSymbolList}
           </select>
         </div>
-        <div>
+        <div className="graphDiv">
           <CreateCandleStickChart candleData={this.state.options} candleSelection={this.state.candleSelection} />
         </div>
       </>
@@ -214,7 +216,7 @@ class CandleWidget extends React.Component {
       <>
         {this.props.showEditPane === 1 && (
           <>
-            <div>
+            <div className="searchPane">
               <StockSearchPane
                 updateWidgetStockList={this.props.updateWidgetStockList}
                 widgetKey={this.props.widgetKey}
@@ -239,7 +241,9 @@ class CandleWidget extends React.Component {
             <div>{Object.keys(this.props.trackedStocks).length > 0 ? this.editCandleListForm() : <></>}</div>
           </>
         )}
-        {this.props.showEditPane === 0 && <div>{Object.keys(this.props.trackedStocks).length > 0 ? this.displayCandleGraph() : <></>}</div>}
+        {this.props.showEditPane === 0 && (
+          <div className="graphDiv">{Object.keys(this.props.trackedStocks).length > 0 ? this.displayCandleGraph() : <></>}</div>
+        )}
       </>
     );
   }
