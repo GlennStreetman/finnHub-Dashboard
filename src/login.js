@@ -1,5 +1,5 @@
 import React from "react";
-const md5 = require("md5");
+
 
 class login extends React.Component {
   constructor(props) {
@@ -50,10 +50,10 @@ class login extends React.Component {
   registerAccount() {
     const data = {
       loginText: this.state.loginText,
-      pwText: md5(this.state.pwText),
+      pwText: this.state.pwText,
       emailText: this.state.emailText,
       secretQuestion: this.state.secretQuestion,
-      secretAnswer: md5(this.state.secretAnswer),
+      secretAnswer: this.state.secretAnswer,
     };
 
     const options = {

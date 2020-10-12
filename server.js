@@ -4,7 +4,7 @@ const port = process.env.NODE_ENV || 5000;
 const md5 = require("md5");
 const db = require("./database.js");
 const cookieParser = require("cookie-parser");
-const { v4: uuidv4 } = require("uuid");
+// const { v4: uuidv4 } = require("uuid");
 const session = require("express-session");
 const FileStore = require("session-file-store")(session);
 const bodyParser = require("body-parser");
@@ -42,7 +42,7 @@ app.post("/register", (req, res) => {
 
   const checkUser = "SELECT loginName FROM user WHERE loginName ='" + loginText + "'";
   const checkEmail = "SELECT email FROM user WHERE email ='" + emailText + "'";
-  const createUser = `INSERT INTO user (loginName, password, email, secretQuestion, secretAnswer) VALUES ('${loginText}','${pwText}','${emailText}','${secretQuestion}','${secretAnswer}')`;
+  const createUser = `INSERT INTO user (loginName, password, email, secretQuestion, secretAnswer) VALUES ('${loginText}','${md5(pwText)}','${emailText}','${secretQuestion}','${md5(secretAnswer)}')`;
 
   //nodes util api might be able to clean this up by using util.promisify.
   //this should get us out of a callback pyramid.
