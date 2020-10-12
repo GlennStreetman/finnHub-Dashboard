@@ -41,11 +41,8 @@ class login extends React.Component {
   }
 
   handleEnterKeyPress(e, keyFunction) {
-    // console.log('handle key press')
-    console.log(e.key)
-    console.log(keyFunction)
     if (e.key === "Enter") {
-      console.log('enter detected')
+      // console.log('enter detected')
       keyFunction()
     }
   }

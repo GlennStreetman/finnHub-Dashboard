@@ -1,7 +1,7 @@
 import React from "react";
 import StockDataList from "./stockDataList.js";
 
-//compnent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
+//compnoent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
 class StockSearchPane extends React.Component {
   constructor(props) {
     super(props);
@@ -49,14 +49,9 @@ class StockSearchPane extends React.Component {
           } = stockValues;
           //set API object keys equal to stock symbol value instad of numeric value
           transformData.push(c + ": " + b);
-          // = {
-          //   // currency: a,
-          //   description: b,
-          //   displaySymbol: c,
-          //   // symbol: d,
-          //   // type: e,
-          // };
+
         }
+        
         this.setState({ availableStocks: transformData });
         console.log("Success retrieving stock symbols");
       })
@@ -89,7 +84,7 @@ class StockSearchPane extends React.Component {
           }}
         >
           <label htmlFor="stockSearch">Search For Stock Symbol: </label>
-          <input className="btn" type="text" id="stockSearch" list="stockSearch1" value={this.state.inputText} onChange={this.handleChange} />
+          <input autoComplete="off" className="btn" type="text" id="stockSearch" list="stockSearch1" value={this.state.inputText} onChange={this.handleChange} />
           {/* <datalist id="stockSearch1">{this.createDataList()}</datalist> */}
           <datalist id="stockSearch1">
             <StockDataList availableStocks={this.state.filteredStocks} />
