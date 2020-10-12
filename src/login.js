@@ -21,8 +21,11 @@ class login extends React.Component {
     this.newPW = this.newPW.bind(this);
     this.clearText = this.clearText.bind(this);
     this.registerAccount = this.registerAccount.bind(this);
+    this.handleEnterKeyPress = this.handleEnterKeyPress.bind(this)
   }
 
+  
+  
   handleChange(e) {
     this.setState({ [e.target.name]: e.target.value });
   }
@@ -35,6 +38,16 @@ class login extends React.Component {
     this.setState({ secretQuestion: "" });
     this.setState({ secretAnswer: "" });
     this.setState({ loginState: loginStateRef });
+  }
+
+  handleEnterKeyPress(e, keyFunction) {
+    // console.log('handle key press')
+    console.log(e.key)
+    console.log(keyFunction)
+    if (e.key === "Enter") {
+      console.log('enter detected')
+      keyFunction()
+    }
   }
 
   registerAccount() {
@@ -219,8 +232,8 @@ class login extends React.Component {
 
     return (
       <>
-        <div className="login-splash">
-          <div className="login-container">
+        <div className="login-splash" onKeyDown = { (e) => this.handleEnterKeyPress(e, submitFunction)}>
+          <div className="login-container" >
             <div className="login-div">
               <img src="logo.png" alt="logo"></img>
             </div>
