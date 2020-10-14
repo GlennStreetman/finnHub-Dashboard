@@ -319,3 +319,7 @@ th {
   display: inline-block;
   width: 400px;
 }
+
+.txt {
+  margin: 10px;
+}

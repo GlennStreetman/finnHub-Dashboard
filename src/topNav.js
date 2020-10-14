@@ -5,7 +5,8 @@ import { watchListMenuProps } from "./widgets/watchListMenu/watchListMenu.js";
 import { candleWidgetProps } from "./widgets/candle/candleWidget.js";
 import { newsWidgetProps } from "./widgets/News/newsWidget.js";
 import { stockDetailWidgetProps } from "./widgets/stockDetails/stockDetailWidget.js";
-import { accountMenu } from "./widgets/AccountMenu/accountMenu.js";
+import { accountMenuProps } from "./widgets/AccountMenu/accountMenu.js";
+import { aboutMenuProps } from "./widgets/AboutMenu/AboutMenu.js";
 
 class TopNav extends React.Component {
   constructor(props) {
@@ -17,6 +18,7 @@ class TopNav extends React.Component {
       WatchListMenu: 0, //1 = show, 0 = hide
       AccountMenu: 0, //1 = show, 0 = hide
       loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
+      AboutMenu: 0, //1 = show, 0 = hide
     };
 
     this.showPane = this.showPane.bind(this);
@@ -27,14 +29,15 @@ class TopNav extends React.Component {
   }
 
   returnBodyProps(that, key, ref = "pass") {
-    // console.log(key);
+    console.log(key);
     let widgetBodyProps = {
       WatchListMenu: () => watchListMenuProps(that, key),
       DashBoardMenu: () => dashBoardMenuProps(that, key),
       CandleWidget: () => candleWidgetProps(that, ref),
       NewsWidget: () => newsWidgetProps(that, ref),
       StockDetailWidget: () => stockDetailWidgetProps(that, ref),
-      AccountMenu: () => accountMenu(that, ref),
+      AccountMenu: () => accountMenuProps(that, ref),
+      AboutMenu: () => aboutMenuProps(that, ref),
     };
     let renderBodyProps = widgetBodyProps[key];
     // console.log(renderBodyProps);
@@ -193,8 +196,11 @@ class TopNav extends React.Component {
     return (
       <>
         <div className="topnav">
-          <a href="#home">About FinnDash</a>
-
+          <div>
+            <a href="#home" onClick={() => this.menuWidgetToggle("AboutMenu", "About FinnDash")}>
+            {this.state.AboutMenu === 0 ? "About" : "Hide About"}
+            </a>
+          </div>
           <div>
             <a href="#contact" onClick={() => this.menuWidgetToggle("WatchListMenu", "WatchList")}>
               {this.state.WatchListMenu === 0 ? "Show Watchlist Menu" : "Hide Watchlist Menu"}

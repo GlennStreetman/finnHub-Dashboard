@@ -1,5 +1,5 @@
 const express = require("express");
-const path = require("path");
+
 const port = process.env.NODE_ENV || 5000;
 const md5 = require("md5");
 const db = require("./database.js");
@@ -11,6 +11,29 @@ const bodyParser = require("body-parser");
 
 const app = express();
 let fileStoreOptions = {};
+
+//enable below to run HTTPS server.
+//see the below link for info on updating https info
+//https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener
+//-------------------------------------------------------
+var fs = require('fs')
+var https = require('https')
+const path = require("path");
+https.createServer({
+  pfx: fs.readFileSync(path.join(__dirname, 'ssl', 'cert.pfx')),
+  passphrase: 'glennPSKey',
+}, app).listen(port, function(){
+  console.log(`serving the direcotry @ https`)
+})
+
+//enable below to run HTTP server
+//---------------------------------------------------
+// app.listen(port, function () {
+//   console.log("Listening to http://localhost:" + port);
+// });
+// app.use(function (req, res) {
+//   res.status(404);
+// });
 
 app.use(cookieParser());
 app.use(bodyParser.json()); // support json encoded bodies
@@ -275,11 +298,4 @@ app.get("/deleteSavedDashboard", (req, res) => {
   });
 });
 
-app.listen(port, function () {
-  // console.log("Listening to http://localhost:" + port);
-});
 
-// Default response for any other request
-app.use(function (req, res) {
-  res.status(404);
-});

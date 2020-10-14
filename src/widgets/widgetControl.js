@@ -5,6 +5,7 @@ import CandleWidget from "./candle/candleWidget.js";
 import DashBoardMenu from "./dashBoardMenu/dashBoardMenu.js";
 import WatchListMenu from "./watchListMenu/watchListMenu.js";
 import AccountMenu from "./AccountMenu/accountMenu.js";
+import AboutMenu from "./AboutMenu/AboutMenu.js";
 
 //creates widget container. Used by all widgets.
 class WidgetControl extends React.Component {
@@ -39,9 +40,9 @@ class WidgetControl extends React.Component {
   updateHeader(e) {
     //changes widget name.
     this.setState({ renderHeader: e.target.value });
-    console.log(e.target.value);
-    console.log(this.props.stateRef);
-    console.log(this.props.widgetKey);
+    // console.log(e.target.value);
+    // console.log(this.props.stateRef);
+    // console.log(this.props.widgetKey);
     this.props.changeWidgetName(this.props.stateRef, this.props.widgetKey, e.target.value);
   }
 
@@ -91,13 +92,14 @@ class WidgetControl extends React.Component {
   }
 
   render() {
+    
+    //Add widgets to the list below that should not have access to the stock search pane
+    const hideStockSearchMenu = ["DashBoardMenu", "AccountMenu", "AboutMenu"]
+    
     const compStyle = {
-      // display: "block",
       display: this.props.stateRef === "menuList" && this.props.showMenu === 0 ? "none" : "block",
       top: this.props.widgetList["xAxis"],
       left: this.props.widgetList["yAxis"],
-      // opacity: ["DashBoardMenu", "WatchListMenu", "AccountMenu"].indexOf(this.state.renderBody) > -1 && this.props.showMenu === 0 ? 0 : 100,
-      // opacity: this.props.stateRef === "menuList" && this.props.showMenu === 0 ? 0 : 100,
     };
 
     let widgetList = {
@@ -107,6 +109,7 @@ class WidgetControl extends React.Component {
       DashBoardMenu: DashBoardMenu,
       WatchListMenu: WatchListMenu,
       AccountMenu: AccountMenu,
+      AboutMenu: AboutMenu,
     };
 
     const that = this;
@@ -136,8 +139,8 @@ class WidgetControl extends React.Component {
             >
               <i className="fa fa-arrows" aria-hidden="true"></i>
             </button>
-            {/* {this.props.widgetKey !== "DashBoardMenu" && ( */}
-            {["DashBoardMenu", "AccountMenu"].indexOf(this.props.widgetKey) < 0 && (
+
+            {hideStockSearchMenu.indexOf(this.props.widgetKey) < 0 && (
               <button className="headerButtons" onClick={() => this.showPane("showEditPane", -1)}>
                 <i className="fa fa-pencil-square-o" aria-hidden="true"></i>
               </button>

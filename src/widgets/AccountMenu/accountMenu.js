@@ -138,7 +138,7 @@ class AccountMenu extends React.PureComponent {
   }
 }
 
-export function accountMenu(that, key = "AccountMenu") {
+export function accountMenuProps(that, key = "AccountMenu") {
   let propList = {
     apiKey: that.props.apiKey,
     globalStockList: that.props.globalStockList,

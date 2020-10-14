@@ -1,5 +1,5 @@
 {
-  "proxy": "http://localhost:5000",
+  "proxy": "https://localhost:5000",
   "name": "dashboard",
   "version": "0.1.0",
   "private": true,
@@ -29,7 +29,6 @@
     "uuid": "^8.3.0"
   },
   "scripts": {
-    "devstart": "nodemon server.js",
     "dev:server": "nodemon --ignore sessions/ server.js",
     "start": "SET PORT=3000 && react-scripts start",
     "build": "react-scripts build",
