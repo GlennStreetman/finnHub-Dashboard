@@ -30,6 +30,8 @@ class App extends React.Component {
     this.saveCurrentDashboard = this.saveCurrentDashboard.bind(this);
     this.getSavedDashBoards = this.getSavedDashBoards.bind(this);
     this.changeWidgetName = this.changeWidgetName.bind(this);
+    this.updateWidgetData = this.updateWidgetData.bind(this);
+    
   }
 
   processLogin(setKey, setLogin) {
@@ -75,6 +77,12 @@ class App extends React.Component {
     updatedWidgetLocation[widgetId]["xAxis"] = xxAxis;
     updatedWidgetLocation[widgetId]["yAxis"] = yyAxis;
     this.setState({ [stateRef]: updatedWidgetLocation });
+  }
+
+  updateWidgetData(widgetID, dataKey, data){
+    let updatedWidgetList = Object.assign({}, this.state.widgetList)
+    updatedWidgetList[widgetID][dataKey] = data
+    this.setState({widgetList: updatedWidgetList})
   }
 
   updateWidgetStockList(widgetId, symbol) {
@@ -209,6 +217,7 @@ class App extends React.Component {
           dashBoardData={this.state.dashBoardData}
           currentDashBoard={this.state.currentDashBoard}
           changeWidgetName={this.changeWidgetName}
+          updateWidgetData={this.updateWidgetData}
         />
       </>
     ) : (

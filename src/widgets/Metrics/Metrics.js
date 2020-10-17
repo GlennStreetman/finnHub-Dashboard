@@ -7,7 +7,7 @@ class MetricsWidget extends React.Component {
     super(props);
     this.state = {
         metricList: [],
-        metricSelection: [],
+        metricSelection: [], //needs to be moved into widgetList data saved in app component.
         metricData: {},
         metricIncrementor: 1,
         orderView: 0,
@@ -28,12 +28,20 @@ class MetricsWidget extends React.Component {
   }
 
   componentDidMount(){
-    //dumby stock symbol user to return list of all metrics
+    //dumby stock symbol user to return list of all metrics.
     fetch("https://finnhub.io/api/v1/stock/metric?symbol=AAPL&metric=all&token=" + this.props.apiKey)
     .then((response) => response.json())
     .then((data) => {
       this.setState({metricList: Object.keys(data.metric)})
     })
+
+    //initial setup the first time widget is loaded.
+    if (this.props.metricSelection === undefined) {
+      let newList = []
+      this.props.updateWidgetData(this.props.widgetKey, 'metricSelection', newList)
+    }
+    //load initial data
+    this.props.trackedStocks.forEach(el => this.getCompanyMetrics(el))
   }
 
   getCompanyMetrics(symbol) {
@@ -58,13 +66,14 @@ class MetricsWidget extends React.Component {
   }
 
   changeOrder(indexRef, change){
-    console.log(indexRef + ":" + change)
-    let moveFrom = this.state.metricSelection[indexRef]
-    let moveTo = this.state.metricSelection[indexRef + change]
-    let orderMetricSelection = this.state.metricSelection.slice()
+    // console.log(indexRef + ":" + change)
+    let moveFrom = this.props.metricSelection[indexRef]
+    let moveTo = this.props.metricSelection[indexRef + change]
+    let orderMetricSelection = this.props.metricSelection.slice()
     orderMetricSelection[indexRef] = moveTo
     orderMetricSelection[indexRef + change] = moveFrom
-    this.setState({metricSelection: orderMetricSelection})
+    this.props.updateWidgetData(this.props.widgetKey, 'metricSelection', orderMetricSelection)
+    // this.setState({metricSelection: orderMetricSelection})
   }
 
   changeIncrememnt(e) {
@@ -74,14 +83,16 @@ class MetricsWidget extends React.Component {
 
   selectMetrics(metric){
 
-    if (this.state.metricSelection.indexOf(metric) < 0) {
-      let newSelection = this.state.metricSelection.slice()
+    if (this.props.metricSelection.indexOf(metric) < 0) {
+      let newSelection = this.props.metricSelection.slice()
       newSelection.push(metric)
-      this.setState({metricSelection: newSelection})
+      this.props.updateWidgetData(this.props.widgetKey, 'metricSelection', newSelection)
+      // this.setState({metricSelection: newSelection})
     } else {
       let newSelection = this.state.metricSelection.slice()
       newSelection.splice(newSelection.indexOf(metric), 1)
-      this.setState({metricSelection: newSelection})
+      this.props.updateWidgetData(this.props.widgetKey, 'metricSelection', newSelection)  
+      // this.setState({metricSelection: newSelection})
     }
   }
 
@@ -113,13 +124,15 @@ class MetricsWidget extends React.Component {
   }
 
   clickCheckBox(boxValue){
-    let newSelection = this.state.metricSelection.splice()
+    let newSelection = this.props.metricSelection.splice()
     newSelection.push(boxValue)
-    this.setState({metricSelection: newSelection})
+    this.props.updateWidgetData(this.props.widgetKey, 'metricSelection', newSelection)
+    // this.setState({metricSelection: newSelection})
   }
 
   checkStatus(check){
-    if (this.state.metricSelection.indexOf(check) > -1) {
+    //sets status of check boxes when selecting or deselecting checkboxes.
+    if (this.props.metricSelection.indexOf(check) > -1) {
       return true
     } else {return false}
   }
@@ -129,7 +142,7 @@ class MetricsWidget extends React.Component {
     let start = increment - 10;
     let end = increment;
     let metricSlice = this.state.metricList.slice(start, end);
-    let selectionSlice = this.state.metricSelection.slice(start, end);
+    let selectionSlice = this.props.metricSelection.slice(start, end);
     let stockSelectionSlice = this.props.trackedStocks.slice(start, end);
     // console.log(selectionSlice)
     let mapMetrics = metricSlice.map((el, index) => (
@@ -185,7 +198,7 @@ class MetricsWidget extends React.Component {
   }
 
   updateWidgetList(stock) {
-    console.log("updating");
+    // console.log("updating");
     if (stock.indexOf(":") > 0) {
       const stockSymbole = stock.slice(0, stock.indexOf(":"));
       this.props.updateWidgetStockList(this.props.widgetKey, stockSymbole);
@@ -196,38 +209,41 @@ class MetricsWidget extends React.Component {
 
   mapStockData(symbol){
     let symbolData = this.state.metricData[symbol]
-    let findMetrics = this.state.metricSelection
+    let findMetrics = this.props.metricSelection
     // console.log(findMetrics)
     let returnMetrics = []
     for (var x in findMetrics) {
       try {
         // console.log(findMetrics[x])
         let metric = symbolData[findMetrics[x]]
-        returnMetrics.push(metric)
+        returnMetrics.push(metric.toLocaleString(undefined, {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2,
+        }))
       } catch(err){
-        console.log('mapStockData err')
+        // console.log('mapStockData err')
       }
     }
     // console.log(returnMetrics)
-    let thisMetricList = returnMetrics.map((el) => <td>{el}</td>)
+    let thisMetricList = returnMetrics.map((el) => <td className="rightTE" key={el + "dat"}>{el}</td>)
     return thisMetricList
   }
 
   renderStockData() {
 
-    let headerRows = this.state.metricSelection.map((el) => {
+    let headerRows = this.props.metricSelection.map((el) => {
       let title = el.replace(/([A-Z])/g, ' $1').trim().split(" ").join("\n")
       if (title.search(/\d\s[A-Z]/g) !== -1) {
         title = title.slice(0, title.search(/\d\s[A-Z]/g)+1) + '-' + title.slice(title.search(/\d\s[A-Z]/g)+2)
       }
-      console.log(title)
+      // console.log(title)
       title = title.replace(/T\sT\sM/g, 'TTM')
-      console.log(title)
-      return (<td className='tdHead'>{title}</td>)}
+      // console.log(title)
+      return (<td className='tdHead' key={el + "title"}>{title}</td>)}
       )
     let bodyRows = this.props.trackedStocks.map((el) => { return (
-    <tr>
-    <td>{el}</td>
+    <tr key={el + "tr1"}>
+    <td key={el + "td1"}>{el}</td>
     {this.mapStockData(el)}
     </tr>
     )})
@@ -235,7 +251,7 @@ class MetricsWidget extends React.Component {
       <table className='widgetBodyTable'>
         <thead>
           <tr>
-            <td>symbol</td>
+            <td className='centerBottomTE'>Symbol</td>
             {headerRows}
           </tr>
         </thead>
@@ -275,8 +291,9 @@ export function metricsProps(that, key = "MetricsWidget") {
     apiKey: that.props.apiKey,
     getStockPrice: that.getStockPrice,
     showPane: that.showPane,
-    trackedStocks: that.props.widgetList[key]["trackedStocks"], //is this needed
-    // trackedStockData: that.state.trackedStockData,
+    trackedStocks: that.props.widgetList[key]["trackedStocks"],
+    metricSelection: that.props.widgetList[key]["metricSelection"],
+    updateWidgetData: that.props.updateWidgetData,
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,

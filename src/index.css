@@ -228,6 +228,11 @@ label {
   text-align: left;
 }
 
+.centerBottomTE {
+  text-align: center;
+  vertical-align: bottom;
+}
+
 tr:nth-child(even) {
   background-color: #f0f0f0;
   /* border-bottom: 1px solid black; */
@@ -238,6 +243,9 @@ thead {
   background-color: #dcdcdc;
   font-weight: bold;
   padding: 2px;
+  vertical-align: bottom;
+  text-align: center;
+  text-transform: capitalize;
 }
 
 table {
