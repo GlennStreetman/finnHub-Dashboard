@@ -78,7 +78,7 @@ class CandleWidget extends React.Component {
         startDateUnix +
         "&to=" +
         endDateUnix +
-        "&token=bsuu7qv48v6qu589jlj0"
+        "&token=" + this.props.apiKey
     )
       .then((response) => response.json())
       .then((data) => {
@@ -115,7 +115,7 @@ class CandleWidget extends React.Component {
       animationEnabled: true,
       exportEnabled: false,
       height: 400,
-      width: 400,
+      width: 525,
       title: {
         text: this.state.candleSelection + ": " + this.state.startDate + " - " + this.state.endDate,
       },

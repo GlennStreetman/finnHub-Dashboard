@@ -97,7 +97,7 @@ class App extends React.Component {
 
   changeWidgetName(stateRef, widgetID, newName) {
     //stateref should equal widgetlist or menulist.
-    console.log(stateRef + ":" + widgetID + ":" + newName);
+    // console.log(stateRef + ":" + widgetID + ":" + newName);
     let newWidgetList = Object.assign(this.state[stateRef]);
     newWidgetList[widgetID]["widgetHeader"] = newName;
     this.setState({ stateRef: newWidgetList });
@@ -145,7 +145,7 @@ class App extends React.Component {
         this.setState({ currentDashBoard: data["menuSetup"][0]["defaultMenu"] });
       })
       .catch((error) => {
-        console.error("Failed to recover dashboards", error);
+        // console.error("Failed to recover dashboards", error);
       });
   }
 

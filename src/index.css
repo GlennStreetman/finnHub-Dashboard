@@ -194,6 +194,10 @@ label {
   display: block;
 }
 
+.widgetTableDiv {
+  align-content: center;
+}
+
 .widgetBodyTable {
   color: black;
   background-color: white;
@@ -317,9 +321,13 @@ th {
 
 .graphDiv {
   display: inline-block;
-  width: 400px;
+  width: 530px;
 }
 
 .txt {
   margin: 10px;
+}
+
+.tdHead {
+  white-space: pre;
 }

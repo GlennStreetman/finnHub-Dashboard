@@ -97,12 +97,12 @@ class login extends React.Component {
   }
 
   forgotLogin() {
-    console.log("recover login request sent");
+    // console.log("recover login request sent");
     fetch("/forgot?loginText=" + this.state.loginText)
       .then((response) => response.json())
       .then((data) => {
         if (data["user"] !== undefined) {
-          console.log("userFound");
+          // console.log("userFound");
           this.setState({ serverResponse: "username: " + data["user"] });
           this.clearText(3);
           this.setState({ secretQuestion: data["question"] });
@@ -111,7 +111,7 @@ class login extends React.Component {
         }
       })
       .catch((error) => {
-        console.error("No server response", error);
+        // console.error("No server response", error);
       });
   }
 
@@ -132,7 +132,7 @@ class login extends React.Component {
         }
       })
       .catch((error) => {
-        console.error("No server response", error);
+        // console.error("No server response", error);
       });
   }
 
@@ -149,7 +149,7 @@ class login extends React.Component {
           }
         })
         .catch((error) => {
-          console.error("No server response", error);
+          // console.error("No server response", error);
         });
     } else {
       this.setState({ serverResponse: "Passwords do not match." });

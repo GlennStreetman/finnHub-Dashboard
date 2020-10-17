@@ -65,7 +65,7 @@ class NewsWidget extends React.Component {
   }
 
   getCompanyNews(symbol, fromDate, toDate) {
-    fetch("https://finnhub.io/api/v1/company-news?symbol=" + symbol + "&from=" + fromDate + "&to=" + toDate + "&token=bsuu7qv48v6qu589jlj0")
+    fetch("https://finnhub.io/api/v1/company-news?symbol=" + symbol + "&from=" + fromDate + "&to=" + toDate + "&token=" + this.props.apiKey)
       .then((response) => response.json())
       .then((data) => {
         let filteredNews = [];

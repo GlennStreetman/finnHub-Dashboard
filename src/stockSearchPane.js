@@ -83,7 +83,7 @@ class StockSearchPane extends React.Component {
             }
           }}
         >
-          <label htmlFor="stockSearch">Search For Stock Symbol: </label>
+          <label htmlFor="stockSearch">Symbol: </label>
           <input autoComplete="off" className="btn" type="text" id="stockSearch" list="stockSearch1" value={this.state.inputText} onChange={this.handleChange} />
           {/* <datalist id="stockSearch1">{this.createDataList()}</datalist> */}
           <datalist id="stockSearch1">

@@ -1,5 +1,7 @@
 import React from "react";
 import WidgetControl from "./widgets/widgetControl.js";
+
+//Import props function from each widget/menu here and add to returnBodyProps function below.
 import { dashBoardMenuProps } from "./widgets/dashBoardMenu/dashBoardMenu.js";
 import { watchListMenuProps } from "./widgets/watchListMenu/watchListMenu.js";
 import { candleWidgetProps } from "./widgets/candle/candleWidget.js";
@@ -7,6 +9,7 @@ import { newsWidgetProps } from "./widgets/News/newsWidget.js";
 import { stockDetailWidgetProps } from "./widgets/stockDetails/stockDetailWidget.js";
 import { accountMenuProps } from "./widgets/AccountMenu/accountMenu.js";
 import { aboutMenuProps } from "./widgets/AboutMenu/AboutMenu.js";
+import { metricsProps } from "./widgets/Metrics/Metrics.js";
 
 class TopNav extends React.Component {
   constructor(props) {
@@ -29,7 +32,7 @@ class TopNav extends React.Component {
   }
 
   returnBodyProps(that, key, ref = "pass") {
-    console.log(key);
+    //text reference should match dropdown link.
     let widgetBodyProps = {
       WatchListMenu: () => watchListMenuProps(that, key),
       DashBoardMenu: () => dashBoardMenuProps(that, key),
@@ -38,6 +41,7 @@ class TopNav extends React.Component {
       StockDetailWidget: () => stockDetailWidgetProps(that, ref),
       AccountMenu: () => accountMenuProps(that, ref),
       AboutMenu: () => aboutMenuProps(that, ref),
+      MetricsWidget: () => metricsProps(that, ref),
     };
     let renderBodyProps = widgetBodyProps[key];
     // console.log(renderBodyProps);
@@ -253,6 +257,14 @@ class TopNav extends React.Component {
                     }}
                   >
                     Stock Candles
+                  </a>
+                  <a
+                    href="#3"
+                    onClick={() => {
+                      this.props.newWidgetContainer("MetricsWidget", "Stock Metrics: ", "stockWidget");
+                    }}
+                  >
+                    Basic Metrics
                   </a>
                 </div>
               </div>
