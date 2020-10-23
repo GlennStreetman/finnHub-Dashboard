@@ -94,7 +94,7 @@ class MetricsWidget extends React.Component {
       this.props.updateWidgetData(this.props.widgetKey, 'metricSelection', newSelection)
       // this.setState({metricSelection: newSelection})
     } else {
-      let newSelection = this.state.metricSelection.slice()
+      let newSelection = this.props.metricSelection.slice()
       newSelection.splice(newSelection.indexOf(metric), 1)
       this.props.updateWidgetData(this.props.widgetKey, 'metricSelection', newSelection)  
       // this.setState({metricSelection: newSelection})
@@ -231,7 +231,7 @@ class MetricsWidget extends React.Component {
     }
     // console.log(returnMetrics)
     let thisKey = this.props.widgetKey
-    let thisMetricList = returnMetrics.map((el) => <td className="rightTE" key={thisKey + el + "dat"}>{el}</td>)
+    let thisMetricList = returnMetrics.map((el, ind) => <td className="rightTE" key={thisKey + el + ind + "dat"}>{el}</td>)
     return thisMetricList
   }
 
