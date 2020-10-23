@@ -9,7 +9,8 @@ class CandleWidget extends React.Component {
     let currentMonth = new Date().getMonth();
     let currentyDay = new Date().getDay();
     let lastMonth = new Date(currentYear - 1, currentMonth, currentyDay).toISOString().slice(0, 10);
-    let startStock = this.props.trackedStocks.length > 0 ? this.props.trackedStocks[0] : 1;
+    let startString = this.props.trackedStocks.length > 0 && this.props.trackedStocks[0].slice(this.props.trackedStocks[0].indexOf('-') + 1,this.props.trackedStocks[0].length)
+    let startStock = this.props.trackedStocks.length > 0 ? startString : '';
 
     this.state = {
       startDate: lastMonth, //default prior month.
@@ -34,15 +35,15 @@ class CandleWidget extends React.Component {
 
   componentDidMount() {
     if (this.props.trackedStocks.length > 0) {
-      this.getCandleData(this.state.candleSelection, this.state.startDate, this.state.endDate);
+      this.getCandleData();
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (this.state.candleSelection !== prevState.candleSelection || this.props.showEditPane !== prevProps.showEditPane) {
-      this.getCandleData(this.state.candleSelection, this.state.startDate, this.state.endDate);
+      this.getCandleData();
     }
-    if (this.state.candleSelection === 1 && this.props.trackedStocks.length) {
+    if (this.state.candleSelection === '' && this.props.trackedStocks.length) {
       this.setState({ candleSelection: this.props.trackedStocks[0] });
     }
   }
@@ -63,6 +64,11 @@ class CandleWidget extends React.Component {
   }
 
   getCandleData() {
+    console.log('creating candle chart')
+    let candleStock = this.state.candleSelection
+    let candleSymbol = candleStock.slice(candleStock.indexOf('-')+1 , candleStock.length)
+    console.log(candleStock)
+    console.log(candleSymbol)
     const s = this.state.startDate;
     const e = this.state.endDate;
 
@@ -71,7 +77,7 @@ class CandleWidget extends React.Component {
 
     fetch(
       "https://finnhub.io/api/v1/stock/candle?symbol=" +
-        this.state.candleSelection +
+        candleSymbol +
         "&resolution=" +
         this.state.resolution +
         "&from=" +
@@ -224,6 +230,7 @@ class CandleWidget extends React.Component {
                 showSearchPane={() => this.props.showPane("showEditPane", 1)}
                 getStockPrice={this.props.getStockPrice}
                 apiKey={this.props.apiKey}
+                throttle={this.props.throttle}
               />
               <div className="stockSearch">
                 <form className="form-inline">
@@ -263,6 +270,7 @@ export function candleWidgetProps(that, key = "CandleWidget") {
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
+    throttle: that.state.throttle,
   };
   return propList;
 }

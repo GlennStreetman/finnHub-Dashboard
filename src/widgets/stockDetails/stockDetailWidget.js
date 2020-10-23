@@ -120,6 +120,7 @@ class StockDetailWidget extends React.Component {
             apiKey={this.props.apiKey}
             updateWidgetStockList={this.props.updateWidgetStockList}
             widgetKey={this.props.widgetKey}
+            throttle={this.props.throttle}
           />
         )}
         {Object.keys(this.props.trackedStockData).length > 0 ? this.renderStockData() : <></>}
@@ -138,6 +139,7 @@ export function stockDetailWidgetProps(that, key = "StockDetailWidget") {
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
+    throttle: that.state.throttle,
   };
   return propList;
 }

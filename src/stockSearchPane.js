@@ -7,57 +7,72 @@ class StockSearchPane extends React.Component {
     super(props);
     this.state = {
       inputText: "",
-      availableStocks: {},
-      filteredStocks: [],
+      availableStocks: {}, //formatted stock list returned from finhubb
+      filteredStockObjects: {}, //object data for each stock selected
+      filteredStocks: [], //short list of stocks selected
+      // exchanges:['US','T','SS','HK','AS','BR','LS','PA','SZ','L'],  //Premium account required to receive stock data for none US exchanges.  
+      exchanges:['US'],   //NYSE
     };
     this.handleChange = this.handleChange.bind(this);
+    this.getSymbolList = this.getSymbolList.bind(this);
   }
 
   componentDidMount() {
     // console.log("mounted");
-    this.getSymbolList();
-  }
-
-  handleChange(e) {
-    let newSearch = e.target.value.toUpperCase();
-    this.setState({ inputText: e.target.value.toUpperCase() });
-    let newFilteredList = [];
-    let availableStockCount = this.state.availableStocks.length;
-
-    for (let resultCount = 0, filteredCount = 0; resultCount < 20 && filteredCount < availableStockCount; filteredCount++) {
-      if (this.state.availableStocks[filteredCount].includes(newSearch) === true) {
-        resultCount = resultCount + 1;
-        newFilteredList.push(this.state.availableStocks[filteredCount]);
-      }
-      this.setState({ filteredStocks: newFilteredList });
+    let exchange = this.state.exchanges
+    for (const x in exchange) {
+      this.getSymbolList(exchange[x]);
     }
   }
 
-  getSymbolList() {
-    fetch("https://finnhub.io/api/v1/stock/symbol?exchange=US&token=" + this.props.apiKey)
-      .then((response) => response.json())
-      .then((data) => {
-        let transformData = [];
-        for (const [, stockValues] of Object.entries(data)) {
-          //deconstruct API object
-          const {
-            // currency: a,
-            description: b,
-            displaySymbol: c,
-            // symbol: d,
-            // type: e
-          } = stockValues;
-          //set API object keys equal to stock symbol value instad of numeric value
-          transformData.push(c + ": " + b);
 
+
+  handleChange(ev=1) {
+    ev.target !== undefined && this.setState({ inputText: ev.target.value.toUpperCase() });
+    
+    let filterObject = {}
+    let newFilteredList = [];
+
+    let availableStockCount = Object.keys(this.state.availableStocks).length;
+    let stockList = Object.keys(this.state.availableStocks)
+    let stockListObject = this.state.availableStocks
+    //limit autofill to 20 results
+    for (let resultCount = 0, filteredCount = 0; 
+        resultCount < 20 && filteredCount < availableStockCount; 
+        filteredCount++) {
+          let stockSearchPhrase = stockList[filteredCount] + ': ' + stockListObject[stockList[filteredCount]]['description'].toUpperCase()
+          if (stockSearchPhrase.includes(this.state.inputText) === true && stockListObject[stockList[filteredCount]]['type'] === 'EQS') {
+            resultCount = resultCount + 1;
+            newFilteredList.push(stockSearchPhrase);
+            filterObject[stockList[filteredCount]] = stockListObject[stockList[filteredCount]] 
+          }
+          this.setState({filteredStockObjects: filterObject})
+          this.setState({ filteredStocks: newFilteredList });
+          
         }
-        
-        this.setState({ availableStocks: transformData });
-        console.log("Success retrieving stock symbols");
+  }
+
+  getSymbolList(exchange) {
+    let that = this
+    this.props.throttle(function() { 
+      fetch(`https://finnhub.io/api/v1/stock/symbol?exchange=${exchange}&token=${that.props.apiKey}`)
+        .then((response) => response.json())
+        .then((data) => {
+          let updateStockList = Object.assign({}, data)
+          for (const key in updateStockList) {
+            let addStockData = updateStockList[key]
+            let addStockKey = exchange + "-" + updateStockList[key]['symbol']
+            updateStockList[addStockKey] = addStockData
+            delete updateStockList[key]
+          }
+          // let list = Object.assign({}, that.state.availableStocks ,updateStockList)
+          that.setState({ availableStocks: Object.assign({}, that.state.availableStocks ,updateStockList)});
+          console.log("Success retrieving stock symbols:" + exchange);
+        })
+        .catch((error) => {
+          console.error("Error retrieving stock symbols:" +  exchange);
+        });
       })
-      .catch((error) => {
-        console.error("Error retrieving stock symbols", error);
-      });
   }
 
   render() {
@@ -69,9 +84,9 @@ class StockSearchPane extends React.Component {
         <form
           className="form-inline"
           onSubmit={(e) => {
-            if (this.state.availableStocks.includes(this.state.inputText)) {
-              // console.log(this.props.availableStocks[e]);
-              this.props.updateGlobalStockList(e, this.state.inputText);
+            if (this.state.filteredStocks.includes(this.state.inputText)) {
+              let stockKey = this.state.inputText.slice(0, this.state.inputText.indexOf(":") )
+              this.props.updateGlobalStockList(e, stockKey ,this.state.filteredStockObjects[stockKey]);
               this.props.showSearchPane();
               this.props.getStockPrice(this.state.inputText);
               if (widgetKey / 1 !== undefined) {
@@ -79,7 +94,7 @@ class StockSearchPane extends React.Component {
               }
             } else {
               //console.log(this.state.inputText);
-              alert("invalid stock selection");
+              console.log("invalid stock selection");
             }
           }}
         >

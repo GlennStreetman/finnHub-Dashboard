@@ -7,7 +7,7 @@ class MetricsWidget extends React.Component {
     super(props);
     this.state = {
         metricList: [],
-        metricSelection: [], //needs to be moved into widgetList data saved in app component.
+        // metricSelection: [], //needs to be moved into widgetList data saved in app component.
         metricData: {},
         metricIncrementor: 1,
         orderView: 0,
@@ -29,12 +29,14 @@ class MetricsWidget extends React.Component {
 
   componentDidMount(){
     //dumby stock symbol user to return list of all metrics.
-    fetch("https://finnhub.io/api/v1/stock/metric?symbol=AAPL&metric=all&token=" + this.props.apiKey)
-    .then((response) => response.json())
-    .then((data) => {
-      this.setState({metricList: Object.keys(data.metric)})
+    let that = this
+    this.props.throttle(function() {  
+    fetch("https://finnhub.io/api/v1/stock/metric?symbol=AAPL&metric=all&token=" + that.props.apiKey)
+      .then((response) => response.json())
+      .then((data) => {
+        that.setState({metricList: Object.keys(data.metric)})
+      })
     })
-
     //initial setup the first time widget is loaded.
     if (this.props.metricSelection === undefined) {
       let newList = []
@@ -45,13 +47,16 @@ class MetricsWidget extends React.Component {
   }
 
   getCompanyMetrics(symbol) {
-    fetch("https://finnhub.io/api/v1/stock/metric?symbol=" + symbol + "&metric=all&token=" + this.props.apiKey)
-      .then((response) => response.json())
-      .then((data) => {
-        let updateData = Object.assign({}, this.state.metricData)
-        updateData[symbol] = data.metric
-        this.setState({metricData: updateData})
-      });
+    let that = this
+    this.props.throttle(function() {  
+    fetch("https://finnhub.io/api/v1/stock/metric?symbol=" + symbol.slice(symbol.indexOf("-")+1, symbol.length) + "&metric=all&token=" + that.props.apiKey)
+        .then((response) => response.json())
+        .then((data) => {
+          let updateData = Object.assign({}, that.state.metricData)
+          updateData[symbol] = data.metric
+          that.setState({metricData: updateData})
+        });
+      })
   }
 
   componentDidUpdate(prevProps, PrevState) {
@@ -225,13 +230,16 @@ class MetricsWidget extends React.Component {
       }
     }
     // console.log(returnMetrics)
-    let thisMetricList = returnMetrics.map((el) => <td className="rightTE" key={el + "dat"}>{el}</td>)
+    let thisKey = this.props.widgetKey
+    let thisMetricList = returnMetrics.map((el) => <td className="rightTE" key={thisKey + el + "dat"}>{el}</td>)
     return thisMetricList
   }
 
   renderStockData() {
-
-    let headerRows = this.props.metricSelection.map((el) => {
+    let selectionList = []
+    let thisKey = this.props.widgetKey
+    if (this.props.metricSelection !== undefined) {selectionList = this.props.metricSelection.slice()}
+    let headerRows = selectionList.map((el) => {
       let title = el.replace(/([A-Z])/g, ' $1').trim().split(" ").join("\n")
       if (title.search(/\d\s[A-Z]/g) !== -1) {
         title = title.slice(0, title.search(/\d\s[A-Z]/g)+1) + '-' + title.slice(title.search(/\d\s[A-Z]/g)+2)
@@ -239,11 +247,11 @@ class MetricsWidget extends React.Component {
       // console.log(title)
       title = title.replace(/T\sT\sM/g, 'TTM')
       // console.log(title)
-      return (<td className='tdHead' key={el + "title"}>{title}</td>)}
+      return (<td className='tdHead' key={thisKey + el +  "title"}>{title}</td>)}
       )
     let bodyRows = this.props.trackedStocks.map((el) => { return (
-    <tr key={el + "tr1"}>
-    <td key={el + "td1"}>{el}</td>
+    <tr key={thisKey + el + "tr1"}>
+    <td key={thisKey + el + "td1"}>{el}</td>
     {this.mapStockData(el)}
     </tr>
     )})
@@ -276,6 +284,7 @@ class MetricsWidget extends React.Component {
             apiKey={this.props.apiKey}
             updateWidgetStockList={this.props.updateWidgetStockList}
             widgetKey={this.props.widgetKey}
+            throttle={this.props.throttle}
           />
           {this.getMetrics()}
           </>
@@ -297,6 +306,8 @@ export function metricsProps(that, key = "MetricsWidget") {
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
+    throttle: that.state.throttle,
+    globalStockObject: that.props.globalStockObject,
   };
   return propList;
 }

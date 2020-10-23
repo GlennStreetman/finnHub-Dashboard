@@ -65,7 +65,8 @@ class NewsWidget extends React.Component {
   }
 
   getCompanyNews(symbol, fromDate, toDate) {
-    fetch("https://finnhub.io/api/v1/company-news?symbol=" + symbol + "&from=" + fromDate + "&to=" + toDate + "&token=" + this.props.apiKey)
+    let stockSymbol = symbol.slice(symbol.indexOf('-')+1, symbol.length)
+    fetch("https://finnhub.io/api/v1/company-news?symbol=" + stockSymbol + "&from=" + fromDate + "&to=" + toDate + "&token=" + this.props.apiKey)
       .then((response) => response.json())
       .then((data) => {
         let filteredNews = [];
@@ -213,6 +214,7 @@ class NewsWidget extends React.Component {
                 getStockPrice={this.props.getStockPrice}
                 updateWidgetList={this.updateWidgetList}
                 apiKey={this.props.apiKey}
+                throttle={this.props.throttle}
               />
               <div className="stockSearch">
                 <form className="form-inline">
@@ -236,17 +238,13 @@ class NewsWidget extends React.Component {
 export function newsWidgetProps(that, key = "CandleWidget") {
   let propList = {
     apiKey: that.props.apiKey,
-    // dashBoardData: that.props.getSavedDashBoards,
-    // currentDashBoard: that.props.currentDashBoard,
     getStockPrice: that.getStockPrice,
-    // getSavedDashBoards: that.props.getSavedDashBoards,
-    // loadDashBoard: that.props.loadDashBoard,
-    // saveCurrentDashboard: that.props.saveCurrentDashboard,
     showPane: that.showPane,
     trackedStocks: that.props.widgetList[key]["trackedStocks"],
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
+    throttle: that.state.throttle,
   };
   return propList;
 }

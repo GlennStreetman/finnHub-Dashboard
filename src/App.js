@@ -2,14 +2,14 @@ import React from "react";
 import "./App.css";
 import TopNav from "./topNav.js";
 import Login from "./login.js";
-// import { isCompositeComponent } from "react-dom/test-utils";
 
 class App extends React.Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      globalStockList: [], //default stocks for new widgets. Viewable through watchlist.
+      globalStockList: [], //default stocks for new widgets. Viewable through watchlist. Needs to be depricated and replaced with globalStockObject.
+      globalStockObject: {},
       widgetList: {}, //lists of all widgets.
       menuList: {}, //lists of all menu widgets.
       login: 0, //login state. 0 logged out, 1 logged in.
@@ -118,13 +118,12 @@ class App extends React.Component {
     this.setState({ stateRef: newWidgetList });
   }
 
-  updateGlobalStockList(event, stockDescription) {
-    //Adds stock to global tracking list.
-    let addStockId = stockDescription;
-    if (stockDescription.indexOf(":") > 0) {
-      addStockId = stockDescription.slice(0, stockDescription.indexOf(":"));
+  updateGlobalStockList(event, stock, stockObject) {
+    // Adds stock to global tracking list.
+    let addStockId = stock;
+    if (stock.indexOf(":") > 0) {
+      addStockId = stock.slice(0, stock.indexOf(":"));
     }
-    // const addStockID = stockDescription.slice(0, stockDescription.indexOf(":"));
     var currentStockList = Array.from(this.state.globalStockList);
     if (currentStockList.includes(addStockId) === false) {
       currentStockList.push(addStockId);
@@ -132,6 +131,16 @@ class App extends React.Component {
       currentStockList.splice(currentStockList.indexOf(addStockId), 1);
     }
     this.setState({ globalStockList: currentStockList });
+
+    if (this.state.globalStockObject[stock] === undefined ) {
+      let updatedStockList = Object.assign(this.state.globalStockObject)
+      updatedStockList[stock] = stockObject
+      this.setState({globalStockObject: updatedStockList})
+    } else {
+      let updatedStockList = Object.assign(this.state.globalStockObject)
+      delete updatedStockList[stock]
+      this.setState({globalStockObject: updatedStockList})
+    }
     event.preventDefault();
   }
 

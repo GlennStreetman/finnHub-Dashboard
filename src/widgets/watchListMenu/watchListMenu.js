@@ -90,6 +90,7 @@ class WatchListMenu extends React.PureComponent {
             showSearchPane={() => this.props.showPane("showEditPane", 1)}
             getStockPrice={this.props.getStockPrice}
             apiKey={this.props.apiKey}
+            throttle={this.props.throttle}
           />
         )}
 
@@ -118,6 +119,7 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
+    throttle: that.state.throttle,
   };
   return propList;
 }
