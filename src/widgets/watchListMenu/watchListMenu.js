@@ -14,6 +14,8 @@ class WatchListMenu extends React.PureComponent {
   }
 
   getSymbolList() {
+    let that = this
+    this.props.throttle(function() {  
     fetch("https://finnhub.io/api/v1/stock/symbol?exchange=US&token=bsuu7qv48v6qu589jlj0")
       .then((response) => response.json())
       .then((data) => {
@@ -36,12 +38,13 @@ class WatchListMenu extends React.PureComponent {
             // type: e,
           };
         }
-        this.setState({ availableStocks: transformData });
+        that.setState({ availableStocks: transformData });
         // console.log("Success retrieving stock symbols");
       })
       .catch((error) => {
         console.error("Error retrieving stock symbols", error);
       });
+    })
   }
 
   renderWatchedStocks() {

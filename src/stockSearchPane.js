@@ -27,8 +27,8 @@ class StockSearchPane extends React.Component {
 
 
 
-  handleChange(ev=1) {
-    ev.target !== undefined && this.setState({ inputText: ev.target.value.toUpperCase() });
+  handleChange(e) {
+    e.target !== undefined && this.setState({ inputText: e.target.value.toUpperCase() });
     
     let filterObject = {}
     let newFilteredList = [];
@@ -41,7 +41,8 @@ class StockSearchPane extends React.Component {
         resultCount < 20 && filteredCount < availableStockCount; 
         filteredCount++) {
           let stockSearchPhrase = stockList[filteredCount] + ': ' + stockListObject[stockList[filteredCount]]['description'].toUpperCase()
-          if (stockSearchPhrase.includes(this.state.inputText) === true && stockListObject[stockList[filteredCount]]['type'] === 'EQS') {
+          // if (stockSearchPhrase.includes(this.state.inputText) === true && stockListObject[stockList[filteredCount]]['type'] in ['EQS', 'DR']) {
+          if (stockSearchPhrase.includes(this.state.inputText) === true) {
             resultCount = resultCount + 1;
             newFilteredList.push(stockSearchPhrase);
             filterObject[stockList[filteredCount]] = stockListObject[stockList[filteredCount]] 

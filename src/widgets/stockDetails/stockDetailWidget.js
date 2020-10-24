@@ -22,10 +22,17 @@ class StockDetailWidget extends React.Component {
   }
 
   renderStockData() {
+    
     let trackedStockData = this.props.trackedStockData;
     let thisStock = this.props.trackedStocks;
+
+    for (const x in thisStock) {
+      if (trackedStockData[thisStock[x]] === undefined ) {
+        trackedStockData[thisStock[x]] = {prevClosePrice: 0, dayOpenPrice:0, dayLowPrice:0, dayHighPrice:0, currentPrice:0,}
+      }
+    }
     let stockDetailRow = thisStock.map((el) =>
-      trackedStockData[el] ? (
+        trackedStockData[el] ? (
         <tr key={el + "st"}>
           <td key={el + "id"}>{el}</td>
           <td className="rightTE" key={el + "prevClosePrice"}>

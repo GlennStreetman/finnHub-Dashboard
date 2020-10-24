@@ -16,6 +16,7 @@ import { metricsProps } from "./widgets/Metrics/Metrics.js";
 class TopNav extends React.Component {
   constructor(props) {
     super(props);
+    
     this.state = {
       trackedStockData: {},
       widgetLockDown: 0, //1: Hide buttons, 0: Show buttons
@@ -24,7 +25,8 @@ class TopNav extends React.Component {
       AccountMenu: 0, //1 = show, 0 = hide
       loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
       AboutMenu: 0, //1 = show, 0 = hide
-      throttle: throttledQueue(5, 1000), //REMEMBER TO WRAP ALL FINNHUB API CALLS IN: throttle(function() {'YOUR API CALL HERE'})
+      throttle: throttledQueue(1, 500), //REMEMBER TO WRAP ALL FINNHUB API CALLS IN: throttle(function() {'YOUR API CALL HERE'})
+      socket: ''
     };
 
     this.showPane = this.showPane.bind(this);
@@ -53,15 +55,32 @@ class TopNav extends React.Component {
 
   componentDidMount() {
     this.props.getSavedDashBoards();
+    
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps) {
     if (this.props.refreshStockData === 1) {
       this.props.toggleRefreshStockData();
 
       for (const stock in this.props.globalStockList) {
         this.getStockPrice(this.props.globalStockList[stock]);
       }
+    }
+
+    if (this.props.apiKey !== '' && prevProps.apiKey === '') {
+    let newSocket = new WebSocket("wss://ws.finnhub.io?token=" + this.props.apiKey)
+    this.setState({socket: newSocket})
+    }
+
+    if (this.props.globalStockList !== prevProps.globalStockList) {
+      // console.log("unsubscribing from old stocks")
+      let prevSockets = prevProps.globalStockList
+      for (const socket in prevSockets) {
+        let symbolName = prevSockets[socket].slice(prevSockets[socket].indexOf("-")+ 1 , prevSockets[socket].length)
+        console.log("unsubscribe from: " + symbolName)
+        this.state.socket.send(JSON.stringify({'type':'unsubscribe','symbol': symbolName}))
+      }
+      this.updateTickerSockets()
     }
 
     if (this.state.loadStartingDashBoard === 0 && this.props.currentDashBoard !== "") {
@@ -78,33 +97,41 @@ class TopNav extends React.Component {
   }
 
   updateTickerSockets() {
+    console.log("creating connections")
     //opens a series of socket connections to live stream stock prices
     //update limited to once every 5 seconds to have mercy on dom rendering.
-    const self = this;
     const globalStockList = this.props.globalStockList;
-    const socket = new WebSocket("wss://ws.finnhub.io?token=" + this.props.apiKey);
+    // const socket = new WebSocket("wss://ws.finnhub.io?token=" + this.props.apiKey);
+    let thisSocket = this.state.socket
     let streamingStockData = {};
     let lastUpdate = new Date().getTime();
+    let that = this
 
-    socket.addEventListener("open", function (event) {
-      globalStockList.map((el) => socket.send(JSON.stringify({ type: "subscribe", symbol: el })));
+    thisSocket.addEventListener("open", function (event) {
+      globalStockList.map((el) => {
+        let stockSym = el.slice(el.indexOf('-')+1 , el.length)
+        that.state.throttle(function() {thisSocket.send(JSON.stringify({ type: "subscribe", symbol: stockSym }))})
+        return true
+      }
+      );
     });
 
     // Listen for messages
-    socket.addEventListener("message", function (event) {
-      var tickerReponse = JSON.parse(event.data);
-      // console.log("Message from server ", event.data);
+    thisSocket.addEventListener("message", function (event) {
+      let tickerReponse = JSON.parse(event.data);
+      console.log("Message from server ", event.data);
       if (tickerReponse.data) {
-        streamingStockData[tickerReponse.data[0]["s"]] = [tickerReponse.data[0]["p"]];
+        streamingStockData['US-' + tickerReponse.data[0]["s"]] = [tickerReponse.data[0]["p"]];
         let checkTime = new Date().getTime();
 
-        if (checkTime - lastUpdate > 5000) {
+        if (checkTime - lastUpdate > 3000) {
           lastUpdate = new Date().getTime();
-          let updatedPrice = Object.assign({}, self.state.trackedStockData);
+          let updatedPrice = Object.assign({}, that.state.trackedStockData);
           for (const prop in streamingStockData) {
+            // updatedPrice[prop] = {}
             updatedPrice[prop]["currentPrice"] = streamingStockData[prop][0];
           }
-          self.setState({ trackedStockData: updatedPrice });
+          that.setState({ trackedStockData: updatedPrice });
         }
       }
     });
@@ -148,11 +175,7 @@ class TopNav extends React.Component {
             return { trackedStockData: newTrackedStockData };
           });
         })
-        .then(() => {
-          // console.log("done");
-          that.updateTickerSockets();
-        });
-    // return stockPriceData
+
     })
   }
 

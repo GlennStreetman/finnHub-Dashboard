@@ -64,37 +64,37 @@ class CandleWidget extends React.Component {
   }
 
   getCandleData() {
-    console.log('creating candle chart')
+    // console.log('creating candle chart')
     let candleStock = this.state.candleSelection
     let candleSymbol = candleStock.slice(candleStock.indexOf('-')+1 , candleStock.length)
-    console.log(candleStock)
-    console.log(candleSymbol)
     const s = this.state.startDate;
     const e = this.state.endDate;
 
     const startDateUnix = new Date(s.slice(0, 4), s.slice(5, 7), s.slice(8, 10)).getTime() / 1000;
     const endDateUnix = new Date(e.slice(0, 4), e.slice(5, 7), e.slice(8, 10)).getTime() / 1000;
-
+    let that =  this
+    this.props.throttle(function() {
     fetch(
       "https://finnhub.io/api/v1/stock/candle?symbol=" +
         candleSymbol +
         "&resolution=" +
-        this.state.resolution +
+        that.state.resolution +
         "&from=" +
         startDateUnix +
         "&to=" +
         endDateUnix +
-        "&token=" + this.props.apiKey
+        "&token=" + that.props.apiKey
     )
       .then((response) => response.json())
       .then((data) => {
         try {
-          this.setState({ candleData: data });
-          this.createCandleDataList(data);
+          that.setState({ candleData: data });
+          that.createCandleDataList(data);
         } catch (err) {
           // console.log("Could not update candles. Component not mounted.");
         }
       });
+    })
   }
 
   createCandleDataList(data) {

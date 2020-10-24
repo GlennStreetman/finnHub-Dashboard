@@ -66,7 +66,9 @@ class NewsWidget extends React.Component {
 
   getCompanyNews(symbol, fromDate, toDate) {
     let stockSymbol = symbol.slice(symbol.indexOf('-')+1, symbol.length)
-    fetch("https://finnhub.io/api/v1/company-news?symbol=" + stockSymbol + "&from=" + fromDate + "&to=" + toDate + "&token=" + this.props.apiKey)
+    let that = this
+    this.props.throttle(function() { 
+    fetch("https://finnhub.io/api/v1/company-news?symbol=" + stockSymbol + "&from=" + fromDate + "&to=" + toDate + "&token=" + that.props.apiKey)
       .then((response) => response.json())
       .then((data) => {
         let filteredNews = [];
@@ -78,11 +80,12 @@ class NewsWidget extends React.Component {
           }
         }
         try {
-          this.setState({ companyNews: filteredNews });
+          that.setState({ companyNews: filteredNews });
         } catch (err) {
           console.log("Could not update news. Component not mounted.");
         }
       });
+    })
   }
 
   changeIncrememnt(e) {
