@@ -1,6 +1,7 @@
 import React from "react";
 import WidgetControl from "./widgets/widgetControl.js";
-import throttledQueue from "throttled-queue"; //Finnhub API calls limited to 30 per second.
+// import throttledQueue from "throttled-queue"; //Finnhub API calls limited to 30 per second.
+
 
 //Import props function from each widget/menu here and add to returnBodyProps function below.
 import { dashBoardMenuProps } from "./widgets/dashBoardMenu/dashBoardMenu.js";
@@ -12,11 +13,10 @@ import { accountMenuProps } from "./widgets/AccountMenu/accountMenu.js";
 import { aboutMenuProps } from "./widgets/AboutMenu/AboutMenu.js";
 import { metricsProps } from "./widgets/Metrics/Metrics.js";
 
-
 class TopNav extends React.Component {
   constructor(props) {
     super(props);
-    
+
     this.state = {
       trackedStockData: {},
       widgetLockDown: 0, //1: Hide buttons, 0: Show buttons
@@ -25,8 +25,8 @@ class TopNav extends React.Component {
       AccountMenu: 0, //1 = show, 0 = hide
       loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
       AboutMenu: 0, //1 = show, 0 = hide
-      throttle: throttledQueue(1, 500), //REMEMBER TO WRAP ALL FINNHUB API CALLS IN: throttle(function() {'YOUR API CALL HERE'})
-      socket: ''
+      // throttle: myThrottleQue(25, 1000, true), //REMEMBER TO WRAP ALL FINNHUB API CALLS IN: throttle(function() {'YOUR API CALL HERE'})
+      socket: '',
     };
 
     this.showPane = this.showPane.bind(this);
@@ -55,10 +55,11 @@ class TopNav extends React.Component {
 
   componentDidMount() {
     this.props.getSavedDashBoards();
-    
   }
 
   componentDidUpdate(prevProps) {
+    // console.log(throttledQueue)
+
     if (this.props.refreshStockData === 1) {
       this.props.toggleRefreshStockData();
 
@@ -110,7 +111,9 @@ class TopNav extends React.Component {
     thisSocket.addEventListener("open", function (event) {
       globalStockList.map((el) => {
         let stockSym = el.slice(el.indexOf('-')+1 , el.length)
-        that.state.throttle(function() {thisSocket.send(JSON.stringify({ type: "subscribe", symbol: stockSym }))})
+        that.props.throttle.enqueue(function() {
+          console.log(Date().slice(20,25) + 'subscribe-' + stockSym)
+          thisSocket.send(JSON.stringify({ type: "subscribe", symbol: stockSym }))})
         return true
       }
       );
@@ -119,7 +122,7 @@ class TopNav extends React.Component {
     // Listen for messages
     thisSocket.addEventListener("message", function (event) {
       let tickerReponse = JSON.parse(event.data);
-      console.log("Message from server ", event.data);
+      // console.log("Message from server ", event.data);
       if (tickerReponse.data) {
         streamingStockData['US-' + tickerReponse.data[0]["s"]] = [tickerReponse.data[0]["p"]];
         let checkTime = new Date().getTime();
@@ -148,9 +151,18 @@ class TopNav extends React.Component {
     const stockSymbol = stockDescription.indexOf(":") > 0 ? stockDescription.slice(0, stockDescription.indexOf(":")) : stockDescription;
     let stockPriceData = {};
     let that = this
-    this.state.throttle(function() {
+    this.props.throttle.enqueue(function() {
       fetch("https://finnhub.io/api/v1/quote?symbol=" + stockSymbol.slice(stockSymbol.indexOf('-') + 1, stockSymbol.length) + "&token=" + that.props.apiKey)
-        .then((response) => response.json())
+        .then((response) => {
+          if (response.status === 429) {
+            that.props.throttle.setSuspend(4000)
+            that.getStockPrice(stockDescription)
+            throw new Error('finnhub 429')
+          } else {
+            console.log(Date().slice(20,25) + 'getStockPrice ' + stockDescription)
+            return response.json()
+          }
+        })
         .then((data) => {
           //destructure data returned from fetch.
           const {
@@ -175,7 +187,9 @@ class TopNav extends React.Component {
             return { trackedStockData: newTrackedStockData };
           });
         })
-
+        .catch(error => {
+          console.log(error.message)
+        });
     })
   }
 

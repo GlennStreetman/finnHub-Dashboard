@@ -146,7 +146,7 @@ export function stockDetailWidgetProps(that, key = "StockDetailWidget") {
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
-    throttle: that.state.throttle,
+    throttle: that.props.throttle,
   };
   return propList;
 }

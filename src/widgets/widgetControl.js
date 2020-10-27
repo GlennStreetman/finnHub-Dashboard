@@ -10,7 +10,6 @@ import AccountMenu from "./AccountMenu/accountMenu.js";
 import AboutMenu from "./AboutMenu/AboutMenu.js";
 import MetricsWidget from "./Metrics/Metrics.js";
 
-
 //creates widget container. Used by all widgets.
 class WidgetControl extends React.Component {
   constructor(props) {

@@ -67,9 +67,18 @@ class NewsWidget extends React.Component {
   getCompanyNews(symbol, fromDate, toDate) {
     let stockSymbol = symbol.slice(symbol.indexOf('-')+1, symbol.length)
     let that = this
-    this.props.throttle(function() { 
+    that.props.throttle.enqueue(function() { 
     fetch("https://finnhub.io/api/v1/company-news?symbol=" + stockSymbol + "&from=" + fromDate + "&to=" + toDate + "&token=" + that.props.apiKey)
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status === 429) {
+          that.props.throttle.setSuspend(4000)
+          that.getCompanyNews(symbol, fromDate, toDate)
+          throw new Error('finnhub 429')
+        } else {
+          console.log(Date().slice(20,25) +  ':get company news' + symbol)
+          return response.json()
+        }
+      })
       .then((data) => {
         let filteredNews = [];
         let newsCount = 0;
@@ -84,6 +93,9 @@ class NewsWidget extends React.Component {
         } catch (err) {
           console.log("Could not update news. Component not mounted.");
         }
+      })
+      .catch(error => {
+        console.log(error.message)
       });
     })
   }
@@ -247,7 +259,7 @@ export function newsWidgetProps(that, key = "CandleWidget") {
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
-    throttle: that.state.throttle,
+    throttle: that.props.throttle,
   };
   return propList;
 }

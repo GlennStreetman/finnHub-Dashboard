@@ -55,9 +55,17 @@ class StockSearchPane extends React.Component {
 
   getSymbolList(exchange) {
     let that = this
-    this.props.throttle(function() { 
+    that.props.throttle.enqueue(function() { 
       fetch(`https://finnhub.io/api/v1/stock/symbol?exchange=${exchange}&token=${that.props.apiKey}`)
-        .then((response) => response.json())
+        .then((response) => {
+          if (response.status === 429) {
+            that.props.throttle.setSuspend(4000)
+            that.getSymbolList(exchange)
+            throw new Error('finnhub 429')
+          } else {
+            return response.json()
+          }
+        })
         .then((data) => {
           let updateStockList = Object.assign({}, data)
           for (const key in updateStockList) {
@@ -67,7 +75,13 @@ class StockSearchPane extends React.Component {
             delete updateStockList[key]
           }
           // let list = Object.assign({}, that.state.availableStocks ,updateStockList)
+          console.log(data)
+          console.log('updating symbol list')
+          console.log(that.state)
+          console.log(that.state.availableStocks)
+          console.log(updateStockList)          
           that.setState({ availableStocks: Object.assign({}, that.state.availableStocks ,updateStockList)});
+          console.log(that.state)
           console.log("Success retrieving stock symbols:" + exchange);
         })
         .catch((error) => {

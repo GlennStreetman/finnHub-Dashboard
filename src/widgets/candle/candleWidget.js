@@ -73,7 +73,7 @@ class CandleWidget extends React.Component {
     const startDateUnix = new Date(s.slice(0, 4), s.slice(5, 7), s.slice(8, 10)).getTime() / 1000;
     const endDateUnix = new Date(e.slice(0, 4), e.slice(5, 7), e.slice(8, 10)).getTime() / 1000;
     let that =  this
-    this.props.throttle(function() {
+    that.props.throttle.enqueue(function() {
     fetch(
       "https://finnhub.io/api/v1/stock/candle?symbol=" +
         candleSymbol +
@@ -85,14 +85,26 @@ class CandleWidget extends React.Component {
         endDateUnix +
         "&token=" + that.props.apiKey
     )
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status === 429) {
+          that.props.throttle.setSuspend(4000)
+          that.getCandleData()
+          throw new Error('finnhub 429')
+        } else {
+          console.log(Date().slice(20,25) +  ': getCandleData ' + candleSymbol)
+          return response.json()
+        }
+      })
       .then((data) => {
         try {
           that.setState({ candleData: data });
           that.createCandleDataList(data);
         } catch (err) {
-          // console.log("Could not update candles. Component not mounted.");
+          console.log("Could not update candles. Component not mounted.");
         }
+      })
+      .catch(error => {
+        console.log(error.message)
       });
     })
   }
@@ -270,7 +282,7 @@ export function candleWidgetProps(that, key = "CandleWidget") {
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
-    throttle: that.state.throttle,
+    throttle: that.props.throttle,
   };
   return propList;
 }

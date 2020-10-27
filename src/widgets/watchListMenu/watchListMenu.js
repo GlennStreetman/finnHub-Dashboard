@@ -15,9 +15,15 @@ class WatchListMenu extends React.PureComponent {
 
   getSymbolList() {
     let that = this
-    this.props.throttle(function() {  
+    this.props.throttle.enqueue(function() {  
     fetch("https://finnhub.io/api/v1/stock/symbol?exchange=US&token=bsuu7qv48v6qu589jlj0")
-      .then((response) => response.json())
+      .then((response) => {
+        if (response.status === 429) {
+          this.props.throttle.setSuspend(3000)
+          this.getSymbolList()
+        }
+        console.log(Date().slice(20,25) + ":symbol list")
+        return response.json()})
       .then((data) => {
         let transformData = {};
         for (const [, stockValues] of Object.entries(data)) {
@@ -122,7 +128,7 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
-    throttle: that.state.throttle,
+    throttle: that.props.throttle,
   };
   return propList;
 }
