@@ -24,47 +24,37 @@ export default function createFunctionQueueObject (maxRequestPerInterval, interv
         let threshold = that.lastCalled + that.interval;
         let now = Date.now();
 
-        /**
-         * Adjust the timer if it was called too early or the queue has been suspended.
-         */
+        // Adjust the timer if it was called too early 
         if (now < threshold) {
-            clearTimeout(that.timeout);
             setTimeout(() => that.dequeue(that), threshold - now);
             return;
-        }
-
-        let callbacks = that.queue.splice(0, that.maxRequestPerInterval);
-
-        for(let x = 0; x < callbacks.length; x++) {
-            // console.log('running')
-            callbacks[x]();
-        }
-
-        that.lastCalled = Date.now();
-        if (that.queue.length) {
-            // console.log('queue has length')
-            // that.timeout = setTimeout(that.dequeue(that), that.interval);
-            setTimeout(() => that.dequeue(that), that.interval);
+        } else if (now < that.suspend){
+            setTimeout(() => that.dequeue(that), that.suspend - now);
+            return;
         } else {
-            // console.log(that.running)
-            that.running = 0
-            // console.log('---------------')
-            // console.log(that.running)
+            let callbacks = that.queue.splice(0, that.maxRequestPerInterval);
+            for(let x = 0; x < callbacks.length; x++) {
+                callbacks[x]();
+            }
+            that.lastCalled = Date.now();
+            if (that.queue.length) {
+                setTimeout(() => that.dequeue(that), that.interval);
+            } else {
+                that.running = 0
+            }
+            return
         }
-        return
     }
 
     que.enqueue = function (callback) {
         this.queue.push(callback);
         if (this.running === 0) {
-            // this.timeout = setTimeout(this.dequeue(this), this.interval);
             setTimeout(() => this.dequeue(this), this.interval);
         } else {console.log('already running')}
     }
 
     que.setSuspend = function (milliseconds) {
-        console.log(milliseconds)
-        this.lastCalled = this.lastCalled + milliseconds
+        this.suspend = Date.now() + milliseconds
         return
     }
 
