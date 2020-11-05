@@ -37,7 +37,7 @@ https.createServer({
 
 app.use(cookieParser());
 app.use(bodyParser.json()); // support json encoded bodies
-
+app.use(express.static(path.join(__dirname, 'build')));
 app.use(
   session({
     store: new FileStore(fileStoreOptions),
@@ -48,8 +48,8 @@ app.use(
   })
 );
 
-app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/src/app.js");
+app.get("*", (req, res) => {
+  res.sendFile(__dirname, "public/index.html");
 });
 
 function emailIsValid(email) {
