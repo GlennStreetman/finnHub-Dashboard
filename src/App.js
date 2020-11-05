@@ -2,7 +2,7 @@ import React from "react";
 import "./App.css";
 import TopNav from "./topNav.js";
 import Login from "./login.js";
-import  myThrottleQue  from "./myThrottleQue.js";
+import  ThrottleQueue  from "./throttleQueue.js";
 
 class App extends React.Component {
   constructor(props) {
@@ -18,7 +18,7 @@ class App extends React.Component {
       refreshStockData: 0, //if set to 1 stock data should be updated from globalStockList
       dashBoardData: [],
       currentDashBoard: "",
-      throttle: myThrottleQue(25, 1000, true), //REMEMBER TO WRAP ALL FINNHUB API CALLS IN: throttle(function() {'YOUR API CALL HERE'})
+      throttle: ThrottleQueue(25, 1000, true), //REMEMBER TO WRAP ALL FINNHUB API CALLS IN: throttle(function() {'YOUR API CALL HERE'})
 
     };
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this);

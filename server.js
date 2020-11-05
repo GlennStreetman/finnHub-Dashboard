@@ -49,7 +49,7 @@ app.use(
 );
 
 app.get("/", (req, res) => {
-  res.sendFile(__dirname + "/public/");
+  res.sendFile(__dirname + "/src/app.js");
 });
 
 function emailIsValid(email) {
