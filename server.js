@@ -29,7 +29,7 @@ let fileStoreOptions = {};
 //enable below to run HTTP server
 //---------------------------------------------------
 const path = require("path");
-app.listen(port, function () {
+app.listen(process.env.PORT || port, function () {
   console.log("Listening to http://localhost:" + port);
 });
 
