@@ -42,7 +42,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
           db.run(insert, [
             "guest",
             "glennstreetman@gmail.com",
-            md5("guest"),
+            md5("guest456!"),
             "This is my secret question",
             md5("answer"),
             "bsuu7qv48v6qu589jlj0",
