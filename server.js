@@ -71,24 +71,24 @@ app.post("/register", (req, res) => {
   if (emailIsValid(emailText) === true) {
     db.get(checkUser, (err, rows) => {
       if (err) {
-        console.log("user check error");
+        // console.log("user check error");
         res.json("User check error");
       } else if (rows !== undefined) {
-        console.log("user check error2");
+        // console.log("user check error2");
         res.json("User Name Already Taken");
       } else {
-        console.log("user name not taken");
+        // console.log("user name not taken");
         db.get(checkEmail, (err, rows) => {
-          console.log(rows);
+          // console.log(rows);
           if (err) {
-            console.log("email check error");
+            // console.log("email check error");
             failedCheck = 1;
             res.json("email check error");
           } else if (rows !== undefined) {
             res.json("Email already taken");
             failedCheck = 1;
           } else {
-            console.log("email not taken");
+            // console.log("email not taken");
             db.exec(createUser, (rows) => {
               if (rows === null) {
                 res.json("true");
@@ -115,7 +115,7 @@ app.get("/login", (req, res) => {
     } else if (rows !== undefined) {
       myKey["key"] = rows.apiKey;
       myKey["login"] = 1;
-      console.log(myKey);
+      // console.log(myKey);
       req.session.uID = rows.id;
       req.session.userName = thisRequest["loginText"];
       res.json(myKey);
@@ -126,18 +126,18 @@ app.get("/login", (req, res) => {
 });
 
 app.get("/forgot", (req, res) => {
-  console.log("forgot");
+  // console.log("forgot");
   thisRequest = req.query; //.query contains all query string parameters.
   newQuery = "SELECT loginName, secretQuestion FROM user WHERE email ='" + thisRequest["loginText"] + "'";
-  console.log(newQuery);
+  // console.log(newQuery);
   let userName = {};
   db.get(newQuery, (err, rows) => {
-    console.log(rows);
+    // console.log(rows);
     if (err) {
-      console.log("email not found");
+      // console.log("email not found");
       res.json("Email not found");
     } else if (rows !== undefined) {
-      console.log("generating rows for forgot password");
+      // console.log("generating rows for forgot password");
       req.session.userName = rows.loginName;
       userName["user"] = rows.loginName;
       userName["question"] = rows.secretQuestion;
@@ -153,19 +153,19 @@ app.get("/forgot", (req, res) => {
 app.get("/secretQuestion", (req, res) => {
   thisRequest = req.query; //.query contains all query string parameters.
   newQuery = "SELECT id FROM user WHERE secretAnswer ='" + md5(thisRequest["loginText"]) + "' AND loginName = '" + req.session.userName + "'";
-  console.log(newQuery);
+  // console.log(newQuery);
   let userName = {};
   db.get(newQuery, [], (err, rows) => {
     if (err) {
       res.json("Secret question did not match.");
     } else {
-      console.log(rows);
+      // console.log(rows);
       if (rows !== undefined) {
-        console.log("reset ready");
+        // console.log("reset ready");
         req.session.reset = 1;
         res.json("true");
       } else {
-        console.log("reset NOT ready");
+        // console.log("reset NOT ready");
         res.json("false");
       }
     }
@@ -175,12 +175,12 @@ app.get("/secretQuestion", (req, res) => {
 app.get("/newPW", (req, res) => {
   thisRequest = req.query; //.query contains all query string parameters.
   newQuery = `UPDATE user SET password = '${md5(thisRequest.newPassword)}' WHERE loginName = '${req.session.userName}' AND 1 = ${req.session.reset}`;
-  console.log(newQuery);
+  // console.log(newQuery);
   db.exec(newQuery, (err, rows) => {
     if (err) {
       res.json("Could not reset password");
     } else {
-      console.log("success");
+      // console.log("success");
       res.json("true");
     }
   });
@@ -203,7 +203,7 @@ app.get("/accountData", (req, res) => {
 });
 
 app.post("/accountData", (req, res) => {
-  console.log("updating user info");
+  // console.log("updating user info");
 
   let updateField = req.body.field;
   let newValue = req.body.newValue;

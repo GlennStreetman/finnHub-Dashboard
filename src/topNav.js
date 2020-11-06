@@ -78,7 +78,7 @@ class TopNav extends React.Component {
       let prevSockets = prevProps.globalStockList
       for (const socket in prevSockets) {
         let symbolName = prevSockets[socket].slice(prevSockets[socket].indexOf("-")+ 1 , prevSockets[socket].length)
-        console.log("unsubscribe from: " + symbolName)
+        // console.log("unsubscribe from: " + symbolName)
         this.state.socket.send(JSON.stringify({'type':'unsubscribe','symbol': symbolName}))
       }
       this.updateTickerSockets()
@@ -98,7 +98,7 @@ class TopNav extends React.Component {
   }
 
   updateTickerSockets() {
-    console.log("creating connections")
+    // console.log("creating connections")
     //opens a series of socket connections to live stream stock prices
     //update limited to once every 5 seconds to have mercy on dom rendering.
     const globalStockList = this.props.globalStockList;
@@ -112,7 +112,7 @@ class TopNav extends React.Component {
       globalStockList.map((el) => {
         let stockSym = el.slice(el.indexOf('-')+1 , el.length)
         that.props.throttle.enqueue(function() {
-          console.log(Date().slice(20,25) + 'subscribe-' + stockSym)
+          // console.log(Date().slice(20,25) + 'subscribe-' + stockSym)
           thisSocket.send(JSON.stringify({ type: "subscribe", symbol: stockSym }))})
         return true
       }
@@ -159,7 +159,7 @@ class TopNav extends React.Component {
             that.getStockPrice(stockDescription)
             throw new Error('finnhub 429')
           } else {
-            console.log(Date().slice(20,25) + 'getStockPrice ' + stockDescription)
+            // console.log(Date().slice(20,25) + 'getStockPrice ' + stockDescription)
             return response.json()
           }
         })
