@@ -1,53 +1,75 @@
 const express = require("express");
 
+const URL = process.env.live ? `https://finn-dash.herokuapp.com/` : `https://localhost:5000`
+
 const port = process.env.NODE_ENV || 5000;
 const md5 = require("md5");
 const db = require("./database.js");
 const cookieParser = require("cookie-parser");
-// const { v4: uuidv4 } = require("uuid");
+const cryptoRandomString = require('crypto-random-string');
 const session = require("express-session");
 const FileStore = require("session-file-store")(session);
 const bodyParser = require("body-parser");
 
+//mailgun config data, needs to be set to be imported if not available in process.env
+const API_KEY = process.env.MAILGUN_API_KEY;
+const DOMAIN = process.env.MAILGUN_DOMAIN_KEY;
+const mailgun = require('mailgun-js')({ apiKey: API_KEY, domain: DOMAIN });
+
 const app = express();
 let fileStoreOptions = {};
 
-//enable below to run HTTPS server.
-//see the below link for info on updating https info
-//https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener
-//-------------------------------------------------------
-// var fs = require('fs')
-// var https = require('https')
-// const path = require("path");
-// https.createServer({
-//   pfx: fs.readFileSync(path.join(__dirname, 'ssl', 'cert.pfx')),
-//   passphrase: 'glennPSKey',
-// }, app).listen(port, function(){
-//   console.log(`serving the direcotry @ https`)
-// })
-
-//enable below to run HTTP server
-//---------------------------------------------------
-const path = require("path");
-app.listen(process.env.PORT || port, function () {
-  console.log("Listening to http://localhost:" + port);
-});
-
-app.use(cookieParser());
-app.use(bodyParser.json()); // support json encoded bodies
-app.use(express.static(path.join(__dirname, 'build')));
-app.use(
-  session({
-    store: new FileStore(fileStoreOptions),
-    secret: "keyboard cat",
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false, sameSite: true },
+if (process.env.live) {
+  //enable below to run HTTP server. Used with Heroku
+  path = require("path");
+  app.listen(process.env.PORT || port, function () {
+    console.log("Listening to http://localhost:" + port);
   })
-);
+  app.use(cookieParser());
+  app.use(bodyParser.json()); // support json encoded bodies
+  app.use(express.static(path.join(__dirname, 'build')));
+  app.use(
+    session({
+      store: new FileStore(fileStoreOptions),
+      secret: process.env.session_secret,
+      resave: false,
+      saveUninitialized: true,
+      cookie: { secure: false, sameSite: true },
+    })
+  );
+} else {
+  //used for local testing.  
+  //enable below to run HTTPS server. Currently needed when running in dev environment.
+  //see the below link for info on updating https info
+  //https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener
+  var fs = require('fs')
+  var https = require('https')
+  path = require("path");
+  https.createServer({
+    pfx: fs.readFileSync(path.join(__dirname, 'ssl', 'cert.pfx')),
+    passphrase: 'glennPSKey',
+  }, app).listen(port, function () {
+    console.log(`serving the direcotry @ https`)
+  })
+  app.use(cookieParser());
+  app.use(bodyParser.json()); // support json encoded bodies
+  app.use(express.static(path.join(__dirname, 'build')));
+  app.use(
+    session({
+      store: new FileStore(fileStoreOptions),
+      secret: "keyboard cat",
+      resave: false,
+      saveUninitialized: true,
+      cookie: { secure: false, sameSite: true },
+    })
+  );
+}
 
 app.get("*", (req, res) => {
-  res.sendFile(__dirname, "public/index.html");
+  //do not return APP until login in complete.
+  const URLLogin = process.env.live ? `build/index.html` : `public/index.html`
+  const URLApp = process.env.live ? `build/index.html` : `public/index.html`
+  req.session.login === true ? res.sendFile(__dirname, URLLogin) : res.sendFile(__dirname, URLApp)
 });
 
 function emailIsValid(email) {
@@ -60,10 +82,12 @@ app.post("/register", (req, res) => {
   let emailText = req.body.emailText;
   let secretQuestion = req.body.secretQuestion;
   let secretAnswer = req.body.secretAnswer;
-
+  const validateKey = cryptoRandomString({ length: 32 })
   const checkUser = "SELECT loginName FROM user WHERE loginName ='" + loginText + "'";
   const checkEmail = "SELECT email FROM user WHERE email ='" + emailText + "'";
-  const createUser = `INSERT INTO user (loginName, password, email, secretQuestion, secretAnswer) VALUES ('${loginText}','${md5(pwText)}','${emailText}','${secretQuestion}','${md5(secretAnswer)}')`;
+  const createUser = `INSERT INTO user (loginName, password, email, secretQuestion, secretAnswer, 
+    confirmEmail, resetPassword) 
+    VALUES ('${loginText}','${md5(pwText)}','${emailText}','${secretQuestion}','${md5(secretAnswer)}', '${validateKey}', "0")`;
 
   //nodes util api might be able to clean this up by using util.promisify.
   //this should get us out of a callback pyramid.
@@ -92,6 +116,20 @@ app.post("/register", (req, res) => {
             db.exec(createUser, (rows) => {
               if (rows === null) {
                 res.json("true");
+                const data = {
+                  from: 'Glenn Streetman <glennstreetman@gmail.com>',
+                  to: 'glennstreetman@gmail.com',
+                  subject: 'Test Mailgun Email',
+                  text: `Please visit the following link to verify your email address and login to finnDash: ${URL}/verify?id=${validateKey}`
+                };
+                mailgun.messages().send(data, (error, body) => {
+                  if (err) {
+                    console.log(error)
+                  } else {
+                    console.log(body);
+                    console.log("email sent")
+                  }
+                });
               } else {
                 res.json("failed to register");
               }
@@ -105,56 +143,148 @@ app.post("/register", (req, res) => {
   }
 });
 
+app.get("/verify", (req, res) => {
+  verifyID = req.query['id']
+  verifyUpdate = `
+  UPDATE user
+  SET confirmEmail = 1
+  WHERE confirmEmail = '${verifyID}'
+  `
+  db.exec(verifyUpdate, (err) => {
+    if (err) {
+      res.json("Could not validate email address.");
+      console.log(verifyUpdate)
+    } else {
+      console.log('email verified')
+      res.redirect('/')
+    }
+  })
+})
+
 app.get("/login", (req, res) => {
   thisRequest = req.query; //.query contains all query string parameters.
-  newQuery = "SELECT id, apiKey FROM user WHERE loginName ='" + thisRequest["loginText"] + "' AND password = '" + md5(thisRequest["pwText"]) + "'";
-  let myKey = { key: "", login: 0 };
+  newQuery = "SELECT id, apiKey, confirmEmail FROM user WHERE loginName ='" + thisRequest["loginText"] + "' AND password = '" + md5(thisRequest["pwText"]) + "'";
+  let info = { key: "", login: 0 };
   db.get(newQuery, (err, rows) => {
     if (err) {
       res.json("false");
-    } else if (rows !== undefined) {
-      myKey["key"] = rows.apiKey;
-      myKey["login"] = 1;
-      // console.log(myKey);
+    } else if (rows !== undefined && rows.confirmEmail === '1') {
+      info["key"] = rows.apiKey;
+      info["login"] = 1;
+      info["response"] = 'success';
       req.session.uID = rows.id;
       req.session.userName = thisRequest["loginText"];
-      res.json(myKey);
+      req.session.login = true
+      res.json(info);
+    } else if (rows !== undefined && rows.confirmEmail !== '1') {
+      info["response"] = 'Please confirm your email address.';
+      res.json(info)
     } else {
-      res.json("false");
+      info["response"] = "Login/Password did not match."
+      res.json(info)
     }
   });
 });
 
 app.get("/forgot", (req, res) => {
-  // console.log("forgot");
   thisRequest = req.query; //.query contains all query string parameters.
-  newQuery = "SELECT loginName, secretQuestion FROM user WHERE email ='" + thisRequest["loginText"] + "'";
-  // console.log(newQuery);
-  let userName = {};
-  db.get(newQuery, (err, rows) => {
-    // console.log(rows);
+  forgotQuery = "SELECT id, loginName, email FROM user WHERE email ='" + thisRequest["loginText"] + "'";
+  db.get(forgotQuery, (err, rows) => {
     if (err) {
-      // console.log("email not found");
       res.json("Email not found");
     } else if (rows !== undefined) {
-      // console.log("generating rows for forgot password");
-      req.session.userName = rows.loginName;
-      userName["user"] = rows.loginName;
-      userName["question"] = rows.secretQuestion;
-      res.json(userName);
+      const validateKey = cryptoRandomString({ length: 32 })
+      const data = {
+        from: 'Glenn Streetman <glennstreetman@gmail.com>',
+        to: `${rows.email}`,
+        subject: 'finnDash Credential Recovery',
+        text: `Your finnDash login name is: ${rows.loginName}.  
+              If you need to recover your password please visit the following link: ${URL}/reset?id=${validateKey}&user=${rows.loginName} `
+      };
+      const resetPasswordCode = `
+      UPDATE user 
+      SET resetPassword = '${validateKey}'
+      WHERE id = ${rows.id} 
+      `
+      db.exec(resetPasswordCode, (err, rows) => {
+        if (err) {
+          console.log(resetPasswordCode)
+          console.log("error on password reset")
+          res.json("Error during password reset..");
+        } else {
+          console.log('password reset flag set')
+          // res.redirect('/')
+        }
+      })
+      mailgun.messages().send(data, (error, body) => {
+        if (err) {
+          console.log(error)
+        } else {
+          console.log(body);
+          console.log("email sent")
+        }
+      });
+      res.json("Please check email for recovery instructions.");
     } else {
       console.log("failed email");
-      res.json("false");
+      res.json("Email not found.");
     }
   });
   // console.log("done");
 });
 
+app.get("/reset", (req, res) => {
+  verifyID = req.query['id']
+  user = req.query['user']
+  verifyUpdate = `
+  UPDATE user
+  SET resetPassword = 1
+  WHERE resetPassword = '${verifyID}'
+  `
+  db.exec(verifyUpdate, (err) => {
+    if (err) {
+      res.json("Error during password reset process.");
+      console.log(verifyUpdate)
+    } else {
+      console.log('passowrd reset flag set.')
+      res.redirect(`/?reset=1&user=${user}`)
+    }
+  })
+})
+
+app.get("/findSecret", (req, res) => {
+  userID = req.query['user']
+  verifyUpdate = `
+  SELECT secretQuestion
+  FROM user
+  WHERE loginName = '${userID}' AND resetPassword = 1
+  `
+  // console.log(verifyUpdate)
+  db.get(verifyUpdate, (err, rows) => {
+    if (err) {
+      res.json("Error during password reset process.");
+    } else if (rows) {
+      console.log(rows.secretQuestion)
+      data = {
+        question: rows.secretQuestion,
+        user: userID
+      }
+      console.log(`Secret Questions returned for user ${userID}.`)
+      res.json(data)
+    } else {
+      console.log(`secret question query problem.`)
+      res.json('Problem with reset password link.')
+    }
+  })
+})
+
+//checks answer to secret question.
 app.get("/secretQuestion", (req, res) => {
   thisRequest = req.query; //.query contains all query string parameters.
-  newQuery = "SELECT id FROM user WHERE secretAnswer ='" + md5(thisRequest["loginText"]) + "' AND loginName = '" + req.session.userName + "'";
-  // console.log(newQuery);
-  let userName = {};
+  console.log(thisRequest)
+  newQuery = "SELECT id FROM user WHERE secretAnswer ='" + md5(thisRequest["loginText"]) + "' AND loginName = '" + thisRequest["user"] + "'";
+  console.log(newQuery);
+  req.session.userName = thisRequest.user
   db.get(newQuery, [], (err, rows) => {
     if (err) {
       res.json("Secret question did not match.");
@@ -175,12 +305,12 @@ app.get("/secretQuestion", (req, res) => {
 app.get("/newPW", (req, res) => {
   thisRequest = req.query; //.query contains all query string parameters.
   newQuery = `UPDATE user SET password = '${md5(thisRequest.newPassword)}' WHERE loginName = '${req.session.userName}' AND 1 = ${req.session.reset}`;
-  // console.log(newQuery);
+  console.log(newQuery);
   db.exec(newQuery, (err, rows) => {
     if (err) {
       res.json("Could not reset password");
     } else {
-      // console.log("success");
+      console.log("success");
       res.json("true");
     }
   });
@@ -295,5 +425,3 @@ app.get("/deleteSavedDashboard", (req, res) => {
     res.json("success");
   });
 });
-
-

@@ -20,7 +20,9 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             secretQuestion text,
             secretAnswer text,
             apiKey text,
-            webHook text
+            webHook text,
+            confirmEmail text,
+            resetPassword text
             )`,
 
       (err) => {
@@ -29,7 +31,7 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
         } else {
           // Table just created, creating some rows
           console.log("inserting rows");
-          var insert = "INSERT INTO user (loginName, email, password, secretQuestion, secretAnswer, apiKey, webHook) VALUES (?,?,?,?,?,?,?)";
+          var insert = "INSERT INTO user (loginName, email, password, secretQuestion, secretAnswer, apiKey, webHook, confirmEmail, resetPassword) VALUES (?,?,?,?,?,?,?,?,?)";
           db.run(insert, [
             "admin",
             "glennstreetmanadmin@gmail.com",
@@ -38,6 +40,8 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             md5("answer"),
             "bsuu7qv48v6qu589jlj0",
             "bss698f48v6u62sfqlog",
+            "1",
+            "0",
           ]);
           db.run(insert, [
             "guest",
@@ -47,6 +51,9 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             md5("answer"),
             "bsuu7qv48v6qu589jlj0",
             "bss698f48v6u62sfqlog",
+            "1",
+            "0",
+
           ]);
           db.run(`CREATE TABLE dashBoard (
             id INTEGER PRIMARY KEY AUTOINCREMENT,

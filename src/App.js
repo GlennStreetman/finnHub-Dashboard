@@ -1,8 +1,11 @@
 import React from "react";
+import queryString from 'query-string';
 import "./App.css";
 import TopNav from "./topNav.js";
 import Login from "./login.js";
 import  ThrottleQueue  from "./throttleQueue.js";
+
+console.log(queryString.parse(window.location.search))
 
 class App extends React.Component {
   constructor(props) {
@@ -207,36 +210,40 @@ class App extends React.Component {
   }
 
   render() {
+    const quaryData = queryString.parse(window.location.search)
     //state.login = 1 means that login succeeded.
     return this.state.login === 1 ? (
-      <>
-        <TopNav
-          availableStocks={this.state.availableStocks}
-          globalStockList={this.state.globalStockList}
-          widgetList={this.state.widgetList}
-          menuList={this.state.menuList}
-          updateGlobalStockList={this.updateGlobalStockList}
-          newWidgetContainer={this.newWidgetContainer}
-          newMenuContainer={this.newMenuContainer}
-          moveWidget={this.moveWidget}
-          removeWidget={this.removeWidget}
-          apiKey={this.state.apiKey}
-          updateWidgetStockList={this.updateWidgetStockList}
-          loadDashBoard={this.loadDashBoard}
-          refreshStockData={this.state.refreshStockData}
-          toggleRefreshStockData={this.toggleRefreshStockData}
-          saveCurrentDashboard={this.saveCurrentDashboard}
-          getSavedDashBoards={this.getSavedDashBoards}
-          dashBoardData={this.state.dashBoardData}
-          currentDashBoard={this.state.currentDashBoard}
-          changeWidgetName={this.changeWidgetName}
-          updateWidgetData={this.updateWidgetData}
-          throttle={this.state.throttle}
+        <>
+            <TopNav
+              availableStocks={this.state.availableStocks}
+              globalStockList={this.state.globalStockList}
+              widgetList={this.state.widgetList}
+              menuList={this.state.menuList}
+              updateGlobalStockList={this.updateGlobalStockList}
+              newWidgetContainer={this.newWidgetContainer}
+              newMenuContainer={this.newMenuContainer}
+              moveWidget={this.moveWidget}
+              removeWidget={this.removeWidget}
+              apiKey={this.state.apiKey}
+              updateWidgetStockList={this.updateWidgetStockList}
+              loadDashBoard={this.loadDashBoard}
+              refreshStockData={this.state.refreshStockData}
+              toggleRefreshStockData={this.toggleRefreshStockData}
+              saveCurrentDashboard={this.saveCurrentDashboard}
+              getSavedDashBoards={this.getSavedDashBoards}
+              dashBoardData={this.state.dashBoardData}
+              currentDashBoard={this.state.currentDashBoard}
+              changeWidgetName={this.changeWidgetName}
+              updateWidgetData={this.updateWidgetData}
+              throttle={this.state.throttle}
 
-        />
-      </>
+            />
+          </>
     ) : (
-      <Login updateLogin={this.processLogin} />
+      <Login 
+        updateLogin={this.processLogin}
+        queryData = {quaryData}
+      />
     );
   }
 }

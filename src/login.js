@@ -12,6 +12,7 @@ class login extends React.Component {
       secretQuestion: "",
       secretAnswer: "",
       serverResponse: "",
+      userName: "",
     };
 
     this.handleChange = this.handleChange.bind(this);
@@ -24,7 +25,25 @@ class login extends React.Component {
     this.handleEnterKeyPress = this.handleEnterKeyPress.bind(this)
   }
 
-  
+  componentDidMount(){
+    if (this.props.queryData.reset === '1') {
+      const user = this.props.queryData.user
+      fetch(`/findSecret?user=${user}`)
+      .then((response) => response.json())
+      .then((data) => {
+        if (data) {
+          this.setState({loginState: 3})
+          this.setState({secretQuestion: data.question})
+          this.setState({userName: data.user})
+        } else {
+          console.log("No response from server")
+        }
+      })
+      .catch((error) => {
+        console.error("No server response", error);
+      });
+    }
+  }
   
   handleChange(e) {
     this.setState({ [e.target.name]: e.target.value });
@@ -69,7 +88,7 @@ class login extends React.Component {
         if (data === "true") {
           // console.log("its true");
           this.clearText(0);
-          this.setState({ serverResponse: "Thank you for registering, please login." });
+          this.setState({ serverResponse: "Thank you for registering, please check your email and follow the confirmation link." });
         } else {
           this.setState({ serverResponse: data });
         }
@@ -78,21 +97,26 @@ class login extends React.Component {
         // console.error("No server response", error);
       });
   }
-
+ 
   checkPassword() {
-    // console.log("logging in");
-    // e.preventDefault();
+
+    // let login = function() {
+    //   fetch("/").then()
+    // }
+
     fetch("/login?loginText=" + this.state.loginText + "&pwText=" + this.state.pwText)
       .then((response) => response.json())
       .then((data) => {
-        if (data !== "false") {
+        if (data.response === 'success') {
           this.props.updateLogin(data["key"], data["login"]);
+          // this.setState({ serverResponse: data.response}); 
+          // login()
         } else {
-          this.setState({ serverResponse: "Login/Password did not match" });
+          this.setState({ serverResponse: data.response});
         }
       })
       .catch((error) => {
-        // console.error("No server response", error);
+        console.error("No server response", error);
       });
   }
 
@@ -101,28 +125,21 @@ class login extends React.Component {
     fetch("/forgot?loginText=" + this.state.loginText)
       .then((response) => response.json())
       .then((data) => {
-        if (data["user"] !== undefined) {
-          // console.log("userFound");
-          this.setState({ serverResponse: "username: " + data["user"] });
-          this.clearText(3);
-          this.setState({ secretQuestion: data["question"] });
-        } else {
-          this.setState({ serverResponse: "Email not found" });
+        if (data) {
+          this.setState({ serverResponse: data });
         }
       })
       .catch((error) => {
-        // console.error("No server response", error);
+        console.error("No server response", error);
       });
   }
 
   secretQuestion() {
     //checks secret question before allowing pw reset.
     console.log("reset password request sent");
-    fetch("/secretQuestion?loginText=" + this.state.loginText)
+    fetch("/secretQuestion?loginText=" + this.state.loginText + "&user=" + this.state.userName)
       .then((response) => response.json())
       .then((data) => {
-        // console.log("-----------");
-        // console.log(data);
         if (data === "true") {
           this.setState({ serverResponse: "username: " + data["user"] });
           this.setState({ secretQuestion: data["question"] });
