@@ -1,5 +1,5 @@
 const express = require("express");
-
+require('dotenv').config()
 const URL = process.env.live ? `https://finn-dash.herokuapp.com/` : `https://localhost:5000`
 
 const port = process.env.NODE_ENV || 5000;
@@ -12,8 +12,8 @@ const FileStore = require("session-file-store")(session);
 const bodyParser = require("body-parser");
 
 //mailgun config data, needs to be set to be imported if not available in process.env
-const API_KEY = process.env.MAILGUN_API_KEY;
-const DOMAIN = process.env.MAILGUN_DOMAIN_KEY;
+const API_KEY = process.env.MAILGUN_API_KEY || 1;
+const DOMAIN = process.env.MAILGUN_DOMAIN_KEY || 1;
 const mailgun = require('mailgun-js')({ apiKey: API_KEY, domain: DOMAIN });
 
 const app = express();
@@ -57,7 +57,7 @@ if (process.env.live) {
   app.use(
     session({
       store: new FileStore(fileStoreOptions),
-      secret: "keyboard cat",
+      secret: process.env.session_secret,
       resave: false,
       saveUninitialized: true,
       cookie: { secure: false, sameSite: true },
