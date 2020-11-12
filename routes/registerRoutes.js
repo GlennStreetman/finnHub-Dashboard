@@ -19,11 +19,6 @@ router.use(function timeLog (req, res, next) {
   next()
 });
 
-// router.get("/", (req, res) => {
-//   console.log("cat")
-//   res.json("cat")
-// });
-
 router.post("/register", (req, res) => {
   let loginText = req.body.loginText;
   let pwText = req.body.pwText;
@@ -108,8 +103,8 @@ router.post("/register", (req, res) => {
             reject("failed to register");
           }
       });
-      })
     })
+  })
   
     if (emailIsValid(emailText) === true) {
       checkUserStatus()
@@ -126,75 +121,24 @@ router.post("/register", (req, res) => {
     } else {
       res.json("Enter a valid email address");
     }
-  
-  // if (emailIsValid(emailText) === true) {
-  // db.get(checkUser, (err, rows) => {
-  //     if (err) {
-  //     // console.log("user check error");
-  //     res.json("User check error");
-  //     } else if (rows !== undefined) {
-  //     // console.log("user check error2");
-  //     res.json("User Name Already Taken");
-  //     } else {
-  //     // console.log("user name not taken");
-  //     db.get(checkEmail, (err, rows) => {
-  //         // console.log(rows);
-  //         if (err) {
-  //         // console.log("email check error");
-  //         failedCheck = 1;
-  //         res.json("email check error");
-  //         } else if (rows !== undefined) {
-  //         res.json("Email already taken");
-  //         failedCheck = 1;
-  //         } else {
-  //         // console.log("email not taken");
-  //         db.exec(createUser, (rows) => {
-  //             if (rows === null) {
-  //             res.json("true");
-  //             const data = {
-  //                 from: 'Glenn Streetman <glennstreetman@gmail.com>',
-  //                 to: 'glennstreetman@gmail.com',
-  //                 subject: 'finnHub Verify Email',
-  //                 text: `Please visit the following link to verify your email address and login to finnDash: ${URL}/verify?id=${validateKey}`
-  //             };
-  //             mailgun.messages().send(data, (error, body) => {
-  //                 if (err) {
-  //                 console.log(error)
-  //                 } else {
-  //                 console.log(body);
-  //                 console.log("email sent")
-  //                 }
-  //             });
-  //             } else {
-  //             res.json("failed to register");
-  //             }
-  //         });
-  //         }
-  //     });
-  //     }
-  // });
-  // } else {
-  // res.json("Enter a valid email address");
-  // }
-
 });
 
 router.get("/verify", (req, res) => {
-verifyID = req.query['id']
-verifyUpdate = `
-UPDATE user
-SET confirmEmail = 1
-WHERE confirmEmail = '${verifyID}'
-`
-db.exec(verifyUpdate, (err) => {
-  if (err) {
-    res.json("Could not validate email address.");
-    console.log(verifyUpdate)
-  } else {
-    console.log('email verified')
-    res.redirect('/')
-  }
-})
+  verifyID = req.query['id']
+  verifyUpdate = `
+  UPDATE user
+  SET confirmEmail = 1
+  WHERE confirmEmail = '${verifyID}'
+  `
+  db.exec(verifyUpdate, (err) => {
+    if (err) {
+      res.json("Could not validate email address.");
+      console.log(verifyUpdate)
+    } else {
+      console.log('email verified')
+      res.redirect('/')
+    }
+  })
 });
 
 router.get("/login", (req, res) => {
@@ -267,7 +211,6 @@ router.get("/forgot", (req, res) => {
       res.json("Email not found.");
     }
   });
-  // console.log("done");
 });
 
 router.get("/reset", (req, res) => {

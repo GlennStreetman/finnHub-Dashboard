@@ -9,7 +9,7 @@ router.use(function timeLog (req, res, next) {
 });
 
 router.get("*", (req, res) => {
-  //do not return APP until login in complete.
+  //Do not return APP until login in complete? Come back to this later.
   console.log(req.session.login)
   const URLLogin = process.env.live ? `build/index.html` : `public/index.html`
   const URLApp = process.env.live ? `build/index.html` : `public/index.html`
@@ -17,10 +17,8 @@ router.get("*", (req, res) => {
 });
 
 router.get("/accountData", (req, res) => {
-  // console.log(req);
   thisRequest = req.query;
   newQuery = `SELECT loginName, email, apiKey, webHook FROM user WHERE id =${req.session.uID}`;
-  // console.log(newQuery);
   resultSet = {};
   db.all(newQuery, [], (err, rows) => {
     if (err) {
@@ -33,8 +31,6 @@ router.get("/accountData", (req, res) => {
 });
 
 router.post("/accountData", (req, res) => {
-  // console.log("updating user info");
-
   let updateField = req.body.field;
   let newValue = req.body.newValue;
   let updateQuery = `UPDATE user SET ${updateField}='${newValue}' WHERE id=${req.session.uID}`;
@@ -72,7 +68,6 @@ router.post("/dashboard", (req, res) => {
   let menuList = JSON.stringify(req.body.menuList);
   let userName = req.session.userName;
   let getUserIdQuery = "SELECT id FROM user WHERE loginName ='" + userName + "'";
-  let userID = -1;
 
   const getUserID = () => {
     return new Promise((resolve, reject)=> {
@@ -134,43 +129,6 @@ router.post("/dashboard", (req, res) => {
 
 });
 
-  //------------------------------------------------------
-  // db.all(getUserIdQuery, [], (err, rows) => {
-  //   if (err) {
-  //     res.json((userID = -1));
-  //     //return negative 1 if error
-  //   } else {
-  //     // console.log("found it");
-  //     rows.forEach((row) => {
-  //       userID = row.id;
-  //     });
-
-  //     // if a duplicate userID/dashBoardName is detected the record is replaced.
-  //     let saveDashBoardSetupQuery = `INSERT OR REPLACE INTO dashBoard (userID, dashBoardName, globalStockList, widgetList) 
-  //     VALUES (${userID}, '${dashBoardName}','${globalStockList}','${widgetList}')`;
-
-  //     let saveMenuSetupQuery = `INSERT OR REPLACE INTO menuSetup (userID, menuList, defaultMenu)
-  //       VALUES (${userID}, '${menuList}', '${dashBoardName}')`;
-
-  //     db.all(saveDashBoardSetupQuery, [], (err, rows) => {
-  //       if (err) {
-  //         res.json("Failed to save dashboard", err);
-  //         //return negative 1 if error
-  //       } else {
-  //         db.all(saveMenuSetupQuery, [], (err, rows) => {
-  //           if (err) {
-  //             res.json("Failed to save menu setup", err);
-  //             //return negative 1 if error
-  //           } else {
-  //             res.json("Save Complete");
-  //           }
-  //         });
-  //       }
-  //     });
-  //   }
-  // });
-
-
 router.get("/deleteSavedDashboard", (req, res) => {
   let uId = req.session.uID;
   let thisRequest = req.query;
@@ -185,5 +143,4 @@ router.get("/deleteSavedDashboard", (req, res) => {
   });
 });
 
-//---------------------------------
 module.exports = router;
