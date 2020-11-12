@@ -19,10 +19,10 @@ router.use(function timeLog (req, res, next) {
   next()
 });
 
-router.get("/", (req, res) => {
-  console.log("cat")
-  res.json("cat")
-});
+// router.get("/", (req, res) => {
+//   console.log("cat")
+//   res.json("cat")
+// });
 
 router.post("/register", (req, res) => {
   let loginText = req.body.loginText;
@@ -33,65 +33,150 @@ router.post("/register", (req, res) => {
   const validateKey = cryptoRandomString({ length: 32 });
   const checkUser = "SELECT loginName FROM user WHERE loginName ='" + loginText + "'";
   const checkEmail = "SELECT email FROM user WHERE email ='" + emailText + "'";
-  const createUser = `INSERT INTO user (loginName, password, email, secretQuestion, secretAnswer, 
-  confirmEmail, resetPassword) 
-  VALUES ('${loginText}','${md5(pwText)}','${emailText}','${secretQuestion}','${md5(secretAnswer)}', '${validateKey}', "0")`;
+  const createUser = `
+  INSERT INTO user (
+    loginName, 
+    password, 
+    email, 
+    secretQuestion, 
+    secretAnswer, 
+    confirmEmail, 
+    resetPassword) 
+  VALUES (
+    '${loginText}',
+    '${md5(pwText)}',
+    '${emailText}',
+    '${secretQuestion}',
+    '${md5(secretAnswer)}', 
+    '${validateKey}', 
+    "0")`;
 
-  //nodes util api might be able to clean this up by using util.promisify.
-  //this should get us out of a callback pyramid.
   function emailIsValid(email) {
     return /\S+@\S+\.\S+/.test(email);
   };
 
-  if (emailIsValid(emailText) === true) {
-  db.get(checkUser, (err, rows) => {
-      if (err) {
-      // console.log("user check error");
-      res.json("User check error");
-      } else if (rows !== undefined) {
-      // console.log("user check error2");
-      res.json("User Name Already Taken");
-      } else {
-      // console.log("user name not taken");
+  const checkUserStatus = () => {
+    return new Promise((resolve, reject)=> {
+      db.get(checkUser, (err, rows) => {
+        if (err) {
+          console.log("user check error");
+          reject("User check error");
+        } else if (rows !== undefined) {
+          console.log("User name already taken.");
+          reject("User Name Already Taken");
+        } else {
+          resolve("User Name Available")
+        }
+      })
+    })
+  }
+
+  const checkEmailUnique = () => {
+    return new Promise((resolve,reject)=>{
       db.get(checkEmail, (err, rows) => {
-          // console.log(rows);
-          if (err) {
-          // console.log("email check error");
-          failedCheck = 1;
-          res.json("email check error");
-          } else if (rows !== undefined) {
-          res.json("Email already taken");
-          failedCheck = 1;
-          } else {
-          // console.log("email not taken");
-          db.exec(createUser, (rows) => {
-              if (rows === null) {
-              res.json("true");
-              const data = {
-                  from: 'Glenn Streetman <glennstreetman@gmail.com>',
-                  to: 'glennstreetman@gmail.com',
-                  subject: 'finnHub Verify Email',
-                  text: `Please visit the following link to verify your email address and login to finnDash: ${URL}/verify?id=${validateKey}`
-              };
-              mailgun.messages().send(data, (error, body) => {
-                  if (err) {
-                  console.log(error)
-                  } else {
-                  console.log(body);
-                  console.log("email sent")
-                  }
-              });
+        if (err) {
+        reject("email check error");
+        } else if (rows !== undefined) {
+        reject("Email already taken");
+        } else { 
+          resolve("Email Available.")
+        }
+      })
+    })
+  }
+
+  const createNewUser = (() => {
+    return new Promise((resolve, reject) => {
+      db.exec(createUser, (rows) => {
+        if (rows === null) {
+          const data = {
+              from: 'Glenn Streetman <glennstreetman@gmail.com>',
+              to: 'glennstreetman@gmail.com',
+              subject: 'finnHub Verify Email',
+              text: `Please visit the following link to verify your email address and login to finnDash: ${URL}/verify?id=${validateKey}`
+          };
+          mailgun.messages().send(data, (error, body) => {
+              if (error) {
+              console.log(error)
               } else {
-              res.json("failed to register");
+              console.log(body);
+              console.log("email sent")
               }
           });
+          resolve("true");
+          } else {
+            reject("failed to register");
           }
       });
-      }
-  });
-  } else {
-  res.json("Enter a valid email address");
-  }
+      })
+    })
+  
+    if (emailIsValid(emailText) === true) {
+      checkUserStatus()
+      .then(data => {
+        console.log(data)
+        return checkEmailUnique()
+      }).then(data => {
+        console.log(data)
+        return createNewUser()
+      }).then(data => {
+        console.log(data)
+        res.json('true')
+      }).catch(err => res.json(err))
+    } else {
+      res.json("Enter a valid email address");
+    }
+  
+  // if (emailIsValid(emailText) === true) {
+  // db.get(checkUser, (err, rows) => {
+  //     if (err) {
+  //     // console.log("user check error");
+  //     res.json("User check error");
+  //     } else if (rows !== undefined) {
+  //     // console.log("user check error2");
+  //     res.json("User Name Already Taken");
+  //     } else {
+  //     // console.log("user name not taken");
+  //     db.get(checkEmail, (err, rows) => {
+  //         // console.log(rows);
+  //         if (err) {
+  //         // console.log("email check error");
+  //         failedCheck = 1;
+  //         res.json("email check error");
+  //         } else if (rows !== undefined) {
+  //         res.json("Email already taken");
+  //         failedCheck = 1;
+  //         } else {
+  //         // console.log("email not taken");
+  //         db.exec(createUser, (rows) => {
+  //             if (rows === null) {
+  //             res.json("true");
+  //             const data = {
+  //                 from: 'Glenn Streetman <glennstreetman@gmail.com>',
+  //                 to: 'glennstreetman@gmail.com',
+  //                 subject: 'finnHub Verify Email',
+  //                 text: `Please visit the following link to verify your email address and login to finnDash: ${URL}/verify?id=${validateKey}`
+  //             };
+  //             mailgun.messages().send(data, (error, body) => {
+  //                 if (err) {
+  //                 console.log(error)
+  //                 } else {
+  //                 console.log(body);
+  //                 console.log("email sent")
+  //                 }
+  //             });
+  //             } else {
+  //             res.json("failed to register");
+  //             }
+  //         });
+  //         }
+  //     });
+  //     }
+  // });
+  // } else {
+  // res.json("Enter a valid email address");
+  // }
+
 });
 
 router.get("/verify", (req, res) => {
