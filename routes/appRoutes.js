@@ -65,53 +65,111 @@ router.get("/dashboard", (req, res) => {
   });
 });
 
-// trackedStocks, widgetList, dashName;
 router.post("/dashboard", (req, res) => {
   let dashBoardName = req.body.dashBoardName;
   let globalStockList = JSON.stringify(req.body.globalStockList);
-  // console.log(req.body.globalStockList);
-  console.log(typeof globalStockList);
   let widgetList = JSON.stringify(req.body.widgetList);
   let menuList = JSON.stringify(req.body.menuList);
   let userName = req.session.userName;
-  getUserIdQuery = "SELECT id FROM user WHERE loginName ='" + userName + "'";
-  // console.log(getUserIdQuery);
+  let getUserIdQuery = "SELECT id FROM user WHERE loginName ='" + userName + "'";
   let userID = -1;
-  db.all(getUserIdQuery, [], (err, rows) => {
-    if (err) {
-      res.json((userID = -1));
-      //return negative 1 if error
-    } else {
-      // console.log("found it");
-      rows.forEach((row) => {
-        userID = row.id;
-      });
 
-      // if a duplicate userID/dashBoardName is detected the record is replaced.
-      let saveDashBoardSetupQuery = `INSERT OR REPLACE INTO dashBoard (userID, dashBoardName, globalStockList, widgetList) 
-      VALUES (${userID}, '${dashBoardName}','${globalStockList}','${widgetList}')`;
+  const getUserID = () => {
+    return new Promise((resolve, reject)=> {
+      db.get(getUserIdQuery, [], (err, rows) => {
+        if (err) {
+          reject('Could not find user ID.');
+        } else {
+          resolve(rows.id)
+        };      
+      })
+    })
+  }
 
-      let saveMenuSetup = `INSERT OR REPLACE INTO menuSetup (userID, menuList, defaultMenu)
-        VALUES (${userID}, '${menuList}', '${dashBoardName}')`;
+  const saveDashBoardSetup = (data) => {
+    return new Promise((resolve, reject)=> {
+      let saveDashBoardSetupQuery = `
+      INSERT OR REPLACE INTO dashBoard 
+      (userID, dashBoardName, globalStockList, widgetList) 
+      VALUES 
+      (${data}, '${dashBoardName}','${globalStockList}','${widgetList}')`;
 
       db.all(saveDashBoardSetupQuery, [], (err, rows) => {
         if (err) {
-          res.json("Failed to save dashboard", err);
-          //return negative 1 if error
+          reject('Failed to save dashboard', err)
         } else {
-          db.all(saveMenuSetup, [], (err, rows) => {
-            if (err) {
-              res.json("Failed to save menu setup", err);
-              //return negative 1 if error
-            } else {
-              res.json("Save Complete");
-            }
-          });
+          resolve(data)
+        }
+      })
+    })
+  }
+
+  const checkUserStatus = (data) => {
+    return new Promise((resolve, reject)=> {
+      let saveMenuSetupQuery = `INSERT OR REPLACE INTO menuSetup 
+        (userID, menuList, defaultMenu)
+        VALUES (${data}, '${menuList}', '${dashBoardName}')`;
+      
+      db.all(saveMenuSetupQuery, [], (err, rows) => {
+        if (err) {
+          reject("Failed to save menu setup", err);
+        } else {
+          res.json("Save Complete");
         }
       });
-    }
-  });
+    })
+  }
+
+  getUserID()
+  .then(data => {
+    console.log(data)
+    return saveDashBoardSetup(data)
+  }).then(data => {
+    console.log(data)
+    return checkUserStatus(data)
+  }).then(data => {
+    console.log(data)
+    res.json('true')
+  }).catch(err => res.json(err))
+
 });
+
+  //------------------------------------------------------
+  // db.all(getUserIdQuery, [], (err, rows) => {
+  //   if (err) {
+  //     res.json((userID = -1));
+  //     //return negative 1 if error
+  //   } else {
+  //     // console.log("found it");
+  //     rows.forEach((row) => {
+  //       userID = row.id;
+  //     });
+
+  //     // if a duplicate userID/dashBoardName is detected the record is replaced.
+  //     let saveDashBoardSetupQuery = `INSERT OR REPLACE INTO dashBoard (userID, dashBoardName, globalStockList, widgetList) 
+  //     VALUES (${userID}, '${dashBoardName}','${globalStockList}','${widgetList}')`;
+
+  //     let saveMenuSetupQuery = `INSERT OR REPLACE INTO menuSetup (userID, menuList, defaultMenu)
+  //       VALUES (${userID}, '${menuList}', '${dashBoardName}')`;
+
+  //     db.all(saveDashBoardSetupQuery, [], (err, rows) => {
+  //       if (err) {
+  //         res.json("Failed to save dashboard", err);
+  //         //return negative 1 if error
+  //       } else {
+  //         db.all(saveMenuSetupQuery, [], (err, rows) => {
+  //           if (err) {
+  //             res.json("Failed to save menu setup", err);
+  //             //return negative 1 if error
+  //           } else {
+  //             res.json("Save Complete");
+  //           }
+  //         });
+  //       }
+  //     });
+  //   }
+  // });
+
 
 router.get("/deleteSavedDashboard", (req, res) => {
   let uId = req.session.uID;
@@ -121,8 +179,9 @@ router.get("/deleteSavedDashboard", (req, res) => {
   db.exec(deleteSQL, (err, rows) => {
     if (err) {
       res.json("Failed to delete");
-    }
+    } else {
     res.json("success");
+    }
   });
 });
 
