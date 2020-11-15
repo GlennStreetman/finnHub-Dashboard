@@ -26,8 +26,10 @@ class login extends React.Component {
   }
 
   componentDidMount(){
+    console.log(this.props.queryData)
     if (this.props.queryData.reset === '1') {
-      const user = this.props.queryData.user
+      const user = this.props.queryData.users
+      console.log(user)
       fetch(`/findSecret?user=${user}`)
       .then((response) => response.json())
       .then((data) => {
@@ -141,7 +143,7 @@ class login extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         if (data === "true") {
-          this.setState({ serverResponse: "username: " + data["user"] });
+          this.setState({ serverResponse: "username: " + data["users"] });
           this.setState({ secretQuestion: data["question"] });
           this.clearText(4);
         } else {

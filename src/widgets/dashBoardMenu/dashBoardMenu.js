@@ -56,12 +56,12 @@ class DashBoardMenu extends React.PureComponent {
             <i className="fa fa-times" aria-hidden="true"></i>
           </button>
         </td>
-        <td key={dashBoardData[el].id + "te"}>{dashBoardData[el].dashBoardName}</td>
+        <td key={dashBoardData[el].id + "te"}>{dashBoardData[el].dashboardname}</td>
         <td className="centerTE">
           <button
             onClick={() => {
-              this.props.loadDashBoard(dashBoardData[el].globalStockList, dashBoardData[el].widgetList);
-              this.setState({ inputText: dashBoardData[el].dashBoardName });
+              this.props.loadDashBoard(dashBoardData[el].globalstocklist, dashBoardData[el].widgetlist);
+              this.setState({ inputText: dashBoardData[el].dashboardname });
             }}
           >
             <i className="fa fa-check-square-o" aria-hidden="true"></i>

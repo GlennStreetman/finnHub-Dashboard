@@ -87,16 +87,16 @@ class TopNav extends React.Component {
     if (this.state.loadStartingDashBoard === 0 && this.props.currentDashBoard !== "") {
       this.setState({ loadStartingDashBoard: 1 });
       try {
-        let loadWidget = this.props.dashBoardData[this.props.currentDashBoard]["widgetList"];
-        let loadGlobal = this.props.dashBoardData[this.props.currentDashBoard]["globalStockList"];
+        let loadWidget = this.props.dashBoardData[this.props.currentDashBoard]["widgetlist"];
+        let loadGlobal = this.props.dashBoardData[this.props.currentDashBoard]["globalstocklist"];
         this.props.loadDashBoard(loadGlobal, loadWidget);
         this.setState({ DashBoardMenu: 1 });
       } catch (err) {
-        // console.log("failed to load dashboards");
+        console.log("failed to load dashboards");
       }
     }
   }
-
+ 
   updateTickerSockets() {
     // console.log("creating connections")
     //opens a series of socket connections to live stream stock prices

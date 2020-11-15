@@ -4,7 +4,7 @@ let router =  express.Router();
 const cryptoRandomString = require('crypto-random-string');
 const URL = process.env.live ? `https://finn-dash.herokuapp.com/` : `https://localhost:5000`
 const md5 = require("md5");
-const db = require("./../database.js");
+const db = require("../../db/databaseSQL3.js");
 
 //mailgun config data, needs to be set to be imported if not available in process.env
 const API_KEY = process.env.API_KEY || 1;
@@ -26,10 +26,10 @@ router.post("/register", (req, res) => {
   let secretQuestion = req.body.secretQuestion;
   let secretAnswer = req.body.secretAnswer;
   const validateKey = cryptoRandomString({ length: 32 });
-  const checkUser = "SELECT loginName FROM user WHERE loginName ='" + loginText + "'";
-  const checkEmail = "SELECT email FROM user WHERE email ='" + emailText + "'";
+  const checkUser = "SELECT loginName FROM users WHERE loginName ='" + loginText + "'";
+  const checkEmail = "SELECT email FROM users WHERE email ='" + emailText + "'";
   const createUser = `
-  INSERT INTO user (
+  INSERT INTO users (
     loginName, 
     password, 
     email, 
@@ -142,11 +142,14 @@ router.get("/verify", (req, res) => {
 });
 
 router.get("/login", (req, res) => {
+  console.log('Logging In')
   thisRequest = req.query; //.query contains all query string parameters.
-  newQuery = "SELECT id, apiKey, confirmEmail FROM user WHERE loginName ='" + thisRequest["loginText"] + "' AND password = '" + md5(thisRequest["pwText"]) + "'";
+  newQuery = "SELECT id, apiKey, confirmEmail FROM users WHERE loginName ='" + thisRequest["loginText"] + "' AND password = '" + md5(thisRequest["pwText"]) + "'";
   let info = { key: "", login: 0 };
   db.get(newQuery, (err, rows) => {
     if (err) {
+      console.log(err)
+      console.log('fail')
       res.json("false");
     } else if (rows !== undefined && rows.confirmEmail === '1') {
       info["key"] = rows.apiKey;

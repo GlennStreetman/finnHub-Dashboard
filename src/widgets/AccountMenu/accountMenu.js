@@ -31,11 +31,12 @@ class AccountMenu extends React.PureComponent {
     fetch(`/accountData`)
       .then((response) => response.json())
       .then((data) => {
-        let dataSet = data["userData"][0];
-        this.setState({ loginName: dataSet["loginName"] });
+        console.log(data)
+        let dataSet = data["userData"];
+        this.setState({ loginName: dataSet["loginname"] });
         this.setState({ email: dataSet["email"] });
-        this.setState({ apiKey: dataSet["apiKey"] });
-        this.setState({ webHook: dataSet["webHook"] });
+        this.setState({ apiKey: dataSet["apikey"] });
+        this.setState({ webHook: dataSet["webhook"] });
       })
       .catch((error) => {
         console.error("Failed to retrieve user data" + error);
@@ -60,6 +61,7 @@ class AccountMenu extends React.PureComponent {
         this.getAccountData();
         this.setState({ editToggle: 0 });
         this.setState({ inputText: "" });
+        this.apiKey(this.state.apiKey)
       });
   }
 
@@ -148,6 +150,7 @@ export function accountMenuProps(that, key = "AccountMenu") {
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
+    updateAPIKey: that.props.apikKey
   };
   return propList;
 }

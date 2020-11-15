@@ -12,17 +12,17 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
   } else {
     console.log("Connected to the SQLite database.");
     db.run(
-      `CREATE TABLE user (
+      `CREATE TABLE users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            loginName text UNIQUE, 
+            loginname text UNIQUE, 
             email text UNIQUE, 
             password text,
-            secretQuestion text,
-            secretAnswer text,
-            apiKey text,
-            webHook text,
-            confirmEmail text,
-            resetPassword text
+            secretquestion text,
+            secretanswer text,
+            apikey text,
+            webhook text,
+            confirmemail text,
+            resetpassword text
             )`,
 
       (err) => {
@@ -31,15 +31,15 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
         } else {
           // Table just created, creating some rows
           console.log("inserting rows");
-          var insert = "INSERT INTO user (loginName, email, password, secretQuestion, secretAnswer, apiKey, webHook, confirmEmail, resetPassword) VALUES (?,?,?,?,?,?,?,?,?)";
+          var insert = "INSERT INTO users (loginName, email, password, secretQuestion, secretAnswer, apiKey, webHook, confirmEmail, resetPassword) VALUES (?,?,?,?,?,?,?,?,?)";
           db.run(insert, [
             "admin",
             "glennstreetmanadmin@gmail.com",
             md5("admin"),
             "This is my secret question",
             md5("answer"),
-            "bsuu7qv48v6qu589jlj0",
-            "bss698f48v6u62sfqlog",
+            "testAPIKey",
+            "testWebhookKey",
             "1",
             "0",
           ]);
@@ -49,26 +49,26 @@ let db = new sqlite3.Database(DBSOURCE, (err) => {
             md5("guest456!"),
             "This is my secret question",
             md5("answer"),
-            "bsuu7qv48v6qu589jlj0",
-            "bss698f48v6u62sfqlog",
+            "testAPIKey",
+            "testWebhookKey",
             "1",
             "0",
 
           ]);
           db.run(`CREATE TABLE dashBoard (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            userID INTEGER, 
-            dashBoardName text,
-            globalStockList text,
-            widgetList text,
-            CONSTRAINT dashBoardID UNIQUE (userid, dashBoardName) 
+            userid INTEGER, 
+            dashboardname text,
+            globalstocklist text,
+            widgetlist text,
+            CONSTRAINT dashboardid UNIQUE (userid, dashboardname) 
             )`);
           db.run(`CREATE TABLE menuSetup (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            userID INTEGER, 
-            menuList text,
-            defaultMenu text,
-            CONSTRAINT onePerUser UNIQUE (userID)
+            userid INTEGER, 
+            menulist text,
+            defaultmenu text,
+            CONSTRAINT onePerUser UNIQUE (userid)
             )`);
         }
       }

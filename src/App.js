@@ -17,7 +17,7 @@ class App extends React.Component {
       widgetList: {}, //lists of all widgets.
       menuList: {}, //lists of all menu widgets.
       login: 0, //login state. 0 logged out, 1 logged in.
-      apiKey: "", //API key retrieved from sqlite3 login database.
+      apiKey: "", //API key retrieved from login database.
       refreshStockData: 0, //if set to 1 stock data should be updated from globalStockList
       dashBoardData: [],
       currentDashBoard: "",
@@ -37,6 +37,7 @@ class App extends React.Component {
     this.getSavedDashBoards = this.getSavedDashBoards.bind(this);
     this.changeWidgetName = this.changeWidgetName.bind(this);
     this.updateWidgetData = this.updateWidgetData.bind(this);
+    this.updateAPIKey = this.updateAPIKey.bind(this);
     
   }
 
@@ -156,17 +157,18 @@ class App extends React.Component {
     fetch("/dashBoard")
       .then((response) => response.json())
       .then((data) => {
-        let x = data["savedDashBoards"];
-        let newList = {};
-        for (const oldKey in x) {
-          let newKey = x[oldKey]["dashBoardName"];
-          let newData = x[oldKey];
+        // console.log('dashboard and menu data retrieved')
+        console.log(data)
+        let dashboards = data["savedDashBoards"];
+        let newList = {}; //replace numeric keys, returned by dataset, with widget IDs.
+        for (const oldKey in dashboards) {
+          let newKey = dashboards[oldKey]["dashboardname"];
+          let newData = dashboards[oldKey];
           newList[newKey] = newData;
         }
-
         this.setState({ dashBoardData: newList });
-        this.setState({ menuList: JSON.parse(data["menuSetup"][0]["menuList"]) });
-        this.setState({ currentDashBoard: data["menuSetup"][0]["defaultMenu"] });
+        this.setState({ menuList: JSON.parse(data["menuSetup"][0]["menulist"]) });
+        this.setState({ currentDashBoard: data["menuSetup"][0]["defaultmenu"] });
       })
       .catch((error) => {
         // console.error("Failed to recover dashboards", error);
@@ -209,6 +211,10 @@ class App extends React.Component {
     // e.preventDefault();
   }
 
+  updateAPIKey(newKey){
+    this.setState({apiKey: newKey})
+  }
+
   render() {
     const quaryData = queryString.parse(window.location.search)
     //state.login = 1 means that login succeeded.
@@ -236,7 +242,7 @@ class App extends React.Component {
               changeWidgetName={this.changeWidgetName}
               updateWidgetData={this.updateWidgetData}
               throttle={this.state.throttle}
-
+              updateAPIKey={this.apiKey}
             />
           </>
     ) : (

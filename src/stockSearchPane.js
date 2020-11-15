@@ -25,8 +25,6 @@ class StockSearchPane extends React.Component {
     }
   }
 
-
-
   handleChange(e) {
     e.target !== undefined && this.setState({ inputText: e.target.value.toUpperCase() });
     
