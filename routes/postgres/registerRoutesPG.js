@@ -4,7 +4,7 @@ let router =  express.Router();
 const cryptoRandomString = require('crypto-random-string');
 const URL = process.env.live ? `https://finn-dash.herokuapp.com/` : `http://localhost:5000`
 const md5 = require("md5");
-const db = process.env.live === 1 ? require("../../db/databaseLive.js") :  require("../../db/databaseLocalPG.js") ;
+const db = process.env.live === '1' ? require("../../db/databaseLive.js") :  require("../../db/databaseLocalPG.js") ;
  
 //mailgun config data, needs to be set to be imported if not available in process.env
 const API_KEY = process.env.API_KEY || 1;

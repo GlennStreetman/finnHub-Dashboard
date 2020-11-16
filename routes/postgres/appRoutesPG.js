@@ -1,7 +1,7 @@
 let express = require('express');
 let router =  express.Router();
 
-const db = process.env.live === 1 ? require("../../db/databaseLive.js") :  require("../../db/databaseLocalPG.js") ;
+const db = process.env.live === '1' ? require("../../db/databaseLive.js") :  require("../../db/databaseLocalPG.js") ;
 // middleware specific to this router
 router.use(function timeLog (req, res, next) {
   console.log('Time: ', Date.now())
