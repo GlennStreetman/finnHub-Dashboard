@@ -10,7 +10,7 @@ router.use(function timeLog (req, res, next) {
 
 router.get("*", (req, res) => {
   //Do not return APP until login in complete? Come back to this later.
-  console.log(req.session.login)
+  console.log("New: " +req.session.login)
   const URLLogin = process.env.live ? `build/index.html` : `public/index.html`
   const URLApp = process.env.live ? `build/index.html` : `public/index.html`
   req.session.login === true ? res.sendFile(__dirname, URLLogin) : res.sendFile(__dirname, URLApp)

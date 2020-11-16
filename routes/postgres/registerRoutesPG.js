@@ -146,17 +146,17 @@ router.get("/verify", (req, res) => {
 
 router.get("/login", (req, res) => {
   thisRequest = req.query; //.query contains all query string parameters.
-  newQuery = `SELECT id, apiKey, confirmEmail 
+  newQuery = `SELECT id, apikey, confirmemail 
               FROM users WHERE loginName ='${thisRequest["loginText"]}' 
               AND password = '${md5(thisRequest["pwText"])}'`;
   let info = { key: "", login: 0 };
-  // console.log(newQuery)
+  console.log(newQuery)
   db.query(newQuery, (err, rows) => {
     let login = rows.rows[0]
     console.log(login)
     if (err) {
       res.json("false");
-    } else if (login.id !== undefined && login.confirmemail === '1') {
+    } else if (rows.rowCount === 1 && login.confirmemail === '1') {
       info["key"] = login.apikey;
       info["login"] = 1;
       info["response"] = 'success';
@@ -164,13 +164,11 @@ router.get("/login", (req, res) => {
       req.session.userName = thisRequest["loginText"];
       req.session.login = true
       res.json(info);
-    } else if (login !== undefined && login.confirmemail !== '1') {
+    } else if (rows.rowCount === 1 && login.confirmemail !== '1') {
       console.log(login)
       info["response"] = 'Please confirm your email address.';
       res.json(info)
     } else {
-      console.log(login.id)
-      console.log(login.confirmemail)
       info["response"] = "Login/Password did not match."
       res.json(info)
     }
