@@ -20,11 +20,11 @@ router.use(function timeLog (req, res, next) {
 });
 
 router.post("/register", (req, res) => {
-  let loginText = req.body.loginText;
-  let pwText = req.body.pwText;
-  let emailText = req.body.emailText;
-  let secretQuestion = req.body.secretQuestion;
-  let secretAnswer = req.body.secretAnswer;
+  const loginText = req.body.loginText;
+  const pwText = req.body.pwText;
+  const emailText = req.body.emailText;
+  const secretQuestion = req.body.secretQuestion;
+  const secretAnswer = req.body.secretAnswer;
   const validateKey = cryptoRandomString({ length: 32 });
   const checkUser = "SELECT loginName FROM users WHERE loginName ='" + loginText + "'";
   const checkEmail = "SELECT email FROM users WHERE email ='" + emailText + "'";
@@ -89,7 +89,7 @@ router.post("/register", (req, res) => {
         if (res.rowCount === 1) {
           const data = {
               from: 'Glenn Streetman <glennstreetman@gmail.com>',
-              to: 'glennstreetman@gmail.com',
+              to: emailText,
               subject: 'finnHub Verify Email',
               text: `Please visit the following link to verify your email address and login to finnDash: ${URL}/verify?id=${validateKey}`
           };
