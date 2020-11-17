@@ -65,39 +65,41 @@ class NewsWidget extends React.Component {
   }
 
   getCompanyNews(symbol, fromDate, toDate) {
-    let stockSymbol = symbol.slice(symbol.indexOf('-')+1, symbol.length)
-    let that = this
-    that.props.throttle.enqueue(function() { 
-    fetch("https://finnhub.io/api/v1/company-news?symbol=" + stockSymbol + "&from=" + fromDate + "&to=" + toDate + "&token=" + that.props.apiKey)
-      .then((response) => {
-        if (response.status === 429) {
-          that.props.throttle.setSuspend(4000)
-          that.getCompanyNews(symbol, fromDate, toDate)
-          throw new Error('finnhub 429')
-        } else {
-          console.log(Date().slice(20,25) +  ':get company news' + symbol)
-          return response.json()
-        }
-      })
-      .then((data) => {
-        let filteredNews = [];
-        let newsCount = 0;
-        for (var news in data) {
-          if (data[news]["source"] !== "seekingalpha.com" && newsCount < 100) {
-            filteredNews.push(data[news]);
-            newsCount += 1;
+    if (this.props.apiKey !== '') {
+      let stockSymbol = symbol.slice(symbol.indexOf('-')+1, symbol.length)
+      let that = this
+      that.props.throttle.enqueue(function() { 
+      fetch("https://finnhub.io/api/v1/company-news?symbol=" + stockSymbol + "&from=" + fromDate + "&to=" + toDate + "&token=" + that.props.apiKey)
+        .then((response) => {
+          if (response.status === 429) {
+            that.props.throttle.setSuspend(4000)
+            that.getCompanyNews(symbol, fromDate, toDate)
+            throw new Error('finnhub 429')
+          } else {
+            console.log(Date().slice(20,25) +  ':get company news' + symbol)
+            return response.json()
           }
-        }
-        try {
-          that.setState({ companyNews: filteredNews });
-        } catch (err) {
-          console.log("Could not update news. Component not mounted.");
-        }
+        })
+        .then((data) => {
+          let filteredNews = [];
+          let newsCount = 0;
+          for (var news in data) {
+            if (data[news]["source"] !== "seekingalpha.com" && newsCount < 100) {
+              filteredNews.push(data[news]);
+              newsCount += 1;
+            }
+          }
+          try {
+            that.setState({ companyNews: filteredNews });
+          } catch (err) {
+            console.log("Could not update news. Component not mounted.");
+          }
+        })
+        .catch(error => {
+          console.log(error.message)
+        });
       })
-      .catch(error => {
-        console.log(error.message)
-      });
-    })
+    }
   }
 
   changeIncrememnt(e) {

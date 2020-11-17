@@ -108,6 +108,7 @@ class StockSearchPane extends React.Component {
             } else {
               //console.log(this.state.inputText);
               console.log("invalid stock selection");
+              e.preventDefault();
             }
           }}
         >

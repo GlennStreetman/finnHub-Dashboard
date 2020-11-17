@@ -29,61 +29,65 @@ class MetricsWidget extends React.Component {
 
   componentDidMount(){
     //dumby stock symbol user to return list of all metrics.
-    let that = this
-    let setup = function () {that.props.throttle.enqueue(function() {  
-      fetch("https://finnhub.io/api/v1/stock/metric?symbol=AAPL&metric=all&token=" + that.props.apiKey)
-        .then((response) => {
-          if (response.status === 429) {
-            that.props.throttle.setSuspend(4000)
-            setup()
-            throw new Error('finnhub 429')
-          } else {
-          console.log(Date().slice(20,25) + ' setup metrics')
-          return response.json()
-        }
+    if (this.props.apiKey !== '' ) {
+      let that = this
+      let setup = function () {that.props.throttle.enqueue(function() {  
+        fetch("https://finnhub.io/api/v1/stock/metric?symbol=AAPL&metric=all&token=" + that.props.apiKey)
+          .then((response) => {
+            if (response.status === 429) {
+              that.props.throttle.setSuspend(4000)
+              setup()
+              throw new Error('finnhub 429')
+            } else {
+            console.log(Date().slice(20,25) + ' setup metrics')
+            return response.json()
+          }
+          })
+          .then((data) => {
+            that.setState({metricList: Object.keys(data.metric)})
+          })
+          .catch(error => {
+            console.log(error.message)
+          });
         })
-        .then((data) => {
-          that.setState({metricList: Object.keys(data.metric)})
-        })
-        .catch(error => {
-          console.log(error.message)
-        });
-      })
-    }
+      }
 
-    setup()
-    //initial setup the first time widget is loaded.
-    if (this.props.metricSelection === undefined) {
-      let newList = []
-      this.props.updateWidgetData(this.props.widgetKey, 'metricSelection', newList)
+      setup()
+      //initial setup the first time widget is loaded.
+      if (this.props.metricSelection === undefined) {
+        let newList = []
+        this.props.updateWidgetData(this.props.widgetKey, 'metricSelection', newList)
+      }
+      //load initial data
+      this.props.trackedStocks.forEach(el => this.getCompanyMetrics(el))
     }
-    //load initial data
-    this.props.trackedStocks.forEach(el => this.getCompanyMetrics(el))
   }
 
   getCompanyMetrics(symbol) {
-    let that = this
-    that.props.throttle.enqueue(function() {  
-    fetch("https://finnhub.io/api/v1/stock/metric?symbol=" + symbol.slice(symbol.indexOf("-")+1, symbol.length) + "&metric=all&token=" + that.props.apiKey)
-        .then((response) => {
-          if (response.status === 429) {
-            that.props.throttle.setSuspend(4000)
-            that.getCompanyMetrics(symbol)
-            throw new Error('finnhub 429')
-          } else {
-            console.log(Date().slice(20,25) +  ": get company metrics" + symbol)
-            return response.json()
-          }
+    if (this.props.apiKey !== '') {
+      let that = this
+      that.props.throttle.enqueue(function() {  
+      fetch("https://finnhub.io/api/v1/stock/metric?symbol=" + symbol.slice(symbol.indexOf("-")+1, symbol.length) + "&metric=all&token=" + that.props.apiKey)
+          .then((response) => {
+            if (response.status === 429) {
+              that.props.throttle.setSuspend(4000)
+              that.getCompanyMetrics(symbol)
+              throw new Error('finnhub 429')
+            } else {
+              console.log(Date().slice(20,25) +  ": get company metrics" + symbol)
+              return response.json()
+            }
+          })
+          .then((data) => {
+            let updateData = Object.assign({}, that.state.metricData)
+            updateData[symbol] = data.metric
+            that.setState({metricData: updateData})
+          })
+          .catch(error => {
+            console.log(error.message)
+          });
         })
-        .then((data) => {
-          let updateData = Object.assign({}, that.state.metricData)
-          updateData[symbol] = data.metric
-          that.setState({metricData: updateData})
-        })
-        .catch(error => {
-          console.log(error.message)
-        });
-      })
+    }
   }
 
   componentDidUpdate(prevProps, PrevState) {

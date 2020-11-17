@@ -14,43 +14,45 @@ class WatchListMenu extends React.PureComponent {
   }
 
   getSymbolList() {
-    let that = this
-    this.props.throttle.enqueue(function() {  
-    fetch("https://finnhub.io/api/v1/stock/symbol?exchange=US&token=bsuu7qv48v6qu589jlj0")
-      .then((response) => {
-        if (response.status === 429) {
-          this.props.throttle.setSuspend(3000)
-          this.getSymbolList()
-        }
-        console.log(Date().slice(20,25) + ":symbol list")
-        return response.json()})
-      .then((data) => {
-        let transformData = {};
-        for (const [, stockValues] of Object.entries(data)) {
-          //deconstruct API object
-          const {
-            // currency: a,
-            description: b,
-            displaySymbol: c,
-            // symbol: d,
-            // type: e
-          } = stockValues;
-          //set API object keys equal to stock symbol value instad of numeric value
-          transformData[c] = {
-            // currency: a,
-            description: b,
-            displaySymbol: c,
-            // symbol: d,
-            // type: e,
-          };
-        }
-        that.setState({ availableStocks: transformData });
-        // console.log("Success retrieving stock symbols");
+    if (this.props.apiKey !== '') {  
+      let that = this
+      this.props.throttle.enqueue(function() {  
+      fetch("https://finnhub.io/api/v1/stock/symbol?exchange=US&token=bsuu7qv48v6qu589jlj0")
+        .then((response) => {
+          if (response.status === 429) {
+            this.props.throttle.setSuspend(3000)
+            this.getSymbolList()
+          }
+          console.log(Date().slice(20,25) + ":symbol list")
+          return response.json()})
+        .then((data) => {
+          let transformData = {};
+          for (const [, stockValues] of Object.entries(data)) {
+            //deconstruct API object
+            const {
+              // currency: a,
+              description: b,
+              displaySymbol: c,
+              // symbol: d,
+              // type: e
+            } = stockValues;
+            //set API object keys equal to stock symbol value instad of numeric value
+            transformData[c] = {
+              // currency: a,
+              description: b,
+              displaySymbol: c,
+              // symbol: d,
+              // type: e,
+            };
+          }
+          that.setState({ availableStocks: transformData });
+          // console.log("Success retrieving stock symbols");
+        })
+        .catch((error) => {
+          console.error("Error retrieving stock symbols", error);
+        });
       })
-      .catch((error) => {
-        console.error("Error retrieving stock symbols", error);
-      });
-    })
+    }
   }
 
   renderWatchedStocks() {

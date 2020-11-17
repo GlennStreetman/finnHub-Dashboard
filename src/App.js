@@ -5,7 +5,8 @@ import TopNav from "./topNav.js";
 import Login from "./login.js";
 import  ThrottleQueue  from "./throttleQueue.js";
 
-console.log(queryString.parse(window.location.search))
+// console.log(queryString.parse(window.location.search))
+console.log(process.env.NODE_ENV)
 
 class App extends React.Component {
   constructor(props) {
@@ -22,6 +23,7 @@ class App extends React.Component {
       dashBoardData: [],
       currentDashBoard: "",
       throttle: ThrottleQueue(25, 1000, true), //REMEMBER TO WRAP ALL FINNHUB API CALLS IN: throttle(function() {'YOUR API CALL HERE'})
+      apiFlag: 0
 
     };
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
@@ -38,6 +40,8 @@ class App extends React.Component {
     this.changeWidgetName = this.changeWidgetName.bind(this);
     this.updateWidgetData = this.updateWidgetData.bind(this);
     this.updateAPIKey = this.updateAPIKey.bind(this);
+    this.updateAPIFlag = this.updateAPIFlag.bind(this);
+    
     
   }
 
@@ -63,7 +67,7 @@ class App extends React.Component {
 
   newMenuContainer(widgetDescription, widgetHeader, widgetConfig) {
     const widgetName = widgetDescription;
-    var newMenuList = Object.assign({}, this.state.menuList);
+    let newMenuList = Object.assign({}, this.state.menuList);
     newMenuList[widgetName] = {
       widgetID: widgetName,
       widgetType: widgetDescription,
@@ -152,8 +156,9 @@ class App extends React.Component {
   }
 
   getSavedDashBoards() {
-    // console.log("running");
+    console.log('getting saved dashboards')
     this.state.throttle.resetQueue()
+
     fetch("/dashBoard")
       .then((response) => response.json())
       .then((data) => {
@@ -167,11 +172,18 @@ class App extends React.Component {
           newList[newKey] = newData;
         }
         this.setState({ dashBoardData: newList });
-        this.setState({ menuList: JSON.parse(data["menuSetup"][0]["menulist"]) });
-        this.setState({ currentDashBoard: data["menuSetup"][0]["defaultmenu"] });
+        if( data.menuSetup[0] !== undefined) {
+          this.setState({ menuList: JSON.parse(data["menuSetup"][0]["menulist"]) });
+          this.setState({ currentDashBoard: data["menuSetup"][0]["defaultmenu"] });
+        }
+        //show about menu by default if login does not return API key.
+        if (this.state.apiKey === '' && this.state.apiFlag === 0) {
+          console.log("chaning api flag")
+          this.setState({apiFlag: 1})
+        }
       })
       .catch((error) => {
-        // console.error("Failed to recover dashboards", error);
+        console.error("Failed to recover dashboards", error);
       });
   }
 
@@ -215,6 +227,10 @@ class App extends React.Component {
     this.setState({apiKey: newKey})
   }
 
+  updateAPIFlag(val){
+    this.setState({apiFlag: val})
+  }
+
   render() {
     const quaryData = queryString.parse(window.location.search)
     //state.login = 1 means that login succeeded.
@@ -242,7 +258,9 @@ class App extends React.Component {
               changeWidgetName={this.changeWidgetName}
               updateWidgetData={this.updateWidgetData}
               throttle={this.state.throttle}
-              updateAPIKey={this.apiKey}
+              updateAPIKey={this.updateAPIKey}
+              apiFlag={this.state.apiFlag}
+              updateAPIFlag={this.updateAPIFlag}
             />
           </>
     ) : (

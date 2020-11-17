@@ -2,7 +2,6 @@ import React from "react";
 import WidgetControl from "./widgets/widgetControl.js";
 // import throttledQueue from "throttled-queue"; //Finnhub API calls limited to 30 per second.
 
-
 //Import props function from each widget/menu here and add to returnBodyProps function below.
 import { dashBoardMenuProps } from "./widgets/dashBoardMenu/dashBoardMenu.js";
 import { watchListMenuProps } from "./widgets/watchListMenu/watchListMenu.js";
@@ -27,6 +26,7 @@ class TopNav extends React.Component {
       AboutMenu: 0, //1 = show, 0 = hide
       // throttle: myThrottleQue(25, 1000, true), //REMEMBER TO WRAP ALL FINNHUB API CALLS IN: throttle(function() {'YOUR API CALL HERE'})
       socket: '',
+      AboutAPIKeyReminder: 0
     };
 
     this.showPane = this.showPane.bind(this);
@@ -54,6 +54,7 @@ class TopNav extends React.Component {
   }
 
   componentDidMount() {
+    console.log('topnav mounted')
     this.props.getSavedDashBoards();
   }
 
@@ -68,12 +69,12 @@ class TopNav extends React.Component {
       }
     }
 
-    if (this.props.apiKey !== '' && prevProps.apiKey === '') {
+    if (this.props.apiKey !== '' && prevProps.apiKey === '' && this.props.apiKey !== '') {
     let newSocket = new WebSocket("wss://ws.finnhub.io?token=" + this.props.apiKey)
     this.setState({socket: newSocket})
     }
 
-    if (this.props.globalStockList !== prevProps.globalStockList) {
+    if (this.props.globalStockList !== prevProps.globalStockList  && this.props.apiKey !== '') {
       // console.log("unsubscribing from old stocks")
       let prevSockets = prevProps.globalStockList
       for (const socket in prevSockets) {
@@ -95,6 +96,12 @@ class TopNav extends React.Component {
         console.log("failed to load dashboards");
       }
     }
+    
+    if (this.props.apiFlag === 1 && this.props.apiFlag !== prevProps.apiFlag) {
+      console.log('show welcome menu')
+      this.setState({AboutAPIKeyReminder: 1})
+      this.menuWidgetToggle("AboutMenu", "Welcome to FinnDash")
+    }
   }
  
   updateTickerSockets() {
@@ -107,37 +114,42 @@ class TopNav extends React.Component {
     let streamingStockData = {};
     let lastUpdate = new Date().getTime();
     let that = this
-
-    thisSocket.addEventListener("open", function (event) {
-      globalStockList.map((el) => {
-        let stockSym = el.slice(el.indexOf('-')+1 , el.length)
-        that.props.throttle.enqueue(function() {
-          // console.log(Date().slice(20,25) + 'subscribe-' + stockSym)
-          thisSocket.send(JSON.stringify({ type: "subscribe", symbol: stockSym }))})
-        return true
-      }
-      );
-    });
-
-    // Listen for messages
-    thisSocket.addEventListener("message", function (event) {
-      let tickerReponse = JSON.parse(event.data);
-      // console.log("Message from server ", event.data);
-      if (tickerReponse.data) {
-        streamingStockData['US-' + tickerReponse.data[0]["s"]] = [tickerReponse.data[0]["p"]];
-        let checkTime = new Date().getTime();
-
-        if (checkTime - lastUpdate > 3000) {
-          lastUpdate = new Date().getTime();
-          let updatedPrice = Object.assign({}, that.state.trackedStockData);
-          for (const prop in streamingStockData) {
-            // updatedPrice[prop] = {}
-            updatedPrice[prop]["currentPrice"] = streamingStockData[prop][0];
+    if (this.props.apiKey !== '') {
+      try {  
+        thisSocket.addEventListener("open", function (event) {
+          globalStockList.map((el) => {
+            let stockSym = el.slice(el.indexOf('-')+1 , el.length)
+            that.props.throttle.enqueue(function() {
+              // console.log(Date().slice(20,25) + 'subscribe-' + stockSym)
+              thisSocket.send(JSON.stringify({ type: "subscribe", symbol: stockSym }))})
+            return true
           }
-          that.setState({ trackedStockData: updatedPrice });
-        }
+          );
+        });
+
+        // Listen for messages
+        thisSocket.addEventListener("message", function (event) {
+          let tickerReponse = JSON.parse(event.data);
+          // console.log("Message from server ", event.data);
+          if (tickerReponse.data) {
+            streamingStockData['US-' + tickerReponse.data[0]["s"]] = [tickerReponse.data[0]["p"]];
+            let checkTime = new Date().getTime();
+
+            if (checkTime - lastUpdate > 3000) {
+              lastUpdate = new Date().getTime();
+              let updatedPrice = Object.assign({}, that.state.trackedStockData);
+              for (const prop in streamingStockData) {
+                // updatedPrice[prop] = {}
+                updatedPrice[prop]["currentPrice"] = streamingStockData[prop][0];
+              }
+              that.setState({ trackedStockData: updatedPrice });
+            }
+          }
+        });
+      } catch(err) {
+        console.log("problem setting up socket connections.")
       }
-    });
+    }
   }
 
   showPane(stateRef, fixState = 0) {
@@ -151,46 +163,48 @@ class TopNav extends React.Component {
     const stockSymbol = stockDescription.indexOf(":") > 0 ? stockDescription.slice(0, stockDescription.indexOf(":")) : stockDescription;
     let stockPriceData = {};
     let that = this
-    this.props.throttle.enqueue(function() {
-      fetch("https://finnhub.io/api/v1/quote?symbol=" + stockSymbol.slice(stockSymbol.indexOf('-') + 1, stockSymbol.length) + "&token=" + that.props.apiKey)
-        .then((response) => {
-          if (response.status === 429) {
-            that.props.throttle.setSuspend(4000)
-            that.getStockPrice(stockDescription)
-            throw new Error('finnhub 429')
-          } else {
-            // console.log(Date().slice(20,25) + 'getStockPrice ' + stockDescription)
-            return response.json()
-          }
-        })
-        .then((data) => {
-          //destructure data returned from fetch.
-          const {
-            c: a, //current price
-            h: b, //current days high price
-            l: c, //current days low price
-            o: d, //current days open price
-            pc: e, //previous days close price
-          } = data;
-          //create object from destructured data above.
-          stockPriceData = {
-            currentPrice: a,
-            dayHighPrice: b,
-            dayLowPrice: c,
-            dayOpenPrice: d,
-            prevClosePrice: e,
-          };
+    if (this.props.apiKey !== '') {
+      this.props.throttle.enqueue(function() {
+        fetch("https://finnhub.io/api/v1/quote?symbol=" + stockSymbol.slice(stockSymbol.indexOf('-') + 1, stockSymbol.length) + "&token=" + that.props.apiKey)
+          .then((response) => {
+            if (response.status === 429) {
+              that.props.throttle.setSuspend(4000)
+              that.getStockPrice(stockDescription)
+              throw new Error('finnhub 429')
+            } else {
+              // console.log(Date().slice(20,25) + 'getStockPrice ' + stockDescription)
+              return response.json()
+            }
+          })
+          .then((data) => {
+            //destructure data returned from fetch.
+            const {
+              c: a, //current price
+              h: b, //current days high price
+              l: c, //current days low price
+              o: d, //current days open price
+              pc: e, //previous days close price
+            } = data;
+            //create object from destructured data above.
+            stockPriceData = {
+              currentPrice: a,
+              dayHighPrice: b,
+              dayLowPrice: c,
+              dayOpenPrice: d,
+              prevClosePrice: e,
+            };
 
-          that.setState((prevState) => {
-            let newTrackedStockData = Object.assign({}, prevState.trackedStockData);
-            newTrackedStockData[stockSymbol] = stockPriceData;
-            return { trackedStockData: newTrackedStockData };
+            that.setState((prevState) => {
+              let newTrackedStockData = Object.assign({}, prevState.trackedStockData);
+              newTrackedStockData[stockSymbol] = stockPriceData;
+              return { trackedStockData: newTrackedStockData };
+            });
+          })
+          .catch(error => {
+            console.log(error.message)
           });
-        })
-        .catch(error => {
-          console.log(error.message)
-        });
-    })
+      })
+    }
   }
 
   menuWidgetToggle(menuName, dashName = "pass") {

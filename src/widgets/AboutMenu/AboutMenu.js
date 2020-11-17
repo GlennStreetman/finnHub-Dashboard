@@ -20,13 +20,13 @@ class AboutMenu extends React.PureComponent {
     return (
       <div className="txt">
         <p>
-        Created by Glenn Streetman. Contact: glennstreetman@gmail.com<br />
         FinnDash allows you to visualize your FinnHub.IO API data by arranging and configuring widgets.<br />
         Register for your free Finnhub.io API key --> <a href='https://finnhub.io/register' target="_blank" rel="noopener noreferrer">FinnHub Register</a><br />
         After registering for your Finnhub API key click Manage Account and update your API Key info.<br />
-        Once your API key is saved click add widget to begin setting up a new widget dashboard.<br />
+        Once your API key is saved click 'add widget' to begin designing a new widget dashboard.<br />
         Remember to click "Show Dashboard Menu" and save your new dashboard before exiting.<br />
         See <a href='https://github.com/GlennStreetman/finHub-Dashboard-react' target="_blank" rel="noopener noreferrer">GitHub</a> to request/submit new widgets, submit bugs, or request changes.<br />
+        Created by Glenn Streetman. Contact: glennstreetman@gmail.com<br />
         </p>
       </div>
     );

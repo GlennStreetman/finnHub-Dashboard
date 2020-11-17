@@ -22,7 +22,7 @@ class AccountMenu extends React.PureComponent {
   componentDidMount() {
     this.getAccountData();
   }
-
+ 
   handleChange(e) {
     this.setState({ inputText: e.target.value });
   }
@@ -55,13 +55,16 @@ class AccountMenu extends React.PureComponent {
       body: JSON.stringify(data),
     };
 
+    if (changeField === 'apiKey') {
+      this.props.updateAPIKey(newValue)
+    }
+ 
     fetch("/accountData", options)
       .then((data) => console.log(data))
       .then(() => {
         this.getAccountData();
         this.setState({ editToggle: 0 });
         this.setState({ inputText: "" });
-        this.apiKey(this.state.apiKey)
       });
   }
 
@@ -150,7 +153,7 @@ export function accountMenuProps(that, key = "AccountMenu") {
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
-    updateAPIKey: that.props.apikKey
+    updateAPIKey: that.props.updateAPIKey
   };
   return propList;
 }

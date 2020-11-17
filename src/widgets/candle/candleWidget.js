@@ -65,48 +65,50 @@ class CandleWidget extends React.Component {
 
   getCandleData() {
     // console.log('creating candle chart')
-    let candleStock = this.state.candleSelection
-    let candleSymbol = candleStock.slice(candleStock.indexOf('-')+1 , candleStock.length)
-    const s = this.state.startDate;
-    const e = this.state.endDate;
+    if (this.props.apiKey !== '') {
+      let candleStock = this.state.candleSelection
+      let candleSymbol = candleStock.slice(candleStock.indexOf('-')+1 , candleStock.length)
+      const s = this.state.startDate;
+      const e = this.state.endDate;
 
-    const startDateUnix = new Date(s.slice(0, 4), s.slice(5, 7), s.slice(8, 10)).getTime() / 1000;
-    const endDateUnix = new Date(e.slice(0, 4), e.slice(5, 7), e.slice(8, 10)).getTime() / 1000;
-    let that =  this
-    that.props.throttle.enqueue(function() {
-    fetch(
-      "https://finnhub.io/api/v1/stock/candle?symbol=" +
-        candleSymbol +
-        "&resolution=" +
-        that.state.resolution +
-        "&from=" +
-        startDateUnix +
-        "&to=" +
-        endDateUnix +
-        "&token=" + that.props.apiKey
-    )
-      .then((response) => {
-        if (response.status === 429) {
-          that.props.throttle.setSuspend(4000)
-          that.getCandleData()
-          throw new Error('finnhub 429')
-        } else {
-          console.log(Date().slice(20,25) +  ': getCandleData ' + candleSymbol)
-          return response.json()
-        }
+      const startDateUnix = new Date(s.slice(0, 4), s.slice(5, 7), s.slice(8, 10)).getTime() / 1000;
+      const endDateUnix = new Date(e.slice(0, 4), e.slice(5, 7), e.slice(8, 10)).getTime() / 1000;
+      let that =  this
+      that.props.throttle.enqueue(function() {
+      fetch(
+        "https://finnhub.io/api/v1/stock/candle?symbol=" +
+          candleSymbol +
+          "&resolution=" +
+          that.state.resolution +
+          "&from=" +
+          startDateUnix +
+          "&to=" +
+          endDateUnix +
+          "&token=" + that.props.apiKey
+      )
+        .then((response) => {
+          if (response.status === 429) {
+            that.props.throttle.setSuspend(4000)
+            that.getCandleData()
+            throw new Error('finnhub 429')
+          } else {
+            console.log(Date().slice(20,25) +  ': getCandleData ' + candleSymbol)
+            return response.json()
+          }
+        })
+        .then((data) => {
+          try {
+            that.setState({ candleData: data });
+            that.createCandleDataList(data);
+          } catch (err) {
+            console.log("Could not update candles. Component not mounted.");
+          }
+        })
+        .catch(error => {
+          console.log(error.message)
+        });
       })
-      .then((data) => {
-        try {
-          that.setState({ candleData: data });
-          that.createCandleDataList(data);
-        } catch (err) {
-          console.log("Could not update candles. Component not mounted.");
-        }
-      })
-      .catch(error => {
-        console.log(error.message)
-      });
-    })
+    }
   }
 
   createCandleDataList(data) {

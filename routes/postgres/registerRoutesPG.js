@@ -2,7 +2,7 @@ let express = require('express');
 let router =  express.Router();
 
 const cryptoRandomString = require('crypto-random-string');
-const URL = process.env.live ? `https://finn-dash.herokuapp.com/` : `http://localhost:5000`
+const URL = process.env.live ? `https://finn-dash.herokuapp.com` : `http://localhost:5000`
 const md5 = require("md5");
 const db = process.env.live === '1' ? require("../../db/databaseLive.js") :  require("../../db/databaseLocalPG.js") ;
  
