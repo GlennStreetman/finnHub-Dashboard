@@ -23,7 +23,8 @@ class App extends React.Component {
       dashBoardData: [],
       currentDashBoard: "",
       throttle: ThrottleQueue(25, 1000, true), //REMEMBER TO WRAP ALL FINNHUB API CALLS IN: throttle(function() {'YOUR API CALL HERE'})
-      apiFlag: 0
+      apiFlag: 0,
+      zIndex: [],
     };
 
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
@@ -41,6 +42,7 @@ class App extends React.Component {
     this.updateWidgetData = this.updateWidgetData.bind(this);
     this.updateAPIKey = this.updateAPIKey.bind(this);
     this.updateAPIFlag = this.updateAPIFlag.bind(this); 
+    this.updateZIndex = this.updateZIndex.bind(this);
   }
 
   processLogin(setKey, setLogin) {
@@ -48,8 +50,23 @@ class App extends React.Component {
     this.setState({ apiKey: setKey });
   }
 
+  updateZIndex(widgetName){
+    // console.log("Updating zIndex of: " + widgetName)
+    let newZ = this.state.zIndex.slice()
+    const index = newZ.indexOf(widgetName);
+    if (index > -1) {
+      // console.log("removing " + widgetName + " from zIndeox.")
+      newZ.splice(index, 1);
+    }
+    newZ.push(widgetName.toString())
+    this.setState({zIndex: newZ})
+    // console.log(this.state.zIndex)
+  }
+
   newWidgetContainer(widgetDescription, widgetHeader, widgetConfig) {
     const widgetName = new Date().getTime();
+    console.log("adding new widget to zIndex") 
+    this.updateZIndex(widgetName)
     var newWidgetList = Object.assign({}, this.state.widgetList);
     newWidgetList[widgetName] = {
       widgetID: widgetName,
@@ -60,11 +77,12 @@ class App extends React.Component {
       trackedStocks: this.state.globalStockList,
       widgetConfig: widgetConfig,
     };
-    this.setState({ widgetList: newWidgetList });
+    this.setState({ widgetList: newWidgetList }); 
   }
 
   newMenuContainer(widgetDescription, widgetHeader, widgetConfig) {
     const widgetName = widgetDescription;
+    this.updateZIndex(widgetName)
     let newMenuList = Object.assign({}, this.state.menuList);
     newMenuList[widgetName] = {
       widgetID: widgetName,
@@ -72,7 +90,6 @@ class App extends React.Component {
       widgetHeader: widgetHeader,
       xAxis: "40px",
       yAxis: "40px",
-      // trackedStocks: this.state.globalStockList,
       widgetConfig: widgetConfig,
     };
     this.setState({ menuList: newMenuList });
@@ -85,6 +102,7 @@ class App extends React.Component {
     updatedWidgetLocation[widgetId]["xAxis"] = xxAxis;
     updatedWidgetLocation[widgetId]["yAxis"] = yyAxis;
     this.setState({ [stateRef]: updatedWidgetLocation });
+    this.updateZIndex(widgetId)
   }
 
   updateWidgetData(widgetID, dataKey, data){
@@ -260,6 +278,8 @@ class App extends React.Component {
               updateAPIKey={this.updateAPIKey}
               apiFlag={this.state.apiFlag}
               updateAPIFlag={this.updateAPIFlag}
+              zIndex={this.state.zIndex}
+              updateZIndex={this.updateZIndex}
             />
           </>
     ) : (

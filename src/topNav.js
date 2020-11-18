@@ -235,6 +235,8 @@ class TopNav extends React.Component {
         widgetList={widgetState[el]}
         widgetLockDown={this.state.widgetLockDown}
         changeWidgetName={this.props.changeWidgetName}
+        zIndex={this.props.zIndex}
+        updateZIndex={this.props.updateZIndex}
       />
     ));
 
@@ -251,6 +253,8 @@ class TopNav extends React.Component {
         widgetList={menuState[el]}
         widgetLockDown={this.state.widgetLockDown}
         changeWidgetName={this.props.changeWidgetName}
+        zIndex={this.props.zIndex}
+        updateZIndex={this.props.updateZIndex}
       />
     ));
 

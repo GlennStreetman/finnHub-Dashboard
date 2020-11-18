@@ -32,6 +32,10 @@ class WidgetControl extends React.Component {
     if (this.props.widgetLockDown !== prevProps.widgetLockDown) {
       this.setState({ showEditPane: 0 });
     }
+    // if (this.props.zIndex.slice(-1) === this.props.widgetKey && 
+    // this.props.zIndex.slice(-1) !== prevProps.zIndex.slice(-1)) {
+    //   this.setState({state: this.state})
+    // }
   }
 
   showPane(stateRef, fixState: -1) {
@@ -95,14 +99,14 @@ class WidgetControl extends React.Component {
   }
 
   render() {
-    
     //Add widgets to the list below that should not have access to the stock search pane
     const hideStockSearchMenu = ["DashBoardMenu", "AccountMenu", "AboutMenu"]
-    
     const compStyle = {
       display: this.props.stateRef === "menuList" && this.props.showMenu === 0 ? "none" : "block",
       top: this.props.widgetList["xAxis"],
       left: this.props.widgetList["yAxis"],
+      zIndex: this.props.zIndex.indexOf(this.props.widgetKey),
+      
     };
 
     let widgetList = {
@@ -118,14 +122,15 @@ class WidgetControl extends React.Component {
 
     const that = this;
     let widgetProps = this.props.widgetBodyProps();
-
+    
     if (this.props.widgetKey !== "dashBoardMenu") {
       widgetProps["showEditPane"] = that.state.showEditPane;
       widgetProps["showPane"] = that.showPane;
     }
 
     return (
-      <div key={this.props.widgetKey + "container"} id={this.props.widgetKey + "box"} className="widgetBox" style={compStyle}>
+      <div key={this.props.widgetKey + "container"} id={this.props.widgetKey + "box"} 
+      className="widgetBox" style={compStyle}>
         {this.props.widgetLockDown === 0 ? (
           <div className="widgetHeader">
             {this.state.showEditPane === 0 ? (

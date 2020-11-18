@@ -10,7 +10,7 @@ class NewsWidget extends React.Component {
     let currentyDay = new Date().getDay();
     let lastMonth = new Date(currentYear, currentMonth - 1, currentyDay).toISOString().slice(0, 10);
     let startList = this.props.trackedStocks.length > 0 ? this.props.trackedStocks : [];
-    let startStock = startList.length > 0 ? startList[0] : 1;
+    let startStock = startList.length > 0 ? startList[0] : undefined;
     this.state = {
       companyNews: [],
       startDate: lastMonth,
@@ -31,7 +31,7 @@ class NewsWidget extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.trackedStocks.length > 0) {
+    if (this.props.trackedStocks.length > 0 && this.state.newsSelection !== undefined) {
       this.getCompanyNews(this.state.newsSelection, this.state.startDate, this.state.endDate);
     }
   }
@@ -63,9 +63,9 @@ class NewsWidget extends React.Component {
     let shortHeadLine = headline.slice(0, 48) + "...";
     return shortHeadLine;
   }
-
+ 
   getCompanyNews(symbol, fromDate, toDate) {
-    if (this.props.apiKey !== '') {
+    if (this.props.apiKey !== '' && symbol !== undefined) {
       let stockSymbol = symbol.slice(symbol.indexOf('-')+1, symbol.length)
       let that = this
       that.props.throttle.enqueue(function() { 
@@ -224,14 +224,13 @@ class NewsWidget extends React.Component {
           <>
             <div>
               <StockSearchPane
-                updateWidgetStockList={this.props.updateWidgetStockList}
-                widgetKey={this.props.widgetKey}
-                updateGlobalStockList={this.props.updateGlobalStockList}
-                showSearchPane={() => this.props.showPane("showEditPane", 1)}
-                getStockPrice={this.props.getStockPrice}
-                updateWidgetList={this.updateWidgetList}
                 apiKey={this.props.apiKey}
+                getStockPrice={this.props.getStockPrice}
                 throttle={this.props.throttle}
+                showSearchPane={() => this.props.showPane("showEditPane", 1)}
+                updateGlobalStockList={this.props.updateGlobalStockList}
+                updateWidgetStockList={this.props.updateWidgetStockList}
+                widgetKey={this.props.widgetKey}     
               />
               <div className="stockSearch">
                 <form className="form-inline">
