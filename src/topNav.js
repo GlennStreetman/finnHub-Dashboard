@@ -59,7 +59,6 @@ class TopNav extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-    // console.log(throttledQueue)
 
     if (this.props.refreshStockData === 1) {
       this.props.toggleRefreshStockData();
@@ -69,7 +68,7 @@ class TopNav extends React.Component {
       }
     }
 
-    if (this.props.apiKey !== '' && prevProps.apiKey === '' && this.props.apiKey !== '') {
+    if (this.props.apiKey !== '' && prevProps.apiKey === '') {
     let newSocket = new WebSocket("wss://ws.finnhub.io?token=" + this.props.apiKey)
     this.setState({socket: newSocket})
     }
@@ -90,10 +89,11 @@ class TopNav extends React.Component {
       try {
         let loadWidget = this.props.dashBoardData[this.props.currentDashBoard]["widgetlist"];
         let loadGlobal = this.props.dashBoardData[this.props.currentDashBoard]["globalstocklist"];
+        console.log(loadWidget, loadGlobal)
         this.props.loadDashBoard(loadGlobal, loadWidget);
         this.setState({ DashBoardMenu: 1 });
       } catch (err) {
-        console.log("failed to load dashboards");
+        console.log("failed to load dashboards", err);
       }
     }
     

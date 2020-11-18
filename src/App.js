@@ -24,8 +24,8 @@ class App extends React.Component {
       currentDashBoard: "",
       throttle: ThrottleQueue(25, 1000, true), //REMEMBER TO WRAP ALL FINNHUB API CALLS IN: throttle(function() {'YOUR API CALL HERE'})
       apiFlag: 0
-
     };
+
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
     this.newWidgetContainer = this.newWidgetContainer.bind(this);
     this.newMenuContainer = this.newMenuContainer.bind(this);
@@ -40,9 +40,7 @@ class App extends React.Component {
     this.changeWidgetName = this.changeWidgetName.bind(this);
     this.updateWidgetData = this.updateWidgetData.bind(this);
     this.updateAPIKey = this.updateAPIKey.bind(this);
-    this.updateAPIFlag = this.updateAPIFlag.bind(this);
-    
-    
+    this.updateAPIFlag = this.updateAPIFlag.bind(this); 
   }
 
   processLogin(setKey, setLogin) {
@@ -83,7 +81,6 @@ class App extends React.Component {
   moveWidget(stateRef, widgetId, xxAxis, yyAxis) {
     //updates x and y pixel location of target widget.
     //stateref should be "widgetList" or "menuList"
-
     let updatedWidgetLocation = Object.assign({}, this.state[stateRef]);
     updatedWidgetLocation[widgetId]["xAxis"] = xxAxis;
     updatedWidgetLocation[widgetId]["yAxis"] = yyAxis;
@@ -162,15 +159,16 @@ class App extends React.Component {
     fetch("/dashBoard")
       .then((response) => response.json())
       .then((data) => {
-        // console.log('dashboard and menu data retrieved')
+        console.log('dashboard and menu data retrieved')
         console.log(data)
-        let dashboards = data["savedDashBoards"];
+        let dashboards = data.savedDashBoards;
         let newList = {}; //replace numeric keys, returned by dataset, with widget IDs.
         for (const oldKey in dashboards) {
           let newKey = dashboards[oldKey]["dashboardname"];
           let newData = dashboards[oldKey];
           newList[newKey] = newData;
         }
+        console.log(newList)
         this.setState({ dashBoardData: newList });
         if( data.menuSetup[0] !== undefined) {
           this.setState({ menuList: JSON.parse(data["menuSetup"][0]["menulist"]) });
@@ -178,7 +176,7 @@ class App extends React.Component {
         }
         //show about menu by default if login does not return API key.
         if (this.state.apiKey === '' && this.state.apiFlag === 0) {
-          console.log("chaning api flag")
+          console.log("changing api flag")
           this.setState({apiFlag: 1})
         }
       })
@@ -215,7 +213,7 @@ class App extends React.Component {
     };
 
     fetch("/dashBoard", options)
-      .then((data) => console.log(data))
+      .then((data) => console.log('dashboard data retrieved'))
       .then(() => {
         // console.log("updating dashboard");
         this.getSavedDashBoards();
@@ -233,6 +231,7 @@ class App extends React.Component {
 
   render() {
     const quaryData = queryString.parse(window.location.search)
+    // console.log(Window.sessionStorage)
     //state.login = 1 means that login succeeded.
     return this.state.login === 1 ? (
         <>

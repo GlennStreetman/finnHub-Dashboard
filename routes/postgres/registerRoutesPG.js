@@ -9,7 +9,7 @@ const db = process.env.live === '1' ? require("../../db/databaseLive.js") :  req
 //mailgun config data, needs to be set to be imported if not available in process.env
 const API_KEY = process.env.API_KEY || 1;
 const DOMAIN = process.env.DOMAIN_KEY || 1;
-console.log(API_KEY, DOMAIN)
+// console.log(API_KEY, DOMAIN)
 
 const mailgun = require('mailgun-js')({ apiKey: API_KEY, domain: DOMAIN });
 
@@ -83,9 +83,9 @@ router.post("/register", (req, res) => {
   const createNewUser = (() => {
     return new Promise((resolve, reject) => {
       console.log("creating user:")
-      console.log(createUser)
+      // console.log(createUser)
       db.query(createUser, (err, res) => {
-        console.log(res)
+        // console.log(res)
         if (res.rowCount === 1) {
           const data = {
               from: 'Glenn Streetman <glennstreetman@gmail.com>',
@@ -97,7 +97,7 @@ router.post("/register", (req, res) => {
               if (error) {
               console.log(error)
               } else {
-              console.log(body);
+              // console.log(body);
               console.log("email sent")
               }
           });
@@ -112,13 +112,13 @@ router.post("/register", (req, res) => {
     if (emailIsValid(emailText) === true) {
       checkUserStatus()
       .then(data => {
-        console.log(data)
+        // console.log(data)
         return checkEmailUnique()
       }).then(data => {
-        console.log(data)
+        // console.log(data)
         return createNewUser()
       }).then(data => {
-        console.log(data)
+        // console.log(data)
         res.json('true')
       }).catch(err => res.json(err))
     } else {
@@ -136,7 +136,7 @@ router.get("/verify", (req, res) => {
   db.query(verifyUpdate, (err) => {
     if (err) {
       res.json("Could not validate email address.");
-      console.log(verifyUpdate)
+      // console.log(verifyUpdate)
     } else {
       console.log('email verified')
       res.redirect('/')
@@ -150,10 +150,10 @@ router.get("/login", (req, res) => {
               FROM users WHERE loginName ='${thisRequest["loginText"]}' 
               AND password = '${md5(thisRequest["pwText"])}'`;
   let info = { key: "", login: 0 };
-  console.log(newQuery)
+  // console.log(newQuery)
   db.query(newQuery, (err, rows) => {
     let login = rows.rows[0]
-    console.log(login)
+    // console.log(login)
     if (err) {
       res.json("false");
     } else if (rows.rowCount === 1 && login.confirmemail === '1') {
@@ -165,7 +165,7 @@ router.get("/login", (req, res) => {
       req.session.login = true
       res.json(info);
     } else if (rows.rowCount === 1 && login.confirmemail !== '1') {
-      console.log(login)
+      // console.log(login)
       info["response"] = 'Please confirm your email address.';
       res.json(info)
     } else {
@@ -181,7 +181,7 @@ router.get("/forgot", (req, res) => {
   forgotQuery = "SELECT id, loginName, email FROM users WHERE email ='" + thisRequest["loginText"] + "'";
   db.query(forgotQuery, (err, rows) => {
     let login = rows.rows[0]
-    console.log(login)
+    // console.log(login)
     if (err) {
       res.json("Email not found");
     } else if (login !== undefined) {
@@ -200,7 +200,7 @@ router.get("/forgot", (req, res) => {
       `
       db.query(resetPasswordCode, (err, rows) => {
         if (err) {
-          console.log(resetPasswordCode)
+          // console.log(resetPasswordCode)
           console.log("error on password reset")
           res.json("Error during password reset..");
         } else {
@@ -208,12 +208,12 @@ router.get("/forgot", (req, res) => {
           // res.redirect('/')
         }
       })
-      console.log(data)
+      // console.log(data)
       mailgun.messages().send(data, (error, body) => {
         if (err) {
           console.log(error)
         } else {
-          console.log(body);
+          // console.log(body);
           console.log("email sent")
         }
       });
@@ -236,7 +236,7 @@ router.get("/reset", (req, res) => {
   db.query(verifyUpdate, (err) => {
     if (err) {
       res.json("Error during password reset process.");
-      console.log(verifyUpdate)
+      // console.log(verifyUpdate)
     } else {
       console.log('passowrd reset flag set.')
       res.redirect(`/?reset=1&users=${user}`)
@@ -251,7 +251,7 @@ router.get("/findSecret", (req, res) => {
   FROM users
   WHERE loginName = '${userID}' AND resetPassword = '1'
   `
-  console.log(verifyUpdate)
+  // console.log(verifyUpdate)
   db.query(verifyUpdate, (err, rows) => {
     secretQuestion = rows.rows[0].secretquestion
     if (err) {
@@ -273,9 +273,9 @@ router.get("/findSecret", (req, res) => {
   //checks answer to secret question.
 router.get("/secretQuestion", (req, res) => {
   thisRequest = req.query; //.query contains all query string parameters.
-  console.log(thisRequest)
+  // console.log(thisRequest)
   newQuery = "SELECT id FROM users WHERE secretAnswer ='" + md5(thisRequest["loginText"]) + "' AND loginName = '" + thisRequest["user"] + "'";
-  console.log(newQuery);
+  // console.log(newQuery);
   req.session.userName = thisRequest.user
   db.query(newQuery, [], (err, rows) => {
     if (err) {
@@ -297,12 +297,12 @@ router.get("/secretQuestion", (req, res) => {
 router.get("/newPW", (req, res) => {
   thisRequest = req.query; //.query contains all query string parameters.
   newQuery = `UPDATE users SET password = '${md5(thisRequest.newPassword)}', resetpassword = 0 WHERE loginName = '${req.session.userName}' AND 1 = ${req.session.reset}`;
-  console.log(newQuery);
+  // console.log(newQuery);
   db.query(newQuery, (err, rows) => {
     if (err) {
       res.json("Could not reset password");
     } else {
-      console.log("success");
+      console.log("password reset");
       res.json("true");
     }
   });
