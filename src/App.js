@@ -2,7 +2,6 @@ import React from "react";
 import queryString from 'query-string';
 import "./App.css";
 import TopNav from "./topNav.js";
-import Login from "./login.js";
 import  ThrottleQueue  from "./throttleQueue.js";
 
 // console.log(queryString.parse(window.location.search))
@@ -43,6 +42,8 @@ class App extends React.Component {
     this.updateAPIKey = this.updateAPIKey.bind(this);
     this.updateAPIFlag = this.updateAPIFlag.bind(this); 
     this.updateZIndex = this.updateZIndex.bind(this);
+    this.newDashboard = this.newDashboard.bind(this);
+    this.logOut = this.logOut.bind(this);
   }
 
   processLogin(setKey, setLogin) {
@@ -247,11 +248,25 @@ class App extends React.Component {
     this.setState({apiFlag: val})
   }
 
+  logOut(){
+    this.setState({login: 0})
+    this.setState({menuList: {}})
+  }
+
+  newDashboard(){
+    this.state.throttle.resetQueue()
+    this.setState({
+      currentDashBoard: "",
+      globalStockList: [],
+      globalStockObject: [],
+      widgetList: {},
+      zIndex: [],
+    })
+  }
+
   render() {
-    const quaryData = queryString.parse(window.location.search)
-    // console.log(Window.sessionStorage)
-    //state.login = 1 means that login succeeded.
-    return this.state.login === 1 ? (
+    // const quaryData = queryString.parse(window.location.search)
+    return (
         <>
             <TopNav
               availableStocks={this.state.availableStocks}
@@ -280,14 +295,13 @@ class App extends React.Component {
               updateAPIFlag={this.updateAPIFlag}
               zIndex={this.state.zIndex}
               updateZIndex={this.updateZIndex}
+              newDashboard={this.newDashboard}
+              login={this.state.login}
+              logOut={this.logOut}
+              processLogin={this.processLogin}
             />
           </>
-    ) : (
-      <Login 
-        updateLogin={this.processLogin}
-        queryData = {quaryData}
-      />
-    );
+    ) 
   }
 }
 

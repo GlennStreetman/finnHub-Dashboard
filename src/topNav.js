@@ -1,5 +1,7 @@
 import React from "react";
 import WidgetControl from "./widgets/widgetControl.js";
+import Login from "./login.js";
+import queryString from 'query-string';
 // import throttledQueue from "throttled-queue"; //Finnhub API calls limited to 30 per second.
 
 //Import props function from each widget/menu here and add to returnBodyProps function below.
@@ -55,10 +57,12 @@ class TopNav extends React.Component {
 
   componentDidMount() {
     console.log('topnav mounted')
-    this.props.getSavedDashBoards();
+    if (this.props.login === 1) {this.props.getSavedDashBoards()};
   }
 
   componentDidUpdate(prevProps) {
+
+    if (this.props.login === 1 && prevProps.login === 0) {this.props.getSavedDashBoards()};
 
     if (this.props.refreshStockData === 1) {
       this.props.toggleRefreshStockData();
@@ -222,6 +226,7 @@ class TopNav extends React.Component {
     let widgetState = this.props.widgetList;
     let menuState = this.props.menuList;
     let that = this;
+    const quaryData = queryString.parse(window.location.search)
 
     let widgetRender = Object.keys(widgetState).map((el) => (
       <WidgetControl
@@ -258,32 +263,29 @@ class TopNav extends React.Component {
       />
     ));
 
-    return (
+    // return (
+    return this.props.login === 1 ? (
       <>
         <div className="topnav">
-          <div>
-            <a href="#home" onClick={() => this.menuWidgetToggle("AboutMenu", "About FinnDash")}>
-            {this.state.AboutMenu === 0 ? "About" : "Hide About"}
-            </a>
-          </div>
-          <div>
+
+          <div className="navItem">
             <a href="#contact" onClick={() => this.menuWidgetToggle("WatchListMenu", "WatchList")}>
               {this.state.WatchListMenu === 0 ? "Show Watchlist Menu" : "Hide Watchlist Menu"}
             </a>
           </div>
 
-          <div>
+          <div className="navItem">
             <a href="#contact" onClick={() => this.menuWidgetToggle("DashBoardMenu", "Saved Dashboards")}>
               {/* <a href="#contact" onClick={() => this.showPane("showDashBoardMenu")}> */}
               {this.state.DashBoardMenu === 0 ? "Show Dashboard Menu" : "Hide Dashboard Menu"}
             </a>
           </div>
-          <div>
+          <div className="navItem">
             <a href="#contact" onClick={() => (this.state.widgetLockDown === 0 ? this.setState({ widgetLockDown: 1 }) : this.setState({ widgetLockDown: 0 }))}>
               {this.state.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}
             </a>
           </div>
-          <div>
+          <div className="navItem">
             <a href="#contact" onClick={() => this.menuWidgetToggle("AccountMenu", "Your Account")}>
               Manage Account
             </a>
@@ -331,12 +333,44 @@ class TopNav extends React.Component {
               </div>
             )}
           </div>
+
+          <div className='navItemEnd'>
+            <a href="#home" onClick={() => this.menuWidgetToggle("AboutMenu", "About FinnDash")}>
+            {this.state.AboutMenu === 0 ? "About" : "Hide About"}
+            </a>
+          </div>
+          <div className='navItem'>
+            <a href="#home" onClick={() => this.props.logOut()}>
+            {this.state.login === 0 ? "Login" : "Logout"}
+            </a>
+          </div>
+
         </div>
 
         {widgetRender}
         {menuRender}
       </>
-    );
+    ) : (
+      <>
+      <div className="topnav">
+      <div className='navItemEnd'>
+            <a href="#home" onClick={() => this.menuWidgetToggle("AboutMenu", "About FinnDash")}>
+            {this.state.AboutMenu === 0 ? "About" : "Hide About"}
+            </a>
+          </div>
+          <div className='navItem'>
+            <a href="#home" onClick={() => this.props.logOut()}>
+            {this.state.login === 0 ? "Login" : "Logout"}
+            </a>
+          </div>
+      </div>
+      <Login 
+        updateLogin={this.props.processLogin}
+        queryData = {quaryData}
+      />
+      {menuRender}
+      </>
+    ); 
   }
 }
 

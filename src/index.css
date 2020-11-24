@@ -12,7 +12,18 @@ code {
 /* Add a black background color to the top navigation */
 .topnav {
   background-color: #1d69ab;
+  display: flex;
   /* overflow: hidden; */
+}
+
+.navItem {
+  display: flex;
+}
+
+.navItemEnd {
+  display: flex;
+  justify-content: end;
+  flex-grow: 1;
 }
 
 /* Style the links inside the navigation bar */

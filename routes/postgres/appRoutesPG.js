@@ -57,10 +57,10 @@ router.get("/dashboard", (req, res) => {
   resultSet = {};
 
   db.query(getSavedDashBoards, (err, rows) => {
-    let result = rows.rows
     if (err) {
       res.json("Failed to retrieve dashboards");
     } else {
+      let result = rows.rows
       console.log('dashboards retrieved')
       resultSet["savedDashBoards"] = result;
       db.query(getMenuSetup, (err, rows) => {

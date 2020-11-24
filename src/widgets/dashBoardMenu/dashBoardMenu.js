@@ -113,6 +113,17 @@ class DashBoardMenu extends React.PureComponent {
                   />
                 </td>
               </tr>
+              <tr><td></td><td></td><td>
+              <input
+                className="btn"
+                type="submit"
+                value="New"
+                // value="submit"
+                onClick={() => {
+                  this.props.newDashBoard();      
+                }}
+              />                
+              </td></tr>
             </tbody>
           </table>
         </div>
@@ -128,6 +139,7 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
     loadDashBoard: that.props.loadDashBoard,
     currentDashBoard: that.props.currentDashBoard,
     saveCurrentDashboard: that.props.saveCurrentDashboard,
+    newDashBoard: that.props.newDashboard,
   };
   return propList;
 }
