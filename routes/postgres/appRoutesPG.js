@@ -1,3 +1,4 @@
+const { json } = require('body-parser');
 let express = require('express');
 let router =  express.Router();
 
@@ -237,5 +238,45 @@ router.get("/deleteSavedDashboard", (req, res) => {
   })
 
 });
+
+router.get("/checkLogin", (req, res) => {
+  resData = {login: 0}
+  let uID = req.session['uID'];
+  apiKeysQuery = `
+    SELECT apikey, webhook 
+    FROM users
+    WHERE id = ${uID}
+    `
+  const retrieveAPIKeys = () => {
+    console.log('getting APIKeys')
+    
+    return new Promise((resolve, reject)=> {
+      db.query(apiKeysQuery, (err, rows) => {
+        if (err){
+          console.log('error retrieving apiKeys')
+          reject(resData)
+        } else {
+          resData.apiKey = rows.rows[0].apikey
+          resData.login = 1
+          resolve(resData)
+        }
+      })
+    })
+  }
+
+  if (req.session.login === true) {
+    retrieveAPIKeys()
+      .then(data => {
+        console.log("login data: ", data)
+        res.json(data)
+      })
+      .catch(err => {
+        res.json(err)
+      })
+  } else {
+    console.log('not logged in')
+    res.json({login: 0})
+  }
+})
 
 module.exports = router;

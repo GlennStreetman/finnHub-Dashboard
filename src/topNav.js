@@ -263,11 +263,11 @@ class TopNav extends React.Component {
       />
     ));
 
-    // return (
+    console.log(this.props.login)
     return this.props.login === 1 ? (
       <>
         <div className="topnav">
-
+        <img src="logo2.png" alt="logo"></img>
           <div className="navItem">
             <a href="#contact" onClick={() => this.menuWidgetToggle("WatchListMenu", "WatchList")}>
               {this.state.WatchListMenu === 0 ? "Show Watchlist Menu" : "Hide Watchlist Menu"}
@@ -341,7 +341,7 @@ class TopNav extends React.Component {
           </div>
           <div className='navItem'>
             <a href="#home" onClick={() => this.props.logOut()}>
-            {this.state.login === 0 ? "Login" : "Logout"}
+            {this.props.login === 0 ? "Login" : "Logout"}
             </a>
           </div>
 
@@ -360,7 +360,7 @@ class TopNav extends React.Component {
           </div>
           <div className='navItem'>
             <a href="#home" onClick={() => this.props.logOut()}>
-            {this.state.login === 0 ? "Login" : "Logout"}
+            {this.props.login === 0 ? "Login" : "Logout"}
             </a>
           </div>
       </div>

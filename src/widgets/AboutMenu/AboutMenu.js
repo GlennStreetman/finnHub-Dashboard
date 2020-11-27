@@ -20,12 +20,14 @@ class AboutMenu extends React.PureComponent {
     return (
       <div className="txt">
         <p>
-        FinnDash allows you to visualize your FinnHub.IO API data by arranging and configuring widgets.<br />
-        Register for your free Finnhub.io API key --> <a href='https://finnhub.io/register' target="_blank" rel="noopener noreferrer">FinnHub Register</a><br />
-        After registering for your Finnhub API key click Manage Account and update your API Key info.<br />
-        Once your API key is saved click 'add widget' to begin designing a new widget dashboard.<br />
-        Remember to click "Show Dashboard Menu" and save your new dashboard before exiting.<br />
-        See <a href='https://github.com/GlennStreetman/finHub-Dashboard-react' target="_blank" rel="noopener noreferrer">GitHub</a> to request/submit new widgets, submit bugs, or request changes.<br />
+        <b>FinnDash:</b> An App that allows you to visualize your FinnHub.IO API data by arranging and configuring financial widgets.<br /><br />
+        <b>Getting Started: </b> <br />
+        1. Register for your free Finnhub.io API key --> <a href='https://finnhub.io/register' target="_blank" rel="noopener noreferrer">FinnHub Register</a><br />
+        2. After registering for your Finnhub API key click Manage Account and update your API Key info.<br />
+        3. Once your API key is saved click 'add widget' to begin designing a new widget dashboard.<br />
+        4. After your dashboard is setup remember to click "Show Dashboard Menu" and save your new dashboard before exiting.<br />
+        <b>Source and Author: </b> <br />
+        See <a href='https://github.com/GlennStreetman/finHub-Dashboard-react' target="_blank" rel="noopener noreferrer">GitHub</a> to review code, request/submit new widgets, submit bugs, or request changes.<br />
         Created by Glenn Streetman. Contact: glennstreetman@gmail.com<br />
         </p>
       </div>

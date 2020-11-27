@@ -1,6 +1,5 @@
 import React from "react";
 
-
 class login extends React.Component {
   constructor(props) {
     super(props);
@@ -23,10 +22,11 @@ class login extends React.Component {
     this.clearText = this.clearText.bind(this);
     this.registerAccount = this.registerAccount.bind(this);
     this.handleEnterKeyPress = this.handleEnterKeyPress.bind(this)
+    this.checkLoginStatus = this.checkLoginStatus.bind(this)
   }
 
   componentDidMount(){
-    console.log(this.props.queryData)
+    // console.log(this.props.queryData)
     if (this.props.queryData.reset === '1') {
       const user = this.props.queryData.users
       console.log(user)
@@ -45,6 +45,20 @@ class login extends React.Component {
         console.error("No server response", error);
       });
     }
+    this.checkLoginStatus()
+  }
+
+  checkLoginStatus(){
+    fetch("/checkLogin")
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Loging status: ", data)
+      if (data.login === 1) {
+        this.props.updateLogin(data.apiKey, 1)
+      } else {
+        console.log("Not logged in:", data)
+      }
+    })
   }
   
   handleChange(e) {
@@ -101,10 +115,6 @@ class login extends React.Component {
   }
  
   checkPassword() {
-
-    // let login = function() {
-    //   fetch("/").then()
-    // }
 
     fetch("/login?loginText=" + this.state.loginText + "&pwText=" + this.state.pwText)
       .then((response) => response.json())
