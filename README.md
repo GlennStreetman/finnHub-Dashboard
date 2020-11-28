@@ -21,9 +21,9 @@ pgdatabase = postgres database name
 pgport = postress server port  
 devDB = PG <--SQLite3 support depricated. Some work needed for SQL3 tag to work  
 ssl = allow  
-live = 0
+live = 0 or 1 (0 for development mode NPM RUN client/server, 1 for live NPM Start)
 
-HEROKU Hosting + Heroku Postgres addon:
+HEROKU Hosting + Heroku Postgres addon:  
 API_Key: mailgun api key  
 DATABASE_URL: Database URL provided by Heroku  
 DOMAIN_KEY: mailgun domain  
