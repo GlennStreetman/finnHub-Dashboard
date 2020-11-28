@@ -5,7 +5,7 @@ import TopNav from "./topNav.js";
 import  ThrottleQueue  from "./throttleQueue.js";
 
 // console.log(queryString.parse(window.location.search))
-console.log(process.env.NODE_ENV)
+// console.log(process.env.NODE_ENV)
 
 class App extends React.Component {
   constructor(props) {
@@ -179,7 +179,7 @@ class App extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         console.log('dashboard and menu data retrieved')
-        console.log(data)
+        // console.log(data)
         let dashboards = data.savedDashBoards;
         let newList = {}; //replace numeric keys, returned by dataset, with widget IDs.
         for (const oldKey in dashboards) {
@@ -187,7 +187,7 @@ class App extends React.Component {
           let newData = dashboards[oldKey];
           newList[newKey] = newData;
         }
-        console.log(newList)
+        // console.log(newList)
         this.setState({ dashBoardData: newList });
         if( data.menuSetup[0] !== undefined) {
           this.setState({ menuList: JSON.parse(data["menuSetup"][0]["menulist"]) });

@@ -29,7 +29,7 @@ class login extends React.Component {
     // console.log(this.props.queryData)
     if (this.props.queryData.reset === '1') {
       const user = this.props.queryData.users
-      console.log(user)
+      // console.log(user)
       fetch(`/findSecret?user=${user}`)
       .then((response) => response.json())
       .then((data) => {
@@ -52,7 +52,7 @@ class login extends React.Component {
     fetch("/checkLogin")
     .then((response) => response.json())
     .then((data) => {
-      console.log("Loging status: ", data)
+      // console.log("Loging status: ", data)
       if (data.login === 1) {
         this.props.updateLogin(data.apiKey, 1)
       } else {

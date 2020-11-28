@@ -93,7 +93,7 @@ class TopNav extends React.Component {
       try {
         let loadWidget = this.props.dashBoardData[this.props.currentDashBoard]["widgetlist"];
         let loadGlobal = this.props.dashBoardData[this.props.currentDashBoard]["globalstocklist"];
-        console.log(loadWidget, loadGlobal)
+        // console.log(loadWidget, loadGlobal)
         this.props.loadDashBoard(loadGlobal, loadWidget);
         this.setState({ DashBoardMenu: 1 });
       } catch (err) {
@@ -263,7 +263,7 @@ class TopNav extends React.Component {
       />
     ));
 
-    console.log(this.props.login)
+    // console.log(this.props.login)
     return this.props.login === 1 ? (
       <>
         <div className="topnav">
