@@ -46,7 +46,7 @@ You will also see any lint errors in the console.
 ### `npm run server`
 
 Runs the express server in development mode.<br />
-Open [http://localhost:5000](http://localhost:5000) to test routes.
+Send HTTP requests [http://localhost:5000](http://localhost:5000) to test routes.
 
 ### `npm start`
 
