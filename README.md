@@ -1,6 +1,6 @@
 A web deployable applicaiton that allows you to quickly design and visualize your [Finnhub Stock API data](https://finnhub.io/) in a [dashboard format](https://github.com/GlennStreetman/finnHub-Dashboard/blob/master/public/Example_small.jpg).
 
-[Working Example](https://finn-dash.herokuapp.com/) Requires going through registration process and working Finnhub.io API Key.
+[Working Example](https://finn-dash.herokuapp.com/) requires going through registration process and working Finnhub.io API Key.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).  
 Backend uses [Express Server](https://expressjs.com).  
