@@ -3,7 +3,7 @@ A web deployable applicaiton that allows you to quickly design and visualize you
 [Working Example](https://finn-dash.herokuapp.com/) Requires going through registration process and working Finnhub.io API Key.
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).  
-Backend uses [Express Server](https://expressjs.com)  
+Backend uses [Express Server](https://expressjs.com).  
 User Login info and dashboard data is saved in a [PostgreSQL database](https://www.postgresql.org).  
 See /db/postgres_schema.sql for required database schema.  
 The registration process requires that express have access to an SMTP server in order to send registration emails. Recommend Mailgun.  
@@ -11,7 +11,7 @@ Register a [Mailgun Account](https://www.mailgun.com/) and add your apikeys to t
 
 ## .env setup
 
-LOCAL HOSTING:  
+FOR LOCAL HOSTING:  
 API_KEY = mailgun api key  
 DOMAIN_KEY = mailgun domain  
 session_secret = secret phrase used for express-session management. KEEP SECRET.  
@@ -24,7 +24,7 @@ devDB = PG <--SQLite3 support depricated. Some work needed for SQL3 tag to work
 ssl = allow  
 live = 0 or 1 (0 for development mode NPM RUN client/server, 1 for live NPM Start)
 
-HEROKU Hosting + Heroku Postgres addon:  
+FOR HEROKU Hosting + Heroku Postgres addon:  
 API_Key: mailgun api key  
 DATABASE_URL: Database URL provided by Heroku  
 DOMAIN_KEY: mailgun domain  
