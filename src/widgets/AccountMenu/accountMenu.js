@@ -83,7 +83,7 @@ class AccountMenu extends React.PureComponent {
                 <td>Login</td>
                 <td>{this.state.loginName}</td>
                 <td>
-                  <button onClick={() => this.showEditPane("loginName")}>edit</button>
+                  <button onClick={() => this.showEditPane("loginname")}>edit</button>
                 </td>
               </tr>
               <tr>
@@ -97,14 +97,14 @@ class AccountMenu extends React.PureComponent {
                 <td>apiKey</td>
                 <td>{this.state.apiKey}</td>
                 <td>
-                  <button onClick={() => this.showEditPane("apiKey")}>edit</button>
+                  <button onClick={() => this.showEditPane("apikey")}>edit</button>
                 </td>
               </tr>
               <tr>
                 <td>webHook Key</td>
                 <td>{this.state.webHook}</td>
                 <td>
-                  <button onClick={() => this.showEditPane("webHook")}>edit</button>
+                  <button onClick={() => this.showEditPane("webhook")}>edit</button>
                 </td>
               </tr>
             </tbody>

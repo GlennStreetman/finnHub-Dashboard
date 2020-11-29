@@ -1,11 +1,12 @@
 const { json } = require('body-parser');
 let express = require('express');
 let router =  express.Router();
+format = require('pg-format');
 
 const db = process.env.live === '1' ? require("../../db/databaseLive.js") :  require("../../db/databaseLocalPG.js") ;
 // middleware specific to this router
 router.use(function timeLog (req, res, next) {
-  console.log('Time: ', Date.now())
+  console.log('Time: ', new Date)
   next()
 });
 
@@ -18,11 +19,12 @@ router.get("*", (req, res) => {
 });
 
 router.get("/accountData", (req, res) => {
-  thisRequest = req.query;
-  newQuery = `SELECT loginName, email, apiKey, webHook FROM users WHERE id =${req.session.uID}`;
+  // thisRequest = req.query;
+  let accountDataQuery = `SELECT loginName, email, apiKey, webHook FROM users WHERE id =$1`;
+  let queryValues = [req.session.uID]
   // console.log(newQuery)
   resultSet = {};
-  db.query(newQuery, (err, rows) => {
+  db.query(accountDataQuery, queryValues,  (err, rows) => {
     result = rows.rows[0]
     // console.log(result)
     if (err) {
@@ -37,10 +39,14 @@ router.get("/accountData", (req, res) => {
 });
 
 router.post("/accountData", (req, res) => {
+  console.log("updating account data")
   let updateField = req.body.field;
   let newValue = req.body.newValue;
-  let updateQuery = `UPDATE users SET ${updateField}='${newValue}' WHERE id=${req.session.uID}`;
-  db.query(updateQuery, (err, rows) => {
+  console.log(updateField, newValue)
+  let updateQuery = format('UPDATE users SET %I = %L WHERE id=%L', updateField, newValue, req.session.uID);
+  console.log(updateQuery)
+  // let queryValues = [updateField, newValue, req.session.uID]
+  db.query(updateQuery, (err) => {
     if (err) {
       res.json(`Failed to update ${updateField}`);
     } else {
@@ -50,8 +56,12 @@ router.post("/accountData", (req, res) => {
 });
 
 router.get("/dashboard", (req, res) => {
-  getSavedDashBoards = `SELECT id, dashBoardName, globalStockList, widgetList FROM dashBoard WHERE userID =${req.session.uID}`;
-  getMenuSetup = `SELECT menuList, defaultMenu FROM menuSetup WHERE userID =${req.session.uID}`;
+  getSavedDashBoards = `
+    SELECT id, dashBoardName, globalStockList, widgetList 
+    FROM dashBoard WHERE userID =${req.session.uID}`;
+  getMenuSetup = `
+    SELECT menuList, defaultMenu 
+    FROM menuSetup WHERE userID =${req.session.uID}`;
   // console.log(getSavedDashBoards)
   // console.log(getMenuSetup)
   
@@ -78,10 +88,10 @@ router.get("/dashboard", (req, res) => {
  
 router.post("/dashboard", (req, res) => {
   // console.log(req.body)
-  let dashBoardName = req.body.dashBoardName;
-  let globalStockList = JSON.stringify(req.body.globalStockList);
-  let widgetList = JSON.stringify(req.body.widgetList);
-  let menuList = JSON.stringify(req.body.menuList);
+  let dashBoardName = format('%L', req.body.dashBoardName);
+  let globalStockList = format('%L', JSON.stringify(req.body.globalStockList));
+  let widgetList = format('%L', JSON.stringify(req.body.widgetList));
+  let menuList = format('%L', JSON.stringify(req.body.menuList));
   let userName = req.session.userName;
   let getUserIdQuery = "SELECT id FROM users WHERE loginName ='" + userName + "'";
   
@@ -106,7 +116,7 @@ router.post("/dashboard", (req, res) => {
       INSERT INTO dashBoard 
       (userID, dashBoardName, globalStockList, widgetList) 
       VALUES 
-      (${data}, '${dashBoardName}','${globalStockList}','${widgetList}')
+      (${data}, ${dashBoardName},${globalStockList},${widgetList})
       ON CONFLICT (userID, dashboardname) 
       DO UPDATE SET globalstocklist = EXCLUDED.globalstocklist, widgetlist = EXCLUDED.widgetlist
       `;
@@ -127,7 +137,7 @@ router.post("/dashboard", (req, res) => {
     return new Promise((resolve, reject)=> {
       let saveMenuSetupQuery = `INSERT INTO menuSetup 
         (userID, menuList, defaultMenu)
-        VALUES (${data}, '${menuList}', '${dashBoardName}') 
+        VALUES (${data}, ${menuList}, ${dashBoardName}) 
         ON CONFLICT (userID) 
         DO UPDATE SET menuList = EXCLUDED.menuList, defaultMenu = EXCLUDED.defaultMenu
         `;
@@ -160,7 +170,7 @@ router.get("/deleteSavedDashboard", (req, res) => {
   let uId = req.session['uID'];
   // console.log(req.session)
   let thisRequest = req.query;
-  let deleteDash = thisRequest["dashID"]; 
+  let deleteDash = format('%L', thisRequest["dashID"]); 
   let deleteSQL = `DELETE FROM dashBoard WHERE userID=${uId} AND id=${deleteDash}`;
   let checkDefault = `
   SELECT dashboard.id 
