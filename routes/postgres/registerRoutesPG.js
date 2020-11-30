@@ -324,7 +324,7 @@ router.get("/newPW", (req, res) => {
   console.log(req.query)
   console.log(req.session)
   let newPW = format('%L', req.query.newPassword)
-  let userName = format('%L', req.session.userName)
+  let userName = req.session.userName
   let reset = format('%L', req.session.reset)
   console.log(newPW, userName, reset)
   newQuery = `
