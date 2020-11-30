@@ -234,8 +234,11 @@ router.get("/forgot", (req, res) => {
 });
 
 router.get("/reset", (req, res) => {
+  console.log('----reset-----')
+  console.log(req.query)
   verifyID = format('%L', req.query['id'])
   user = format('%L', req.query['users'])
+  req.session.userName = req.query['users']
   verifyUpdate = `
   UPDATE users
   SET resetPassword = 1
@@ -250,6 +253,7 @@ router.get("/reset", (req, res) => {
     } else if (rows.rowCount === 1) {
       // console.log(rows)
       console.log('password reset flag set.')
+      console.log(req.session)
       res.redirect(`/?reset=1&users=${rows.rows[0].loginname}`)
     } else {
       console.log("failed to update reset flag")
@@ -261,8 +265,9 @@ router.get("/reset", (req, res) => {
 //find secret question
 router.get("/findSecret", (req, res) => {
   console.log('-------findsecret-------')
+  console.log(req.session)
   console.log(req.query)
-  req.session.userName = req.query['user']
+  // req.session.userName = req.query['user']
   userID = format('%L', req.query['user'])
   verifyUpdate = `
   SELECT secretQuestion
@@ -291,6 +296,8 @@ router.get("/findSecret", (req, res) => {
 
   //checks answer to secret question.
 router.get("/secretQuestion", (req, res) => {
+  console.log('------secretquestion-------')
+  console.log(req.session)
   let loginText = md5(req.query["loginText"])
   // let loginName = format('%L', req.query["user"])
   
@@ -324,7 +331,7 @@ router.get("/newPW", (req, res) => {
   console.log(req.query)
   console.log(req.session)
   let newPW = format('%L', req.query.newPassword)
-  let userName = req.session.userName
+  let userName = format('%L', req.session.userName)
   let reset = format('%L', req.session.reset)
   console.log(newPW, userName, reset)
   newQuery = `
