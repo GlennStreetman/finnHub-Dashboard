@@ -56,7 +56,7 @@ class TopNav extends React.Component {
   }
 
   componentDidMount() {
-    console.log('topnav mounted')
+    // console.log('topnav mounted')
     if (this.props.login === 1) {this.props.getSavedDashBoards()};
   }
 
@@ -72,20 +72,14 @@ class TopNav extends React.Component {
       }
     }
 
-    if (this.props.apiKey !== '' && prevProps.apiKey === '') {
-    let newSocket = new WebSocket("wss://ws.finnhub.io?token=" + this.props.apiKey)
-    this.setState({socket: newSocket})
-    }
-
-    if (this.props.globalStockList !== prevProps.globalStockList  && this.props.apiKey !== '') {
-      // console.log("unsubscribing from old stocks")
-      let prevSockets = prevProps.globalStockList
-      for (const socket in prevSockets) {
-        let symbolName = prevSockets[socket].slice(prevSockets[socket].indexOf("-")+ 1 , prevSockets[socket].length)
-        // console.log("unsubscribe from: " + symbolName)
-        this.state.socket.send(JSON.stringify({'type':'unsubscribe','symbol': symbolName}))
+    if (this.props.globalStockList !== prevProps.globalStockList){
+      // console.log("------updating ticker sockets-------------")
+      if (this.state.socket !== '') { 
+        // console.log("closing old sockets")
+        this.state.socket.close()
       }
-      this.updateTickerSockets()
+      let newSocket = new WebSocket("wss://ws.finnhub.io?token=" + this.props.apiKey)
+      this.updateTickerSockets(newSocket)
     }
 
     if (this.state.loadStartingDashBoard === 0 && this.props.currentDashBoard !== "") {
@@ -102,44 +96,46 @@ class TopNav extends React.Component {
     }
     
     if (this.props.apiFlag === 1 && this.props.apiFlag !== prevProps.apiFlag) {
-      console.log('show welcome menu')
+      // console.log('show welcome menu')
       this.setState({AboutAPIKeyReminder: 1})
       this.menuWidgetToggle("AboutMenu", "Welcome to FinnDash")
     }
   }
  
-  updateTickerSockets() {
-    // console.log("creating connections")
+  updateTickerSockets(socket) {
+    
+    console.log('--------------updating ticker sockets-------------')
+    // console.log(socket)
+    let thisSocket = socket
     //opens a series of socket connections to live stream stock prices
     //update limited to once every 5 seconds to have mercy on dom rendering.
     const globalStockList = this.props.globalStockList;
-    // const socket = new WebSocket("wss://ws.finnhub.io?token=" + this.props.apiKey);
-    let thisSocket = this.state.socket
     let streamingStockData = {};
     let lastUpdate = new Date().getTime();
     let that = this
-    if (this.props.apiKey !== '') {
-      try {  
+    if (that.props.apiKey !== '' && that.props.globalstocklist !== []) {
+      try { 
+        // console.log("setting up sockets for " + globalStockList) 
+        // console.log(thisSocket)
         thisSocket.addEventListener("open", function (event) {
           globalStockList.map((el) => {
             let stockSym = el.slice(el.indexOf('-')+1 , el.length)
-            that.props.throttle.enqueue(function() {
-              // console.log(Date().slice(20,25) + 'subscribe-' + stockSym)
-              thisSocket.send(JSON.stringify({ type: "subscribe", symbol: stockSym }))})
-            return true
-          }
+              that.props.throttle.enqueue(function() {
+                thisSocket.send(JSON.stringify({ type: "subscribe", symbol: stockSym }))
+              })
+            }
           );
         });
 
         // Listen for messages
         thisSocket.addEventListener("message", function (event) {
           let tickerReponse = JSON.parse(event.data);
-          // console.log("Message from server ", event.data);
           if (tickerReponse.data) {
             streamingStockData['US-' + tickerReponse.data[0]["s"]] = [tickerReponse.data[0]["p"]];
             let checkTime = new Date().getTime();
-
+            // console.log("Message from server ", event.data);
             if (checkTime - lastUpdate > 3000) {
+              
               lastUpdate = new Date().getTime();
               let updatedPrice = Object.assign({}, that.state.trackedStockData);
               for (const prop in streamingStockData) {
@@ -151,9 +147,10 @@ class TopNav extends React.Component {
           }
         });
       } catch(err) {
-        console.log("problem setting up socket connections.")
+        console.log("problem setting up socket connections:", err)
       }
     }
+    that.setState({socket: thisSocket})
   }
 
   showPane(stateRef, fixState = 0) {
