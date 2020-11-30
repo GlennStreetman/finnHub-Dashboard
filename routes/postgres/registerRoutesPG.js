@@ -1,8 +1,8 @@
-let express = require('express');
-let router =  express.Router();
-
+const express = require('express');
+const router =  express.Router();
+const format = require('pg-format');
 const cryptoRandomString = require('crypto-random-string');
-const URL = process.env.live ? `https://finn-dash.herokuapp.com` : `http://localhost:5000`
+const URL = process.env.live === '1' ? `https://finn-dash.herokuapp.com` : `http://localhost:5000`
 const md5 = require("md5");
 const db = process.env.live === '1' ? require("../../db/databaseLive.js") :  require("../../db/databaseLocalPG.js") ;
  
@@ -20,14 +20,15 @@ router.use(function timeLog (req, res, next) {
 });
 
 router.post("/register", (req, res) => {
-  const loginText = req.body.loginText;
-  const pwText = req.body.pwText;
-  const emailText = req.body.emailText;
-  const secretQuestion = req.body.secretQuestion;
-  const secretAnswer = req.body.secretAnswer;
+  const loginText = format('%L', req.body.loginText);
+  const pwText = format('%L', req.body.pwText);
+  const emailText = format('%L', req.body.emailText);
+  const secretQuestion = format('%L', req.body.secretQuestion);
+  const secretAnswer = format('%L', req.body.secretAnswer);
+  console.log(loginText, pwText, emailText, secretQuestion, secretAnswer)
   const validateKey = cryptoRandomString({ length: 32 });
-  const checkUser = "SELECT loginName FROM users WHERE loginName ='" + loginText + "'";
-  const checkEmail = "SELECT email FROM users WHERE email ='" + emailText + "'";
+  const checkUser = `SELECT loginName FROM users WHERE loginName = ${loginText}`;
+  const checkEmail = `SELECT email FROM users WHERE email = ${emailText}`;
   const createUser = `
   INSERT INTO users (
     loginName, 
@@ -38,13 +39,14 @@ router.post("/register", (req, res) => {
     confirmEmail, 
     resetPassword) 
   VALUES (
-    '${loginText}',
+    ${loginText},
     '${md5(pwText)}',
-    '${emailText}',
-    '${secretQuestion}',
+    ${emailText},
+    ${secretQuestion},
     '${md5(secretAnswer)}', 
     '${validateKey}', 
-    '0')`;
+    '0')
+    RETURNING *`;
 
   function emailIsValid(email) {
     return /\S+@\S+\.\S+/.test(email);
@@ -83,17 +85,19 @@ router.post("/register", (req, res) => {
   const createNewUser = (() => {
     return new Promise((resolve, reject) => {
       console.log("creating user:")
-      // console.log(createUser)
+      console.log(createUser)
       db.query(createUser, (err, res) => {
-        // console.log(res)
-        if (res.rowCount === 1) {
+        console.log(res)
+        if (res !== undefined) {
+          console.log(req.body.emailText)
           const data = {
               from: 'Glenn Streetman <glennstreetman@gmail.com>',
-              to: emailText,
+              to: req.body.emailText,
               subject: 'finnHub Verify Email',
               text: `Please visit the following link to verify your email address and login to finnDash: ${URL}/verify?id=${validateKey}`
           };
-          mailgun.messages().send(data, (error, body) => {
+          console.log(data)
+          mailgun.messages().send(data, (error) => {
               if (error) {
               console.log(error)
               } else {
@@ -127,12 +131,13 @@ router.post("/register", (req, res) => {
 });
 
 router.get("/verify", (req, res) => {
-  verifyID = req.query['id']
+  verifyID = format('%L', req.query['id'])
   verifyUpdate = `
   UPDATE users
   SET confirmEmail = 1
-  WHERE confirmEmail = '${verifyID}'
+  WHERE confirmEmail = ${verifyID}
   `
+  console.log(verifyUpdate)
   db.query(verifyUpdate, (err) => {
     if (err) {
       res.json("Could not validate email address.");
@@ -145,13 +150,14 @@ router.get("/verify", (req, res) => {
 });
 
 router.get("/login", (req, res) => {
-  thisRequest = req.query; //.query contains all query string parameters.
-  newQuery = `SELECT id, apikey, confirmemail 
-              FROM users WHERE loginName ='${thisRequest["loginText"]}' 
-              AND password = '${md5(thisRequest["pwText"])}'`;
+  let loginText = format('%L', req.query["loginText"])
+  let pwText = format('%L', req.query["pwText"])
+  loginQuery = `SELECT id, loginname, apikey, confirmemail 
+              FROM users WHERE loginName =${loginText} 
+              AND password = '${md5(pwText)}'`;
   let info = { key: "", login: 0 };
-  // console.log(newQuery)
-  db.query(newQuery, (err, rows) => {
+  console.log(loginQuery)
+  db.query(loginQuery, (err, rows) => {
     let login = rows.rows[0]
     // console.log(login)
     if (err) {
@@ -161,8 +167,9 @@ router.get("/login", (req, res) => {
       info["login"] = 1;
       info["response"] = 'success';
       req.session.uID = login.id;
-      req.session.userName = thisRequest["loginText"];
+      req.session.userName = rows.rows[0]['loginname'];
       req.session.login = true
+      console.log(req.session)
       res.json(info);
     } else if (rows.rowCount === 1 && login.confirmemail !== '1') {
       // console.log(login)
@@ -177,8 +184,9 @@ router.get("/login", (req, res) => {
 
 router.get("/forgot", (req, res) => {
   console.log("reseting password")
-  thisRequest = req.query; //.query contains all query string parameters.
-  forgotQuery = "SELECT id, loginName, email FROM users WHERE email ='" + thisRequest["loginText"] + "'";
+  loginName = format('%L', req.query["loginText"]);
+  forgotQuery = `SELECT id, loginName, email FROM users WHERE email = ${loginName}`;
+  console.log(forgotQuery)
   db.query(forgotQuery, (err, rows) => {
     let login = rows.rows[0]
     // console.log(login)
@@ -226,32 +234,43 @@ router.get("/forgot", (req, res) => {
 });
 
 router.get("/reset", (req, res) => {
-  verifyID = req.query['id']
-  user = req.query['user']
+  verifyID = format('%L', req.query['id'])
+  user = format('%L', req.query['users'])
   verifyUpdate = `
   UPDATE users
   SET resetPassword = 1
-  WHERE resetPassword = '${verifyID}'
+  WHERE resetPassword = ${verifyID}
+  RETURNING *
   `
-  db.query(verifyUpdate, (err) => {
+  console.log(verifyUpdate)
+  db.query(verifyUpdate, (err, rows) => {
     if (err) {
       res.json("Error during password reset process.");
       // console.log(verifyUpdate)
+    } else if (rows.rowCount === 1) {
+      // console.log(rows)
+      console.log('password reset flag set.')
+      res.redirect(`/?reset=1&users=${rows.rows[0].loginname}`)
     } else {
-      console.log('passowrd reset flag set.')
-      res.redirect(`/?reset=1&users=${user}`)
+      console.log("failed to update reset flag")
+      // console.log(rows)
+      res.redirect('/')
     }
   })
 });
-
+//find secret question
 router.get("/findSecret", (req, res) => {
-  userID = req.query['user']
+  console.log('-------findsecret-------')
+  console.log(req.query)
+  req.session.userName = req.query['user']
+  userID = format('%L', req.query['user'])
   verifyUpdate = `
   SELECT secretQuestion
   FROM users
-  WHERE loginName = '${userID}' AND resetPassword = '1'
+  WHERE loginName = ${userID} AND resetPassword = '1'
   `
   // console.log(verifyUpdate)
+  // console.log(req.session.userName)
   db.query(verifyUpdate, (err, rows) => {
     secretQuestion = rows.rows[0].secretquestion
     if (err) {
@@ -272,11 +291,16 @@ router.get("/findSecret", (req, res) => {
 
   //checks answer to secret question.
 router.get("/secretQuestion", (req, res) => {
-  thisRequest = req.query; //.query contains all query string parameters.
-  // console.log(thisRequest)
-  newQuery = "SELECT id FROM users WHERE secretAnswer ='" + md5(thisRequest["loginText"]) + "' AND loginName = '" + thisRequest["user"] + "'";
-  // console.log(newQuery);
-  req.session.userName = thisRequest.user
+  let loginText = md5(req.query["loginText"])
+  // let loginName = format('%L', req.query["user"])
+  
+  newQuery = `
+    SELECT id, loginname 
+    FROM users 
+    WHERE secretAnswer = '${loginText}' AND 
+    loginName = '${req.session.userName}'`;
+  console.log(newQuery);
+  console.log(req.query['user'])
   db.query(newQuery, [], (err, rows) => {
     if (err) {
       res.json("Secret question did not match.");
@@ -284,6 +308,7 @@ router.get("/secretQuestion", (req, res) => {
       // console.log(rows);
       if (rows !== undefined) {
         // console.log("reset ready");
+        // req.session.userName = rows.rows[0]['loginname']
         req.session.reset = 1;
         res.json("true");
       } else {
@@ -295,10 +320,19 @@ router.get("/secretQuestion", (req, res) => {
 });
 
 router.get("/newPW", (req, res) => {
-  thisRequest = req.query; //.query contains all query string parameters.
-  newQuery = `UPDATE users SET password = '${md5(thisRequest.newPassword)}', resetpassword = 0 WHERE loginName = '${req.session.userName}' AND 1 = ${req.session.reset}`;
-  // console.log(newQuery);
-  db.query(newQuery, (err, rows) => {
+  console.log('----new PW --------')
+  console.log(req.query)
+  console.log(req.session)
+  let newPW = format('%L', req.query.newPassword)
+  let userName = format('%L', req.session.userName)
+  let reset = format('%L', req.session.reset)
+  console.log(newPW, userName, reset)
+  newQuery = `
+    UPDATE users 
+    SET password = '${md5(newPW)}', resetpassword = 0 
+    WHERE loginName = ${userName} AND '1' = ${reset}`;
+  console.log(newQuery);
+  db.query(newQuery, (err) => {
     if (err) {
       res.json("Could not reset password");
     } else {

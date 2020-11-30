@@ -249,8 +249,12 @@ class App extends React.Component {
   }
 
   logOut(){
-    this.setState({login: 0})
-    this.setState({menuList: {}})
+    fetch("/logOut")
+    .then((data) => console.log('logging out'))
+    .then(() => {
+      this.setState({login: 0})
+      this.setState({menuList: {}})
+    });
   }
 
   newDashboard(){

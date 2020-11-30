@@ -1,10 +1,10 @@
 const { json } = require('body-parser');
-let express = require('express');
-let router =  express.Router();
-format = require('pg-format');
-
+const express = require('express');
+const router =  express.Router();
+const format = require('pg-format');
 const db = process.env.live === '1' ? require("../../db/databaseLive.js") :  require("../../db/databaseLocalPG.js") ;
 // middleware specific to this router
+
 router.use(function timeLog (req, res, next) {
   console.log('Time: ', new Date)
   next()
@@ -250,7 +250,7 @@ router.get("/deleteSavedDashboard", (req, res) => {
 });
 
 router.get("/checkLogin", (req, res) => {
-  resData = {login: 0}
+  let resData = {login: 0}
   let uID = req.session['uID'];
   apiKeysQuery = `
     SELECT apikey, webhook 
@@ -259,6 +259,7 @@ router.get("/checkLogin", (req, res) => {
     `
   const retrieveAPIKeys = () => {
     console.log('getting APIKeys')
+    console.log(req.session)
     
     return new Promise((resolve, reject)=> {
       db.query(apiKeysQuery, (err, rows) => {
@@ -287,6 +288,12 @@ router.get("/checkLogin", (req, res) => {
     console.log('not logged in')
     res.json({login: 0})
   }
+})
+
+router.get("/logOut", (req, res) => {
+  req.session.login = false
+  console.log(req.session.userName, req.session.login)
+  res.json('true')
 })
 
 module.exports = router;
