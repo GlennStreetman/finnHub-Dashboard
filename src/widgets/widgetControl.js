@@ -84,8 +84,8 @@ class WidgetControl extends React.Component {
       xAxis = e.clientX;
       yAxis = e.clientY;
       // set the element's new position:
-      let newX = xAxis - widgetWidth;
-      let newY = yAxis;
+      let newX = xAxis - widgetWidth + 25;
+      let newY = yAxis - 25;
       // that.setState({ yAxis: newY });
       // that.setState({ xAxis: newX });
       that.props.moveWidget(that.props.stateRef, that.props.widgetKey, newY, newX);
