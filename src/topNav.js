@@ -104,7 +104,7 @@ class TopNav extends React.Component {
  
   updateTickerSockets(socket) {
     
-    console.log('--------------updating ticker sockets-------------')
+    // console.log('--------------updating ticker sockets-------------')
     // console.log(socket)
     let thisSocket = socket
     //opens a series of socket connections to live stream stock prices
@@ -123,6 +123,7 @@ class TopNav extends React.Component {
               that.props.throttle.enqueue(function() {
                 thisSocket.send(JSON.stringify({ type: "subscribe", symbol: stockSym }))
               })
+            return true;
             }
           );
         });

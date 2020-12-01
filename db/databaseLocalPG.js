@@ -1,7 +1,7 @@
 console.log("loading development postgres connection")
 
 const { Client } = require('pg')
-const fs = require('fs');
+// const fs = require('fs');
 const db = new Client({
     sslmode: 'disable',
     user: process.env.pguser ,

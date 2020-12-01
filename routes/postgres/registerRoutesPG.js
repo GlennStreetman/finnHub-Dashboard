@@ -131,8 +131,8 @@ router.post("/register", (req, res) => {
 });
 
 router.get("/verify", (req, res) => {
-  verifyID = format('%L', req.query['id'])
-  verifyUpdate = `
+  let verifyID = format('%L', req.query['id'])
+  let verifyUpdate = `
   UPDATE users
   SET confirmEmail = 1
   WHERE confirmEmail = ${verifyID}
@@ -152,7 +152,7 @@ router.get("/verify", (req, res) => {
 router.get("/login", (req, res) => {
   let loginText = format('%L', req.query["loginText"])
   let pwText = format('%L', req.query["pwText"])
-  loginQuery = `SELECT id, loginname, apikey, confirmemail 
+  let loginQuery = `SELECT id, loginname, apikey, confirmemail 
               FROM users WHERE loginName =${loginText} 
               AND password = '${md5(pwText)}'`;
   let info = { key: "", login: 0 };
@@ -184,8 +184,8 @@ router.get("/login", (req, res) => {
 
 router.get("/forgot", (req, res) => {
   console.log("reseting password")
-  loginName = format('%L', req.query["loginText"]);
-  forgotQuery = `SELECT id, loginName, email FROM users WHERE email = ${loginName}`;
+  let loginName = format('%L', req.query["loginText"]);
+  let forgotQuery = `SELECT id, loginName, email FROM users WHERE email = ${loginName}`;
   console.log(forgotQuery)
   db.query(forgotQuery, (err, rows) => {
     let login = rows.rows[0]
@@ -236,10 +236,10 @@ router.get("/forgot", (req, res) => {
 router.get("/reset", (req, res) => {
   console.log('----reset-----')
   console.log(req.query)
-  verifyID = format('%L', req.query['id'])
-  user = format('%L', req.query['users'])
+  let verifyID = format('%L', req.query['id'])
+  // let user = format('%L', req.query['users'])
   req.session.userName = req.query['users']
-  verifyUpdate = `
+  let verifyUpdate = `
   UPDATE users
   SET resetPassword = 1
   WHERE resetPassword = ${verifyID}
@@ -268,8 +268,8 @@ router.get("/findSecret", (req, res) => {
   console.log(req.session)
   console.log(req.query)
   // req.session.userName = req.query['user']
-  userID = format('%L', req.query['user'])
-  verifyUpdate = `
+  let userID = format('%L', req.query['user'])
+  let verifyUpdate = `
   SELECT secretQuestion
   FROM users
   WHERE loginName = ${userID} AND resetPassword = '1'
@@ -277,11 +277,11 @@ router.get("/findSecret", (req, res) => {
   // console.log(verifyUpdate)
   // console.log(req.session.userName)
   db.query(verifyUpdate, (err, rows) => {
-    secretQuestion = rows.rows[0].secretquestion
+    let secretQuestion = rows.rows[0].secretquestion
     if (err) {
       res.json("Error during password reset process.");
     } else if (secretQuestion !== undefined) {
-      data = {
+      let data = {
         question: secretQuestion,
         user: userID
       }
@@ -301,7 +301,7 @@ router.get("/secretQuestion", (req, res) => {
   let loginText = md5(req.query["loginText"])
   // let loginName = format('%L', req.query["user"])
   
-  newQuery = `
+  let newQuery = `
     SELECT id, loginname 
     FROM users 
     WHERE secretAnswer = '${loginText}' AND 
@@ -334,7 +334,7 @@ router.get("/newPW", (req, res) => {
   let userName = format('%L', req.session.userName)
   let reset = format('%L', req.session.reset)
   console.log(newPW, userName, reset)
-  newQuery = `
+  let newQuery = `
     UPDATE users 
     SET password = '${md5(newPW)}', resetpassword = 0 
     WHERE loginName = ${userName} AND '1' = ${reset}`;

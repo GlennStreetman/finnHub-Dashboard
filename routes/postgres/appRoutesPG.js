@@ -1,4 +1,4 @@
-const { json } = require('body-parser');
+// const { json } = require('body-parser');
 const express = require('express');
 const router =  express.Router();
 const format = require('pg-format');
@@ -6,7 +6,7 @@ const db = process.env.live === '1' ? require("../../db/databaseLive.js") :  req
 // middleware specific to this router
 
 router.use(function timeLog (req, res, next) {
-  console.log('Time: ', new Date)
+  console.log('Time: ', new Date())
   next()
 });
 
@@ -23,9 +23,9 @@ router.get("/accountData", (req, res) => {
   let accountDataQuery = `SELECT loginName, email, apiKey, webHook FROM users WHERE id =$1`;
   let queryValues = [req.session.uID]
   // console.log(newQuery)
-  resultSet = {};
+  let resultSet = {};
   db.query(accountDataQuery, queryValues,  (err, rows) => {
-    result = rows.rows[0]
+    let result = rows.rows[0]
     // console.log(result)
     if (err) {
       res.json("Could not retrieve user data");
@@ -56,16 +56,16 @@ router.post("/accountData", (req, res) => {
 });
 
 router.get("/dashboard", (req, res) => {
-  getSavedDashBoards = `
+  let getSavedDashBoards = `
     SELECT id, dashBoardName, globalStockList, widgetList 
     FROM dashBoard WHERE userID =${req.session.uID}`;
-  getMenuSetup = `
+  let getMenuSetup = `
     SELECT menuList, defaultMenu 
     FROM menuSetup WHERE userID =${req.session.uID}`;
   // console.log(getSavedDashBoards)
   // console.log(getMenuSetup)
   
-  resultSet = {};
+  let resultSet = {};
 
   db.query(getSavedDashBoards, (err, rows) => {
     if (err) {
@@ -98,7 +98,7 @@ router.post("/dashboard", (req, res) => {
   const getUserID = () => {
     return new Promise((resolve, reject)=> {
       db.query(getUserIdQuery, (err, rows) => {
-        data = rows.rows[0].id
+        let data = rows.rows[0].id
         console.log('posting dashboard data')
         // console.log(data)
         if (err) {
@@ -252,7 +252,7 @@ router.get("/deleteSavedDashboard", (req, res) => {
 router.get("/checkLogin", (req, res) => {
   let resData = {login: 0}
   let uID = req.session['uID'];
-  apiKeysQuery = `
+  let apiKeysQuery = `
     SELECT apikey, webhook 
     FROM users
     WHERE id = ${uID}

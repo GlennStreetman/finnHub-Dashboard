@@ -38,7 +38,7 @@ class WidgetControl extends React.Component {
     // }
   }
 
-  showPane(stateRef, fixState: -1) {
+  showPane(stateRef, fixState = -1) {
     let showMenu = this.state[stateRef] === 0 ? 1 : 0;
     fixState !== -1 && (showMenu = fixState);
     this.setState({ [stateRef]: showMenu });
