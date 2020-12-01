@@ -1,5 +1,4 @@
-
-export default function UpdateTickerSockets(context, socket, apiKey, globalStockList) {
+function UpdateTickerSockets(context, socket, apiKey, globalStockList) {
     
   console.log('--------------updating ticker sockets-------------')
   // console.log(socket)
@@ -50,3 +49,18 @@ export default function UpdateTickerSockets(context, socket, apiKey, globalStock
   }
   that.setState({socket: thisSocket})
 }
+
+function LoadTickerSocket(context, prevProps, globalStockList, socket, apiKey, updateTickerSockets) {
+  const that = context
+  if (globalStockList !== prevProps.globalStockList){
+    // console.log("------updating ticker sockets-------------")
+    if (socket !== '') { 
+      // console.log("closing old sockets")
+      socket.close()
+    }
+    let newSocket = new WebSocket("wss://ws.finnhub.io?token=" + apiKey)
+    updateTickerSockets(that, newSocket, apiKey, globalStockList)
+  }
+}
+
+export {UpdateTickerSockets ,LoadTickerSocket}

@@ -3,7 +3,7 @@ import WidgetControl from "./widgets/widgetControl.js";
 import Login from "./login.js";
 import queryString from 'query-string';
 import GetStockPrice  from "./getStockPrices.js";
-import UpdateTickerSockets  from "./socketData.js";
+import {UpdateTickerSockets, LoadTickerSocket}  from "./socketData.js";
 
 //Import props function from each widget/menu here and add to returnBodyProps function below.
 import { dashBoardMenuProps } from "./widgets/dashBoardMenu/dashBoardMenu.js";
@@ -32,7 +32,6 @@ class TopNav extends React.Component {
     };
 
     this.showPane = this.showPane.bind(this);
-    // this.updateTickerSockets = this.updateTickerSockets.bind(this);
     this.menuWidgetToggle = this.menuWidgetToggle.bind(this);
     this.returnBodyProps = this.returnBodyProps.bind(this);
   }
@@ -71,16 +70,17 @@ class TopNav extends React.Component {
       }
     }
 
-    if (this.props.globalStockList !== prevProps.globalStockList){
-      // console.log("------updating ticker sockets-------------")
-      if (this.state.socket !== '') { 
-        // console.log("closing old sockets")
-        this.state.socket.close()
-      }
-      let newSocket = new WebSocket("wss://ws.finnhub.io?token=" + this.props.apiKey)
-      // this.updateTickerSockets(newSocket)
-      UpdateTickerSockets(this, newSocket, this.props.apiKey, this.props.globalStockList)
-    }
+    // if (this.props.globalStockList !== prevProps.globalStockList){
+    //   // console.log("------updating ticker sockets-------------")
+    //   if (this.state.socket !== '') { 
+    //     // console.log("closing old sockets")
+    //     this.state.socket.close()
+    //   }
+    //   let newSocket = new WebSocket("wss://ws.finnhub.io?token=" + this.props.apiKey)
+    //   UpdateTickerSockets(this, newSocket, this.props.apiKey, this.props.globalStockList)
+    // }
+    LoadTickerSocket(this, prevProps, this.props.globalStockList, this.state.socket, this.props.apiKey, UpdateTickerSockets)
+
 
     if (this.state.loadStartingDashBoard === 0 && this.props.currentDashBoard !== "") {
       this.setState({ loadStartingDashBoard: 1 });
