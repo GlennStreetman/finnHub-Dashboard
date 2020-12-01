@@ -1,5 +1,5 @@
 
-export default function GetStockPrice(context, stockDescription, apiKey, throttle) {
+function GetStockPrice(context, stockDescription, apiKey, throttle) {
     console.log("getting stock prices for: ", stockDescription)
     const stockSymbol = stockDescription.indexOf(":") > 0 ? stockDescription.slice(0, stockDescription.indexOf(":")) : stockDescription;
     let stockPriceData = {};
@@ -47,3 +47,14 @@ export default function GetStockPrice(context, stockDescription, apiKey, throttl
       })
     }
   }
+
+function LoadSocketData(context, p, getStockPrice){
+  if (p.refreshStockData === 1) {
+    p.toggleRefreshStockData();
+    for (const stock in p.globalStockList) {
+      getStockPrice(context, p.globalStockList[stock], p.apiKey, p.throttle)
+    }
+  }
+}
+
+export {GetStockPrice, LoadSocketData}

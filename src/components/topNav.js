@@ -3,7 +3,7 @@ import queryString from 'query-string';
 
 import WidgetControl from "./../widgets/widgetControl.js";
 import Login from "./login.js";
-import GetStockPrice  from "./../appFunctions/getStockPrices.js";
+import {GetStockPrice, LoadSocketData}  from "./../appFunctions/getStockPrices.js";
 import {UpdateTickerSockets, LoadTickerSocket}  from "./../appFunctions/socketData.js";
 
 //Import props function from each widget/menu here and add to returnBodyProps function below.
@@ -50,13 +50,13 @@ class TopNav extends React.Component {
       p.getSavedDashBoards()
     };
     //lift this up to app level?
-    if (p.refreshStockData === 1) {
-      p.toggleRefreshStockData();
-      for (const stock in p.globalStockList) {
-        GetStockPrice(this, p.globalStockList[stock], p.apiKey, p.throttle)
-      }
-    }
-
+      // if (p.refreshStockData === 1) {
+      //   p.toggleRefreshStockData();
+      //   for (const stock in p.globalStockList) {
+      //     GetStockPrice(this, p.globalStockList[stock], p.apiKey, p.throttle)
+      //   }
+      // }
+    LoadSocketData(this, p, GetStockPrice)
     LoadTickerSocket(this, prevProps, p.globalStockList, s.socket, p.apiKey, UpdateTickerSockets)
 
     if (s.loadStartingDashBoard === 0 && p.currentDashBoard !== "") {
