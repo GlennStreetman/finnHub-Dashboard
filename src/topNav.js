@@ -3,7 +3,7 @@ import WidgetControl from "./widgets/widgetControl.js";
 import Login from "./login.js";
 import queryString from 'query-string';
 import GetStockPrice  from "./getStockPrices.js";
-// import throttledQueue from "throttled-queue"; //Finnhub API calls limited to 30 per second.
+import UpdateTickerSockets  from "./socketData.js";
 
 //Import props function from each widget/menu here and add to returnBodyProps function below.
 import { dashBoardMenuProps } from "./widgets/dashBoardMenu/dashBoardMenu.js";
@@ -32,8 +32,7 @@ class TopNav extends React.Component {
     };
 
     this.showPane = this.showPane.bind(this);
-    // this.getStockPrice = this.getStockPrice.bind(this);
-    this.updateTickerSockets = this.updateTickerSockets.bind(this);
+    // this.updateTickerSockets = this.updateTickerSockets.bind(this);
     this.menuWidgetToggle = this.menuWidgetToggle.bind(this);
     this.returnBodyProps = this.returnBodyProps.bind(this);
   }
@@ -68,7 +67,6 @@ class TopNav extends React.Component {
       this.props.toggleRefreshStockData();
 
       for (const stock in this.props.globalStockList) {
-        // this.getStockPrice(this.props.globalStockList[stock]);
         GetStockPrice(this, this.props.globalStockList[stock], this.props.apiKey, this.props.throttle)
       }
     }
@@ -80,7 +78,8 @@ class TopNav extends React.Component {
         this.state.socket.close()
       }
       let newSocket = new WebSocket("wss://ws.finnhub.io?token=" + this.props.apiKey)
-      this.updateTickerSockets(newSocket)
+      // this.updateTickerSockets(newSocket)
+      UpdateTickerSockets(this, newSocket, this.props.apiKey, this.props.globalStockList)
     }
 
     if (this.state.loadStartingDashBoard === 0 && this.props.currentDashBoard !== "") {
@@ -102,58 +101,6 @@ class TopNav extends React.Component {
       this.menuWidgetToggle("AboutMenu", "Welcome to FinnDash")
     }
   }
- 
-  updateTickerSockets(socket) {
-    
-    // console.log('--------------updating ticker sockets-------------')
-    // console.log(socket)
-    let thisSocket = socket
-    //opens a series of socket connections to live stream stock prices
-    //update limited to once every 5 seconds to have mercy on dom rendering.
-    const globalStockList = this.props.globalStockList;
-    let streamingStockData = {};
-    let lastUpdate = new Date().getTime();
-    let that = this
-    if (that.props.apiKey !== '' && that.props.globalstocklist !== []) {
-      try { 
-        // console.log("setting up sockets for " + globalStockList) 
-        // console.log(thisSocket)
-        thisSocket.addEventListener("open", function (event) {
-          globalStockList.map((el) => {
-            let stockSym = el.slice(el.indexOf('-')+1 , el.length)
-              that.props.throttle.enqueue(function() {
-                thisSocket.send(JSON.stringify({ type: "subscribe", symbol: stockSym }))
-              })
-            return true;
-            }
-          );
-        });
-
-        // Listen for messages
-        thisSocket.addEventListener("message", function (event) {
-          let tickerReponse = JSON.parse(event.data);
-          if (tickerReponse.data) {
-            streamingStockData['US-' + tickerReponse.data[0]["s"]] = [tickerReponse.data[0]["p"]];
-            let checkTime = new Date().getTime();
-            // console.log("Message from server ", event.data);
-            if (checkTime - lastUpdate > 3000) {
-              
-              lastUpdate = new Date().getTime();
-              let updatedPrice = Object.assign({}, that.state.trackedStockData);
-              for (const prop in streamingStockData) {
-                // updatedPrice[prop] = {}
-                updatedPrice[prop]["currentPrice"] = streamingStockData[prop][0];
-              }
-              that.setState({ trackedStockData: updatedPrice });
-            }
-          }
-        });
-      } catch(err) {
-        console.log("problem setting up socket connections:", err)
-      }
-    }
-    that.setState({socket: thisSocket})
-  }
 
   showPane(stateRef, fixState = 0) {
     //toggles view of specified menu. 1 = open 0 = closed
@@ -161,54 +108,6 @@ class TopNav extends React.Component {
     fixState === 1 && (showMenu = 1);
     this.setState({ [stateRef]: showMenu });
   }
-
-  // getStockPrice(stockDescription) {
-  //   const stockSymbol = stockDescription.indexOf(":") > 0 ? stockDescription.slice(0, stockDescription.indexOf(":")) : stockDescription;
-  //   let stockPriceData = {};
-  //   let that = this
-  //   if (this.props.apiKey !== '') {
-  //     this.props.throttle.enqueue(function() {
-  //       fetch("https://finnhub.io/api/v1/quote?symbol=" + stockSymbol.slice(stockSymbol.indexOf('-') + 1, stockSymbol.length) + "&token=" + that.props.apiKey)
-  //         .then((response) => {
-  //           if (response.status === 429) {
-  //             that.props.throttle.setSuspend(4000)
-  //             that.getStockPrice(stockDescription)
-  //             throw new Error('finnhub 429')
-  //           } else {
-  //             // console.log(Date().slice(20,25) + 'getStockPrice ' + stockDescription)
-  //             return response.json()
-  //           }
-  //         })
-  //         .then((data) => {
-  //           //destructure data returned from fetch.
-  //           const {
-  //             c: a, //current price
-  //             h: b, //current days high price
-  //             l: c, //current days low price
-  //             o: d, //current days open price
-  //             pc: e, //previous days close price
-  //           } = data;
-  //           //create object from destructured data above.
-  //           stockPriceData = {
-  //             currentPrice: a,
-  //             dayHighPrice: b,
-  //             dayLowPrice: c,
-  //             dayOpenPrice: d,
-  //             prevClosePrice: e,
-  //           };
-
-  //           that.setState((prevState) => {
-  //             let newTrackedStockData = Object.assign({}, prevState.trackedStockData);
-  //             newTrackedStockData[stockSymbol] = stockPriceData;
-  //             return { trackedStockData: newTrackedStockData };
-  //           });
-  //         })
-  //         .catch(error => {
-  //           console.log(error.message)
-  //         });
-  //     })
-  //   }
-  // }
 
   menuWidgetToggle(menuName, dashName = "pass") {
     //Create dashboard menu if first time looking at, else toggle visability
