@@ -1,5 +1,5 @@
 import React from "react";
-import StockSearchPane from "../../stockSearchPane.js";
+import StockSearchPane from "../../components/stockSearchPane.js";
 // import Moment from "react-moment";
 
 class NewsWidget extends React.Component {

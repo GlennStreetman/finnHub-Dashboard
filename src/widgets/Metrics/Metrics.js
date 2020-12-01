@@ -1,5 +1,5 @@
 import React from "react";
-import StockSearchPane from "../../stockSearchPane.js";
+import StockSearchPane from "../../components/stockSearchPane.js";
 
 //Widget body component. Shows stock detail info and recent news. Maybe a graph?
 class MetricsWidget extends React.Component {

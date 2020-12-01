@@ -1,5 +1,5 @@
 import React from "react";
-import StockSearchPane from "../../stockSearchPane.js";
+import StockSearchPane from "../../components/stockSearchPane.js";
 import CreateCandleStickChart from "./createCandleStickChart.js";
 
 class CandleWidget extends React.Component {
