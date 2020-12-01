@@ -72,15 +72,7 @@ class StockSearchPane extends React.Component {
             updateStockList[addStockKey] = addStockData
             delete updateStockList[key]
           }
-          // let list = Object.assign({}, that.state.availableStocks ,updateStockList)
-          console.log(data)
-          console.log('updating symbol list')
-          console.log(that.state)
-          console.log(that.state.availableStocks)
-          console.log(updateStockList)          
           that.setState({ availableStocks: Object.assign({}, that.state.availableStocks ,updateStockList)});
-          console.log(that.state)
-          console.log("Success retrieving stock symbols:" + exchange);
         })
         .catch((error) => {
           console.error("Error retrieving stock symbols:" +  exchange);
