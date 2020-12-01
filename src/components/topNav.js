@@ -1,19 +1,20 @@
 import React from "react";
-import WidgetControl from "./widgets/widgetControl.js";
-import Login from "./login.js";
 import queryString from 'query-string';
-import GetStockPrice  from "./getStockPrices.js";
-import {UpdateTickerSockets, LoadTickerSocket}  from "./socketData.js";
+
+import WidgetControl from "./../widgets/widgetControl.js";
+import Login from "./login.js";
+import GetStockPrice  from "./../appFunctions/getStockPrices.js";
+import {UpdateTickerSockets, LoadTickerSocket}  from "./../appFunctions/socketData.js";
 
 //Import props function from each widget/menu here and add to returnBodyProps function below.
-import { dashBoardMenuProps } from "./widgets/dashBoardMenu/dashBoardMenu.js";
-import { watchListMenuProps } from "./widgets/watchListMenu/watchListMenu.js";
-import { candleWidgetProps } from "./widgets/candle/candleWidget.js";
-import { newsWidgetProps } from "./widgets/News/newsWidget.js";
-import { stockDetailWidgetProps } from "./widgets/stockDetails/stockDetailWidget.js";
-import { accountMenuProps } from "./widgets/AccountMenu/accountMenu.js";
-import { aboutMenuProps } from "./widgets/AboutMenu/AboutMenu.js";
-import { metricsProps } from "./widgets/Metrics/Metrics.js";
+import { dashBoardMenuProps } from "./../widgets/dashBoardMenu/dashBoardMenu.js";
+import { watchListMenuProps } from "./../widgets/watchListMenu/watchListMenu.js";
+import { candleWidgetProps } from "./../widgets/candle/candleWidget.js";
+import { newsWidgetProps } from "./../widgets/News/newsWidget.js";
+import { stockDetailWidgetProps } from "./../widgets/stockDetails/stockDetailWidget.js";
+import { accountMenuProps } from "./../widgets/AccountMenu/accountMenu.js";
+import { aboutMenuProps } from "./../widgets/AboutMenu/AboutMenu.js";
+import { metricsProps } from "./../widgets/Metrics/Metrics.js";
 
 class TopNav extends React.Component {
   constructor(props) {
@@ -36,6 +37,48 @@ class TopNav extends React.Component {
     this.returnBodyProps = this.returnBodyProps.bind(this);
   }
 
+  componentDidMount() {
+    // console.log('topnav mounted')
+    if (this.props.login === 1) {this.props.getSavedDashBoards()};
+  }
+
+  componentDidUpdate(prevProps) {
+    const p = this.props
+    const s = this.state
+    //lift this up to app level?
+    if (p.login === 1 && prevProps.login === 0) {
+      p.getSavedDashBoards()
+    };
+    //lift this up to app level?
+    if (p.refreshStockData === 1) {
+      p.toggleRefreshStockData();
+      for (const stock in p.globalStockList) {
+        GetStockPrice(this, p.globalStockList[stock], p.apiKey, p.throttle)
+      }
+    }
+
+    LoadTickerSocket(this, prevProps, p.globalStockList, s.socket, p.apiKey, UpdateTickerSockets)
+
+    if (s.loadStartingDashBoard === 0 && p.currentDashBoard !== "") {
+      this.setState({ loadStartingDashBoard: 1 });
+      try {
+        let loadWidget = p.dashBoardData[p.currentDashBoard]["widgetlist"];
+        let loadGlobal = p.dashBoardData[p.currentDashBoard]["globalstocklist"];
+        // console.log(loadWidget, loadGlobal)
+        p.loadDashBoard(loadGlobal, loadWidget);
+        this.setState({ DashBoardMenu: 1 });
+      } catch (err) {
+        console.log("failed to load dashboards", err);
+      }
+    }
+    
+    if (p.apiFlag === 1 && p.apiFlag !== prevProps.apiFlag) {
+      // console.log('show welcome menu')
+      this.setState({AboutAPIKeyReminder: 1})
+      this.menuWidgetToggle("AboutMenu", "Welcome to FinnDash")
+    }
+  }
+
   returnBodyProps(that, key, ref = "pass") {
     //text reference should match dropdown link.
     let widgetBodyProps = {
@@ -51,55 +94,6 @@ class TopNav extends React.Component {
     let renderBodyProps = widgetBodyProps[key];
     // console.log(renderBodyProps);
     return renderBodyProps;
-  }
-
-  componentDidMount() {
-    // console.log('topnav mounted')
-    if (this.props.login === 1) {this.props.getSavedDashBoards()};
-  }
-
-  componentDidUpdate(prevProps) {
-    //lift this up to app level?
-    if (this.props.login === 1 && prevProps.login === 0) {this.props.getSavedDashBoards()};
-    //lift this up to app level?
-    if (this.props.refreshStockData === 1) {
-      this.props.toggleRefreshStockData();
-
-      for (const stock in this.props.globalStockList) {
-        GetStockPrice(this, this.props.globalStockList[stock], this.props.apiKey, this.props.throttle)
-      }
-    }
-
-    // if (this.props.globalStockList !== prevProps.globalStockList){
-    //   // console.log("------updating ticker sockets-------------")
-    //   if (this.state.socket !== '') { 
-    //     // console.log("closing old sockets")
-    //     this.state.socket.close()
-    //   }
-    //   let newSocket = new WebSocket("wss://ws.finnhub.io?token=" + this.props.apiKey)
-    //   UpdateTickerSockets(this, newSocket, this.props.apiKey, this.props.globalStockList)
-    // }
-    LoadTickerSocket(this, prevProps, this.props.globalStockList, this.state.socket, this.props.apiKey, UpdateTickerSockets)
-
-
-    if (this.state.loadStartingDashBoard === 0 && this.props.currentDashBoard !== "") {
-      this.setState({ loadStartingDashBoard: 1 });
-      try {
-        let loadWidget = this.props.dashBoardData[this.props.currentDashBoard]["widgetlist"];
-        let loadGlobal = this.props.dashBoardData[this.props.currentDashBoard]["globalstocklist"];
-        // console.log(loadWidget, loadGlobal)
-        this.props.loadDashBoard(loadGlobal, loadWidget);
-        this.setState({ DashBoardMenu: 1 });
-      } catch (err) {
-        console.log("failed to load dashboards", err);
-      }
-    }
-    
-    if (this.props.apiFlag === 1 && this.props.apiFlag !== prevProps.apiFlag) {
-      // console.log('show welcome menu')
-      this.setState({AboutAPIKeyReminder: 1})
-      this.menuWidgetToggle("AboutMenu", "Welcome to FinnDash")
-    }
   }
 
   showPane(stateRef, fixState = 0) {

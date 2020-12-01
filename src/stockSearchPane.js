@@ -1,5 +1,5 @@
 import React from "react";
-import StockDataList from "./stockDataList.js";
+import StockDataList from "./components/stockDataList.js";
 
 //compnoent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
 class StockSearchPane extends React.Component {

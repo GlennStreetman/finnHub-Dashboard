@@ -1,8 +1,8 @@
 import React from "react";
 // import queryString from 'query-string';
 import "./App.css";
-import TopNav from "./topNav.js";
-import  ThrottleQueue  from "./throttleQueue.js";
+import TopNav from "./components/topNav.js";
+import  ThrottleQueue  from "./appFunctions/throttleQueue.js";
 
 // console.log(queryString.parse(window.location.search))
 // console.log(process.env.NODE_ENV)
