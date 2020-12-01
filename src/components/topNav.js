@@ -3,8 +3,6 @@ import queryString from 'query-string';
 
 import WidgetControl from "./../widgets/widgetControl.js";
 import Login from "./login.js";
-import {GetStockPrice, LoadSocketData}  from "./../appFunctions/getStockPrices.js";
-import {UpdateTickerSockets, LoadTickerSocket}  from "./../appFunctions/socketData.js";
 
 //Import props function from each widget/menu here and add to returnBodyProps function below.
 import { dashBoardMenuProps } from "./../widgets/dashBoardMenu/dashBoardMenu.js";
@@ -21,14 +19,13 @@ class TopNav extends React.Component {
     super(props);
 
     this.state = {
-      trackedStockData: {},
+      // trackedStockData: {},
       widgetLockDown: 0, //1: Hide buttons, 0: Show buttons
       DashBoardMenu: 0, //1 = show, 0 = hide
       WatchListMenu: 0, //1 = show, 0 = hide
       AccountMenu: 0, //1 = show, 0 = hide
       loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
       AboutMenu: 0, //1 = show, 0 = hide
-      socket: '',
       AboutAPIKeyReminder: 0
     };
 
@@ -50,14 +47,6 @@ class TopNav extends React.Component {
       p.getSavedDashBoards()
     };
     //lift this up to app level?
-      // if (p.refreshStockData === 1) {
-      //   p.toggleRefreshStockData();
-      //   for (const stock in p.globalStockList) {
-      //     GetStockPrice(this, p.globalStockList[stock], p.apiKey, p.throttle)
-      //   }
-      // }
-    LoadSocketData(this, p, GetStockPrice)
-    LoadTickerSocket(this, prevProps, p.globalStockList, s.socket, p.apiKey, UpdateTickerSockets)
 
     if (s.loadStartingDashBoard === 0 && p.currentDashBoard !== "") {
       this.setState({ loadStartingDashBoard: 1 });

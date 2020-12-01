@@ -1,11 +1,9 @@
 import React from "react";
-// import queryString from 'query-string';
 import "./App.css";
 import TopNav from "./components/topNav.js";
 import  ThrottleQueue  from "./appFunctions/throttleQueue.js";
-
-// console.log(queryString.parse(window.location.search))
-// console.log(process.env.NODE_ENV)
+import {GetStockPrice, LoadStockData}  from "./appFunctions/getStockPrices.js";
+import {UpdateTickerSockets, LoadTickerSocket}  from "./appFunctions/socketData.js";
 
 class App extends React.Component {
   constructor(props) {
@@ -24,6 +22,8 @@ class App extends React.Component {
       throttle: ThrottleQueue(25, 1000, true), //REMEMBER TO WRAP ALL FINNHUB API CALLS IN: throttle(function() {'YOUR API CALL HERE'})
       apiFlag: 0,
       zIndex: [],
+      socket: '',
+      trackedStockData: {},
     };
 
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
@@ -34,7 +34,6 @@ class App extends React.Component {
     this.moveWidget = this.moveWidget.bind(this);
     this.updateWidgetStockList = this.updateWidgetStockList.bind(this);
     this.loadDashBoard = this.loadDashBoard.bind(this);
-    this.toggleRefreshStockData = this.toggleRefreshStockData.bind(this);
     this.saveCurrentDashboard = this.saveCurrentDashboard.bind(this);
     this.getSavedDashBoards = this.getSavedDashBoards.bind(this);
     this.changeWidgetName = this.changeWidgetName.bind(this);
@@ -44,6 +43,14 @@ class App extends React.Component {
     this.updateZIndex = this.updateZIndex.bind(this);
     this.newDashboard = this.newDashboard.bind(this);
     this.logOut = this.logOut.bind(this);
+  }
+ 
+  componentDidUpdate(prevProps, prevState){
+    // const p = this.props
+    const s = this.state
+
+    LoadStockData(this, s, GetStockPrice)
+    LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets, s.throttle)
   }
 
   processLogin(setKey, setLogin) {
@@ -66,7 +73,7 @@ class App extends React.Component {
 
   newWidgetContainer(widgetDescription, widgetHeader, widgetConfig) {
     const widgetName = new Date().getTime();
-    console.log("adding new widget to zIndex") 
+    // console.log("adding new widget to zIndex") 
     this.updateZIndex(widgetName)
     var newWidgetList = Object.assign({}, this.state.widgetList);
     newWidgetList[widgetName] = {
@@ -212,10 +219,6 @@ class App extends React.Component {
     this.setState({ refreshStockData: 1 });
   }
 
-  toggleRefreshStockData() {
-    this.setState({ refreshStockData: 0 });
-  }
-
   saveCurrentDashboard(dashboardName) {
     // console.log("updating dashboard");
     const data = {
@@ -262,7 +265,7 @@ class App extends React.Component {
     this.setState({
       currentDashBoard: "",
       globalStockList: [],
-      globalStockObject: [],
+      // globalStockObject: [],
       widgetList: {},
       zIndex: [],
     })
@@ -286,7 +289,7 @@ class App extends React.Component {
               updateWidgetStockList={this.updateWidgetStockList}
               loadDashBoard={this.loadDashBoard}
               refreshStockData={this.state.refreshStockData}
-              toggleRefreshStockData={this.toggleRefreshStockData}
+              // toggleRefreshStockData={this.toggleRefreshStockData}
               saveCurrentDashboard={this.saveCurrentDashboard}
               getSavedDashBoards={this.getSavedDashBoards}
               dashBoardData={this.state.dashBoardData}
@@ -303,6 +306,7 @@ class App extends React.Component {
               login={this.state.login}
               logOut={this.logOut}
               processLogin={this.processLogin}
+              trackedStockData={this.state.trackedStockData}
             />
           </>
     ) 

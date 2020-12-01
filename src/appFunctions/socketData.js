@@ -1,6 +1,6 @@
-function UpdateTickerSockets(context, socket, apiKey, globalStockList) {
+function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle) {
     
-  console.log('--------------updating ticker sockets-------------')
+  // console.log('--------------updating ticker sockets-------------')
   // console.log(socket)
   let thisSocket = socket
   //opens a series of socket connections to live stream stock prices
@@ -16,7 +16,7 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList) {
       thisSocket.addEventListener("open", function (event) {
         globalStockList.map((el) => {
           let stockSym = el.slice(el.indexOf('-')+1 , el.length)
-            that.props.throttle.enqueue(function() {
+            throttle.enqueue(function() {
               thisSocket.send(JSON.stringify({ type: "subscribe", symbol: stockSym }))
             })
           return true;
@@ -36,7 +36,6 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList) {
             lastUpdate = new Date().getTime();
             let updatedPrice = Object.assign({}, that.state.trackedStockData);
             for (const prop in streamingStockData) {
-              // updatedPrice[prop] = {}
               updatedPrice[prop]["currentPrice"] = streamingStockData[prop][0];
             }
             that.setState({ trackedStockData: updatedPrice });
@@ -50,16 +49,17 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList) {
   that.setState({socket: thisSocket})
 }
 
-function LoadTickerSocket(context, prevProps, globalStockList, socket, apiKey, updateTickerSockets) {
+function LoadTickerSocket(context, prevState, globalStockList, socket, apiKey, updateTickerSockets, throttle) {
   const that = context
-  if (globalStockList !== prevProps.globalStockList){
-    // console.log("------updating ticker sockets-------------")
+  if (globalStockList !== prevState.globalStockList && throttle !== undefined){
+    // console.log("------loading ticker sockets-------------", apiKey)
+    // console.log(throttle)
     if (socket !== '') { 
       // console.log("closing old sockets")
       socket.close()
     }
     let newSocket = new WebSocket("wss://ws.finnhub.io?token=" + apiKey)
-    updateTickerSockets(that, newSocket, apiKey, globalStockList)
+    updateTickerSockets(that, newSocket, apiKey, globalStockList, throttle)
   }
 }
 

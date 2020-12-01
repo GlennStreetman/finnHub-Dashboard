@@ -4,14 +4,7 @@ class AboutMenu extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      loginName: "",
-      email: "",
-      apiKey: "",
-      webHook: "",
-      editToggle: 0,
-      editField: "",
-      inputText: "",
- 
+
     };
   }
 
@@ -44,14 +37,7 @@ class AboutMenu extends React.PureComponent {
 
 export function aboutMenuProps(that, key = "AboutMenu") {
   let propList = {
-    apiKey: that.props.apiKey,
-    globalStockList: that.props.globalStockList,
-    getStockPrice: that.getStockPrice,
-    showPane: that.props.showPane,
-    trackedStockData: that.state.trackedStockData,
-    updateGlobalStockList: that.props.updateGlobalStockList,
-    updateWidgetStockList: that.props.updateWidgetStockList,
-    widgetKey: key,
+
   };
   return propList;
 }

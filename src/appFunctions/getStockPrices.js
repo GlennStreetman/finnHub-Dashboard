@@ -1,12 +1,14 @@
 
 function GetStockPrice(context, stockDescription, apiKey, throttle) {
-    console.log("getting stock prices for: ", stockDescription)
+  if (stockDescription !== undefined) {
+    // console.log("------getStockPrice-------", stockDescription)
+    // console.log("getting stock prices for: ", stockDescription)
     const stockSymbol = stockDescription.indexOf(":") > 0 ? stockDescription.slice(0, stockDescription.indexOf(":")) : stockDescription;
     let stockPriceData = {};
     let that = context
     if (apiKey !== '') {
         throttle.enqueue(function() {
-        fetch("https://finnhub.io/api/v1/quote?symbol=" + stockSymbol.slice(stockSymbol.indexOf('-') + 1, stockSymbol.length) + "&token=" + that.props.apiKey)
+        fetch("https://finnhub.io/api/v1/quote?symbol=" + stockSymbol.slice(stockSymbol.indexOf('-') + 1, stockSymbol.length) + "&token=" + apiKey)
           .then((response) => {
             if (response.status === 429) {
               throttle.setSuspend(4000)
@@ -18,6 +20,7 @@ function GetStockPrice(context, stockDescription, apiKey, throttle) {
             }
           })
           .then((data) => {
+            // console.log(data)
             //destructure data returned from fetch.
             const {
               c: a, //current price
@@ -47,14 +50,19 @@ function GetStockPrice(context, stockDescription, apiKey, throttle) {
       })
     }
   }
+}
 
-function LoadSocketData(context, p, getStockPrice){
-  if (p.refreshStockData === 1) {
-    p.toggleRefreshStockData();
-    for (const stock in p.globalStockList) {
-      getStockPrice(context, p.globalStockList[stock], p.apiKey, p.throttle)
+function LoadStockData(context, s, getStockPrice){
+  // console.log("------loadStockPrice-------")
+  if (s.refreshStockData === 1 && s.globalStockList !== []) {
+    // console.log(s.globalStockList)
+    context.setState({ refreshStockData: 0 })
+    for (const stock in s.globalStockList) {
+      // console.log("stocks")
+      // console.log("-->", stock, s.globalStockList)
+      getStockPrice(context, s.globalStockList[stock], s.apiKey, s.throttle)
     }
   }
 }
 
-export {GetStockPrice, LoadSocketData}
+export {GetStockPrice, LoadStockData}

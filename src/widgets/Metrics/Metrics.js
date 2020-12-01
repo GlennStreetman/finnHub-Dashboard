@@ -39,7 +39,7 @@ class MetricsWidget extends React.Component {
               setup()
               throw new Error('finnhub 429')
             } else {
-            console.log(Date().slice(20,25) + ' setup metrics')
+            // console.log(Date().slice(20,25) + ' setup metrics')
             return response.json()
           }
           })
@@ -74,7 +74,7 @@ class MetricsWidget extends React.Component {
               that.getCompanyMetrics(symbol)
               throw new Error('finnhub 429')
             } else {
-              console.log(Date().slice(20,25) +  ": get company metrics" + symbol)
+              // console.log(Date().slice(20,25) +  ": get company metrics" + symbol)
               return response.json()
             }
           })

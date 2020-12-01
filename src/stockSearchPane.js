@@ -101,7 +101,7 @@ class StockSearchPane extends React.Component {
               let stockKey = this.state.inputText.slice(0, this.state.inputText.indexOf(":") )
               this.props.updateGlobalStockList(e, stockKey ,this.state.filteredStockObjects[stockKey]);
               this.props.showSearchPane();
-              this.props.getStockPrice(this.state.inputText);
+              // this.props.getStockPrice(this.state.inputText);
               if (widgetKey / 1 !== undefined) {
                 this.props.updateWidgetStockList(widgetKey, stockSymbol);
               }

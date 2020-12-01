@@ -1,18 +1,43 @@
 import React from "react";
 import StockSearchPane from "../../stockSearchPane.js";
-
+import {GetStockPrice}  from "../../appFunctions/getStockPrices.js";
 //Widget body component. Shows stock detail info and recent news. Maybe a graph?
 class StockDetailWidget extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {};
+    this.state = {
+      trackedStockData: []
+    };
 
     this.updateWidgetList = this.updateWidgetList.bind(this);
     this.renderStockData = this.renderStockData.bind(this);
   }
 
+  // componentDidMount(){
+  //   const p = this.props
+  //   for (const stock in p.trackedStocks) {
+  //     let stockID = p.trackedStocks[stock]
+  //     let stockSymbol = stockID.slice(stockID.slice(stockID.indexOf("-")+1, stockID.length))
+  //     GetStockPrice(this, stockSymbol, p.apiKey, p.throttle)
+  //   }
+  // }
+
+  // componentDidUpdate(prevProps){
+  //   const p = this.props
+
+  //   if (this.props.trackedStocks !== prevProps.trackedStocks) {
+  //     for (const stock in p.trackedStocks) {
+  //       if (prevProps.trackedStocks[stock] === undefined){
+  //         let stockID = p.trackedStocks[stock]
+  //         let stockSymbol = stockID.slice(stockID.slice(stockID.indexOf("-")+1, stockID.length))
+  //         GetStockPrice(this, stockSymbol, p.apiKey, p.throttle)
+  //       }
+  //     }
+  //   }
+  // }
+
   updateWidgetList(stock) {
-    console.log("updating");
+    // console.log("updating");
     if (stock.indexOf(":") > 0) {
       const stockSymbole = stock.slice(0, stock.indexOf(":"));
       this.props.updateWidgetStockList(this.props.widgetKey, stockSymbole);
@@ -123,7 +148,7 @@ class StockDetailWidget extends React.Component {
           <StockSearchPane
             updateGlobalStockList={this.props.updateGlobalStockList}
             showSearchPane={() => this.props.showPane("showEditPane", 1)}
-            getStockPrice={this.props.getStockPrice}
+            // getStockPrice={this.props.getStockPrice}
             apiKey={this.props.apiKey}
             updateWidgetStockList={this.props.updateWidgetStockList}
             widgetKey={this.props.widgetKey}
@@ -139,10 +164,10 @@ class StockDetailWidget extends React.Component {
 export function stockDetailWidgetProps(that, key = "StockDetailWidget") {
   let propList = {
     apiKey: that.props.apiKey,
-    getStockPrice: that.getStockPrice,
+    // getStockPrice: that.props.getStockPrice,
     showPane: that.showPane,
     trackedStocks: that.props.widgetList[key]["trackedStocks"],
-    trackedStockData: that.state.trackedStockData,
+    trackedStockData: that.props.trackedStockData,
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,

@@ -76,7 +76,7 @@ class NewsWidget extends React.Component {
             that.getCompanyNews(symbol, fromDate, toDate)
             throw new Error('finnhub 429')
           } else {
-            console.log(Date().slice(20,25) +  ':get company news' + symbol)
+            // console.log(Date().slice(20,25) +  ':get company news' + symbol)
             return response.json()
           }
         })

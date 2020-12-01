@@ -89,7 +89,7 @@ class WatchListMenu extends React.PureComponent {
 
     return <>{stockListKey}</>;
   }
-
+ 
   render() {
     return (
       <>
@@ -99,7 +99,7 @@ class WatchListMenu extends React.PureComponent {
             widgetKey={this.props.widgetKey}
             updateGlobalStockList={this.props.updateGlobalStockList}
             showSearchPane={() => this.props.showPane("showEditPane", 1)}
-            getStockPrice={this.props.getStockPrice}
+            // getStockPrice={this.props.getStockPrice}
             apiKey={this.props.apiKey}
             throttle={this.props.throttle}
           />
@@ -124,9 +124,9 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
   let propList = {
     apiKey: that.props.apiKey,
     globalStockList: that.props.globalStockList,
-    getStockPrice: that.getStockPrice,
+    // getStockPrice: that.props.getStockPrice,
     showPane: that.props.showPane,
-    trackedStockData: that.state.trackedStockData,
+    trackedStockData: that.props.trackedStockData,
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,

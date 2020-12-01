@@ -31,7 +31,7 @@ class AccountMenu extends React.PureComponent {
     fetch(`/accountData`)
       .then((response) => response.json())
       .then((data) => {
-        console.log(data)
+        // console.log(data)
         let dataSet = data["userData"];
         this.setState({ loginName: dataSet["loginname"] });
         this.setState({ email: dataSet["email"] });
@@ -149,12 +149,12 @@ class AccountMenu extends React.PureComponent {
 export function accountMenuProps(that, key = "AccountMenu") {
   let propList = {
     apiKey: that.props.apiKey,
-    globalStockList: that.props.globalStockList,
-    getStockPrice: that.getStockPrice,
-    showPane: that.props.showPane,
-    trackedStockData: that.state.trackedStockData,
-    updateGlobalStockList: that.props.updateGlobalStockList,
-    updateWidgetStockList: that.props.updateWidgetStockList,
+    // globalStockList: that.props.globalStockList,
+    // getStockPrice: that.getStockPrice,
+    // showPane: that.props.showPane,
+    // trackedStockData: that.state.trackedStockData,
+    // updateGlobalStockList: that.props.updateGlobalStockList,
+    // updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
     updateAPIKey: that.props.updateAPIKey
   };

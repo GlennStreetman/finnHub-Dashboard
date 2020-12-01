@@ -92,7 +92,7 @@ class CandleWidget extends React.Component {
             that.getCandleData()
             throw new Error('finnhub 429')
           } else {
-            console.log(Date().slice(20,25) +  ': getCandleData ' + candleSymbol)
+            // console.log(Date().slice(20,25) +  ': getCandleData ' + candleSymbol)
             return response.json()
           }
         })
