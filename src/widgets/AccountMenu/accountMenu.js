@@ -44,6 +44,8 @@ class AccountMenu extends React.PureComponent {
   }
 
   changeAccountData(changeField, newValue) {
+    
+    console.log(changeField, newValue)
     const data = {
       field: changeField,
       newValue: newValue,
@@ -55,9 +57,10 @@ class AccountMenu extends React.PureComponent {
       body: JSON.stringify(data),
     };
 
-    if (changeField === 'apiKey') {
+    if (changeField === "apikey") {
+      console.log('updating apikey')
       this.props.updateAPIKey(newValue)
-    }
+    } else {console.log('not updating apikey', changeField)}
  
     fetch("/accountData", options)
       .then((data) => console.log(data))
