@@ -1,7 +1,7 @@
 import React from "react";
 import queryString from 'query-string';
 
-import WidgetControl from "./../widgets/widgetControl.js";
+import WidgetControl from "./widgetControl.js";
 import Login from "./login.js";
 
 //Import props function from each widget/menu here and add to returnBodyProps function below.

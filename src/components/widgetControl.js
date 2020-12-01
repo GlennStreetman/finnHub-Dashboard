@@ -1,14 +1,14 @@
 import React from "react";
 
 //import widget and menu objects here. Also add to widgetList object in render method below.
-import StockDetailWidget from "./stockDetails/stockDetailWidget.js";
-import NewsWidget from "./News/newsWidget.js";
-import CandleWidget from "./candle/candleWidget.js";
-import DashBoardMenu from "./dashBoardMenu/dashBoardMenu.js";
-import WatchListMenu from "./watchListMenu/watchListMenu.js";
-import AccountMenu from "./AccountMenu/accountMenu.js";
-import AboutMenu from "./AboutMenu/AboutMenu.js";
-import MetricsWidget from "./Metrics/Metrics.js";
+import StockDetailWidget from "../widgets/stockDetails/stockDetailWidget.js";
+import NewsWidget from "../widgets/News/newsWidget.js";
+import CandleWidget from "../widgets/candle/candleWidget.js";
+import DashBoardMenu from "../widgets/dashBoardMenu/dashBoardMenu.js";
+import WatchListMenu from "../widgets/watchListMenu/watchListMenu.js";
+import AccountMenu from "../widgets/AccountMenu/accountMenu.js";
+import AboutMenu from "../widgets/AboutMenu/AboutMenu.js";
+import MetricsWidget from "../widgets/Metrics/Metrics.js";
 
 //creates widget container. Used by all widgets.
 class WidgetControl extends React.Component {
