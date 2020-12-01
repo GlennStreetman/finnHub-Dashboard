@@ -2,6 +2,7 @@ import React from "react";
 import WidgetControl from "./widgets/widgetControl.js";
 import Login from "./login.js";
 import queryString from 'query-string';
+import GetStockPrice  from "./getStockPrices.js";
 // import throttledQueue from "throttled-queue"; //Finnhub API calls limited to 30 per second.
 
 //Import props function from each widget/menu here and add to returnBodyProps function below.
@@ -26,13 +27,12 @@ class TopNav extends React.Component {
       AccountMenu: 0, //1 = show, 0 = hide
       loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
       AboutMenu: 0, //1 = show, 0 = hide
-      // throttle: myThrottleQue(25, 1000, true), //REMEMBER TO WRAP ALL FINNHUB API CALLS IN: throttle(function() {'YOUR API CALL HERE'})
       socket: '',
       AboutAPIKeyReminder: 0
     };
 
     this.showPane = this.showPane.bind(this);
-    this.getStockPrice = this.getStockPrice.bind(this);
+    // this.getStockPrice = this.getStockPrice.bind(this);
     this.updateTickerSockets = this.updateTickerSockets.bind(this);
     this.menuWidgetToggle = this.menuWidgetToggle.bind(this);
     this.returnBodyProps = this.returnBodyProps.bind(this);
@@ -61,14 +61,15 @@ class TopNav extends React.Component {
   }
 
   componentDidUpdate(prevProps) {
-
+    //lift this up to app level?
     if (this.props.login === 1 && prevProps.login === 0) {this.props.getSavedDashBoards()};
-
+    //lift this up to app level?
     if (this.props.refreshStockData === 1) {
       this.props.toggleRefreshStockData();
 
       for (const stock in this.props.globalStockList) {
-        this.getStockPrice(this.props.globalStockList[stock]);
+        // this.getStockPrice(this.props.globalStockList[stock]);
+        GetStockPrice(this, this.props.globalStockList[stock], this.props.apiKey, this.props.throttle)
       }
     }
 
@@ -161,53 +162,53 @@ class TopNav extends React.Component {
     this.setState({ [stateRef]: showMenu });
   }
 
-  getStockPrice(stockDescription) {
-    const stockSymbol = stockDescription.indexOf(":") > 0 ? stockDescription.slice(0, stockDescription.indexOf(":")) : stockDescription;
-    let stockPriceData = {};
-    let that = this
-    if (this.props.apiKey !== '') {
-      this.props.throttle.enqueue(function() {
-        fetch("https://finnhub.io/api/v1/quote?symbol=" + stockSymbol.slice(stockSymbol.indexOf('-') + 1, stockSymbol.length) + "&token=" + that.props.apiKey)
-          .then((response) => {
-            if (response.status === 429) {
-              that.props.throttle.setSuspend(4000)
-              that.getStockPrice(stockDescription)
-              throw new Error('finnhub 429')
-            } else {
-              // console.log(Date().slice(20,25) + 'getStockPrice ' + stockDescription)
-              return response.json()
-            }
-          })
-          .then((data) => {
-            //destructure data returned from fetch.
-            const {
-              c: a, //current price
-              h: b, //current days high price
-              l: c, //current days low price
-              o: d, //current days open price
-              pc: e, //previous days close price
-            } = data;
-            //create object from destructured data above.
-            stockPriceData = {
-              currentPrice: a,
-              dayHighPrice: b,
-              dayLowPrice: c,
-              dayOpenPrice: d,
-              prevClosePrice: e,
-            };
+  // getStockPrice(stockDescription) {
+  //   const stockSymbol = stockDescription.indexOf(":") > 0 ? stockDescription.slice(0, stockDescription.indexOf(":")) : stockDescription;
+  //   let stockPriceData = {};
+  //   let that = this
+  //   if (this.props.apiKey !== '') {
+  //     this.props.throttle.enqueue(function() {
+  //       fetch("https://finnhub.io/api/v1/quote?symbol=" + stockSymbol.slice(stockSymbol.indexOf('-') + 1, stockSymbol.length) + "&token=" + that.props.apiKey)
+  //         .then((response) => {
+  //           if (response.status === 429) {
+  //             that.props.throttle.setSuspend(4000)
+  //             that.getStockPrice(stockDescription)
+  //             throw new Error('finnhub 429')
+  //           } else {
+  //             // console.log(Date().slice(20,25) + 'getStockPrice ' + stockDescription)
+  //             return response.json()
+  //           }
+  //         })
+  //         .then((data) => {
+  //           //destructure data returned from fetch.
+  //           const {
+  //             c: a, //current price
+  //             h: b, //current days high price
+  //             l: c, //current days low price
+  //             o: d, //current days open price
+  //             pc: e, //previous days close price
+  //           } = data;
+  //           //create object from destructured data above.
+  //           stockPriceData = {
+  //             currentPrice: a,
+  //             dayHighPrice: b,
+  //             dayLowPrice: c,
+  //             dayOpenPrice: d,
+  //             prevClosePrice: e,
+  //           };
 
-            that.setState((prevState) => {
-              let newTrackedStockData = Object.assign({}, prevState.trackedStockData);
-              newTrackedStockData[stockSymbol] = stockPriceData;
-              return { trackedStockData: newTrackedStockData };
-            });
-          })
-          .catch(error => {
-            console.log(error.message)
-          });
-      })
-    }
-  }
+  //           that.setState((prevState) => {
+  //             let newTrackedStockData = Object.assign({}, prevState.trackedStockData);
+  //             newTrackedStockData[stockSymbol] = stockPriceData;
+  //             return { trackedStockData: newTrackedStockData };
+  //           });
+  //         })
+  //         .catch(error => {
+  //           console.log(error.message)
+  //         });
+  //     })
+  //   }
+  // }
 
   menuWidgetToggle(menuName, dashName = "pass") {
     //Create dashboard menu if first time looking at, else toggle visability
