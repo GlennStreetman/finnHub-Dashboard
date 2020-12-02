@@ -34,5 +34,15 @@ CREATE TABLE public.users
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT users_email_key UNIQUE (email),
     CONSTRAINT users_loginname_key UNIQUE (loginname)
+),
+
+CREATE TABLE public.newEmail
+(
+    userID integer NOT NULL,
+    newEmail text,
+    queryString text,
+    CONSTRAINT fk_users FOREIGN KEY(userID) REFERENCES users(id)
 )
+
+
 

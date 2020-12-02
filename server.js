@@ -12,7 +12,7 @@ let fileStoreOptions = {};
 if (process.env.live) {
   console.log("loading live server config")
   //enable below to run HTTP server. Used with Heroku
-  path = require("path");
+  const path = require("path");
   app.listen(process.env.PORT || port, function () {
     console.log("Listening to http://localhost:" + port);
   })
@@ -54,7 +54,7 @@ if (process.env.live) {
   // })
 
   //enable below to run HTTP server.
-  path = require("path");
+  const path = require("path");
   app.listen(port, function () {console.log(`serving the direcotry @ http`)})
 
 
