@@ -28,6 +28,9 @@ class App extends React.Component {
       zIndex: [],
       socket: '',
       trackedStockData: {},
+      loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
+      DashBoardMenu: 0, //1 = show, 0 = hide
+
     };
 
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
@@ -48,13 +51,27 @@ class App extends React.Component {
     this.newDashboard = this.newDashboard.bind(this);
     this.logOut = this.logOut.bind(this);
   }
- 
+
   componentDidUpdate(prevProps, prevState){
-    // const p = this.props
     const s = this.state
 
+    if (s.login === 1 && prevState.login === 0) {this.getSavedDashBoards()};
     LoadStockData(this, s, GetStockPrice)
     LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets, s.throttle)
+
+    if (s.loadStartingDashBoard === 0 && s.currentDashBoard !== "") {
+      console.log("loading dashboard")
+      this.setState({ loadStartingDashBoard: 1 });
+      try {
+        let loadWidget = s.dashBoardData[s.currentDashBoard]["widgetlist"];
+        let loadGlobal = s.dashBoardData[s.currentDashBoard]["globalstocklist"];
+        // console.log(loadWidget, loadGlobal)
+        this.loadDashBoard(loadGlobal, loadWidget);
+        this.setState({ DashBoardMenu: 1 });
+      } catch (err) {
+        console.log("failed to load dashboards", err);
+      }
+    }
   }
 
   processLogin(setKey, setLogin) {
@@ -259,8 +276,8 @@ class App extends React.Component {
     fetch("/logOut")
     .then((data) => console.log('logging out'))
     .then(() => {
-      this.setState({login: 0})
       this.setState({menuList: {}})
+      this.setState({login: 0})
     });
   }
 
@@ -276,13 +293,14 @@ class App extends React.Component {
   }
 
   render() {
+    
     const quaryData = queryString.parse(window.location.search)
     const loginScreen = this.state.login === 0 ? 
       <Login 
       updateLogin={this.processLogin}
       queryData = {quaryData}
       /> : <></>
-    // const quaryData = queryString.parse(window.location.search)
+
     return (
         <>
             <TopNav

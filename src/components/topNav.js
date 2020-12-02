@@ -1,8 +1,6 @@
 import React from "react";
-// import queryString from 'query-string';
 
 import WidgetControl from "./widgetControl.js";
-// import Login from "./login.js";
 
 //Import props function from each widget/menu here and add to returnBodyProps function below.
 import { dashBoardMenuProps } from "./../widgets/dashBoardMenu/dashBoardMenu.js";
@@ -19,12 +17,9 @@ class TopNav extends React.Component {
     super(props);
 
     this.state = {
-      // trackedStockData: {},
       widgetLockDown: 0, //1: Hide buttons, 0: Show buttons
-      DashBoardMenu: 0, //1 = show, 0 = hide
       WatchListMenu: 0, //1 = show, 0 = hide
       AccountMenu: 0, //1 = show, 0 = hide
-      loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
       AboutMenu: 0, //1 = show, 0 = hide
       AboutAPIKeyReminder: 0
     };
@@ -34,35 +29,11 @@ class TopNav extends React.Component {
     this.returnBodyProps = this.returnBodyProps.bind(this);
   }
 
-  componentDidMount() {
-    // console.log('topnav mounted')
-    if (this.props.login === 1) {this.props.getSavedDashBoards()};
-  }
-
   componentDidUpdate(prevProps) {
     const p = this.props
-    const s = this.state
-    //lift this up to app level?
-    if (p.login === 1 && prevProps.login === 0) {
-      p.getSavedDashBoards()
-    };
-    //lift this up to app level?
-
-    if (s.loadStartingDashBoard === 0 && p.currentDashBoard !== "") {
-      this.setState({ loadStartingDashBoard: 1 });
-      try {
-        let loadWidget = p.dashBoardData[p.currentDashBoard]["widgetlist"];
-        let loadGlobal = p.dashBoardData[p.currentDashBoard]["globalstocklist"];
-        // console.log(loadWidget, loadGlobal)
-        p.loadDashBoard(loadGlobal, loadWidget);
-        this.setState({ DashBoardMenu: 1 });
-      } catch (err) {
-        console.log("failed to load dashboards", err);
-      }
-    }
     
     if (p.apiFlag === 1 && p.apiFlag !== prevProps.apiFlag) {
-      // console.log('show welcome menu')
+      // show welcome menu if finnhub apiKey not setup.
       this.setState({AboutAPIKeyReminder: 1})
       this.menuWidgetToggle("AboutMenu", "Welcome to FinnDash")
     }
@@ -107,7 +78,6 @@ class TopNav extends React.Component {
     let widgetState = this.props.widgetList;
     let menuState = this.props.menuList;
     let that = this;
-    // const quaryData = queryString.parse(window.location.search)
 
     let widgetRender = Object.keys(widgetState).map((el) => (
       <WidgetControl
@@ -144,7 +114,6 @@ class TopNav extends React.Component {
       />
     ));
 
-    // console.log(this.props.login)
     return this.props.login === 1 ? (
       <>
         <div className="topnav">
