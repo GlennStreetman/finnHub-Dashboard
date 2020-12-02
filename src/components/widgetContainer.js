@@ -11,7 +11,7 @@ import AboutMenu from "../widgets/AboutMenu/AboutMenu.js";
 import MetricsWidget from "../widgets/Metrics/Metrics.js";
 
 //creates widget container. Used by all widgets.
-class WidgetControl extends React.Component {
+class WidgetContainer extends React.Component {
   constructor(props) {
     super(props);
     // let showEditPaneOnRender = this.props.widgetLockDown === 0 ? 0 : 1;
@@ -183,4 +183,4 @@ class WidgetControl extends React.Component {
   }
 }
 
-export default WidgetControl;
+export default WidgetContainer;

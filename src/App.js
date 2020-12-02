@@ -4,8 +4,9 @@ import queryString from 'query-string';
 
 import TopNav from "./components/topNav.js";
 import Login from "./components/login.js";
-
 import  ThrottleQueue  from "./appFunctions/throttleQueue.js";
+
+import {WidgetController, MenuWidgetToggle} from "./components/widgetController"
 import {GetStockPrice, LoadStockData}  from "./appFunctions/getStockPrices.js";
 import {UpdateTickerSockets, LoadTickerSocket}  from "./appFunctions/socketData.js";
 
@@ -30,11 +31,16 @@ class App extends React.Component {
       trackedStockData: {},
       loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
       DashBoardMenu: 0, //1 = show, 0 = hide
+      WatchListMenu: 0, //1 = show, 0 = hide
+      AccountMenu: 0, //1 = show, 0 = hide
+      AboutMenu: 0, //1 = show, 0 = hide
+      widgetLockDown: 0,
 
     };
 
+    this.baseState = this.state 
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
-    this.newWidgetContainer = this.newWidgetContainer.bind(this);
+    this.newWidgetContainer = this.newWidgetContainer.bind(this); //move to
     this.newMenuContainer = this.newMenuContainer.bind(this);
     this.removeWidget = this.removeWidget.bind(this);
     this.processLogin = this.processLogin.bind(this);
@@ -50,6 +56,7 @@ class App extends React.Component {
     this.updateZIndex = this.updateZIndex.bind(this);
     this.newDashboard = this.newDashboard.bind(this);
     this.logOut = this.logOut.bind(this);
+    this.lockWidgets = this.lockWidgets.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState){
@@ -59,7 +66,7 @@ class App extends React.Component {
     LoadStockData(this, s, GetStockPrice)
     LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets, s.throttle)
 
-    if (s.loadStartingDashBoard === 0 && s.currentDashBoard !== "") {
+    if (s.login === 1 && s.loadStartingDashBoard === 0 && s.currentDashBoard !== "") {
       console.log("loading dashboard")
       this.setState({ loadStartingDashBoard: 1 });
       try {
@@ -96,7 +103,7 @@ class App extends React.Component {
     const widgetName = new Date().getTime();
     // console.log("adding new widget to zIndex") 
     this.updateZIndex(widgetName)
-    var newWidgetList = Object.assign({}, this.state.widgetList);
+    let newWidgetList = Object.assign({}, this.state.widgetList);
     newWidgetList[widgetName] = {
       widgetID: widgetName,
       widgetType: widgetDescription,
@@ -215,7 +222,7 @@ class App extends React.Component {
           let newData = dashboards[oldKey];
           newList[newKey] = newData;
         }
-        // console.log(newList)
+        console.log("new Dash Data ", newList)
         this.setState({ dashBoardData: newList });
         if( data.menuSetup[0] !== undefined) {
           this.setState({ menuList: JSON.parse(data["menuSetup"][0]["menulist"]) });
@@ -268,6 +275,11 @@ class App extends React.Component {
     this.setState({apiKey: newKey})
   }
 
+  lockWidgets(toggle){
+    console.log("toggle widget lock")
+    this.setState({widgetLockDown: toggle})
+  }
+
   updateAPIFlag(val){
     this.setState({apiFlag: val})
   }
@@ -276,8 +288,8 @@ class App extends React.Component {
     fetch("/logOut")
     .then((data) => console.log('logging out'))
     .then(() => {
-      this.setState({menuList: {}})
-      this.setState({login: 0})
+      console.log("reseting state")
+      this.setState(this.baseState)
     });
   }
 
@@ -294,6 +306,7 @@ class App extends React.Component {
 
   render() {
     
+    const menuWidgetToggle = MenuWidgetToggle(this)
     const quaryData = queryString.parse(window.location.search)
     const loginScreen = this.state.login === 0 ? 
       <Login 
@@ -302,42 +315,60 @@ class App extends React.Component {
       /> : <></>
 
     return (
-        <>
-            <TopNav
-              availableStocks={this.state.availableStocks}
-              globalStockList={this.state.globalStockList}
-              widgetList={this.state.widgetList}
-              menuList={this.state.menuList}
-              updateGlobalStockList={this.updateGlobalStockList}
-              newWidgetContainer={this.newWidgetContainer}
-              newMenuContainer={this.newMenuContainer}
-              moveWidget={this.moveWidget}
-              removeWidget={this.removeWidget}
-              apiKey={this.state.apiKey}
-              updateWidgetStockList={this.updateWidgetStockList}
-              loadDashBoard={this.loadDashBoard}
-              refreshStockData={this.state.refreshStockData}
-              // toggleRefreshStockData={this.toggleRefreshStockData}
-              saveCurrentDashboard={this.saveCurrentDashboard}
-              getSavedDashBoards={this.getSavedDashBoards}
-              dashBoardData={this.state.dashBoardData}
-              currentDashBoard={this.state.currentDashBoard}
-              changeWidgetName={this.changeWidgetName}
-              updateWidgetData={this.updateWidgetData}
-              throttle={this.state.throttle}
-              updateAPIKey={this.updateAPIKey}
-              apiFlag={this.state.apiFlag}
-              updateAPIFlag={this.updateAPIFlag}
-              zIndex={this.state.zIndex}
-              updateZIndex={this.updateZIndex}
-              newDashboard={this.newDashboard}
-              login={this.state.login}
-              logOut={this.logOut}
-              processLogin={this.processLogin}
-              trackedStockData={this.state.trackedStockData}
-            />
-            {loginScreen}
-          </>
+      <>
+        <TopNav
+          apiFlag={this.state.apiFlag}
+          login={this.state.login}
+          logOut={this.logOut}            
+          newWidgetContainer={this.newWidgetContainer}
+          newMenuContainer={this.newMenuContainer}            
+          menuList={this.state.menuList}
+          updateAPIFlag={this.updateAPIFlag}
+          menuWidgetToggle={menuWidgetToggle}
+          WatchListMenu={this.state.WatchListMenu}
+          AccountMenu={this.state.AccountMenu}
+          AboutMenu={this.state.AboutMenu}
+          DashBoardMenu={this.state.DashBoardMenu}
+          lockWidgets={this.lockWidgets}
+          widgetLockDown={this.state.widgetLockDown}
+        />
+        <WidgetController
+          login={this.state.login}
+          menuList={this.state.menuList}
+          availableStocks={this.state.availableStocks}
+          globalStockList={this.state.globalStockList}
+          widgetList={this.state.widgetList}
+          updateGlobalStockList={this.updateGlobalStockList}
+          moveWidget={this.moveWidget}
+          removeWidget={this.removeWidget}
+          apiKey={this.state.apiKey}
+          updateWidgetStockList={this.updateWidgetStockList}
+          loadDashBoard={this.loadDashBoard}
+          refreshStockData={this.state.refreshStockData}
+          toggleRefreshStockData={this.toggleRefreshStockData}
+          saveCurrentDashboard={this.saveCurrentDashboard}
+          getSavedDashBoards={this.getSavedDashBoards}
+          dashBoardData={this.state.dashBoardData}
+          currentDashBoard={this.state.currentDashBoard}
+          changeWidgetName={this.changeWidgetName}
+          updateWidgetData={this.updateWidgetData}
+          throttle={this.state.throttle}
+          updateAPIKey={this.updateAPIKey}
+          zIndex={this.state.zIndex}
+          updateZIndex={this.updateZIndex}
+          newDashboard={this.newDashboard}
+          processLogin={this.processLogin}
+          trackedStockData={this.state.trackedStockData}
+          menuWidgetToggle={menuWidgetToggle}
+          WatchListMenu={this.state.WatchListMenu}
+          AccountMenu={this.state.AccountMenu}
+          AboutMenu={this.state.AboutMenu}
+          DashBoardMenu={this.state.DashBoardMenu}
+          widgetLockDown={this.state.widgetLockDown}
+        />
+        {loginScreen}
+
+      </>
     ) 
   }
 }
