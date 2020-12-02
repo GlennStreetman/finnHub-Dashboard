@@ -1,17 +1,5 @@
 import React from "react";
 
-// import WidgetControl from "./widgetContainer.js";
-
-// //Import props function from each widget/menu here and add to returnBodyProps function below.
-// import { dashBoardMenuProps } from "./../widgets/dashBoardMenu/dashBoardMenu.js";
-// import { watchListMenuProps } from "./../widgets/watchListMenu/watchListMenu.js";
-// import { candleWidgetProps } from "./../widgets/candle/candleWidget.js";
-// import { newsWidgetProps } from "./../widgets/News/newsWidget.js";
-// import { stockDetailWidgetProps } from "./../widgets/stockDetails/stockDetailWidget.js";
-// import { accountMenuProps } from "./../widgets/AccountMenu/accountMenu.js";
-// import { aboutMenuProps } from "./../widgets/AboutMenu/AboutMenu.js";
-// import { metricsProps } from "./../widgets/Metrics/Metrics.js";
-
 class TopNav extends React.Component {
   constructor(props) {
     super(props);
@@ -22,8 +10,6 @@ class TopNav extends React.Component {
     };
 
     this.showPane = this.showPane.bind(this);
-    // this.menuWidgetToggle = this.menuWidgetToggle.bind(this);
-    // this.returnBodyProps = this.returnBodyProps.bind(this);
   }
 
   componentDidUpdate(prevProps) {
@@ -36,23 +22,6 @@ class TopNav extends React.Component {
     }
   }
 
-  // returnBodyProps(that, key, ref = "pass") {
-  //   //text reference should match dropdown link.
-  //   let widgetBodyProps = {
-  //     WatchListMenu: () => watchListMenuProps(that, key),
-  //     DashBoardMenu: () => dashBoardMenuProps(that, key),
-  //     CandleWidget: () => candleWidgetProps(that, ref),
-  //     NewsWidget: () => newsWidgetProps(that, ref),
-  //     StockDetailWidget: () => stockDetailWidgetProps(that, ref),
-  //     AccountMenu: () => accountMenuProps(that, ref),
-  //     AboutMenu: () => aboutMenuProps(that, ref),
-  //     MetricsWidget: () => metricsProps(that, ref),
-  //   };
-  //   let renderBodyProps = widgetBodyProps[key];
-  //   // console.log(renderBodyProps);
-  //   return renderBodyProps;
-  // }
-
   showPane(stateRef, fixState = 0) {
     //toggles view of specified menu. 1 = open 0 = closed
     let showMenu = this.state[stateRef] === 0 ? 1 : 0;
@@ -60,56 +29,7 @@ class TopNav extends React.Component {
     this.setState({ [stateRef]: showMenu });
   }
 
-  // menuWidgetToggle(menuName, dashName = "pass") {
-  //   //Create dashboard menu if first time looking at, else toggle visability
-
-  //   if (this.props.menuList[menuName] === undefined) {
-  //     this.props.newMenuContainer(menuName, dashName, "menuWidget");
-  //     this.setState({ [menuName]: 1 });
-  //   } else {
-  //     this.state[menuName] === 1 ? this.setState({ [menuName]: 0 }) : this.setState({ [menuName]: 1 });
-  //   }
-  // }
-
   render() {
-    // let widgetState = this.props.widgetList;
-    // let menuState = this.props.menuList;
-    // let that = this;
-
-    // let widgetRender = Object.keys(widgetState).map((el) => (
-    //   <widgetContainer
-    //     //Required for widget Control.
-    //     key={el}
-    //     moveWidget={this.props.moveWidget}
-    //     removeWidget={this.props.removeWidget}
-    //     stateRef="widgetList" //used by app.js to move and remove widgets.
-    //     widgetBodyProps={this.returnBodyProps(that, widgetState[el]["widgetType"], el)}
-    //     widgetKey={el}
-    //     widgetList={widgetState[el]}
-    //     widgetLockDown={this.state.widgetLockDown}
-    //     changeWidgetName={this.props.changeWidgetName}
-    //     zIndex={this.props.zIndex}
-    //     updateZIndex={this.props.updateZIndex}
-    //   />
-    // ));
-
-    // let menuRender = Object.keys(menuState).map((el) => (
-    //   <widgetContainer
-    //     key={el}
-    //     menuWidgetToggle={this.menuWidgetToggle}
-    //     moveWidget={this.props.moveWidget}
-    //     removeWidget={this.props.removeWidget}
-    //     stateRef="menuList" //used by app.js to move and remove widgets.
-    //     showMenu={this.state[el]}
-    //     widgetBodyProps={this.returnBodyProps(that, el)}
-    //     widgetKey={el}
-    //     widgetList={menuState[el]}
-    //     widgetLockDown={this.state.widgetLockDown}
-    //     changeWidgetName={this.props.changeWidgetName}
-    //     zIndex={this.props.zIndex}
-    //     updateZIndex={this.props.updateZIndex}
-    //   />
-    // ));
 
     return this.props.login === 1 ? (
       <>
@@ -194,8 +114,6 @@ class TopNav extends React.Component {
 
         </div>
 
-        {/* {widgetRender} */}
-        {/* {menuRender} */}
       </>
     ) : (
       <>
@@ -206,7 +124,6 @@ class TopNav extends React.Component {
           </a>
         </div>
       </div>
-      {/* {menuRender} */}
       </>
     ); 
   }
