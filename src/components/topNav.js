@@ -1,8 +1,8 @@
 import React from "react";
-import queryString from 'query-string';
+// import queryString from 'query-string';
 
 import WidgetControl from "./widgetControl.js";
-import Login from "./login.js";
+// import Login from "./login.js";
 
 //Import props function from each widget/menu here and add to returnBodyProps function below.
 import { dashBoardMenuProps } from "./../widgets/dashBoardMenu/dashBoardMenu.js";
@@ -107,7 +107,7 @@ class TopNav extends React.Component {
     let widgetState = this.props.widgetList;
     let menuState = this.props.menuList;
     let that = this;
-    const quaryData = queryString.parse(window.location.search)
+    // const quaryData = queryString.parse(window.location.search)
 
     let widgetRender = Object.keys(widgetState).map((el) => (
       <WidgetControl
@@ -234,21 +234,12 @@ class TopNav extends React.Component {
     ) : (
       <>
       <div className="topnav">
-      <div className='navItemEnd'>
-            <a href="#home" onClick={() => this.menuWidgetToggle("AboutMenu", "About FinnDash")}>
-            {this.state.AboutMenu === 0 ? "About" : "Hide About"}
-            </a>
-          </div>
-          <div className='navItem'>
-            <a href="#home" onClick={() => this.props.logOut()}>
-            {this.props.login === 0 ? "Login" : "Logout"}
-            </a>
-          </div>
+        <div className='navItemEnd'>
+          <a href="#home" onClick={() => this.menuWidgetToggle("AboutMenu", "About FinnDash")}>
+          {this.state.AboutMenu === 0 ? "About" : "Hide About"}
+          </a>
+        </div>
       </div>
-      <Login 
-        updateLogin={this.props.processLogin}
-        queryData = {quaryData}
-      />
       {menuRender}
       </>
     ); 

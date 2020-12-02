@@ -1,6 +1,10 @@
 import React from "react";
 import "./App.css";
+import queryString from 'query-string';
+
 import TopNav from "./components/topNav.js";
+import Login from "./components/login.js";
+
 import  ThrottleQueue  from "./appFunctions/throttleQueue.js";
 import {GetStockPrice, LoadStockData}  from "./appFunctions/getStockPrices.js";
 import {UpdateTickerSockets, LoadTickerSocket}  from "./appFunctions/socketData.js";
@@ -272,6 +276,12 @@ class App extends React.Component {
   }
 
   render() {
+    const quaryData = queryString.parse(window.location.search)
+    const loginScreen = this.state.login === 0 ? 
+      <Login 
+      updateLogin={this.processLogin}
+      queryData = {quaryData}
+      /> : <></>
     // const quaryData = queryString.parse(window.location.search)
     return (
         <>
@@ -308,6 +318,7 @@ class App extends React.Component {
               processLogin={this.processLogin}
               trackedStockData={this.state.trackedStockData}
             />
+            {loginScreen}
           </>
     ) 
   }
