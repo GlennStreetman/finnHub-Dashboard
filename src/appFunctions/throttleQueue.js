@@ -1,13 +1,15 @@
+
+//any function passed to a functionQueueObject must que.openRequests = que.openRequests -=1 upon resolving its request
 export default function createFunctionQueueObject (maxRequestPerInterval, interval, evenlySpaced) {
     let que = {}
     que.maxRequestPerInterval = maxRequestPerInterval
     que.interval = interval
-    que.evenlySpaced = evenlySpaced
+    que.evenlySpaced = evenlySpaced //true to run evenly over interval period.
     que.suspend = 0
     que.queue = []
     que.lastCalled = Date.now();
-    // que.timeout = undefined
-    que.running = 0
+    que.openRequests = 0 //open requests should not exceed maxRequestsPerInterval
+    que.running = 0 //0 not yet started, 1 running
 
     if (evenlySpaced) {
         que.interval = que.interval / que.maxRequestPerInterval;
@@ -31,10 +33,17 @@ export default function createFunctionQueueObject (maxRequestPerInterval, interv
         } else if (now < that.suspend){
             setTimeout(() => that.dequeue(that), that.suspend - now);
             return;
+        } else if (that.openRequests >= that.maxRequestPerInterval){
+            // console.log("Open finnhub.io request limit exceeded, temp pause requests.")
+            that.openRequests = that.openRequests -= 1
+            setTimeout(() => that.dequeue(that), 100);
+            return;
         } else {
+
             let callbacks = that.queue.splice(0, that.maxRequestPerInterval);
             for(let x = 0; x < callbacks.length; x++) {
                 callbacks[x]();
+                that.openRequests = that.openRequests += 1
             }
             that.lastCalled = Date.now();
             if (that.queue.length) {
@@ -46,7 +55,7 @@ export default function createFunctionQueueObject (maxRequestPerInterval, interv
         }
     }
 
-    que.enqueue = function (callback) {
+    que.enqueue = function(callback) {
         this.queue.push(callback);
         if (this.running === 0) {
             setTimeout(() => this.dequeue(this), this.interval);
@@ -59,28 +68,9 @@ export default function createFunctionQueueObject (maxRequestPerInterval, interv
     }
 
     que.resetQueue = function(){
+        console.log("Finnhub.io requests queue reset.")
         this.queue = []
     }
 
     return que
 }
-
-
-// test = createFunctionQueueObject(1, 1000, true)
-// test.enqueue(function(){console.log('1')})
-// test.enqueue(function(){console.log('2')})
-// test.enqueue(function(){console.log('3')})
-// test.enqueue(function(){console.log('4')})
-// test.enqueue(function(){console.log('5')})
-// test.enqueue(function(){console.log('6')})
-// test.enqueue(function(){console.log('7')})
-// test.enqueue(function(){console.log('8')})
-// test.enqueue(function(){console.log('9')})
-// test.enqueue(function(){console.log('10')})
-// test.enqueue(function(){console.log('11')})
-// test.enqueue(function(){console.log('12')})
-// test.enqueue(function(){console.log('13')})
-// test.enqueue(function(){console.log('14')})
-// test.setSuspend(5000)
-// test.resetQueue()
-

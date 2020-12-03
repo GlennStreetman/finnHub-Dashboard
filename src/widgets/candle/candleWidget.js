@@ -88,11 +88,13 @@ class CandleWidget extends React.Component {
       )
         .then((response) => {
           if (response.status === 429) {
+            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
             that.props.throttle.setSuspend(4000)
             that.getCandleData()
             throw new Error('finnhub 429')
           } else {
             // console.log(Date().slice(20,25) +  ': getCandleData ' + candleSymbol)
+            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
             return response.json()
           }
         })

@@ -57,10 +57,12 @@ class StockSearchPane extends React.Component {
       fetch(`https://finnhub.io/api/v1/stock/symbol?exchange=${exchange}&token=${that.props.apiKey}`)
         .then((response) => {
           if (response.status === 429) {
+            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
             that.props.throttle.setSuspend(4000)
             that.getSymbolList(exchange)
             throw new Error('finnhub 429')
           } else {
+            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
             return response.json()
           }
         })

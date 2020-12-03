@@ -63,7 +63,7 @@ class NewsWidget extends React.Component {
     let shortHeadLine = headline.slice(0, 48) + "...";
     return shortHeadLine;
   }
- 
+  
   getCompanyNews(symbol, fromDate, toDate) {
     if (this.props.apiKey !== '' && symbol !== undefined) {
       let stockSymbol = symbol.slice(symbol.indexOf('-')+1, symbol.length)
@@ -72,11 +72,13 @@ class NewsWidget extends React.Component {
       fetch("https://finnhub.io/api/v1/company-news?symbol=" + stockSymbol + "&from=" + fromDate + "&to=" + toDate + "&token=" + that.props.apiKey)
         .then((response) => {
           if (response.status === 429) {
+            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
             that.props.throttle.setSuspend(4000)
             that.getCompanyNews(symbol, fromDate, toDate)
             throw new Error('finnhub 429')
           } else {
             // console.log(Date().slice(20,25) +  ':get company news' + symbol)
+            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
             return response.json()
           }
         })

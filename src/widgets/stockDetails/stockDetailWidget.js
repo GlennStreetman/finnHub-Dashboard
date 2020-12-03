@@ -12,29 +12,6 @@ class StockDetailWidget extends React.Component {
     this.renderStockData = this.renderStockData.bind(this);
   }
 
-  // componentDidMount(){
-  //   const p = this.props
-  //   for (const stock in p.trackedStocks) {
-  //     let stockID = p.trackedStocks[stock]
-  //     let stockSymbol = stockID.slice(stockID.slice(stockID.indexOf("-")+1, stockID.length))
-  //     GetStockPrice(this, stockSymbol, p.apiKey, p.throttle)
-  //   }
-  // }
-
-  // componentDidUpdate(prevProps){
-  //   const p = this.props
-
-  //   if (this.props.trackedStocks !== prevProps.trackedStocks) {
-  //     for (const stock in p.trackedStocks) {
-  //       if (prevProps.trackedStocks[stock] === undefined){
-  //         let stockID = p.trackedStocks[stock]
-  //         let stockSymbol = stockID.slice(stockID.slice(stockID.indexOf("-")+1, stockID.length))
-  //         GetStockPrice(this, stockSymbol, p.apiKey, p.throttle)
-  //       }
-  //     }
-  //   }
-  // }
-
   updateWidgetList(stock) {
     // console.log("updating");
     if (stock.indexOf(":") > 0) {

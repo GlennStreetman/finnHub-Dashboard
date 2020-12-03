@@ -35,11 +35,13 @@ class MetricsWidget extends React.Component {
         fetch("https://finnhub.io/api/v1/stock/metric?symbol=AAPL&metric=all&token=" + that.props.apiKey)
           .then((response) => {
             if (response.status === 429) {
+              that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
               that.props.throttle.setSuspend(4000)
               setup()
               throw new Error('finnhub 429')
             } else {
             // console.log(Date().slice(20,25) + ' setup metrics')
+            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
             return response.json()
           }
           })

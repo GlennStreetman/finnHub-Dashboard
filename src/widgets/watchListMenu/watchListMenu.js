@@ -20,11 +20,13 @@ class WatchListMenu extends React.PureComponent {
       fetch("https://finnhub.io/api/v1/stock/symbol?exchange=US&token=bsuu7qv48v6qu589jlj0")
         .then((response) => {
           if (response.status === 429) {
+            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
             this.props.throttle.setSuspend(3000)
             this.getSymbolList()
-          }
-          console.log(Date().slice(20,25) + ":symbol list")
-          return response.json()})
+          } else {
+          // console.log(Date().slice(20,25) + ":symbol list")
+          that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
+          return response.json()}})
         .then((data) => {
           let transformData = {};
           for (const [, stockValues] of Object.entries(data)) {

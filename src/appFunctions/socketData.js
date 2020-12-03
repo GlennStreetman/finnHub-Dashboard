@@ -17,6 +17,7 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle)
         globalStockList.map((el) => {
           let stockSym = el.slice(el.indexOf('-')+1 , el.length)
             throttle.enqueue(function() {
+              // throttle.openRequests = throttle.openRequests -= 1
               thisSocket.send(JSON.stringify({ type: "subscribe", symbol: stockSym }))
             })
           return true;

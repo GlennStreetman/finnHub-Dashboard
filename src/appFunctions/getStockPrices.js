@@ -11,11 +11,13 @@ function GetStockPrice(context, stockDescription, apiKey, throttle) {
         fetch("https://finnhub.io/api/v1/quote?symbol=" + stockSymbol.slice(stockSymbol.indexOf('-') + 1, stockSymbol.length) + "&token=" + apiKey)
           .then((response) => {
             if (response.status === 429) {
+              throttle.openRequests = throttle.openRequests -= 1
               throttle.setSuspend(4000)
               that.GetStockPrice(context, stockDescription, apiKey, throttle)
               throw new Error('finnhub 429')
             } else {
               // console.log(Date().slice(20,25) + 'getStockPrice ' + stockDescription)
+              throttle.openRequests = throttle.openRequests -= 1
               return response.json()
             }
           })
