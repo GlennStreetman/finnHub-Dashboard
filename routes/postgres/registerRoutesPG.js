@@ -123,10 +123,10 @@ router.post("/register", (req, res) => {
         return createNewUser()
       }).then(data => {
         // console.log(data)
-        res.json('true')
+        res.json({message: 'new user created'})
       }).catch(err => res.json(err))
     } else {
-      res.json("Enter a valid email address");
+      res.json({message: "Enter a valid email address"});
     }
 });
 
@@ -140,7 +140,7 @@ router.get("/verify", (req, res) => {
   console.log(verifyUpdate)
   db.query(verifyUpdate, (err) => {
     if (err) {
-      res.json("Could not validate email address.");
+      res.json({message: "Could not validate email address."});
       // console.log(verifyUpdate)
     } else {
       console.log('email verified')
@@ -161,7 +161,7 @@ router.get("/login", (req, res) => {
     let login = rows.rows[0]
     // console.log(login)
     if (err) {
-      res.json("false");
+      res.json({message: "login error"});
     } else if (rows.rowCount === 1 && login.confirmemail === '1') {
       info["key"] = login.apikey;
       info["login"] = 1;
@@ -191,7 +191,7 @@ router.get("/forgot", (req, res) => {
     let login = rows.rows[0]
     // console.log(login)
     if (err) {
-      res.json("Email not found");
+      res.json({message: "Email not found"});
     } else if (login !== undefined) {
       const validateKey = cryptoRandomString({ length: 32 })
       const data = {
@@ -210,7 +210,7 @@ router.get("/forgot", (req, res) => {
         if (err) {
           // console.log(resetPasswordCode)
           console.log("error on password reset")
-          res.json("Error during password reset..");
+          res.json({message: "Error during password reset.."});
         } else {
           console.log('password reset flag set')
           // res.redirect('/')
@@ -225,10 +225,10 @@ router.get("/forgot", (req, res) => {
           console.log("email sent")
         }
       });
-      res.json("Please check email for recovery instructions.");
+      res.json({message: "Please check email for recovery instructions."});
     } else {
       console.log("failed email");
-      res.json("Email not found.");
+      res.json({message: "Email not found."});
     }
   });
 });
@@ -248,7 +248,7 @@ router.get("/reset", (req, res) => {
   console.log(verifyUpdate)
   db.query(verifyUpdate, (err, rows) => {
     if (err) {
-      res.json("Error during password reset process.");
+      res.json({message: "Error during password reset process."});
       // console.log(verifyUpdate)
     } else if (rows.rowCount === 1) {
       // console.log(rows)
@@ -279,7 +279,7 @@ router.get("/findSecret", (req, res) => {
   db.query(verifyUpdate, (err, rows) => {
     let secretQuestion = rows.rows[0].secretquestion
     if (err) {
-      res.json("Error during password reset process.");
+      res.json({message: "Error during password reset process."});
     } else if (secretQuestion !== undefined) {
       let data = {
         question: secretQuestion,
@@ -289,7 +289,7 @@ router.get("/findSecret", (req, res) => {
       res.json(data)
     } else {
       console.log(`secret question query problem.`)
-      res.json('Problem with reset password link.')
+      res.json({message: 'Problem with reset password link.'})
     }
   })
 });
@@ -310,17 +310,15 @@ router.get("/secretQuestion", (req, res) => {
   console.log(req.query['user'])
   db.query(newQuery, [], (err, rows) => {
     if (err) {
-      res.json("Secret question did not match.");
+      res.json({message: "Secret question did not match."});
     } else {
-      // console.log(rows);
       if (rows !== undefined) {
-        // console.log("reset ready");
-        // req.session.userName = rows.rows[0]['loginname']
+
         req.session.reset = 1;
-        res.json("true");
+        res.json({message: "correct"});
       } else {
-        // console.log("reset NOT ready");
-        res.json("false");
+
+        res.json({message: "Secret question answer did not match."});
       }
     }
   });
@@ -341,10 +339,10 @@ router.get("/newPW", (req, res) => {
   console.log(newQuery);
   db.query(newQuery, (err) => {
     if (err) {
-      res.json("Could not reset password");
+      res.json({message: "Could not reset password"});
     } else {
       console.log("password reset");
-      res.json("true");
+      res.json({message: "true"});
     }
   });
 });
