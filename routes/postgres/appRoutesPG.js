@@ -159,36 +159,18 @@ router.get("/dashboard", (req, res) => {
 });
 
 router.post("/dashboard", (req, res) => {
-  // console.log(req.body)
+  console.log("--------post dashboard-------------")
   let dashBoardName = format("%L", req.body.dashBoardName);
   let globalStockList = format("%L", JSON.stringify(req.body.globalStockList));
   let widgetList = format("%L", JSON.stringify(req.body.widgetList));
   let menuList = format("%L", JSON.stringify(req.body.menuList));
-  let userName = req.session.userName;
-  let getUserIdQuery = "SELECT id FROM users WHERE loginName ='" + userName + "'";
 
-  const getUserID = () => {
-    return new Promise((resolve, reject) => {
-      db.query(getUserIdQuery, (err, rows) => {
-        let data = rows.rows[0].id;
-        console.log("posting dashboard data");
-        // console.log(data)
-        if (err) {
-          reject("Could not find user ID.");
-        } else {
-          resolve(data);
-        }
-      });
-    });
-  };
-
-  const saveDashBoardSetup = (data) => {
+  const saveDashBoardSetup = (userID) => {
     return new Promise((resolve, reject) => {
       let saveDashBoardSetupQuery = `
       INSERT INTO dashBoard 
       (userID, dashBoardName, globalStockList, widgetList) 
-      VALUES 
-      (${data}, ${dashBoardName},${globalStockList},${widgetList})
+      VALUES (${userID}, ${dashBoardName},${globalStockList},${widgetList})
       ON CONFLICT (userID, dashboardname) 
       DO UPDATE SET globalstocklist = EXCLUDED.globalstocklist, widgetlist = EXCLUDED.widgetlist
       `;
@@ -199,7 +181,7 @@ router.post("/dashboard", (req, res) => {
           console.log("Failed to save dashboard");
         } else {
           console.log("dashboard data updated.");
-          resolve(data);
+          resolve(userID);
         }
       });
     });
@@ -224,11 +206,7 @@ router.post("/dashboard", (req, res) => {
     });
   };
 
-  getUserID()
-    .then((data) => {
-      console.log(data);
-      return saveDashBoardSetup(data);
-    })
+  saveDashBoardSetup(req.session.uID)
     .then((data) => {
       console.log(data);
       return updateMenuSetup(data);

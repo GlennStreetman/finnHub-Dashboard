@@ -156,7 +156,7 @@ router.get("/login", (req, res) => {
               FROM users WHERE loginName =${loginText} 
               AND password = '${md5(pwText)}'`;
   let info = { key: "", login: 0 };
-  console.log(loginQuery)
+  // console.log(loginQuery)
   db.query(loginQuery, (err, rows) => {
     let login = rows.rows[0]
     // console.log(login)
