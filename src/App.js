@@ -67,14 +67,16 @@ class App extends React.Component {
     LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets, s.throttle)
 
     if (s.login === 1 && s.loadStartingDashBoard === 0 && s.currentDashBoard !== "") {
-      console.log("loading dashboard")
+      console.log("loading dashboards", s.dashBoardData)
       this.setState({ loadStartingDashBoard: 1 });
       try {
-        let loadWidget = s.dashBoardData[s.currentDashBoard]["widgetlist"];
-        let loadGlobal = s.dashBoardData[s.currentDashBoard]["globalstocklist"];
-        // console.log(loadWidget, loadGlobal)
-        this.loadDashBoard(loadGlobal, loadWidget);
-        this.setState({ DashBoardMenu: 1 });
+        if (Object.keys(s.dashBoardData).length > 0){
+          let loadWidget = s.dashBoardData[s.currentDashBoard]["widgetlist"];
+          let loadGlobal = s.dashBoardData[s.currentDashBoard]["globalstocklist"];
+          // console.log(loadWidget, loadGlobal)
+          this.loadDashBoard(loadGlobal, loadWidget);
+          this.setState({ DashBoardMenu: 1 });
+        }
       } catch (err) {
         console.log("failed to load dashboards", err);
       }

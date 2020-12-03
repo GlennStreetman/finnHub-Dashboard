@@ -40,7 +40,7 @@ router.get("/accountData", (req, res) => {
     let result = rows.rows[0];
     // console.log(result)
     if (err) {
-      res.json("Could not retrieve user data");
+      res.json({message: "Could not retrieve user data"});
     } else {
       resultSet["userData"] = result;
       // console.log(resultSet)
@@ -62,9 +62,9 @@ router.post("/accountData", (req, res) => {
     // let queryValues = [updateField, newValue, req.session.uID]
     db.query(updateQuery, (err) => {
       if (err) {
-        res.json(`Failed to update ${updateField}`);
+        res.json({message: `Failed to update ${updateField}`});
       } else {
-        res.json(`Update complete`);
+        res.json({message: `${updateField} updated`});
       }
     });
   } else {
@@ -82,7 +82,7 @@ router.post("/accountData", (req, res) => {
       db.query(updateQuery, (err) => {
         if (err) {
           // console.log(err)
-          res.json(`Problem updating email.`);
+          res.json({message: `Problem updating email.`});
         } else {
           console.log(res);
           const data = {
@@ -95,14 +95,14 @@ router.post("/accountData", (req, res) => {
           mailgun.messages().send(data, (error) => {
             if (error) {
               console.log(error);
-              res.json("Failed to send verification email");
+              res.json({message: "Failed to send verification email"});
             } else {
-              console.log("Please check email to verify change.");
+              res.json({message: "Please check email to verify change."});
             }
           });
         }
       });
-    } else {res.json("email not valid")}}
+    } else {res.json({message: `email not valid`})}}
 });
 
 router.get("/verifyChange", (req, res) => {
@@ -118,7 +118,7 @@ router.get("/verifyChange", (req, res) => {
   console.log(verifyUpdate)
   db.query(verifyUpdate, (err) => {
     if (err) {
-      res.json("Could not update email address.");
+      res.json({message: "Could not update email address."});
       // console.log(verifyUpdate)
     } else {
       console.log('email verified')
@@ -141,7 +141,7 @@ router.get("/dashboard", (req, res) => {
 
   db.query(getSavedDashBoards, (err, rows) => {
     if (err) {
-      res.json("Failed to retrieve dashboards");
+      res.json({message: "Failed to retrieve dashboards"});
     } else {
       let result = rows.rows;
       console.log("dashboards retrieved");
@@ -200,7 +200,7 @@ router.post("/dashboard", (req, res) => {
         if (err) {
           reject("Failed to save menu setup", err);
         } else {
-          res.json("Save Complete");
+          res.json({message: "Save Complete"});
         }
       });
     });
@@ -213,7 +213,7 @@ router.post("/dashboard", (req, res) => {
     })
     .then((data) => {
       console.log(data);
-      res.json("true");
+      res.json({message: "true"});
     })
     .catch((err) => res.json(err));
 });
@@ -245,11 +245,9 @@ router.get("/deleteSavedDashboard", (req, res) => {
       db.query(deleteSQL, (err, rows) => {
         if (err) {
           reject("failed to delete dashboard", err);
-          // res.json("Failed to delete");
         } else {
           console.log("dashboard deleted");
           resolve("dashboard deleted");
-          // res.json("success");
         }
       });
     });
@@ -295,7 +293,7 @@ router.get("/deleteSavedDashboard", (req, res) => {
     })
     .then((data) => {
       console.log(data);
-      res.json("success");
+      res.json({message: "success"});
     })
     .catch((err) => {
       console.log(err);

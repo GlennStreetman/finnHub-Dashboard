@@ -12,6 +12,7 @@ class AccountMenu extends React.PureComponent {
       editToggle: 0,
       editField: "",
       inputText: "",
+      serverMessage: "",
     };
     this.getAccountData = this.getAccountData.bind(this);
     this.changeAccountData = this.changeAccountData.bind(this);
@@ -45,7 +46,7 @@ class AccountMenu extends React.PureComponent {
 
   changeAccountData(changeField, newValue) {
     
-    console.log(changeField, newValue)
+    // console.log(changeField, newValue)
     const data = {
       field: changeField,
       newValue: newValue,
@@ -60,14 +61,17 @@ class AccountMenu extends React.PureComponent {
     if (changeField === "apikey") {
       console.log('updating apikey')
       this.props.updateAPIKey(newValue)
-    } else {console.log('not updating apikey', changeField)}
+    }
  
     fetch("/accountData", options)
-      .then((data) => console.log(data))
-      .then(() => {
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("----------")
+        console.log(data)
         this.getAccountData();
         this.setState({ editToggle: 0 });
         this.setState({ inputText: "" });
+        this.setState({serverMessage: data.message});
       });
   }
 

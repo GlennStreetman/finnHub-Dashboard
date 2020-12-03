@@ -20,7 +20,7 @@ class DashBoardMenu extends React.PureComponent {
   }
 
   componentDidUpdate(prevProps){
-    if (this.props.currentDashBoard !== prevProps.currentDashBoard) {
+    if (this.props.currentDashBoard !== prevProps.currentDashBoard && this.props.currentDashBoard !== null) {
       this.setState({inputText: this.props.currentDashBoard})
     }
   }
