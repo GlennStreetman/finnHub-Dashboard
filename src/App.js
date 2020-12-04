@@ -181,9 +181,10 @@ class App extends React.Component {
     delete newWidgetList[widgetID];
     this.setState({ stateRef: newWidgetList });
   }
-
+   
   updateGlobalStockList(event, stock, stockObject) {
     // Adds stock to global tracking list.
+    GetStockPrice(this, stock, this.state.apiKey, this.state.throttle)
     let addStockId = stock;
     if (stock.indexOf(":") > 0) {
       addStockId = stock.slice(0, stock.indexOf(":"));

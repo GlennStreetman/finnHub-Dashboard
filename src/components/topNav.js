@@ -52,11 +52,7 @@ class TopNav extends React.Component {
               {this.props.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}
             </a>
           </div>
-          <div className="navItem">
-            <a href="#contact" onClick={() => this.props.menuWidgetToggle("AccountMenu", "Your Account")}>
-              Manage Account
-            </a>
-          </div>
+
           <div className="dropDiv" onMouseLeave={() => this.showPane("showAddWidgetDropdown")}>
             <a href="#test" className="dropbtn" onMouseOver={() => this.showPane("showAddWidgetDropdown")}>
               Add Widget
@@ -100,8 +96,13 @@ class TopNav extends React.Component {
               </div>
             )}
           </div>
+          <div className="navItemEnd">
+            <a href="#contact" onClick={() => this.props.menuWidgetToggle("AccountMenu", "Your Account")}>
+              Manage Account
+            </a>
+          </div>
 
-          <div className='navItemEnd'>
+          <div className='navItem'>
             <a href="#home" onClick={() => this.props.menuWidgetToggle("AboutMenu", "About FinnDash")}>
             {this.props.AboutMenu === 0 ? "About" : "Hide About"}
             </a>

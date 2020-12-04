@@ -107,6 +107,7 @@ class WidgetContainer extends React.Component {
       left: this.props.widgetList["yAxis"],
       zIndex: this.props.zIndex.indexOf(this.props.widgetKey),
       
+      
     };
 
     let widgetList = {

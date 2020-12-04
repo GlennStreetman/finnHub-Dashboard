@@ -66,8 +66,8 @@ class AccountMenu extends React.PureComponent {
     fetch("/accountData", options)
       .then((response) => response.json())
       .then((data) => {
-        console.log("----------")
-        console.log(data)
+        // console.log("----------")
+        // console.log(data)
         this.getAccountData();
         this.setState({ editToggle: 0 });
         this.setState({ inputText: "" });
@@ -78,44 +78,54 @@ class AccountMenu extends React.PureComponent {
   showEditPane(targetField) {
     this.setState({ editField: targetField });
     this.setState({ editToggle: 1 });
+    this.setState({serverMessage: ""});
   }
 
   render() {
+    let messageStyle = {
+      'text-align': 'center',
+    }
+
     return (
       <>
         {this.state.editToggle === 0 && (
-          <table>
-            <tbody>
-              <tr>
-                <td>Login</td>
-                <td>{this.state.loginName}</td>
-                <td>
-                  <button onClick={() => this.showEditPane("loginname")}>edit</button>
-                </td>
-              </tr>
-              <tr>
-                <td>Email</td>
-                <td>{this.state.email}</td>
-                <td>
-                  <button onClick={() => this.showEditPane("email")}>edit</button>
-                </td>
-              </tr>
-              <tr>
-                <td>apiKey</td>
-                <td>{this.state.apiKey}</td>
-                <td>
-                  <button onClick={() => this.showEditPane("apikey")}>edit</button>
-                </td>
-              </tr>
-              <tr>
-                <td>webHook Key</td>
-                <td>{this.state.webHook}</td>
-                <td>
-                  <button onClick={() => this.showEditPane("webhook")}>edit</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <>
+            <table>
+              <tbody>
+                <tr>
+                  <td>Login</td>
+                  <td>{this.state.loginName}</td>
+                  <td>
+                    <button onClick={() => this.showEditPane("loginname")}>edit</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Email</td>
+                  <td>{this.state.email}</td>
+                  <td>
+                    <button onClick={() => this.showEditPane("email")}>edit</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>apiKey</td>
+                  <td>{this.state.apiKey}</td>
+                  <td>
+                    <button onClick={() => this.showEditPane("apikey")}>edit</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>webHook Key</td>
+                  <td>{this.state.webHook}</td>
+                  <td>
+                    <button onClick={() => this.showEditPane("webhook")}>edit</button>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            {this.state.serverMessage !== "" && (
+                <div style={messageStyle}><b >{this.state.serverMessage}</b></div>
+            )}
+          </>
         )}
         {this.state.editToggle === 1 && (
           <table>

@@ -235,6 +235,21 @@ label {
   text-align: right;
 }
 
+@keyframes test {
+  from {
+    background-color: rgba(255, 0, 0, 0.137);
+  }
+  to {
+    background-color: auto;
+  }
+}
+
+.rightTEFade {
+  text-align: right;
+  animation-name: test;
+  animation-duration: 3s;
+}
+
 .leftTE {
   text-align: left;
 }
