@@ -6,40 +6,10 @@ class StockDetailWidget extends React.Component {
     super(props);
     this.state = {
       flashUpdate: {},
-
-
     };
 
     this.updateWidgetList = this.updateWidgetList.bind(this);
     this.renderStockData = this.renderStockData.bind(this);
-  }
-
-  componentDidUpdate(prevProps){
-    let resetFlag = 0
-    let newFlash = {}
-    for (const x in prevProps.trackedStockData) {
-      if (prevProps.trackedStockData[x].currentPrice !== this.props.trackedStockData[x].currentPrice) {
-        resetFlag = resetFlag += 1
-        newFlash[x] = 'rightTEFade'
-      } else {
-        newFlash[x] = 'rightTE'
-      }
-    }
-
-
-    if (resetFlag > 0) {
-      this.setState({flashUpdate: newFlash})
-      let that = this
-      let prev = prevProps.trackedStockData
-      setTimeout(
-        function(context=that, prevStocks=prev) {
-          let newsFlash = {}
-          for (const x in prevStocks) {
-          newsFlash[x] = 'rightTE'}
-          context.setState({flashUpdate: newsFlash})
-        }
-      ,3000)
-    }
   }
 
   updateWidgetList(stock) {
@@ -64,7 +34,7 @@ class StockDetailWidget extends React.Component {
     }
     let stockDetailRow = thisStock.map((el) =>
         trackedStockData[el] ? (
-        <tr key={el + "st"}>
+        <tr key={el + "st" + + trackedStockData[el]["currentPrice"]}>
           <td key={el + "id"}>{el}</td>
           <td className="rightTE" key={el + "prevClosePrice"}>
             {trackedStockData[el]["prevClosePrice"].toLocaleString(undefined, {
@@ -90,7 +60,9 @@ class StockDetailWidget extends React.Component {
               maximumFractionDigits: 2,
             })}
           </td>
-          <td className={this.state.flashUpdate[el]} key={el + "currentPrice"}>
+          {/* <td className={this.state.flashUpdate[el]} key={el + "currentPrice" + trackedStockData[el]["currentPrice"]}> */}
+          <td className='rightTEFade' key={el + "currentPrice" + trackedStockData[el]["currentPrice"]}>
+            
             {trackedStockData[el]["currentPrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
