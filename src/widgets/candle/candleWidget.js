@@ -1,6 +1,7 @@
 import React from "react";
 import StockSearchPane from "../../components/stockSearchPane.js";
 import CreateCandleStickChart from "./createCandleStickChart.js";
+import {finnHub} from "../../appFunctions/throttleQueue.js";
 
 class CandleWidget extends React.Component {
   constructor(props) {
@@ -74,9 +75,7 @@ class CandleWidget extends React.Component {
       const startDateUnix = new Date(s.slice(0, 4), s.slice(5, 7), s.slice(8, 10)).getTime() / 1000;
       const endDateUnix = new Date(e.slice(0, 4), e.slice(5, 7), e.slice(8, 10)).getTime() / 1000;
       let that =  this
-      that.props.throttle.enqueue(function() {
-      fetch(
-        "https://finnhub.io/api/v1/stock/candle?symbol=" +
+      const queryString = "https://finnhub.io/api/v1/stock/candle?symbol=" +
           candleSymbol +
           "&resolution=" +
           that.state.resolution +
@@ -85,20 +84,9 @@ class CandleWidget extends React.Component {
           "&to=" +
           endDateUnix +
           "&token=" + that.props.apiKey
-      )
-        .then((response) => {
-          if (response.status === 429) {
-            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
-            that.props.throttle.setSuspend(4000)
-            that.getCandleData()
-            throw new Error('finnhub 429')
-          } else {
-            // console.log(Date().slice(20,25) +  ': getCandleData ' + candleSymbol)
-            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
-            return response.json()
-          }
-        })
-        .then((data) => {
+
+      finnHub(this.props.throttle, queryString)
+      .then((data) => {
           try {
             that.setState({ candleData: data });
             that.createCandleDataList(data);
@@ -109,7 +97,6 @@ class CandleWidget extends React.Component {
         .catch(error => {
           console.log(error.message)
         });
-      })
     }
   }
 
@@ -275,12 +262,7 @@ class CandleWidget extends React.Component {
 export function candleWidgetProps(that, key = "CandleWidget") {
   let propList = {
     apiKey: that.props.apiKey,
-    // dashBoardData: that.props.getSavedDashBoards,
-    // currentDashBoard: that.props.currentDashBoard,
     getStockPrice: that.getStockPrice,
-    // getSavedDashBoards: that.props.getSavedDashBoards,
-    // loadDashBoard: that.props.loadDashBoard,
-    // saveCurrentDashboard: that.props.saveCurrentDashboard,
     showPane: that.showPane,
     trackedStocks: that.props.widgetList[key]["trackedStocks"],
     updateGlobalStockList: that.props.updateGlobalStockList,

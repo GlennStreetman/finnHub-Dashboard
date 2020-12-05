@@ -1,5 +1,6 @@
 import React from "react";
 import StockSearchPane from "../../components/stockSearchPane.js";
+import {finnHub} from "../../appFunctions/throttleQueue.js";
 
 //Widget body component. Shows stock detail info and recent news. Maybe a graph?
 class MetricsWidget extends React.Component {
@@ -28,33 +29,19 @@ class MetricsWidget extends React.Component {
   }
 
   componentDidMount(){
-    //dumby stock symbol user to return list of all metrics.
+    //AAPL is dumby stock symbol user to return list of all tracked metrics.
+    //Im not totaly sure this works entirely, different companies might have different metrics they report. 
     if (this.props.apiKey !== '' ) {
       let that = this
-      let setup = function () {that.props.throttle.enqueue(function() {  
-        fetch("https://finnhub.io/api/v1/stock/metric?symbol=AAPL&metric=all&token=" + that.props.apiKey)
-          .then((response) => {
-            if (response.status === 429) {
-              that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
-              that.props.throttle.setSuspend(4000)
-              setup()
-              throw new Error('finnhub 429')
-            } else {
-            // console.log(Date().slice(20,25) + ' setup metrics')
-            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
-            return response.json()
-          }
-          })
-          .then((data) => {
-            that.setState({metricList: Object.keys(data.metric)})
-          })
-          .catch(error => {
-            console.log(error.message)
-          });
-        })
-      }
+      let querySting = "https://finnhub.io/api/v1/stock/metric?symbol=AAPL&metric=all&token=" + that.props.apiKey
+      finnHub(this.props.throttle, querySting)
+      .then((data) => {
+              that.setState({metricList: Object.keys(data.metric)})
+            })
+            .catch(error => {
+              console.log(error.message)
+            });
 
-      setup()
       //initial setup the first time widget is loaded.
       if (this.props.metricSelection === undefined) {
         let newList = []
@@ -68,27 +55,19 @@ class MetricsWidget extends React.Component {
   getCompanyMetrics(symbol) {
     if (this.props.apiKey !== '') {
       let that = this
-      that.props.throttle.enqueue(function() {  
-      fetch("https://finnhub.io/api/v1/stock/metric?symbol=" + symbol.slice(symbol.indexOf("-")+1, symbol.length) + "&metric=all&token=" + that.props.apiKey)
-          .then((response) => {
-            if (response.status === 429) {
-              that.props.throttle.setSuspend(4000)
-              that.getCompanyMetrics(symbol)
-              throw new Error('finnhub 429')
-            } else {
-              // console.log(Date().slice(20,25) +  ": get company metrics" + symbol)
-              return response.json()
-            }
-          })
-          .then((data) => {
-            let updateData = Object.assign({}, that.state.metricData)
-            updateData[symbol] = data.metric
-            that.setState({metricData: updateData})
-          })
-          .catch(error => {
-            console.log(error.message)
-          });
-        })
+      let querySting = "https://finnhub.io/api/v1/stock/metric?symbol=" + 
+        symbol.slice(symbol.indexOf("-")+1, symbol.length) + 
+        "&metric=all&token=" + 
+        that.props.apiKey
+      finnHub(this.props.throttle, querySting)
+      .then((data) => {
+              let updateData = Object.assign({}, that.state.metricData)
+              updateData[symbol] = data.metric
+              that.setState({metricData: updateData})
+            })
+            .catch(error => {
+              console.log(error.message)
+            });
     }
   }
 
@@ -351,3 +330,4 @@ export function metricsProps(that, key = "MetricsWidget") {
 }
 
 export default MetricsWidget;
+

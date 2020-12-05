@@ -1,5 +1,6 @@
 import React from "react";
 import StockSearchPane from "../../components/stockSearchPane.js";
+import {finnHub} from "../../appFunctions/throttleQueue.js";
 // import Moment from "react-moment";
 
 class NewsWidget extends React.Component {
@@ -68,20 +69,10 @@ class NewsWidget extends React.Component {
     if (this.props.apiKey !== '' && symbol !== undefined) {
       let stockSymbol = symbol.slice(symbol.indexOf('-')+1, symbol.length)
       let that = this
-      that.props.throttle.enqueue(function() { 
-      fetch("https://finnhub.io/api/v1/company-news?symbol=" + stockSymbol + "&from=" + fromDate + "&to=" + toDate + "&token=" + that.props.apiKey)
-        .then((response) => {
-          if (response.status === 429) {
-            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
-            that.props.throttle.setSuspend(4000)
-            that.getCompanyNews(symbol, fromDate, toDate)
-            throw new Error('finnhub 429')
-          } else {
-            // console.log(Date().slice(20,25) +  ':get company news' + symbol)
-            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
-            return response.json()
-          }
-        })
+      let querryString = "https://finnhub.io/api/v1/company-news?symbol=" + stockSymbol + "&from=" + fromDate + "&to=" + toDate + "&token=" + that.props.apiKey
+      
+      finnHub(this.props.throttle, querryString)
+        // .then((data) => {console.log(data)})
         .then((data) => {
           let filteredNews = [];
           let newsCount = 0;
@@ -94,13 +85,13 @@ class NewsWidget extends React.Component {
           try {
             that.setState({ companyNews: filteredNews });
           } catch (err) {
-            console.log("Could not update news. Component not mounted.");
+            console.log("Could not update news.");
           }
         })
         .catch(error => {
           console.log(error.message)
         });
-      })
+      // })
     }
   }
 

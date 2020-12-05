@@ -103,7 +103,6 @@ class App extends React.Component {
 
   newWidgetContainer(widgetDescription, widgetHeader, widgetConfig) {
     const widgetName = new Date().getTime();
-    // console.log("adding new widget to zIndex") 
     this.updateZIndex(widgetName)
     let newWidgetList = Object.assign({}, this.state.widgetList);
     newWidgetList[widgetName] = {
@@ -225,7 +224,7 @@ class App extends React.Component {
           let newData = dashboards[oldKey];
           newList[newKey] = newData;
         }
-        console.log("new Dash Data ", newList)
+        // console.log("new Dash Data ", newList)
         this.setState({ dashBoardData: newList });
         if( data.menuSetup[0] !== undefined) {
           this.setState({ menuList: JSON.parse(data["menuSetup"][0]["menulist"]) });

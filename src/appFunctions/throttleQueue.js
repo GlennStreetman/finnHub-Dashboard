@@ -1,5 +1,5 @@
 
-//any function passed to a functionQueueObject must que.openRequests = que.openRequests -=1 upon resolving its request
+//returns queue object. Open new apiCalls by running finnHub function bellow.
 export default function createFunctionQueueObject (maxRequestPerInterval, interval, evenlySpaced) {
     let que = {}
     que.maxRequestPerInterval = maxRequestPerInterval
@@ -59,7 +59,7 @@ export default function createFunctionQueueObject (maxRequestPerInterval, interv
         this.queue.push(callback);
         if (this.running === 0) {
             setTimeout(() => this.dequeue(this), this.interval);
-        } else {console.log('already running')}
+        } else {console.log('queue running')}
     }
 
     que.setSuspend = function (milliseconds) {
@@ -73,4 +73,37 @@ export default function createFunctionQueueObject (maxRequestPerInterval, interv
     }
 
     return que
+}
+
+//add all API calls to throttleQue object using function below.
+//throttle =  que object returned by function above.
+export const finnHub = (throttle, apiString) => {
+    return new Promise((resolve, reject) => {
+        throttle.enqueue(function() { 
+            // console.log('--------',apiString,'--------------')
+            fetch(apiString)
+            .then((response) => {
+                // console.log(response)
+                if (response.status === 429) {
+                    console.log('429')
+                    throttle.openRequests = throttle.openRequests -= 1
+                    throttle.setSuspend(4000)
+                    finnHub(throttle, apiString)
+                    reject('finnhub 429')
+                } else {
+            // console.log("FIRST RESPONSE:", response)
+                throttle.openRequests = throttle.openRequests -= 1
+                return response.json()
+            }
+            })
+            .then((data) => {
+                // console.log("resolving")
+                resolve(data)
+            })
+            .catch(error => {
+                console.log(error.message)
+                throttle.openRequests = throttle.openRequests -= 1
+            });
+        })
+    })
 }

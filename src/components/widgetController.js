@@ -14,13 +14,13 @@ import { metricsProps } from "./../widgets/Metrics/Metrics.js";
 function MenuWidgetToggle(context) {
     //Create dashboard menu if first time looking at, else toggle visability
     return function toggleFunction(menuName, dashName = "pass", that = context ){
-        console.log("toggling ", menuName)
+        // console.log("toggling ", menuName)
         if (that.state.menuList[menuName] === undefined) {
             console.log("new menu")
             that.newMenuContainer(menuName, dashName, "menuWidget");
             that.setState({ [menuName]: 1 });
         } else {
-            console.log("toggle menu")
+            // console.log("toggle menu")
             that.state[menuName] === 1 ? that.setState({ [menuName]: 0 }) : that.setState({ [menuName]: 1 });
         }
     }

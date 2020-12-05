@@ -28,6 +28,7 @@ class WidgetContainer extends React.Component {
     this.handleChange = this.handleChange.bind(this);
   }
 
+
   componentDidUpdate(prevProps) {
     if (this.props.widgetLockDown !== prevProps.widgetLockDown) {
       this.setState({ showEditPane: 0 });
@@ -122,7 +123,7 @@ class WidgetContainer extends React.Component {
     };
 
     const that = this;
-    let widgetProps = this.props.widgetBodyProps();
+    let widgetProps = that.props.widgetBodyProps();
     
     if (this.props.widgetKey !== "dashBoardMenu") {
       widgetProps["showEditPane"] = that.state.showEditPane;

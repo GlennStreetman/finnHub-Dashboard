@@ -31,6 +31,26 @@ class TopNav extends React.Component {
 
   render() {
 
+    let widgetOptions = [
+      ["MetricsWidget", "Stock Metrics: ", "stockWidget", "Fundamentals: Basic Financials"],
+      ["NewsWidget", "Recent News: ", "stockWidget", "Fundamentals: Market News"],
+      ["StockDetailWidget", "Stock Values: ", "stockWidget", "Price: Quote"],
+      ["CandleWidget", "Candle Data: ", "stockWidget", "Price: Candles"],
+
+    ]
+
+    let widgetDropDown = widgetOptions.map((nested) => {
+      let [a,b,c,d] = nested
+        return (<a key= {a}
+        href="#r"
+        onClick={() => {
+          this.props.newWidgetContainer(a, b, c);
+        }}
+        >
+        {d}
+        </a>)
+    })
+    
     return this.props.login === 1 ? (
       <>
         <div className="topnav">
@@ -60,38 +80,7 @@ class TopNav extends React.Component {
             {this.state.showAddWidgetDropdown === 1 && (
               <div className="dropdown">
                 <div className="dropdown-content">
-                  <a
-                    href="#1"
-                    onClick={() => {
-                      this.props.newWidgetContainer("StockDetailWidget", "Stock Values: ", "stockWidget");
-                    }}
-                  >
-                    Day Stock Price
-                  </a>
-                  <a
-                    href="#2"
-                    onClick={() => {
-                      this.props.newWidgetContainer("NewsWidget", "Recent News: ", "stockWidget");
-                    }}
-                  >
-                    News Widget
-                  </a>
-                  <a
-                    href="#3"
-                    onClick={() => {
-                      this.props.newWidgetContainer("CandleWidget", "Candle Data: ", "stockWidget");
-                    }}
-                  >
-                    Stock Candles
-                  </a>
-                  <a
-                    href="#3"
-                    onClick={() => {
-                      this.props.newWidgetContainer("MetricsWidget", "Stock Metrics: ", "stockWidget");
-                    }}
-                  >
-                    Basic Metrics
-                  </a>
+                  {widgetDropDown}
                 </div>
               </div>
             )}
