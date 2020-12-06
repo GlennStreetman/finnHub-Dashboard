@@ -218,7 +218,7 @@ class NewsWidget extends React.Component {
             <div>
               <StockSearchPane
                 apiKey={this.props.apiKey}
-                getStockPrice={this.props.getStockPrice}
+                // getStockPrice={this.props.getStockPrice}
                 throttle={this.props.throttle}
                 showSearchPane={() => this.props.showPane("showEditPane", 1)}
                 updateGlobalStockList={this.props.updateGlobalStockList}
@@ -247,7 +247,7 @@ class NewsWidget extends React.Component {
 export function newsWidgetProps(that, key = "CandleWidget") {
   let propList = {
     apiKey: that.props.apiKey,
-    getStockPrice: that.getStockPrice,
+    // getStockPrice: that.getStockPrice,
     showPane: that.showPane,
     trackedStocks: that.props.widgetList[key]["trackedStocks"],
     updateGlobalStockList: that.props.updateGlobalStockList,

@@ -3,18 +3,15 @@ import StockSearchPane from "../../components/stockSearchPane.js";
 import CreateCandleStickChart from "./createCandleStickChart.js";
 import {finnHub} from "../../appFunctions/throttleQueue.js";
 
-class CandleWidget extends React.Component {
+export default class CandleWidget extends React.Component {
   constructor(props) {
     super(props);
-    let currentYear = new Date().getFullYear();
-    let currentMonth = new Date().getMonth();
-    let currentyDay = new Date().getDay();
-    let lastMonth = new Date(currentYear - 1, currentMonth, currentyDay).toISOString().slice(0, 10);
-    let startString = this.props.trackedStocks.length > 0 && this.props.trackedStocks[0].slice(this.props.trackedStocks[0].indexOf('-') + 1,this.props.trackedStocks[0].length)
+    let p = this.props.trackedStocks
+    let startString = p.length > 0 && p[0].slice(p[0].indexOf('-') + 1, p[0].length)
     let startStock = this.props.trackedStocks.length > 0 ? startString : '';
 
     this.state = {
-      startDate: lastMonth, //default prior month.
+      startDate: new Date(Date.now()-31536000*1000).toISOString().slice(0, 10), 
       endDate: new Date().toISOString().slice(0, 10), //default to today.
       candleSelection: startStock, //current stock to be graphed.
       candleData: { 0: "blank" }, //graph data.
@@ -231,7 +228,7 @@ class CandleWidget extends React.Component {
                 widgetKey={this.props.widgetKey}
                 updateGlobalStockList={this.props.updateGlobalStockList}
                 showSearchPane={() => this.props.showPane("showEditPane", 1)}
-                getStockPrice={this.props.getStockPrice}
+                // getStockPrice={this.props.getStockPrice}
                 apiKey={this.props.apiKey}
                 throttle={this.props.throttle}
               />
@@ -262,10 +259,11 @@ class CandleWidget extends React.Component {
 export function candleWidgetProps(that, key = "CandleWidget") {
   let propList = {
     apiKey: that.props.apiKey,
-    getStockPrice: that.getStockPrice,
+    // getStockPrice: that.getStockPrice,
     showPane: that.showPane,
     trackedStocks: that.props.widgetList[key]["trackedStocks"],
     updateGlobalStockList: that.props.updateGlobalStockList,
+    updateWidgetFilters: that.props.updateWidgetFilters,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
     throttle: that.props.throttle,
@@ -273,4 +271,25 @@ export function candleWidgetProps(that, key = "CandleWidget") {
   return propList;
 }
 
-export default CandleWidget;
+// function that returns query strings and filter procedure.
+// export function candleWidgetEndPoint(stockList, filters, apiKey){
+//   //filters should be start, end, resolution
+//   let today = Date.now()
+//   let lastYear = Date.now()-31536000
+//   let queryStringList = []
+
+//   for (const stock in stockList) {
+//   const queryString = "https://finnhub.io/api/v1/stock/candle?symbol=" +
+//       candleSymbole +
+//       "&resolution=" +
+//       that.state.resolution +
+//       "&from=" +
+//       lastYear +
+//       "&to=" +
+//       today +
+//       "&token=" + apiKey
+//     }
+
+
+// }
+

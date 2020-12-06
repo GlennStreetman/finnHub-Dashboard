@@ -3,12 +3,10 @@ import React from "react";
 class TopNav extends React.Component {
   constructor(props) {
     super(props);
-
     this.state = {
       AboutAPIKeyReminder: 0,
-      showAddWidgetDropdown: 0
+      showAddWidgetDropdown: 0,
     };
-
     this.showPane = this.showPane.bind(this);
   }
 
@@ -36,7 +34,6 @@ class TopNav extends React.Component {
       ["NewsWidget", "Recent News: ", "stockWidget", "Fundamentals: Market News"],
       ["StockDetailWidget", "Stock Values: ", "stockWidget", "Price: Quote"],
       ["CandleWidget", "Candle Data: ", "stockWidget", "Price: Candles"],
-
     ]
 
     let widgetDropDown = widgetOptions.map((nested) => {
@@ -63,13 +60,12 @@ class TopNav extends React.Component {
 
           <div className="navItem">
             <a href="#contact" onClick={() => this.props.menuWidgetToggle("DashBoardMenu", "Saved Dashboards")}>
-              {/* <a href="#contact" onClick={() => this.showPane("showDashBoardMenu")}> */}
               {this.props.DashBoardMenu === 0 ? "Show Dashboard Menu" : "Hide Dashboard Menu"}
             </a>
           </div>
           <div className="navItem">
             <a href="#contact" onClick={() => (this.props.widgetLockDown === 0 ? this.props.lockWidgets(1) : this.props.lockWidgets(0))}>
-              {this.props.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}
+              {this.props.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}     
             </a>
           </div>
 
@@ -118,5 +114,5 @@ class TopNav extends React.Component {
     ); 
   }
 }
-
+// TopNav.contextType = TopNavContext
 export default TopNav;

@@ -8,7 +8,6 @@ class MetricsWidget extends React.Component {
     super(props);
     this.state = {
         metricList: [],
-        // metricSelection: [], //needs to be moved into widgetList data saved in app component.
         metricData: {},
         metricIncrementor: 1,
         orderView: 0,
@@ -21,7 +20,6 @@ class MetricsWidget extends React.Component {
     this.selectMetrics = this.selectMetrics.bind(this);
     this.changeIncrememnt = this.changeIncrememnt.bind(this);
     this.metricsTable = this.metricsTable.bind(this);
-    this.clickCheckBox = this.clickCheckBox.bind(this);
     this.checkStatus = this.checkStatus.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.changeOrder = this.changeOrder.bind(this); 
@@ -43,9 +41,9 @@ class MetricsWidget extends React.Component {
             });
 
       //initial setup the first time widget is loaded.
-      if (this.props.metricSelection === undefined) {
+      if (this.props.filters['metricSelection'] === undefined) {
         let newList = []
-        this.props.updateWidgetData(this.props.widgetKey, 'metricSelection', newList)
+        this.props.updateWidgetFilters(this.props.widgetKey, 'metricSelection', newList)
       }
       //load initial data
       this.props.trackedStocks.forEach(el => this.getCompanyMetrics(el))
@@ -89,12 +87,12 @@ class MetricsWidget extends React.Component {
 
   changeOrder(indexRef, change){
     // console.log(indexRef + ":" + change)
-    let moveFrom = this.props.metricSelection[indexRef]
-    let moveTo = this.props.metricSelection[indexRef + change]
-    let orderMetricSelection = this.props.metricSelection.slice()
+    let moveFrom = this.props.filters.metricSelection[indexRef]
+    let moveTo = this.props.filters.metricSelection[indexRef + change]
+    let orderMetricSelection = this.props.filters.metricSelection.slice()
     orderMetricSelection[indexRef] = moveTo
     orderMetricSelection[indexRef + change] = moveFrom
-    this.props.updateWidgetData(this.props.widgetKey, 'metricSelection', orderMetricSelection)
+    this.props.updateWidgetFilters(this.props.widgetKey, 'metricSelection', orderMetricSelection)
     // this.setState({metricSelection: orderMetricSelection})
   }
 
@@ -105,15 +103,15 @@ class MetricsWidget extends React.Component {
 
   selectMetrics(metric){
 
-    if (this.props.metricSelection.indexOf(metric) < 0) {
-      let newSelection = this.props.metricSelection.slice()
+    if (this.props.filters.metricSelection.indexOf(metric) < 0) {
+      let newSelection = this.props.filters.metricSelection.slice()
       newSelection.push(metric)
-      this.props.updateWidgetData(this.props.widgetKey, 'metricSelection', newSelection)
+      this.props.updateWidgetFilters(this.props.widgetKey, 'metricSelection', newSelection)
       // this.setState({metricSelection: newSelection})
     } else {
-      let newSelection = this.props.metricSelection.slice()
+      let newSelection = this.props.filters.metricSelection.slice()
       newSelection.splice(newSelection.indexOf(metric), 1)
-      this.props.updateWidgetData(this.props.widgetKey, 'metricSelection', newSelection)  
+      this.props.updateWidgetFilters(this.props.widgetKey, 'metricSelection', newSelection)  
       // this.setState({metricSelection: newSelection})
     }
   }
@@ -140,21 +138,12 @@ class MetricsWidget extends React.Component {
         </div>
         <div>{this.metricsTable()}</div>
       </> )
-
-    
     return metricSelector
-  }
-
-  clickCheckBox(boxValue){
-    let newSelection = this.props.metricSelection.splice()
-    newSelection.push(boxValue)
-    this.props.updateWidgetData(this.props.widgetKey, 'metricSelection', newSelection)
-    // this.setState({metricSelection: newSelection})
   }
 
   checkStatus(check){
     //sets status of check boxes when selecting or deselecting checkboxes.
-    if (this.props.metricSelection.indexOf(check) > -1) {
+    if (this.props.filters !== undefined && this.props.filters.metricSelection.indexOf(check) > -1) {
       return true
     } else {return false}
   }
@@ -164,7 +153,7 @@ class MetricsWidget extends React.Component {
     let start = increment - 10;
     let end = increment;
     let metricSlice = this.state.metricList.slice(start, end);
-    let selectionSlice = this.props.metricSelection.slice(start, end);
+    let selectionSlice = this.props.filters.metricSelection.slice(start, end);
     let stockSelectionSlice = this.props.trackedStocks.slice(start, end);
     // console.log(selectionSlice)
     let mapMetrics = metricSlice.map((el, index) => (
@@ -231,7 +220,7 @@ class MetricsWidget extends React.Component {
 
   mapStockData(symbol){
     let symbolData = this.state.metricData[symbol]
-    let findMetrics = this.props.metricSelection
+    let findMetrics = this.props.filters.metricSelection
     // console.log(findMetrics)
     let returnMetrics = []
     for (var x in findMetrics) {
@@ -255,7 +244,7 @@ class MetricsWidget extends React.Component {
   renderStockData() {
     let selectionList = []
     let thisKey = this.props.widgetKey
-    if (this.props.metricSelection !== undefined) {selectionList = this.props.metricSelection.slice()}
+    if (this.props.filters.metricSelection !== undefined) {selectionList = this.props.filters.metricSelection.slice()}
     let headerRows = selectionList.map((el) => {
       let title = el.replace(/([A-Z])/g, ' $1').trim().split(" ").join("\n")
       if (title.search(/\d\s[A-Z]/g) !== -1) {
@@ -297,7 +286,6 @@ class MetricsWidget extends React.Component {
           <StockSearchPane
             updateGlobalStockList={this.props.updateGlobalStockList}
             showSearchPane={() => this.props.showPane("showEditPane", 1)}
-            getStockPrice={this.props.getStockPrice}
             apiKey={this.props.apiKey}
             updateWidgetStockList={this.props.updateWidgetStockList}
             widgetKey={this.props.widgetKey}
@@ -315,16 +303,14 @@ class MetricsWidget extends React.Component {
 export function metricsProps(that, key = "MetricsWidget") {
   let propList = {
     apiKey: that.props.apiKey,
-    getStockPrice: that.getStockPrice,
     showPane: that.showPane,
     trackedStocks: that.props.widgetList[key]["trackedStocks"],
-    metricSelection: that.props.widgetList[key]["metricSelection"],
-    updateWidgetData: that.props.updateWidgetData,
+    filters: that.props.widgetList[key]["filters"],
+    updateWidgetFilters: that.props.updateWidgetFilters,
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
     throttle: that.props.throttle,
-    globalStockObject: that.props.globalStockObject,
   };
   return propList;
 }

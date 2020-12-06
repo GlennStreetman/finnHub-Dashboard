@@ -56,46 +56,49 @@ class WidgetController extends React.Component {
     }
 
     render(){
+        
         let widgetState = this.props.widgetList;
         let menuState = this.props.menuList;
         let that = this;
-
+        
+        //render all finnHub API widgets.
         let widgetRender = Object.keys(widgetState).map((el) => (
-        <WidgetContainer
-            key={el}
-            moveWidget={this.props.moveWidget}
-            removeWidget={this.props.removeWidget}
-            stateRef="widgetList" //used by app.js to move and remove widgets.
-            widgetBodyProps={this.returnBodyProps(that, widgetState[el]["widgetType"], el)}
-            widgetKey={el}
-            widgetList={widgetState[el]}
-            widgetLockDown={this.props.widgetLockDown}
-            changeWidgetName={this.props.changeWidgetName}
-            zIndex={this.props.zIndex}
-            updateZIndex={this.props.updateZIndex}
-        />
+            <WidgetContainer
+                key={el}
+                moveWidget={this.props.moveWidget}
+                removeWidget={this.props.removeWidget}
+                stateRef="widgetList" //used by app.js to move and remove widgets.
+                widgetBodyProps={this.returnBodyProps(that, widgetState[el]["widgetType"], el)}
+                widgetKey={el}
+                widgetList={widgetState[el]}
+                widgetLockDown={this.props.widgetLockDown}
+                changeWidgetName={this.props.changeWidgetName}
+                zIndex={this.props.zIndex}
+                updateZIndex={this.props.updateZIndex}
+            />
         ));
-
+        
+        //render all menu widgets.
         let menuRender = Object.keys(menuState).map((el) => (
-        <WidgetContainer
-            key={el}
-            menuWidgetToggle={this.props.menuWidgetToggle}
-            moveWidget={this.props.moveWidget}
-            removeWidget={this.props.removeWidget}
-            stateRef="menuList" //used by app.js to move and remove widgets.
-            showMenu={this.props[el]}
-            widgetBodyProps={this.returnBodyProps(that, el)}
-            widgetKey={el}
-            widgetList={menuState[el]}
-            widgetLockDown={this.props.widgetLockDown}
-            changeWidgetName={this.props.changeWidgetName}
-            zIndex={this.props.zIndex}
-            updateZIndex={this.props.updateZIndex}
-            WatchListMenu={this.state.WatchListMenu}
-            AccountMenu={this.state.AccountMenu}
-            AboutMenu={this.state.AboutMenu}
-            DashBoardMenu={this.state.DashBoardMenu}
-        />
+            <WidgetContainer
+                key={el}
+                menuWidgetToggle={this.props.menuWidgetToggle}
+                moveWidget={this.props.moveWidget}
+                removeWidget={this.props.removeWidget}
+                stateRef="menuList" //used by app.js to move and remove widgets.
+                showMenu={this.props[el]}
+                widgetBodyProps={this.returnBodyProps(that, el)}
+                widgetKey={el}
+                widgetList={menuState[el]}
+                widgetLockDown={this.props.widgetLockDown}
+                changeWidgetName={this.props.changeWidgetName}
+                zIndex={this.props.zIndex}
+                updateZIndex={this.props.updateZIndex}
+                WatchListMenu={this.state.WatchListMenu}
+                AccountMenu={this.state.AccountMenu}
+                AboutMenu={this.state.AboutMenu}
+                DashBoardMenu={this.state.DashBoardMenu}
+            />
         ))
 
         return this.props.login === 1 ? (
