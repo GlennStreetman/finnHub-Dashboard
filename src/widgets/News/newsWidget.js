@@ -6,21 +6,18 @@ import {finnHub} from "../../appFunctions/throttleQueue.js";
 class NewsWidget extends React.Component {
   constructor(props) {
     super(props);
-    let currentYear = new Date().getFullYear();
-    let currentMonth = new Date().getMonth();
-    let currentyDay = new Date().getDay();
-    let lastMonth = new Date(currentYear, currentMonth - 1, currentyDay).toISOString().slice(0, 10);
+
     let startList = this.props.trackedStocks.length > 0 ? this.props.trackedStocks : [];
     let startStock = startList.length > 0 ? startList[0] : undefined;
     this.state = {
       companyNews: [],
-      startDate: lastMonth,
-      endDate: new Date().toISOString().slice(0, 10),
+      // startDate: new Date(Date.now()-604800*1000).toISOString().slice(0, 10),
+      // endDate: new Date().toISOString().slice(0, 10),
       newsSelection: startStock,
       newsIncrementor: 1,
     };
     this.getCompanyNews = this.getCompanyNews.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.updateFilter = this.updateFilter.bind(this);
     this.updateWidgetList = this.updateWidgetList.bind(this);
     this.editNewsListForm = this.editNewsListForm.bind(this);
     this.displayNews = this.displayNews.bind(this);
@@ -32,14 +29,26 @@ class NewsWidget extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.trackedStocks.length > 0 && this.state.newsSelection !== undefined) {
-      this.getCompanyNews(this.state.newsSelection, this.state.startDate, this.state.endDate);
+    const p = this.props
+    const s = this.state
+    if (p.filters['startDate'] === undefined) {
+      const startDate = new Date(Date.now()-604800*1000).toISOString().slice(0, 10)
+      const endDate = new Date().toISOString().slice(0, 10)
+      p.updateWidgetFilters(p.widgetKey, 'startDate', startDate)
+      p.updateWidgetFilters(p.widgetKey, 'endDate', endDate)
+    } 
+
+    if (p.trackedStocks.length > 0 && s.newsSelection !== undefined && p.filters !== undefined) {
+      this.getCompanyNews(s.newsSelection, p.filters.startDate, p.filters.endDate);
     }
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.newsSelection !== prevState.newsSelection || this.props.showEditPane !== prevProps.showEditPane) {
-      this.getCompanyNews(this.state.newsSelection, this.state.startDate, this.state.endDate);
+    const p = this.props
+    const s = this.state
+
+    if (s.newsSelection !== prevState.newsSelection || p.showEditPane !== prevProps.showEditPane) {
+      this.getCompanyNews(s.newsSelection, p.filters.startDate, p.filters.endDate);
     }
     if (this.state.newsSelection === 1 && this.props.trackedStocks.length) {
       this.setState({ newsSelection: this.props.trackedStocks[0] });
@@ -100,16 +109,17 @@ class NewsWidget extends React.Component {
     if (newIncrement > 0 && newIncrement < 11) this.setState({ newsIncrementor: newIncrement });
   }
 
-  handleChange(e) {
+  updateFilter(e) {
     const target = e.target;
     const name = target.name;
-    this.setState({ [name]: e.target.value });
+    this.props.updateWidgetFilters(this.props.widgetKey, name, target.value)
+    // this.setState({ [name]: e.target.value });
   }
 
   changeNewsSelection(e) {
     const target = e.target.value;
     this.setState({ newsSelection: target });
-    this.getCompanyNews(target, this.state.startDate, this.state.endDate);
+    this.getCompanyNews(target, this.props.filters.startDate, this.props.filters.endDate);
     this.setState({ newsIncrementor: 1 });
   }
 
@@ -228,9 +238,9 @@ class NewsWidget extends React.Component {
               <div className="stockSearch">
                 <form className="form-inline">
                   <label htmlFor="start">Start date:</label>
-                  <input className="btn" id="start" type="date" name="startDate" onChange={this.handleChange} value={this.state.startDate}></input>
+                  <input className="btn" id="start" type="date" name="startDate" onChange={this.updateFilter} value={this.props.filters.startDate}></input>
                   <label htmlFor="end">End date:</label>
-                  <input className="btn" id="end" type="date" name="endDate" onChange={this.handleChange} value={this.state.endDate}></input>
+                  <input className="btn" id="end" type="date" name="endDate" onChange={this.updateFilter} value={this.props.filters.endDate}></input>
                 </form>
               </div>
             </div>
@@ -247,13 +257,15 @@ class NewsWidget extends React.Component {
 export function newsWidgetProps(that, key = "CandleWidget") {
   let propList = {
     apiKey: that.props.apiKey,
-    // getStockPrice: that.getStockPrice,
+    filters: that.props.widgetList[key]["filters"],
     showPane: that.showPane,
+    throttle: that.props.throttle,
     trackedStocks: that.props.widgetList[key]["trackedStocks"],
     updateGlobalStockList: that.props.updateGlobalStockList,
+    updateWidgetFilters: that.props.updateWidgetFilters,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
-    throttle: that.props.throttle,
+
   };
   return propList;
 }
