@@ -1,7 +1,7 @@
 import React from "react";
-import StockSearchPane from "../../components/stockSearchPane.js";
+import StockSearchPane from "../../../components/stockSearchPane.js";
 import CreateCandleStickChart from "./createCandleStickChart.js";
-import {finnHub} from "../../appFunctions/throttleQueue.js";
+import {finnHub} from "../../../appFunctions/throttleQueue.js";
 
 export default class CandleWidget extends React.Component {
   constructor(props) {

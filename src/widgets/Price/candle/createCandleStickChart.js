@@ -1,5 +1,5 @@
 import React from "react";
-import CanvasJSReact from "../../canvasjs.react";
+import CanvasJSReact from "../../../canvasjs.react";
 
 class CreateCandleStickChart extends React.PureComponent {
   constructor(props) {

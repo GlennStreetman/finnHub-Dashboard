@@ -2,14 +2,16 @@ import React from "react";
 import WidgetContainer from "./widgetContainer.js";
 
 //Import props function from each widget/menu here and add to returnBodyProps function below.
-import { dashBoardMenuProps } from "./../widgets/dashBoardMenu/dashBoardMenu.js";
-import { watchListMenuProps } from "./../widgets/watchListMenu/watchListMenu.js";
-import { candleWidgetProps } from "./../widgets/candle/candleWidget.js";
-import { newsWidgetProps } from "./../widgets/News/newsWidget.js";
-import { stockDetailWidgetProps } from "./../widgets/stockDetails/stockDetailWidget.js";
-import { accountMenuProps } from "./../widgets/AccountMenu/accountMenu.js";
-import { aboutMenuProps } from "./../widgets/AboutMenu/AboutMenu.js";
-import { metricsProps } from "./../widgets/Metrics/Metrics.js";
+import { dashBoardMenuProps } from "./../widgets/Menu/dashBoardMenu/dashBoardMenu.js";
+import { watchListMenuProps } from "./../widgets/Menu/watchListMenu/watchListMenu.js";
+import { accountMenuProps } from "./../widgets/Menu/AccountMenu/accountMenu.js";
+import { aboutMenuProps } from "./../widgets/Menu/AboutMenu/AboutMenu.js";
+
+import { candleWidgetProps } from "./../widgets/Price/candle/candleWidget.js";
+import { stockDetailWidgetProps } from "./../widgets/Price/stockDetails/stockDetailWidget.js";
+
+import { newsWidgetProps } from "./../widgets/Fundamentals/News/newsWidget.js";
+import { metricsProps } from "./../widgets/Fundamentals/Metrics/Metrics.js";
 
 function MenuWidgetToggle(context) {
     //Create dashboard menu if first time looking at, else toggle visability

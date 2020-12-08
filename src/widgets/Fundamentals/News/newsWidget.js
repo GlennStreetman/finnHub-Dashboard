@@ -1,6 +1,6 @@
 import React from "react";
-import StockSearchPane from "../../components/stockSearchPane.js";
-import {finnHub} from "../../appFunctions/throttleQueue.js";
+import StockSearchPane from "../../../components/stockSearchPane.js";
+import {finnHub} from "../../../appFunctions/throttleQueue.js";
 // import Moment from "react-moment";
 
 class NewsWidget extends React.Component {

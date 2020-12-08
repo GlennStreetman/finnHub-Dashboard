@@ -1,5 +1,5 @@
 import React from "react";
-import StockSearchPane from "../../components/stockSearchPane.js";
+import StockSearchPane from "../../../components/stockSearchPane.js";
 
 class WatchListMenu extends React.PureComponent {
   constructor(props) {
