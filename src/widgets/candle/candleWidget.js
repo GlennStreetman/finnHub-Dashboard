@@ -28,7 +28,6 @@ export default class CandleWidget extends React.Component {
     this.changeStockSelection = this.changeStockSelection.bind(this);
     this.createCandleDataList = this.createCandleDataList.bind(this);
     this.createChartOptions = this.createChartOptions.bind(this);
-    this.changeResolutionSelection = this.changeResolutionSelection.bind(this);
   }
 
   componentDidMount() {
@@ -162,11 +161,6 @@ export default class CandleWidget extends React.Component {
   changeStockSelection(e) {
     const target = e.target.value;
     this.setState({ candleSelection: target });
-  }
-
-  changeResolutionSelection(e) {
-    const target = e.target.value;
-    this.setState({ resolution: target });
   }
 
   editCandleListForm() {
