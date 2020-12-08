@@ -132,7 +132,7 @@ class WidgetContainer extends React.Component {
 
     return (
       <div key={this.props.widgetKey + "container"} id={this.props.widgetKey + "box"} 
-      className="widgetBox" style={compStyle}>
+      className="widgetBox" style={compStyle} onMouseOut={() => {this.props.updateZIndex(this.props.widgetKey)}}>
         {this.props.widgetLockDown === 0 ? (
           <div className="widgetHeader">
             {this.state.showEditPane === 0 ? (
