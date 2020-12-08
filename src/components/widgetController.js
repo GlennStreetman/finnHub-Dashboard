@@ -7,11 +7,11 @@ import { watchListMenuProps } from "./../widgets/Menu/watchListMenu/watchListMen
 import { accountMenuProps } from "./../widgets/Menu/AccountMenu/accountMenu.js";
 import { aboutMenuProps } from "./../widgets/Menu/AboutMenu/AboutMenu.js";
 
-import { candleWidgetProps } from "./../widgets/Price/candle/candleWidget.js";
-import { stockDetailWidgetProps } from "./../widgets/Price/stockDetails/stockDetailWidget.js";
+import { candleWidgetProps } from "../widgets/Price/candles/candleWidget.js";
+import { stockDetailWidgetProps } from "../widgets/Price/quote/stockDetailWidget.js";
 
-import { newsWidgetProps } from "./../widgets/Fundamentals/News/newsWidget.js";
-import { metricsProps } from "./../widgets/Fundamentals/Metrics/Metrics.js";
+import { newsWidgetProps } from "./../widgets/Fundamentals/marketNews/marketNewsBody.js";
+import { metricsProps } from "./../widgets/Fundamentals/basicFinancials/basicFinancialsBody.js";
 
 function MenuWidgetToggle(context) {
     //Create dashboard menu if first time looking at, else toggle visability
