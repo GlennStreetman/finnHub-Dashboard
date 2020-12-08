@@ -3,7 +3,7 @@ import StockSearchPane from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
 
 //Widget body component. Shows stock detail info and recent news. Maybe a graph?
-class MetricsWidget extends React.Component {
+export default class BasicFinancials extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -300,7 +300,7 @@ class MetricsWidget extends React.Component {
   }
 }
 
-export function metricsProps(that, key = "MetricsWidget") {
+export function metricsProps(that, key = "basicFinancials") {
   let propList = {
     apiKey: that.props.apiKey,
     showPane: that.showPane,
@@ -314,6 +314,4 @@ export function metricsProps(that, key = "MetricsWidget") {
   };
   return propList;
 }
-
-export default MetricsWidget;
 

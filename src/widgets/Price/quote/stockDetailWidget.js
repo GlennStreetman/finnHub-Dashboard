@@ -1,7 +1,7 @@
 import React from "react";
 import StockSearchPane from "../../../components/stockSearchPane.js";
-//Widget body component. Shows stock detail info and recent news. Maybe a graph?
-class StockDetailWidget extends React.Component {
+
+export default class Quote extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -139,7 +139,7 @@ class StockDetailWidget extends React.Component {
   }
 }
 
-export function stockDetailWidgetProps(that, key = "StockDetailWidget") {
+export function stockDetailWidgetProps(that, key = "Quote") {
   let propList = {
     apiKey: that.props.apiKey,
     // getStockPrice: that.props.getStockPrice,
@@ -154,4 +154,3 @@ export function stockDetailWidgetProps(that, key = "StockDetailWidget") {
   return propList;
 }
 
-export default StockDetailWidget;

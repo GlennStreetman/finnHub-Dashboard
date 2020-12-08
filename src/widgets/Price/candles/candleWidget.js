@@ -2,8 +2,9 @@ import React from "react";
 import StockSearchPane from "../../../components/stockSearchPane.js";
 import CreateCandleStickChart from "./createCandleStickChart.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
+// import { json } from "body-parser";
 
-export default class CandleWidget extends React.Component {
+export default class Candles extends React.Component {
   constructor(props) {
     super(props);
     let p = this.props.trackedStocks
@@ -261,7 +262,7 @@ export default class CandleWidget extends React.Component {
   }
 }
 
-export function candleWidgetProps(that, key = "CandleWidget") {
+export function candleWidgetProps(that, key = "Candles") {
   let propList = {
     apiKey: that.props.apiKey,
     filters: that.props.widgetList[key]["filters"],
@@ -276,25 +277,15 @@ export function candleWidgetProps(that, key = "CandleWidget") {
   return propList;
 }
 
+
 // function that returns query strings and filter procedure.
-// export function candleWidgetEndPoint(stockList, filters, apiKey){
-//   //filters should be start, end, resolution
-//   let today = Date.now()
-//   let lastYear = Date.now()-31536000
-//   let queryStringList = []
 
-//   for (const stock in stockList) {
-//   const queryString = "https://finnhub.io/api/v1/stock/candle?symbol=" +
-//       candleSymbole +
-//       "&resolution=" +
-//       that.state.resolution +
-//       "&from=" +
-//       lastYear +
-//       "&to=" +
-//       today +
-//       "&token=" + apiKey
-//     }
 
+// export function candleWidgetToJson(data){
 
 // }
 
+
+// fetch('https://finnhub.io/api/v1/stock/candle?symbol=AAPL&resolution=1&from=1605543327&to=1605629727&token=bsuu7qv48v6qu589jlj0')
+//   .then(response => response.json())
+//   .then (data => console.log(data))

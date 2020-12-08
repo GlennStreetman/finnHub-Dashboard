@@ -3,7 +3,7 @@ import StockSearchPane from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
 // import Moment from "react-moment";
 
-class NewsWidget extends React.Component {
+export default class marketNews extends React.Component {
   constructor(props) {
     super(props);
 
@@ -254,7 +254,7 @@ class NewsWidget extends React.Component {
   }
 }
 
-export function newsWidgetProps(that, key = "CandleWidget") {
+export function newsWidgetProps(that, key = "marketNews") {
   let propList = {
     apiKey: that.props.apiKey,
     filters: that.props.widgetList[key]["filters"],
@@ -270,4 +270,3 @@ export function newsWidgetProps(that, key = "CandleWidget") {
   return propList;
 }
 
-export default NewsWidget;
