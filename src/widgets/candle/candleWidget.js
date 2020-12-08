@@ -11,17 +11,17 @@ export default class CandleWidget extends React.Component {
     let startStock = this.props.trackedStocks.length > 0 ? startString : '';
 
     this.state = {
-      startDate: new Date(Date.now()-31536000*1000).toISOString().slice(0, 10), 
-      endDate: new Date().toISOString().slice(0, 10), //default to today.
+      // startDate: new Date(Date.now()-31536000*1000).toISOString().slice(0, 10), 
+      // endDate: new Date().toISOString().slice(0, 10), //default to today.
       candleSelection: startStock, //current stock to be graphed.
       candleData: { 0: "blank" }, //graph data.
       chartData: [],
       options: {}, //graph options
-      resolution: "W",
+      // resolution: "W",
       selectResolution: [1, 5, 15, 30, 60, "D", "W", "M"],
     };
     this.updateWidgetList = this.updateWidgetList.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.updateFilter = this.updateFilter.bind(this);
     this.getCandleData = this.getCandleData.bind(this);
     this.editCandleListForm = this.editCandleListForm.bind(this);
     this.displayCandleGraph = this.displayCandleGraph.bind(this);
@@ -32,7 +32,16 @@ export default class CandleWidget extends React.Component {
   }
 
   componentDidMount() {
-    if (this.props.trackedStocks.length > 0) {
+    const p = this.props
+    if (p.filters['startDate'] === undefined) {
+      const startDate = new Date(Date.now()-31536000*1000).toISOString().slice(0, 10)
+      const endDate = new Date().toISOString().slice(0, 10)
+      p.updateWidgetFilters(p.widgetKey, 'startDate', startDate)
+      p.updateWidgetFilters(p.widgetKey, 'endDate', endDate)
+      p.updateWidgetFilters(p.widgetKey, 'resolution', 'W')
+    } 
+    
+    if (p.trackedStocks.length > 0) {
       this.getCandleData();
     }
   }
@@ -55,19 +64,21 @@ export default class CandleWidget extends React.Component {
     }
   }
 
-  handleChange(e) {
+  updateFilter(e) {
     const target = e.target;
     const name = target.name;
-    this.setState({ [name]: e.target.value });
+    this.props.updateWidgetFilters(this.props.widgetKey, name, target.value);
+    // this.setState({ [name]: e.target.value });
   }
 
   getCandleData() {
     // console.log('creating candle chart')
-    if (this.props.apiKey !== '') {
+    const p = this.props
+    if (p.apiKey !== '') {
       let candleStock = this.state.candleSelection
       let candleSymbol = candleStock.slice(candleStock.indexOf('-')+1 , candleStock.length)
-      const s = this.state.startDate;
-      const e = this.state.endDate;
+      const s = p.filters.startDate;
+      const e = p.filters.endDate;
 
       const startDateUnix = new Date(s.slice(0, 4), s.slice(5, 7), s.slice(8, 10)).getTime() / 1000;
       const endDateUnix = new Date(e.slice(0, 4), e.slice(5, 7), e.slice(8, 10)).getTime() / 1000;
@@ -75,7 +86,7 @@ export default class CandleWidget extends React.Component {
       const queryString = "https://finnhub.io/api/v1/stock/candle?symbol=" +
           candleSymbol +
           "&resolution=" +
-          that.state.resolution +
+          p.filters.resolution +
           "&from=" +
           startDateUnix +
           "&to=" +
@@ -123,7 +134,7 @@ export default class CandleWidget extends React.Component {
       height: 400,
       width: 525,
       title: {
-        text: this.state.candleSelection + ": " + this.state.startDate + " - " + this.state.endDate,
+        text: this.state.candleSelection + ": " + this.props.filters.startDate + " - " + this.props.filters.endDate,
       },
       axisX: {
         valueFormatString: "YYYY-MM-DD",
@@ -235,11 +246,11 @@ export default class CandleWidget extends React.Component {
               <div className="stockSearch">
                 <form className="form-inline">
                   <label htmlFor="start">Start date:</label>
-                  <input className="btn" id="start" type="date" name="startDate" onChange={this.handleChange} value={this.state.startDate}></input>
+                  <input className="btn" id="start" type="date" name="startDate" onChange={this.updateFilter} value={this.props.filters.startDate}></input>
                   <label htmlFor="end">End date:</label>
-                  <input className="btn" id="end" type="date" name="endDate" onChange={this.handleChange} value={this.state.endDate}></input>
+                  <input className="btn" id="end" type="date" name="endDate" onChange={this.updateFilter} value={this.props.filters.endDate}></input>
                   <label htmlFor="resBtn">Resolution:</label>
-                  <select id="resBtn" className="btn" value={this.state.resolution} onChange={this.changeResolutionSelection}>
+                  <select id="resBtn" className="btn" name='resolution' value={this.props.filters.resolution} onChange={this.updateFilter}>
                     {resolutionList}
                   </select>
                 </form>
@@ -259,7 +270,7 @@ export default class CandleWidget extends React.Component {
 export function candleWidgetProps(that, key = "CandleWidget") {
   let propList = {
     apiKey: that.props.apiKey,
-    // getStockPrice: that.getStockPrice,
+    filters: that.props.widgetList[key]["filters"],
     showPane: that.showPane,
     trackedStocks: that.props.widgetList[key]["trackedStocks"],
     updateGlobalStockList: that.props.updateGlobalStockList,
