@@ -2,11 +2,14 @@ const express = require("express");
 const router = express.Router();
 const format = require("pg-format");
 const db = process.env.live === "1" ? require("../../db/databaseLive.js") : require("../../db/databaseLocalPG.js");
-const candleWidgetEndPoint = require("../../src/widgets/Price/candles/candlesEndPoint.js");
 const {finnHub, createFunctionQueueObject} = require("../../src/appFunctions/throttleQueueAPI.js");
 
+const candleWidgetEndPoint = require("../../src/widgets/Price/candles/candlesEndPoint.js");
+const quoteWidgetEndPoint = require("../../src/widgets/Price/quote/quoteEndPoint.js");
+
 const widgetDict = {
-    CandleWidget: candleWidgetEndPoint
+    CandleWidget: candleWidgetEndPoint,
+    StockDetailWidget:quoteWidgetEndPoint,
 }
 
 console.log(widgetDict)
@@ -48,7 +51,9 @@ router.get("/endPoint", (req, res) => {
     //builds query strings for finnHub API calls.
         const resObject = {}
         for (const widgetKey in dashboard) {
+            
             const thisWidget = dashboard[widgetKey]
+            console.log(thisWidget.widgetType)
             const widgetFunction = widgetDict[thisWidget.widgetType] //function to create query string
             const queryStringList = widgetFunction(
                 thisWidget.trackedStocks, 
@@ -69,7 +74,6 @@ router.get("/endPoint", (req, res) => {
                 } 
                 // console.log(resObject[id].stockData[stock])  
             }
-                    //data to be added here next step
         }
         // console.log("res Object -->", resObject)
         resolve(resObject)
