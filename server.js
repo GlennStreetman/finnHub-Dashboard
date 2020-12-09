@@ -1,3 +1,4 @@
+// import {endPoint} from './routes/postgres/endPoint.mjs'
 const express = require("express");
 require('dotenv').config()
 const port = process.env.NODE_ENV || 5000;
@@ -9,7 +10,7 @@ const bodyParser = require("body-parser");
 const app = express();
 let fileStoreOptions = {};
 
-if (process.env.live) {
+if (process.env.live === 1) {
   console.log("loading live server config")
   //enable below to run HTTP server. Used with Heroku
   const path = require("path");
@@ -31,10 +32,12 @@ if (process.env.live) {
   );
 
     //live routes, postgres db.
-    let appRoutes = require('./routes/postgres/appRoutesPG')
-    let appRegister =  require('./routes/postgres/registerRoutesPG')
+    const appRoutes = require('./routes/postgres/appRoutesPG')
+    const appRegister =  require('./routes/postgres/registerRoutesPG')
+    const endPoint =  require('./routes/postgres/endPoint')
     app.use('/', appRoutes)
     app.use('/', appRegister)
+    app.use('/', endPoint)
 
 } else {
   console.log("loading dev server config")
@@ -72,9 +75,11 @@ if (process.env.live) {
   );
 
   //dev routes
-const appRoutes = process.env.devDB === 'SQL3' ? require('./routes/sqLite3/appRoutesDevSQL3') : require('./routes/postgres/appRoutesPG');
-const appRegister = process.env.devDB === 'SQL3' ? require('./routes/sqLite3/registerRoutesSQL3') : require('./routes/postgres/registerRoutesPG') ;
+const appRoutes = require('./routes/postgres/appRoutesPG');
+const appRegister = require('./routes/postgres/registerRoutesPG') ;
+const endPoint = require('./routes/postgres/endPoint') ;
 app.use('/', appRoutes)
 app.use('/', appRegister)
+app.use('/', endPoint)
 
 }
