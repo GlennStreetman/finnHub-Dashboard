@@ -286,6 +286,4 @@ export function candleWidgetProps(that, key = "Candles") {
 // }
 
 
-// fetch('https://finnhub.io/api/v1/stock/candle?symbol=AAPL&resolution=1&from=1605543327&to=1605629727&token=bsuu7qv48v6qu589jlj0')
-//   .then(response => response.json())
-//   .then (data => console.log(data))
+
