@@ -88,7 +88,7 @@ const finnHub = (throttle, apiString, id) => {
                     throttle.openRequests = throttle.openRequests -= 1
                     throttle.setSuspend(4000)
                     finnHub(throttle, apiString)
-                    reject('finnhub 429')
+                    // reject('finnhub 429') <--do not reject if 429. Will break promises.all in /routes/endpoint.
                 } else {
             // console.log("FIRST RESPONSE:", response)
                 throttle.openRequests = throttle.openRequests -= 1

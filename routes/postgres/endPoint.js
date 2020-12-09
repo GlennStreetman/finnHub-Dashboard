@@ -4,13 +4,20 @@ const format = require("pg-format");
 const db = process.env.live === "1" ? require("../../db/databaseLive.js") : require("../../db/databaseLocalPG.js");
 const {finnHub, createFunctionQueueObject} = require("../../src/appFunctions/throttleQueueAPI.js");
 
+//import all API string generator functions here and register to object below to widgetDict.
 const candleWidgetEndPoint = require("../../src/widgets/Price/candles/candlesEndPoint.js");
 const quoteWidgetEndPoint = require("../../src/widgets/Price/quote/quoteEndPoint.js");
+const basicFinancialsEndPoint = require("../../src/widgets/Fundamentals/basicFinancials/basicFinancialsEndPoint.js");
+const marketNewsEndPoint = require("../../src/widgets/Fundamentals/marketNews/marketNewsEndPoint.js");
+
 
 const widgetDict = {
     CandleWidget: candleWidgetEndPoint,
     StockDetailWidget:quoteWidgetEndPoint,
+    MetricsWidget: basicFinancialsEndPoint,
+    NewsWidget:marketNewsEndPoint,
 }
+//Import all API data filter functions here and register below to postDataFilter.
 
 console.log(widgetDict)
 
@@ -121,7 +128,6 @@ router.get("/endPoint", (req, res) => {
     })
     .then((data) => {
         console.log("endpoint request complete")
-        // console.log(data)
         res.json(data)
     })
     .catch((err => {
