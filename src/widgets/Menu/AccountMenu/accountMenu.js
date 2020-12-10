@@ -24,7 +24,6 @@ class AccountMenu extends React.PureComponent {
   }
 
   componentDidMount() {
-    console.log("###LOADING ACCOUNT MENU###")
     this.getAccountData(this.baseState);
   }
 
@@ -40,14 +39,12 @@ class AccountMenu extends React.PureComponent {
     fetch(`/accountData`)
     .then((response) => response.json())
     .then((data) => {
-      console.log(baseState)
       if (baseState.mounted === true) {
-      console.log("updating accountmenu:")
-      let dataSet = data["userData"];
-      this.setState({ loginName: dataSet["loginname"] });
-      this.setState({ email: dataSet["email"] });
-      this.setState({ apiKey: dataSet["apikey"] });
-      this.setState({ webHook: dataSet["webhook"] }); 
+        let dataSet = data["userData"];
+        this.setState({ loginName: dataSet["loginname"] });
+        this.setState({ email: dataSet["email"] });
+        this.setState({ apiKey: dataSet["apikey"] });
+        this.setState({ webHook: dataSet["webhook"] }); 
       }
     })
     .catch((error) => {
@@ -95,7 +92,6 @@ class AccountMenu extends React.PureComponent {
     let messageStyle = {
       'text-align': 'center',
     }
-    let baseState = this.baseState
     return (
       <>
         {this.state.editToggle === 0 && (
