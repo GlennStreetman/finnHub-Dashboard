@@ -29,7 +29,7 @@ class TopNav extends React.Component {
 
   render() {
 
-    let widgetOptions = [
+    let widgetOptions = [ //dropdown menu: widgetType, Widget name, family, dropdown description
       ["MetricsWidget", "Stock Metrics: ", "stockWidget", "Fundamentals: Basic Financials"],
       ["NewsWidget", "Recent News: ", "stockWidget", "Fundamentals: Market News"],
       ["StockDetailWidget", "Stock Values: ", "stockWidget", "Price: Quote"],
@@ -81,12 +81,17 @@ class TopNav extends React.Component {
               </div>
             )}
           </div>
+          
           <div className="navItemEnd">
-            <a href="#contact" onClick={() => this.props.menuWidgetToggle("AccountMenu", "Your Account")}>
-              Manage Account
+            <a href="#contact" onClick={() => this.props.toggleWidgetVisability()}>
+            {this.props.showStockWidgets === 1 ? "Endpoints" : "Return to Dashboards"}
             </a>
           </div>
-
+          <div className="navItem">
+            <a href="#contact" onClick={() => this.props.menuWidgetToggle("AccountMenu", "Your Account")}>
+            {this.props.AccountMenu === 0 ? "Manage Account" : "Hide Account Menu"}
+            </a>
+          </div>
           <div className='navItem'>
             <a href="#home" onClick={() => this.props.menuWidgetToggle("AboutMenu", "About FinnDash")}>
             {this.props.AboutMenu === 0 ? "About" : "Hide About"}

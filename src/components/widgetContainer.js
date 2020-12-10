@@ -22,23 +22,34 @@ class WidgetContainer extends React.Component {
       renderHeader: this.props.widgetList["widgetHeader"],
       renderBody: this.props.widgetList["widgetType"],
       showEditPane: 0, //0: Hide, 1: Show
+      show: 'block'
     };
 
     this.dragElement = this.dragElement.bind(this);
     this.showPane = this.showPane.bind(this);
     this.updateHeader = this.updateHeader.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.showWidget = this.showWidget.bind(this);
   }
+
+  componentDidMount(){
+  const visable = this.showWidget()
+  this.setState({show: visable})
+}
+
 
 
   componentDidUpdate(prevProps) {
-    if (this.props.widgetLockDown !== prevProps.widgetLockDown) {
+    const p = this.props
+    if (p.widgetLockDown !== prevProps.widgetLockDown) {
       this.setState({ showEditPane: 0 });
     }
-    // if (this.props.zIndex.slice(-1) === this.props.widgetKey && 
-    // this.props.zIndex.slice(-1) !== prevProps.zIndex.slice(-1)) {
-    //   this.setState({state: this.state})
-    // }
+    if (p.stateRef !== prevProps.stateRef || 
+        p.showMenu !== prevProps.showMenu || 
+        p.showStockWidgets !== prevProps.showStockWidgets) {
+          const visable = this.showWidget()
+          this.setState({show: visable})
+    }
   }
 
   showPane(stateRef, fixState = -1) {
@@ -101,17 +112,30 @@ class WidgetContainer extends React.Component {
     }
   }
 
+  showWidget(){
+    if (this.props.stateRef === "menuList" && this.props.showMenu === 0){
+      return "none"
+    } else if (this.props.showStockWidgets === 0) {
+      return "none"
+    } else { 
+      return "block"
+    }
+  }
+
   render() {
     //Add widgets to the list below that should not have access to the stock search pane
     const hideStockSearchMenu = ["DashBoardMenu", "AccountMenu", "AboutMenu"]
+
     const compStyle = {
-      display: this.props.stateRef === "menuList" && this.props.showMenu === 0 ? "none" : "block",
+      display: this.state.show,
       top: this.props.widgetList["xAxis"],
       left: this.props.widgetList["yAxis"],
       zIndex: this.props.zIndex.indexOf(this.props.widgetKey),
-      
-      
     };
+
+    // console.log(compStyle)
+
+    // console.log(compStyle)
 
     let widgetList = {
       StockDetailWidget: StockDetailWidget,
@@ -133,7 +157,7 @@ class WidgetContainer extends React.Component {
     }
 
     return (
-      <div key={this.props.widgetKey + "container"} id={this.props.widgetKey + "box"} 
+      <div key={this.props.widgetKey + "container" + this.state.show} id={this.props.widgetKey + "box"} 
       className="widgetBox" style={compStyle} onMouseOut={() => {this.props.updateZIndex(this.props.widgetKey)}}>
         {this.props.widgetLockDown === 0 ? (
           <div className="widgetHeader">

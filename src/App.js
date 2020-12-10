@@ -17,7 +17,6 @@ class App extends React.Component {
 
     this.state = {
       globalStockList: [], //default stocks for new widgets. 
-      // globalStockObject: {},
       widgetList: {}, //lists of all widgets.
       menuList: {}, //lists of all menu widgets.
       login: 0, //login state. 0 logged out, 1 logged in.
@@ -25,7 +24,7 @@ class App extends React.Component {
       refreshStockData: 0, //if set to 1 stock data should be updated from globalStockList
       dashBoardData: [],
       currentDashBoard: "",
-      throttle: ThrottleQueue(25, 1000, true), //REMEMBER TO WRAP ALL FINNHUB API CALLS IN: throttle(function() {'YOUR API CALL HERE'})
+      throttle: ThrottleQueue(25, 1000, true), //all throttle Queue requests should be done with finnHub function.
       apiFlag: 0,
       zIndex: [],
       socket: '',
@@ -36,6 +35,7 @@ class App extends React.Component {
       AccountMenu: 0, //1 = show, 0 = hide
       AboutMenu: 0, //1 = show, 0 = hide
       widgetLockDown: 0,
+      showStockWidgets: 1,
 
     };
 
@@ -58,14 +58,21 @@ class App extends React.Component {
     this.newDashboard = this.newDashboard.bind(this);
     this.logOut = this.logOut.bind(this);
     this.lockWidgets = this.lockWidgets.bind(this);
+    this.toggleWidgetVisability = this.toggleWidgetVisability.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState){
     const s = this.state
 
-    if (s.login === 1 && prevState.login === 0) {this.getSavedDashBoards()};
-    LoadStockData(this, s, GetStockPrice)
-    LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets, s.throttle)
+    if (s.login === 1 && prevState.login === 0) {
+      console.log("loggin detected")
+      this.getSavedDashBoards()
+    };
+    
+    if (s.globalStockList !== prevState.globalStockList){
+      LoadStockData(this, s, GetStockPrice)
+      LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets, s.throttle)
+    }
 
     if (s.login === 1 && s.loadStartingDashBoard === 0 && s.currentDashBoard !== "") {
       console.log("loading dashboards", s.dashBoardData)
@@ -206,13 +213,13 @@ class App extends React.Component {
   }
 
   getSavedDashBoards() {
-    console.log('getting saved dashboards')
+    console.log('Getting saved dashboards')
     this.state.throttle.resetQueue()
 
     fetch("/dashBoard")
       .then((response) => response.json())
       .then((data) => {
-        console.log('dashboard and menu data retrieved')
+        console.log('Dashboard and menu data retrieved.')
         // console.log(data)
         let dashboards = data.savedDashBoards;
         let newList = {}; //replace numeric keys, returned by dataset, with widget IDs.
@@ -247,7 +254,7 @@ class App extends React.Component {
   }
 
   saveCurrentDashboard(dashboardName) {
-    // console.log("updating dashboard");
+    console.log("saving current dashboard");
     const data = {
       dashBoardName: dashboardName,
       globalStockList: this.state.globalStockList,
@@ -277,6 +284,11 @@ class App extends React.Component {
   lockWidgets(toggle){
     console.log("toggle widget lock")
     this.setState({widgetLockDown: toggle})
+  }
+
+  toggleWidgetVisability(){
+    const s = this.state
+    this.setState({showStockWidgets: s.showStockWidgets === 0 ? 1 : 0})
   }
 
   updateAPIFlag(val){
@@ -330,6 +342,8 @@ class App extends React.Component {
             DashBoardMenu={this.state.DashBoardMenu}
             lockWidgets={this.lockWidgets}
             widgetLockDown={this.state.widgetLockDown}
+            toggleWidgetVisability={this.toggleWidgetVisability}
+            showStockWidgets={this.state.showStockWidgets}
           />
           <WidgetController
             login={this.state.login}
@@ -364,6 +378,7 @@ class App extends React.Component {
             AboutMenu={this.state.AboutMenu}
             DashBoardMenu={this.state.DashBoardMenu}
             widgetLockDown={this.state.widgetLockDown}
+            showStockWidgets={this.state.showStockWidgets}
           />
         {loginScreen}
         

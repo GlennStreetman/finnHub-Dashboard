@@ -1,11 +1,7 @@
 function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle) {
-    
-  // console.log('--------------updating ticker sockets-------------')
-  // console.log(socket)
-  let thisSocket = socket
   //opens a series of socket connections to live stream stock prices
-  //update limited to once every 5 seconds to have mercy on dom rendering.
-  // const globalStockList = globalStockList;
+  //update limited to once every 3 seconds to have mercy on dom rendering.
+  let thisSocket = socket
   let streamingStockData = {};
   let lastUpdate = new Date().getTime();
   let that = context
@@ -17,7 +13,6 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle)
         globalStockList.map((el) => {
           let stockSym = el.slice(el.indexOf('-')+1 , el.length)
             throttle.enqueue(function() {
-              // throttle.openRequests = throttle.openRequests -= 1
               thisSocket.send(JSON.stringify({ type: "subscribe", symbol: stockSym }))
             })
           return true;
@@ -33,16 +28,20 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle)
           let checkTime = new Date().getTime();
           // console.log("Message from server ", event.data);
           if (checkTime - lastUpdate > 3000) {
-            
             lastUpdate = new Date().getTime();
             let updatedPrice = Object.assign({}, that.state.trackedStockData);
             for (const prop in streamingStockData) {
-              updatedPrice[prop]["currentPrice"] = streamingStockData[prop][0];
+              // console.log("thisSTock----->", prop)
+              if (updatedPrice[prop] !== undefined) {
+                updatedPrice[prop]["currentPrice"] = streamingStockData[prop][0]
+            } else {
+              // console.log("unsubscribing from: ",tickerReponse.data[0]["s"])
+              thisSocket.send(JSON.stringify({'type':'unsubscribe','symbol': tickerReponse.data[0]["s"]}))
             }
             that.setState({ trackedStockData: updatedPrice });
           }
         }
-      });
+      }})
     } catch(err) {
       console.log("problem setting up socket connections:", err)
     }
@@ -52,11 +51,8 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle)
 
 function LoadTickerSocket(context, prevState, globalStockList, socket, apiKey, updateTickerSockets, throttle) {
   const that = context
-  if (globalStockList !== prevState.globalStockList && throttle !== undefined){
-    // console.log("------loading ticker sockets-------------", apiKey)
-    // console.log(throttle)
+  if (globalStockList !== prevState.globalStockList && throttle !== undefined && apiKey !== ""){
     if (socket !== '') { 
-      // console.log("closing old sockets")
       socket.close()
     }
     let newSocket = new WebSocket("wss://ws.finnhub.io?token=" + apiKey)

@@ -77,6 +77,7 @@ class WidgetController extends React.Component {
                 changeWidgetName={this.props.changeWidgetName}
                 zIndex={this.props.zIndex}
                 updateZIndex={this.props.updateZIndex}
+                showStockWidgets={this.props.showStockWidgets}
             />
         ));
         
@@ -96,10 +97,7 @@ class WidgetController extends React.Component {
                 changeWidgetName={this.props.changeWidgetName}
                 zIndex={this.props.zIndex}
                 updateZIndex={this.props.updateZIndex}
-                WatchListMenu={this.state.WatchListMenu}
-                AccountMenu={this.state.AccountMenu}
-                AboutMenu={this.state.AboutMenu}
-                DashBoardMenu={this.state.DashBoardMenu}
+                showStockWidgets={this.props.showStockWidgets}
             />
         ))
 

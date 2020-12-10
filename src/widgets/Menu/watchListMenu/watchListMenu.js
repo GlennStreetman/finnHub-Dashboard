@@ -7,13 +7,22 @@ class WatchListMenu extends React.PureComponent {
     this.state = {
       availableStocks: {},
     };
+
+    this.baseState = {mounted: true}
+    this.getSymbolList = this.getSymbolList.bind(this);
+    this.renderWatchedStocks = this.renderWatchedStocks.bind(this);
+  
   }
 
   componentDidMount() {
-    this.getSymbolList();
+    this.getSymbolList(this.baseState);
   }
 
-  getSymbolList() {
+  componentWillUnmount(){
+    this.baseState.mounted = false
+  }
+
+  getSymbolList(baseState) {
     if (this.props.apiKey !== '') {  
       let that = this
       this.props.throttle.enqueue(function() {  
@@ -22,33 +31,35 @@ class WatchListMenu extends React.PureComponent {
           if (response.status === 429) {
             that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
             this.props.throttle.setSuspend(3000)
-            this.getSymbolList()
+            this.getSymbolList(this.baseState)
           } else {
           // console.log(Date().slice(20,25) + ":symbol list")
           that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
           return response.json()}})
         .then((data) => {
-          let transformData = {};
-          for (const [, stockValues] of Object.entries(data)) {
-            //deconstruct API object
-            const {
-              // currency: a,
-              description: b,
-              displaySymbol: c,
-              // symbol: d,
-              // type: e
-            } = stockValues;
-            //set API object keys equal to stock symbol value instad of numeric value
-            transformData[c] = {
-              // currency: a,
-              description: b,
-              displaySymbol: c,
-              // symbol: d,
-              // type: e,
-            };
+            let transformData = {};
+            for (const [, stockValues] of Object.entries(data)) {
+              //deconstruct API object
+              const {
+                // currency: a,
+                description: b,
+                displaySymbol: c,
+                // symbol: d,
+                // type: e
+              } = stockValues;
+              //set API object keys equal to stock symbol value instad of numeric value
+              transformData[c] = {
+                // currency: a,
+                description: b,
+                displaySymbol: c,
+                // symbol: d,
+                // type: e,
+              };
+            }
+            if (baseState.mounted === true) {
+            that.setState({ availableStocks: transformData });
+            // console.log("Success retrieving stock symbols");
           }
-          that.setState({ availableStocks: transformData });
-          // console.log("Success retrieving stock symbols");
         })
         .catch((error) => {
           console.error("Error retrieving stock symbols", error);
@@ -101,7 +112,6 @@ class WatchListMenu extends React.PureComponent {
             widgetKey={this.props.widgetKey}
             updateGlobalStockList={this.props.updateGlobalStockList}
             showSearchPane={() => this.props.showPane("showEditPane", 1)}
-            // getStockPrice={this.props.getStockPrice}
             apiKey={this.props.apiKey}
             throttle={this.props.throttle}
           />
@@ -126,7 +136,6 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
   let propList = {
     apiKey: that.props.apiKey,
     globalStockList: that.props.globalStockList,
-    // getStockPrice: that.props.getStockPrice,
     showPane: that.props.showPane,
     trackedStockData: that.props.trackedStockData,
     updateGlobalStockList: that.props.updateGlobalStockList,

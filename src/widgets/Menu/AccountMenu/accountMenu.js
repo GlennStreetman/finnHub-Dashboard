@@ -4,6 +4,7 @@ import React from "react";
 class AccountMenu extends React.PureComponent {
   constructor(props) {
     super(props);
+    this.myRef = React.createRef()
     this.state = {
       loginName: "",
       email: "",
@@ -14,6 +15,8 @@ class AccountMenu extends React.PureComponent {
       inputText: "",
       serverMessage: "",
     };
+
+    this.baseState = {mounted: true}
     this.getAccountData = this.getAccountData.bind(this);
     this.changeAccountData = this.changeAccountData.bind(this);
     this.showEditPane = this.showEditPane.bind(this);
@@ -21,30 +24,38 @@ class AccountMenu extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.getAccountData();
+    console.log("###LOADING ACCOUNT MENU###")
+    this.getAccountData(this.baseState);
   }
- 
+
+  componentWillUnmount(){
+    this.baseState.mounted = false
+  }
+
   handleChange(e) {
     this.setState({ inputText: e.target.value });
   }
 
-  getAccountData() {
+  getAccountData(baseState) {
     fetch(`/accountData`)
-      .then((response) => response.json())
-      .then((data) => {
-        // console.log(data)
-        let dataSet = data["userData"];
-        this.setState({ loginName: dataSet["loginname"] });
-        this.setState({ email: dataSet["email"] });
-        this.setState({ apiKey: dataSet["apikey"] });
-        this.setState({ webHook: dataSet["webhook"] });
-      })
-      .catch((error) => {
-        console.error("Failed to retrieve user data" + error);
-      });
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(baseState)
+      if (baseState.mounted === true) {
+      console.log("updating accountmenu:")
+      let dataSet = data["userData"];
+      this.setState({ loginName: dataSet["loginname"] });
+      this.setState({ email: dataSet["email"] });
+      this.setState({ apiKey: dataSet["apikey"] });
+      this.setState({ webHook: dataSet["webhook"] }); 
+      }
+    })
+    .catch((error) => {
+      console.error("Failed to retrieve user data" + error);
+    });
   }
 
-  changeAccountData(changeField, newValue) {
+  changeAccountData(changeField, newValue, baseState) {
     
     // console.log(changeField, newValue)
     const data = {
@@ -62,16 +73,15 @@ class AccountMenu extends React.PureComponent {
       console.log('updating apikey')
       this.props.updateAPIKey(newValue)
     }
- 
     fetch("/accountData", options)
       .then((response) => response.json())
       .then((data) => {
-        // console.log("----------")
-        // console.log(data)
-        this.getAccountData();
-        this.setState({ editToggle: 0 });
-        this.setState({ inputText: "" });
-        this.setState({serverMessage: data.message});
+        if (baseState.mounted === true) {
+          this.getAccountData(baseState);
+          this.setState({ editToggle: 0 });
+          this.setState({ inputText: "" });
+          this.setState({serverMessage: data.message});
+        }
       });
   }
 
@@ -85,7 +95,7 @@ class AccountMenu extends React.PureComponent {
     let messageStyle = {
       'text-align': 'center',
     }
-
+    let baseState = this.baseState
     return (
       <>
         {this.state.editToggle === 0 && (
@@ -147,7 +157,7 @@ class AccountMenu extends React.PureComponent {
                   </button>
                 </td>
                 <td>
-                  <button value="Submit" onClick={() => this.changeAccountData(this.state.editField, this.state.inputText)}>
+                  <button value="Submit" onClick={() => this.changeAccountData(this.state.editField, this.state.inputText, this.baseState)}>
                     Submit
                   </button>
                 </td>
@@ -163,12 +173,6 @@ class AccountMenu extends React.PureComponent {
 export function accountMenuProps(that, key = "AccountMenu") {
   let propList = {
     apiKey: that.props.apiKey,
-    // globalStockList: that.props.globalStockList,
-    // getStockPrice: that.getStockPrice,
-    // showPane: that.props.showPane,
-    // trackedStockData: that.state.trackedStockData,
-    // updateGlobalStockList: that.props.updateGlobalStockList,
-    // updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
     updateAPIKey: that.props.updateAPIKey
   };
