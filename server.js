@@ -33,12 +33,12 @@ if (process.env.live === 1) {
 
     //live routes, postgres db.
     const login = require('./routes/postgres/appLogin')
-    const appRoutes = require('./routes/postgres/appRoutesPG')
+    const loggedIn = require('./routes/postgres/loggedInRoutes')
     const appRegister =  require('./routes/postgres/registerRoutesPG')
     const recover =  require('./routes/postgres/recoverAccount')
     const endPoint =  require('./routes/postgres/endPoint')
     app.use('/', login)    
-    app.use('/', appRoutes)
+    app.use('/', loggedIn)
     app.use('/', appRegister)
     app.use('/', endPoint)
     app.use('/', recover)
@@ -80,12 +80,12 @@ if (process.env.live === 1) {
 
   //dev routes
   const login = require('./routes/postgres/appLogin')
-  const appRoutes = require('./routes/postgres/appRoutesPG')
+  const loggedIn = require('./routes/postgres/loggedInRoutes')
   const appRegister =  require('./routes/postgres/registerRoutesPG')
   const recover =  require('./routes/postgres/recoverAccount')
   const endPoint =  require('./routes/postgres/endPoint')
   app.use('/', login)    
-  app.use('/', appRoutes)
+  app.use('/', loggedIn)
   app.use('/', appRegister)
   app.use('/', endPoint)
   app.use('/', recover)
