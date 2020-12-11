@@ -8,8 +8,11 @@ import ThrottleQueue  from "./appFunctions/throttleQueue.js";
 
 import TopNav from "./components/topNav.js";
 import Login from "./components/login.js";
-import {WidgetController, MenuWidgetToggle} from "./components/widgetController"
+import AboutMenu from "./components/AboutMenu.js";
+import AccountMenu from "./components/accountMenu.js";
+import EndPoints from "./components/endPoints.js";
 
+import {WidgetController, MenuWidgetToggle} from "./components/widgetController"
 
 class App extends React.Component {
   constructor(props) {
@@ -36,6 +39,7 @@ class App extends React.Component {
       AboutMenu: 0, //1 = show, 0 = hide
       widgetLockDown: 0,
       showStockWidgets: 1,
+      backGroundMenu: '',
 
     };
 
@@ -59,6 +63,7 @@ class App extends React.Component {
     this.logOut = this.logOut.bind(this);
     this.lockWidgets = this.lockWidgets.bind(this);
     this.toggleWidgetVisability = this.toggleWidgetVisability.bind(this);
+    this.toggleBackGroundMenu = this.toggleBackGroundMenu.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState){
@@ -291,16 +296,28 @@ class App extends React.Component {
     this.setState({showStockWidgets: s.showStockWidgets === 0 ? 1 : 0})
   }
 
+  toggleBackGroundMenu(menu){
+    if (menu === '') {
+      this.setState({backGroundMenu: menu})
+      this.setState({showStockWidgets: 1})
+    } else if (this.state.backGroundMenu !== menu) {
+      this.setState({backGroundMenu: menu})
+      this.setState({showStockWidgets: 0})
+    } else {
+      this.setState({backGroundMenu: ""})
+      this.setState({showStockWidgets: 1})
+    }
+  }
+
   updateAPIFlag(val){
     this.setState({apiFlag: val})
   }
 
   logOut(){
     fetch("/logOut")
-    .then((data) => console.log('logging out'))
+    .then((data) => console.log('logging out', data))
     .then(() => {
-      console.log("reseting state")
-      this.setState(this.baseState)
+      setTimeout(() => this.setState(this.baseState),100)
     });
   }
 
@@ -319,11 +336,23 @@ class App extends React.Component {
     // console.log("--------", TopNavContext)
     const menuWidgetToggle = MenuWidgetToggle(this)
     const quaryData = queryString.parse(window.location.search)
-    const loginScreen = this.state.login === 0 ? 
+    const loginScreen = this.state.login === 0 && this.state.backGroundMenu === '' ? 
       <Login 
       updateLogin={this.processLogin}
       queryData = {quaryData}
       /> : <></>
+
+      const backGroundMenu = () => {
+        if (this.state.backGroundMenu === 'endPoint') {
+          return(<EndPoints />)
+        } else if (this.state.backGroundMenu === 'manageAccount') {
+          return(<AccountMenu />)
+        } else if (this.state.backGroundMenu === 'about'){
+          return(<AboutMenu />)
+        } else {
+          return (<></>)
+        }
+      }
 
     return (
       <>
@@ -344,6 +373,8 @@ class App extends React.Component {
             widgetLockDown={this.state.widgetLockDown}
             toggleWidgetVisability={this.toggleWidgetVisability}
             showStockWidgets={this.state.showStockWidgets}
+            toggleBackGroundMenu={this.toggleBackGroundMenu}
+            backGroundMenu={this.state.backGroundMenu}
           />
           <WidgetController
             login={this.state.login}
@@ -381,6 +412,7 @@ class App extends React.Component {
             showStockWidgets={this.state.showStockWidgets}
           />
         {loginScreen}
+        {backGroundMenu()}
         
       </>
     ) 

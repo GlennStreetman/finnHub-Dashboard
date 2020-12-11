@@ -81,20 +81,33 @@ class TopNav extends React.Component {
               </div>
             )}
           </div>
-          
+
           <div className="navItemEnd">
-            <a href="#contact" onClick={() => this.props.toggleWidgetVisability()}>
-            {this.props.showStockWidgets === 1 ? "Endpoints" : "Return to Dashboards"}
+            <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('')}}> 
+            {/* <a href="#contact" onClick={() => this.props.toggleWidgetVisability()}> */}
+            {this.props.backGroundMenu === '' ? " " : "Back to Dashboards"}
+            {/* {this.props.showStockWidgets === 1 ? "Endpoints" : "Return to Dashboards"} */}
             </a>
           </div>
           <div className="navItem">
-            <a href="#contact" onClick={() => this.props.menuWidgetToggle("AccountMenu", "Your Account")}>
-            {this.props.AccountMenu === 0 ? "Manage Account" : "Hide Account Menu"}
+            <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('endPoint')}}> 
+            {/* <a href="#contact" onClick={() => this.props.toggleWidgetVisability()}> */}
+            Endpoints
+            {/* {this.props.showStockWidgets === 1 ? "Endpoints" : "Return to Dashboards"} */}
+            </a>
+          </div>
+          <div className="navItem">
+            <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('manageAccount')}}> 
+            {/* <a href="#contact" onClick={() => this.props.menuWidgetToggle("AccountMenu", "Your Account")}> */}
+            Manage Account
+            {/* {this.props.AccountMenu === 0 ? "Manage Account" : "Hide Account Menu"} */}
             </a>
           </div>
           <div className='navItem'>
-            <a href="#home" onClick={() => this.props.menuWidgetToggle("AboutMenu", "About FinnDash")}>
-            {this.props.AboutMenu === 0 ? "About" : "Hide About"}
+            <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('about')}}>
+            {/* <a href="#home" onClick={() => this.props.menuWidgetToggle("AboutMenu", "About FinnDash")}> */}
+            About
+            {/* {this.props.AboutMenu === 0 ? "About" : "Hide About"} */}
             </a>
           </div>
           <div className='navItem'>
@@ -110,8 +123,9 @@ class TopNav extends React.Component {
       <>
       <div className="topnav">
         <div className='navItemEnd'>
-          <a href="#home" onClick={() => this.props.menuWidgetToggle("AboutMenu", "About FinnDash")}>
-          {this.props.AboutMenu === 0 ? "About" : "Hide About"}
+          <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('about')}}>
+          {/* <a href="#home" onClick={() => this.props.menuWidgetToggle("AboutMenu", "About FinnDash")}> */}
+          {this.props.backGroundMenu === 'about' ? "Login" : "About"}
           </a>
         </div>
       </div>
