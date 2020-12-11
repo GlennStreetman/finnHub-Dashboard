@@ -1,0 +1,54 @@
+// const { json } = require('body-parser');
+const express = require("express");
+const router = express.Router();
+const format = require('pg-format');
+const md5 = require("md5");
+const db = process.env.live === '1' ? 
+  require("../../db/databaseLive.js") :  
+  require("../../db/databaseLocalPG.js") ;
+
+  router.use(function timeLog(req, res, next) {
+    console.log("Time: ", new Date());
+    next();
+  });
+
+router.get("/login", (req, res) => {
+    let loginText = format('%L', req.query["loginText"])
+    let pwText = format('%L', req.query["pwText"])
+    let loginQuery = `SELECT id, loginname, apikey, confirmemail 
+                FROM users WHERE loginName =${loginText} 
+                AND password = '${md5(pwText)}'`;
+    let info = { key: "", login: 0 };
+    // console.log(loginQuery)
+    db.query(loginQuery, (err, rows) => {
+        let login = rows.rows[0]
+      // console.log(login)
+        if (err) {
+        res.json({message: "login error"});
+        } else if (rows.rowCount === 1 && login.confirmemail === '1') {
+        info["key"] = login.apikey;
+        info["login"] = 1;
+        info["response"] = 'success';
+        req.session.uID = login.id;
+        req.session.userName = rows.rows[0]['loginname'];
+        req.session.login = true
+        console.log(req.session)
+        res.json(info);
+        } else if (rows.rowCount === 1 && login.confirmemail !== '1') {
+        // console.log(login)
+        info["response"] = 'Please confirm your email address.';
+        res.json(info)
+        } else {
+        info["response"] = "Login/Password did not match."
+        res.json(info)
+        }
+    });
+});
+
+router.get("/logOut", (req, res) => {
+    req.session.login = false;
+    console.log(req.session.userName, req.session.login);
+    res.json("true");
+});
+
+module.exports = router;

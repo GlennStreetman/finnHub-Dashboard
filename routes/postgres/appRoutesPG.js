@@ -1,16 +1,14 @@
-// const { json } = require('body-parser');
+
 const express = require("express");
 const router = express.Router();
 const format = require("pg-format");
 const cryptoRandomString = require("crypto-random-string");
 const db = process.env.live === "1" ? require("../../db/databaseLive.js") : require("../../db/databaseLocalPG.js");
 const URL = process.env.live === '1' ? `https://finn-dash.herokuapp.com` : `http://localhost:5000`
-// middleware specific to this router
 
 //mailgun config data, needs to be set to be imported if not available in process.env
 const API_KEY = process.env.API_KEY || 1;
 const DOMAIN = process.env.DOMAIN_KEY || 1;
-// console.log(API_KEY, DOMAIN)
 const mailgun = require("mailgun-js")({ apiKey: API_KEY, domain: DOMAIN });
 
 function emailIsValid(email) {
@@ -21,6 +19,8 @@ router.use(function timeLog(req, res, next) {
   console.log("Time: ", new Date());
   next();
 });
+
+
 
 router.get("*", (req, res) => {
   //Do not return APP until login in complete? Come back to this later.
@@ -103,28 +103,6 @@ router.post("/accountData", (req, res) => {
         }
       });
     } else {res.json({message: `email not valid`})}}
-});
-
-router.get("/verifyChange", (req, res) => {
-  let verifyID = format('%L', req.query['id'])
-  let verifyUpdate = `
-    UPDATE users
-    SET email = (SELECT newEmail FROM newEmail WHERE queryString = ${verifyID} limit 1)
-    WHERE id = (SELECT userID FROM newEmail WHERE queryString = ${verifyID} limit 1)
-    ;
-    DELETE FROM newEmail 
-    WHERE userID  = (SELECT userID FROM newEmail WHERE queryString = ${verifyID})
-  `
-  console.log(verifyUpdate)
-  db.query(verifyUpdate, (err) => {
-    if (err) {
-      res.json({message: "Could not update email address."});
-      // console.log(verifyUpdate)
-    } else {
-      console.log('email verified')
-      res.redirect('/')
-    }
-  })
 });
 
 router.get("/dashboard", (req, res) => {
@@ -342,10 +320,7 @@ router.get("/checkLogin", (req, res) => {
   }
 });
 
-router.get("/logOut", (req, res) => {
-  req.session.login = false;
-  console.log(req.session.userName, req.session.login);
-  res.json("true");
-});
+
 
 module.exports = router;
+  

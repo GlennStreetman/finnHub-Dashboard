@@ -32,12 +32,16 @@ if (process.env.live === 1) {
   );
 
     //live routes, postgres db.
+    const login = require('./routes/postgres/appLogin')
     const appRoutes = require('./routes/postgres/appRoutesPG')
     const appRegister =  require('./routes/postgres/registerRoutesPG')
+    const recover =  require('./routes/postgres/recoverAccount')
     const endPoint =  require('./routes/postgres/endPoint')
+    app.use('/', login)    
     app.use('/', appRoutes)
     app.use('/', appRegister)
     app.use('/', endPoint)
+    app.use('/', recover)
 
 } else {
   console.log("loading dev server config")
@@ -75,11 +79,15 @@ if (process.env.live === 1) {
   );
 
   //dev routes
-const appRoutes = require('./routes/postgres/appRoutesPG');
-const appRegister = require('./routes/postgres/registerRoutesPG') ;
-const endPoint = require('./routes/postgres/endPoint') ;
-app.use('/', appRoutes)
-app.use('/', appRegister)
-app.use('/', endPoint)
+  const login = require('./routes/postgres/appLogin')
+  const appRoutes = require('./routes/postgres/appRoutesPG')
+  const appRegister =  require('./routes/postgres/registerRoutesPG')
+  const recover =  require('./routes/postgres/recoverAccount')
+  const endPoint =  require('./routes/postgres/endPoint')
+  app.use('/', login)    
+  app.use('/', appRoutes)
+  app.use('/', appRegister)
+  app.use('/', endPoint)
+  app.use('/', recover)
 
 }
