@@ -10,9 +10,9 @@ import TopNav from "./components/topNav.js";
 import Login from "./components/login.js";
 import AboutMenu from "./components/AboutMenu.js";
 import AccountMenu from "./components/accountMenu.js";
-import EndPoints from "./components/endPoints.js";
+import EndPointMenu from "./components/endPoints.js";
 
-import {WidgetController, MenuWidgetToggle} from "./components/widgetController"
+import {WidgetController, MenuWidgetToggle} from "./components/widgetController";
 
 class App extends React.Component {
   constructor(props) {
@@ -344,7 +344,12 @@ class App extends React.Component {
 
       const backGroundMenu = () => {
         if (this.state.backGroundMenu === 'endPoint') {
-          return(<EndPoints />)
+          return(
+            <EndPointMenu 
+              dashBoardData={this.state.dashBoardData}
+              apiKey={this.state.apiKey}
+              throttle={this.state.throttle}
+            />)
         } else if (this.state.backGroundMenu === 'manageAccount') {
           return(<AccountMenu />)
         } else if (this.state.backGroundMenu === 'about'){

@@ -3,6 +3,7 @@ const router = express.Router();
 const format = require("pg-format");
 const db = process.env.live === "1" ? require("../../db/databaseLive.js") : require("../../db/databaseLocalPG.js");
 const {finnHub, createFunctionQueueObject} = require("../../src/appFunctions/throttleQueueAPI.js");
+const cors = require('cors')
 
 //import all API string generator functions here and register to object below to widgetDict.
 const candleWidgetEndPoint = require("../../src/widgets/Price/candles/candlesEndPoint.js");
@@ -26,7 +27,7 @@ router.use(function timeLog(req, res, next) {
     next();
     });
 
-router.get("/endPoint", (req, res) => {
+router.get("/endPoint", cors(),(req, res) => {
     console.log("Generating new endpoint data");
     // const data = {}
     const apiKey = format('%L', req.query['apiKey'])

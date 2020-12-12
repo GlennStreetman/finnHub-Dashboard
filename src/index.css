@@ -365,3 +365,23 @@ th {
 .tdHead {
   white-space: pre;
 }
+
+.headerButtonsLeft {
+  height: 25px;
+  width: 25px;
+  padding: 2px;
+  align-content: center;
+}
+
+.endPointDivColumn {
+  display: flex;
+  flex-direction: column;
+  padding: 5px;
+  align-items: top;
+}
+
+.endPointDivRow {
+  display: flex;
+  flex-direction: row;
+  padding: 5px;
+}

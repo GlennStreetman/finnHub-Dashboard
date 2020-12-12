@@ -12,6 +12,7 @@
     "canvasjs": "^1.8.3",
     "chart.js": "^2.9.3",
     "cookie-parser": "^1.4.5",
+    "cors": "^2.8.5",
     "crypto-random-string": "^3.3.0",
     "denodify": "^0.1.18",
     "express": "^4.17.1",
