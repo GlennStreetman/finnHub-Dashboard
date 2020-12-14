@@ -47,40 +47,49 @@ class TopNav extends React.Component {
         {d}
         </a>)
     })
+
+    const showDashBoardButtons = () => {
+      if (this.props.showStockWidgets === 1) {
+        return ( <>
+          <div className="navItem">
+          <a href="#contact" onClick={() => this.props.menuWidgetToggle("WatchListMenu", "WatchList")}>
+            {this.props.WatchListMenu === 0 ? "Show Watchlist Menu" : "Hide Watchlist Menu"}
+          </a>
+        </div>
+
+        <div className="navItem">
+          <a href="#contact" onClick={() => this.props.menuWidgetToggle("DashBoardMenu", "Saved Dashboards")}>
+            {this.props.DashBoardMenu === 0 ? "Show Dashboard Menu" : "Hide Dashboard Menu"}
+          </a>
+        </div>
+        <div className="navItem">
+          <a href="#contact" onClick={() => (this.props.widgetLockDown === 0 ? this.props.lockWidgets(1) : this.props.lockWidgets(0))}>
+            {this.props.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}     
+          </a>
+        </div>
+
+        <div className="dropDiv" onMouseLeave={() => this.showPane("showAddWidgetDropdown")}>
+          <a href="#test" className="dropbtn" onMouseOver={() => this.showPane("showAddWidgetDropdown")}>
+            Add Widget
+          </a>
+          {this.state.showAddWidgetDropdown === 1 && (
+            <div className="dropdown">
+              <div className="dropdown-content">
+                {widgetDropDown}
+              </div>
+            </div>
+          )}
+        </div>
+        </>
+        )
+      } else { return <></>}
+    }
     
     return this.props.login === 1 ? (
       <>
         <div className="topnav">
         <img src="logo2.png" alt="logo"></img>
-          <div className="navItem">
-            <a href="#contact" onClick={() => this.props.menuWidgetToggle("WatchListMenu", "WatchList")}>
-              {this.props.WatchListMenu === 0 ? "Show Watchlist Menu" : "Hide Watchlist Menu"}
-            </a>
-          </div>
-
-          <div className="navItem">
-            <a href="#contact" onClick={() => this.props.menuWidgetToggle("DashBoardMenu", "Saved Dashboards")}>
-              {this.props.DashBoardMenu === 0 ? "Show Dashboard Menu" : "Hide Dashboard Menu"}
-            </a>
-          </div>
-          <div className="navItem">
-            <a href="#contact" onClick={() => (this.props.widgetLockDown === 0 ? this.props.lockWidgets(1) : this.props.lockWidgets(0))}>
-              {this.props.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}     
-            </a>
-          </div>
-
-          <div className="dropDiv" onMouseLeave={() => this.showPane("showAddWidgetDropdown")}>
-            <a href="#test" className="dropbtn" onMouseOver={() => this.showPane("showAddWidgetDropdown")}>
-              Add Widget
-            </a>
-            {this.state.showAddWidgetDropdown === 1 && (
-              <div className="dropdown">
-                <div className="dropdown-content">
-                  {widgetDropDown}
-                </div>
-              </div>
-            )}
-          </div>
+        {showDashBoardButtons()}
 
           <div className="navItemEnd">
             <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('')}}> 

@@ -345,15 +345,18 @@ class App extends React.Component {
       const backGroundMenu = () => {
         if (this.state.backGroundMenu === 'endPoint') {
           return(
-            <EndPointMenu 
-              dashBoardData={this.state.dashBoardData}
-              apiKey={this.state.apiKey}
-              throttle={this.state.throttle}
-            />)
+            <div className='backgroundMenu'>
+              <EndPointMenu 
+                dashBoardData={this.state.dashBoardData}
+                apiKey={this.state.apiKey}
+                throttle={this.state.throttle}
+              />
+            </div>
+          )
         } else if (this.state.backGroundMenu === 'manageAccount') {
-          return(<AccountMenu />)
+          return(<div className='backgroundMenu'><AccountMenu /></div>)
         } else if (this.state.backGroundMenu === 'about'){
-          return(<AboutMenu />)
+          return(<div className='backgroundMenu'><AboutMenu /></div>)
         } else {
           return (<></>)
         }
