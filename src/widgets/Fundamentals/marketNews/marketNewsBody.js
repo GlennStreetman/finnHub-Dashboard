@@ -11,8 +11,8 @@ export default class marketNews extends React.Component {
     let startStock = startList.length > 0 ? startList[0] : undefined;
     this.state = {
       companyNews: [],
-      // startDate: new Date(Date.now()-604800*1000).toISOString().slice(0, 10),
-      // endDate: new Date().toISOString().slice(0, 10),
+      startDate: new Date(Date.now()-604800*1000).toISOString().slice(0, 10),
+      endDate: new Date().toISOString().slice(0, 10),
       newsSelection: startStock,
       newsIncrementor: 1,
     };
@@ -34,10 +34,13 @@ export default class marketNews extends React.Component {
     const p = this.props
     const s = this.state
     if (p.filters['startDate'] === undefined) {
-      const startDate = new Date(Date.now()-604800*1000).toISOString().slice(0, 10)
-      const endDate = new Date().toISOString().slice(0, 10)
-      p.updateWidgetFilters(p.widgetKey, 'startDate', startDate)
-      p.updateWidgetFilters(p.widgetKey, 'endDate', endDate)
+      // const startDate = new Date(Date.now()-604800*1000).toISOString().slice(0, 10)
+      // const endDate = new Date().toISOString().slice(0, 10)
+      const startDateSetBack = 604800*1000 //1 week
+      const endDateSetBack = 0
+      p.updateWidgetFilters(p.widgetKey, 'startDate', startDateSetBack)
+      p.updateWidgetFilters(p.widgetKey, 'endDate', endDateSetBack)
+      p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
     } 
 
     if (p.trackedStocks.length > 0 && s.newsSelection !== undefined && p.filters !== undefined) {
@@ -81,13 +84,23 @@ export default class marketNews extends React.Component {
   }
   
   getCompanyNews(symbol, fromDate, toDate) {
-    if (this.props.apiKey !== '' && symbol !== undefined) {
-      let stockSymbol = symbol.slice(symbol.indexOf('-')+1, symbol.length)
-      let that = this
-      let querryString = "https://finnhub.io/api/v1/company-news?symbol=" + stockSymbol + "&from=" + fromDate + "&to=" + toDate + "&token=" + that.props.apiKey
+    const p = this.props
+    if (p.apiKey !== '' && symbol !== undefined) {
       
-      finnHub(this.props.throttle, querryString)
-        // .then((data) => {console.log(data)})
+      let stockSymbol = symbol.slice(symbol.indexOf('-')+1, symbol.length)
+      
+      const now = Date.now()
+      const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800*1000
+      const startUnix = now - startUnixOffset
+      const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
+      const endUnix = now - endUnixOffset
+      const startDate = new Date(startUnix).toISOString().slice(0, 10);
+      const endDate = new Date(endUnix).toISOString().slice(0, 10);
+      
+      let that = this
+      let querryString = "https://finnhub.io/api/v1/company-news?symbol=" + stockSymbol + "&from=" + startDate + "&to=" + endDate + "&token=" + that.props.apiKey
+      console.log(querryString)
+      finnHub(p.throttle, querryString)
         .then((data) => {
           if (this.baseState.mounted === true) {
             let filteredNews = [];
@@ -118,10 +131,14 @@ export default class marketNews extends React.Component {
   }
 
   updateFilter(e) {
-    const target = e.target;
-    const name = target.name;
-    this.props.updateWidgetFilters(this.props.widgetKey, name, target.value)
-    // this.setState({ [name]: e.target.value });
+    if (isNaN(new Date(e.target.value).getTime()) === false){
+      const now = Date.now()
+      const target = new Date(e.target.value).getTime();
+      const offset = now - target
+      const name = e.target.name;
+
+      this.props.updateWidgetFilters(this.props.widgetKey, name, offset)
+    }
   }
 
   changeNewsSelection(e) {
@@ -229,6 +246,16 @@ export default class marketNews extends React.Component {
   }
 
   render() {
+    const p = this.props
+    
+    const now = Date.now()
+    const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800*1000
+    const startUnix = now - startUnixOffset
+    const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
+    const endUnix = now - endUnixOffset
+    const startDate = new Date(startUnix).toISOString().slice(0, 10);
+    const endDate = new Date(endUnix).toISOString().slice(0, 10);
+  
     return (
       <>
         {this.props.showEditPane === 1 && (
@@ -246,9 +273,9 @@ export default class marketNews extends React.Component {
               <div className="stockSearch">
                 <form className="form-inline">
                   <label htmlFor="start">Start date:</label>
-                  <input className="btn" id="start" type="date" name="startDate" onChange={this.updateFilter} value={this.props.filters.startDate}></input>
+                  <input className="btn" id="start" type="date" name="startDate" onChange={this.updateFilter} value={startDate}></input>
                   <label htmlFor="end">End date:</label>
-                  <input className="btn" id="end" type="date" name="endDate" onChange={this.updateFilter} value={this.props.filters.endDate}></input>
+                  <input className="btn" id="end" type="date" name="endDate" onChange={this.updateFilter} value={endDate}></input>
                 </form>
               </div>
             </div>
