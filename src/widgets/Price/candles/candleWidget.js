@@ -35,12 +35,14 @@ export default class Candles extends React.Component {
   componentDidMount() {
     const p = this.props
     if (p.filters['startDate'] === undefined) {
-      const startDate = new Date(Date.now()-31536000*1000).toISOString().slice(0, 10)
-      const endDate = new Date().toISOString().slice(0, 10)
-      p.updateWidgetFilters(p.widgetKey, 'startDate', startDate)
-      p.updateWidgetFilters(p.widgetKey, 'endDate', endDate)
+      const startDateSetBack = 31536000*1000 //1 week
+      const endDateSetBack = 0
+      p.updateWidgetFilters(p.widgetKey, 'startDate', startDateSetBack)
+      p.updateWidgetFilters(p.widgetKey, 'endDate', endDateSetBack)
+      p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
       p.updateWidgetFilters(p.widgetKey, 'resolution', 'W')
     } 
+    
     
     if (p.trackedStocks.length > 0) {
       this.getCandleData();
@@ -71,33 +73,41 @@ export default class Candles extends React.Component {
   }
 
   updateFilter(e) {
-    const target = e.target;
-    const name = target.name;
-    this.props.updateWidgetFilters(this.props.widgetKey, name, target.value);
-    // this.setState({ [name]: e.target.value });
+    // const target = e.target;
+    // const name = target.name;
+    if (isNaN(new Date(e.target.value).getTime()) === false){
+      const now = Date.now()
+      const target = new Date(e.target.value).getTime();
+      const offset = now - target
+      const name = e.target.name;
+      this.props.updateWidgetFilters(this.props.widgetKey, name, offset);
+    };
   }
 
   getCandleData() {
     // console.log('creating candle chart')
     const p = this.props
     if (p.apiKey !== '') {
-      let candleStock = this.state.candleSelection
-      let candleSymbol = candleStock.slice(candleStock.indexOf('-')+1 , candleStock.length)
-      const s = p.filters.startDate;
-      const e = p.filters.endDate;
+      const candleStock = this.state.candleSelection
+      const candleSymbol = candleStock.slice(candleStock.indexOf('-')+1 , candleStock.length)
+      const now = Date.now()
+      const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800
+      const startUnix = Math.floor((now - startUnixOffset) / 1000)
+      const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
+      const endUnix = Math.floor((now - endUnixOffset) / 1000)
 
-      const startDateUnix = new Date(s.slice(0, 4), s.slice(5, 7), s.slice(8, 10)).getTime() / 1000;
-      const endDateUnix = new Date(e.slice(0, 4), e.slice(5, 7), e.slice(8, 10)).getTime() / 1000;
       let that =  this
       const queryString = "https://finnhub.io/api/v1/stock/candle?symbol=" +
           candleSymbol +
           "&resolution=" +
           p.filters.resolution +
           "&from=" +
-          startDateUnix +
+          startUnix +
           "&to=" +
-          endDateUnix +
+          endUnix +
           "&token=" + that.props.apiKey
+
+      console.log(queryString)
 
       finnHub(this.props.throttle, queryString)
       .then((data) => {
@@ -135,6 +145,16 @@ export default class Candles extends React.Component {
   }
 
   createChartOptions() {
+    const p = this.props
+    
+    const now = Date.now()
+    const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800*1000
+    const startUnix = now - startUnixOffset
+    const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
+    const endUnix = now - endUnixOffset
+    const startDate = new Date(startUnix).toISOString().slice(0, 10);
+    const endDate = new Date(endUnix).toISOString().slice(0, 10);
+    
     const options = {
       theme: "light2", // "light1", "light2", "dark1", "dark2"
       animationEnabled: true,
@@ -142,7 +162,7 @@ export default class Candles extends React.Component {
       height: 400,
       width: 525,
       title: {
-        text: this.state.candleSelection + ": " + this.props.filters.startDate + " - " + this.props.filters.endDate,
+        text: this.state.candleSelection + ": " + startDate + " - " + endDate,
       },
       axisX: {
         valueFormatString: "YYYY-MM-DD",
@@ -232,6 +252,16 @@ export default class Candles extends React.Component {
       </option>
     ));
 
+    const p = this.props
+    
+    const now = Date.now()
+    const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800*1000
+    const startUnix = now - startUnixOffset
+    const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
+    const endUnix = now - endUnixOffset
+    const startDate = new Date(startUnix).toISOString().slice(0, 10);
+    const endDate = new Date(endUnix).toISOString().slice(0, 10);
+
     return (
       <>
         {this.props.showEditPane === 1 && (
@@ -249,9 +279,9 @@ export default class Candles extends React.Component {
               <div className="stockSearch">
                 <form className="form-inline">
                   <label htmlFor="start">Start date:</label>
-                  <input className="btn" id="start" type="date" name="startDate" onChange={this.updateFilter} value={this.props.filters.startDate}></input>
+                  <input className="btn" id="start" type="date" name="startDate" onChange={this.updateFilter} value={startDate}></input>
                   <label htmlFor="end">End date:</label>
-                  <input className="btn" id="end" type="date" name="endDate" onChange={this.updateFilter} value={this.props.filters.endDate}></input>
+                  <input className="btn" id="end" type="date" name="endDate" onChange={this.updateFilter} value={endDate}></input>
                   <label htmlFor="resBtn">Resolution:</label>
                   <select id="resBtn" className="btn" name='resolution' value={this.props.filters.resolution} onChange={this.updateFilter}>
                     {resolutionList}
@@ -284,14 +314,6 @@ export function candleWidgetProps(that, key = "Candles") {
   };
   return propList;
 }
-
-
-// function that returns query strings and filter procedure.
-
-
-// export function candleWidgetToJson(data){
-
-// }
 
 
 
