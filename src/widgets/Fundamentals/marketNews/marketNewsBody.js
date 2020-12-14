@@ -34,8 +34,6 @@ export default class marketNews extends React.Component {
     const p = this.props
     const s = this.state
     if (p.filters['startDate'] === undefined) {
-      // const startDate = new Date(Date.now()-604800*1000).toISOString().slice(0, 10)
-      // const endDate = new Date().toISOString().slice(0, 10)
       const startDateSetBack = 604800*1000 //1 week
       const endDateSetBack = 0
       p.updateWidgetFilters(p.widgetKey, 'startDate', startDateSetBack)
@@ -244,7 +242,7 @@ export default class marketNews extends React.Component {
     );
     return symbolSelectorDropDown;
   }
-
+  
   render() {
     const p = this.props
     
