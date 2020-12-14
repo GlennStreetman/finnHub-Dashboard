@@ -16,6 +16,8 @@ export default class marketNews extends React.Component {
       newsSelection: startStock,
       newsIncrementor: 1,
     };
+    
+    this.baseState = {mounted: true}
     this.getCompanyNews = this.getCompanyNews.bind(this);
     this.updateFilter = this.updateFilter.bind(this);
     this.updateWidgetList = this.updateWidgetList.bind(this);
@@ -41,6 +43,10 @@ export default class marketNews extends React.Component {
     if (p.trackedStocks.length > 0 && s.newsSelection !== undefined && p.filters !== undefined) {
       this.getCompanyNews(s.newsSelection, p.filters.startDate, p.filters.endDate);
     }
+  }
+
+  componentWillUnmount(){
+    this.baseState.mounted = false
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -83,18 +89,20 @@ export default class marketNews extends React.Component {
       finnHub(this.props.throttle, querryString)
         // .then((data) => {console.log(data)})
         .then((data) => {
-          let filteredNews = [];
-          let newsCount = 0;
-          for (var news in data) {
-            if (data[news]["source"] !== "seekingalpha.com" && newsCount < 100) {
-              filteredNews.push(data[news]);
-              newsCount += 1;
+          if (this.baseState.mounted === true) {
+            let filteredNews = [];
+            let newsCount = 0;
+            for (var news in data) {
+              if (data[news]["source"] !== "seekingalpha.com" && newsCount < 100) {
+                filteredNews.push(data[news]);
+                newsCount += 1;
+              }
             }
-          }
-          try {
-            that.setState({ companyNews: filteredNews });
-          } catch (err) {
-            console.log("Could not update news.");
+            try {
+              that.setState({ companyNews: filteredNews });
+            } catch (err) {
+              console.log("Could not update news.");
+            }
           }
         })
         .catch(error => {

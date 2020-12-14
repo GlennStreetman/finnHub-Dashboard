@@ -1,5 +1,6 @@
 import React from "react";
 import StockSearchPane from "../../../components/stockSearchPane.js";
+import {finnHub} from "../../../appFunctions/throttleQueue.js";
 
 class WatchListMenu extends React.PureComponent {
   constructor(props) {
@@ -21,22 +22,15 @@ class WatchListMenu extends React.PureComponent {
   componentWillUnmount(){
     this.baseState.mounted = false
   }
-
+  
   getSymbolList(baseState) {
     if (this.props.apiKey !== '') {  
       let that = this
+      const querryString = `https://finnhub.io/api/v1/stock/symbol?exchange=US&token=${this.props.apiKey}`
       this.props.throttle.enqueue(function() {  
-      fetch("https://finnhub.io/api/v1/stock/symbol?exchange=US&token=bsuu7qv48v6qu589jlj0")
-        .then((response) => {
-          if (response.status === 429) {
-            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
-            this.props.throttle.setSuspend(3000)
-            this.getSymbolList(this.baseState)
-          } else {
-          // console.log(Date().slice(20,25) + ":symbol list")
-          that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
-          return response.json()}})
+      finnHub(that.props.throttle, querryString)
         .then((data) => {
+          if (that.baseState.mounted === true) {
             let transformData = {};
             for (const [, stockValues] of Object.entries(data)) {
               //deconstruct API object
@@ -59,6 +53,7 @@ class WatchListMenu extends React.PureComponent {
             if (baseState.mounted === true) {
             that.setState({ availableStocks: transformData });
             // console.log("Success retrieving stock symbols");
+            }
           }
         })
         .catch((error) => {

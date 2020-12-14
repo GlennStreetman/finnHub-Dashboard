@@ -1,6 +1,6 @@
 import React from "react";
 import StockDataList from "./stockDataList.js";
-
+import {finnHub} from "../appFunctions/throttleQueue.js";
 //compnoent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
 class StockSearchPane extends React.Component {
   constructor(props) {
@@ -13,6 +13,7 @@ class StockSearchPane extends React.Component {
       // exchanges:['US','T','SS','HK','AS','BR','LS','PA','SZ','L'],  //Premium account required to receive stock data for none US exchanges.  
       exchanges:['US'],   //NYSE
     };
+    this.baseState = {mounted: true}
     this.handleChange = this.handleChange.bind(this);
     this.getSymbolList = this.getSymbolList.bind(this);
   }
@@ -23,6 +24,10 @@ class StockSearchPane extends React.Component {
     for (const x in exchange) {
       this.getSymbolList(exchange[x]);
     }
+  }
+
+  componentWillUnmount(){
+    this.baseState.mounted = false
   }
 
   handleChange(e) {
@@ -53,20 +58,10 @@ class StockSearchPane extends React.Component {
 
   getSymbolList(exchange) {
     let that = this
-    that.props.throttle.enqueue(function() { 
-      fetch(`https://finnhub.io/api/v1/stock/symbol?exchange=${exchange}&token=${that.props.apiKey}`)
-        .then((response) => {
-          if (response.status === 429) {
-            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
-            that.props.throttle.setSuspend(4000)
-            that.getSymbolList(exchange)
-            throw new Error('finnhub 429')
-          } else {
-            that.props.throttle.openRequests = that.props.throttle.openRequests -= 1
-            return response.json()
-          }
-        })
-        .then((data) => {
+    const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${exchange}&token=${that.props.apiKey}`
+      finnHub(this.props.throttle, apiString)  
+      .then((data) => {
+        if (this.baseState.mounted === true) {
           let updateStockList = Object.assign({}, data)
           for (const key in updateStockList) {
             let addStockData = updateStockList[key]
@@ -75,12 +70,13 @@ class StockSearchPane extends React.Component {
             delete updateStockList[key]
           }
           that.setState({ availableStocks: Object.assign({}, that.state.availableStocks ,updateStockList)});
-        })
-        .catch((error) => {
-          console.error("Error retrieving stock symbols:" +  exchange);
-        });
+        }
       })
-  }
+      .catch((error) => {
+        console.error("Error retrieving stock symbols:" +  exchange);
+      });
+      }
+  
 
   render() {
     let widgetKey = this.props.widgetKey;

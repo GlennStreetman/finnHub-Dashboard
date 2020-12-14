@@ -14,6 +14,7 @@ export default class BasicFinancials extends React.Component {
         symbolView: 0,
     };
 
+    this.baseState = {mounted: true}
     this.updateWidgetList = this.updateWidgetList.bind(this);
     this.renderStockData = this.renderStockData.bind(this);
     this.getCompanyMetrics = this.getCompanyMetrics.bind(this);
@@ -34,11 +35,13 @@ export default class BasicFinancials extends React.Component {
       let querySting = "https://finnhub.io/api/v1/stock/metric?symbol=AAPL&metric=all&token=" + that.props.apiKey
       finnHub(this.props.throttle, querySting)
       .then((data) => {
-              that.setState({metricList: Object.keys(data.metric)})
-            })
-            .catch(error => {
-              console.log(error.message)
-            });
+        if (this.baseState.mounted === true) {
+          that.setState({metricList: Object.keys(data.metric)})
+        }
+      })
+      .catch(error => {
+        console.log(error.message)
+      });
 
       //initial setup the first time widget is loaded.
       if (this.props.filters['metricSelection'] === undefined) {
@@ -50,6 +53,10 @@ export default class BasicFinancials extends React.Component {
     }
   }
 
+  componentWillUnmount(){
+    this.baseState.mounted = false
+  }
+
   getCompanyMetrics(symbol) {
     if (this.props.apiKey !== '') {
       let that = this
@@ -59,16 +66,18 @@ export default class BasicFinancials extends React.Component {
         that.props.apiKey
       finnHub(this.props.throttle, querySting)
       .then((data) => {
-              let updateData = Object.assign({}, that.state.metricData)
-              updateData[symbol] = data.metric
-              that.setState({metricData: updateData})
-            })
-            .catch(error => {
-              console.log(error.message)
-            });
+          if (this.baseState.mounted === true) {
+            let updateData = Object.assign({}, that.state.metricData)
+            updateData[symbol] = data.metric
+            that.setState({metricData: updateData})
+          }
+        })
+        .catch(error => {
+          console.log(error.message)
+        });
     }
   }
-
+  
   componentDidUpdate(prevProps, PrevState) {
     // if (this.props.trackedStocks === 0 && prevProps.showEditPane === 1) {
     //   this.props.trackedStocks.forEach(el => this.getCompanyMetrics(el))

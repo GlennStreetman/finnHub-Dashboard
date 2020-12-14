@@ -21,6 +21,7 @@ export default class Candles extends React.Component {
       // resolution: "W",
       selectResolution: [1, 5, 15, 30, 60, "D", "W", "M"],
     };
+    this.baseState = {mounted: true}
     this.updateWidgetList = this.updateWidgetList.bind(this);
     this.updateFilter = this.updateFilter.bind(this);
     this.getCandleData = this.getCandleData.bind(this);
@@ -46,8 +47,13 @@ export default class Candles extends React.Component {
     }
   }
 
+  componentWillUnmount(){
+    this.baseState.mounted = false
+  }
+
   componentDidUpdate(prevProps, prevState) {
-    if (this.state.candleSelection !== prevState.candleSelection || this.props.showEditPane !== prevProps.showEditPane) {
+    if (this.state.candleSelection !== prevState.candleSelection || 
+        this.props.showEditPane !== prevProps.showEditPane) {
       this.getCandleData();
     }
     if (this.state.candleSelection === '' && this.props.trackedStocks.length) {
@@ -95,12 +101,14 @@ export default class Candles extends React.Component {
 
       finnHub(this.props.throttle, queryString)
       .then((data) => {
-          try {
+          // try {
+          if (this.baseState.mounted === true) {
             that.setState({ candleData: data });
             that.createCandleDataList(data);
-          } catch (err) {
-            console.log("Could not update candles. Component not mounted.");
           }
+          // } catch (err) {
+          //   console.log("Could not update candles. Component not mounted.");
+          // }
         })
         .catch(error => {
           console.log(error.message)
