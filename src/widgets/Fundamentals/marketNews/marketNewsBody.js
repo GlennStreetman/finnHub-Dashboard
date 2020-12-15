@@ -3,7 +3,7 @@ import StockSearchPane from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
 // import Moment from "react-moment";
 
-export default class marketNews extends React.Component {
+export default class FundamentalsCompanyNews extends React.Component {
   constructor(props) {
     super(props);
 

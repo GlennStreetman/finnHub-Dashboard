@@ -41,23 +41,18 @@ class WidgetController extends React.Component {
     }
 
     returnBodyProps(that, key, ref = "pass") {
-        //text reference should match dropdown link.
         let widgetBodyProps = {
             WatchListMenu: () => watchListMenuProps(that, key),
             DashBoardMenu: () => dashBoardMenuProps(that, key),
-            CandleWidget: () => candleWidgetProps(that, ref),
-            NewsWidget: () => newsWidgetProps(that, ref),
-            StockDetailWidget: () => stockDetailWidgetProps(that, ref),
-            MetricsWidget: () => metricsProps(that, ref),
+            PriceCandles: () => candleWidgetProps(that, ref),
+            FundamentalsCompanyNews: () => newsWidgetProps(that, ref),
+            PriceQuote: () => stockDetailWidgetProps(that, ref),
+            FundamentalsBasicFinancials: () => metricsProps(that, ref),
         };
         let renderBodyProps = widgetBodyProps[key];
-        // console.log(renderBodyProps);
         return renderBodyProps;
     }
-
-                // AccountMenu: () => accountMenuProps(that, ref),
-            // AboutMenu: () => aboutMenuProps(that, ref),
-
+  
     render(){
         
         let widgetState = this.props.widgetList;

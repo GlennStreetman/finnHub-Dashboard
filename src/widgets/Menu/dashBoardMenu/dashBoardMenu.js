@@ -4,10 +4,11 @@ class DashBoardMenu extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      inputText: "enter name",
+      inputText: "Enter Name",
       checkMark: "faIcon",
       // dashBoardData: [],
     };
+    this.baseState = {mounted: true}
     this.handleChange = this.handleChange.bind(this);
     this.deleteDashBoard = this.deleteDashBoard.bind(this);
     this.showCheckMark = this.showCheckMark.bind(this);
@@ -15,6 +16,10 @@ class DashBoardMenu extends React.PureComponent {
 
   componentDidMount() {
     this.setState({inputText: this.props.currentDashBoard})
+  }
+
+  componentWillUnmount(){
+    this.baseState.mounted = false
   }
 
   componentDidUpdate(prevProps){
@@ -40,8 +45,12 @@ class DashBoardMenu extends React.PureComponent {
   }
 
   showCheckMark() {
-    this.setState({ checkMark: "faIconFade" });
-    setTimeout(() => this.setState({ checkMark: "faIcon" }), 3000);
+    if (this.baseState.mounted === true) {
+      this.setState({ checkMark: "faIconFade" });
+      setTimeout(() => {if (this.baseState.mounted === true) {
+        this.setState({ checkMark: "faIcon" })
+      }}, 3000);
+    }
   }
 
   render() {

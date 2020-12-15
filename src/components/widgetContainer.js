@@ -1,11 +1,11 @@
 import React from "react";
 
 //import widget and menu objects here. Also add to widgetList object in render method below.
-import StockDetailWidget from "../widgets/Price/quote/stockDetailWidget.js";
-import CandleWidget from "../widgets/Price/candles/candleWidget.js";
+import PriceQuote from "../widgets/Price/quote/stockDetailWidget.js";
+import PriceCandles from "../widgets/Price/candles/candleWidget.js";
 
-import NewsWidget from "../widgets/Fundamentals/marketNews/marketNewsBody.js";
-import MetricsWidget from "../widgets/Fundamentals/basicFinancials/basicFinancialsBody.js";
+import FundamentalsCompanyNews from "../widgets/Fundamentals/marketNews/marketNewsBody.js";
+import FundamentalsBasicFinancials from "../widgets/Fundamentals/basicFinancials/basicFinancialsBody.js";
 
 import DashBoardMenu from "../widgets/Menu/dashBoardMenu/dashBoardMenu.js";
 import WatchListMenu from "../widgets/Menu/watchListMenu/watchListMenu.js";
@@ -136,15 +136,13 @@ class WidgetContainer extends React.Component {
     };
 
     let widgetLookUp = {
-      StockDetailWidget: StockDetailWidget,
-      NewsWidget: NewsWidget,
-      CandleWidget: CandleWidget,
+      FundamentalsCompanyNews: FundamentalsCompanyNews,
+      FundamentalsBasicFinancials: FundamentalsBasicFinancials,
+      PriceQuote: PriceQuote,
+      PriceCandles: PriceCandles,
       DashBoardMenu: DashBoardMenu,
       WatchListMenu: WatchListMenu,
-      MetricsWidget: MetricsWidget,
-    };
-          // AccountMenu: AccountMenu,
-      // AboutMenu: AboutMenu,
+    }; 
 
     const that = this;
     let widgetProps = that.props.widgetBodyProps();

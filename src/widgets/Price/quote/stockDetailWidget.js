@@ -1,7 +1,7 @@
 import React from "react";
 import StockSearchPane from "../../../components/stockSearchPane.js";
 
-export default class Quote extends React.Component {
+export default class PriceQuote extends React.Component {
   //widget data provided by appFunctions/getSTockPrices
   //Data is shared with widgets/Menu/watchListMenu
   constructor(props) {

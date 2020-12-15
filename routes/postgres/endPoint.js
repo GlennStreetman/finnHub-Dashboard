@@ -10,13 +10,12 @@ const candleWidgetEndPoint = require("../../src/widgets/Price/candles/candlesEnd
 const quoteWidgetEndPoint = require("../../src/widgets/Price/quote/quoteEndPoint.js");
 const basicFinancialsEndPoint = require("../../src/widgets/Fundamentals/basicFinancials/basicFinancialsEndPoint.js");
 const marketNewsEndPoint = require("../../src/widgets/Fundamentals/marketNews/marketNewsEndPoint.js");
-
-
+ 
 const widgetDict = {
-    CandleWidget: candleWidgetEndPoint,
-    StockDetailWidget:quoteWidgetEndPoint,
-    MetricsWidget: basicFinancialsEndPoint,
-    NewsWidget:marketNewsEndPoint,
+    PriceCandles: candleWidgetEndPoint,
+    PriceQuote:quoteWidgetEndPoint,
+    FundamentalsBasicFinancials: basicFinancialsEndPoint,
+    FundamentalsCompanyNews: marketNewsEndPoint,
 }
 //Import all API data filter functions here and register below to postDataFilter.
 

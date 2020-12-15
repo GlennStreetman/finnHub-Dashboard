@@ -4,7 +4,7 @@ import CreateCandleStickChart from "./createCandleStickChart.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
 // import { json } from "body-parser";
 
-export default class Candles extends React.Component {
+export default class PriceCandles extends React.Component {
   constructor(props) {
     super(props);
     let p = this.props.trackedStocks
