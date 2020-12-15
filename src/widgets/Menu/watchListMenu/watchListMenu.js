@@ -93,7 +93,8 @@ class WatchListMenu extends React.PureComponent {
           </button>
         </td>
       </tr>
-    ));
+      )
+    );
 
     return <>{stockListKey}</>;
   }

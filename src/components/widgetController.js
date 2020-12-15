@@ -4,8 +4,8 @@ import WidgetContainer from "./widgetContainer.js";
 //Import props function from each widget/menu here and add to returnBodyProps function below.
 import { dashBoardMenuProps } from "./../widgets/Menu/dashBoardMenu/dashBoardMenu.js";
 import { watchListMenuProps } from "./../widgets/Menu/watchListMenu/watchListMenu.js";
-import { accountMenuProps } from "./../widgets/Menu/AccountMenu/accountMenu.js";
-import { aboutMenuProps } from "./../widgets/Menu/AboutMenu/AboutMenu.js";
+// import { accountMenuProps } from "./../widgets/Menu/AccountMenu/accountMenu.js";
+// import { aboutMenuProps } from "./../widgets/Menu/AboutMenu/AboutMenu.js";
 
 import { candleWidgetProps } from "../widgets/Price/candles/candleWidget.js";
 import { stockDetailWidgetProps } from "../widgets/Price/quote/stockDetailWidget.js";
@@ -48,14 +48,15 @@ class WidgetController extends React.Component {
             CandleWidget: () => candleWidgetProps(that, ref),
             NewsWidget: () => newsWidgetProps(that, ref),
             StockDetailWidget: () => stockDetailWidgetProps(that, ref),
-            AccountMenu: () => accountMenuProps(that, ref),
-            AboutMenu: () => aboutMenuProps(that, ref),
             MetricsWidget: () => metricsProps(that, ref),
         };
         let renderBodyProps = widgetBodyProps[key];
         // console.log(renderBodyProps);
         return renderBodyProps;
     }
+
+                // AccountMenu: () => accountMenuProps(that, ref),
+            // AboutMenu: () => aboutMenuProps(that, ref),
 
     render(){
         

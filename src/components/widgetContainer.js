@@ -9,8 +9,8 @@ import MetricsWidget from "../widgets/Fundamentals/basicFinancials/basicFinancia
 
 import DashBoardMenu from "../widgets/Menu/dashBoardMenu/dashBoardMenu.js";
 import WatchListMenu from "../widgets/Menu/watchListMenu/watchListMenu.js";
-import AccountMenu from "../widgets/Menu/AccountMenu/accountMenu.js";
-import AboutMenu from "../widgets/Menu/AboutMenu/AboutMenu.js";
+// import AccountMenu from "../widgets/Menu/AccountMenu/accountMenu.js";
+// import AboutMenu from "../widgets/Menu/AboutMenu/AboutMenu.js";
 
 //creates widget container. Used by all widgets.
 class WidgetContainer extends React.Component {
@@ -124,7 +124,9 @@ class WidgetContainer extends React.Component {
 
   render() {
     //Add widgets to the list below that should not have access to the stock search pane
-    const hideStockSearchMenu = ["DashBoardMenu", "AccountMenu", "AboutMenu"]
+    // const hideStockSearchMenu = ["DashBoardMenu", "AccountMenu", "AboutMenu"]
+    const hideStockSearchMenu = ["DashBoardMenu"]
+
 
     const compStyle = {
       display: this.state.show,
@@ -133,24 +135,19 @@ class WidgetContainer extends React.Component {
       zIndex: this.props.zIndex.indexOf(this.props.widgetKey),
     };
 
-    // console.log(compStyle)
-
-    // console.log(compStyle)
-
-    let widgetList = {
+    let widgetLookUp = {
       StockDetailWidget: StockDetailWidget,
       NewsWidget: NewsWidget,
       CandleWidget: CandleWidget,
       DashBoardMenu: DashBoardMenu,
       WatchListMenu: WatchListMenu,
-      AccountMenu: AccountMenu,
-      AboutMenu: AboutMenu,
       MetricsWidget: MetricsWidget,
     };
+          // AccountMenu: AccountMenu,
+      // AboutMenu: AboutMenu,
 
     const that = this;
     let widgetProps = that.props.widgetBodyProps();
-    
     if (this.props.widgetKey !== "dashBoardMenu") {
       widgetProps["showEditPane"] = that.state.showEditPane;
       widgetProps["showPane"] = that.showPane;
@@ -187,7 +184,7 @@ class WidgetContainer extends React.Component {
           <div className="widgetHeader">{this.state.renderHeader}</div>
         )}
 
-        {React.createElement(widgetList[this.props.widgetList["widgetType"]], widgetProps)}
+        {React.createElement(widgetLookUp[this.props.widgetList["widgetType"]], widgetProps)}
 
         <div className="widgetFooter">
           {this.props.widgetLockDown === 0 ? (
