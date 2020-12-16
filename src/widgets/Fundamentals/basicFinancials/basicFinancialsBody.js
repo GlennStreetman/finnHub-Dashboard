@@ -7,6 +7,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+        targetStock: 'US-AAPL',
         metricList: [],
         metricData: {},
         metricIncrementor: 1,
@@ -28,12 +29,25 @@ export default class FundamentalsBasicFinancials extends React.Component {
   }
 
   componentDidMount(){
-    //AAPL is dumby stock symbol user to return list of all tracked metrics.
-    //Im not totaly sure this works entirely, different companies might have different metrics they report. 
+    const p = this.props
+    //initial setup the first time widget is loaded.
+    if (p.filters['metricSelection'] === undefined) {
+      let newList = []
+      p.updateWidgetFilters(p.widgetKey, 'metricSelection', newList)
+      p.trackedStocks[0] === undefined ?
+        p.updateWidgetFilters(p.widgetKey, 'metricSource', 'US-AAPL') :
+        p.updateWidgetFilters(p.widgetKey, 'metricSource', p.trackedStocks[0])
+        p.updateWidgetFilters(p.widgetKey, 'Note', 'Metric source for dashboard display purposes.')
+    }
+
     if (this.props.apiKey !== '' ) {
-      let that = this
-      let querySting = "https://finnhub.io/api/v1/stock/metric?symbol=AAPL&metric=all&token=" + that.props.apiKey
-      finnHub(this.props.throttle, querySting)
+      const that = this
+      console.log( p.filters)
+      const sourceStock = p.filters.metricSource
+      const sourceSymbol = sourceStock.slice(sourceStock.indexOf('-') + 1, sourceStock.length)
+      let queryString = `https://finnhub.io/api/v1/stock/metric?symbol=${sourceSymbol}&metric=all&token=${p.apiKey}`
+      console.log(queryString)
+      finnHub(p.throttle, queryString)
       .then((data) => {
         if (this.baseState.mounted === true) {
           that.setState({metricList: Object.keys(data.metric)})
@@ -43,13 +57,8 @@ export default class FundamentalsBasicFinancials extends React.Component {
         console.log(error.message)
       });
 
-      //initial setup the first time widget is loaded.
-      if (this.props.filters['metricSelection'] === undefined) {
-        let newList = []
-        this.props.updateWidgetFilters(this.props.widgetKey, 'metricSelection', newList)
-      }
-      //load initial data
-      this.props.trackedStocks.forEach(el => this.getCompanyMetrics(el))
+      // load initial data
+      p.trackedStocks.forEach(el => this.getCompanyMetrics(el))
     }
   }
 
@@ -158,6 +167,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
   }
 
   metricsTable() {
+    const p = this.props
     let increment = 10 * this.state.metricIncrementor; 
     let start = increment - 10;
     let end = increment;
@@ -189,21 +199,50 @@ export default class FundamentalsBasicFinancials extends React.Component {
     let mapStockSelection = stockSelectionSlice.map((el, index) => (
       <tr key={el + "metricRow" + index}>
         <td key={el + "metricdesc"}>{el}</td>
-        <td key={el + "up"}>
+        <td><input type='radio' name='sourceStock' onClick={()=> p.updateWidgetFilters(p.widgetKey, 'metricSource', el)} /></td>
+        <td key={el + "remove"}>
           <button onClick={() => {this.updateWidgetList(el);}}><i className="fa fa-times" aria-hidden="true" /></button>
         </td>
 
       </tr>
     ));
 
+    let metricSelectTableheading = () => {
+      if (this.state.symbolView === 1) {
+        return (
+          <>
+          <td>Stock</td>
+          <td>Source</td>
+          <td>Remove</td>
+          </>
+        )
+      } else if (this.state.orderView === 0){
+        return (
+          <>
+          <td>Metric</td>
+          <td>Select</td>
+          </>
+        )
+      } else {
+        return(
+          <>
+          <td>Metric</td>
+          <td>Up</td>
+          <td>Down</td>
+          </>
+        )
+      }
+    }
+
+
+    
+
     let metricSelectTable = (
       <div className="widgetTableDiv">
         <table className='widgetBodyTable'>
           <thead>
             <tr>
-              <td>Metric</td>
-              <td>{this.state.orderView === 0 ? 'Select' : 'Up'}</td>
-              {this.state.orderView === 1 && (<td>Down</td>) }
+            {metricSelectTableheading()}
             </tr>
           </thead>
           <tbody>
