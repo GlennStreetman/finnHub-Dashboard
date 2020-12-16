@@ -199,7 +199,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
     let mapStockSelection = stockSelectionSlice.map((el, index) => (
       <tr key={el + "metricRow" + index}>
         <td key={el + "metricdesc"}>{el}</td>
-        <td><input type='radio' name='sourceStock' onClick={()=> p.updateWidgetFilters(p.widgetKey, 'metricSource', el)} /></td>
+        <td><input type='radio' name='sourceStock' checked={p.filters.metricSource === el} onClick={()=> p.updateWidgetFilters(p.widgetKey, 'metricSource', el)} /></td>
         <td key={el + "remove"}>
           <button onClick={() => {this.updateWidgetList(el);}}><i className="fa fa-times" aria-hidden="true" /></button>
         </td>
