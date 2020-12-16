@@ -221,7 +221,7 @@ router.get("/deleteSavedDashboard", (req, res) => {
         WHERE userid = ${uId} AND id = (SELECT min(id) FROM dashboard where userid=${uId})
       )
       WHERE userid = ${uId}`;
-    console.log(deleteSQL);
+    // console.log(deleteSQL);
     // console.log(uId, deleteSQL);
     const deleteDashboard = () => {
       console.log("deleting dashboard");
@@ -287,4 +287,3 @@ router.get("/deleteSavedDashboard", (req, res) => {
 });
 
 module.exports = router;
-  
