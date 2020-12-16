@@ -1,10 +1,9 @@
 import React from "react";
 // import StockSearchPane from "../../stockSearchPane.js";
 
-class AccountMenu extends React.PureComponent {
+class AccountMenu extends React.Component {
   constructor(props) {
     super(props);
-    this.myRef = React.createRef()
     this.state = {
       loginName: "",
       email: "",
@@ -99,31 +98,38 @@ class AccountMenu extends React.PureComponent {
             <table>
               <tbody>
                 <tr>
-                  <td>Login</td>
+                  <td>Login:</td>
                   <td>{this.state.loginName}</td>
                   <td>
                     <button onClick={() => this.showEditPane("loginname")}>edit</button>
                   </td>
                 </tr>
                 <tr>
-                  <td>Email</td>
+                  <td>Email:</td>
                   <td>{this.state.email}</td>
                   <td>
                     <button onClick={() => this.showEditPane("email")}>edit</button>
                   </td>
                 </tr>
                 <tr>
-                  <td>apiKey</td>
+                  <td>apiKey:</td>
                   <td>{this.state.apiKey}</td>
                   <td>
                     <button onClick={() => this.showEditPane("apikey")}>edit</button>
                   </td>
                 </tr>
                 <tr>
-                  <td>webHook Key</td>
+                  <td>webHook Key:</td>
                   <td>{this.state.webHook}</td>
                   <td>
                     <button onClick={() => this.showEditPane("webhook")}>edit</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Active Exchanges: </td>
+                  <td>{this.props.exchangeList.toString()}</td>
+                  <td>
+                    <button onClick={() => this.props.toggleBackGroundMenu("exchangeMenu")}>edit</button>
                   </td>
                 </tr>
               </tbody>
@@ -168,9 +174,11 @@ class AccountMenu extends React.PureComponent {
 
 export function accountMenuProps(that, key = "AccountMenu") {
   let propList = {
-    apiKey: that.props.apiKey,
+    apiKey: that.state.apiKey,
     widgetKey: key,
-    updateAPIKey: that.props.updateAPIKey
+    updateAPIKey: that.state.updateAPIKey,
+    exchangeList: that.state.exchangeList,
+    toggleBackGroundMenu: that.toggleBackGroundMenu,
   };
   return propList;
 }

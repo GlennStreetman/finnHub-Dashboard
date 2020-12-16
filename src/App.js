@@ -9,8 +9,9 @@ import ThrottleQueue  from "./appFunctions/throttleQueue.js";
 import TopNav from "./components/topNav.js";
 import Login from "./components/login.js";
 import AboutMenu from "./components/AboutMenu.js";
-import AccountMenu from "./components/accountMenu.js";
-import EndPointMenu from "./components/endPoints.js";
+import AccountMenu, {accountMenuProps} from "./components/accountMenu.js";
+import EndPointMenu, {endPointProps} from "./components/endPoints.js";
+import ExchangeMenu, {exchangeMenuProps} from "./components/exchangeMenu.js";
 
 import {WidgetController, MenuWidgetToggle} from "./components/widgetController";
 
@@ -19,28 +20,28 @@ class App extends React.Component {
     super(props);
 
     this.state = {
-      globalStockList: [], //default stocks for new widgets. 
-      widgetList: {}, //lists of all widgets.
-      menuList: {}, //lists of all menu widgets.
-      login: 0, //login state. 0 logged out, 1 logged in.
-      apiKey: "", //API key retrieved from login database.
-      refreshStockData: 0, //if set to 1 stock data should be updated from globalStockList
-      dashBoardData: [],
-      currentDashBoard: "",
-      throttle: ThrottleQueue(25, 1000, true), //all throttle Queue requests should be done with finnHub function.
-      apiFlag: 0,
-      zIndex: [],
-      socket: '',
-      trackedStockData: {},
-      loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
-      DashBoardMenu: 0, //1 = show, 0 = hide
-      WatchListMenu: 0, //1 = show, 0 = hide
-      AccountMenu: 0, //1 = show, 0 = hide
       AboutMenu: 0, //1 = show, 0 = hide
-      widgetLockDown: 0,
-      showStockWidgets: 1,
-      backGroundMenu: '',
-
+      AccountMenu: 0, //1 = show, 0 = hide
+      apiFlag: 0, //set to 1 when retrieval of apiKey is needed
+      apiKey: "", //API key retrieved from login database.
+      backGroundMenu: '', //reference to none widet info displayed when s.showWidget === 0
+      currentDashBoard: "", //dashboard being displayed
+      DashBoardMenu: 0, //1 = show, 0 = hide
+      dashBoardData: [], //list of all saved dashboards.
+      exchangeList: ['US'], //list of all exchanges activated under account management.
+      globalStockList: [], //default stocks for new widgets.
+      login: 0, //login state. 0 logged out, 1 logged in. 
+      loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
+      menuList: {}, //lists of all menu widgets.
+      refreshStockData: 0, //if set to 1 stock data should be updated from globalStockList
+      socket: '', //socket connection for streaming stock data.
+      showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
+      throttle: ThrottleQueue(25, 1000, true), //all finnhub API requests should be done with finnHub function.
+      trackedStockData: {}, //data shared between some widgets and watchlist menu. Updated by socket data.
+      WatchListMenu: 0, //1 = show, 0 = hide
+      widgetLockDown: 0, //1 removes buttons from all widgets.
+      widgetList: {}, //lists of all widgets.
+      zIndex: [], //list widgets. Index location sets zIndex
     };
 
     this.baseState = this.state 
@@ -64,6 +65,7 @@ class App extends React.Component {
     this.lockWidgets = this.lockWidgets.bind(this);
     this.toggleWidgetVisability = this.toggleWidgetVisability.bind(this);
     this.toggleBackGroundMenu = this.toggleBackGroundMenu.bind(this);
+    this.updateExchangeList = this.updateExchangeList.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState){
@@ -335,6 +337,17 @@ class App extends React.Component {
     })
   }
 
+  updateExchangeList(ex) {
+    const s = this.state
+    const newExchangeList = [...s.exchangeList]
+    if (s.exchangeList.indexOf(ex) >= 0) {
+      newExchangeList.splice(s.exchangeList.indexOf(ex),1)
+    } else {
+      newExchangeList.push(ex)
+    }
+    this.setState({exchangeList: newExchangeList})
+  } 
+
   render() {
     // console.log("--------", TopNavContext)
     const menuWidgetToggle = MenuWidgetToggle(this)
@@ -345,24 +358,19 @@ class App extends React.Component {
       queryData = {quaryData}
       /> : <></>
 
+      const backGroundSelection = {
+        'endPoint': React.createElement(EndPointMenu, endPointProps(this)),
+        'manageAccount': React.createElement(AccountMenu, accountMenuProps(this)),
+        'about': <AboutMenu />,
+        'exchangeMenu': React.createElement(ExchangeMenu, exchangeMenuProps(this))
+      }
+      
       const backGroundMenu = () => {
-        if (this.state.backGroundMenu === 'endPoint') {
-          return(
-            <div className='backgroundMenu'>
-              <EndPointMenu 
-                dashBoardData={this.state.dashBoardData}
-                apiKey={this.state.apiKey}
-                throttle={this.state.throttle}
-              />
-            </div>
-          )
-        } else if (this.state.backGroundMenu === 'manageAccount') {
-          return(<div className='backgroundMenu'><AccountMenu /></div>)
-        } else if (this.state.backGroundMenu === 'about'){
-          return(<div className='backgroundMenu'><AboutMenu /></div>)
-        } else {
-          return (<></>)
-        }
+        return (
+          <div className='backgroundMenu'>
+            {backGroundSelection[this.state.backGroundMenu]}
+          </div>
+        )
       }
 
     return (

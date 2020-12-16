@@ -76,6 +76,11 @@ export default class EndPointMenu extends React.Component {
     }
 }
 
-// fetch(`http://localhost:3000/endPoint?apiKey=bsuu7qv48v6qu589jlj0&dashBoardName=TEST`)
-//     .then(res => res.json())
-//     .then(data => console.log(data));
+export function endPointProps(that, key = "AccountMenu") {
+    let propList = {
+        dashBoardData: that.state.dashBoardData,
+        apiKey: that.state.apiKey,
+        throttle: that.state.throttle,
+    };
+    return propList;
+}
