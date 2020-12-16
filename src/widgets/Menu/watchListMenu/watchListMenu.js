@@ -1,6 +1,9 @@
+import Papa from 'papaparse'
 import React from "react";
 import StockSearchPane from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
+
+
 
 class WatchListMenu extends React.PureComponent {
   constructor(props) {
@@ -9,10 +12,12 @@ class WatchListMenu extends React.PureComponent {
       availableStocks: {},
     };
 
+    this.inputReference = React.createRef();
     this.baseState = {mounted: true}
     this.getSymbolList = this.getSymbolList.bind(this);
     this.renderWatchedStocks = this.renderWatchedStocks.bind(this);
-  
+    this.fileUploadAction = this.fileUploadAction.bind(this);
+    this.fileUploadInputChange = this.fileUploadInputChange.bind(this);
   }
 
   componentDidMount() {
@@ -98,11 +103,36 @@ class WatchListMenu extends React.PureComponent {
 
     return <>{stockListKey}</>;
   }
- 
+
+  fileUploadAction() {
+    this.inputReference.current.click();
+    console.log("upload action")
+  }
+  
+  fileUploadInputChange(e){
+    const that = this
+    Papa.parse(e.target.files[0], {
+      complete: function(results) {
+        for (const stock in results.data) {
+          if (results.data[stock][1] !== undefined) {
+            const thisStock = results.data[stock][0].toUpperCase() + '-' + results.data[stock][1].toUpperCase()
+            const thisSymbol = results.data[stock][1].toUpperCase()
+            that.state.availableStocks[thisSymbol] !== undefined && 
+            that.props.updateGlobalStockList(e, thisStock)
+          }
+        }
+      }
+    });
+
+
+  }
+
   render() {
+    
     return (
       <>
         {this.props.showEditPane === 1 && (
+          <>
           <StockSearchPane
             updateWidgetStockList={this.props.updateWidgetStockList}
             widgetKey={this.props.widgetKey}
@@ -111,6 +141,15 @@ class WatchListMenu extends React.PureComponent {
             apiKey={this.props.apiKey}
             throttle={this.props.throttle}
           />
+          <div>
+            <input type="file" hidden ref={this.inputReference} onChange={this.fileUploadInputChange} />
+            <button className="ui button" onClick={this.fileUploadAction}>
+                Stock List CSV
+            </button>
+            {`<--Market,Symbol /nl`} 
+          </div>
+
+          </>
         )}
 
         <table>

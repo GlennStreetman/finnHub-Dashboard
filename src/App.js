@@ -199,14 +199,17 @@ class App extends React.Component {
     this.setState({ stateRef: newWidgetList });
   }
    
-  updateGlobalStockList(event, stock, stockObject) {
+  // updateGlobalStockList(event, stock, stockObject) {
+  updateGlobalStockList(event, stock) {
+
     // Adds stock to global tracking list.
     GetStockPrice(this, stock, this.state.apiKey, this.state.throttle)
     let addStockId = stock;
+    console.log("globalNew", addStockId)
     if (stock.indexOf(":") > 0) {
       addStockId = stock.slice(0, stock.indexOf(":"));
     }
-    var currentStockList = Array.from(this.state.globalStockList);
+    const currentStockList = Array.from(this.state.globalStockList);
     if (currentStockList.includes(addStockId) === false) {
       currentStockList.push(addStockId);
     } else {
@@ -214,7 +217,7 @@ class App extends React.Component {
     }
     this.setState({ globalStockList: currentStockList });
 
-    event.preventDefault();
+    event instanceof Event === true && event.preventDefault();
   }
 
   getSavedDashBoards() {
