@@ -28,6 +28,7 @@ class App extends React.Component {
       currentDashBoard: "", //dashboard being displayed
       DashBoardMenu: 0, //1 = show, 0 = hide
       dashBoardData: [], //list of all saved dashboards.
+      defaultExchange: 'US',
       exchangeList: ['US'], //list of all exchanges activated under account management.
       globalStockList: [], //default stocks for new widgets.
       login: 0, //login state. 0 logged out, 1 logged in. 
@@ -66,6 +67,7 @@ class App extends React.Component {
     this.toggleWidgetVisability = this.toggleWidgetVisability.bind(this);
     this.toggleBackGroundMenu = this.toggleBackGroundMenu.bind(this);
     this.updateExchangeList = this.updateExchangeList.bind(this);
+    this.updateDefaultExchange = this.updateDefaultExchange.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState){
@@ -348,6 +350,11 @@ class App extends React.Component {
     this.setState({exchangeList: newExchangeList})
   } 
 
+  updateDefaultExchange(event){
+    // console.log('===>', event.target.value)
+    this.setState({defaultExchange: event.target.value})
+  }
+
   render() {
     // console.log("--------", TopNavContext)
     const menuWidgetToggle = MenuWidgetToggle(this)
@@ -429,6 +436,9 @@ class App extends React.Component {
             DashBoardMenu={this.state.DashBoardMenu}
             widgetLockDown={this.state.widgetLockDown}
             showStockWidgets={this.state.showStockWidgets}
+            exchangeList={this.state.exchangeList}
+            defaultExchange={this.state.defaultExchange}
+            updateDefaultExchange={this.updateDefaultExchange}
           />
         {loginScreen}
         {backGroundMenu()}

@@ -1,5 +1,5 @@
 import React from "react";
-import StockSearchPane from "../../../components/stockSearchPane.js";
+import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 
 export default class PriceQuote extends React.Component {
   //widget data provided by appFunctions/getSTockPrices
@@ -125,15 +125,8 @@ export default class PriceQuote extends React.Component {
     return (
       <>
         {this.props.showEditPane === 1 && (
-          <StockSearchPane
-            updateGlobalStockList={this.props.updateGlobalStockList}
-            showSearchPane={() => this.props.showPane("showEditPane", 1)}
-            // getStockPrice={this.props.getStockPrice}
-            apiKey={this.props.apiKey}
-            updateWidgetStockList={this.props.updateWidgetStockList}
-            widgetKey={this.props.widgetKey}
-            throttle={this.props.throttle}
-          />
+          React.createElement(StockSearchPane, searchPaneProps(this))
+
         )}
         {Object.keys(this.props.trackedStockData).length > 0 ? this.renderStockData() : <></>}
       </>
@@ -152,6 +145,9 @@ export function stockDetailWidgetProps(that, key = "Quote") {
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
     throttle: that.props.throttle,
+    exchangeList: that.props.exchangeList,
+    defaultExchange: that.props.defaultExchange,
+    updateDefaultExchange: that.props.updateDefaultExchange,
   };
   return propList;
 }

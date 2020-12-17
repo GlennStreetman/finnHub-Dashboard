@@ -1,6 +1,7 @@
 import React from "react";
-import StockSearchPane from "../../../components/stockSearchPane.js";
+import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
+
 // import Moment from "react-moment";
 
 export default class FundamentalsCompanyNews extends React.Component {
@@ -259,15 +260,7 @@ export default class FundamentalsCompanyNews extends React.Component {
         {this.props.showEditPane === 1 && (
           <>
             <div>
-              <StockSearchPane
-                apiKey={this.props.apiKey}
-                // getStockPrice={this.props.getStockPrice}
-                throttle={this.props.throttle}
-                showSearchPane={() => this.props.showPane("showEditPane", 1)}
-                updateGlobalStockList={this.props.updateGlobalStockList}
-                updateWidgetStockList={this.props.updateWidgetStockList}
-                widgetKey={this.props.widgetKey}     
-              />
+            {React.createElement(StockSearchPane, searchPaneProps(this))}
               <div className="stockSearch">
                 <form className="form-inline">
                   <label htmlFor="start">Start date:</label>
@@ -298,6 +291,9 @@ export function newsWidgetProps(that, key = "marketNews") {
     updateWidgetFilters: that.props.updateWidgetFilters,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
+    exchangeList: that.props.exchangeList,
+    defaultExchange: that.props.defaultExchange,
+    updateDefaultExchange: that.props.updateDefaultExchange,
 
   };
   return propList;

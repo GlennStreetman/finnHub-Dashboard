@@ -11,16 +11,19 @@ class StockSearchPane extends React.Component {
       filteredStockObjects: {}, //object data for each stock selected
       filteredStocks: [], //short list of stocks selected
       // exchanges:['US','T','SS','HK','AS','BR','LS','PA','SZ','L'],  //Premium account required to receive stock data for none US exchanges.  
-      exchanges:['US'],   //NYSE
+      // exchanges:['US'],   //NYSE
     };
     this.baseState = {mounted: true}
     this.handleChange = this.handleChange.bind(this);
     this.getSymbolList = this.getSymbolList.bind(this);
+    this.changeDefault = this.changeDefault.bind(this);
   }
 
   componentDidMount() {
     // console.log("mounted");
-    let exchange = this.state.exchanges
+    // let exchange = this.state.exchanges
+    let exchange = this.props.exchangeList
+
     for (const x in exchange) {
       this.getSymbolList(exchange[x]);
     }
@@ -44,7 +47,6 @@ class StockSearchPane extends React.Component {
         resultCount < 20 && filteredCount < availableStockCount; 
         filteredCount++) {
           let stockSearchPhrase = stockList[filteredCount] + ': ' + stockListObject[stockList[filteredCount]]['description'].toUpperCase()
-          // if (stockSearchPhrase.includes(this.state.inputText) === true && stockListObject[stockList[filteredCount]]['type'] in ['EQS', 'DR']) {
           if (stockSearchPhrase.includes(this.state.inputText) === true) {
             resultCount = resultCount + 1;
             newFilteredList.push(stockSearchPhrase);
@@ -76,11 +78,17 @@ class StockSearchPane extends React.Component {
         console.error("Error retrieving stock symbols:" +  exchange);
       });
       }
-  
+
+  changeDefault(event){
+    this.props.updateDefaultExchange(event)
+  }
 
   render() {
     let widgetKey = this.props.widgetKey;
     let stockSymbol = this.state.inputText.slice(0, this.state.inputText.indexOf(":"));
+    const exchangeOptions = this.props.exchangeList.map((el) => 
+      <option key={el} value={el}>{el}</option>
+    )
 
     return (
       <div className="stockSearch">
@@ -104,6 +112,10 @@ class StockSearchPane extends React.Component {
             }
           }}
         >
+          <label htmlFor="exchangeList">Exchange: </label>
+          <select value={this.props.defaultExchange} name='exchangeList' onChange={this.changeDefault}>
+            {exchangeOptions}
+          </select>
           <label htmlFor="stockSearch">Symbol: </label>
           <input autoComplete="off" className="btn" type="text" id="stockSearch" list="stockSearch1" value={this.state.inputText} onChange={this.handleChange} />
           {/* <datalist id="stockSearch1">{this.createDataList()}</datalist> */}
@@ -118,3 +130,19 @@ class StockSearchPane extends React.Component {
 }
 
 export default StockSearchPane;
+
+export function searchPaneProps(that) {
+  let propList = {
+    updateGlobalStockList: that.props.updateGlobalStockList,
+    showSearchPane: () => that.props.showPane("showEditPane", 1),
+    apiKey: that.props.apiKey,
+    updateWidgetStockList: that.props.updateWidgetStockList,
+    widgetKey: that.props.widgetKey,
+    throttle: that.props.throttle,
+    exchangeList: that.props.exchangeList,
+    defaultExchange: that.props.defaultExchange,
+    updateDefaultExchange: that.props.updateDefaultExchange,
+  };
+  return propList;
+}
+

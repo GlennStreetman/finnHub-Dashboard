@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 import React from "react";
-import StockSearchPane from "../../../components/stockSearchPane.js";
+import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
 
 
@@ -133,14 +133,7 @@ class WatchListMenu extends React.PureComponent {
       <>
         {this.props.showEditPane === 1 && (
           <>
-          <StockSearchPane
-            updateWidgetStockList={this.props.updateWidgetStockList}
-            widgetKey={this.props.widgetKey}
-            updateGlobalStockList={this.props.updateGlobalStockList}
-            showSearchPane={() => this.props.showPane("showEditPane", 1)}
-            apiKey={this.props.apiKey}
-            throttle={this.props.throttle}
-          />
+          {React.createElement(StockSearchPane, searchPaneProps(this))}
           <div>
             <input type="file" hidden ref={this.inputReference} onChange={this.fileUploadInputChange} />
             <button className="ui button" onClick={this.fileUploadAction}>
@@ -177,6 +170,9 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
     throttle: that.props.throttle,
+    exchangeList: that.props.exchangeList,
+    defaultExchange: that.props.defaultExchange,
+    updateDefaultExchange: that.props.updateDefaultExchange,
   };
   return propList;
 }

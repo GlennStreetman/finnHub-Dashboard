@@ -1,5 +1,4 @@
 import React from "react";
-// import StockSearchPane from "../../stockSearchPane.js";
 
 class AccountMenu extends React.Component {
   constructor(props) {

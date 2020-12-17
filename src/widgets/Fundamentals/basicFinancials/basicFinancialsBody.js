@@ -1,5 +1,5 @@
 import React from "react";
-import StockSearchPane from "../../../components/stockSearchPane.js";
+import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
 
 //Widget body component. Shows stock detail info and recent news. Maybe a graph?
@@ -234,9 +234,6 @@ export default class FundamentalsBasicFinancials extends React.Component {
       }
     }
 
-
-    
-
     let metricSelectTable = (
       <div className="widgetTableDiv">
         <table className='widgetBodyTable'>
@@ -331,14 +328,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
       <>
         {this.props.showEditPane === 1 && (
           <>
-          <StockSearchPane
-            updateGlobalStockList={this.props.updateGlobalStockList}
-            showSearchPane={() => this.props.showPane("showEditPane", 1)}
-            apiKey={this.props.apiKey}
-            updateWidgetStockList={this.props.updateWidgetStockList}
-            widgetKey={this.props.widgetKey}
-            throttle={this.props.throttle}
-          />
+          {React.createElement(StockSearchPane, searchPaneProps(this))}
           {this.getMetrics()}
           </>
         )}
@@ -359,6 +349,9 @@ export function metricsProps(that, key = "basicFinancials") {
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
     throttle: that.props.throttle,
+    exchangeList: that.props.exchangeList,
+    defaultExchange: that.props.defaultExchange,
+    updateDefaultExchange: that.props.updateDefaultExchange,
   };
   return propList;
 }
