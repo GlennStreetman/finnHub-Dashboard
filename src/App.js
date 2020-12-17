@@ -162,7 +162,6 @@ class App extends React.Component {
 
   updateWidgetFilters(widgetID, dataKey, data){
     let updatedWidgetList = Object.assign({}, this.state.widgetList)
-    // updatedWidgetList[widgetID][dataKey] = data
     if (updatedWidgetList[widgetID].filters === undefined) {
       updatedWidgetList[widgetID].filters = {}
     }
@@ -340,18 +339,17 @@ class App extends React.Component {
   }
 
   updateExchangeList(ex) {
-    const s = this.state
-    const newExchangeList = [...s.exchangeList]
-    if (s.exchangeList.indexOf(ex) >= 0) {
-      newExchangeList.splice(s.exchangeList.indexOf(ex),1)
-    } else {
-      newExchangeList.push(ex)
-    }
-    this.setState({exchangeList: newExchangeList})
+    // const s = this.state
+    // // const newExchangeList = [...s.exchangeList]
+    // // if (s.exchangeList.indexOf(ex) >= 0) {
+    // //   newExchangeList.splice(s.exchangeList.indexOf(ex),1)
+    // // } else {
+    // //   newExchangeList.push(ex)
+    // // }
+    this.setState({exchangeList: ex})
   } 
 
   updateDefaultExchange(event){
-    // console.log('===>', event.target.value)
     this.setState({defaultExchange: event.target.value})
   }
 

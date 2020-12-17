@@ -72,6 +72,41 @@ export default class ExchangeMenu extends Component {
                 
             },
         };
+
+        this.baseState = {mounted: true}
+        this.changeExchange = this.changeExchange.bind(this)
+
+    }
+
+    changeExchange(ex){
+        const p = this.props
+        const newExchangeList = [...p.exchangeList]
+        if (p.exchangeList.indexOf(ex) >= 0) {
+          newExchangeList.splice(p.exchangeList.indexOf(ex),1)
+        } else {
+          newExchangeList.push(ex)
+        }
+
+        const data = {
+            field: "exchangelist",
+            newValue: newExchangeList.toString().replace("'", ),
+        };
+
+        const options = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+        };
+
+        fetch("/accountData", options)
+            .then((response) => response.json())
+            .then((data) => {
+            if (this.baseState.mounted === true) {
+                console.log("Exchange list updated.", data)
+                this.props.updateExchangeList(newExchangeList)
+            }   
+            });
+
     }
 
     render() {
@@ -86,7 +121,8 @@ export default class ExchangeMenu extends Component {
                     <td key={el[0]+ 'box'}>
                         <input key={el[0]+ 'mark'}
                             type="checkbox" 
-                            onChange={() => this.props.updateExchangeList(el[0])} 
+                            // onChange={() => this.props.updateExchangeList(el[0])} 
+                            onChange={() => this.changeExchange(el[0])} 
                             checked={p.exchangeList.indexOf(el[0]) >= 0} /> 
                     </td>
                 </tr>
@@ -97,7 +133,7 @@ export default class ExchangeMenu extends Component {
             <div >
                 <table >
                     <thead>
-                            <tr>
+                        <tr>
                             <td>Short</td>
                             <td>Description</td>
                             <td>Activate</td>

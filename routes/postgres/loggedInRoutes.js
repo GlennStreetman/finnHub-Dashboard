@@ -53,8 +53,10 @@ router.get("/accountData", (req, res) => {
 router.post("/accountData", (req, res) => {
   console.log(req.body);
   if (req.session.login === true) {  
+    
     if (req.body.field !== "email") {
-    console.log("updating account data");
+    //NOT EMAIL
+      console.log("updating account data");
     let updateField = req.body.field;
     let newValue = req.body.newValue;
     // console.log(updateField, newValue)
@@ -65,11 +67,14 @@ router.post("/accountData", (req, res) => {
       if (err) {
         res.json({message: `Failed to update ${updateField}`});
       } else {
-        res.json({message: `${updateField} updated`});
+        res.json({
+          message: `${updateField} updated`,
+          data: newValue,
+      });
       }
     });
     } else {
-    //update email
+    //EMAIL
     if (emailIsValid(req.body.newValue) === true) {
       console.log("new email address");
 

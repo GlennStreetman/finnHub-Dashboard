@@ -31,6 +31,8 @@ CREATE TABLE public.users
     webhook text COLLATE pg_catalog."default",
     confirmemail text COLLATE pg_catalog."default",
     resetpassword text COLLATE pg_catalog."default",
+    exchangelist text COLLATE pg_catalog."default",
+    defaultexchange text COLLATE pg_catalog."default",
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT users_email_key UNIQUE (email),
     CONSTRAINT users_loginname_key UNIQUE (loginname)
