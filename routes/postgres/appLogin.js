@@ -15,7 +15,7 @@ const db = process.env.live === '1' ?
 router.get("/login", (req, res) => {
     let loginText = format('%L', req.query["loginText"])
     let pwText = format('%L', req.query["pwText"])
-    let loginQuery = `SELECT id, loginname, apikey, confirmemail 
+    let loginQuery = `SELECT id, loginname, apikey, confirmemail,exchangelist, defaultexchange
                 FROM users WHERE loginName =${loginText} 
                 AND password = '${md5(pwText)}'`;
     let info = { key: "", login: 0 };
@@ -24,16 +24,18 @@ router.get("/login", (req, res) => {
         let login = rows.rows[0]
       // console.log(login)
         if (err) {
-        res.json({message: "login error"});
+          res.json({message: "login error"});
         } else if (rows.rowCount === 1 && login.confirmemail === '1') {
-        info["key"] = login.apikey;
-        info["login"] = 1;
-        info["response"] = 'success';
-        req.session.uID = login.id;
-        req.session.userName = rows.rows[0]['loginname'];
-        req.session.login = true
-        console.log(req.session)
-        res.json(info);
+          info["key"] = login.apikey;
+          info["login"] = 1;
+          info["response"] = 'success';
+          info["exchangelist"] = rows.rows[0]['exchangelist']
+          info["defaultexchange"] = rows.rows[0]['defaultexchange']
+          req.session.uID = login.id;
+          req.session.userName = rows.rows[0]['loginname'];
+          req.session.login = true
+          console.log(req.session)
+          res.json(info);
         } else if (rows.rowCount === 1 && login.confirmemail !== '1') {
         // console.log(login)
         info["response"] = 'Please confirm your email address.';

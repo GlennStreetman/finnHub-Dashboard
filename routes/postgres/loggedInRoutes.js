@@ -117,10 +117,12 @@ router.get("/dashboard", (req, res) => {
   if (req.session.login === true) { 
     let getSavedDashBoards = `
       SELECT id, dashBoardName, globalStockList, widgetList 
-      FROM dashBoard WHERE userID =${req.session.uID}`;
+      FROM dashBoard 
+      WHERE userID =${req.session.uID}`;
     let getMenuSetup = `
       SELECT menuList, defaultMenu 
-      FROM menuSetup WHERE userID =${req.session.uID}`;
+      FROM menuSetup 
+      WHERE userID =${req.session.uID}`;
     
     let resultSet = {};
     db.query(getSavedDashBoards, (err, rows) => {

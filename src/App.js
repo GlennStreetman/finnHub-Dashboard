@@ -339,18 +339,15 @@ class App extends React.Component {
   }
 
   updateExchangeList(ex) {
-    // const s = this.state
-    // // const newExchangeList = [...s.exchangeList]
-    // // if (s.exchangeList.indexOf(ex) >= 0) {
-    // //   newExchangeList.splice(s.exchangeList.indexOf(ex),1)
-    // // } else {
-    // //   newExchangeList.push(ex)
-    // // }
     this.setState({exchangeList: ex})
   } 
 
-  updateDefaultExchange(event){
-    this.setState({defaultExchange: event.target.value})
+  updateDefaultExchange(ex){
+    if (ex.target) {
+      this.setState({defaultExchange: ex.target.value})
+    } else {
+      this.setState({defaultExchange: ex})
+    }
   }
 
   render() {
@@ -361,6 +358,8 @@ class App extends React.Component {
       <Login 
       updateLogin={this.processLogin}
       queryData = {quaryData}
+      updateExchangeList={this.updateExchangeList}
+      updateDefaultExchange={this.updateDefaultExchange}
       /> : <></>
 
       const backGroundSelection = {

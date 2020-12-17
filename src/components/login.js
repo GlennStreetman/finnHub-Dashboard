@@ -119,10 +119,11 @@ class login extends React.Component {
     fetch("/login?loginText=" + this.state.loginText + "&pwText=" + this.state.pwText)
       .then((response) => response.json())
       .then((data) => {
+        console.log("login data: ",data.exchangelist, data.defaultexchange)
         if (data.response === 'success') {
           this.props.updateLogin(data["key"], data["login"]);
-          // this.setState({ serverResponse: data.response}); 
-          // login()
+          this.props.updateExchangeList(data.exchangelist)
+          this.props.updateDefaultExchange(data.defaultexchange)
         } else {
           this.setState({ serverResponse: data.response});
         }
