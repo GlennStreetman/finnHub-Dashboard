@@ -38,7 +38,10 @@ router.post("/register", (req, res) => {
     secretQuestion, 
     secretAnswer, 
     confirmEmail, 
-    resetPassword) 
+    resetPassword,
+    exchangelist,
+    defaultexchange
+    ) 
   VALUES (
     ${loginText},
     '${md5(pwText)}',
@@ -46,7 +49,9 @@ router.post("/register", (req, res) => {
     ${secretQuestion},
     '${md5(secretAnswer)}', 
     '${validateKey}', 
-    '0')
+    '0',
+    'US',
+    'US')
     RETURNING *`;
 
   function emailIsValid(email) {
