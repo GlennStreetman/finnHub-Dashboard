@@ -26,6 +26,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.changeOrder = this.changeOrder.bind(this); 
     this.mapStockData = this.mapStockData.bind(this);
+    this.changeSource = this.changeSource.bind(this);
   }
 
   componentDidMount(){
@@ -62,6 +63,15 @@ export default class FundamentalsBasicFinancials extends React.Component {
     }
   }
 
+  componentDidUpdate(prevProps, PrevState) {
+    if (this.props.trackedStocks !== prevProps.trackedStocks) {
+      this.props.trackedStocks.forEach(el => {
+        prevProps.trackedStocks.indexOf(el) === -1 && this.getCompanyMetrics(el)
+      })
+    }
+    
+  }
+
   componentWillUnmount(){
     this.baseState.mounted = false
   }
@@ -86,21 +96,16 @@ export default class FundamentalsBasicFinancials extends React.Component {
         });
     }
   }
-  
-  componentDidUpdate(prevProps, PrevState) {
-    // if (this.props.trackedStocks === 0 && prevProps.showEditPane === 1) {
-    //   this.props.trackedStocks.forEach(el => this.getCompanyMetrics(el))
-    // }
-    if (this.props.trackedStocks !== prevProps.trackedStocks) {
-      this.props.trackedStocks.forEach(el => {
-        prevProps.trackedStocks.indexOf(el) === -1 && this.getCompanyMetrics(el)
-      })
-    }
-  }
 
   handleChange(stateRef) {
     this.state[stateRef] === 1 ? this.setState({ [stateRef]: 0 }) : this.setState({ [stateRef]: 1 });
     this.setState({metricIncrementor: 1})
+  }
+
+  changeSource(el){
+    const p = this.props
+    p.updateWidgetFilters(p.widgetKey, 'metricSource', el)
+    p.updateWidgetFilters(p.widgetKey, 'metricSelection', [])
   }
 
   changeOrder(indexRef, change){
@@ -199,7 +204,8 @@ export default class FundamentalsBasicFinancials extends React.Component {
     let mapStockSelection = stockSelectionSlice.map((el, index) => (
       <tr key={el + "metricRow" + index}>
         <td key={el + "metricdesc"}>{el}</td>
-        <td><input type='radio' name='sourceStock' checked={p.filters.metricSource === el} onClick={()=> p.updateWidgetFilters(p.widgetKey, 'metricSource', el)} /></td>
+        {/* <td><input type='radio' name='sourceStock' checked={p.filters.metricSource === el} onChange={()=> p.updateWidgetFilters(p.widgetKey, 'metricSource', el)} /></td> */}
+        <td><input type='radio' name='sourceStock' checked={p.filters.metricSource === el} onChange={()=> this.changeSource(el)} /></td>
         <td key={el + "remove"}>
           <button onClick={() => {this.updateWidgetList(el);}}><i className="fa fa-times" aria-hidden="true" /></button>
         </td>
