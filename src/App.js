@@ -84,7 +84,7 @@ class App extends React.Component {
     }
 
     if (s.login === 1 && s.loadStartingDashBoard === 0 && s.currentDashBoard !== "") {
-      console.log("loading dashboards", s.dashBoardData)
+      // console.log("loading dashboards", s.dashBoardData)
       this.setState({ loadStartingDashBoard: 1 });
       try {
         if (Object.keys(s.dashBoardData).length > 0){
