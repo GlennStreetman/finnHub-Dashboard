@@ -10,8 +10,6 @@ class StockSearchPane extends React.Component {
       availableStocks: {}, //formatted stock list returned from finhubb
       filteredStockObjects: {}, //object data for each stock selected
       filteredStocks: [], //short list of stocks selected
-      // exchanges:['US','T','SS','HK','AS','BR','LS','PA','SZ','L'],  //Premium account required to receive stock data for none US exchanges.  
-      // exchanges:['US'],   //NYSE
     };
     this.baseState = {mounted: true}
     this.handleChange = this.handleChange.bind(this);
@@ -20,12 +18,12 @@ class StockSearchPane extends React.Component {
   }
 
   componentDidMount() {
-    // console.log("mounted");
-    // let exchange = this.state.exchanges
-    let exchange = this.props.exchangeList
+    this.getSymbolList(this.props.defaultExchange)
+  }
 
-    for (const x in exchange) {
-      this.getSymbolList(exchange[x]);
+  componentDidUpdate(prevProps) {
+    if (this.props.defaultExchange !== prevProps.defaultExchange) {
+      this.getSymbolList(this.props.defaultExchange)
     }
   }
 
@@ -35,7 +33,7 @@ class StockSearchPane extends React.Component {
 
   handleChange(e) {
     e.target !== undefined && this.setState({ inputText: e.target.value.toUpperCase() });
-    
+    console.log("returning new dropdown list")
     let filterObject = {}
     let newFilteredList = [];
 
@@ -60,6 +58,7 @@ class StockSearchPane extends React.Component {
 
   getSymbolList(exchange) {
     let that = this
+    // console.log("getting listings for exchange:", exchange )
     const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${exchange}&token=${that.props.apiKey}`
       finnHub(this.props.throttle, apiString)  
       .then((data) => {
@@ -71,7 +70,7 @@ class StockSearchPane extends React.Component {
             updateStockList[addStockKey] = addStockData
             delete updateStockList[key]
           }
-          that.setState({ availableStocks: Object.assign({}, that.state.availableStocks ,updateStockList)});
+          that.setState({ availableStocks: Object.assign({}, updateStockList)});
         }
       })
       .catch((error) => {
@@ -117,8 +116,7 @@ class StockSearchPane extends React.Component {
             {exchangeOptions}
           </select>
           <label htmlFor="stockSearch">Symbol: </label>
-          <input autoComplete="off" className="btn" type="text" id="stockSearch" list="stockSearch1" value={this.state.inputText} onChange={this.handleChange} />
-          {/* <datalist id="stockSearch1">{this.createDataList()}</datalist> */}
+          <input size='40' autoComplete="off" className="btn" type="text" id="stockSearch" list="stockSearch1" value={this.state.inputText} onChange={this.handleChange} />
           <datalist id="stockSearch1">
             <StockDataList availableStocks={this.state.filteredStocks} />
           </datalist>
