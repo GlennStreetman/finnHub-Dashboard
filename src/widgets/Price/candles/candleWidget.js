@@ -107,7 +107,7 @@ export default class PriceCandles extends React.Component {
           endUnix +
           "&token=" + that.props.apiKey
 
-      console.log(queryString)
+      // console.log(queryString)
 
       finnHub(this.props.throttle, queryString)
       .then((data) => {
