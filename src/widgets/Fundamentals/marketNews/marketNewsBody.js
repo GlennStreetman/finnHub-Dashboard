@@ -98,7 +98,7 @@ export default class FundamentalsCompanyNews extends React.Component {
       
       let that = this
       let querryString = "https://finnhub.io/api/v1/company-news?symbol=" + stockSymbol + "&from=" + startDate + "&to=" + endDate + "&token=" + that.props.apiKey
-      console.log(querryString)
+      // console.log(querryString)
       finnHub(p.throttle, querryString)
         .then((data) => {
           if (this.baseState.mounted === true) {

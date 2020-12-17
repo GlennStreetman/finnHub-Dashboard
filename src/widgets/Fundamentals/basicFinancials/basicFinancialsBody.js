@@ -42,11 +42,11 @@ export default class FundamentalsBasicFinancials extends React.Component {
 
     if (this.props.apiKey !== '' ) {
       const that = this
-      console.log( p.filters)
+      // console.log( p.filters)
       const sourceStock = p.filters.metricSource
       const sourceSymbol = sourceStock.slice(sourceStock.indexOf('-') + 1, sourceStock.length)
       let queryString = `https://finnhub.io/api/v1/stock/metric?symbol=${sourceSymbol}&metric=all&token=${p.apiKey}`
-      console.log(queryString)
+      // console.log(queryString)
       finnHub(p.throttle, queryString)
       .then((data) => {
         if (this.baseState.mounted === true) {
