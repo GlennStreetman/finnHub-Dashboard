@@ -339,7 +339,12 @@ class App extends React.Component {
   }
 
   updateExchangeList(ex) {
+    if (typeof ex === 'string'){
+      const newList = ex.split(',')
+      this.setState({exchangeList: newList})
+    } else {
     this.setState({exchangeList: ex})
+    }
   } 
 
   updateDefaultExchange(ex){
