@@ -58,7 +58,7 @@ router.get("/checkLogin", (req, res) => {
   let resData = { login: 0 };
   let uID = req.session["uID"];
   let apiKeysQuery = `
-    SELECT apikey, webhook 
+    SELECT apikey, webhook, exchangelist, defaultexchange 
     FROM users
     WHERE id = ${uID}
     `;
@@ -73,6 +73,8 @@ router.get("/checkLogin", (req, res) => {
           reject(resData);
         } else {
           resData.apiKey = rows.rows[0].apikey;
+          resData.exchangelist = rows.rows[0].exchangelist;
+          resData.defaultexchange = rows.rows[0].defaultexchange;
           resData.login = 1;
           resolve(resData);
         }

@@ -26,6 +26,7 @@ class login extends React.Component {
   }
 
   componentDidMount(){
+    console.log("Loading loggin screen.")
     // console.log(this.props.queryData)
     if (this.props.queryData.reset === '1') {
       const user = this.props.queryData.users
@@ -45,6 +46,7 @@ class login extends React.Component {
         console.error("No server response", error);
       });
     }
+    
     this.checkLoginStatus()
   }
 
@@ -52,9 +54,11 @@ class login extends React.Component {
     fetch("/checkLogin")
     .then((response) => response.json())
     .then((data) => {
-      // console.log("Loging status: ", data)
+      console.log("Loggin status: ", data)
       if (data.login === 1) {
         this.props.updateLogin(data.apiKey, 1)
+        this.props.updateExchangeList(data.exchangelist)
+        this.props.updateDefaultExchange(data.defaultexchange)
       } else {
         console.log("Not logged in:", data)
       }
