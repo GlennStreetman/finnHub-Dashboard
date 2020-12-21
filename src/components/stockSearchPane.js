@@ -81,7 +81,7 @@ class StockSearchPane extends React.Component {
   changeDefault(event){
     this.props.updateDefaultExchange(event)
   }
-
+  
   render() {
     let widgetKey = this.props.widgetKey;
     let stockSymbol = this.state.inputText.slice(0, this.state.inputText.indexOf(":"));

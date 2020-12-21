@@ -14,59 +14,59 @@ class WatchListMenu extends React.PureComponent {
 
     this.inputReference = React.createRef();
     this.baseState = {mounted: true}
-    this.getSymbolList = this.getSymbolList.bind(this);
+    // this.getSymbolList = this.getSymbolList.bind(this);
     this.renderWatchedStocks = this.renderWatchedStocks.bind(this);
     this.fileUploadAction = this.fileUploadAction.bind(this);
     this.fileUploadInputChange = this.fileUploadInputChange.bind(this);
   }
 
-  componentDidMount() {
-    this.getSymbolList(this.baseState);
-  }
+  // componentDidMount() {
+  //   this.getSymbolList(this.baseState);
+  // }
 
   componentWillUnmount(){
     this.baseState.mounted = false
   }
   
-  getSymbolList(baseState) {
-    if (this.props.apiKey !== '') {  
-      let that = this
-      const querryString = `https://finnhub.io/api/v1/stock/symbol?exchange=US&token=${this.props.apiKey}`
-      this.props.throttle.enqueue(function() {  
-      finnHub(that.props.throttle, querryString)
-        .then((data) => {
-          if (that.baseState.mounted === true) {
-            let transformData = {};
-            for (const [, stockValues] of Object.entries(data)) {
-              //deconstruct API object
-              const {
-                // currency: a,
-                description: b,
-                displaySymbol: c,
-                // symbol: d,
-                // type: e
-              } = stockValues;
-              //set API object keys equal to stock symbol value instad of numeric value
-              transformData[c] = {
-                // currency: a,
-                description: b,
-                displaySymbol: c,
-                // symbol: d,
-                // type: e,
-              };
-            }
-            if (baseState.mounted === true) {
-            that.setState({ availableStocks: transformData });
-            // console.log("Success retrieving stock symbols");
-            }
-          }
-        })
-        .catch((error) => {
-          console.error("Error retrieving stock symbols", error);
-        });
-      })
-    }
-  }
+  // getSymbolList(baseState) {
+  //   if (this.props.apiKey !== '') {  
+  //     let that = this
+  //     const querryString = `https://finnhub.io/api/v1/stock/symbol?exchange=US&token=${this.props.apiKey}`
+  //     this.props.throttle.enqueue(function() {  
+  //     finnHub(that.props.throttle, querryString)
+  //       .then((data) => {
+  //         if (that.baseState.mounted === true) {
+  //           let transformData = {};
+  //           for (const [, stockValues] of Object.entries(data)) {
+  //             //deconstruct API object
+  //             const {
+  //               // currency: a,
+  //               description: b,
+  //               displaySymbol: c,
+  //               // symbol: d,
+  //               // type: e
+  //             } = stockValues;
+  //             //set API object keys equal to stock symbol value instad of numeric value
+  //             transformData[c] = {
+  //               // currency: a,
+  //               description: b,
+  //               displaySymbol: c,
+  //               // symbol: d,
+  //               // type: e,
+  //             };
+  //           }
+  //           if (baseState.mounted === true) {
+  //           that.setState({ availableStocks: transformData });
+  //           // console.log("Success retrieving stock symbols");
+  //           }
+  //         }
+  //       })
+  //       .catch((error) => {
+  //         console.error("Error retrieving stock symbols", error);
+  //       });
+  //     })
+  //   }
+  // }
 
   renderWatchedStocks() {
     //console.log("rendering watched stocks");
@@ -79,6 +79,7 @@ class WatchListMenu extends React.PureComponent {
         </td>
         <td className="rightTE" key={el + "prc"}>
           {this.props.trackedStockData[el] ? (
+            this.props.trackedStockData[el]["currentPrice"] !== undefined &&
             this.props.trackedStockData[el]["currentPrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,

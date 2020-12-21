@@ -1,7 +1,8 @@
 import {finnHub} from "./throttleQueue.js";
 
 function GetStockPrice(context, stockDescription, apiKey, throttle) {
-  if (stockDescription !== undefined && apiKey !== undefined) {
+  //US ONLY
+  if (stockDescription !== undefined && apiKey !== undefined && stockDescription.slice(0, stockDescription.indexOf('-')) === 'US') {
     const stockSymbol = stockDescription.indexOf(":") > 0 ? 
       stockDescription.slice(0, stockDescription.indexOf(":")) : stockDescription;
     let stockPriceData = {};
