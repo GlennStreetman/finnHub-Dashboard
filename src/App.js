@@ -161,7 +161,7 @@ class App extends React.Component {
   }
 
   updateWidgetFilters(widgetID, dataKey, data){
-    let updatedWidgetList = Object.assign({}, this.state.widgetList)
+    const updatedWidgetList = {...this.state.widgetList}
     if (updatedWidgetList[widgetID].filters === undefined) {
       updatedWidgetList[widgetID].filters = {}
     }
