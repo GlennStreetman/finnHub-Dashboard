@@ -3,7 +3,7 @@
 import PriceQuote from "../widgets/Price/quote/stockDetailWidget.js";
 import PriceCandles from "../widgets/Price/candles/candleWidget.js";
 
-import FundamentalsCompanyNews from "../widgets/Fundamentals/marketNews/marketNewsBody.js";
+import FundamentalsCompanyNews from "../widgets/Fundamentals/companyNews/companyNewsBody.js";
 import FundamentalsBasicFinancials from "../widgets/Fundamentals/basicFinancials/basicFinancialsBody.js";
 import FundamentalsCompanyProfile2 from "../widgets/Fundamentals/companyProfile2/companyProfile2Body.js";
 

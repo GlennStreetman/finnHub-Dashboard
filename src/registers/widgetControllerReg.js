@@ -5,7 +5,7 @@ import { watchListMenuProps } from "./../widgets/Menu/watchListMenu/watchListMen
 import { candleWidgetProps } from "../widgets/Price/candles/candleWidget.js";
 import { stockDetailWidgetProps } from "../widgets/Price/quote/stockDetailWidget.js";
 
-import { newsWidgetProps } from "./../widgets/Fundamentals/marketNews/marketNewsBody.js";
+import { newsWidgetProps } from "./../widgets/Fundamentals/companyNews/companyNewsBody.js";
 import { metricsProps } from "./../widgets/Fundamentals/basicFinancials/basicFinancialsBody.js";
 import { companyProfile2Props } from "./../widgets/Fundamentals/companyProfile2/companyProfile2Body.js";
 
