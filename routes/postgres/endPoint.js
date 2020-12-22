@@ -4,22 +4,7 @@ const format = require("pg-format");
 const db = process.env.live === "1" ? require("../../db/databaseLive.js") : require("../../db/databaseLocalPG.js");
 const {finnHub, createFunctionQueueObject} = require("../../src/appFunctions/throttleQueueAPI.js");
 const cors = require('cors')
-
-//import all API string generator functions here and register to object below to widgetDict.
-const candleWidgetEndPoint = require("../../src/widgets/Price/candles/candlesEndPoint.js");
-const quoteWidgetEndPoint = require("../../src/widgets/Price/quote/quoteEndPoint.js");
-const basicFinancialsEndPoint = require("../../src/widgets/Fundamentals/basicFinancials/basicFinancialsEndPoint.js");
-const marketNewsEndPoint = require("../../src/widgets/Fundamentals/marketNews/marketNewsEndPoint.js");
- 
-const widgetDict = {
-    PriceCandles: candleWidgetEndPoint,
-    PriceQuote:quoteWidgetEndPoint,
-    FundamentalsBasicFinancials: basicFinancialsEndPoint,
-    FundamentalsCompanyNews: marketNewsEndPoint,
-}
-//Import all API data filter functions here and register below to postDataFilter.
-
-console.log(widgetDict)
+const {widgetDict} = require("../../src/registers/endPointsReg.js")
 
 router.use(function timeLog(req, res, next) {
     console.log("Time: ", new Date());
@@ -58,9 +43,7 @@ router.get("/endPoint", cors(),(req, res) => {
     //builds query strings for finnHub API calls.
         const resObject = {}
         for (const widgetKey in dashboard) {
-            
             const thisWidget = dashboard[widgetKey]
-            console.log(thisWidget.widgetType)
             const widgetFunction = widgetDict[thisWidget.widgetType] //function to create query string
             const queryStringList = widgetFunction(
                 thisWidget.trackedStocks, 
