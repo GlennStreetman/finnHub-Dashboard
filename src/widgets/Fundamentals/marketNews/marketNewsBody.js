@@ -8,7 +8,6 @@ export default class FundamentalsMarketNews extends React.Component {
     this.state = {
       companyNews: [],
       categoryList: ['general', 'forex', 'crypto', 'merger'],
-    //   categorySelection: 'general',
       newsIncrementor: 1,
     };
     
@@ -30,7 +29,6 @@ export default class FundamentalsMarketNews extends React.Component {
 
   componentWillUnmount(){
     this.baseState.mounted = false
-    this.updateFilter('general')
     // this.getCompanyNews()
   }
 

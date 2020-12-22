@@ -9,6 +9,7 @@ import { newsWidgetProps } from "./../widgets/Fundamentals/companyNews/companyNe
 import { marketNewsProps } from "./../widgets/Fundamentals/marketNews/marketNewsBody.js";
 import { metricsProps } from "./../widgets/Fundamentals/basicFinancials/basicFinancialsBody.js";
 import { companyProfile2Props } from "./../widgets/Fundamentals/companyProfile2/companyProfile2Body.js";
+import {newsSentimentsProps} from "../widgets/Fundamentals/newsSentiment/newsSentimentBody.js";
 
 export function returnBodyProps(that, key, ref = "pass") {
     let widgetBodyProps = {
@@ -20,6 +21,7 @@ export function returnBodyProps(that, key, ref = "pass") {
         FundamentalsMarketNews: () => marketNewsProps(that, ref),
         FundamentalsBasicFinancials: () => metricsProps(that, ref),
         FundamentalsCompanyProfile2: () => companyProfile2Props(that, ref),
+        FundamentalsNewsSentiment: () => newsSentimentsProps(that, ref),
     };
     let renderBodyProps = widgetBodyProps[key];
     return renderBodyProps;

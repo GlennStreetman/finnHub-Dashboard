@@ -4,6 +4,7 @@ export let widgetOptions = [
     ["FundamentalsBasicFinancials", "Basic Financials: ", "stockWidget", "Fundamentals: Basic Financials"],
     ["FundamentalsCompanyNews", "Company News: ", "stockWidget", "Fundamentals: Company News"],
     ["FundamentalsMarketNews", "Market News: ", "stockWidget", "Fundamentals: Market News"],
+    ["FundamentalsNewsSentiment", "News Sentiment: ", "stockWidget", "Fundamentals: News Sentiments"],
     ["PriceQuote", "Price Quote: ", "stockWidget", "Price: Quote"],
     ["PriceCandles", "Price Candle: ", "stockWidget", "Price: Candles"],
   ]

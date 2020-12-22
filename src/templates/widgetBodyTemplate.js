@@ -1,22 +1,26 @@
 import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
+import {dStock} from "../../../appFunctions/formatStockSymbols.js";
 
 export default class widgetName extends Component {
     constructor(props) {
         super(props);
         this.state = {
-
+          
         };
 
       this.baseState = {mounted: true}
       this.renderSearchPane = this.renderSearchPane.bind(this);
       this.renderStockData = this.renderStockData.bind(this);
       this.getStockData = this.getStockData.bind(this);
+      this.updateFilter = this.updateFilter.bind(this);
     }
 
     componentDidMount(){
-      //get starting data?
+      const p = this.props
+      p.stockList[0] !== undefined && this.setState({targetStock: p.stockList[0]}) 
+
     }
 
     componentDidUpdate(prevProps, prevState){
@@ -26,6 +30,11 @@ export default class widgetName extends Component {
     componentWillUnmount(){
       this.baseState.mounted = false
     }
+
+    updateFilter(e) {
+      //e should be click event.
+      this.props.updateWidgetFilters(this.props.widgetKey, "filterName", e)
+  }
 
     renderSearchPane(){
         //add search pane rendering logic here. Additional filters need to be added below.
