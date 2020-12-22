@@ -2,7 +2,7 @@ import React from "react";
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import CreateCandleStickChart from "./createCandleStickChart.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
-// import { json } from "body-parser";
+import {dStock} from "../../../appFunctions/formatStockSymbols.js";
 
 export default class PriceCandles extends React.Component {
   constructor(props) {
@@ -12,14 +12,11 @@ export default class PriceCandles extends React.Component {
     let startStock = this.props.trackedStocks.length > 0 ? startString : '';
 
     this.state = {
-      // startDate: new Date(Date.now()-31536000*1000).toISOString().slice(0, 10), 
-      // endDate: new Date().toISOString().slice(0, 10), //default to today.
       candleSelection: startStock, //current stock to be graphed.
       candleData: { 0: "blank" }, //graph data.
-      chartData: [],
+      chartData: [], //time series data
       options: {}, //graph options
-      // resolution: "W",
-      selectResolution: [1, 5, 15, 30, 60, "D", "W", "M"],
+      selectResolution: [1, 5, 15, 30, 60, "D", "W", "M"], //see finnhub api docs
     };
     this.baseState = {mounted: true}
     this.updateWidgetList = this.updateWidgetList.bind(this);
@@ -193,12 +190,12 @@ export default class PriceCandles extends React.Component {
   }
 
   editCandleListForm() {
-    let candleList = this.props.trackedStocks;
-
+    const p = this.props
+    let candleList = p.trackedStocks;
     let candleSelectionRow = candleList.map((el) =>
       this.props.showEditPane === 1 ? (
         <tr key={el + "container"}>
-          <td key={el + "name"}>{el}</td>
+          <td key={el + "name"}>{dStock(el, p.exchangeList)}</td>
           <td key={el + "buttonC"}>
             <button
               key={el + "button"}
@@ -225,7 +222,7 @@ export default class PriceCandles extends React.Component {
   displayCandleGraph() {
     let newSymbolList = this.props.trackedStocks.map((el) => (
       <option key={el + "ddl"} value={el}>
-        {el}
+        {dStock(el, this.props.exchangeList)}
       </option>
     ));
 

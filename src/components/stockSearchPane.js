@@ -77,7 +77,7 @@ class StockSearchPane extends React.Component {
         console.error("Error retrieving stock symbols:" +  exchange);
       });
       }
-
+ 
   changeDefault(event){
     this.props.updateDefaultExchange(event)
   }
@@ -111,14 +111,19 @@ class StockSearchPane extends React.Component {
             }
           }}
         >
+          {this.props.exchangeList.length > 1 && <>
           <label htmlFor="exchangeList">Exchange: </label>
           <select value={this.props.defaultExchange} name='exchangeList' onChange={this.changeDefault}>
             {exchangeOptions}
-          </select>
+          </select></>
+          }
           <label htmlFor="stockSearch">Symbol: </label>
           <input size='40' autoComplete="off" className="btn" type="text" id="stockSearch" list="stockSearch1" value={this.state.inputText} onChange={this.handleChange} />
           <datalist id="stockSearch1">
-            <StockDataList availableStocks={this.state.filteredStocks} />
+            <StockDataList 
+              availableStocks={this.state.filteredStocks} 
+              exchangeList={this.props.exchangeList}  
+            />
           </datalist>
           <input className="btn" type="submit" value="Submit" />
         </form>

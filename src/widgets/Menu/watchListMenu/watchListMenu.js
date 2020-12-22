@@ -1,9 +1,7 @@
 import Papa from 'papaparse'
 import React from "react";
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
-import {finnHub} from "../../../appFunctions/throttleQueue.js";
-
-
+import {dStock} from "../../../appFunctions/formatStockSymbols.js";
 
 class WatchListMenu extends React.PureComponent {
   constructor(props) {
@@ -20,67 +18,24 @@ class WatchListMenu extends React.PureComponent {
     this.fileUploadInputChange = this.fileUploadInputChange.bind(this);
   }
 
-  // componentDidMount() {
-  //   this.getSymbolList(this.baseState);
-  // }
-
   componentWillUnmount(){
     this.baseState.mounted = false
   }
-  
-  // getSymbolList(baseState) {
-  //   if (this.props.apiKey !== '') {  
-  //     let that = this
-  //     const querryString = `https://finnhub.io/api/v1/stock/symbol?exchange=US&token=${this.props.apiKey}`
-  //     this.props.throttle.enqueue(function() {  
-  //     finnHub(that.props.throttle, querryString)
-  //       .then((data) => {
-  //         if (that.baseState.mounted === true) {
-  //           let transformData = {};
-  //           for (const [, stockValues] of Object.entries(data)) {
-  //             //deconstruct API object
-  //             const {
-  //               // currency: a,
-  //               description: b,
-  //               displaySymbol: c,
-  //               // symbol: d,
-  //               // type: e
-  //             } = stockValues;
-  //             //set API object keys equal to stock symbol value instad of numeric value
-  //             transformData[c] = {
-  //               // currency: a,
-  //               description: b,
-  //               displaySymbol: c,
-  //               // symbol: d,
-  //               // type: e,
-  //             };
-  //           }
-  //           if (baseState.mounted === true) {
-  //           that.setState({ availableStocks: transformData });
-  //           // console.log("Success retrieving stock symbols");
-  //           }
-  //         }
-  //       })
-  //       .catch((error) => {
-  //         console.error("Error retrieving stock symbols", error);
-  //       });
-  //     })
-  //   }
-  // }
 
   renderWatchedStocks() {
     //console.log("rendering watched stocks");
-    const watchListStocks = this.props.globalStockList;
+    const p = this.props
+    const watchListStocks = p.globalStockList;
     const stockListKey = watchListStocks.map((el) => (
       <tr key={el + "row"}>
         <td key={el + "desc"}>
-          {el + ": "}
+          {dStock(el, p.exchangeList) + ": "}
           {this.state.availableStocks[el] ? this.state.availableStocks[el]["description"] : <></>}
         </td>
         <td className="rightTE" key={el + "prc"}>
-          {this.props.trackedStockData[el] ? (
-            this.props.trackedStockData[el]["currentPrice"] !== undefined &&
-            this.props.trackedStockData[el]["currentPrice"].toLocaleString(undefined, {
+          {p.trackedStockData[el] ? (
+            p.trackedStockData[el]["currentPrice"] !== undefined &&
+            p.trackedStockData[el]["currentPrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })
@@ -92,7 +47,7 @@ class WatchListMenu extends React.PureComponent {
           <button
             key={el + "clck"}
             onClick={(e) => {
-              this.props.updateGlobalStockList(e, el);
+              p.updateGlobalStockList(e, el);
             }}
           >
             <i className="fa fa-times" aria-hidden="true"></i>

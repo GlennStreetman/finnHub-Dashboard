@@ -1,5 +1,6 @@
 import React from "react";
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
+import {dStock} from "../../../appFunctions/formatStockSymbols.js";
 
 export default class PriceQuote extends React.Component {
   //widget data provided by appFunctions/getSTockPrices
@@ -25,9 +26,9 @@ export default class PriceQuote extends React.Component {
   }
 
   renderStockData() {
-    
-    let trackedStockData = this.props.trackedStockData;
-    let thisStock = this.props.trackedStocks;
+    const p = this.props
+    let trackedStockData = p.trackedStockData;
+    let thisStock = p.trackedStocks;
 
     for (const x in thisStock) {
       if (trackedStockData[thisStock[x]] === undefined ) {
@@ -37,7 +38,7 @@ export default class PriceQuote extends React.Component {
     let stockDetailRow = thisStock.map((el) =>
         trackedStockData[el] ? (
         <tr key={el + "st" + + trackedStockData[el]["currentPrice"]}>
-          <td key={el + "id"}>{el}</td>
+          <td key={el + "id"}>{dStock(el, p.exchangeList)}</td>
           <td className="rightTE" key={el + "prevClosePrice"}>
             {trackedStockData[el]["prevClosePrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,

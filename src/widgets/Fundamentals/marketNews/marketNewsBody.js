@@ -1,6 +1,7 @@
 import React from "react";
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
+import {dStock} from "../../../appFunctions/formatStockSymbols.js";
 
 // import Moment from "react-moment";
 
@@ -157,12 +158,12 @@ export default class FundamentalsCompanyNews extends React.Component {
   }
 
   editNewsListForm() {
-    let newsList = this.props.trackedStocks;
-
+    const p = this.props
+    let newsList = p.trackedStocks;
     let stockNewsRow = newsList.map((el) =>
-      this.props.showEditPane === 1 ? (
+      p.showEditPane === 1 ? (
         <tr key={el + "container"}>
-          <td key={el + "name"}>{el}</td>
+          <td key={el + "name"}>{(dStock(el, p.exchangeList))}</td>
           <td key={el + "buttonC"}>
             <button
               key={el + "button"}
@@ -219,9 +220,10 @@ export default class FundamentalsCompanyNews extends React.Component {
   }
 
   displayNews() {
+    const p = this.props
     let newSymbolList = this.props.trackedStocks.map((el) => (
       <option key={el + "ddl"} value={el}>
-        {el}
+        {dStock(el, p.exchangeList)}
       </option>
     ));
 

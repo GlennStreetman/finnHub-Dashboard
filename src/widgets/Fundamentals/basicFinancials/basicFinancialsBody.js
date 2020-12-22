@@ -1,6 +1,7 @@
 import React from "react";
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
+import {dStock} from "../../../appFunctions/formatStockSymbols.js";
 
 //Widget body component. Shows stock detail info and recent news. Maybe a graph?
 export default class FundamentalsBasicFinancials extends React.Component {
@@ -203,7 +204,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
 
     let mapStockSelection = stockSelectionSlice.map((el, index) => (
       <tr key={el + "metricRow" + index}>
-        <td key={el + "metricdesc"}>{el}</td>
+        <td key={el + "metricdesc"}>{dStock(el, p.exchangeList)}</td>
         {/* <td><input type='radio' name='sourceStock' checked={p.filters.metricSource === el} onChange={()=> p.updateWidgetFilters(p.widgetKey, 'metricSource', el)} /></td> */}
         <td><input type='radio' name='sourceStock' checked={p.filters.metricSource === el} onChange={()=> this.changeSource(el)} /></td>
         <td key={el + "remove"}>
@@ -308,7 +309,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
       )
     let bodyRows = this.props.trackedStocks.map((el) => { return (
     <tr key={thisKey + el + "tr1"}>
-    <td key={thisKey + el + "td1"}>{el}</td>
+    <td key={thisKey + el + "td1"}>{dStock(el, this.props.exchangeList)}</td>
     {this.mapStockData(el)}
     </tr>
     )})
