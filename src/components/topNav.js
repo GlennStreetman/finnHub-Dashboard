@@ -1,4 +1,5 @@
 import React from "react";
+import {widgetOptions} from '../registers/topNavReg.js'
 
 class TopNav extends React.Component {
   constructor(props) {
@@ -28,13 +29,6 @@ class TopNav extends React.Component {
   }
 
   render() {
-
-    let widgetOptions = [ //dropdown menu: widgetType, Widget name, family, dropdown description
-      ["FundamentalsBasicFinancials", "Stock Metrics: ", "stockWidget", "Fundamentals: Basic Financials"],
-      ["FundamentalsCompanyNews", "Recent News: ", "stockWidget", "Fundamentals: Company News"],
-      ["PriceQuote", "Stock Values: ", "stockWidget", "Price: Quote"],
-      ["PriceCandles", "Candle Data: ", "stockWidget", "Price: Candles"],
-    ]
 
     let widgetDropDown = widgetOptions.map((nested) => {
       let [a,b,c,d] = nested

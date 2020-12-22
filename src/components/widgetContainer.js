@@ -1,16 +1,5 @@
 import React from "react";
-
-//import widget and menu objects here. Also add to widgetList object in render method below.
-import PriceQuote from "../widgets/Price/quote/stockDetailWidget.js";
-import PriceCandles from "../widgets/Price/candles/candleWidget.js";
-
-import FundamentalsCompanyNews from "../widgets/Fundamentals/marketNews/marketNewsBody.js";
-import FundamentalsBasicFinancials from "../widgets/Fundamentals/basicFinancials/basicFinancialsBody.js";
-
-import DashBoardMenu from "../widgets/Menu/dashBoardMenu/dashBoardMenu.js";
-import WatchListMenu from "../widgets/Menu/watchListMenu/watchListMenu.js";
-// import AccountMenu from "../widgets/Menu/AccountMenu/accountMenu.js";
-// import AboutMenu from "../widgets/Menu/AboutMenu/AboutMenu.js";
+import {widgetLookUp} from '../registers/widgetContainerReg.js'
 
 //creates widget container. Used by all widgets.
 class WidgetContainer extends React.Component {
@@ -134,15 +123,6 @@ class WidgetContainer extends React.Component {
       left: this.props.widgetList["yAxis"],
       zIndex: this.props.zIndex.indexOf(this.props.widgetKey),
     };
-
-    let widgetLookUp = {
-      FundamentalsCompanyNews: FundamentalsCompanyNews,
-      FundamentalsBasicFinancials: FundamentalsBasicFinancials,
-      PriceQuote: PriceQuote,
-      PriceCandles: PriceCandles,
-      DashBoardMenu: DashBoardMenu,
-      WatchListMenu: WatchListMenu,
-    }; 
 
     const that = this;
     let widgetProps = that.props.widgetBodyProps();
