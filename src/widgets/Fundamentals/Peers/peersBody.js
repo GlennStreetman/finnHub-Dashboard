@@ -138,13 +138,13 @@ export default class FundamentalsPeers extends Component {
     } 
 
     getStockData(){
-      console.log("getting stock data")
+      // console.log("getting stock data")
       const p = this.props
       const s = this.state
       const that = this
       const stockSymbol = s.targetStock.slice(s.targetStock.indexOf("-")+1, s.targetStock.length)
       const queryString = `https://finnhub.io/api/v1/stock/peers?symbol=${stockSymbol}&token=${p.apiKey}`
-      console.log(queryString)
+      // console.log(queryString)
       finnHub(p.throttle, queryString)
       .then((data) => {
         if (that.baseState.mounted === true) {
