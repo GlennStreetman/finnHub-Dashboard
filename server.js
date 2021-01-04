@@ -9,8 +9,8 @@ const bodyParser = require("body-parser");
 
 const app = express();
 let fileStoreOptions = {};
-
-if (process.env.live === 1) {
+console.log("env=", process.env.live)
+if (process.env.live === '1') {
   console.log("loading live server config")
   //enable below to run HTTP server. Used with Heroku
   const path = require("path");
@@ -30,7 +30,7 @@ if (process.env.live === 1) {
     })
 
   );
-
+    console.log("loading routes")
     //live routes, postgres db.
     const login = require('./routes/postgres/appLogin')
     const loggedIn = require('./routes/postgres/loggedInRoutes')
