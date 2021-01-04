@@ -59,7 +59,6 @@ class DashBoardMenu extends React.PureComponent {
       <tr key={dashBoardData[el].id + "tr"}>
         <td className="centerTE">
           <button onClick={() => this.deleteDashBoard(dashBoardData[el].id)}>
-            {/* <button onClick={() => this.props.loadDashBoard(el.globalStockList, el.widgetList)}> */}
             <i className="fa fa-times" aria-hidden="true"></i>
           </button>
         </td>

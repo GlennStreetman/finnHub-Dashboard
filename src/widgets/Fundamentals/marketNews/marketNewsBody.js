@@ -59,7 +59,6 @@ export default class FundamentalsMarketNews extends React.Component {
   
   getCompanyNews() {
     const p = this.props
-    const s = this.state
     if (p.apiKey !== '') {
       let that = this
       let querryString = `https://finnhub.io/api/v1/news?category=${p.filters.categorySelection}&token=${p.apiKey}` 

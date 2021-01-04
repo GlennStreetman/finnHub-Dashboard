@@ -6,15 +6,17 @@ const companyNewsEndPoint = require("../widgets/Fundamentals/companyNews/company
 const companyProfileEndPoint = require("../widgets/Fundamentals/companyProfile2/companyProfile2EndPoint.js");
 const marketNewsEndPoint = require("../widgets/Fundamentals/marketNews/marketNewsEndPoint.js");
 const newsSentimentEndPoint = require("../widgets/Fundamentals/newsSentiment/newsSentimentEndPoint.js");
+const peersEndPoint = require("../widgets/Fundamentals/Peers/peersEndPoint.js");
 
 const widgetDict = {
     PriceCandles: candleWidgetEndPoint,
-    PriceQuote:quoteWidgetEndPoint,
+    PriceQuote: quoteWidgetEndPoint,
     FundamentalsBasicFinancials: basicFinancialsEndPoint,
     FundamentalsCompanyNews: companyNewsEndPoint,
     FundamentalsCompanyProfile2: companyProfileEndPoint,
     FundamentalsMarketNews: marketNewsEndPoint,
-    FundamentalsNewsSentiment:newsSentimentEndPoint,
+    FundamentalsNewsSentiment: newsSentimentEndPoint,
+    FundamentalsPeers: peersEndPoint,
 }
 
 module.exports.widgetDict = widgetDict
