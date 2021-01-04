@@ -26,6 +26,7 @@
     "react-papaparse": "^3.11.1",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.3",
+    "react-test-renderer": "^17.0.1",
     "session-file-store": "^1.4.0",
     "sqlite3": "^5.0.0"
   },
@@ -34,7 +35,8 @@
     "client": "SET PORT=3000 && react-scripts start",
     "start": "node server.js",
     "build": "react-scripts build",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "test": "jest"
   },
   "eslintConfig": {
     "extends": "react-app"
