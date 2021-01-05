@@ -2,30 +2,28 @@ import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import EndPointNode from "../../../components/endPointNode.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
-import {dStock} from "../../../appFunctions/formatStockSymbols.js";
+import {dStock, sStock} from "../../../appFunctions/formatStockSymbols.js";
 
-export default class FundamentalsNewsSentiment extends Component {
+export default class FundamentalsFinancialsAsReported extends Component {
     constructor(props) {
         super(props);
         this.state = {
           targetStock: '',
-          stockData: {},
+          stockdata: undefined, //{}
         };
 
       this.baseState = {mounted: true}
       this.renderSearchPane = this.renderSearchPane.bind(this);
       this.renderStockData = this.renderStockData.bind(this);
       this.getStockData = this.getStockData.bind(this);
-      // this.mapStockData  = this.mapStockData.bind(this);
-      this.changeStockSelection = this.changeStockSelection.bind(this);
       this.updateWidgetList = this.updateWidgetList.bind(this);
+      this.changeStockSelection = this.changeStockSelection.bind(this);
     }
 
     componentDidMount(){
       const p = this.props
-      p.trackedStocks[0] !== undefined && 
-        this.setState({targetStock: p.trackedStocks[0]}, () => this.getStockData()) 
-      
+      p.trackedStocks[0] !== undefined && this.setState({targetStock: p.trackedStocks[0]}, ()=>this.getStockData()) 
+
     }
 
     componentDidUpdate(prevProps, prevState){
@@ -34,7 +32,6 @@ export default class FundamentalsNewsSentiment extends Component {
       if (prevProps.trackedStocks[0] === undefined && p.trackedStocks[0] !== undefined) {
         this.setState({targetStock: p.trackedStocks[0]}, () => this.getStockData())
       }
-      
     }
 
     componentWillUnmount(){
@@ -48,12 +45,6 @@ export default class FundamentalsNewsSentiment extends Component {
       } else {
         this.props.updateWidgetStockList(this.props.widgetKey, stock);
       }
-    }
-
-    changeStockSelection(e) {
-      const target = e.target.value;
-      this.setState({ targetStock: target }, () => this.getStockData());
-      
     }
 
     renderSearchPane(){
@@ -86,6 +77,12 @@ export default class FundamentalsNewsSentiment extends Component {
       return <>{stockListTable}</>;
     }
 
+    changeStockSelection(e) {
+      const target = e.target.value;
+      this.setState({ targetStock: target }, () => this.getStockData());
+      
+    }
+
     renderStockData(){
       const p = this.props
       const newSymbolList = this.props.trackedStocks.map((el) => (
@@ -101,45 +98,28 @@ export default class FundamentalsNewsSentiment extends Component {
           {newSymbolList}
         </select>
         <br />
-        <EndPointNode nodeData={this.state.stockData} />
+        {this.state.stockData !== undefined && <EndPointNode nodeData={this.state.stockData} />}
         </>
     return stockTable
     }
-    
-  //   mapStockData(){
-  //     const s = this.state
-  //     const rows = Object.keys(s.stockData).map((key) => 
-  //       <tr key={s.stockData[key]}>
-  //         <td>{ `${key}: `}</td>
-  //         {/* <td>{s.stockData[key]}</td> */}
-  //         <td>
-  //           s.stockData[key]
-  //           {/* {key === 'logo' ? <img width='25%' src={s.stockData[key]}  alt={s.stockData[key]}></img> :  s.stockData[key]} */}
-  //         </td>
-  //       </tr>
-  //     )
-  //   return rows
-  // }
 
     getStockData(){
-      if (this.state.targetStock !== undefined) {
-        const p = this.props
-        const that = this
-        const stock = this.state.targetStock
-        if (stock.slice(0, stock.indexOf('-')) === 'US') {
-          const thisStock = stock.slice(stock.indexOf('-') + 1, stock.length)
-          const queryString = `https://finnhub.io/api/v1/news-sentiment?symbol=${thisStock}&token=${p.apiKey}`
-          finnHub(p.throttle, queryString)
-          .then((data) => {
-            if (that.baseState.mounted === true) {
-              this.setState({stockData: data})
-            }
-          })
-          .catch(error => {
-            console.log(error.message)
-          });
+      const p = this.props
+      const s = this.state
+      const stock = sStock(s.targetStock)
+      const that = this
+      const queryString = `https://finnhub.io/api/v1/stock/financials-reported?symbol=${stock}&token=${p.apiKey}`
+      finnHub(p.throttle, queryString)
+      .then((data) => {
+        if (that.baseState.mounted === true) {
+            this.setState({stockData: data})
+            console.log(queryString)
+            console.log(data)
         }
-      }
+      })
+      .catch(error => {
+        console.log(error.message)
+      });
     }
 
     render() {
@@ -159,7 +139,7 @@ export default class FundamentalsNewsSentiment extends Component {
   }
 
 
-export function newsSentimentsProps(that, key = "newWidgetNameProps") {
+export function financialsAsReportedProps(that, key = "financialsAsReported") {
     let propList = {
       apiKey: that.props.apiKey,
       showPane: that.showPane,
@@ -176,8 +156,3 @@ export function newsSentimentsProps(that, key = "newWidgetNameProps") {
     };
     return propList;
   }
-
-
-  // fetch('https://finnhub.io/api/v1/stock/profile2?symbol=AAPL&token=bsuu7qv48v6qu589jlj0')
-  //   .then(response => response.json())
-  //   .then(data => console.log(data))

@@ -9,6 +9,7 @@ import FundamentalsCompanyProfile2 from "../widgets/Fundamentals/companyProfile2
 import FundamentalsMarketNews from "../widgets/Fundamentals/marketNews/marketNewsBody.js";
 import FundamentalsNewsSentiment from "../widgets/Fundamentals/newsSentiment/newsSentimentBody.js";
 import FundamentalsPeers from "../widgets/Fundamentals/Peers/peersBody.js";
+import FundamentalsFinancialsAsReported from "../widgets/Fundamentals/financialsAsReported/financialsAsReportedBody.js";
 
 import DashBoardMenu from "../widgets/Menu/dashBoardMenu/dashBoardMenu.js";
 import WatchListMenu from "../widgets/Menu/watchListMenu/watchListMenu.js";
@@ -20,6 +21,7 @@ export let widgetLookUp = {
     FundamentalsMarketNews: FundamentalsMarketNews,
     FundamentalsNewsSentiment: FundamentalsNewsSentiment,
     FundamentalsPeers: FundamentalsPeers,
+    FundamentalsFinancialsAsReported: FundamentalsFinancialsAsReported,
     PriceQuote: PriceQuote,
     PriceCandles: PriceCandles,
     DashBoardMenu: DashBoardMenu,
