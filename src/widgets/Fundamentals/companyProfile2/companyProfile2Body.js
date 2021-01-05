@@ -133,22 +133,24 @@ export default class FundamentalsCompanyProfile2 extends Component {
   }
 
     getStockData(){
+      if (this.state.targetStock !== undefined){
       const stock = this.state.targetStock
-      if (stock.slice(0, stock.indexOf('-')) === 'US') {
-        const thisStock = stock.slice(stock.indexOf('-') + 1, stock.length)
-        const p = this.props
-        const that = this
-        const queryString = `https://finnhub.io/api/v1/stock/profile2?symbol=${thisStock}&token=${p.apiKey}`
-        console.log(queryString)
-        finnHub(p.throttle, queryString)
-        .then((data) => {
-          if (this.baseState.mounted === true) {
-            that.setState({stockData: Object.assign({}, data)})
-          }
-        })
-        .catch(error => {
-          console.log(error.message)
-        });
+        if (stock.slice(0, stock.indexOf('-')) === 'US') {
+          const thisStock = stock.slice(stock.indexOf('-') + 1, stock.length)
+          const p = this.props
+          const that = this
+          const queryString = `https://finnhub.io/api/v1/stock/profile2?symbol=${thisStock}&token=${p.apiKey}`
+          console.log(queryString)
+          finnHub(p.throttle, queryString)
+          .then((data) => {
+            if (this.baseState.mounted === true) {
+              that.setState({stockData: Object.assign({}, data)})
+            }
+          })
+          .catch(error => {
+            console.log(error.message)
+          });
+        }
       }
     }
 
