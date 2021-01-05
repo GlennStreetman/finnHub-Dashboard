@@ -142,7 +142,7 @@ class AccountMenu extends React.Component {
           <table>
             <tbody>
               <tr>
-                <td>{"Old " + this.state.editField + ":"}</td>
+                <td>{"Old apikey: " + this.props.apiKey + ":"}</td>
                 <td>{this.state[this.state.editField]}</td>
               </tr>
               <tr>
@@ -175,7 +175,7 @@ export function accountMenuProps(that, key = "AccountMenu") {
   let propList = {
     apiKey: that.state.apiKey,
     widgetKey: key,
-    updateAPIKey: that.state.updateAPIKey,
+    updateAPIKey: that.updateAPIKey,
     exchangeList: that.state.exchangeList,
     toggleBackGroundMenu: that.toggleBackGroundMenu,
   };
