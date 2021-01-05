@@ -1,5 +1,5 @@
 {
-  "proxy": "http://localhost:5000",
+  "proxy": "https://localhost:5000",
   "name": "dashboard",
   "version": "0.1.0",
   "private": true,
