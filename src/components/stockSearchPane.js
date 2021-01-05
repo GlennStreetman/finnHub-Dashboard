@@ -103,6 +103,7 @@ class StockSearchPane extends React.Component {
               // this.props.getStockPrice(this.state.inputText);
               if (widgetKey / 1 !== undefined) {
                 this.props.updateWidgetStockList(widgetKey, stockSymbol);
+                e.preventDefault();
               }
             } else {
               //console.log(this.state.inputText);
