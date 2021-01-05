@@ -225,7 +225,7 @@ export default class FundamentalsCompanyNews extends React.Component {
 
   displayNews() {
     const p = this.props
-    let newSymbolList = this.props.trackedStocks.map((el) => (
+    let newSymbolList = p.trackedStocks.map((el) => (
       <option key={el + "ddl"} value={el}>
         {dStock(el, p.exchangeList)}
       </option>
