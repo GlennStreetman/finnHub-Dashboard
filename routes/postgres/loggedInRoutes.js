@@ -163,7 +163,7 @@ router.post("/dashboard", (req, res) => {
         ON CONFLICT (userID, dashboardname) 
         DO UPDATE SET globalstocklist = EXCLUDED.globalstocklist, widgetlist = EXCLUDED.widgetlist
         `;
-        // console.log(saveDashBoardSetupQuery)
+        console.log(saveDashBoardSetupQuery)
         db.query(saveDashBoardSetupQuery, (err, rows) => {
           if (err) {
             reject("Failed to save dashboard", err);
