@@ -29,9 +29,12 @@ export default class FundamentalsPeers extends Component {
       
     }
 
-    // componentDidUpdate(prevProps, prevState){
-    //   //pass
-    // }
+    componentDidUpdate(prevProps, prevState){
+      const p = this.props
+      if (prevProps.trackedStocks[0] !== p.trackedStocks[0]) {
+        this.setState({targetStock: p.trackedStocks[0]}, () => this.getStockData())
+      }
+    }
 
     componentWillUnmount(){
       this.baseState.mounted = false

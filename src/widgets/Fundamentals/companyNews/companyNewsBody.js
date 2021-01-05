@@ -48,10 +48,6 @@ export default class FundamentalsCompanyNews extends React.Component {
     }
   }
 
-  componentWillUnmount(){
-    this.baseState.mounted = false
-  }
-
   componentDidUpdate(prevProps, prevState) {
     const p = this.props
     const s = this.state
@@ -59,9 +55,17 @@ export default class FundamentalsCompanyNews extends React.Component {
     if (s.newsSelection !== prevState.newsSelection || p.showEditPane !== prevProps.showEditPane) {
       this.getCompanyNews(s.newsSelection, p.filters.startDate, p.filters.endDate);
     }
-    if (this.state.newsSelection === 1 && this.props.trackedStocks.length) {
-      this.setState({ newsSelection: this.props.trackedStocks[0] });
+    // if (this.state.newsSelection === 1 && this.props.trackedStocks.length) {
+    //   console.log("-----------------HERE")
+    //   this.setState({ newsSelection: this.props.trackedStocks[0] });
+    // }
+    if (prevProps.trackedStocks[0] !== p.trackedStocks[0]) {
+      this.setState({newsSelection: p.trackedStocks[0]}, () => this.getCompanyNews(s.newsSelection, p.filters.startDate, p.filters.endDate))
     }
+  }
+
+  componentWillUnmount(){
+    this.baseState.mounted = false
   }
 
   formatSourceName(source) {
