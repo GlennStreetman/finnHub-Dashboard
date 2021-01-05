@@ -19,7 +19,7 @@ export default class widgetName extends Component {
 
     componentDidMount(){
       const p = this.props
-      p.stockList[0] !== undefined && this.setState({targetStock: p.stockList[0]}) 
+      p.trackedStocks[0] !== undefined && this.setState({targetStock: p.trackedStocks[0]}) 
 
     }
 
@@ -41,7 +41,7 @@ export default class widgetName extends Component {
     }
 
     renderStockData(){
-        //add widget data here
+        //add widget data render here
     } 
 
     getStockData(stock){
