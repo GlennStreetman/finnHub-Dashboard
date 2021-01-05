@@ -24,13 +24,17 @@ export default class FundamentalsCompanyProfile2 extends Component {
   componentDidMount(){
     const p = this.props
     console.log('getting stock data')
-    this.setState({targetStock: p.trackedStocks[0]})
-    // this.getStockData()
+    this.setState({targetStock: p.trackedStocks[0]}, () => this.getStockData())
+    
   }
 
   componentDidUpdate(prevProps, prevState){
+    const p = this.props
     if (prevState.targetStock !== this.state.targetStock) {
       this.getStockData()
+    }
+    if (prevProps.trackedStocks[0] !== p.trackedStocks[0]) {
+      this.setState({targetStock: p.trackedStocks[0]}, () => this.getStockData())
     }
   }
 
@@ -134,6 +138,7 @@ export default class FundamentalsCompanyProfile2 extends Component {
 
     getStockData(){
       if (this.state.targetStock !== undefined){
+      console.log("--------getting stocks data")
       const stock = this.state.targetStock
         if (stock.slice(0, stock.indexOf('-')) === 'US') {
           const thisStock = stock.slice(stock.indexOf('-') + 1, stock.length)
