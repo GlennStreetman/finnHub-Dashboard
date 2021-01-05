@@ -8,6 +8,7 @@ const marketNewsEndPoint = require("../widgets/Fundamentals/marketNews/marketNew
 const newsSentimentEndPoint = require("../widgets/Fundamentals/newsSentiment/newsSentimentEndPoint.js");
 const peersEndPoint = require("../widgets/Fundamentals/Peers/peersEndPoint.js");
 const financialsAsReportedEndPoint = require("../widgets/Fundamentals/financialsAsReported/financialsAsReportedEndPoint.js");
+const secFilingsEndPoint = require("../widgets/Fundamentals/secFilings/secFilingsEndPoint.js");
 
 const widgetDict = {
     PriceCandles: candleWidgetEndPoint,
@@ -19,6 +20,7 @@ const widgetDict = {
     FundamentalsNewsSentiment: newsSentimentEndPoint,
     FundamentalsPeers: peersEndPoint,
     FundamentalsFinancialsAsReported: financialsAsReportedEndPoint,
+    FundamentalsSECFilings: secFilingsEndPoint,
 }
 
 module.exports.widgetDict = widgetDict

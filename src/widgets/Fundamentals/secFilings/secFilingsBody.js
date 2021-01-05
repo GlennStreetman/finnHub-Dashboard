@@ -1,23 +1,28 @@
 import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
-import EndPointNode from "../../../components/endPointNode.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
 import {dStock, sStock} from "../../../appFunctions/formatStockSymbols.js";
+// import EndPointNode from "../../../components/endPointNode.js";
 
-export default class FundamentalsFinancialsAsReported extends Component {
+export default class FundamentalsSECFilings extends Component {
     constructor(props) {
         super(props);
         this.state = {
           targetStock: '',
-          stockdata: undefined, //{}
+          stockData: undefined, //list
+          pageinationInt: 0,
+          
         };
 
       this.baseState = {mounted: true}
       this.renderSearchPane = this.renderSearchPane.bind(this);
       this.renderStockData = this.renderStockData.bind(this);
       this.getStockData = this.getStockData.bind(this);
-      this.updateWidgetList = this.updateWidgetList.bind(this);
+      this.updateFilter = this.updateFilter.bind(this);
+      this.changeIncrement = this.changeIncrement.bind(this);
       this.changeStockSelection = this.changeStockSelection.bind(this);
+      this.stockTable = this.stockTable.bind(this);
+      this.formatURLS = this.formatURLS.bind(this);
     }
 
     componentDidMount(){
@@ -38,13 +43,9 @@ export default class FundamentalsFinancialsAsReported extends Component {
       this.baseState.mounted = false
     }
 
-    updateWidgetList(stock) {
-      if (stock.indexOf(":") > 0) {
-        const stockSymbole = stock.slice(0, stock.indexOf(":"));
-        this.props.updateWidgetStockList(this.props.widgetKey, stockSymbole);
-      } else {
-        this.props.updateWidgetStockList(this.props.widgetKey, stock);
-      }
+    updateFilter(e) {
+      //e should be click event.
+      this.props.updateWidgetFilters(this.props.widgetKey, "filterName", e)
     }
 
     renderSearchPane(){
@@ -77,42 +78,89 @@ export default class FundamentalsFinancialsAsReported extends Component {
       return <>{stockListTable}</>;
     }
 
+    changeIncrement(e) {
+      const newpageinationInt = this.state.pageinationInt + e;
+      if (newpageinationInt > 0 && newpageinationInt < 251) this.setState({ pageinationInt: newpageinationInt });
+    }
+
     changeStockSelection(e) {
       const target = e.target.value;
-      this.setState({ targetStock: target }, () => this.getStockData());
-      
+      this.setState({ targetStock: target }, ()=> this.getStockData());
+      this.setState({ pageinationInt: 0 });
+    }
+
+    formatURLS(e){
+      if (e.includes("http")){
+        return <a href={e} target="_blank" rel="noopener noreferrer">{e.slice(0,21) + '...'}</a>
+      } else return e
+    }
+
+    stockTable(data){
+      let tableData = Object.keys(data).map((el)=>
+        <tr key={"row" + el}>
+          <td key={"heading" + el}>{el}</td>
+          <td key={"value" + el}>{this.formatURLS(data[el])}</td>
+        </tr>
+      )
+      return tableData
     }
 
     renderStockData(){
+      
       const p = this.props
-      const newSymbolList = this.props.trackedStocks.map((el) => (
+      const s = this.state
+      if (s.stockData !== undefined) {
+      let newSymbolList = p.trackedStocks.map((el) => (
         <option key={el + "ddl"} value={el}>
           {dStock(el, p.exchangeList)}
         </option>
-      ))
-      
-  
-      const stockTable = 
+      ));
+        
+      let currentFiling = s.stockData[s.pageinationInt]
+      let symbolSelectorDropDown = (
         <>
-        <select className="btn" value={this.state.targetStock} onChange={this.changeStockSelection}>
-          {newSymbolList}
-        </select>
-        <br />
-        {this.state.stockData !== undefined && <EndPointNode nodeData={this.state.stockData} />}
+          <div>
+            <select value={this.state.newsSelection} onChange={this.changeStockSelection}>
+              {newSymbolList}
+            </select>
+            <button onClick={() => this.changeIncrement(-1)}>
+              <i className="fa fa-backward" aria-hidden="true"></i>
+            </button>
+            <button onClick={() => this.changeIncrement(1)}>
+              <i className="fa fa-forward" aria-hidden="true"></i>
+            </button>
+          </div>
+          {/* <div>{this.state.stockData !== undefined && <EndPointNode nodeData={currentFiling} />}</div> */}
+          <div>
+            {this.state.stockData !== undefined && 
+            <table>
+              <thead>
+                <tr>
+                  <td>Heading</td>
+                  <td>Value</td>
+                </tr>
+              </thead>
+              <tbody>{this.stockTable(currentFiling)}</tbody>
+            </table> }
+          </div>
+
         </>
-    return stockTable
+      );
+      return symbolSelectorDropDown;
     }
+    } 
 
     getStockData(){
       const p = this.props
       const s = this.state
-      const stock = sStock(s.targetStock)
       const that = this
-      const queryString = `https://finnhub.io/api/v1/stock/financials-reported?symbol=${stock}&token=${p.apiKey}`
+      const stock = sStock(s.targetStock)
+      const queryString = `https://finnhub.io/api/v1/stock/filings?symbol=${stock}&token=${p.apiKey}`
       finnHub(p.throttle, queryString)
       .then((data) => {
         if (that.baseState.mounted === true) {
-            this.setState({stockData: data})
+          //update state
+          this.setState({stockData: data})
         }
       })
       .catch(error => {
@@ -137,7 +185,7 @@ export default class FundamentalsFinancialsAsReported extends Component {
   }
 
 
-export function financialsAsReportedProps(that, key = "financialsAsReported") {
+export function secFilingsProps(that, key = "newWidgetNameProps") {
     let propList = {
       apiKey: that.props.apiKey,
       showPane: that.showPane,

@@ -2,13 +2,13 @@ function sStock(stock){
     return stock.slice(stock.indexOf("-")+1, stock.length)
 }
 
-module.exports = function financialsAsReportedEndPoint(stockList, filters, apiKey){
+module.exports = function secFilingsEndPoint(stockList, filters, apiKey){
     //filters used after data is returned.
     let queryStringObj = {}
 
     for (const stock in stockList) {
         let stockSymbole = sStock(stockList[stock])
-        const queryString = `https://finnhub.io/api/v1/stock/financials-reported?symbol=${stockSymbole}&token=${apiKey}`
+        const queryString = `https://finnhub.io/api/v1/stock/filings?symbol=${stockSymbole}&token=${apiKey}`
         queryStringObj[stockSymbole] = (queryString)
     }
     return queryStringObj
