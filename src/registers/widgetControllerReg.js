@@ -2,8 +2,8 @@
 import { dashBoardMenuProps } from "./../widgets/Menu/dashBoardMenu/dashBoardMenu.js";
 import { watchListMenuProps } from "./../widgets/Menu/watchListMenu/watchListMenu.js";
 
-import { candleWidgetProps } from "../widgets/Price/candles/candleWidget.js";
-import { stockDetailWidgetProps } from "../widgets/Price/quote/stockDetailWidget.js";
+import { recommendationTrendsProps } from "./../widgets/Estimates/RecommendationTrends/recommendationTrendsBody.js";
+import { priceTargetProps } from "./../widgets/Estimates/PriceTarget/priceTargetBody.js";
 
 import { newsWidgetProps } from "./../widgets/Fundamentals/companyNews/companyNewsBody.js";
 import { marketNewsProps } from "./../widgets/Fundamentals/marketNews/marketNewsBody.js";
@@ -15,10 +15,15 @@ import { financialsAsReportedProps } from "../widgets/Fundamentals/financialsAsR
 import { secFilingsProps } from "../widgets/Fundamentals/secFilings/secFilingsBody.js";
 import { IPOCalendarProps } from "../widgets/Fundamentals/IPOCalendar/IPOCalendarBody.js";
 
+import { candleWidgetProps } from "../widgets/Price/candles/candleWidget.js";
+import { stockDetailWidgetProps } from "../widgets/Price/quote/stockDetailWidget.js";
+
 export function returnBodyProps(that, key, ref = "pass") {
     let widgetBodyProps = {
         WatchListMenu: () => watchListMenuProps(that, key),
         DashBoardMenu: () => dashBoardMenuProps(that, key),
+        EstimatesRecommendationTrends: () => recommendationTrendsProps(that, ref),
+        EstimatesPriceTarget: () => priceTargetProps(that, ref),
         PriceCandles: () => candleWidgetProps(that, ref),
         PriceQuote: () => stockDetailWidgetProps(that, ref),
         FundamentalsCompanyNews: () => newsWidgetProps(that, ref),

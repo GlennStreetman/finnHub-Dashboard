@@ -1,7 +1,9 @@
-
 //import widget and menu objects here and then add to widgetlookup below.
-import PriceQuote from "../widgets/Price/quote/stockDetailWidget.js";
-import PriceCandles from "../widgets/Price/candles/candleWidget.js";
+import DashBoardMenu from "../widgets/Menu/dashBoardMenu/dashBoardMenu.js";
+import WatchListMenu from "../widgets/Menu/watchListMenu/watchListMenu.js";
+
+import EstimatesRecommendationTrends from "../widgets/Estimates/RecommendationTrends/recommendationTrendsBody.js";
+import EstimatesPriceTarget from "../widgets/Estimates/PriceTarget/priceTargetBody.js";
 
 import FundamentalsCompanyNews from "../widgets/Fundamentals/companyNews/companyNewsBody.js";
 import FundamentalsBasicFinancials from "../widgets/Fundamentals/basicFinancials/basicFinancialsBody.js";
@@ -13,10 +15,12 @@ import FundamentalsFinancialsAsReported from "../widgets/Fundamentals/financials
 import FundamentalsSECFilings from "../widgets/Fundamentals/secFilings/secFilingsBody.js";
 import FundamentalsIPOCalendar from "../widgets/Fundamentals/IPOCalendar/IPOCalendarBody.js";
 
-import DashBoardMenu from "../widgets/Menu/dashBoardMenu/dashBoardMenu.js";
-import WatchListMenu from "../widgets/Menu/watchListMenu/watchListMenu.js";
+import PriceQuote from "../widgets/Price/quote/stockDetailWidget.js";
+import PriceCandles from "../widgets/Price/candles/candleWidget.js";
 
 export let widgetLookUp = {
+    EstimatesRecommendationTrends: EstimatesRecommendationTrends,
+    EstimatesPriceTarget: EstimatesPriceTarget,
     FundamentalsCompanyNews: FundamentalsCompanyNews,
     FundamentalsBasicFinancials: FundamentalsBasicFinancials,
     FundamentalsCompanyProfile2: FundamentalsCompanyProfile2,

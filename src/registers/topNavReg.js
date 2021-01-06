@@ -1,5 +1,7 @@
-//dropdown menu: widgetType, Widget default name, family, Dropdown list description
-export let widgetOptions = [ 
+//dropdown menu: widget Object, Widget default name, family, Dropdown list description
+export let widgetOptions = [
+    ["EstimatesRecommendationTrends" ,"Recommendation Trends: ", "stockWidget", "Estimates: Recommendation Trends"], 
+    ["EstimatesPriceTarget" ,"Price Target: ", "stockWidget", "Estimates: Price Target"], 
     ["FundamentalsBasicFinancials", "Basic Financials: ", "stockWidget", "Fundamentals: Basic Financials"],
     ["FundamentalsCompanyProfile2","Profile 2:","stockWidget","Fundamentals: Company Profile 2"],
     ["FundamentalsCompanyNews", "Company News: ", "stockWidget", "Fundamentals: Company News"],
