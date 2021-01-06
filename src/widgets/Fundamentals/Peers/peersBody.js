@@ -104,12 +104,12 @@ export default class FundamentalsPeers extends Component {
         </tr>
       )
 
-    let stockCandleTable = (
+    let stockTable = (
       <table>
         <tbody>{stockListRows}</tbody>
       </table>
     );
-  return stockCandleTable
+  return stockTable
   }
 
 
