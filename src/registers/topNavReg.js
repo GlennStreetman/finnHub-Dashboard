@@ -4,6 +4,7 @@ export let widgetOptions = [
     ["FundamentalsCompanyProfile2","Profile 2:","stockWidget","Fundamentals: Company Profile 2"],
     ["FundamentalsCompanyNews", "Company News: ", "stockWidget", "Fundamentals: Company News"],
     ["FundamentalsFinancialsAsReported", "FinancialsAsReported: ", "stockWidget", "Fundamentals: Fin. As Reported"],
+    ["FundamentalsIPOCalendar", "IPO Calendar: ", "stockWidget", "Fundamentals: IPO Calendar"],
     ["FundamentalsMarketNews", "Market News: ", "stockWidget", "Fundamentals: Market News"],
     ["FundamentalsNewsSentiment", "News Sentiment: ", "stockWidget", "Fundamentals: News Sentiments"],
     ["FundamentalsPeers", "Peers: ", "stockWidget", "Fundamentals: Peers"],

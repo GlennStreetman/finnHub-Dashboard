@@ -13,6 +13,7 @@ import { newsSentimentsProps } from "../widgets/Fundamentals/newsSentiment/newsS
 import { peersProps } from "../widgets/Fundamentals/Peers/peersBody.js";
 import { financialsAsReportedProps } from "../widgets/Fundamentals/financialsAsReported/financialsAsReportedBody.js";
 import { secFilingsProps } from "../widgets/Fundamentals/secFilings/secFilingsBody.js";
+import { IPOCalendarProps } from "../widgets/Fundamentals/IPOCalendar/IPOCalendarBody.js";
 
 export function returnBodyProps(that, key, ref = "pass") {
     let widgetBodyProps = {
@@ -28,6 +29,7 @@ export function returnBodyProps(that, key, ref = "pass") {
         FundamentalsPeers: () => peersProps(that, ref),
         FundamentalsFinancialsAsReported: () => financialsAsReportedProps(that, ref),
         FundamentalsSECFilings: () => secFilingsProps(that, ref),
+        FundamentalsIPOCalendar: () => IPOCalendarProps(that, ref),
     };
     let renderBodyProps = widgetBodyProps[key];
     return renderBodyProps;
