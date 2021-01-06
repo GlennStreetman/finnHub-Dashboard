@@ -7,7 +7,8 @@ export default class widgetName extends Component {
     constructor(props) {
         super(props);
         this.state = {
-          
+          targetStock: '', //default stock, assuming only one stocks data shown at a time.
+          stockData: undefined, //object returned by finnhub.
         };
 
       this.baseState = {mounted: true}
@@ -19,7 +20,7 @@ export default class widgetName extends Component {
 
     componentDidMount(){
       const p = this.props
-      p.trackedStocks[0] !== undefined && this.setState({targetStock: p.trackedStocks[0]}) 
+      p.trackedStocks[0] !== undefined && this.setState({targetStock: p.trackedStocks[0]}, ()=>this.getStockData()) 
 
     }
 
@@ -53,6 +54,7 @@ export default class widgetName extends Component {
         if (that.baseState.mounted === true) {
           //update state
           console.log(data)
+          this.setState({stockData: data})
         }
       })
       .catch(error => {
