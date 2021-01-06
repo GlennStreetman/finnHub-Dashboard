@@ -9,7 +9,7 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle)
       USList.push(thisStock)
     } 
   }
-  console.log(USList)
+  // console.log(USList)
 
   let thisSocket = socket
   let streamingStockData = {};
