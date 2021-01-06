@@ -155,7 +155,7 @@ export default class PriceCandles extends React.Component {
     const options = {
       theme: "light2", // "light1", "light2", "dark1", "dark2"
       animationEnabled: true,
-      exportEnabled: false,
+      exportEnabled: true,
       height: 400,
       width: 525,
       title: {
