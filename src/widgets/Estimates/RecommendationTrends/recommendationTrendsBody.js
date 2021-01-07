@@ -89,7 +89,7 @@ export default class EstimatesRecommendationTrends extends Component {
           showInLegend: "true",
           xValueFormatString: "DD, MMM",
           yValueFormatString: "#,##0",
-          dataPoints: [] //populated by lopo below
+          dataPoints: [] //populated by loop below
         }
       }
       const listSixData = s.stockData.slice(0, 12)

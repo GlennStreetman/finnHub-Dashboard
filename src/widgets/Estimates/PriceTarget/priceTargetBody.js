@@ -168,8 +168,3 @@ export function priceTargetProps(that, key = "newWidgetNameProps") {
     };
     return propList;
   }
-
-
-  fetch('https://finnhub.io/api/v1/stock/price-target?symbol=NFLX&token=bsuu7qv48v6qu589jlj0')
-    .then(response => response.json())
-    .then(data => console.log(data))
