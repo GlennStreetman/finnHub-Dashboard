@@ -4,6 +4,7 @@ import { watchListMenuProps } from "./../widgets/Menu/watchListMenu/watchListMen
 
 import { recommendationTrendsProps } from "./../widgets/Estimates/RecommendationTrends/recommendationTrendsBody.js";
 import { priceTargetProps } from "./../widgets/Estimates/PriceTarget/priceTargetBody.js";
+import { EPSSurprisesProps } from "./../widgets/Estimates/EPSSurprises/EPSSurpsisesBody.js";
 
 import { newsWidgetProps } from "./../widgets/Fundamentals/companyNews/companyNewsBody.js";
 import { marketNewsProps } from "./../widgets/Fundamentals/marketNews/marketNewsBody.js";
@@ -24,6 +25,7 @@ export function returnBodyProps(that, key, ref = "pass") {
         DashBoardMenu: () => dashBoardMenuProps(that, key),
         EstimatesRecommendationTrends: () => recommendationTrendsProps(that, ref),
         EstimatesPriceTarget: () => priceTargetProps(that, ref),
+        EstimatesEPSSurprises: () => EPSSurprisesProps(that, ref),
         PriceCandles: () => candleWidgetProps(that, ref),
         PriceQuote: () => stockDetailWidgetProps(that, ref),
         FundamentalsCompanyNews: () => newsWidgetProps(that, ref),
