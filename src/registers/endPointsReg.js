@@ -13,6 +13,7 @@ const IPOCalendarEndPoint = require("../widgets/Fundamentals/IPOCalendar/IPOCale
 const recommendationTrendsEndPoint = require("../widgets/Estimates/recommendationTrends/RecommendationTrendsEndPoint.js")
 const priceTargetEndPoint = require("../widgets/Estimates/priceTarget/priceTargetEndPoint.js")
 const EPSSuprisesEndPoint = require("../widgets/Estimates/EPSSurprises/EPSSurprisesEndPoint.js")
+const EarningsCalendarEndPoint = require("../widgets/Estimates/EarningsCalendar/EarningsCalendarEndPoint.js")
 
 const widgetDict = {
     PriceCandles: candleWidgetEndPoint,
@@ -29,6 +30,7 @@ const widgetDict = {
     EstimatesRecommendationTrends: recommendationTrendsEndPoint,
     EstimatesPriceTarget: priceTargetEndPoint,
     EstimatesEPSSurprises: EPSSuprisesEndPoint,
+    EstimatesEarningsCalendar: EarningsCalendarEndPoint,
 }
 
 module.exports.widgetDict = widgetDict

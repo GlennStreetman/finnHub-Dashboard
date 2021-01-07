@@ -3,6 +3,7 @@ export let widgetOptions = [
     ["EstimatesRecommendationTrends" ,"Recommendation Trends: ", "stockWidget", "Estimates: Recommendation Trends"], 
     ["EstimatesPriceTarget" ,"Price Target: ", "stockWidget", "Estimates: Price Target"], 
     ["EstimatesEPSSurprises" ,"EPS Surprises: ", "stockWidget", "Estimates: EPS Surprises"], 
+    ["EstimatesEarningsCalendar" ,"Earnings Calendar: ", "stockWidget", "Estimates: Earnings Calendar"],
     ["FundamentalsBasicFinancials", "Basic Financials: ", "stockWidget", "Fundamentals: Basic Financials"],
     ["FundamentalsCompanyProfile2","Profile 2:","stockWidget","Fundamentals: Company Profile 2"],
     ["FundamentalsCompanyNews", "Company News: ", "stockWidget", "Fundamentals: Company News"],

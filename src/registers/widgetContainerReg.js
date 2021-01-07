@@ -5,6 +5,7 @@ import WatchListMenu from "../widgets/Menu/watchListMenu/watchListMenu.js";
 import EstimatesRecommendationTrends from "../widgets/Estimates/RecommendationTrends/recommendationTrendsBody.js";
 import EstimatesPriceTarget from "../widgets/Estimates/PriceTarget/priceTargetBody.js";
 import EstimatesEPSSurprises from "../widgets/Estimates/EPSSurprises/EPSSurpsisesBody.js";
+import EstimatesEarningsCalendar from "../widgets/Estimates/EarningsCalendar/EarningsCalendarBody.js";
 
 import FundamentalsCompanyNews from "../widgets/Fundamentals/companyNews/companyNewsBody.js";
 import FundamentalsBasicFinancials from "../widgets/Fundamentals/basicFinancials/basicFinancialsBody.js";
@@ -23,6 +24,7 @@ export let widgetLookUp = {
     EstimatesRecommendationTrends: EstimatesRecommendationTrends,
     EstimatesPriceTarget: EstimatesPriceTarget,
     EstimatesEPSSurprises: EstimatesEPSSurprises,
+    EstimatesEarningsCalendar: EstimatesEarningsCalendar,
     FundamentalsCompanyNews: FundamentalsCompanyNews,
     FundamentalsBasicFinancials: FundamentalsBasicFinancials,
     FundamentalsCompanyProfile2: FundamentalsCompanyProfile2,
