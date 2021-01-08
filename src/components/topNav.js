@@ -35,7 +35,7 @@ class TopNav extends React.Component {
   dropDownList(dropList){
     let newList = dropList.map((nested) => {
       let [a,b,c,d] = nested
-        return (<li id='ddi'>
+        return (<li key={a+'li'} id='ddi'>
           <a key= {a} href="#r" onClick={() => {this.props.newWidgetContainer(a, b, c);}}>
           {d}
           </a>
