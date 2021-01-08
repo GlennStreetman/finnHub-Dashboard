@@ -1,5 +1,5 @@
 import React from "react";
-import {widgetOptions} from '../registers/topNavReg.js'
+import {estimateOptions, fundamentalsOptions, priceOptions} from '../registers/topNavReg.js'
 
 class TopNav extends React.Component {
   constructor(props) {
@@ -7,8 +7,12 @@ class TopNav extends React.Component {
     this.state = {
       AboutAPIKeyReminder: 0,
       showAddWidgetDropdown: 0,
+      showEstimates: 0,
+      showFundamentals: 0,
+      showCost: 0,
     };
     this.showPane = this.showPane.bind(this);
+    this.dropDownList = this.dropDownList.bind(this);
   }
 
   componentDidUpdate(prevProps) {
@@ -28,101 +32,104 @@ class TopNav extends React.Component {
     this.setState({ [stateRef]: showMenu });
   }
 
-  render() {
-
-    let widgetDropDown = widgetOptions.map((nested) => {
+  dropDownList(dropList){
+    let newList = dropList.map((nested) => {
       let [a,b,c,d] = nested
-        return (<a key= {a}
-        href="#r"
-        onClick={() => {
-          this.props.newWidgetContainer(a, b, c);
-        }}
-        >
-        {d}
-        </a>)
+        return (<li>
+          <a key= {a} href="#r" onClick={() => {this.props.newWidgetContainer(a, b, c);}}>
+          {d}
+          </a>
+        </li>)
     })
+    return <ul className='sub-menu'>{newList}</ul>
+  }
+
+  render() {
+// <div className='dropDownList'>
+    let widgetDropDown = <>
+      <ul className='sub-Menu'>
+        <li className='menu-item-has-children'><a href='#1'>Estimate</a>
+          {this.dropDownList(estimateOptions)}
+        </li>
+        <li className='menu-item-has-children'><a href='#2'>Fundamentals</a>
+          {this.dropDownList(fundamentalsOptions)}
+        </li>
+        <li className='menu-item-has-children'><a href='#3'>Cost</a>
+          {this.dropDownList(priceOptions)}
+        </li>
+      </ul>
+    </>
 
     const showDashBoardButtons = () => {
       if (this.props.showStockWidgets === 1) {
         return ( <>
-        <div className="navItem">
-          <a href="#contact" onClick={() => this.props.menuWidgetToggle("DashBoardMenu", "Saved Dashboards")}>
-            {this.props.DashBoardMenu === 0 ? "Show Dashboard Menu" : "Hide Dashboard Menu"}
-          </a>
-        </div>
+          
+            <li className='navItem'> 
+              <a href="#contact" onClick={() => this.props.menuWidgetToggle("DashBoardMenu", "Saved Dashboards")}>
+                {this.props.DashBoardMenu === 0 ? "Show Dashboard Menu" : "Hide Dashboard Menu"}
+              </a>
+            </li>
 
-          <div className="navItem">
-          <a href="#contact" onClick={() => this.props.menuWidgetToggle("WatchListMenu", "WatchList")}>
-            {this.props.WatchListMenu === 0 ? "Show Watchlist Menu" : "Hide Watchlist Menu"}
-          </a>
-        </div>
+            <li className='navItem'>
+              <a href="#contact" onClick={() => this.props.menuWidgetToggle("WatchListMenu", "WatchList")}>
+                {this.props.WatchListMenu === 0 ? "Show Watchlist Menu" : "Hide Watchlist Menu"}
+              </a>
+            </li>
 
-        <div className="navItem">
-          <a href="#contact" onClick={() => (this.props.widgetLockDown === 0 ? this.props.lockWidgets(1) : this.props.lockWidgets(0))}>
-            {this.props.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}     
-          </a>
-        </div>
-
-        <div className="dropDiv" onMouseLeave={() => this.showPane("showAddWidgetDropdown")}>
-          <a href="#test" className="dropbtn" onMouseOver={() => this.showPane("showAddWidgetDropdown")}>
-            Add Widget
-          </a>
-          {this.state.showAddWidgetDropdown === 1 && (
-            <div className="dropdown">
-              <div className="dropdown-content">
-                {widgetDropDown}
-              </div>
-            </div>
-          )}
-        </div>
+            <li className='navItem'>
+              <a href="#contact" onClick={() => (this.props.widgetLockDown === 0 ? this.props.lockWidgets(1) : this.props.lockWidgets(0))}>
+                {this.props.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}     
+              </a>
+            </li>
+            <li className="menu-item-has-children"><a href="#contact">Widgets</a>
+            {widgetDropDown}
+            </li>
+          
         </>
         )
       } else { return <></>}
     }
     
     return this.props.login === 1 ? (
-      <>
-        <div className="topnav">
-        <img src="logo2.png" alt="logo"></img>
-        {showDashBoardButtons()}
 
-          <div className="navItemEnd">
-            <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('')}}> 
-            {/* <a href="#contact" onClick={() => this.props.toggleWidgetVisability()}> */}
-            {this.props.backGroundMenu === '' ? " " : "Back to Dashboards"}
-            {/* {this.props.showStockWidgets === 1 ? "Endpoints" : "Return to Dashboards"} */}
-            </a>
-          </div>
-          <div className="navItem">
-            <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('endPoint')}}> 
-            {/* <a href="#contact" onClick={() => this.props.toggleWidgetVisability()}> */}
-            Endpoints
-            {/* {this.props.showStockWidgets === 1 ? "Endpoints" : "Return to Dashboards"} */}
-            </a>
-          </div>
-          <div className="navItem">
-            <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('manageAccount')}}> 
-            {/* <a href="#contact" onClick={() => this.props.menuWidgetToggle("AccountMenu", "Your Account")}> */}
-            Manage Account
-            {/* {this.props.AccountMenu === 0 ? "Manage Account" : "Hide Account Menu"} */}
-            </a>
-          </div>
-          <div className='navItem'>
-            <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('about')}}>
-            {/* <a href="#home" onClick={() => this.props.menuWidgetToggle("AboutMenu", "About FinnDash")}> */}
-            About
-            {/* {this.props.AboutMenu === 0 ? "About" : "Hide About"} */}
-            </a>
-          </div>
-          <div className='navItem'>
-            <a href="#home" onClick={() => this.props.logOut()}>
-            {this.props.login === 0 ? "Login" : "Logout"}
-            </a>
-          </div>
-
+        <nav className="mainNavigation">
+        
+        <ul className="menu">
+            <li><img src="logo2.png" alt="logo"></img></li>
+            {showDashBoardButtons()}
+        </ul>
+        
+        <div className="navItemEnd">
+          <ul className="menu">
+            <li className="navItem">
+              <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('')}}> 
+              {this.props.backGroundMenu === '' ? " " : "Back to Dashboards"}
+              </a>
+            </li>
+            <li className="navItem">
+              <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('endPoint')}}> 
+              Endpoints
+              </a>
+            </li>
+            <li className="navItem">
+              <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('manageAccount')}}> 
+              Manage Account
+              </a>
+            </li>
+            <li className='navItem'>
+              <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('about')}}>
+              About
+              </a>
+            </li>
+            <li className='navItem'>
+              <a href="#home" onClick={() => this.props.logOut()}>
+              {this.props.login === 0 ? "Login" : "Logout"}
+              </a>
+            </li>
+          </ul>
         </div>
+        </nav>
 
-      </>
     ) : (
       <>
       <div className="topnav">

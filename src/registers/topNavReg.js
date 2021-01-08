@@ -1,9 +1,15 @@
 //dropdown menu: widget Object, Widget default name, family, Dropdown list description
-export let widgetOptions = [
-    ["EstimatesRecommendationTrends" ,"Recommendation Trends: ", "stockWidget", "Estimates: Recommendation Trends"], 
-    ["EstimatesPriceTarget" ,"Price Target: ", "stockWidget", "Estimates: Price Target"], 
+//imported by topNav component.
+
+
+export let estimateOptions = [
+    ["EstimatesEarningsCalendar" ,"Earnings Calendar: ", "stockWidget", "Estimates: Earnings Calendar"],  
     ["EstimatesEPSSurprises" ,"EPS Surprises: ", "stockWidget", "Estimates: EPS Surprises"], 
-    ["EstimatesEarningsCalendar" ,"Earnings Calendar: ", "stockWidget", "Estimates: Earnings Calendar"],
+    ["EstimatesPriceTarget" ,"Price Target: ", "stockWidget", "Estimates: Price Target"], 
+    ["EstimatesRecommendationTrends" ,"Recommendation Trends: ", "stockWidget", "Estimates: Recommendation Trends"], 
+  ]
+
+export let fundamentalsOptions = [  
     ["FundamentalsBasicFinancials", "Basic Financials: ", "stockWidget", "Fundamentals: Basic Financials"],
     ["FundamentalsCompanyProfile2","Profile 2:","stockWidget","Fundamentals: Company Profile 2"],
     ["FundamentalsCompanyNews", "Company News: ", "stockWidget", "Fundamentals: Company News"],
@@ -13,6 +19,9 @@ export let widgetOptions = [
     ["FundamentalsNewsSentiment", "News Sentiment: ", "stockWidget", "Fundamentals: News Sentiments"],
     ["FundamentalsPeers", "Peers: ", "stockWidget", "Fundamentals: Peers"],
     ["FundamentalsSECFilings", "SEC Filings: ", "stockWidget", "Fundamentals: SEC Filings"],
+  ]
+
+export let priceOptions = [
     ["PriceCandles", "Price Candle: ", "stockWidget", "Price: Candles"],
     ["PriceQuote", "Price Quote: ", "stockWidget", "Price: Quote"],
   ]

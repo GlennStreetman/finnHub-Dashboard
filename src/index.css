@@ -17,7 +17,12 @@ code {
 }
 
 .navItem {
-  display: flex;
+  /* display: flex; */
+  color: white;
+}
+
+.navLink {
+  color: white;
 }
 
 .navItemEnd {
@@ -188,22 +193,12 @@ label {
   display: block;
 }
 
-.dropdown-content {
-  display: flex;
-  flex-direction: column;
-  position: absolute;
-  background-color: #ddd;
-  min-width: 300px;
-  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
-  z-index: 1000;
-}
-
-.dropdown-content a {
+/* .dropdown-content a {
   color: black;
   padding: 12px 16px;
   text-decoration: none;
   display: block;
-}
+} */
 
 .widgetTableDiv {
   align-content: center;
@@ -390,4 +385,87 @@ th {
   display: flex;
   padding-left: 5%;
   padding-top: 2%;
+}
+
+.dropdown-content {
+  display: flex;
+  /* flex-direction: column; */
+  position: absolute;
+  background-color: #ddd;
+  min-width: 300px;
+  box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+/* test */
+
+.mainNavigation {
+  background-color: #1d69ab;
+  display: flex;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background: #1d69ab;
+}
+
+ul li {
+  display: block;
+  position: relative;
+  float: left;
+  background: #1d69ab;
+}
+
+li ul {
+  display: none;
+}
+
+ul li a {
+  display: block;
+  padding: 1em;
+  text-decoration: none;
+  white-space: nowrap;
+  color: #fff;
+}
+
+ul li a:hover {
+  background: #2c3e50;
+}
+
+li:hover > ul {
+  display: block;
+  position: absolute;
+}
+
+li:hover li {
+  float: none;
+}
+
+li:hover a {
+  background: #1d69ab;
+}
+
+li:hover li a:hover {
+  background: #2c3e50;
+}
+
+.main-navigation li ul li {
+  border-top: 0;
+}
+
+ul ul ul {
+  left: 100%;
+  top: 0;
+}
+
+ul:before,
+ul:after {
+  content: " "; /* 1 */
+  display: table; /* 2 */
+}
+
+ul:after {
+  clear: both;
 }
