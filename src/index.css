@@ -409,13 +409,15 @@ th {
   padding: 0;
   margin: 0;
   background: #1d69ab;
+  z-index: 1000;
 }
 
-ul li#ddi {
+#ddu li {
   display: block;
   position: relative;
   float: left;
   background: #1d69ab;
+  z-index: 1000;
 }
 
 li #ddu {
@@ -434,20 +436,20 @@ li #ddu {
   background: #2c3e50;
 }
 
-li:hover > #ddu {
+#ddi:hover > #ddu {
   display: block;
   position: absolute;
 }
 
-li:hover li {
+#ddi:hover li {
   float: none;
 }
 
-li:hover a {
+#ddi:hover a {
   background: #1d69ab;
 }
 
-li:hover li a:hover {
+#ddi:hover li a:hover {
   background: #2c3e50;
 }
 

@@ -100,7 +100,7 @@ class TopNav extends React.Component {
         </ul>
         
         <div className="navItemEnd">
-          <ul id='ddu' className="menu">
+          <ul id='ddu' className="sub-menu">
             <li id='ddi' className="navItem">
               <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('')}}> 
               {this.props.backGroundMenu === '' ? " " : "Back to Dashboards"}
