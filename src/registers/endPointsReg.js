@@ -11,7 +11,7 @@ const financialsAsReportedEndPoint = require("../widgets/Fundamentals/financials
 const secFilingsEndPoint = require("../widgets/Fundamentals/secFilings/secFilingsEndPoint.js");
 const IPOCalendarEndPoint = require("../widgets/Fundamentals/IPOCalendar/IPOCalendarEndPoint.js")
 const recommendationTrendsEndPoint = require("../widgets/Estimates/RecommendationTrends/RecommendationTrendsEndPoint.js")
-const priceTargetEndPoint = require("../widgets/Estimates/priceTarget/priceTargetEndPoint.js")
+const priceTargetEndPoint = require("../widgets/Estimates/PriceTarget/priceTargetEndPoint.js")
 const EPSSuprisesEndPoint = require("../widgets/Estimates/EPSSurprises/EPSSurprisesEndPoint.js")
 const EarningsCalendarEndPoint = require("../widgets/Estimates/EarningsCalendar/EarningsCalendarEndPoint.js")
 
