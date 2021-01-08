@@ -31,7 +31,7 @@ export default class EndPointNode extends React.Component {
             // console.log(el, p.nodeData[el])
             if (typeof p.nodeData[el] === 'object' && p.nodeData[el] !== null && this.state[el] === false) {
                 return (
-                    <li key={ind + 'li'}>
+                    <li className='liNode' key={ind + 'li'}>
                         <div key={ind}>
                             {el} - <button className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
                                 <i className="fa fa-caret-square-o-right" aria-hidden="true"></i>
@@ -41,7 +41,7 @@ export default class EndPointNode extends React.Component {
                 )
             } else if (typeof p.nodeData[el] === 'object' && p.nodeData[el] !== null) {
                 return (
-                    <li key={ind + 'li'}>
+                    <li className='liNode'  key={ind + 'li'}>
                         <div className='endPointDivRow' key={ind}>
                             {el} - <button className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
                                 <i className="fa fa-caret-square-o-down" aria-hidden="true"></i>
@@ -54,7 +54,7 @@ export default class EndPointNode extends React.Component {
                 let thisString = this.props.nodeData[el]
                 // console.log("----------->", thisString)
                 return(
-                    <li key={ind + 'li'}>
+                    <li className='liNode'  key={ind + 'li'}>
                     <div key={ind}>{el} - {thisString} </div>
                     </li>
                 )
@@ -62,7 +62,7 @@ export default class EndPointNode extends React.Component {
         })
         
 
-        return <ul>{objectKeyZeroToList}</ul>
+        return <ul className='ulNode' >{objectKeyZeroToList}</ul>
     }
     
      render() {

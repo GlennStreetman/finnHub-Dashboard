@@ -404,25 +404,25 @@ th {
   display: flex;
 }
 
-ul {
+#ddu {
   list-style: none;
   padding: 0;
   margin: 0;
   background: #1d69ab;
 }
 
-ul li {
+ul li#ddi {
   display: block;
   position: relative;
   float: left;
   background: #1d69ab;
 }
 
-li ul {
+li #ddu {
   display: none;
 }
 
-ul li a {
+#ddu li a {
   display: block;
   padding: 1em;
   text-decoration: none;
@@ -430,11 +430,11 @@ ul li a {
   color: #fff;
 }
 
-ul li a:hover {
+#ddu li a:hover {
   background: #2c3e50;
 }
 
-li:hover > ul {
+li:hover > #ddu {
   display: block;
   position: absolute;
 }
@@ -455,17 +455,17 @@ li:hover li a:hover {
   border-top: 0;
 }
 
-ul ul ul {
+#ddu #ddu #ddu {
   left: 100%;
   top: 0;
 }
 
-ul:before,
-ul:after {
+#ddu:before,
+#ddu:after {
   content: " "; /* 1 */
   display: table; /* 2 */
 }
 
-ul:after {
+#ddu:after {
   clear: both;
 }
