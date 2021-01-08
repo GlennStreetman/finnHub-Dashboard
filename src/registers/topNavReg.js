@@ -3,25 +3,25 @@
 
 
 export let estimateOptions = [
-    ["EstimatesEarningsCalendar" ,"Earnings Calendar: ", "stockWidget", "Estimates: Earnings Calendar"],  
-    ["EstimatesEPSSurprises" ,"EPS Surprises: ", "stockWidget", "Estimates: EPS Surprises"], 
-    ["EstimatesPriceTarget" ,"Price Target: ", "stockWidget", "Estimates: Price Target"], 
-    ["EstimatesRecommendationTrends" ,"Recommendation Trends: ", "stockWidget", "Estimates: Recommendation Trends"], 
+    ["EstimatesEarningsCalendar" ,"Earnings Calendar: ", "stockWidget", "Earnings Calendar"],  
+    ["EstimatesEPSSurprises" ,"EPS Surprises: ", "stockWidget", "EPS Surprises"], 
+    ["EstimatesPriceTarget" ,"Price Target: ", "stockWidget", "Price Target"], 
+    ["EstimatesRecommendationTrends" ,"Recommendation Trends: ", "stockWidget", "Recommendation Trends"], 
   ]
 
 export let fundamentalsOptions = [  
-    ["FundamentalsBasicFinancials", "Basic Financials: ", "stockWidget", "Fundamentals: Basic Financials"],
-    ["FundamentalsCompanyProfile2","Profile 2:","stockWidget","Fundamentals: Company Profile 2"],
-    ["FundamentalsCompanyNews", "Company News: ", "stockWidget", "Fundamentals: Company News"],
-    ["FundamentalsFinancialsAsReported", "FinancialsAsReported: ", "stockWidget", "Fundamentals: Fin. As Reported"],
-    ["FundamentalsIPOCalendar", "IPO Calendar: ", "stockWidget", "Fundamentals: IPO Calendar"],
-    ["FundamentalsMarketNews", "Market News: ", "stockWidget", "Fundamentals: Market News"],
-    ["FundamentalsNewsSentiment", "News Sentiment: ", "stockWidget", "Fundamentals: News Sentiments"],
-    ["FundamentalsPeers", "Peers: ", "stockWidget", "Fundamentals: Peers"],
-    ["FundamentalsSECFilings", "SEC Filings: ", "stockWidget", "Fundamentals: SEC Filings"],
+    ["FundamentalsBasicFinancials", "Basic Financials: ", "stockWidget", "Basic Financials"],
+    ["FundamentalsCompanyProfile2","Profile 2:","stockWidget","Company Profile 2"],
+    ["FundamentalsCompanyNews", "Company News: ", "stockWidget", "Company News"],
+    ["FundamentalsFinancialsAsReported", "FinancialsAsReported: ", "stockWidget", "Fin. As Reported"],
+    ["FundamentalsIPOCalendar", "IPO Calendar: ", "stockWidget", "IPO Calendar"],
+    ["FundamentalsMarketNews", "Market News: ", "stockWidget", "Market News"],
+    ["FundamentalsNewsSentiment", "News Sentiment: ", "stockWidget", "News Sentiments"],
+    ["FundamentalsPeers", "Peers: ", "stockWidget", "Peers"],
+    ["FundamentalsSECFilings", "SEC Filings: ", "stockWidget", "SEC Filings"],
   ]
 
 export let priceOptions = [
-    ["PriceCandles", "Price Candle: ", "stockWidget", "Price: Candles"],
-    ["PriceQuote", "Price Quote: ", "stockWidget", "Price: Quote"],
-  ]
+    ["PriceCandles", "Price Candle: ", "stockWidget", "Candles"],
+    ["PriceQuote", "Price Quote: ", "stockWidget", "Quote"],
+  ] 

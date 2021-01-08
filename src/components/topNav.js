@@ -54,7 +54,7 @@ class TopNav extends React.Component {
         <li id='ddi' className='menu-item-has-children'><a href='#2'>Fundamentals</a>
           {this.dropDownList(fundamentalsOptions)}
         </li>
-        <li id='ddi' className='menu-item-has-children'><a href='#3'>Cost</a>
+        <li id='ddi' className='menu-item-has-children'><a href='#3'>Price</a>
           {this.dropDownList(priceOptions)}
         </li>
       </ul>
