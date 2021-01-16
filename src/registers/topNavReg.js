@@ -24,4 +24,5 @@ export let fundamentalsOptions = [
 export let priceOptions = [
     ["PriceCandles", "Price Candle: ", "stockWidget", "Candles"],
     ["PriceQuote", "Price Quote: ", "stockWidget", "Quote"],
+    ["PriceSplits", "Price Split: ", "stockWidget", "Splits"],
   ] 

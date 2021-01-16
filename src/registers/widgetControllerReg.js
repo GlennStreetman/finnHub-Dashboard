@@ -19,6 +19,7 @@ import { IPOCalendarProps } from "../widgets/Fundamentals/IPOCalendar/IPOCalenda
 
 import { candleWidgetProps } from "../widgets/Price/candles/candleWidget.js";
 import { stockDetailWidgetProps } from "../widgets/Price/quote/stockDetailWidget.js";
+import {PriceSplitsProps} from "../widgets/Price/splits/PriceSplitsBody.js";
 
 export function returnBodyProps(that, key, ref = "pass") {
     let widgetBodyProps = {
@@ -30,6 +31,7 @@ export function returnBodyProps(that, key, ref = "pass") {
         EstimatesEarningsCalendar: () => EarningsCalendarProps(that, ref),
         PriceCandles: () => candleWidgetProps(that, ref),
         PriceQuote: () => stockDetailWidgetProps(that, ref),
+        PriceSplits: () => PriceSplitsProps(that, ref),
         FundamentalsCompanyNews: () => newsWidgetProps(that, ref),
         FundamentalsMarketNews: () => marketNewsProps(that, ref),
         FundamentalsBasicFinancials: () => metricsProps(that, ref),

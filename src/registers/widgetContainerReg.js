@@ -18,7 +18,8 @@ import FundamentalsSECFilings from "../widgets/Fundamentals/secFilings/secFiling
 import FundamentalsIPOCalendar from "../widgets/Fundamentals/IPOCalendar/IPOCalendarBody.js";
 
 import PriceQuote from "../widgets/Price/quote/stockDetailWidget.js";
-import PriceCandles from "../widgets/Price/candles/candleWidget.js";
+import PriceCandles from "../widgets/Price/candles/candleWidget.js"; //fix names
+import PriceSplits from "../widgets/Price/splits/PriceSplitsBody.js";
 
 export let widgetLookUp = {
     EstimatesRecommendationTrends: EstimatesRecommendationTrends,
@@ -36,6 +37,7 @@ export let widgetLookUp = {
     FundamentalsIPOCalendar: FundamentalsIPOCalendar,
     PriceQuote: PriceQuote,
     PriceCandles: PriceCandles,
+    PriceSplits:PriceSplits,
     DashBoardMenu: DashBoardMenu,
     WatchListMenu: WatchListMenu,
 }; 
