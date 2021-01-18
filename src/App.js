@@ -263,10 +263,9 @@ class App extends React.Component {
   }
 
   loadDashBoard(newGlobalList, newWidgetList) {
+    //setup global stock list.
     let updateGlobalList = JSON.parse(newGlobalList);
-    
-    for (const stock in updateGlobalList) {
-      
+    for (const stock in updateGlobalList) {      
       updateGlobalList[stock]['dStock'] = function(ex){
         if (ex.length === 1) {
           return (this.symbol)
@@ -282,13 +281,14 @@ class App extends React.Component {
       stockList.splice(index,1) 
       return stockList
     }
-    
+    //setup widgets, and their individual stock lists.
     let updateWidgetList = JSON.parse(newWidgetList);
     for (const widget in updateWidgetList){
       const widgetStockObj = updateWidgetList[widget]
-
-      for (const stock in widgetStockObj.trackedStocks) {
-        widgetStockObj[stock]['dStock'] = function(ex){
+      const trackedStockObj = widgetStockObj.trackedStocks
+      for (const stock in trackedStockObj) {
+        
+        trackedStockObj[stock]['dStock'] = function(ex){
           if (ex.length === 1) {
             return (this.symbol)
           } else {
@@ -296,9 +296,12 @@ class App extends React.Component {
           }
         }
         widgetStockObj.trackedStocks['key'] = function(){
-          return Object.keys(this)
+          const stockList = Object.keys(this)
+          const index = stockList.indexOf('key')
+          stockList.splice(index,1) 
+          return stockList
         }
-
+        console.log(trackedStockObj, stock)
       }
     }
 
