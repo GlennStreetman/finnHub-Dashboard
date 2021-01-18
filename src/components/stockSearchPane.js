@@ -8,7 +8,6 @@ class StockSearchPane extends React.Component {
     this.state = {
       inputText: "",
       availableStocks: {}, //formatted stock list returned from finhubb
-      filteredStockObjects: {}, //object data for each stock selected
       filteredStocks: [], //short list of stocks selected
     };
     this.baseState = {mounted: true}
@@ -50,39 +49,54 @@ class StockSearchPane extends React.Component {
             newFilteredList.push(stockSearchPhrase);
             filterObject[stockList[filteredCount]] = stockListObject[stockList[filteredCount]] 
           }
-          this.setState({filteredStockObjects: filterObject})
+          // this.setState({filteredStockObjects: filterObject})
           this.setState({ filteredStocks: newFilteredList });
           
         }
   }
 
-  getSymbolList(exchange) {
-    let that = this
-    // console.log("getting listings for exchange:", exchange )
-    const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${exchange}&token=${that.props.apiKey}`
-      finnHub(this.props.throttle, apiString)  
-      .then((data) => {
-        if (this.baseState.mounted === true) {
-          let updateStockList = Object.assign({}, data)
-          for (const key in updateStockList) {
-            let addStockData = updateStockList[key]
-            let addStockKey = exchange + "-" + updateStockList[key]['symbol']
-            updateStockList[addStockKey] = addStockData
-            delete updateStockList[key]
+      getSymbolList(exchange) { //new
+        let that = this
+        // console.log("getting listings for exchange:", exchange )
+        const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${exchange}&token=${that.props.apiKey}`
+          finnHub(this.props.throttle, apiString)  
+          .then((data) => {
+            if (this.baseState.mounted === true) {
+              let updateStockList = {}
+              for (const stockObj in data) {
+                data[stockObj]['exchange'] = exchange
+                let addStockKey = exchange + "-" + data[stockObj]['symbol']
+                updateStockList[addStockKey] = data[stockObj]
+                updateStockList[addStockKey]['key'] = addStockKey
+                //return exchange + stock symbol if more than one exchange selected
+                updateStockList[addStockKey]['dStock'] = function(ex){
+                  if (ex.length === 1) {
+                    return (this.symbol)
+                  } else {
+                    return (this.key)
+                  }
+                }
+
+                updateStockList[addStockKey]['keys'] = function(){
+                  return Object.keys(this)
+                }
+
+              }
+              that.setState({ availableStocks: updateStockList});
+            }
+          })
+          .catch((error) => {
+            console.error("Error retrieving stock symbols:" +  error);
+          });
           }
-          that.setState({ availableStocks: Object.assign({}, updateStockList)});
-        }
-      })
-      .catch((error) => {
-        console.error("Error retrieving stock symbols:" +  exchange);
-      });
-      }
+     
  
   changeDefault(event){
     this.props.updateDefaultExchange(event)
   }
   
   render() {
+    let s = this.state
     let widgetKey = this.props.widgetKey;
     let stockSymbol = this.state.inputText.slice(0, this.state.inputText.indexOf(":"));
     const exchangeOptions = this.props.exchangeList.map((el) => 
@@ -97,10 +111,9 @@ class StockSearchPane extends React.Component {
             if (this.state.filteredStocks.includes(this.state.inputText)) {
               let stockKey = this.state.inputText.slice(0, this.state.inputText.indexOf(":") )
               // this.props.updateGlobalStockList(e, stockKey ,this.state.filteredStockObjects[stockKey]);
-              this.props.updateGlobalStockList(e, stockKey);
-
+              console.log('---------->',s.availableStocks.[stockKey])
+              this.props.updateGlobalStockList(e, stockKey,s.availableStocks[stockKey]);
               this.props.showSearchPane();
-              // this.props.getStockPrice(this.state.inputText);
               if (widgetKey / 1 !== undefined) {
                 this.props.updateWidgetStockList(widgetKey, stockSymbol);
                 e.preventDefault();
@@ -149,4 +162,3 @@ export function searchPaneProps(that) {
   };
   return propList;
 }
-

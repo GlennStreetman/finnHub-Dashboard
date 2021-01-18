@@ -1,5 +1,4 @@
 import React from "react";
-import {dStock} from "../appFunctions/formatStockSymbols.js";
 //list of stock data used for auto complete on stock search.
 class StockDataList extends React.Component {
   constructor(props) {
@@ -13,7 +12,8 @@ class StockDataList extends React.Component {
     const stockListKey = availableStocks.map((el) => (
       <option key={el + "op"} value={el}>
         {/* {el} */}
-        {dStock(el, this.props.exchangeList)}
+        {/* {dStock(el, this.props.exchangeList)} */} 
+        {el.symbol}
       </option>
     ));
     return stockListKey;

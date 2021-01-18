@@ -1,7 +1,6 @@
 import Papa from 'papaparse'
 import React from "react";
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
-import {dStock} from "../../../appFunctions/formatStockSymbols.js";
 
 class WatchListMenu extends React.PureComponent {
   constructor(props) {
@@ -12,7 +11,6 @@ class WatchListMenu extends React.PureComponent {
 
     this.inputReference = React.createRef();
     this.baseState = {mounted: true}
-    // this.getSymbolList = this.getSymbolList.bind(this);
     this.renderWatchedStocks = this.renderWatchedStocks.bind(this);
     this.fileUploadAction = this.fileUploadAction.bind(this);
     this.fileUploadInputChange = this.fileUploadInputChange.bind(this);
@@ -22,14 +20,20 @@ class WatchListMenu extends React.PureComponent {
     this.baseState.mounted = false
   }
 
+  componentDidMount() {
+
+  }
+
   renderWatchedStocks() {
-    //console.log("rendering watched stocks");
+    
     const p = this.props
-    const watchListStocks = p.globalStockList;
-    const stockListKey = watchListStocks.map((el) => (
-      <tr key={el + "row"}>
+    const g = p.globalStockList;
+    if (g.key !== undefined) {
+    // console.log(g, '-------------')
+    const stockListKey = g.key().map((el) => ( 
+    <tr key={el + "row"}>
         <td key={el + "desc"}>
-          {dStock(el, p.exchangeList) + ": "}
+          {g[el].dStock(p.exchangeList) + ": "}
           {this.state.availableStocks[el] ? this.state.availableStocks[el]["description"] : <></>}
         </td>
         <td className="rightTE" key={el + "prc"}>
@@ -54,10 +58,14 @@ class WatchListMenu extends React.PureComponent {
           </button>
         </td>
       </tr>
-      )
+    )
     );
 
     return <>{stockListKey}</>;
+  } else {
+    return <></>
+  }
+
   }
 
   fileUploadAction() {

@@ -30,7 +30,7 @@ class App extends React.Component {
       dashBoardData: [], //list of all saved dashboards.
       defaultExchange: 'US',
       exchangeList: ['US'], //list of all exchanges activated under account management.
-      globalStockList: [], //default stocks for new widgets.
+      globalStockList: {}, //default stocks for new widgets.
       login: 0, //login state. 0 logged out, 1 logged in. 
       loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
       menuList: {}, //lists of all menu widgets.
@@ -44,30 +44,30 @@ class App extends React.Component {
       widgetList: {}, //lists of all widgets.
       zIndex: [], //list widgets. Index location sets zIndex
     };
-
+  
     this.baseState = this.state 
-    this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
-    this.newWidgetContainer = this.newWidgetContainer.bind(this); //move to
-    this.newMenuContainer = this.newMenuContainer.bind(this);
-    this.removeWidget = this.removeWidget.bind(this);
-    this.processLogin = this.processLogin.bind(this);
-    this.moveWidget = this.moveWidget.bind(this);
-    this.updateWidgetStockList = this.updateWidgetStockList.bind(this);
-    this.loadDashBoard = this.loadDashBoard.bind(this);
-    this.saveCurrentDashboard = this.saveCurrentDashboard.bind(this);
-    this.getSavedDashBoards = this.getSavedDashBoards.bind(this);
     this.changeWidgetName = this.changeWidgetName.bind(this);
+    this.getSavedDashBoards = this.getSavedDashBoards.bind(this);
+    this.loadDashBoard = this.loadDashBoard.bind(this);
+    this.logOut = this.logOut.bind(this);
+    this.lockWidgets = this.lockWidgets.bind(this);
+    this.moveWidget = this.moveWidget.bind(this);
+    this.newWidgetContainer = this.newWidgetContainer.bind(this); 
+    this.newMenuContainer = this.newMenuContainer.bind(this);
+    this.newDashboard = this.newDashboard.bind(this);
+    this.processLogin = this.processLogin.bind(this);
+    this.removeWidget = this.removeWidget.bind(this);
+    this.saveCurrentDashboard = this.saveCurrentDashboard.bind(this);
+    this.toggleWidgetVisability = this.toggleWidgetVisability.bind(this);
+    this.toggleBackGroundMenu = this.toggleBackGroundMenu.bind(this);
     this.updateWidgetFilters = this.updateWidgetFilters.bind(this);
     this.updateAPIKey = this.updateAPIKey.bind(this);
     this.updateAPIFlag = this.updateAPIFlag.bind(this); 
     this.updateZIndex = this.updateZIndex.bind(this);
-    this.newDashboard = this.newDashboard.bind(this);
-    this.logOut = this.logOut.bind(this);
-    this.lockWidgets = this.lockWidgets.bind(this);
-    this.toggleWidgetVisability = this.toggleWidgetVisability.bind(this);
-    this.toggleBackGroundMenu = this.toggleBackGroundMenu.bind(this);
     this.updateExchangeList = this.updateExchangeList.bind(this);
     this.updateDefaultExchange = this.updateDefaultExchange.bind(this);
+    this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
+    this.updateWidgetStockList = this.updateWidgetStockList.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState){
@@ -79,6 +79,7 @@ class App extends React.Component {
     };
     
     if (s.globalStockList !== prevState.globalStockList){
+      console.log('updating Stock Data')
       LoadStockData(this, s, GetStockPrice)
       LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets, s.throttle)
     }
@@ -187,6 +188,29 @@ class App extends React.Component {
     }
   }
 
+  updateGlobalStockList(event, stockRef, stockObj={}) {
+    //pass stockRef to delete, pass in stockObj to update.
+    console.log("update global: ", stockRef)
+    const s = this.state
+    const currentStockObj = {...s.globalStockList}
+    if (currentStockObj[stockRef] === undefined) {
+      console.log('undefined')
+      currentStockObj[stockRef] = stockObj
+      currentStockObj[stockRef]['dStock'] = function(ex){
+        if (ex.length === 1) {
+          return (this.symbol)
+        } else {
+          return (this.key)
+        }
+      }
+      // GetStockPrice(this, stock, s.apiKey, s.throttle);
+    } else {
+      delete currentStockObj[stockRef]
+    }
+    this.setState({ globalStockList: currentStockObj });
+    event instanceof Event === true && event.preventDefault();
+  }
+
   changeWidgetName(stateRef, widgetID, newName) {
     //stateref should equal widgetlist or menulist.
     // console.log(stateRef + ":" + widgetID + ":" + newName);
@@ -201,27 +225,6 @@ class App extends React.Component {
     delete newWidgetList[widgetID];
     this.setState({ stateRef: newWidgetList });
   }
-   
-  // updateGlobalStockList(event, stock, stockObject) {
-  updateGlobalStockList(event, stock) {
-
-    // Adds stock to global tracking list.
-    GetStockPrice(this, stock, this.state.apiKey, this.state.throttle)
-    let addStockId = stock;
-    console.log("globalNew", addStockId)
-    if (stock.indexOf(":") > 0) {
-      addStockId = stock.slice(0, stock.indexOf(":"));
-    }
-    const currentStockList = Array.from(this.state.globalStockList);
-    if (currentStockList.includes(addStockId) === false) {
-      currentStockList.push(addStockId);
-    } else {
-      currentStockList.splice(currentStockList.indexOf(addStockId), 1);
-    }
-    this.setState({ globalStockList: currentStockList });
-
-    event instanceof Event === true && event.preventDefault();
-  }
 
   getSavedDashBoards() {
     console.log('Getting saved dashboards')
@@ -231,7 +234,6 @@ class App extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         console.log('Dashboard and menu data retrieved.')
-        // console.log(data)
         let dashboards = data.savedDashBoards;
         let newList = {}; //replace numeric keys, returned by dataset, with widget IDs.
         for (const oldKey in dashboards) {
@@ -258,7 +260,44 @@ class App extends React.Component {
 
   loadDashBoard(newGlobalList, newWidgetList) {
     let updateGlobalList = JSON.parse(newGlobalList);
+    
+    for (const stock in updateGlobalList) {
+      
+      updateGlobalList[stock]['dStock'] = function(ex){
+        if (ex.length === 1) {
+          return (this.symbol)
+        } else {
+          return (this.key)
+        }
+      }
+    }
+
+    updateGlobalList['key'] = function(){
+      const stockList = Object.keys(this)
+      const index = stockList.indexOf('key')
+      stockList.splice(index,1) 
+      return stockList
+    }
+    
     let updateWidgetList = JSON.parse(newWidgetList);
+    for (const widget in updateWidgetList){
+      const widgetStockObj = updateWidgetList[widget]
+
+      for (const stock in widgetStockObj.trackedStocks) {
+        widgetStockObj[stock]['dStock'] = function(ex){
+          if (ex.length === 1) {
+            return (this.symbol)
+          } else {
+            return (this.key)
+          }
+        }
+        widgetStockObj.trackedStocks['key'] = function(){
+          return Object.keys(this)
+        }
+
+      }
+    }
+
     this.setState({ globalStockList: updateGlobalList });
     this.setState({ widgetList: updateWidgetList });
     this.setState({ refreshStockData: 1 });

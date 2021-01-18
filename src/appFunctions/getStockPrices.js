@@ -2,15 +2,12 @@ import {finnHub} from "./throttleQueue.js";
 
 function GetStockPrice(context, stockDescription, apiKey, throttle) {
   //US ONLY
-  if (stockDescription !== undefined && apiKey !== undefined && stockDescription.slice(0, stockDescription.indexOf('-')) === 'US') {
-    const stockSymbol = stockDescription.indexOf(":") > 0 ? 
-      stockDescription.slice(0, stockDescription.indexOf(":")) : stockDescription;
+  if (stockDescription !== undefined && apiKey !== undefined && stockDescription.exchange === 'US') {
+    const stockSymbol = stockDescription.symbol
     let stockPriceData = {};
     let that = context
     
-    const queryString = "https://finnhub.io/api/v1/quote?symbol=" + 
-    stockSymbol.slice(stockSymbol.indexOf('-') + 1, stockSymbol.length) + 
-    "&token=" +apiKey
+    const queryString = `https://finnhub.io/api/v1/quote?symbol=${stockSymbol}&token=${apiKey}`
     finnHub(throttle, queryString)
       .then((data) => {
         console.log("updating stock data")
@@ -33,7 +30,7 @@ function GetStockPrice(context, stockDescription, apiKey, throttle) {
         that.setState((prevState) => {
           console.log("setting trackedStockData")
           let newTrackedStockData = Object.assign({}, prevState.trackedStockData);
-          newTrackedStockData[stockSymbol] = stockPriceData;
+          newTrackedStockData[`US-${stockSymbol}`] = stockPriceData;
           return { trackedStockData: newTrackedStockData };
         });
       })
@@ -44,13 +41,11 @@ function GetStockPrice(context, stockDescription, apiKey, throttle) {
   }
 
 function LoadStockData(context, s, getStockPrice){
-  // console.log("------loadStockPrice-------")
-  if (s.refreshStockData === 1 && s.globalStockList !== []) {
+  console.log("------loadStockPrice-------")
+  if (s.refreshStockData === 1 && Object.keys(s.globalStockList).length !== 0) {
     // console.log(s.globalStockList)
     context.setState({ refreshStockData: 0 })
     for (const stock in s.globalStockList) {
-      // console.log("stocks")
-      // console.log("-->", stock, s.globalStockList)
       getStockPrice(context, s.globalStockList[stock], s.apiKey, s.throttle)
     }
   }
