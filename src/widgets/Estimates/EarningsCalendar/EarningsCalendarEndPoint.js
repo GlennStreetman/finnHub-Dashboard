@@ -4,12 +4,13 @@ function findDate(offset){
   }
 
 
-module.exports = function EPSSuprisesEndPoint(stockList, filters, apiKey){
-
+module.exports = function earningsCalendarEndPoint(stockList, filters, apiKey){
+    // console.log(stockList, filters, apiKey)
     let queryStringObj = {}
 
     for (const stock in stockList) {
-        let stockSymbole = stockList[stock].slice(stockList[stock].indexOf('-')+1 , stockList[stock].length)
+        console.log(stock, stockList[stock].symbol)
+        let stockSymbole = stockList[stock].symbol
         const queryString = `https://finnhub.io/api/v1/calendar/earnings?from=${findDate(filters.startDate)}1&to=${findDate(filters.endDate)}1&symbol=${stockSymbole}&token=${apiKey}`
         queryStringObj[stockSymbole] = (queryString)
     }
