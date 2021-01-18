@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
-import {dStock, sStock} from "../../../appFunctions/formatStockSymbols.js";
+import {sStock} from "../../../appFunctions/formatStockSymbols.js";
 
 export default class EstimatesEarningsCalendar extends Component {
     constructor(props) {
@@ -72,7 +72,7 @@ export default class EstimatesEarningsCalendar extends Component {
     const stockList = p.trackedStocks.key();
     const stockListRows = stockList.map((el) =>
         <tr key={el + "container"}>
-          <td key={el + "name"}>{dStock(el, p.exchangeList)}</td>
+          <td key={el + "name"}>{el.dStock(p.exchangeList)}</td>
           <td key={el + "buttonC"}>
             <button
               key={el + "button"}
@@ -161,7 +161,7 @@ export default class EstimatesEarningsCalendar extends Component {
             {el}
           </option>
         ));
-
+        // console.log(p.trackedStocks, p.trackedStocks.key(), '<-----------------')
         let newStockList = p.trackedStocks.key().map((el) => (
           <option key={el + "ddl"} value={el}>
             {p.trackedStocks[el].dStock(p.exchangeList)}
