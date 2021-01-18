@@ -34,7 +34,7 @@ export default class EstimatesEarningsCalendar extends Component {
       } 
 
       if (p.trackedStocks.key()[0] !== undefined) {
-        this.setState({targetStock: p.trackedStocks[0]}, ()=>this.getStockData())
+        this.setState({targetStock: p.trackedStocks.key()[0]}, ()=>this.getStockData())
       }
     }
 
@@ -77,7 +77,7 @@ export default class EstimatesEarningsCalendar extends Component {
             <button
               key={el + "button"}
               onClick={() => {
-                this.updateWidgetList(el);
+                p.updateWidgetStockList(p.widgetKey, el);
               }}
             >
               <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
