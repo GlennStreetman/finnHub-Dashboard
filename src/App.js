@@ -170,20 +170,24 @@ class App extends React.Component {
     this.setState({widgetList: updatedWidgetList})
   }
   
-  updateWidgetStockList(widgetId, symbol) {
+  updateWidgetStockList(widgetId, symbol, stockObj={}) {
     //adds if not present, else removes stock from widget specific stock list.
 
     if (isNaN(widgetId) === false) {
-      let updateWidgetStockList = Object.assign({}, this.state.widgetList);
-      const trackingSymbolList = updateWidgetStockList[widgetId]["trackedStocks"].slice();
+      let updateWidgetStockList = Object.assign({}, this.state.widgetList); //copy widget list
+      const trackingSymbolList = Object.assign({}, updateWidgetStockList[widgetId]["trackedStocks"]); //copy target widgets stock object
 
-      if (trackingSymbolList.indexOf(symbol) === -1) {
-        updateWidgetStockList[widgetId]["widgetList"] = trackingSymbolList.push(symbol);
+      if (Object.keys(trackingSymbolList).indexOf(symbol) === -1) {
+        //add
+        trackingSymbolList[symbol] = stockObj
+        updateWidgetStockList[widgetId]["trackedStocks"] = trackingSymbolList;
       } else {
-        updateWidgetStockList[widgetId]["widgetList"] = trackingSymbolList.splice(trackingSymbolList.indexOf(symbol), 1);
+        //remove
+        delete trackingSymbolList[symbol]
+        updateWidgetStockList[widgetId]["trackedStocks"] = trackingSymbolList
       }
 
-      updateWidgetStockList[widgetId]["trackedStocks"] = trackingSymbolList;
+      // updateWidgetStockList[widgetId]["trackedStocks"] = trackingSymbolList;
       this.setState({ widgetList: updateWidgetStockList });
     }
   }

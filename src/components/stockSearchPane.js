@@ -111,11 +111,11 @@ class StockSearchPane extends React.Component {
             if (this.state.filteredStocks.includes(this.state.inputText)) {
               let stockKey = this.state.inputText.slice(0, this.state.inputText.indexOf(":") )
               // this.props.updateGlobalStockList(e, stockKey ,this.state.filteredStockObjects[stockKey]);
-              console.log('---------->',s.availableStocks.[stockKey])
-              this.props.updateGlobalStockList(e, stockKey,s.availableStocks[stockKey]);
+              // console.log('---------->',s.availableStocks.[stockKey])
+              this.props.updateGlobalStockList(e, stockKey, s.availableStocks[stockKey]);
               this.props.showSearchPane();
               if (widgetKey / 1 !== undefined) {
-                this.props.updateWidgetStockList(widgetKey, stockSymbol);
+                this.props.updateWidgetStockList(widgetKey, stockSymbol, s.availableStocks[stockKey]);
                 e.preventDefault();
               }
             } else {
