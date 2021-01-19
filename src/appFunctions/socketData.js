@@ -9,17 +9,17 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle)
       USList.push(gs.symbol)
     } 
   }
-  console.log('socket stockList: ', USList)
+  // console.log('socket stockList: ', USList)
   let thisSocket = socket
   let streamingStockData = {};
   let lastUpdate = new Date().getTime();
   let that = context
   if (apiKey !== '' && USList !== []) {
     try { 
-      console.log('adding event listener----------------')
+      // console.log('adding event listener----------------')
       thisSocket.addEventListener("open", function (event) {
         USList.map((el) => {
-          console.log("mapping: ", { type: "subscribe", symbol: el })
+          // console.log("mapping: ", { type: "subscribe", symbol: el })
             throttle.enqueue(function() {
               thisSocket.send(JSON.stringify({ type: "subscribe", symbol: el }))
             })
@@ -35,7 +35,7 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle)
         if (tickerReponse.data) {  
           streamingStockData['US-' + tickerReponse.data[0]["s"]] = [tickerReponse.data[0]["p"]];
           let checkTime = new Date().getTime();
-          console.log("Message from server ", event.data);
+          // console.log("Message from server ", event.data);
           if (checkTime - lastUpdate > 3000) {
             lastUpdate = new Date().getTime();
             let updatedPrice = Object.assign({}, that.state.trackedStockData);

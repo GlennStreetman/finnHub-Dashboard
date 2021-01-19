@@ -4,7 +4,7 @@ module.exports = function recommendationTrendsEndPoint(stockList, filters, apiKe
     let queryStringObj = {}
 
     for (const stock in stockList) {
-        let stockSymbole = stockList[stock].slice(stockList[stock].indexOf('-')+1 , stockList[stock].length)
+        const stockSymbole = stockList[stock].symbol
         const queryString = `https://finnhub.io/api/v1/stock/price-target?symbol=${stockSymbole}&token=${apiKey}`
         queryStringObj[stockSymbole] = (queryString)
     }
