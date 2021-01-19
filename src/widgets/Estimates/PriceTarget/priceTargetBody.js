@@ -27,7 +27,7 @@ export default class PriceTargetBody extends Component {
 
     componentDidUpdate(prevProps, prevState){
       const p = this.props
-      if (prevProps.trackedStocks[0] !== p.trackedStocks[0]) {
+      if (prevProps.trackedStocks.key()[0] !== p.trackedStocks.key()[0]) {
         this.setState({targetStock: p.trackedStocks.key()[0]}, () => this.getStockData())
       }
     }

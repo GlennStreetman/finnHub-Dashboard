@@ -9,7 +9,7 @@ export default class FundamentalsCompanyNews extends React.Component {
   constructor(props) {
     super(props);
 
-    let startList = this.props.trackedStocks.length > 0 ? this.props.trackedStocks : [];
+    let startList = this.props.trackedStocks.key().length > 0 ? this.props.trackedStocks.key() : {};
     let startStock = startList.length > 0 ? startList[0] : undefined;
     this.state = {
       companyNews: [],
@@ -43,7 +43,9 @@ export default class FundamentalsCompanyNews extends React.Component {
       p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
     } 
 
-    if (p.trackedStocks.length > 0 && s.newsSelection !== undefined && p.filters !== undefined) {
+
+
+    if (p.trackedStocks.key().length > 0 && s.newsSelection !== undefined && p.filters !== undefined) {
       this.getCompanyNews(s.newsSelection, p.filters.startDate, p.filters.endDate);
     }
   }
@@ -55,12 +57,12 @@ export default class FundamentalsCompanyNews extends React.Component {
     if (s.newsSelection !== prevState.newsSelection || p.showEditPane !== prevProps.showEditPane) {
       this.getCompanyNews(s.newsSelection, p.filters.startDate, p.filters.endDate);
     }
-    // if (this.state.newsSelection === 1 && this.props.trackedStocks.length) {
+    // if (this.state.newsSelection === 1 && this.props.trackedStocks.key().length) {
     //   console.log("-----------------HERE")
     //   this.setState({ newsSelection: this.props.trackedStocks[0] });
     // }
-    if (prevProps.trackedStocks[0] !== p.trackedStocks[0]) {
-      this.setState({newsSelection: p.trackedStocks[0]}, () => this.getCompanyNews(s.newsSelection, p.filters.startDate, p.filters.endDate))
+    if (prevProps.trackedStocks.key()[0] !== p.trackedStocks.key()[0]) {
+      this.setState({newsSelection: p.trackedStocks.key()[0]}, () => this.getCompanyNews(s.newsSelection, p.filters.startDate, p.filters.endDate))
     }
   }
 
@@ -163,7 +165,7 @@ export default class FundamentalsCompanyNews extends React.Component {
 
   editNewsListForm() {
     const p = this.props
-    let newsList = p.trackedStocks;
+    let newsList = p.trackedStocks.key();
     let stockNewsRow = newsList.map((el) =>
       p.showEditPane === 1 ? (
         <tr key={el + "container"}>
@@ -225,7 +227,7 @@ export default class FundamentalsCompanyNews extends React.Component {
 
   displayNews() {
     const p = this.props
-    let newSymbolList = p.trackedStocks.map((el) => (
+    let newSymbolList = p.trackedStocks.key().map((el) => (
       <option key={el + "ddl"} value={el}>
         {dStock(el, p.exchangeList)}
       </option>

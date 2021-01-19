@@ -24,7 +24,7 @@ export default class FundamentalsCompanyProfile2 extends Component {
   componentDidMount(){
     const p = this.props
     console.log('getting stock data')
-    this.setState({targetStock: p.trackedStocks[0]}, () => this.getStockData())
+    this.setState({targetStock: p.trackedStocks.key()[0]}, () => this.getStockData())
     
   }
 
@@ -33,8 +33,8 @@ export default class FundamentalsCompanyProfile2 extends Component {
     if (prevState.targetStock !== this.state.targetStock) {
       this.getStockData()
     }
-    if (prevProps.trackedStocks[0] !== p.trackedStocks[0]) {
-      this.setState({targetStock: p.trackedStocks[0]}, () => this.getStockData())
+    if (prevProps.trackedStocks.key()[0] !== p.trackedStocks.key()[0]) {
+      this.setState({targetStock: p.trackedStocks.key()[0]}, () => this.getStockData())
     }
   }
 
@@ -62,9 +62,9 @@ export default class FundamentalsCompanyProfile2 extends Component {
     </>
   }
 
-  stockListForm() {
-    let stockList = this.props.trackedStocks;
+  stockListForm() { 
     const p = this.props
+    const stockList = p.trackedStocks.key();
     let row = stockList.map((el) =>
       this.props.showEditPane === 1 ? (
         <tr key={el + "container"}>
@@ -94,7 +94,7 @@ export default class FundamentalsCompanyProfile2 extends Component {
 
   renderStockData(){
     const p = this.props
-    const newSymbolList = this.props.trackedStocks.map((el) => (
+    const newSymbolList = p.trackedStocks.key().map((el) => (
       <option key={el + "ddl"} value={el}>
         {dStock(el, p.exchangeList)}
       </option>
@@ -124,12 +124,12 @@ export default class FundamentalsCompanyProfile2 extends Component {
 
   mapStockData(){
       const s = this.state
+      // console.log(Object.keys(s.stockData))
       const rows = Object.keys(s.stockData).map((key) => 
-        <tr key={s.stockData[key]}>
-          <td>{ `${key}: `}</td>
-          {/* <td>{s.stockData[key]}</td> */}
-          <td>
-            {key === 'logo' ? <img width='25%' src={s.stockData[key]}  alt={s.stockData[key]}></img> :  s.stockData[key]}
+        <tr key={s.stockData[key+'tr']+key}>
+          <td key={s.stockData[key+'td']}>{ `${key}: `}</td>
+          <td key={s.stockData[key+'td2'] + key}>
+            {key === 'logo' ? <img key={s.stockData[key+'pic']+ key} width='25%' src={s.stockData[key]}  alt={s.stockData[key]}></img> :  s.stockData[key]}
           </td>
         </tr>
       )
@@ -138,7 +138,7 @@ export default class FundamentalsCompanyProfile2 extends Component {
 
     getStockData(){
       if (this.state.targetStock !== undefined){
-      console.log("--------getting stocks data")
+      // console.log("--------getting stocks data")
       const stock = this.state.targetStock
         if (stock.slice(0, stock.indexOf('-')) === 'US') {
           const thisStock = stock.slice(stock.indexOf('-') + 1, stock.length)

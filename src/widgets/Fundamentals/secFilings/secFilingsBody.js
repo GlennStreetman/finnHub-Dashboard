@@ -27,15 +27,15 @@ export default class FundamentalsSECFilings extends Component {
 
     componentDidMount(){
       const p = this.props
-      p.trackedStocks[0] !== undefined && this.setState({targetStock: p.trackedStocks[0]}, ()=>this.getStockData()) 
+      p.trackedStocks.key()[0] !== undefined && this.setState({targetStock: p.trackedStocks.key()[0]}, ()=>this.getStockData()) 
 
     }
 
     componentDidUpdate(prevProps, prevState){
       const p = this.props
       
-      if (prevProps.trackedStocks[0] === undefined && p.trackedStocks[0] !== undefined) {
-        this.setState({targetStock: p.trackedStocks[0]}, () => this.getStockData())
+      if (prevProps.trackedStocks.key()[0] === undefined && p.trackedStocks.key()[0] !== undefined) {
+        this.setState({targetStock: p.trackedStocks.key()[0]}, () => this.getStockData())
       }
     }
 
@@ -49,8 +49,8 @@ export default class FundamentalsSECFilings extends Component {
     }
 
     renderSearchPane(){
-      let stockList = this.props.trackedStocks;
       const p = this.props
+      let stockList = p.trackedStocks.key();
       let row = stockList.map((el) =>
         this.props.showEditPane === 1 ? (
           <tr key={el + "container"}>
@@ -59,7 +59,7 @@ export default class FundamentalsSECFilings extends Component {
               <button
                 key={el + "button"}
                 onClick={() => {
-                  this.updateWidgetList(el);
+                  p.updateWidgetStockList(p.widgetKey, el);
                 }}
               >
                 <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
@@ -96,6 +96,8 @@ export default class FundamentalsSECFilings extends Component {
     }
 
     stockTable(data){
+      // console.log(data, '<--------')
+      if (data !== undefined) {
       let tableData = Object.keys(data).map((el)=>
         <tr key={"row" + el}>
           <td key={"heading" + el}>{el}</td>
@@ -103,6 +105,10 @@ export default class FundamentalsSECFilings extends Component {
         </tr>
       )
       return tableData
+    } else {
+      return <></>
+    }
+      
     }
 
     renderStockData(){
@@ -110,7 +116,7 @@ export default class FundamentalsSECFilings extends Component {
       const p = this.props
       const s = this.state
       if (s.stockData !== undefined) {
-      let newSymbolList = p.trackedStocks.map((el) => (
+      let newSymbolList = p.trackedStocks.key().map((el) => (
         <option key={el + "ddl"} value={el}>
           {dStock(el, p.exchangeList)}
         </option>

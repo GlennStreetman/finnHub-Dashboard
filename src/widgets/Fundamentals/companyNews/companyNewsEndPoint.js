@@ -14,7 +14,7 @@ module.exports = function companyNewsEndPoint(stockList, filters, apiKey){
         const endDate = new Date(endUnix).toISOString().slice(0, 10);
 
         
-        let stockSymbole = stockList[stock].slice(stockList[stock].indexOf('-')+1 , stockList[stock].length)
+        const stockSymbole = stockList[stock].symbol
         const queryString = `https://finnhub.io/api/v1/company-news?symbol=${stockSymbole}&from=${startDate}&to=${endDate}&token=${apiKey}`
         console.log(queryString)
         queryStringObj[stockSymbole] = (queryString)

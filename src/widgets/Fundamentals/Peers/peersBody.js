@@ -24,15 +24,15 @@ export default class FundamentalsPeers extends Component {
 
     componentDidMount(){
       const p = this.props
-      p.trackedStocks[0] !== undefined && this.setState({targetStock: p.trackedStocks[0]}, () => this.getStockData()) 
+      p.trackedStocks.key()[0] !== undefined && this.setState({targetStock: p.trackedStocks.key()[0]}, () => this.getStockData()) 
       this.getSymbolList()
       
     }
 
     componentDidUpdate(prevProps, prevState){
       const p = this.props
-      if (prevProps.trackedStocks[0] !== p.trackedStocks[0]) {
-        this.setState({targetStock: p.trackedStocks[0]}, () => this.getStockData())
+      if (prevProps.trackedStocks.key()[0] !== p.trackedStocks.key()[0]) {
+        this.setState({targetStock: p.trackedStocks.key()[0]}, () => this.getStockData())
       }
     }
 
@@ -87,7 +87,7 @@ export default class FundamentalsPeers extends Component {
     renderSearchPane(){
       //add search pane rendering logic here. Additional filters need to be added below.
     const p = this.props
-    const stockList = p.trackedStocks;
+    const stockList = p.trackedStocks.key();
     const stockListRows = stockList.map((el) =>
         <tr key={el + "container"}>
           <td key={el + "name"}>{dStock(el, p.exchangeList)}</td>
@@ -95,7 +95,7 @@ export default class FundamentalsPeers extends Component {
             <button
               key={el + "button"}
               onClick={() => {
-                this.updateWidgetList(el);
+                p.updateWidgetStockList(p.widgetKey, el);
               }}
             >
               <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
@@ -123,7 +123,7 @@ export default class FundamentalsPeers extends Component {
           <td key={el + "name"}>{this.getStockName(el)}</td>
         </tr>
       )
-      const newSymbolList = this.props.trackedStocks.map((el) => (
+      const newSymbolList = this.props.trackedStocks.key().map((el) => (
         <option key={el + "ddl"} value={el}>
           {dStock(el, p.exchangeList)}
         </option>

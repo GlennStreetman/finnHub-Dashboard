@@ -7,9 +7,9 @@ import {dStock} from "../../../appFunctions/formatStockSymbols.js";
 export default class PriceCandles extends React.Component {
   constructor(props) {
     super(props);
-    let p = this.props.trackedStocks
+    let p = this.props.trackedStocks.key()
     let startString = p.length > 0 && p[0].slice(p[0].indexOf('-') + 1, p[0].length)
-    let startStock = this.props.trackedStocks.length > 0 ? startString : '';
+    let startStock = this.props.trackedStocks.key().length > 0 ? startString : '';
 
     this.state = {
       candleSelection: startStock, //current stock to be graphed.
@@ -41,7 +41,7 @@ export default class PriceCandles extends React.Component {
     } 
     
     
-    if (p.trackedStocks.length > 0) {
+    if (p.trackedStocks.key().length > 0) {
       this.getCandleData();
     }
   }
@@ -55,7 +55,7 @@ export default class PriceCandles extends React.Component {
         this.props.showEditPane !== prevProps.showEditPane) {
       this.getCandleData();
     }
-    if (this.state.candleSelection === '' && this.props.trackedStocks.length) {
+    if (this.state.candleSelection === '' && this.props.trackedStocks.key().length) {
       this.setState({ candleSelection: this.props.trackedStocks[0] });
     }
   }
@@ -191,7 +191,7 @@ export default class PriceCandles extends React.Component {
 
   editCandleListForm() {
     const p = this.props
-    let candleList = p.trackedStocks;
+    let candleList = p.trackedStocks.key();
     let candleSelectionRow = candleList.map((el) =>
       this.props.showEditPane === 1 ? (
         <tr key={el + "container"}>
@@ -220,7 +220,7 @@ export default class PriceCandles extends React.Component {
   }
 
   displayCandleGraph() {
-    let newSymbolList = this.props.trackedStocks.map((el) => (
+    let newSymbolList = this.props.trackedStocks.key().map((el) => (
       <option key={el + "ddl"} value={el}>
         {dStock(el, this.props.exchangeList)}
       </option>

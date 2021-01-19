@@ -36,9 +36,9 @@ export default class FundamentalsBasicFinancials extends React.Component {
     if (p.filters['metricSelection'] === undefined) {
       let newList = []
       p.updateWidgetFilters(p.widgetKey, 'metricSelection', newList)
-      p.trackedStocks[0] === undefined ?
+      p.trackedStocks.key()[0] === undefined ?
         p.updateWidgetFilters(p.widgetKey, 'metricSource', 'US-AAPL') :
-        p.updateWidgetFilters(p.widgetKey, 'metricSource', p.trackedStocks[0])
+        p.updateWidgetFilters(p.widgetKey, 'metricSource', p.trackedStocks.key()[0])
         p.updateWidgetFilters(p.widgetKey, 'Note', 'Metric source for dashboard display purposes.')
     }
 
@@ -60,14 +60,14 @@ export default class FundamentalsBasicFinancials extends React.Component {
       });
 
       // load initial data
-      p.trackedStocks.forEach(el => this.getCompanyMetrics(el))
+      p.trackedStocks.key().forEach(el => this.getCompanyMetrics(el))
     }
   }
 
   componentDidUpdate(prevProps, PrevState) {
     if (this.props.trackedStocks !== prevProps.trackedStocks) {
-      this.props.trackedStocks.forEach(el => {
-        prevProps.trackedStocks.indexOf(el) === -1 && this.getCompanyMetrics(el)
+      this.props.trackedStocks.key().forEach(el => {
+        prevProps.trackedStocks.key().indexOf(el) === -1 && this.getCompanyMetrics(el)
       })
     }
     
@@ -110,13 +110,18 @@ export default class FundamentalsBasicFinancials extends React.Component {
   }
 
   changeOrder(indexRef, change){
-    // console.log(indexRef + ":" + change)
-    let moveFrom = this.props.filters.metricSelection[indexRef]
-    let moveTo = this.props.filters.metricSelection[indexRef + change]
-    let orderMetricSelection = this.props.filters.metricSelection.slice()
+    console.log(indexRef + ":" + change)
+    const p = this.props
+    let moveFrom = p.filters.metricSelection[indexRef]
+    let moveTo = p.filters.metricSelection[indexRef + change]
+    let orderMetricSelection = p.filters.metricSelection.slice()
     orderMetricSelection[indexRef] = moveTo
     orderMetricSelection[indexRef + change] = moveFrom
-    this.props.updateWidgetFilters(this.props.widgetKey, 'metricSelection', orderMetricSelection)
+    console.log(orderMetricSelection, moveFrom, moveTo, p.filters.metricSelection.length)
+    if (indexRef + change  >= 0 && indexRef + change < p.filters.metricSelection.length) {
+      console.log('updating')
+      p.updateWidgetFilters(p.widgetKey, 'metricSelection', orderMetricSelection)
+    }
     // this.setState({metricSelection: orderMetricSelection})
   }
 
@@ -179,7 +184,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
     let end = increment;
     let metricSlice = this.state.metricList.slice(start, end);
     let selectionSlice = this.props.filters.metricSelection.slice(start, end);
-    let stockSelectionSlice = this.props.trackedStocks.slice(start, end);
+    let stockSelectionSlice = this.props.trackedStocks.key().slice(start, end);
     // console.log(selectionSlice)
     let mapMetrics = metricSlice.map((el, index) => (
       <tr key={el + "metricRow" + index}>
@@ -294,9 +299,10 @@ export default class FundamentalsBasicFinancials extends React.Component {
   }
 
   renderStockData() {
+    const p = this.props
     let selectionList = []
     let thisKey = this.props.widgetKey
-    if (this.props.filters.metricSelection !== undefined) {selectionList = this.props.filters.metricSelection.slice()}
+    if (p.filters.metricSelection !== undefined) {selectionList = p.filters.metricSelection.slice()}
     let headerRows = selectionList.map((el) => {
       let title = el.replace(/([A-Z])/g, ' $1').trim().split(" ").join("\n")
       if (title.search(/\d\s[A-Z]/g) !== -1) {
@@ -307,9 +313,9 @@ export default class FundamentalsBasicFinancials extends React.Component {
       // console.log(title)
       return (<td className='tdHead' key={thisKey + el +  "title"}>{title}</td>)}
       )
-    let bodyRows = this.props.trackedStocks.map((el) => { return (
+    let bodyRows = p.trackedStocks.key().map((el) => { return (
     <tr key={thisKey + el + "tr1"}>
-    <td key={thisKey + el + "td1"}>{dStock(el, this.props.exchangeList)}</td>
+    <td key={thisKey + el + "td1"}>{dStock(el, p.exchangeList)}</td>
     {this.mapStockData(el)}
     </tr>
     )})
@@ -339,7 +345,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
           {this.getMetrics()}
           </>
         )}
-        {Object.keys(this.props.trackedStocks).length > 0 && this.props.showEditPane === 0  ? this.renderStockData() : <></>}       
+        {this.props.trackedStocks.key().length > 0 && this.props.showEditPane === 0  ? this.renderStockData() : <></>}       
       </>
     );
   }
