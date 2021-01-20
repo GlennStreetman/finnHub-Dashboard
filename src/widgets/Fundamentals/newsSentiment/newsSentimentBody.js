@@ -23,16 +23,16 @@ export default class FundamentalsNewsSentiment extends Component {
 
     componentDidMount(){
       const p = this.props
-      p.trackedStocks.key()[0] !== undefined && 
-        this.setState({targetStock: p.trackedStocks.key()[0]}, () => this.getStockData()) 
+      p.trackedStocks.sKeys()[0] !== undefined && 
+        this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData()) 
       
     }
 
     componentDidUpdate(prevProps, prevState){
       const p = this.props
       
-      if (prevProps.trackedStocks.key()[0] === undefined && p.trackedStocks.key()[0] !== undefined) {
-        this.setState({targetStock: p.trackedStocks.key()[0]}, () => this.getStockData())
+      if (prevProps.trackedStocks.sKeys()[0] === undefined && p.trackedStocks.sKeys()[0] !== undefined) {
+        this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData())
       }
       
     }
@@ -58,7 +58,7 @@ export default class FundamentalsNewsSentiment extends Component {
 
     renderSearchPane(){
       const p = this.props
-      const stockList = p.trackedStocks.key();
+      const stockList = p.trackedStocks.sKeys();
       let row = stockList.map((el) =>
         this.props.showEditPane === 1 ? (
           <tr key={el + "container"}>
@@ -88,7 +88,7 @@ export default class FundamentalsNewsSentiment extends Component {
 
     renderStockData(){
       const p = this.props
-      const newSymbolList = this.props.trackedStocks.key().map((el) => (
+      const newSymbolList = this.props.trackedStocks.sKeys().map((el) => (
         <option key={el + "ddl"} value={el}>
           {dStock(el, p.exchangeList)}
         </option>

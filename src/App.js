@@ -275,9 +275,9 @@ class App extends React.Component {
       }
     }
 
-    updateGlobalList['key'] = function(){
+    updateGlobalList['sKeys'] = function(){
       const stockList = Object.keys(this)
-      const index = stockList.indexOf('key')
+      const index = stockList.indexOf('sKeys')
       stockList.splice(index,1) 
       return stockList
     }
@@ -295,9 +295,9 @@ class App extends React.Component {
             return (this.key)
           }
         }
-        widgetStockObj.trackedStocks['key'] = function(){
+        widgetStockObj.trackedStocks['sKeys'] = function(){
           const stockList = Object.keys(this)
-          const index = stockList.indexOf('key')
+          const index = stockList.indexOf('sKeys')
           stockList.splice(index,1) 
           return stockList
         }

@@ -20,7 +20,7 @@ export default class widgetName extends Component {
 
     componentDidMount(){
       const p = this.props
-      p.trackedStocks.key()[0] !== undefined && this.setState({targetStock: p.trackedStocks.key()[0]}, ()=>this.getStockData()) 
+      p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData()) 
 
     }
 

@@ -28,9 +28,9 @@ class WatchListMenu extends React.PureComponent {
     
     const p = this.props
     const g = p.globalStockList;
-    if (g.key !== undefined) {
+    if (g.sKeys !== undefined) {
     // console.log(g, '-------------')
-    const stockListKey = g.key().map((el) => ( 
+    const stockListKey = g.sKeys().map((el) => ( 
     <tr key={el + "row"}>
         <td key={el + "desc"}>
           {g[el].dStock(p.exchangeList) + ": "}

@@ -22,13 +22,13 @@ export default class PriceTargetBody extends Component {
 
     componentDidMount(){
       const p = this.props
-      p.trackedStocks.key()[0] !== undefined && this.setState({targetStock: p.trackedStocks.key()[0]}, () => this.getStockData()) 
+      p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData()) 
     }
 
     componentDidUpdate(prevProps, prevState){
       const p = this.props
-      if (prevProps.trackedStocks.key()[0] !== p.trackedStocks.key()[0]) {
-        this.setState({targetStock: p.trackedStocks.key()[0]}, () => this.getStockData())
+      if (prevProps.trackedStocks.sKeys()[0] !== p.trackedStocks.sKeys()[0]) {
+        this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData())
       }
     }
 
@@ -60,7 +60,7 @@ export default class PriceTargetBody extends Component {
     renderSearchPane(){
       //add search pane rendering logic here. Additional filters need to be added below.
     const p = this.props
-    const stockList = p.trackedStocks.key();
+    const stockList = p.trackedStocks.sKeys();
     const stockListRows = stockList.map((el) =>
         <tr key={el + "container"}>
           <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
@@ -96,7 +96,7 @@ export default class PriceTargetBody extends Component {
           <td key={el + "name"}>{s.targetData[el]}</td>
         </tr>
       )
-      const newSymbolList = p.trackedStocks.key().map((el) => (
+      const newSymbolList = p.trackedStocks.sKeys().map((el) => (
         <option key={el + "ddl"} value={el}>
           {dStock(el, p.exchangeList)}
         </option>
@@ -144,7 +144,7 @@ export default class PriceTargetBody extends Component {
               {this.renderSearchPane()}
               </>
             )}
-            {p.trackedStocks.key().length > 0 && 
+            {p.trackedStocks.sKeys().length > 0 && 
             this.props.showEditPane === 0  ? this.renderStockData() : <></>}       
           </>
         )

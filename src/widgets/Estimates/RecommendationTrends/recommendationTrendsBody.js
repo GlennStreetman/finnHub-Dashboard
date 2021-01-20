@@ -25,13 +25,13 @@ export default class EstimatesRecommendationTrends extends Component {
 
     componentDidMount(){
       const p = this.props
-      p.trackedStocks.key()[0] !== undefined && this.setState({targetStock: p.trackedStocks.key()[0]}, ()=>this.getStockData())
+      p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData())
     }
 
     componentDidUpdate(prevProps, prevState){
       const p = this.props
-      if (prevProps.trackedStocks.key()[0] === undefined && p.trackedStocks.key()[0] !== undefined) {
-        this.setState({targetStock: p.trackedStocks.key()[0]}, ()=>this.getStockData())
+      if (prevProps.trackedStocks.sKeys()[0] === undefined && p.trackedStocks.sKeys()[0] !== undefined) {
+        this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData())
       }
     }
 
@@ -47,7 +47,7 @@ export default class EstimatesRecommendationTrends extends Component {
     renderSearchPane(){
       //add search pane rendering logic here. Additional filters need to be added below.
     const p = this.props
-    const stockList = p.trackedStocks.key();
+    const stockList = p.trackedStocks.sKeys();
     const stockListRows = stockList.map((el) =>
         <tr key={el + "container"}>
           <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
@@ -166,7 +166,7 @@ export default class EstimatesRecommendationTrends extends Component {
     renderStockData(){
       const s = this.state
       const p = this.props
-      let newSymbolList = this.props.trackedStocks.key().map((el) => (
+      let newSymbolList = this.props.trackedStocks.sKeys().map((el) => (
         <option key={el + "ddl"} value={el}>
           {p.trackedStocks[el].dStock(p.exchangeList)}
         </option>
@@ -197,7 +197,7 @@ export default class EstimatesRecommendationTrends extends Component {
               {this.renderSearchPane()}
               </>
             )}
-            {this.props.trackedStocks.key().length > 0 && 
+            {this.props.trackedStocks.sKeys().length > 0 && 
             this.props.showEditPane === 0  ? this.renderStockData() : <></>}       
           </>
         )

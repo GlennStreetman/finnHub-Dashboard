@@ -28,7 +28,7 @@ export default class PriceQuote extends React.Component {
   renderStockData() {
     const p = this.props
     let trackedStockData = p.trackedStockData;
-    let thisStock = p.trackedStocks.key();
+    let thisStock = p.trackedStocks.sKeys();
 
     for (const x in thisStock) {
       if (trackedStockData[thisStock[x]] === undefined ) {

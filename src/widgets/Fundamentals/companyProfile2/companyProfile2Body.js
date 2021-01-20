@@ -24,7 +24,7 @@ export default class FundamentalsCompanyProfile2 extends Component {
   componentDidMount(){
     const p = this.props
     console.log('getting stock data')
-    this.setState({targetStock: p.trackedStocks.key()[0]}, () => this.getStockData())
+    this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData())
     
   }
 
@@ -33,8 +33,8 @@ export default class FundamentalsCompanyProfile2 extends Component {
     if (prevState.targetStock !== this.state.targetStock) {
       this.getStockData()
     }
-    if (prevProps.trackedStocks.key()[0] !== p.trackedStocks.key()[0]) {
-      this.setState({targetStock: p.trackedStocks.key()[0]}, () => this.getStockData())
+    if (prevProps.trackedStocks.sKeys()[0] !== p.trackedStocks.sKeys()[0]) {
+      this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData())
     }
   }
 
@@ -64,7 +64,7 @@ export default class FundamentalsCompanyProfile2 extends Component {
 
   stockListForm() { 
     const p = this.props
-    const stockList = p.trackedStocks.key();
+    const stockList = p.trackedStocks.sKeys();
     let row = stockList.map((el) =>
       this.props.showEditPane === 1 ? (
         <tr key={el + "container"}>
@@ -94,7 +94,7 @@ export default class FundamentalsCompanyProfile2 extends Component {
 
   renderStockData(){
     const p = this.props
-    const newSymbolList = p.trackedStocks.key().map((el) => (
+    const newSymbolList = p.trackedStocks.sKeys().map((el) => (
       <option key={el + "ddl"} value={el}>
         {dStock(el, p.exchangeList)}
       </option>

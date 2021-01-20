@@ -36,9 +36,9 @@ export default class FundamentalsBasicFinancials extends React.Component {
     if (p.filters['metricSelection'] === undefined) {
       let newList = []
       p.updateWidgetFilters(p.widgetKey, 'metricSelection', newList)
-      p.trackedStocks.key()[0] === undefined ?
+      p.trackedStocks.sKeys()[0] === undefined ?
         p.updateWidgetFilters(p.widgetKey, 'metricSource', 'US-AAPL') :
-        p.updateWidgetFilters(p.widgetKey, 'metricSource', p.trackedStocks.key()[0])
+        p.updateWidgetFilters(p.widgetKey, 'metricSource', p.trackedStocks.sKeys()[0])
         p.updateWidgetFilters(p.widgetKey, 'Note', 'Metric source for dashboard display purposes.')
     }
 
@@ -60,14 +60,14 @@ export default class FundamentalsBasicFinancials extends React.Component {
       });
 
       // load initial data
-      p.trackedStocks.key().forEach(el => this.getCompanyMetrics(el))
+      p.trackedStocks.sKeys().forEach(el => this.getCompanyMetrics(el))
     }
   }
 
   componentDidUpdate(prevProps, PrevState) {
     if (this.props.trackedStocks !== prevProps.trackedStocks) {
-      this.props.trackedStocks.key().forEach(el => {
-        prevProps.trackedStocks.key().indexOf(el) === -1 && this.getCompanyMetrics(el)
+      this.props.trackedStocks.sKeys().forEach(el => {
+        prevProps.trackedStocks.sKeys().indexOf(el) === -1 && this.getCompanyMetrics(el)
       })
     }
     
@@ -184,7 +184,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
     let end = increment;
     let metricSlice = this.state.metricList.slice(start, end);
     let selectionSlice = this.props.filters.metricSelection.slice(start, end);
-    let stockSelectionSlice = this.props.trackedStocks.key().slice(start, end);
+    let stockSelectionSlice = this.props.trackedStocks.sKeys().slice(start, end);
     // console.log(selectionSlice)
     let mapMetrics = metricSlice.map((el, index) => (
       <tr key={el + "metricRow" + index}>
@@ -313,7 +313,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
       // console.log(title)
       return (<td className='tdHead' key={thisKey + el +  "title"}>{title}</td>)}
       )
-    let bodyRows = p.trackedStocks.key().map((el) => { return (
+    let bodyRows = p.trackedStocks.sKeys().map((el) => { return (
     <tr key={thisKey + el + "tr1"}>
     <td key={thisKey + el + "td1"}>{dStock(el, p.exchangeList)}</td>
     {this.mapStockData(el)}
@@ -345,7 +345,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
           {this.getMetrics()}
           </>
         )}
-        {this.props.trackedStocks.key().length > 0 && this.props.showEditPane === 0  ? this.renderStockData() : <></>}       
+        {this.props.trackedStocks.sKeys().length > 0 && this.props.showEditPane === 0  ? this.renderStockData() : <></>}       
       </>
     );
   }

@@ -32,16 +32,16 @@ export default class PriceSplits extends Component {
         p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
       } 
 
-      if (p.trackedStocks.key()[0] !== undefined) {
-        this.setState({targetStock: p.trackedStocks.key()[0]}, ()=>this.getStockData())
+      if (p.trackedStocks.sKeys()[0] !== undefined) {
+        this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData())
       }
     }
 
     componentDidUpdate(prevProps, prevState){
       const p = this.props
 
-      if (prevProps.trackedStocks.key()[0] === undefined && p.trackedStocks.key()[0] !== undefined) {
-        this.setState({targetStock: p.trackedStocks.key()[0]}, ()=>this.getStockData())
+      if (prevProps.trackedStocks.sKeys()[0] === undefined && p.trackedStocks.sKeys()[0] !== undefined) {
+        this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData())
       }
     }
 
@@ -68,7 +68,7 @@ export default class PriceSplits extends Component {
     renderSearchPane(){
       //add search pane rendering logic here. Additional filters need to be added below.
     const p = this.props
-    const stockList = p.trackedStocks.key();
+    const stockList = p.trackedStocks.sKeys();
     const stockListRows = stockList.map((el) =>
         <tr key={el + "container"}>
           <td key={el + "name"}>{dStock(el, p.exchangeList)}</td>
@@ -134,7 +134,7 @@ export default class PriceSplits extends Component {
     renderStockData() {
         const s = this.state
 
-        let newStockList = this.props.trackedStocks.key().map((el) => (
+        let newStockList = this.props.trackedStocks.sKeys().map((el) => (
           <option key={el + "ddl"} value={el}>
             {dStock(el, this.props.exchangeList)}
           </option>
