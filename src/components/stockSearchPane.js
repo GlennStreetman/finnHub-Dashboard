@@ -14,6 +14,7 @@ class StockSearchPane extends React.Component {
     this.handleChange = this.handleChange.bind(this);
     this.getSymbolList = this.getSymbolList.bind(this);
     this.changeDefault = this.changeDefault.bind(this);
+    this.createFilteredList = this.createFilteredList.bind(this);
   }
 
   componentDidMount() {
@@ -30,29 +31,37 @@ class StockSearchPane extends React.Component {
     this.baseState.mounted = false
   }
 
-  handleChange(e) {
-    e.target !== undefined && this.setState({ inputText: e.target.value.toUpperCase() });
-    console.log("returning new dropdown list")
+  createFilteredList(){
+    const s = this.state
+    // console.log("returning new dropdown list")
     let filterObject = {}
     let newFilteredList = [];
 
-    let availableStockCount = Object.keys(this.state.availableStocks).length;
-    let stockList = Object.keys(this.state.availableStocks)
-    let stockListObject = this.state.availableStocks
+    let availableStockCount = Object.keys(s.availableStocks).length;
+    let stockList = Object.keys(s.availableStocks)
+    let stockListObject = s.availableStocks
     //limit autofill to 20 results
     for (let resultCount = 0, filteredCount = 0; 
         resultCount < 20 && filteredCount < availableStockCount; 
         filteredCount++) {
           let stockSearchPhrase = stockList[filteredCount] + ': ' + stockListObject[stockList[filteredCount]]['description'].toUpperCase()
-          if (stockSearchPhrase.includes(this.state.inputText) === true) {
+          if (stockSearchPhrase.includes(s.inputText) === true) {
             resultCount = resultCount + 1;
             newFilteredList.push(stockSearchPhrase);
             filterObject[stockList[filteredCount]] = stockListObject[stockList[filteredCount]] 
           }
-          // this.setState({filteredStockObjects: filterObject})
-          this.setState({ filteredStocks: newFilteredList });
-          
+          this.setState({ filteredStocks: newFilteredList }
+          );   
         }
+  }
+
+  handleChange(e) {
+    if (e.target !== undefined) { 
+      const ITUpper = e.target.value.toUpperCase()
+      this.setState({ inputText: ITUpper},() => {
+        this.createFilteredList()
+      });
+    }
   }
 
       getSymbolList(exchange) { //new
@@ -82,7 +91,7 @@ class StockSearchPane extends React.Component {
                 }
 
               }
-              that.setState({ availableStocks: updateStockList});
+              that.setState({ availableStocks: updateStockList}, ()=> this.createFilteredList());
             }
           })
           .catch((error) => {
@@ -136,7 +145,7 @@ class StockSearchPane extends React.Component {
           <datalist id="stockSearch1">
             <StockDataList 
               availableStocks={this.state.filteredStocks} 
-              exchangeList={this.props.exchangeList}  
+              exchangeList={this.props.exchangeList}
             />
           </datalist>
           <input className="btn" type="submit" value="Submit" />

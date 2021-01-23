@@ -78,12 +78,13 @@ export default function createFunctionQueueObject (maxRequestPerInterval, interv
 //add all API calls to throttleQue object using function below.
 //throttle =  que object returned by function above.
 export const finnHub = (throttle, apiString) => {
+    console.log('running finnhub: ', throttle, apiString)
     return new Promise((resolve, reject) => {
         throttle.enqueue(function() { 
-            // console.log('--------',apiString,'--------------')
+            console.log('--------',apiString,'--------------')
             fetch(apiString)
             .then((response) => {
-                // console.log(response)
+                console.log(response)
                 if (response.status === 429) {
                     console.log('429')
                     throttle.openRequests = throttle.openRequests -= 1
@@ -91,17 +92,17 @@ export const finnHub = (throttle, apiString) => {
                     finnHub(throttle, apiString)
                     reject('finnhub 429')
                 } else {
-            // console.log("FIRST RESPONSE:", response)
+                console.log("FIRST RESPONSE:", response)
                 throttle.openRequests = throttle.openRequests -= 1
                 return response.json()
             }
             })
             .then((data) => {
-                // console.log("resolving")
+                console.log("resolving")
                 resolve(data)
             })
             .catch(error => {
-                console.log(error.message)
+                console.log("throttleQueue error",error.message)
                 throttle.openRequests = throttle.openRequests -= 1
             });
         })

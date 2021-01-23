@@ -2,18 +2,23 @@ import React from "react";
 import "./App.css";
 import queryString from 'query-string';
 
+//app functions
 import {GetStockPrice, LoadStockData}  from "./appFunctions/getStockPrices.js";
 import {UpdateTickerSockets, LoadTickerSocket}  from "./appFunctions/socketData.js";
 import ThrottleQueue  from "./appFunctions/throttleQueue.js";
 
+//components
 import TopNav from "./components/topNav.js";
 import Login from "./components/login.js";
 import AboutMenu from "./components/AboutMenu.js";
 import AccountMenu, {accountMenuProps} from "./components/accountMenu.js";
 import EndPointMenu, {endPointProps} from "./components/endPoints.js";
 import ExchangeMenu, {exchangeMenuProps} from "./components/exchangeMenu.js";
-
 import {WidgetController, MenuWidgetToggle} from "./components/widgetController";
+
+//redux imports
+import { connect } from "react-redux";
+import { updateExchange } from './slices/sliceExchangeData.js'
 
 class App extends React.Component {
   constructor(props) {
@@ -387,6 +392,12 @@ class App extends React.Component {
   updateExchangeList(ex) {
     if (typeof ex === 'string'){
       const newList = ex.split(',')
+      const payload = {
+        'exchangeList': newList,
+        'apiKey': this.state.apiKey,
+        'finnHub': this.state.finnHub,
+    }
+      this.props.updateExchange(payload)
       this.setState({exchangeList: newList})
     } else {
     this.setState({exchangeList: ex})
@@ -496,5 +507,5 @@ class App extends React.Component {
   }
 }
 
-export default App;
+export default connect(null,{updateExchange})(App);
   

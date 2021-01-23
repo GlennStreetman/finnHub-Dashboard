@@ -11,8 +11,6 @@ class StockDataList extends React.Component {
     const availableStocks = this.props.availableStocks;
     const stockListKey = availableStocks.map((el) => (
       <option key={el + "op"} value={el}>
-        {/* {el} */}
-        {/* {dStock(el, this.props.exchangeList)} */} 
         {el.symbol}
       </option>
     ));

@@ -78,11 +78,14 @@ class WatchListMenu extends React.PureComponent {
     Papa.parse(e.target.files[0], {
       complete: function(results) {
         for (const stock in results.data) {
+          console.log(results.data, stock)
           if (results.data[stock][1] !== undefined) {
+            
             const thisStock = results.data[stock][0].toUpperCase() + '-' + results.data[stock][1].toUpperCase()
-            const thisSymbol = results.data[stock][1].toUpperCase()
-            that.state.availableStocks[thisSymbol] !== undefined && 
-            that.props.updateGlobalStockList(e, thisStock)
+            console.log(thisStock, that.state.availableStocks[thisStock])
+            // const thisSymbol = results.data[stock][1].toUpperCase()
+            that.state.availableStocks[thisStock] !== undefined && 
+            that.props.updateGlobalStockList(e, thisStock, that.state.availableStocks[thisStock])
           }
         }
       }
