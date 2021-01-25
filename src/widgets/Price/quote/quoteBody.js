@@ -1,6 +1,7 @@
 import React from "react";
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
-import {dStock} from "../../../appFunctions/formatStockSymbols.js";
+// import {dStock} from "../../../appFunctions/formatStockSymbols.js";
+import {finnHub} from "../../../appFunctions/throttleQueue.js";
 
 export default class PriceQuote extends React.Component {
   //widget data provided by appFunctions/getSTockPrices
@@ -8,65 +9,124 @@ export default class PriceQuote extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      flashUpdate: {},
+      stockData: {}
     };
 
-    this.updateWidgetList = this.updateWidgetList.bind(this);
+    this.baseState = {mounted: true}
+    this.getStockData = this.getStockData.bind(this);
     this.renderStockData = this.renderStockData.bind(this);
+    this.findPrice = this.findPrice.bind(this)
+    this.returnKey = this.returnKey.bind(this)
   }
 
-  updateWidgetList(stock) {
-    // console.log("updating");
-    if (stock.indexOf(":") > 0) {
-      const stockSymbole = stock.slice(0, stock.indexOf(":"));
-      this.props.updateWidgetStockList(this.props.widgetKey, stockSymbole);
+  componentDidMount(){
+    const p = this.props
+    const stocks = p.trackedStocks.sKeys()
+    for (const x in stocks) {
+      this.getStockData(p.trackedStocks[stocks[x]]['symbol'], p.trackedStocks[stocks[x]]['key'])
+    }
+    // this.setState({stockData: startingStockData})
+  }
+
+  componentDidUpdate(prevProps){
+    const p = this.props
+
+    if (p.trackedStocks !== prevProps.trackedStocks){
+      const oList = prevProps.trackedStocks.sKeys()
+      const nList = p.trackedStocks.sKeys()
+      const sList = [...new Set([...oList, ...nList])]
+      for (const s in sList) {
+        prevProps.trackedStocks[sList[s]] === undefined && this.getStockData(p.trackedStocks[sList[s]].symbol, sList[s])
+      }
+    }
+  }
+
+  componentWillUnmount(){
+    this.baseState.mounted = false
+  }
+
+  returnKey(ref){
+    const retVal = ref !== undefined ? ref["currentPrice"] : "noDat"
+    return retVal
+  }
+
+  getStockData(stock, key){
+    const p = this.props
+    // const that = this
+    const queryString = `https://finnhub.io/api/v1/quote?symbol=${stock}&token=${p.apiKey}`
+    console.log(queryString)
+    finnHub(p.throttle, queryString)
+    .then((data) => {
+      const s = this.state
+      if (this.baseState.mounted === true) {
+        const newData = {...s.stockData}
+        newData[key] = {}
+        newData[key]['currentPrice'] = data.c
+        newData[key]['dayHighPrice'] = data.h
+        newData[key]['dayLowPrice'] = data.l
+        newData[key]['dayOpenPrice'] = data.o
+        newData[key]['prevClosePrice'] = data.pc
+        this.setState({stockData: newData})
+      }
+    })
+    .catch(error => {
+      console.log(error.message)
+    });
+  }
+
+  findPrice(stock){
+    const p = this.props
+    const s = this.state
+    if (p.streamingPriceData[stock] !== undefined) {
+      const sPrice = p.streamingPriceData[stock].currentPrice
+      const dayPrice = s.stockData[stock] ? s.stockData[stock].currentPrice : 0
+      const price = isNaN(sPrice) === false ? sPrice : dayPrice
+      return price  
     } else {
-      this.props.updateWidgetStockList(this.props.widgetKey, stock);
+      const dayPrice = s.stockData[stock] ? s.stockData[stock].currentPrice : 0
+      return dayPrice
     }
   }
 
   renderStockData() {
     const p = this.props
-    let streamingPriceData = p.streamingPriceData;
-    let thisStock = p.trackedStocks.sKeys();
+    const s = this.state
+    let pd = s.stockData;
+    let widgetStockList = p.trackedStocks.sKeys();
 
-    for (const x in thisStock) {
-      if (streamingPriceData[thisStock[x]] === undefined ) {
-        streamingPriceData[thisStock[x]] = {prevClosePrice: 0, dayOpenPrice:0, dayLowPrice:0, dayHighPrice:0, currentPrice:0,}
-      }
-    }
-    let stockDetailRow = thisStock.map((el) =>
-        streamingPriceData[el] ? (
-        <tr key={el + "st" + + streamingPriceData[el]["currentPrice"]}>
-          <td key={el + "id"}>{dStock(el, p.exchangeList)}</td>
+    let stockDetailRow = widgetStockList.map((el) =>
+        pd[el] ? (
+        <tr key={el + "st" + + pd[el]["currentPrice"]}>
+          <td key={el + "id"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
           <td className="rightTE" key={el + "prevClosePrice"}>
-            {streamingPriceData[el]["prevClosePrice"].toLocaleString(undefined, {
+            {pd[el]["prevClosePrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
           </td>
           <td className="rightTE" key={el + "dayOpenPrice"}>
-            {streamingPriceData[el]["dayOpenPrice"].toLocaleString(undefined, {
+            {pd[el]["dayOpenPrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
           </td>
           <td className="rightTE" key={el + "dayLowPrice"}>
-            {streamingPriceData[el]["dayLowPrice"].toLocaleString(undefined, {
+            {pd[el]["dayLowPrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
           </td>
           <td className="rightTE" key={el + "dayHighPrice"}>
-            {streamingPriceData[el]["dayHighPrice"].toLocaleString(undefined, {
+            {pd[el]["dayHighPrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
           </td>
-          {/* <td className={this.state.flashUpdate[el]} key={el + "currentPrice" + streamingPriceData[el]["currentPrice"]}> */}
-          <td className='rightTEFade' key={el + "currentPrice" + streamingPriceData[el]["currentPrice"]}>
+          
+          <td className='rightTEFade' key={el + "currentPrice" + this.returnKey(p.streamingPriceData[el])}>
             
-            {streamingPriceData[el]["currentPrice"].toLocaleString(undefined, {
+            {/* {pd[el]["currentPrice"].toLocaleString(undefined, { */}
+            {this.findPrice(el).toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
@@ -77,7 +137,7 @@ export default class PriceQuote extends React.Component {
               <button
                 key={el + "button"}
                 onClick={() => {
-                  this.updateWidgetList(el);
+                  this.props.updateWidgetList(this.props.widgetKey, el);
                 }}
               >
                 <i className="fa fa-times" aria-hidden="true"></i>
@@ -88,7 +148,7 @@ export default class PriceQuote extends React.Component {
           )}
         </tr>
       ) : (
-        <tr key={el + "cat"}></tr>
+        <tr key={el + ""}></tr>
       )
     );
     let buildTable = (
@@ -135,10 +195,9 @@ export default class PriceQuote extends React.Component {
   }
 }
 
-export function stockDetailWidgetProps(that, key = "Quote") {
+export function quoteBodyProps(that, key = "Quote") {
   let propList = {
     apiKey: that.props.apiKey,
-    // getStockPrice: that.props.getStockPrice,
     showPane: that.showPane,
     trackedStocks: that.props.widgetList[key]["trackedStocks"],
     streamingPriceData: that.props.streamingPriceData,

@@ -14,6 +14,7 @@ class WatchListMenu extends React.PureComponent {
     this.renderWatchedStocks = this.renderWatchedStocks.bind(this);
     this.fileUploadAction = this.fileUploadAction.bind(this);
     this.fileUploadInputChange = this.fileUploadInputChange.bind(this);
+    this.returnKey = this.returnKey.bind(this);
   }
 
   componentWillUnmount(){
@@ -22,6 +23,11 @@ class WatchListMenu extends React.PureComponent {
 
   componentDidMount() {
 
+  }
+
+  returnKey(ref){
+    const retVal = ref !== undefined ? ref["currentPrice"] : "noDat"
+    return retVal
   }
 
   renderWatchedStocks() {
@@ -36,7 +42,7 @@ class WatchListMenu extends React.PureComponent {
           {g[el].dStock(p.exchangeList) + ": "}
           {this.state.availableStocks[el] ? this.state.availableStocks[el]["description"] : <></>}
         </td>
-        <td className="rightTE" key={el + "prc"}>
+        <td className="rightTEFade" key={el + "prc" + this.returnKey(p.streamingPriceData[el])}>
           {p.streamingPriceData[el] ? (
             p.streamingPriceData[el]["currentPrice"] !== undefined &&
             p.streamingPriceData[el]["currentPrice"].toLocaleString(undefined, {

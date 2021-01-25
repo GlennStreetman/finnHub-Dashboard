@@ -13,18 +13,18 @@ function GetStockPrice(context, stockDescription, apiKey, throttle) {
         // console.log("updating stock data")
         const {
           c: a, //current price
-          h: b, //current days high price
-          l: c, //current days low price
-          o: d, //current days open price
-          pc: e, //previous days close price
+          // h: b, //current days high price
+          // l: c, //current days low price
+          // o: d, //current days open price
+          // pc: e, //previous days close price
         } = data;
         //create object from destructured data above.
         stockPriceData = {
           currentPrice: a, 
-          dayHighPrice: b,
-          dayLowPrice: c,
-          dayOpenPrice: d,
-          prevClosePrice: e,
+          // dayHighPrice: b,
+          // dayLowPrice: c,
+          // dayOpenPrice: d,
+          // prevClosePrice: e,
         };
 
         that.setState((prevState) => {

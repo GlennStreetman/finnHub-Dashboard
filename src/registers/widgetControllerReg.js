@@ -18,7 +18,7 @@ import { secFilingsProps } from "../widgets/Fundamentals/secFilings/secFilingsBo
 import { IPOCalendarProps } from "../widgets/Fundamentals/IPOCalendar/IPOCalendarBody.js";
 
 import { candleWidgetProps } from "../widgets/Price/candles/candleWidget.js";
-import { stockDetailWidgetProps } from "../widgets/Price/quote/stockDetailWidget.js";
+import { quoteBodyProps } from "../widgets/Price/quote/quoteBody.js";
 import {PriceSplitsProps} from "../widgets/Price/splits/PriceSplitsBody.js";
 
 export function returnBodyProps(that, key, ref = "pass") {
@@ -30,7 +30,7 @@ export function returnBodyProps(that, key, ref = "pass") {
         EstimatesEPSSurprises: () => EPSSurprisesProps(that, ref),
         EstimatesEarningsCalendar: () => EarningsCalendarProps(that, ref),
         PriceCandles: () => candleWidgetProps(that, ref),
-        PriceQuote: () => stockDetailWidgetProps(that, ref),
+        PriceQuote: () => quoteBodyProps(that, ref),
         PriceSplits: () => PriceSplitsProps(that, ref),
         FundamentalsCompanyNews: () => newsWidgetProps(that, ref),
         FundamentalsMarketNews: () => marketNewsProps(that, ref),

@@ -17,7 +17,7 @@ import FundamentalsFinancialsAsReported from "../widgets/Fundamentals/financials
 import FundamentalsSECFilings from "../widgets/Fundamentals/secFilings/secFilingsBody.js";
 import FundamentalsIPOCalendar from "../widgets/Fundamentals/IPOCalendar/IPOCalendarBody.js";
 
-import PriceQuote from "../widgets/Price/quote/stockDetailWidget.js";
+import PriceQuote from "../widgets/Price/quote/quoteBody.js";
 import PriceCandles from "../widgets/Price/candles/candleWidget.js"; //fix names
 import PriceSplits from "../widgets/Price/splits/PriceSplitsBody.js";
 
