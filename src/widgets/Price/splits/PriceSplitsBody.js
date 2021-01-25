@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
-import {dStock, sStock} from "../../../appFunctions/formatStockSymbols.js";
+import {dStock} from "../../../appFunctions/formatStockSymbols.js";
 
 export default class PriceSplits extends Component {
     constructor(props) {

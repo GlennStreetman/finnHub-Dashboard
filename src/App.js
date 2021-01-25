@@ -6,7 +6,7 @@ import queryString from 'query-string';
 import {GetStockPrice, LoadStockData}  from "./appFunctions/getStockPrices.js";
 import {UpdateTickerSockets, LoadTickerSocket}  from "./appFunctions/socketData.js";
 import ThrottleQueue  from "./appFunctions/throttleQueue.js";
-
+ 
 //components
 import TopNav from "./components/topNav.js";
 import Login from "./components/login.js";
@@ -18,7 +18,8 @@ import {WidgetController, MenuWidgetToggle} from "./components/widgetController"
 
 //redux imports
 import { connect } from "react-redux";
-import { updateExchange } from './slices/sliceExchangeData.js'
+import { rGetSymbolList } from './slices/sliceExchangeData.js'
+import { rUpdateExchangeList } from './slices/sliceExchangeList.js'
 
 class App extends React.Component {
   constructor(props) {
@@ -39,7 +40,6 @@ class App extends React.Component {
       login: 0, //login state. 0 logged out, 1 logged in. 
       loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
       menuList: {}, //lists of all menu widgets.
-      refreshStockData: 0, //if set to 1 stock data should be updated from globalStockList
       socket: '', //socket connection for streaming stock data.
       showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
       throttle: ThrottleQueue(25, 1000, true), //all finnhub API requests should be done with finnHub function.
@@ -177,15 +177,24 @@ class App extends React.Component {
   
   updateWidgetStockList(widgetId, symbol, stockObj={}) {
     //adds if not present, else removes stock from widget specific stock list.
-
+    console.log(widgetId, symbol, stockObj, 'updating stock list')
     if (isNaN(widgetId) === false) {
       let updateWidgetStockList = Object.assign({}, this.state.widgetList); //copy widget list
       const trackingSymbolList = Object.assign({}, updateWidgetStockList[widgetId]["trackedStocks"]); //copy target widgets stock object
 
       if (Object.keys(trackingSymbolList).indexOf(symbol) === -1) {
         //add
-        trackingSymbolList[symbol] = stockObj
+        trackingSymbolList[symbol] = {...stockObj}
+        trackingSymbolList[symbol]['dStock'] = function(ex){
+          if (ex.length === 1) {
+            return (this.symbol)
+          } else {
+            return (this.key)
+          }
+        }
         updateWidgetStockList[widgetId]["trackedStocks"] = trackingSymbolList;
+
+
       } else {
         //remove
         delete trackingSymbolList[symbol]
@@ -199,12 +208,11 @@ class App extends React.Component {
 
   updateGlobalStockList(event, stockRef, stockObj={}) {
     //pass stockRef to delete, pass in stockObj to update.
-    console.log("update global: ", stockRef)
+    // console.log("update global: ", stockRef, stockObj)
     const s = this.state
     const currentStockObj = {...s.globalStockList}
     if (currentStockObj[stockRef] === undefined) {
-      console.log('undefined')
-      currentStockObj[stockRef] = stockObj
+      currentStockObj[stockRef] = {...stockObj}
       currentStockObj[stockRef]['dStock'] = function(ex){
         if (ex.length === 1) {
           return (this.symbol)
@@ -312,7 +320,6 @@ class App extends React.Component {
 
     this.setState({ globalStockList: updateGlobalList });
     this.setState({ widgetList: updateWidgetList });
-    this.setState({ refreshStockData: 1 });
   }
 
   saveCurrentDashboard(dashboardName) {
@@ -390,14 +397,30 @@ class App extends React.Component {
   }
 
   updateExchangeList(ex) {
+    const p = this.props
+    const s = this.state
+
     if (typeof ex === 'string'){
       const newList = ex.split(',')
-      const payload = {
-        'exchangeList': newList,
-        'apiKey': this.state.apiKey,
-        'finnHub': this.state.finnHub,
+    
+    for (const stock in newList) {
+      // if (p.exchangeList.indexOf(newList[stock]) === -1){
+        const newPayload = {
+            'exchange': newList[stock],
+            'apiKey': s.apiKey,
+            'throttle': s.throttle,
+        }
+        p.rGetSymbolList(newPayload)
+      // }
     }
-      this.props.updateExchange(payload)
+
+    const payload = {
+      'exchangeList': newList,
+      'apiKey': this.state.apiKey,
+      'finnHub': this.state.finnHub,
+    }
+    p.rUpdateExchangeList(payload)
+    
       this.setState({exchangeList: newList})
     } else {
     this.setState({exchangeList: ex})
@@ -473,8 +496,6 @@ class App extends React.Component {
             apiKey={this.state.apiKey}
             updateWidgetStockList={this.updateWidgetStockList}
             loadDashBoard={this.loadDashBoard}
-            refreshStockData={this.state.refreshStockData}
-            toggleRefreshStockData={this.toggleRefreshStockData}
             saveCurrentDashboard={this.saveCurrentDashboard}
             getSavedDashBoards={this.getSavedDashBoards}
             dashBoardData={this.state.dashBoardData}
@@ -506,6 +527,6 @@ class App extends React.Component {
     ) 
   }
 }
-
-export default connect(null,{updateExchange})(App);
+const mapStateToProps = state => ({rExchangeList: state.exchangeList.exchangeList})
+export default connect(mapStateToProps,{rGetSymbolList, rUpdateExchangeList})(App);
   

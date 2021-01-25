@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { updateExchange, getSymbolList } from './../slices/sliceExchangeData.js'
+import { rGetSymbolList } from './../slices/sliceExchangeData.js'
+import { rUpdateExchangeList } from './../slices/sliceExchangeList.js'
 
 export default function ExchangeMenu(p) {
     
     const dispatch = useDispatch()
-    const rExchangeList = useSelector(state => state.exchangeData.exchangeList)
+    const rExchangeList = useSelector(state => state.exchangeList.exchangeList)
     const [allExchanges] = useState(() => {
         return {
             AS:'NYSE EURONEXT - EURONEXT AMSTERDAM',
@@ -84,8 +85,8 @@ function changeExchange(ex){
     const payload = {
         'exchangeList': newExchangeList,
     }
-    // dispatch(updateExchange(newExchangeList))
-    dispatch(updateExchange(payload))
+
+    dispatch(rUpdateExchangeList(payload))
     
     for (const stock in newExchangeList) {
         if (rExchangeList.indexOf(newExchangeList[stock]) === -1){
@@ -94,7 +95,7 @@ function changeExchange(ex){
                 'apiKey': p.apiKey,
                 'throttle': p.throttle,
             }
-            dispatch(getSymbolList(newPayload))
+            dispatch(rGetSymbolList(newPayload))
         }
     }
     

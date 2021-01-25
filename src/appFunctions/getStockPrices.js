@@ -10,7 +10,7 @@ function GetStockPrice(context, stockDescription, apiKey, throttle) {
     const queryString = `https://finnhub.io/api/v1/quote?symbol=${stockSymbol}&token=${apiKey}`
     finnHub(throttle, queryString)
       .then((data) => {
-        console.log("updating stock data")
+        // console.log("updating stock data")
         const {
           c: a, //current price
           h: b, //current days high price
@@ -28,7 +28,7 @@ function GetStockPrice(context, stockDescription, apiKey, throttle) {
         };
 
         that.setState((prevState) => {
-          console.log("setting trackedStockData")
+          // console.log("setting trackedStockData")
           let newTrackedStockData = Object.assign({}, prevState.trackedStockData);
           newTrackedStockData[`US-${stockSymbol}`] = stockPriceData;
           return { trackedStockData: newTrackedStockData };
@@ -42,9 +42,9 @@ function GetStockPrice(context, stockDescription, apiKey, throttle) {
 
 function LoadStockData(context, s, getStockPrice){
   console.log("------loadStockPrice-------")
-  if (s.refreshStockData === 1 && Object.keys(s.globalStockList).length !== 0) {
+  if (Object.keys(s.globalStockList).length !== 0) {
     // console.log(s.globalStockList)
-    context.setState({ refreshStockData: 0 })
+    // context.setState({ refreshStockData: 0 })
     for (const stock in s.globalStockList) {
       getStockPrice(context, s.globalStockList[stock], s.apiKey, s.throttle)
     }

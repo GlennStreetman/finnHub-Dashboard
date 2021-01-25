@@ -1,16 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {finnHub} from "./../appFunctions/throttleQueue.js";
 
-export const getSymbolList = createAsyncThunk(
+export const rGetSymbolList = createAsyncThunk(
     'newSymbolList',
     (reqObj) => { //{exchange, apiKey, finnHub} Not passing thunk api as second arg.
-        
-        console.log(reqObj, "-------request object")
         const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${reqObj.exchange}&token=${reqObj.apiKey}`
-        console.log(apiString)
+        // console.log(apiString)
         return finnHub(reqObj['throttle'], apiString)
         .then((data) => {
-            console.log("thunk completing")
             let updateStockList = {}
             for (const stockObj in data) {
                 data[stockObj]['exchange'] = reqObj.exchange
@@ -19,58 +16,42 @@ export const getSymbolList = createAsyncThunk(
                 updateStockList[addStockKey]['key'] = addStockKey
             }  
             return {
-                'data': data, 
+                'data': updateStockList, 
                 'exchange': reqObj.exchange,
             }
         })
     }
     )
 
-
 const exchangeData = createSlice({
     name: 'exchangedata',
     initialState: {
-        exchangeList: [], //list of active exchanges
+        exchangeData: {}, //keys for  exchange data objects
     },
     reducers: { //reducers can reference eachother with slice.caseReducers.reducer(state)
-        updateExchange: (state, action) => {
-            const ap = action.payload
+        rUpdateExchangeData: (state, action) => {
+            // const ap = action.payload
             const s = state
-            return {...s, exchangeList: ap.exchangeList}  
+            return {...s, exchangeData: {}}}  
         },
-    },
     
     extraReducers: {
-    [getSymbolList.pending]: (state) => {
-        console.log('getting stock data')
+    [rGetSymbolList.pending]: (state) => {
+        // console.log('getting stock data')
         return {...state}
     },
-    [getSymbolList.rejected]: (state, action) => {
+    [rGetSymbolList.rejected]: (state, action) => {
         console.log('failed to retrieve stock data for: ', action)
         return {...state}
     },
-    [getSymbolList.fulfilled]: (state, action) => {
-        console.log("updating stock data:", action.payload)
+    [rGetSymbolList.fulfilled]: (state, action) => {
+        // console.log("updating stock data:", action.payload)
         return {...state, [action.payload.exchange]: action.payload.data}
     },
 }
 })
 
 export const {
-    updateExchange,
+    rUpdateExchangeData,
 } = exchangeData.actions
 export default exchangeData.reducer
-
-
-//   updateStockList[addStockKey]['dStock'] = function(ex){
-//     if (ex.length === 1) {
-//       return (this.symbol)
-//     } else {
-//       return (this.key)
-//     }
-//   }
-
-//   updateStockList[addStockKey]['keys'] = function(){
-//     return Object.keys(this)
-//   }
-  

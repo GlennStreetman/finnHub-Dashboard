@@ -1,113 +1,40 @@
 import React from "react";
 import StockDataList from "./stockDataList.js";
-import {finnHub} from "../appFunctions/throttleQueue.js";
+import { connect } from "react-redux";
+import { rUpdateText } from './../slices/sliceStockSearch.js'
 //compnoent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
 class StockSearchPane extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      inputText: "",
-      availableStocks: {}, //formatted stock list returned from finhubb
-      filteredStocks: [], //short list of stocks selected
+      // inputText: "",
+      // availableStocks: {}, //formatted stock list returned from finhubb
+      // filteredStocks: [], //short list of stocks selected
     };
-    this.baseState = {mounted: true}
     this.handleChange = this.handleChange.bind(this);
-    this.getSymbolList = this.getSymbolList.bind(this);
     this.changeDefault = this.changeDefault.bind(this);
-    this.createFilteredList = this.createFilteredList.bind(this);
-  }
-
-  componentDidMount() {
-    this.getSymbolList(this.props.defaultExchange)
-  }
-
-  componentDidUpdate(prevProps) {
-    if (this.props.defaultExchange !== prevProps.defaultExchange) {
-      this.getSymbolList(this.props.defaultExchange)
-    }
-  }
-
-  componentWillUnmount(){
-    this.baseState.mounted = false
-  }
-
-  createFilteredList(){
-    const s = this.state
-    // console.log("returning new dropdown list")
-    let filterObject = {}
-    let newFilteredList = [];
-
-    let availableStockCount = Object.keys(s.availableStocks).length;
-    let stockList = Object.keys(s.availableStocks)
-    let stockListObject = s.availableStocks
-    //limit autofill to 20 results
-    for (let resultCount = 0, filteredCount = 0; 
-        resultCount < 20 && filteredCount < availableStockCount; 
-        filteredCount++) {
-          let stockSearchPhrase = stockList[filteredCount] + ': ' + stockListObject[stockList[filteredCount]]['description'].toUpperCase()
-          if (stockSearchPhrase.includes(s.inputText) === true) {
-            resultCount = resultCount + 1;
-            newFilteredList.push(stockSearchPhrase);
-            filterObject[stockList[filteredCount]] = stockListObject[stockList[filteredCount]] 
-          }
-          this.setState({ filteredStocks: newFilteredList }
-          );   
-        }
   }
 
   handleChange(e) {
+    const p = this.props
     if (e.target !== undefined) { 
-      const ITUpper = e.target.value.toUpperCase()
-      this.setState({ inputText: ITUpper},() => {
-        this.createFilteredList()
-      });
+
+      const payload = {
+        'inputText': e.target.value.toUpperCase(),
+      }
+      // console.log(payload, '<-------payload')
+      p.rUpdateText(payload)
     }
   }
 
-      getSymbolList(exchange) { //new
-        let that = this
-        // console.log("getting listings for exchange:", exchange )
-        const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${exchange}&token=${that.props.apiKey}`
-          finnHub(this.props.throttle, apiString)  
-          .then((data) => {
-            if (this.baseState.mounted === true) {
-              let updateStockList = {}
-              for (const stockObj in data) {
-                data[stockObj]['exchange'] = exchange
-                let addStockKey = exchange + "-" + data[stockObj]['symbol']
-                updateStockList[addStockKey] = data[stockObj]
-                updateStockList[addStockKey]['key'] = addStockKey
-                //return exchange + stock symbol if more than one exchange selected
-                updateStockList[addStockKey]['dStock'] = function(ex){
-                  if (ex.length === 1) {
-                    return (this.symbol)
-                  } else {
-                    return (this.key)
-                  }
-                }
-
-                updateStockList[addStockKey]['keys'] = function(){
-                  return Object.keys(this)
-                }
-
-              }
-              that.setState({ availableStocks: updateStockList}, ()=> this.createFilteredList());
-            }
-          })
-          .catch((error) => {
-            console.error("Error retrieving stock symbols:" +  error);
-          });
-          }
-     
- 
   changeDefault(event){
     this.props.updateDefaultExchange(event)
   }
   
-  render() {
-    let s = this.state
-    let widgetKey = this.props.widgetKey;
-    let stockSymbol = this.state.inputText.slice(0, this.state.inputText.indexOf(":"));
+  render() { // inputText
+    const p = this.props
+    let widgetKey = p.widgetKey;
+    // let stockSymbol = p.rInputText.slice(0, p.rInputText.indexOf(":"));
     const exchangeOptions = this.props.exchangeList.map((el) => 
       <option key={el} value={el}>{el}</option>
     )
@@ -117,18 +44,16 @@ class StockSearchPane extends React.Component {
         <form
           className="form-inline"
           onSubmit={(e) => {
-            if (this.state.filteredStocks.includes(this.state.inputText)) {
-              let stockKey = this.state.inputText.slice(0, this.state.inputText.indexOf(":") )
-              // this.props.updateGlobalStockList(e, stockKey ,this.state.filteredStockObjects[stockKey]);
-              // console.log('---------->',s.availableStocks.[stockKey])
-              this.props.updateGlobalStockList(e, stockKey, s.availableStocks[stockKey]);
+            if (this.props.rUpdateStock !== undefined) {
+              const stockKey = this.props.rUpdateStock.key
+              this.props.updateGlobalStockList(e, stockKey, this.props.rUpdateStock);
               this.props.showSearchPane();
-              if (widgetKey / 1 !== undefined) {
-                this.props.updateWidgetStockList(widgetKey, stockSymbol, s.availableStocks[stockKey]);
+              if (widgetKey / 1 !== undefined) { //Not menu widget. Menus named, widgets numbered.
+                console.log("stock symbol: ",stockKey )
+                this.props.updateWidgetStockList(widgetKey, stockKey, this.props.rUpdateStock);
                 e.preventDefault();
               }
             } else {
-              //console.log(this.state.inputText);
               console.log("invalid stock selection");
               e.preventDefault();
             }
@@ -144,8 +69,9 @@ class StockSearchPane extends React.Component {
           <input size='40' autoComplete="off" className="btn" type="text" id="stockSearch" list="stockSearch1" value={this.state.inputText} onChange={this.handleChange} />
           <datalist id="stockSearch1">
             <StockDataList 
-              availableStocks={this.state.filteredStocks} 
-              exchangeList={this.props.exchangeList}
+              // availableStocks={this.state.filteredStocks} 
+              defaultExchange={this.props.defaultExchange}
+              inputText={this.props.rInputText}
             />
           </datalist>
           <input className="btn" type="submit" value="Submit" />
@@ -155,10 +81,23 @@ class StockSearchPane extends React.Component {
   }
 }
 
-export default StockSearchPane;
+const mapStateToProps = (state, ownProps) => {
+  const p = ownProps
+  const st = state.stockSearch.searchText
+  const inputSymbol = p.defaultExchange + "-" + st.slice(0, st.indexOf("-"))
+  const updateStock = state.exchangeData[p.defaultExchange][inputSymbol]
+
+  return {
+    rUpdateStock: updateStock,
+    rInputText: state.stockSearch.searchText
+    
+  }
+}
+
+export default connect(mapStateToProps, {rUpdateText})(StockSearchPane);
 
 export function searchPaneProps(that) {
-  let propList = {
+  const propList = {
     updateGlobalStockList: that.props.updateGlobalStockList,
     showSearchPane: () => that.props.showPane("showEditPane", 1),
     apiKey: that.props.apiKey,

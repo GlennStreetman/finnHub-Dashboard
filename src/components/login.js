@@ -54,7 +54,7 @@ class login extends React.Component {
     fetch("/checkLogin")
     .then((response) => response.json())
     .then((data) => {
-      console.log("Loggin status: ", data)
+      // console.log("Loggin status: ", data)
       if (data.login === 1) {
         this.props.updateLogin(data.apiKey, 1)
         this.props.updateExchangeList(data.exchangelist)
