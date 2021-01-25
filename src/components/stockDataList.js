@@ -28,9 +28,9 @@ const mapStateToProps = (state, ownProps) => {
   const p = ownProps
   const exchangeData = state.exchangeData[p.defaultExchange]
   const newFilteredList = []
-  const availableStockCount = Object.keys(exchangeData).length;
-  const stockList = Object.keys(exchangeData)
-
+  const availableStockCount = exchangeData !== undefined ?  Object.keys(exchangeData).length : 0;
+  const stockList = exchangeData !== undefined ? Object.keys(exchangeData): []
+  
   for (let resultCount = 0, filteredCount = 0; 
     resultCount < 20 && filteredCount < availableStockCount; 
     filteredCount++) {

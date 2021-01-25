@@ -25,7 +25,7 @@ class WatchListMenu extends React.PureComponent {
   }
 
   renderWatchedStocks() {
-    
+      
     const p = this.props
     const g = p.globalStockList;
     if (g.sKeys !== undefined) {
@@ -37,9 +37,9 @@ class WatchListMenu extends React.PureComponent {
           {this.state.availableStocks[el] ? this.state.availableStocks[el]["description"] : <></>}
         </td>
         <td className="rightTE" key={el + "prc"}>
-          {p.trackedStockData[el] ? (
-            p.trackedStockData[el]["currentPrice"] !== undefined &&
-            p.trackedStockData[el]["currentPrice"].toLocaleString(undefined, {
+          {p.streamingPriceData[el] ? (
+            p.streamingPriceData[el]["currentPrice"] !== undefined &&
+            p.streamingPriceData[el]["currentPrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })
@@ -130,9 +130,11 @@ class WatchListMenu extends React.PureComponent {
 export function watchListMenuProps(that, key = "WatchListMenu") {
   let propList = {
     apiKey: that.props.apiKey,
+    // searchText: that.state.searchText,
+    // changeSearchText: that.changeSearchText,
     globalStockList: that.props.globalStockList,
     showPane: that.props.showPane,
-    trackedStockData: that.props.trackedStockData,
+    streamingPriceData: that.props.streamingPriceData,
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,
@@ -141,6 +143,7 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
     defaultExchange: that.props.defaultExchange,
     updateDefaultExchange: that.props.updateDefaultExchange,
   };
+  // console.log("watchlistmenu", that, propList)
   return propList;
 }
 

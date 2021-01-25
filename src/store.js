@@ -1,13 +1,12 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import exchangeData from './slices/sliceExchangeData.js'
 import exchangeList from './slices/sliceExchangeList.js'
-import stockSearch from './slices/sliceStockSearch.js'
 
 export default configureStore({
   reducer: {
     'exchangeData': exchangeData,
     'exchangeList': exchangeList,
-    'stockSearch': stockSearch,
+
   },
   middleware: () =>
     getDefaultMiddleware ({

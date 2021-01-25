@@ -1,6 +1,6 @@
 import React from "react";
 import {widgetLookUp} from '../registers/widgetContainerReg.js'
-
+  
 //creates widget container. Used by all widgets.
 class WidgetContainer extends React.Component {
   constructor(props) {
@@ -11,7 +11,8 @@ class WidgetContainer extends React.Component {
       renderHeader: this.props.widgetList["widgetHeader"],
       renderBody: this.props.widgetList["widgetType"],
       showEditPane: 0, //0: Hide, 1: Show
-      show: 'block'
+      show: 'block',
+      searchText: '',
     };
 
     this.dragElement = this.dragElement.bind(this);
@@ -19,14 +20,13 @@ class WidgetContainer extends React.Component {
     this.updateHeader = this.updateHeader.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.showWidget = this.showWidget.bind(this);
+    this.changeSearchText = this.changeSearchText.bind(this);
   }
 
   componentDidMount(){
   const visable = this.showWidget()
   this.setState({show: visable})
-}
-
-
+  }
 
   componentDidUpdate(prevProps) {
     const p = this.props
@@ -41,6 +41,12 @@ class WidgetContainer extends React.Component {
     }
   }
 
+  changeSearchText(text) {
+    if (text !== '' && text !== undefined) { 
+      this.setState({searchText: text})
+    }
+  }
+
   showPane(stateRef, fixState = -1) {
     let showMenu = this.state[stateRef] === 0 ? 1 : 0;
     fixState !== -1 && (showMenu = fixState);
@@ -50,9 +56,6 @@ class WidgetContainer extends React.Component {
   updateHeader(e) {
     //changes widget name.
     this.setState({ renderHeader: e.target.value });
-    // console.log(e.target.value);
-    // console.log(this.props.stateRef);
-    // console.log(this.props.widgetKey);
     this.props.changeWidgetName(this.props.stateRef, this.props.widgetKey, e.target.value);
   }
 
@@ -69,7 +72,6 @@ class WidgetContainer extends React.Component {
     let widgetWidth = document.getElementById(this.props.widgetKey + "box").clientWidth;
 
     function dragMouseDown(e) {
-      // that.setState({ showEditPane: 0 });
       e = e || window.event;
       e.preventDefault();
       // get the mouse cursor position at startup:
@@ -89,8 +91,6 @@ class WidgetContainer extends React.Component {
       // set the element's new position:
       let newX = xAxis - widgetWidth + 25;
       let newY = yAxis - 25;
-      // that.setState({ yAxis: newY });
-      // that.setState({ xAxis: newX });
       that.props.moveWidget(that.props.stateRef, that.props.widgetKey, newY, newX);
     }
 
@@ -113,7 +113,6 @@ class WidgetContainer extends React.Component {
 
   render() {
     //Add widgets to the list below that should not have access to the stock search pane
-    // const hideStockSearchMenu = ["DashBoardMenu", "AccountMenu", "AboutMenu"]
     const hideStockSearchMenu = ["DashBoardMenu"]
 
 
@@ -129,7 +128,9 @@ class WidgetContainer extends React.Component {
     if (this.props.widgetKey !== "dashBoardMenu") {
       widgetProps["showEditPane"] = that.state.showEditPane;
       widgetProps["showPane"] = that.showPane;
-    }
+      widgetProps['searchText'] = this.state.searchText
+      widgetProps['changeSearchText'] = this.changeSearchText
+    } 
 
     return (
       <div key={this.props.widgetKey + "container" + this.state.show} id={this.props.widgetKey + "box"} 

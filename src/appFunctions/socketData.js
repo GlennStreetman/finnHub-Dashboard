@@ -37,7 +37,7 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle)
           // console.log("Message from server ", event.data);
           if (checkTime - lastUpdate > 3000) {
             lastUpdate = new Date().getTime();
-            let updatedPrice = Object.assign({}, that.state.trackedStockData);
+            let updatedPrice = Object.assign({}, that.state.streamingPriceData);
             for (const prop in streamingStockData) {
               // console.log("thisSTock----->", prop)
               if (updatedPrice[prop] !== undefined) {
@@ -46,7 +46,7 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle)
               // console.log("unsubscribing from: ",tickerReponse.data[0]["s"])
               thisSocket.send(JSON.stringify({'type':'unsubscribe','symbol': tickerReponse.data[0]["s"]}))
             }
-            that.setState({ trackedStockData: updatedPrice });
+            that.setState({ streamingPriceData: updatedPrice });
           }
         }
       }})

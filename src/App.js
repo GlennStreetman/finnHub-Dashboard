@@ -43,7 +43,7 @@ class App extends React.Component {
       socket: '', //socket connection for streaming stock data.
       showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
       throttle: ThrottleQueue(25, 1000, true), //all finnhub API requests should be done with finnHub function.
-      trackedStockData: {}, //data shared between some widgets and watchlist menu. Updated by socket data.
+      streamingPriceData: {}, //data shared between some widgets and watchlist menu. Updated by socket data.
       WatchListMenu: 0, //1 = show, 0 = hide
       widgetLockDown: 0, //1 removes buttons from all widgets.
       widgetList: {}, //lists of all widgets.
@@ -84,7 +84,7 @@ class App extends React.Component {
     };
     
     if (s.globalStockList !== prevState.globalStockList){
-      console.log('updating Stock Data')
+      // console.log('updating Stock Data')
       LoadStockData(this, s, GetStockPrice)
       LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets, s.throttle)
     }
@@ -177,7 +177,7 @@ class App extends React.Component {
   
   updateWidgetStockList(widgetId, symbol, stockObj={}) {
     //adds if not present, else removes stock from widget specific stock list.
-    console.log(widgetId, symbol, stockObj, 'updating stock list')
+    // console.log(widgetId, symbol, stockObj, 'updating stock list')
     if (isNaN(widgetId) === false) {
       let updateWidgetStockList = Object.assign({}, this.state.widgetList); //copy widget list
       const trackingSymbolList = Object.assign({}, updateWidgetStockList[widgetId]["trackedStocks"]); //copy target widgets stock object
@@ -508,7 +508,7 @@ class App extends React.Component {
             updateZIndex={this.updateZIndex}
             newDashboard={this.newDashboard}
             processLogin={this.processLogin}
-            trackedStockData={this.state.trackedStockData}
+            streamingPriceData={this.state.streamingPriceData}
             menuWidgetToggle={menuWidgetToggle}
             WatchListMenu={this.state.WatchListMenu}
             AccountMenu={this.state.AccountMenu}

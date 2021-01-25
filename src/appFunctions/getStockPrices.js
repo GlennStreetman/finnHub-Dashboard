@@ -28,10 +28,10 @@ function GetStockPrice(context, stockDescription, apiKey, throttle) {
         };
 
         that.setState((prevState) => {
-          // console.log("setting trackedStockData")
-          let newTrackedStockData = Object.assign({}, prevState.trackedStockData);
-          newTrackedStockData[`US-${stockSymbol}`] = stockPriceData;
-          return { trackedStockData: newTrackedStockData };
+          // console.log("setting streamingPriceData")
+          let newstreamingPriceData = Object.assign({}, prevState.streamingPriceData);
+          newstreamingPriceData[`US-${stockSymbol}`] = stockPriceData;
+          return { streamingPriceData: newstreamingPriceData };
         });
       })
       .catch(error => {
@@ -41,7 +41,7 @@ function GetStockPrice(context, stockDescription, apiKey, throttle) {
   }
 
 function LoadStockData(context, s, getStockPrice){
-  console.log("------loadStockPrice-------")
+  // console.log("------loadStockPrice-------")
   if (Object.keys(s.globalStockList).length !== 0) {
     // console.log(s.globalStockList)
     // context.setState({ refreshStockData: 0 })

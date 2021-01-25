@@ -27,46 +27,46 @@ export default class PriceQuote extends React.Component {
 
   renderStockData() {
     const p = this.props
-    let trackedStockData = p.trackedStockData;
+    let streamingPriceData = p.streamingPriceData;
     let thisStock = p.trackedStocks.sKeys();
 
     for (const x in thisStock) {
-      if (trackedStockData[thisStock[x]] === undefined ) {
-        trackedStockData[thisStock[x]] = {prevClosePrice: 0, dayOpenPrice:0, dayLowPrice:0, dayHighPrice:0, currentPrice:0,}
+      if (streamingPriceData[thisStock[x]] === undefined ) {
+        streamingPriceData[thisStock[x]] = {prevClosePrice: 0, dayOpenPrice:0, dayLowPrice:0, dayHighPrice:0, currentPrice:0,}
       }
     }
     let stockDetailRow = thisStock.map((el) =>
-        trackedStockData[el] ? (
-        <tr key={el + "st" + + trackedStockData[el]["currentPrice"]}>
+        streamingPriceData[el] ? (
+        <tr key={el + "st" + + streamingPriceData[el]["currentPrice"]}>
           <td key={el + "id"}>{dStock(el, p.exchangeList)}</td>
           <td className="rightTE" key={el + "prevClosePrice"}>
-            {trackedStockData[el]["prevClosePrice"].toLocaleString(undefined, {
+            {streamingPriceData[el]["prevClosePrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
           </td>
           <td className="rightTE" key={el + "dayOpenPrice"}>
-            {trackedStockData[el]["dayOpenPrice"].toLocaleString(undefined, {
+            {streamingPriceData[el]["dayOpenPrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
           </td>
           <td className="rightTE" key={el + "dayLowPrice"}>
-            {trackedStockData[el]["dayLowPrice"].toLocaleString(undefined, {
+            {streamingPriceData[el]["dayLowPrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
           </td>
           <td className="rightTE" key={el + "dayHighPrice"}>
-            {trackedStockData[el]["dayHighPrice"].toLocaleString(undefined, {
+            {streamingPriceData[el]["dayHighPrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
           </td>
-          {/* <td className={this.state.flashUpdate[el]} key={el + "currentPrice" + trackedStockData[el]["currentPrice"]}> */}
-          <td className='rightTEFade' key={el + "currentPrice" + trackedStockData[el]["currentPrice"]}>
+          {/* <td className={this.state.flashUpdate[el]} key={el + "currentPrice" + streamingPriceData[el]["currentPrice"]}> */}
+          <td className='rightTEFade' key={el + "currentPrice" + streamingPriceData[el]["currentPrice"]}>
             
-            {trackedStockData[el]["currentPrice"].toLocaleString(undefined, {
+            {streamingPriceData[el]["currentPrice"].toLocaleString(undefined, {
               minimumFractionDigits: 2,
               maximumFractionDigits: 2,
             })}
@@ -129,7 +129,7 @@ export default class PriceQuote extends React.Component {
           React.createElement(StockSearchPane, searchPaneProps(this))
 
         )}
-        {Object.keys(this.props.trackedStockData).length > 0 ? this.renderStockData() : <></>}
+        {Object.keys(this.props.streamingPriceData).length > 0 ? this.renderStockData() : <></>}
       </>
     );
   }
@@ -141,7 +141,7 @@ export function stockDetailWidgetProps(that, key = "Quote") {
     // getStockPrice: that.props.getStockPrice,
     showPane: that.showPane,
     trackedStocks: that.props.widgetList[key]["trackedStocks"],
-    trackedStockData: that.props.trackedStockData,
+    streamingPriceData: that.props.streamingPriceData,
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,

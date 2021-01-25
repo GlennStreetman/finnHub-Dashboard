@@ -1,7 +1,6 @@
 import React from "react";
 import StockDataList from "./stockDataList.js";
 import { connect } from "react-redux";
-import { rUpdateText } from './../slices/sliceStockSearch.js'
 //compnoent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
 class StockSearchPane extends React.Component {
   constructor(props) {
@@ -17,14 +16,7 @@ class StockSearchPane extends React.Component {
 
   handleChange(e) {
     const p = this.props
-    if (e.target !== undefined) { 
-
-      const payload = {
-        'inputText': e.target.value.toUpperCase(),
-      }
-      // console.log(payload, '<-------payload')
-      p.rUpdateText(payload)
-    }
+    p.changeSearchText(e.target.value.toUpperCase())
   }
 
   changeDefault(event){
@@ -34,7 +26,6 @@ class StockSearchPane extends React.Component {
   render() { // inputText
     const p = this.props
     let widgetKey = p.widgetKey;
-    // let stockSymbol = p.rInputText.slice(0, p.rInputText.indexOf(":"));
     const exchangeOptions = this.props.exchangeList.map((el) => 
       <option key={el} value={el}>{el}</option>
     )
@@ -43,16 +34,16 @@ class StockSearchPane extends React.Component {
       <div className="stockSearch">
         <form
           className="form-inline"
-          onSubmit={(e) => {
-            if (this.props.rUpdateStock !== undefined) {
+          onSubmit={(e) => { //submit stock to be added/removed from global & widget stocklist.
+            if (this.props.rUpdateStock !== undefined && widgetKey === 'WatchListMenu') {
               const stockKey = this.props.rUpdateStock.key
               this.props.updateGlobalStockList(e, stockKey, this.props.rUpdateStock);
               this.props.showSearchPane();
-              if (widgetKey / 1 !== undefined) { //Not menu widget. Menus named, widgets numbered.
-                console.log("stock symbol: ",stockKey )
-                this.props.updateWidgetStockList(widgetKey, stockKey, this.props.rUpdateStock);
-                e.preventDefault();
-              }
+            } else if (widgetKey / 1 !== undefined) { //Not menu widget. Menus named, widgets numbered.
+              const stockKey = this.props.rUpdateStock.key
+              this.props.updateWidgetStockList(widgetKey, stockKey, this.props.rUpdateStock);
+              e.preventDefault();
+            
             } else {
               console.log("invalid stock selection");
               e.preventDefault();
@@ -71,7 +62,7 @@ class StockSearchPane extends React.Component {
             <StockDataList 
               // availableStocks={this.state.filteredStocks} 
               defaultExchange={this.props.defaultExchange}
-              inputText={this.props.rInputText}
+              inputText={this.props.searchText}
             />
           </datalist>
           <input className="btn" type="submit" value="Submit" />
@@ -82,19 +73,17 @@ class StockSearchPane extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
+  // console.log("OWNPROPS:", ownProps)
   const p = ownProps
-  const st = state.stockSearch.searchText
-  const inputSymbol = p.defaultExchange + "-" + st.slice(0, st.indexOf("-"))
-  const updateStock = state.exchangeData[p.defaultExchange][inputSymbol]
+  const inputSymbol = p.defaultExchange + "-" + p.searchText.slice(0, p.searchText.indexOf("-"))
+  const updateStock = state.exchangeData[p.defaultExchange] ? state.exchangeData[p.defaultExchange][inputSymbol] : {}
 
   return {
     rUpdateStock: updateStock,
-    rInputText: state.stockSearch.searchText
-    
   }
 }
 
-export default connect(mapStateToProps, {rUpdateText})(StockSearchPane);
+export default connect(mapStateToProps)(StockSearchPane);
 
 export function searchPaneProps(that) {
   const propList = {
@@ -107,6 +96,9 @@ export function searchPaneProps(that) {
     exchangeList: that.props.exchangeList,
     defaultExchange: that.props.defaultExchange,
     updateDefaultExchange: that.props.updateDefaultExchange,
+    searchText: that.props.searchText,
+    changeSearchText: that.props.changeSearchText,
   };
   return propList;
 }
+  
