@@ -11,7 +11,7 @@ class AboutMenu extends React.PureComponent {
   render() {
       
     return (
-      <div className="txt">
+      <div className="bodyTxt">
         <p>
         <b>FinnDash:</b> An App that allows you to visualize your FinnHub.IO API data by arranging and configuring financial widgets.<br /><br />
         <b>Getting Started: </b> <br />

@@ -50,7 +50,7 @@ class App extends React.Component {
       zIndex: [], //list widgets. Index location sets zIndex
     };
   
-    this.baseState = this.state 
+    this.baseState = this.state //used to reset state upon logout.
     this.changeWidgetName = this.changeWidgetName.bind(this);
     this.getSavedDashBoards = this.getSavedDashBoards.bind(this);
     this.loadDashBoard = this.loadDashBoard.bind(this);
@@ -132,8 +132,8 @@ class App extends React.Component {
       widgetID: widgetName,
       widgetType: widgetDescription,
       widgetHeader: widgetHeader,
-      xAxis: "40px",
-      yAxis: "40px",
+      xAxis: "5rem",
+      yAxis: "5rem",
       trackedStocks: this.state.globalStockList,
       widgetConfig: widgetConfig,
       filters: {}
@@ -314,7 +314,7 @@ class App extends React.Component {
           stockList.splice(index,1) 
           return stockList
         }
-        console.log(trackedStockObj, stock)
+        // console.log(trackedStockObj, stock)
       }
     }
 
@@ -390,7 +390,6 @@ class App extends React.Component {
     this.setState({
       currentDashBoard: "",
       globalStockList: [],
-      // globalStockObject: [],
       widgetList: {},
       zIndex: [],
     })

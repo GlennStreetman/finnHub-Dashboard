@@ -54,7 +54,7 @@ export default class PriceQuote extends React.Component {
     const p = this.props
     // const that = this
     const queryString = `https://finnhub.io/api/v1/quote?symbol=${stock}&token=${p.apiKey}`
-    console.log(queryString)
+    // console.log(queryString)
     finnHub(p.throttle, queryString)
     .then((data) => {
       const s = this.state

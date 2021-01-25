@@ -6,7 +6,7 @@ class WatchListMenu extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      availableStocks: {},
+      // availableStocks: {},
     };
 
     this.inputReference = React.createRef();
@@ -19,10 +19,6 @@ class WatchListMenu extends React.PureComponent {
 
   componentWillUnmount(){
     this.baseState.mounted = false
-  }
-
-  componentDidMount() {
-
   }
 
   returnKey(ref){
@@ -40,7 +36,7 @@ class WatchListMenu extends React.PureComponent {
     <tr key={el + "row"}>
         <td key={el + "desc"}>
           {g[el].dStock(p.exchangeList) + ": "}
-          {this.state.availableStocks[el] ? this.state.availableStocks[el]["description"] : <></>}
+          {/* {this.state.availableStocks[el] ? this.state.availableStocks[el]["description"] : <></>} */}
         </td>
         <td className="rightTEFade" key={el + "prc" + this.returnKey(p.streamingPriceData[el])}>
           {p.streamingPriceData[el] ? (
@@ -84,11 +80,11 @@ class WatchListMenu extends React.PureComponent {
     Papa.parse(e.target.files[0], {
       complete: function(results) {
         for (const stock in results.data) {
-          console.log(results.data, stock)
+          console.log(results.data, stock, "<--------------")
           if (results.data[stock][1] !== undefined) {
             
             const thisStock = results.data[stock][0].toUpperCase() + '-' + results.data[stock][1].toUpperCase()
-            console.log(thisStock, that.state.availableStocks[thisStock])
+            console.log(thisStock, that.state.availableStocks[thisStock], "<-------------->")
             // const thisSymbol = results.data[stock][1].toUpperCase()
             that.state.availableStocks[thisStock] !== undefined && 
             that.props.updateGlobalStockList(e, thisStock, that.state.availableStocks[thisStock])

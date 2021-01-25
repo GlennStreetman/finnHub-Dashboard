@@ -1,0 +1,103 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+}
+
+.form-inline {
+  display: flex;
+  flex-flow: row wrap;
+  align-items: center;
+  padding: 10px;
+  margin-inline: 25px;
+  /* margin-bottom: 25px; */
+  color: white;
+}
+
+.div-inline {
+  display: flex;
+  /* flex-grow: auto; */
+  flex-flow: row wrap;
+  align-items: center;
+  padding: 10px;
+  margin-inline: 25px;
+}
+
+.div-side {
+  display: flex;
+  /* flex-flow: row wrap; */
+  /* align-items: center; */
+  /* padding: 10px; */
+  margin-inline: 2px;
+}
+
+.btn {
+  margin: 5px;
+}
+
+label {
+  padding-inline: 10px;
+}
+
+/* Style page content */
+.main {
+  margin-left: 160px; /* Same as the width of the sidebar */
+  padding: 0px 10px;
+}
+
+.centerTE {
+  text-align: center;
+}
+
+.rightTE {
+  text-align: right;
+}
+
+.rightTEFade {
+  text-align: right;
+  animation-name: test;
+  animation-duration: 3s;
+}
+
+.leftTE {
+  text-align: left;
+}
+
+.centerBottomTE {
+  text-align: center;
+  vertical-align: bottom;
+}
+
+tr:nth-child(even) {
+  background-color: #f0f0f0;
+  /* border-bottom: 1px solid black; */
+}
+
+thead {
+  /* border-bottom: 1px solid #000; */
+  background-color: #dcdcdc;
+  font-weight: bold;
+  padding: 2px;
+  vertical-align: bottom;
+  text-align: center;
+  text-transform: capitalize;
+}
+
+table {
+  border-collapse: collapse;
+  margin: 2px;
+  border: 5px;
+}
+
+td {
+  padding: 2px;
+}
+
+th {
+  padding: 2px;
+}

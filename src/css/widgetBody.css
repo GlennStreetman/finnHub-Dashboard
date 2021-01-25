@@ -1,0 +1,45 @@
+.tdHead {
+  white-space: pre;
+}
+
+.graphDiv {
+  display: inline-block;
+  width: 530px;
+}
+
+.stockSearch {
+  background-color: #1d69ab;
+  /* width: 25%; */
+  align-items: center;
+}
+
+.widgetTableDiv {
+  align-content: center;
+}
+
+.widgetBodyTable {
+  color: black;
+  background-color: white;
+}
+
+.faIcon {
+  color: white;
+  visibility: auto;
+  opacity: 1;
+}
+
+.faIconFade {
+  color: green;
+  visibility: hidden;
+  opacity: 0;
+  transition: visibility 0s 2s, opacity 2s linear;
+}
+
+@keyframes test {
+  from {
+    background-color: rgba(255, 0, 0, 0.137);
+  }
+  to {
+    background-color: auto;
+  }
+}

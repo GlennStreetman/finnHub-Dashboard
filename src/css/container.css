@@ -1,0 +1,41 @@
+.widgetBox {
+  overflow: hidden;
+  position: absolute;
+  z-index: 1;
+  border: 2px solid black;
+  border-radius: 10px;
+  background-color: white;
+}
+
+.widgetBox:hover {
+  overflow: hidden;
+  position: absolute;
+  z-index: 99 !important;
+  border: 2px solid black;
+  border-radius: 10px;
+  background-color: white;
+}
+
+.widgetHeader {
+  padding: 5px;
+  z-index: 1;
+  background-color: #1d69ab;
+  color: #fff;
+  /* display: flex; */
+  flex-direction: row;
+}
+
+.headerButtons {
+  float: right;
+}
+
+.widgetFooter {
+  /* overflow: hidden; */
+  padding: 2px;
+  /* cursor: move; */
+  z-index: 1;
+  background-color: #1d69ab;
+  color: #1d69ab;
+  flex-direction: row;
+  text-align: right;
+}
