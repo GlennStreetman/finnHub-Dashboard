@@ -73,6 +73,7 @@ class App extends React.Component {
     this.updateDefaultExchange = this.updateDefaultExchange.bind(this);
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
     this.updateWidgetStockList = this.updateWidgetStockList.bind(this);
+    this.uploadGlobalStockList = this.uploadGlobalStockList.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState){
@@ -208,12 +209,14 @@ class App extends React.Component {
 
   updateGlobalStockList(event, stockRef, stockObj={}) {
     //pass stockRef to delete, pass in stockObj to update.
-    // console.log("update global: ", stockRef, stockObj)
+    console.log("update global: ", stockRef, stockObj)
     const s = this.state
     const currentStockObj = {...s.globalStockList}
     if (currentStockObj[stockRef] === undefined) {
+      console.log('updating global list:', stockRef)
       currentStockObj[stockRef] = {...stockObj}
       currentStockObj[stockRef]['dStock'] = function(ex){
+        //pass in exchange list
         if (ex.length === 1) {
           return (this.symbol)
         } else {
@@ -226,6 +229,10 @@ class App extends React.Component {
     }
     this.setState({ globalStockList: currentStockObj });
     event instanceof Event === true && event.preventDefault();
+  }
+
+  uploadGlobalStockList(newStockObj){
+    this.setState({globalStockList: newStockObj})
   }
 
   changeWidgetName(stateRef, widgetID, newName) {
@@ -518,6 +525,7 @@ class App extends React.Component {
             exchangeList={this.state.exchangeList}
             defaultExchange={this.state.defaultExchange}
             updateDefaultExchange={this.updateDefaultExchange}
+            uploadGlobalStockList={this.uploadGlobalStockList}
           />
         {loginScreen}
         {backGroundMenu()}

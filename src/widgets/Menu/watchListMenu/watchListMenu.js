@@ -1,12 +1,13 @@
 import Papa from 'papaparse'
 import React from "react";
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
+import CsvUpload from './csvUpload.js'
 
 class WatchListMenu extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      // availableStocks: {},
+      uploadList: null //pass in list to trigger up
     };
 
     this.inputReference = React.createRef();
@@ -15,6 +16,7 @@ class WatchListMenu extends React.PureComponent {
     this.fileUploadAction = this.fileUploadAction.bind(this);
     this.fileUploadInputChange = this.fileUploadInputChange.bind(this);
     this.returnKey = this.returnKey.bind(this);
+    this.resetUploadList = this.resetUploadList.bind(this)
   }
 
   componentWillUnmount(){
@@ -70,26 +72,29 @@ class WatchListMenu extends React.PureComponent {
 
   }
 
-  fileUploadAction() {
+  fileUploadAction() { //what does this do?
     this.inputReference.current.click();
     console.log("upload action")
   }
   
+  resetUploadList() {
+    this.setState({uploadList: null})
+  }
+
   fileUploadInputChange(e){
     const that = this
     Papa.parse(e.target.files[0], {
       complete: function(results) {
+        const newStockList = []
         for (const stock in results.data) {
-          console.log(results.data, stock, "<--------------")
+          // console.log(results.data, stock, "<--------------")
           if (results.data[stock][1] !== undefined) {
-            
             const thisStock = results.data[stock][0].toUpperCase() + '-' + results.data[stock][1].toUpperCase()
-            console.log(thisStock, that.state.availableStocks[thisStock], "<-------------->")
-            // const thisSymbol = results.data[stock][1].toUpperCase()
-            that.state.availableStocks[thisStock] !== undefined && 
-            that.props.updateGlobalStockList(e, thisStock, that.state.availableStocks[thisStock])
+            newStockList.push(thisStock)
+            // that.props.updateGlobalStockList(e, thisStock, that.state.availableStocks[thisStock])
           }
         }
+        that.setState({uploadList: newStockList})
       }
     });
 
@@ -124,16 +129,22 @@ class WatchListMenu extends React.PureComponent {
           </thead>
           <tbody>{this.renderWatchedStocks()}</tbody>
         </table>
+      {this.state.uploadList !== null && (
+        <CsvUpload 
+          uploadList={this.state.uploadList} 
+          resetUploadList={this.resetUploadList}
+          uploadGlobalStockList={this.props.uploadGlobalStockList}
+        />
+      )}
       </>
     );
-  }
+    
+  };
 }
 
 export function watchListMenuProps(that, key = "WatchListMenu") {
   let propList = {
     apiKey: that.props.apiKey,
-    // searchText: that.state.searchText,
-    // changeSearchText: that.changeSearchText,
     globalStockList: that.props.globalStockList,
     showPane: that.props.showPane,
     streamingPriceData: that.props.streamingPriceData,
@@ -144,8 +155,8 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
     exchangeList: that.props.exchangeList,
     defaultExchange: that.props.defaultExchange,
     updateDefaultExchange: that.props.updateDefaultExchange,
+    uploadGlobalStockList: that.props.uploadGlobalStockList,
   };
-  // console.log("watchlistmenu", that, propList)
   return propList;
 }
 
