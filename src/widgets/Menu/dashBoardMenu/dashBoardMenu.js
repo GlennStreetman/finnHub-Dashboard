@@ -139,6 +139,12 @@ class DashBoardMenu extends React.PureComponent {
 }
 
 export function dashBoardMenuProps(that, key = "DashBoardMenu") {
+  const helpText = <>
+  Save and manage your widget setups with this menu<br />
+  Each saved dashboard becomes its own Finndash API endpoint.<br />
+  Click Endpoints on the top navigation bar to preview your endpoint data.
+  </>
+  
   let propList = {
     getSavedDashBoards: that.props.getSavedDashBoards,
     dashBoardData: that.props.dashBoardData,
@@ -146,6 +152,7 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
     currentDashBoard: that.props.currentDashBoard,
     saveCurrentDashboard: that.props.saveCurrentDashboard,
     newDashBoard: that.props.newDashboard,
+    helpText: helpText,
   };
   return propList;
 }

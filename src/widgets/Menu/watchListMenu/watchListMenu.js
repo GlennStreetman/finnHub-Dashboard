@@ -2,6 +2,7 @@ import Papa from 'papaparse'
 import React from "react";
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import CsvUpload from './csvUpload.js'
+import ToolTip from '../../../components/toolTip.js'
 
 class WatchListMenu extends React.PureComponent {
   constructor(props) {
@@ -107,7 +108,6 @@ class WatchListMenu extends React.PureComponent {
           if (results.data[stock][1] !== undefined) {
             const thisStock = results.data[stock][0].toUpperCase() + '-' + results.data[stock][1].toUpperCase()
             newStockList.push(thisStock)
-            // that.props.updateGlobalStockList(e, thisStock, that.state.availableStocks[thisStock])
           }
         }
         that.setState({uploadList: newStockList})
@@ -119,6 +119,19 @@ class WatchListMenu extends React.PureComponent {
 
   render() {
     
+    const tab = {'textIndent': '25px',}
+
+    const helpText = <>
+      Upload a .CSV file to load a new stock watchlist.<br />
+      The CSV should contain two values per line: <br />
+      <div style={tab}>  1. Exchange symbol <br /></div>
+      <div style={tab}>2. Stock Symbol <br /></div>
+      Example file shown below: <br />
+      <div style={tab}>US, AAPL <br /></div>
+      <div style={tab}>US, MSFT <br /></div>
+      <div style={tab}>US, GOOGL <br /></div>
+    </>
+
     return (
       <>
         {this.props.showEditPane === 1 && (
@@ -129,7 +142,7 @@ class WatchListMenu extends React.PureComponent {
             <button className="ui button" onClick={this.fileUploadAction}>
                 Stock List CSV
             </button>
-            {`<--Market,Symbol /nl`} 
+            <ToolTip textFragment={helpText} hintName='wl' />
           </div>
 
           </>
@@ -172,6 +185,12 @@ class WatchListMenu extends React.PureComponent {
 }
 
 export function watchListMenuProps(that, key = "WatchListMenu") {
+  const helpText = <>
+    All stocks added to Watchlist become default stocks for new widgets. <br />
+    Each stock on watchlist also opens a socket connection for steaming data.<br />
+    Some widgets are updating by socket connections.
+    </>
+  
   let propList = {
     apiKey: that.props.apiKey,
     globalStockList: that.props.globalStockList,
@@ -185,6 +204,7 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
     defaultExchange: that.props.defaultExchange,
     updateDefaultExchange: that.props.updateDefaultExchange,
     uploadGlobalStockList: that.props.uploadGlobalStockList,
+    helpText: helpText,
   };
   return propList;
 }

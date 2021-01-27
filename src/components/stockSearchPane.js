@@ -1,6 +1,7 @@
 import React from "react";
 import StockDataList from "./stockDataList.js";
 import { connect } from "react-redux";
+import ToolTip from './toolTip.js'
 //compnoent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
 class StockSearchPane extends React.Component {
   constructor(props) {
@@ -29,6 +30,10 @@ class StockSearchPane extends React.Component {
     const exchangeOptions = this.props.exchangeList.map((el) => 
       <option key={el} value={el}>{el}</option>
     )
+    const helpText = <>
+        'Click manage account to update manage exchange list.' <br />
+        'Enter stock name or symbol to right to search for stocks to add to watchlist.'
+      </>
 
     return (
       <div className="stockSearch">
@@ -51,6 +56,7 @@ class StockSearchPane extends React.Component {
           }}
         >
           {this.props.exchangeList.length > 1 && <>
+            <ToolTip textFragment={helpText} hintName='sspe' />
           <label htmlFor="exchangeList">Exchange: </label>
           <select value={this.props.defaultExchange} name='exchangeList' onChange={this.changeDefault}>
             {exchangeOptions}

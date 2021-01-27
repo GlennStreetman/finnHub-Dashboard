@@ -1,12 +1,11 @@
 import React from "react";
 import {widgetLookUp} from '../registers/widgetContainerReg.js'
-  
+import ToolTip from './../components/toolTip.js'
+
 //creates widget container. Used by all widgets.
 class WidgetContainer extends React.Component {
   constructor(props) {
     super(props);
-    // let showEditPaneOnRender = this.props.widgetLockDown === 0 ? 0 : 1;
-
     this.state = {
       renderHeader: this.props.widgetList["widgetHeader"],
       renderBody: this.props.widgetList["widgetType"],
@@ -115,7 +114,6 @@ class WidgetContainer extends React.Component {
     //Add widgets to the list below that should not have access to the stock search pane
     const hideStockSearchMenu = ["DashBoardMenu"]
 
-
     const compStyle = {
       display: this.state.show,
       top: this.props.widgetList["xAxis"],
@@ -132,13 +130,18 @@ class WidgetContainer extends React.Component {
       widgetProps['changeSearchText'] = this.changeSearchText
     } 
 
+    // const tab = {'textIndent': '25px',}
+
     return (
       <div key={this.props.widgetKey + "container" + this.state.show} id={this.props.widgetKey + "box"} 
       className="widgetBox" style={compStyle} onMouseOut={() => {this.props.updateZIndex(this.props.widgetKey)}}>
         {this.props.widgetLockDown === 0 ? (
           <div className="widgetHeader">
             {this.state.showEditPane === 0 ? (
-              <>{this.state.renderHeader}</>
+              <>
+                <ToolTip textFragment={widgetProps['helpText']} hintName='wC1' />
+                {this.state.renderHeader}
+              </>
             ) : (
               <input type="text" id={this.props.widgetKey + "HeaderValue"} value={this.state.renderHeader} onChange={this.updateHeader} />
             )}

@@ -13,8 +13,8 @@ code {
   display: flex;
   flex-flow: row wrap;
   align-items: center;
-  padding: 10px;
-  margin-inline: 25px;
+  padding: 2px;
+  margin-inline: 2px;
   /* margin-bottom: 25px; */
   color: white;
 }
