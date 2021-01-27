@@ -36,31 +36,47 @@ class WatchListMenu extends React.PureComponent {
     // console.log(g, '-------------')
     const stockListKey = g.sKeys().map((el) => ( 
     <tr key={el + "row"}>
-        <td key={el + "desc"}>
-          {g[el].dStock(p.exchangeList) + ": "}
-          {/* {this.state.availableStocks[el] ? this.state.availableStocks[el]["description"] : <></>} */}
-        </td>
-        <td className="rightTEFade" key={el + "prc" + this.returnKey(p.streamingPriceData[el])}>
-          {p.streamingPriceData[el] ? (
-            p.streamingPriceData[el]["currentPrice"] !== undefined &&
-            p.streamingPriceData[el]["currentPrice"].toLocaleString(undefined, {
-              minimumFractionDigits: 2,
-              maximumFractionDigits: 2,
-            })
-          ) : (
-            <></>
-          )}
-        </td>
-        <td className="centerTE" key={el + "rmv"}>
-          <button
-            key={el + "clck"}
-            onClick={(e) => {
-              p.updateGlobalStockList(e, el);
-            }}
-          >
-            <i className="fa fa-times" aria-hidden="true"></i>
-          </button>
-        </td>
+
+        {this.props.showEditPane === 0 &&
+          <>
+            <td key={el + "desc"}>
+              {this.props.showEditPane === 1 ? g[el].dStock(p.exchangeList) + 
+              ": " + 
+              g[el]['description'] : g[el].dStock(p.exchangeList)}
+            </td>
+            <td className="rightTEFade" key={el + "prc" + this.returnKey(p.streamingPriceData[el])}>
+              {p.streamingPriceData[el] ? (
+                p.streamingPriceData[el]["currentPrice"] !== undefined &&
+                p.streamingPriceData[el]["currentPrice"].toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })
+              ) : (
+                <></>
+              )}
+            </td>
+          </>
+        }
+        {this.props.showEditPane === 1 && 
+          <>
+            <td className="rightTE">{g[el]['exchange']}</td>
+            <td className="leftTe">{g[el]['symbol']}</td>
+            <td className="leftTe">{g[el]['description']}</td>
+            <td className="rightTE">{g[el]['currency']}</td>
+            <td className="leftTe">{g[el]['figi']}</td>
+            <td className="rightTE">{g[el]['mic']}</td>
+            <td className="centerTE" key={el + "rmv"}>
+              <button
+                key={el + "clck"}
+                onClick={(e) => {
+                  p.updateGlobalStockList(e, el);
+                }}
+              >
+                <i className="fa fa-times" aria-hidden="true"></i>
+              </button>
+            </td>
+          </>
+        }
       </tr>
     )
     );
@@ -122,9 +138,22 @@ class WatchListMenu extends React.PureComponent {
         <table>
           <thead>
             <tr>
-              <td className="centerTE">Description</td>
-              <td className="centerTE">Price</td>
-              <td className="centerTE">Remove</td>
+              {this.props.showEditPane === 0 &&
+                <>
+                  <td className="centerTE">Description</td>
+                  <td className="centerTE">Price</td>
+                </>
+              }
+              {this.props.showEditPane === 1 &&  <> 
+                <td className="centerTE">Exchange</td>
+                <td className="centerTE">Symbol</td>
+                <td className="centerTE">Name</td>
+                <td className="centerTE">Currency</td>
+                <td className="centerTE">FIGI</td>
+                <td className="centerTE">MIC</td>
+                <td className="centerTE">Remove</td>
+                </>
+              }
             </tr>
           </thead>
           <tbody>{this.renderWatchedStocks()}</tbody>
