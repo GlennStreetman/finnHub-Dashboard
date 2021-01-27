@@ -59,10 +59,10 @@ class WatchListMenu extends React.PureComponent {
         }
         {this.props.showEditPane === 1 && 
           <>
-            <td className="rightTE">{g[el]['exchange']}</td>
-            <td className="leftTe">{g[el]['symbol']}</td>
+            <td className="centerTE">{g[el]['exchange']}</td>
+            <td className="centerTE">{g[el]['symbol']}</td>
             <td className="leftTe">{g[el]['description']}</td>
-            <td className="rightTE">{g[el]['currency']}</td>
+            <td className="centerTE">{g[el]['currency']}</td>
             <td className="leftTe">{g[el]['figi']}</td>
             <td className="rightTE">{g[el]['mic']}</td>
             <td className="centerTE" key={el + "rmv"}>
