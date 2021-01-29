@@ -25,6 +25,14 @@ class App extends React.Component {
   constructor(props) {
     super(props);
 
+    const defaultGlobalStockList = {}
+    defaultGlobalStockList['sKeys'] = function(){
+      const stockList = Object.keys(this)
+      const index = stockList.indexOf('sKeys')
+      stockList.splice(index,1) 
+      return stockList
+    }
+
     this.state = {
       AboutMenu: 0, //1 = show, 0 = hide
       AccountMenu: 0, //1 = show, 0 = hide
@@ -36,7 +44,7 @@ class App extends React.Component {
       dashBoardData: [], //list of all saved dashboards.
       defaultExchange: 'US',
       exchangeList: ['US'], //list of all exchanges activated under account management.
-      globalStockList: {}, //default stocks for new widgets.
+      globalStockList: defaultGlobalStockList, //default stocks for new widgets.
       login: 0, //login state. 0 logged out, 1 logged in. 
       loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
       menuList: {}, //lists of all menu widgets.
@@ -76,6 +84,7 @@ class App extends React.Component {
     this.uploadGlobalStockList = this.uploadGlobalStockList.bind(this);
     this.syncGlobalStockList = this.syncGlobalStockList.bind(this);
   }
+
 
   componentDidUpdate(prevProps, prevState){
     const s = this.state
