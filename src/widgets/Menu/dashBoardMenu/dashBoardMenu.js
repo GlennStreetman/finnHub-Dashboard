@@ -15,7 +15,9 @@ class DashBoardMenu extends React.PureComponent {
   }
 
   componentDidMount() {
-    this.setState({inputText: this.props.currentDashBoard})
+    if (this.props.currentDashBoard !== null) {
+      this.setState({inputText: this.props.currentDashBoard})
+    }
   }
 
   componentWillUnmount(){

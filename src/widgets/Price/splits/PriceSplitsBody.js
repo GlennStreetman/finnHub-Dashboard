@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
-import {dStock} from "../../../appFunctions/formatStockSymbols.js";
+
 
 export default class PriceSplits extends Component {
     constructor(props) {
@@ -71,7 +71,7 @@ export default class PriceSplits extends Component {
     const stockList = p.trackedStocks.sKeys();
     const stockListRows = stockList.map((el) =>
         <tr key={el + "container"}>
-          <td key={el + "name"}>{dStock(el, p.exchangeList)}</td>
+          <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
           <td key={el + "buttonC"}>
             <button
               key={el + "button"}
@@ -133,10 +133,10 @@ export default class PriceSplits extends Component {
 
     renderStockData() {
         const s = this.state
-
-        let newStockList = this.props.trackedStocks.sKeys().map((el) => (
+        const p = this.props
+        let newStockList = p.trackedStocks.sKeys().map((el) => (
           <option key={el + "ddl"} value={el}>
-            {dStock(el, this.props.exchangeList)}
+            {p.trackedStocks[el].dStock(p.exchangeList)}
           </option>
         ));
 
@@ -170,8 +170,10 @@ export default class PriceSplits extends Component {
       const s = this.state
       const pf = this.props.filters
       const that = this
+      
       if (pf.startDate !== undefined && this.findDate(pf.endDate) !== undefined && s.targetStock !== undefined) {
-          const queryString = `https://finnhub.io/api/v1/stock/split?symbol=${dStock(s.targetStock,p.exchangeList)}&from=${this.findDate(pf.startDate)}&to=${this.findDate(pf.endDate)}&token=${p.apiKey}`
+          const queryString = 
+            `https://finnhub.io/api/v1/stock/split?symbol=${p.trackedStocks[s.targetStock]['symbol']}&from=${this.findDate(pf.startDate)}&to=${this.findDate(pf.endDate)}&token=${p.apiKey}`
           finnHub(p.throttle, queryString)
           .then((data) => {
             if (that.baseState.mounted === true) {

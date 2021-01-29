@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
-import {dStock} from "../../../appFunctions/formatStockSymbols.js";
 
 export default class PriceTargetBody extends Component {
   constructor(props) {
@@ -98,7 +97,7 @@ export default class PriceTargetBody extends Component {
       )
       const newSymbolList = p.trackedStocks.sKeys().map((el) => (
         <option key={el + "ddl"} value={el}>
-          {dStock(el, p.exchangeList)}
+          {p.trackedStocks[el].dStock(p.exchangeList)}
         </option>
       ))
       return <>

@@ -2,7 +2,6 @@ import React from "react";
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import CreateCandleStickChart from "./createCandleStickChart.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
-import {dStock} from "../../../appFunctions/formatStockSymbols.js";
 
 export default class PriceCandles extends React.Component {
   constructor(props) {
@@ -195,7 +194,7 @@ export default class PriceCandles extends React.Component {
     let candleSelectionRow = candleList.map((el) =>
       this.props.showEditPane === 1 ? (
         <tr key={el + "container"}>
-          <td key={el + "name"}>{dStock(el, p.exchangeList)}</td>
+          <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
           <td key={el + "buttonC"}>
             <button
               key={el + "button"}
@@ -220,9 +219,10 @@ export default class PriceCandles extends React.Component {
   }
 
   displayCandleGraph() {
-    let newSymbolList = this.props.trackedStocks.sKeys().map((el) => (
+    const p = this.props
+    let newSymbolList = p.trackedStocks.sKeys().map((el) => (
       <option key={el + "ddl"} value={el}>
-        {dStock(el, this.props.exchangeList)}
+        {p.trackedStocks[el].dStock(p.exchangeList)}
       </option>
     ));
 

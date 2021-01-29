@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import EndPointNode from "../../../components/endPointNode.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
-import {dStock} from "../../../appFunctions/formatStockSymbols.js";
 
 export default class FundamentalsNewsSentiment extends Component {
     constructor(props) {
@@ -62,7 +61,7 @@ export default class FundamentalsNewsSentiment extends Component {
       let row = stockList.map((el) =>
         this.props.showEditPane === 1 ? (
           <tr key={el + "container"}>
-            <td key={el + "name"}>{dStock(el, p.exchangeList)}</td>
+            <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
             <td key={el + "buttonC"}>
               <button
                 key={el + "button"}
@@ -90,7 +89,7 @@ export default class FundamentalsNewsSentiment extends Component {
       const p = this.props
       const newSymbolList = this.props.trackedStocks.sKeys().map((el) => (
         <option key={el + "ddl"} value={el}>
-          {dStock(el, p.exchangeList)}
+          {p.trackedStocks[el].dStock(p.exchangeList)}
         </option>
       ))
       

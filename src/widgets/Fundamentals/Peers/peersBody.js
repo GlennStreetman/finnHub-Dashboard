@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
-import {dStock} from "../../../appFunctions/formatStockSymbols.js";
 
 export default class FundamentalsPeers extends Component {
     constructor(props) {
@@ -90,7 +89,7 @@ export default class FundamentalsPeers extends Component {
     const stockList = p.trackedStocks.sKeys();
     const stockListRows = stockList.map((el) =>
         <tr key={el + "container"}>
-          <td key={el + "name"}>{dStock(el, p.exchangeList)}</td>
+          <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
           <td key={el + "buttonC"}>
             <button
               key={el + "button"}
@@ -125,7 +124,7 @@ export default class FundamentalsPeers extends Component {
       )
       const newSymbolList = this.props.trackedStocks.sKeys().map((el) => (
         <option key={el + "ddl"} value={el}>
-          {dStock(el, p.exchangeList)}
+          {p.trackedStocks[el].dStock(p.exchangeList)}
         </option>
       ))
       return <>
