@@ -1,6 +1,7 @@
 //import all API string generator functions here and register below to widgetDict.
 const candleWidgetEndPoint = require("../widgets/Price/candles/candlesEndPoint.js");
 const quoteWidgetEndPoint = require("../widgets/Price/quote/quoteEndPoint.js");
+const priceSplitsEndPoint = require("../widgets/Price/splits/priceSplitsEndPoint.js");
 const basicFinancialsEndPoint = require("../widgets/Fundamentals/basicFinancials/basicFinancialsEndPoint.js");
 const companyNewsEndPoint = require("../widgets/Fundamentals/companyNews/companyNewsEndPoint.js");
 const companyProfileEndPoint = require("../widgets/Fundamentals/companyProfile2/companyProfile2EndPoint.js");
@@ -18,6 +19,7 @@ const EarningsCalendarEndPoint = require("../widgets/Estimates/EarningsCalendar/
 const widgetDict = {
     PriceCandles: candleWidgetEndPoint,
     PriceQuote: quoteWidgetEndPoint,
+    PriceSplits: priceSplitsEndPoint,
     FundamentalsBasicFinancials: basicFinancialsEndPoint,
     FundamentalsCompanyNews: companyNewsEndPoint,
     FundamentalsCompanyProfile2: companyProfileEndPoint,

@@ -117,6 +117,10 @@ class App extends React.Component {
     }
   }
 
+  componentWillUnmount(){
+    if (this.state.socket !== '') {this.state.socket.close()}
+  }
+
   processLogin(setKey, setLogin) {
     this.setState({ login: setLogin });
     this.setState({ apiKey: setKey });

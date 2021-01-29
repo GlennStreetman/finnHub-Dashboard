@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
-import {dStock} from "../../../appFunctions/formatStockSymbols.js";
 
 export default class widgetName extends Component {
     constructor(props) {
@@ -98,6 +97,6 @@ export function newWidgetNameProps(that, key = "newWidgetNameProps") {
   }
 
 
-  // fetch('https://finnhub.io/api/v1/stock/profile2?symbol=AAPL&token=bsuu7qv48v6qu589jlj0')
-  //   .then(response => response.json())
-  //   .then(data => console.log(data))
+  fetch('https://finnhub.io/api/v1/stock/split?symbol=TSLA&from=2001-02-23& to=2021-01-29&token=bsuu7qv48v6qu589jlj0')
+    .then(response => response.json())
+    .then(data => console.log(data))

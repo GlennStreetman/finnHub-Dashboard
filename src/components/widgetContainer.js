@@ -144,7 +144,7 @@ class WidgetContainer extends React.Component {
           <div className="widgetHeader">
             {this.state.showEditPane === 0 ? (
               <>
-                <ToolTip textFragment={widgetProps['helpText']} hintName='wC1' />
+                {widgetProps['helpText'] !== undefined && <ToolTip textFragment={widgetProps['helpText']} hintName='wC1' />}
                 {this.state.renderHeader}
               </>
             ) : (

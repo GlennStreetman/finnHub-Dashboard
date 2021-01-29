@@ -61,11 +61,14 @@ function LoadTickerSocket(context, prevState, globalStockList, socket, apiKey, u
   const that = context
   if (globalStockList !== prevState.globalStockList && throttle !== undefined && apiKey !== ""){
     // console.log('updating socket')
-    if (socket !== '') { 
-      socket.close()
+    // if (socket !== '') { 
+    //   socket.close()
+    // }
+    // let newSocket = new WebSocket(`wss://ws.finnhub.io?token=${apiKey}`)
+    if (socket === '') {
+      socket = new WebSocket(`wss://ws.finnhub.io?token=${apiKey}`)
     }
-    let newSocket = new WebSocket(`wss://ws.finnhub.io?token=${apiKey}`)
-    updateTickerSockets(that, newSocket, apiKey, globalStockList, throttle)
+    updateTickerSockets(that, socket, apiKey, globalStockList, throttle)
   }
 }
 
