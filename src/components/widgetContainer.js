@@ -90,7 +90,12 @@ class WidgetContainer extends React.Component {
       // set the element's new position:
       let newX = xAxis - widgetWidth + 25;
       let newY = yAxis - 25;
+      if (newY >= 60) {
       that.props.moveWidget(that.props.stateRef, that.props.widgetKey, newY, newX);
+      } else {
+        console.log("under 60, stop")
+        that.props.moveWidget(that.props.stateRef, that.props.widgetKey, 60, newX);
+      }
     }
 
     function closeDragElement() {
