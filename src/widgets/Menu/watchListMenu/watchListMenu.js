@@ -132,6 +132,12 @@ class WatchListMenu extends React.PureComponent {
       <div style={tab}>US, GOOGL <br /></div>
     </>
 
+    const syncText = <>
+    Set all widgets stocklists equal to global stock list.<br />
+    Useful after copying a dashboard and quickly updating all widgets to new stock list. <br />
+
+    </>
+
     return (
       <>
         {this.props.showEditPane === 1 && (
@@ -140,9 +146,13 @@ class WatchListMenu extends React.PureComponent {
           <div>
             <input type="file" hidden ref={this.inputReference} onChange={this.fileUploadInputChange} />
             <button className="ui button" onClick={this.fileUploadAction}>
-                Stock List CSV
+                Upload CSV
             </button>
-            <ToolTip textFragment={helpText} hintName='wl' />
+            <ToolTip textFragment={helpText} hintName='wl' /> <br />
+            <button className="ui button" onClick={this.props.syncGlobalStockList}>
+                Sync Widgets
+            </button>
+            <ToolTip textFragment={syncText} hintName='sw' /> <br />
           </div>
 
           </>
@@ -205,6 +215,7 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
     updateDefaultExchange: that.props.updateDefaultExchange,
     uploadGlobalStockList: that.props.uploadGlobalStockList,
     helpText: helpText,
+    syncGlobalStockList: that.props.syncGlobalStockList
   };
   return propList;
 }

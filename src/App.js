@@ -74,6 +74,7 @@ class App extends React.Component {
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this);
     this.updateWidgetStockList = this.updateWidgetStockList.bind(this);
     this.uploadGlobalStockList = this.uploadGlobalStockList.bind(this);
+    this.syncGlobalStockList = this.syncGlobalStockList.bind(this);
   }
 
   componentDidUpdate(prevProps, prevState){
@@ -229,6 +230,18 @@ class App extends React.Component {
     }
     this.setState({ globalStockList: currentStockObj });
     event instanceof Event === true && event.preventDefault();
+  }
+
+  syncGlobalStockList(){
+    const s = this.state
+    console.log("syncing stocks")
+    const updatedWidgetList = {...s.widgetList}
+    for (const w in updatedWidgetList) {
+      console.log(updatedWidgetList[w]['widgetHeader'])
+      updatedWidgetList[w]['trackedStocks'] = this.state.globalStockList
+      console.log(updatedWidgetList[w]['trackedStocks'])
+    }
+    this.setState({widgetList: updatedWidgetList})
   }
 
   uploadGlobalStockList(newStockObj){
@@ -526,6 +539,7 @@ class App extends React.Component {
             defaultExchange={this.state.defaultExchange}
             updateDefaultExchange={this.updateDefaultExchange}
             uploadGlobalStockList={this.uploadGlobalStockList}
+            syncGlobalStockList={this.syncGlobalStockList}
           />
         {loginScreen}
         {backGroundMenu()}
