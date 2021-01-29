@@ -76,6 +76,7 @@ class WidgetContainer extends React.Component {
       // get the mouse cursor position at startup:
       xAxis = e.clientX;
       yAxis = e.clientY;
+      console.log(xAxis, yAxis)
       document.onmouseup = closeDragElement;
       // call a function whenever the cursor moves:
       document.onmousemove = elementDrag;
@@ -88,14 +89,16 @@ class WidgetContainer extends React.Component {
       xAxis = e.clientX;
       yAxis = e.clientY;
       // set the element's new position:
-      let newX = xAxis - widgetWidth + 25;
-      let newY = yAxis - 25;
-      if (newY >= 60) {
+      // let newX = xAxis - widgetWidth + 25;
+      // let newY = yAxis - 25;
+      let newX = xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5
+      let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
+      // if (newY >= 60) {
       that.props.moveWidget(that.props.stateRef, that.props.widgetKey, newY, newX);
-      } else {
-        console.log("under 60, stop")
-        that.props.moveWidget(that.props.stateRef, that.props.widgetKey, 60, newX);
-      }
+      // } else {
+      //   console.log("under 60, stop")
+      //   that.props.moveWidget(that.props.stateRef, that.props.widgetKey, 60, newX);
+      // }
     }
 
     function closeDragElement() {
