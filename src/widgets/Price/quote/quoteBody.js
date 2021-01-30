@@ -154,7 +154,7 @@ export default class PriceQuote extends React.Component {
       <table className="widgetBodyTable" key={this.props.widgetKey + "id"}>
         <thead key={this.props.widgetKey + "head"}>
           <tr key={this.props.widgetKey + "tr"}>
-            <td key={this.props.widgetKey + "stock"}>Stock</td>
+            <td key={this.props.widgetKey + "stock"}>Symbole:</td>
             <td className="centerTE" key={this.props.widgetKey + "close"}>
               Prev Close
             </td>

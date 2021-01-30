@@ -85,6 +85,10 @@ class App extends React.Component {
     this.syncGlobalStockList = this.syncGlobalStockList.bind(this);
   }
 
+  componentDidMount(){
+    this.state.throttle.suspend = Date.now()+2000
+    console.log(Date.now(), this.state.throttle.suspend)
+  }
 
   componentDidUpdate(prevProps, prevState){
     const s = this.state

@@ -99,6 +99,8 @@ createChartDataList() {
 
 createChartOptions(chartData) {
   const options = {
+    width: 400,
+    height: 200,
     theme: "light2",
     animationEnabled: true,
     exportEnabled: true,

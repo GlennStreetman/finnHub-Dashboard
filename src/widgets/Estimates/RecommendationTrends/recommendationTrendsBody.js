@@ -110,6 +110,8 @@ export default class EstimatesRecommendationTrends extends Component {
     createChartOptions(chartData) {
       
       const options = {
+      width: 400,
+      height: 200,
       animationEnabled: true,
       exportEnabled: true,
 			theme: "light1",

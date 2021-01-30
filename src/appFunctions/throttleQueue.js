@@ -31,6 +31,7 @@ export default function createFunctionQueueObject (maxRequestPerInterval, interv
             setTimeout(() => that.dequeue(that), threshold - now);
             return;
         } else if (now < that.suspend){
+            console.log("Finnhub API calls suspended")
             setTimeout(() => that.dequeue(that), that.suspend - now);
             return;
         } else if (that.openRequests >= that.maxRequestPerInterval){

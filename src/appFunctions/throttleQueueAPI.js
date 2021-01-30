@@ -28,9 +28,11 @@ const createFunctionQueueObject = function (maxRequestPerInterval, interval, eve
 
         // Adjust the timer if it was called too early 
         if (now < threshold) {
+            
             setTimeout(() => that.dequeue(that), threshold - now);
             return;
         } else if (now < that.suspend){
+            console.log("Finnhub API calls suspended")
             setTimeout(() => that.dequeue(that), that.suspend - now);
             return;
         } else if (that.openRequests >= that.maxRequestPerInterval){

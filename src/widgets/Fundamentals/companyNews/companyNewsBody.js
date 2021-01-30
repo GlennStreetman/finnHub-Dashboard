@@ -56,10 +56,6 @@ export default class FundamentalsCompanyNews extends React.Component {
     if (s.newsSelection !== prevState.newsSelection || p.showEditPane !== prevProps.showEditPane) {
       this.getCompanyNews(s.newsSelection, p.filters.startDate, p.filters.endDate);
     }
-    // if (this.state.newsSelection === 1 && this.props.trackedStocks.sKeys().length) {
-    //   console.log("-----------------HERE")
-    //   this.setState({ newsSelection: this.props.trackedStocks[0] });
-    // }
     if (prevProps.trackedStocks.sKeys()[0] !== p.trackedStocks.sKeys()[0]) {
       this.setState({newsSelection: p.trackedStocks.sKeys()[0]}, () => this.getCompanyNews(s.newsSelection, p.filters.startDate, p.filters.endDate))
     }
@@ -84,7 +80,7 @@ export default class FundamentalsCompanyNews extends React.Component {
   }
 
   shortHeadline(headline) {
-    let shortHeadLine = headline.slice(0, 48) + "...";
+    let shortHeadLine = headline.slice(0, 32) + "...";
     return shortHeadLine;
   }
   

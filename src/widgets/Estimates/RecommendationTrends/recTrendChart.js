@@ -19,4 +19,4 @@ export default class RecTrendChart extends React.PureComponent {
 
     /*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/
   }
-}
+}  

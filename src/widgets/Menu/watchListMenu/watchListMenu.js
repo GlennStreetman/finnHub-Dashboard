@@ -157,30 +157,31 @@ class WatchListMenu extends React.PureComponent {
 
           </>
         )}
-
-        <table>
-          <thead>
-            <tr>
-              {this.props.showEditPane === 0 &&
-                <>
-                  <td className="centerTE">Description</td>
-                  <td className="centerTE">Price</td>
-                </>
-              }
-              {this.props.showEditPane === 1 &&  <> 
-                <td className="centerTE">Exchange</td>
-                <td className="centerTE">Symbol</td>
-                <td className="centerTE">Name</td>
-                <td className="centerTE">Currency</td>
-                <td className="centerTE">FIGI</td>
-                <td className="centerTE">MIC</td>
-                <td className="centerTE">Remove</td>
-                </>
-              }
-            </tr>
-          </thead>
-          <tbody>{this.renderWatchedStocks()}</tbody>
-        </table>
+        <div className='widgetBodyTableDiv'>
+          <table className='widgetBodyTable'>
+            <thead>
+              <tr>
+                {this.props.showEditPane === 0 &&
+                  <>
+                    <td className="centerTE">Description</td>
+                    <td className="centerTE">Price</td>
+                  </>
+                }
+                {this.props.showEditPane === 1 &&  <> 
+                  <td className="centerTE">Exchange</td>
+                  <td className="centerTE">Symbol</td>
+                  <td className="centerTE">Name</td>
+                  <td className="centerTE">Currency</td>
+                  <td className="centerTE">FIGI</td>
+                  <td className="centerTE">MIC</td>
+                  <td className="centerTE">Remove</td>
+                  </>
+                }
+              </tr>
+            </thead>
+            <tbody>{this.renderWatchedStocks()}</tbody>
+          </table>
+        </div>
       {this.state.uploadList !== null && (
         <CsvUpload 
           uploadList={this.state.uploadList} 

@@ -152,11 +152,11 @@ export default class PriceCandles extends React.Component {
     const endDate = new Date(endUnix).toISOString().slice(0, 10);
     
     const options = {
+      width: 400,
+      height: 200,
       theme: "light2", // "light1", "light2", "dark1", "dark2"
       animationEnabled: true,
       exportEnabled: true,
-      height: 400,
-      width: 525,
       title: {
         text: this.state.candleSelection + ": " + startDate + " - " + endDate,
       },
@@ -235,7 +235,7 @@ export default class PriceCandles extends React.Component {
           </select>
         </div>
         <div className="graphDiv">
-          <CreateCandleStickChart candleData={this.state.options} candleSelection={this.state.candleSelection} />
+          <CreateCandleStickChart candleData={this.state.options} />
         </div>
       </>
     );
@@ -282,7 +282,7 @@ export default class PriceCandles extends React.Component {
           </>
         )}
         {this.props.showEditPane === 0 && (
-          <div className="graphDiv">{Object.keys(this.props.trackedStocks).length > 0 ? this.displayCandleGraph() : <></>}</div>
+          Object.keys(this.props.trackedStocks).length > 0 ? this.displayCandleGraph() : <></>
         )}
       </>
     );

@@ -244,7 +244,6 @@ export default class FundamentalsBasicFinancials extends React.Component {
         )
       }
     }
-
     let metricSelectTable = (
       <div className="widgetTableDiv">
         <table className='widgetBodyTable'>
@@ -322,7 +321,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
       <table className='widgetBodyTable'>
         <thead>
           <tr>
-            <td className='centerBottomTE'>Symbol</td>
+            <td className='centerBottomTE'>Symbole:</td>
             {headerRows}
           </tr>
         </thead>

@@ -14,7 +14,7 @@ class CreateCandleStickChart extends React.PureComponent {
     let options = this.props.candleData;
     return (
       <>
-        <CanvasJSChart options={options} onRef={(ref) => (this.chart = ref)} />
+        {this.props.candleData !== undefined && <CanvasJSChart options={options} onRef={(ref) => (this.chart = ref)} />}
       </>
     );
 

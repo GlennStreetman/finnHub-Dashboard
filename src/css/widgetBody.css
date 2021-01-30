@@ -4,7 +4,7 @@
 
 .graphDiv {
   display: inline-block;
-  width: 530px;
+  height: 200px;
 }
 
 .stockSearch {
@@ -15,6 +15,7 @@
 
 .widgetTableDiv {
   align-content: center;
+  overflow: scroll;
 }
 
 .widgetBodyTable {
