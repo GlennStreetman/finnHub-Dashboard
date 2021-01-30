@@ -86,7 +86,7 @@ class App extends React.Component {
   }
 
   componentDidMount(){
-    this.state.throttle.suspend = Date.now()+2000
+    // this.state.throttle.suspend = Date.now()+2000
     console.log(Date.now(), this.state.throttle.suspend)
   }
 

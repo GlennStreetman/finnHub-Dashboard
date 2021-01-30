@@ -1,4 +1,4 @@
-
+//used by finnDash frontend to make ALL finnhub api requests.
 //returns queue object. Open new apiCalls by running finnHub function bellow.
 export default function createFunctionQueueObject (maxRequestPerInterval, interval, evenlySpaced) {
     let que = {}
@@ -16,9 +16,9 @@ export default function createFunctionQueueObject (maxRequestPerInterval, interv
         que.maxRequestPerInterval = 1;
     }
 
-    if (interval < 200) {
-        console.warn('An interval of less than 200ms can create performance issues.');
-    }
+    // if (interval < 200) {
+    //     console.warn('An interval of less than 200ms can create performance issues.');
+    // }
 
     que.dequeue = function(that) {
         that.running = 1
@@ -36,18 +36,17 @@ export default function createFunctionQueueObject (maxRequestPerInterval, interv
             return;
         } else if (that.openRequests >= that.maxRequestPerInterval){
             // console.log("Open finnhub.io request limit exceeded, temp pause requests.")
-            that.openRequests = that.openRequests -= 1
             setTimeout(() => that.dequeue(that), 100);
             return;
         } else {
-
+            //max requests should default to 1 if evenly spaced. 
             let callbacks = that.queue.splice(0, that.maxRequestPerInterval);
             for(let x = 0; x < callbacks.length; x++) {
-                callbacks[x]();
+                callbacks[x](); //runs callback from queue
                 that.openRequests = that.openRequests += 1
             }
             that.lastCalled = Date.now();
-            if (that.queue.length) {
+            if (that.queue.length) { 
                 setTimeout(() => that.dequeue(that), that.interval);
             } else {
                 that.running = 0
@@ -79,32 +78,31 @@ export default function createFunctionQueueObject (maxRequestPerInterval, interv
 
 //add all API calls to throttleQue object using function below.
 //throttle =  que object returned by function above.
+//response 429 means API queue is overloaded. Component that submitted API call --
+//  needs to check if its still mounted then resubmit request.
 export const finnHub = (throttle, apiString) => {
     // console.log('running finnhub: ', throttle, apiString)
     return new Promise((resolve, reject) => {
         throttle.enqueue(function() { 
             fetch(apiString)
             .then((response) => {
-                // console.log(response)
                 if (response.status === 429) {
                     console.log('429')
-                    throttle.openRequests = throttle.openRequests -= 1
                     throttle.setSuspend(4000)
-                    finnHub(throttle, apiString)
-                    reject('finnhub 429')
+                    const errorObj = {error: 429} 
+                    return errorObj
                 } else {
-                // console.log("FIRST RESPONSE:", response)
-                throttle.openRequests = throttle.openRequests -= 1
-                return response.json()
-            }
+                    return response.json()
+                }
             })
             .then((data) => {
-                // console.log("resolving")
+                throttle.openRequests = throttle.openRequests -= 1
                 resolve(data)
             })
             .catch(error => {
                 console.log("throttleQueue error",error.message)
                 throttle.openRequests = throttle.openRequests -= 1
+                reject({errorMessage: error.message})
             });
         })
     })

@@ -112,7 +112,11 @@ export default class FundamentalsFinancialsAsReported extends Component {
       finnHub(p.throttle, queryString)
       .then((data) => {
         if (that.baseState.mounted === true) {
+          if (data.error === 429) { //run again
+            this.getStockData()
+          } else {  
             this.setState({stockData: data})
+          }
         }
       })
       .catch(error => {

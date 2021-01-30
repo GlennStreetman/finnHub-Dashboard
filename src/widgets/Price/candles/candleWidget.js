@@ -107,14 +107,14 @@ export default class PriceCandles extends React.Component {
 
       finnHub(this.props.throttle, queryString)
       .then((data) => {
-          // try {
           if (this.baseState.mounted === true) {
-            that.setState({ candleData: data });
-            that.createCandleDataList(data);
+            if (data.error === 429) { //run again
+              this.getCandleData()
+            } else {
+              that.setState({ candleData: data });
+              that.createCandleDataList(data);
+            }
           }
-          // } catch (err) {
-          //   console.log("Could not update candles. Component not mounted.");
-          // }
         })
         .catch(error => {
           console.log(error.message)

@@ -58,14 +58,18 @@ export default class PriceQuote extends React.Component {
     .then((data) => {
       const s = this.state
       if (this.baseState.mounted === true) {
-        const newData = {...s.stockData}
-        newData[key] = {}
-        newData[key]['currentPrice'] = data.c
-        newData[key]['dayHighPrice'] = data.h
-        newData[key]['dayLowPrice'] = data.l
-        newData[key]['dayOpenPrice'] = data.o
-        newData[key]['prevClosePrice'] = data.pc
-        this.setState({stockData: newData})
+        if (data.error === 429) { //run again
+          this.getStockData(stock)
+        } else {
+          const newData = {...s.stockData}
+          newData[key] = {}
+          newData[key]['currentPrice'] = data.c
+          newData[key]['dayHighPrice'] = data.h
+          newData[key]['dayLowPrice'] = data.l
+          newData[key]['dayOpenPrice'] = data.o
+          newData[key]['prevClosePrice'] = data.pc
+          this.setState({stockData: newData})
+        }
       }
     })
     .catch(error => {

@@ -165,8 +165,12 @@ export default class FundamentalsSECFilings extends Component {
       finnHub(p.throttle, queryString)
       .then((data) => {
         if (that.baseState.mounted === true) {
-          //update state
-          this.setState({stockData: data})
+          if (data.error === 429) { //run again
+            this.getStockData()
+          } else {  
+            //update state
+            this.setState({stockData: data})
+          }
         }
       })
       .catch(error => {

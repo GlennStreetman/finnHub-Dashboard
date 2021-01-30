@@ -13,19 +13,20 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle)
   let streamingStockData = {};
   let lastUpdate = new Date().getTime();
   let that = context
+  
   if (apiKey !== '' && USList !== []) {
-    try { 
-      // console.log('adding event listener----------------')
+    
+    // const newList = USList.map((el) => {
+    //   return  thisSocket.send(JSON.stringify({ type: "subscribe", symbol: el }))
+    // })
+
+  try { 
+
+    for (const stock in USList) {
       thisSocket.addEventListener("open", function (event) {
-        USList.map((el) => {
-          // console.log("mapping: ", { type: "subscribe", symbol: el })
-            throttle.enqueue(function() {
-              thisSocket.send(JSON.stringify({ type: "subscribe", symbol: el }))
-            })
-          return true;
-          }
-        );
-      });
+        thisSocket.send(JSON.stringify({ type: "subscribe", symbol: USList[stock] }))
+      })
+    }
 
       // Listen for messages
       thisSocket.addEventListener("message", function (event) {
@@ -60,7 +61,7 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle)
 function LoadTickerSocket(context, prevState, globalStockList, socket, apiKey, updateTickerSockets, throttle) {
   const that = context
   if (globalStockList !== prevState.globalStockList && throttle !== undefined && apiKey !== ""){
-    // console.log('updating socket')
+    console.log('updating socket')
     // if (socket !== '') { 
     //   socket.close()
     // }

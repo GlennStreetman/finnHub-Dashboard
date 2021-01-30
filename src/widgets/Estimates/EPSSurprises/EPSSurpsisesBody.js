@@ -141,6 +141,7 @@ createChartOptions(chartData) {
 }
 
 getStockData(){
+  console.log('EPS: getting stock data!')
   const p = this.props
   const s = this.state
   const that = this
@@ -148,8 +149,12 @@ getStockData(){
   finnHub(p.throttle, queryString)
   .then((data) => {
     if (that.baseState.mounted === true) {
-      // console.log(queryString,data)
-      this.setState({stockData: data}, ()=>this.createChartDataList())
+      if (data.error === 429) { //run again
+        this.getStockData()
+      } else {
+        // console.log(queryString,data)
+        this.setState({stockData: data}, ()=>this.createChartDataList())
+      }
     }
   })
   .catch(error => {

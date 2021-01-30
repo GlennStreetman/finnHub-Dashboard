@@ -32,16 +32,15 @@ const createFunctionQueueObject = function (maxRequestPerInterval, interval, eve
             setTimeout(() => that.dequeue(that), threshold - now);
             return;
         } else if (now < that.suspend){
-            console.log("Finnhub API calls suspended")
+            // console.log("Finnhub API calls suspended", that.openRequests, maxRequestPerInterval, that.suspend-now)
             setTimeout(() => that.dequeue(that), that.suspend - now);
             return;
         } else if (that.openRequests >= that.maxRequestPerInterval){
             // console.log("Open finnhub.io request limit exceeded, temp pause requests.")
-            that.openRequests = that.openRequests -= 1
+            // that.openRequests = that.openRequests -= 1
             setTimeout(() => that.dequeue(that), 100);
             return;
         } else {
-
             let callbacks = that.queue.splice(0, that.maxRequestPerInterval);
             for(let x = 0; x < callbacks.length; x++) {
                 callbacks[x]();
@@ -84,21 +83,17 @@ const finnHub = (throttle, apiString, id) => {
         throttle.enqueue(function() { 
             fetch(apiString)
             .then((response) => {
-                // console.log(response)
                 if (response.status === 429) {
                     console.log('429')
-                    throttle.openRequests = throttle.openRequests -= 1
                     throttle.setSuspend(4000)
-                    finnHub(throttle, apiString)
-                    // reject('finnhub 429') <--do not reject if 429. Will break promises.all in /routes/endpoint.
+                    // finnHub(throttle, apiString)
                 } else {
-            // console.log("FIRST RESPONSE:", response)
-                throttle.openRequests = throttle.openRequests -= 1
-                return response.json()
-            }
+                    return response.json()
+                }
             })
             .then((data) => {
                 // data.requestID = id
+                throttle.openRequests = throttle.openRequests -= 1
                 id.data = data
                 resolve(id)
             })
@@ -107,7 +102,7 @@ const finnHub = (throttle, apiString, id) => {
                 throttle.openRequests = throttle.openRequests -= 1
                 // error.requestID = id
                 id.data = {err: error}
-                resolve(id)
+                resolve(finnHub(throttle, apiString))
             });
         })
     })

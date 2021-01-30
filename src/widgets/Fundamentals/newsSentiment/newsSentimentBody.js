@@ -131,7 +131,11 @@ export default class FundamentalsNewsSentiment extends Component {
           finnHub(p.throttle, queryString)
           .then((data) => {
             if (that.baseState.mounted === true) {
-              this.setState({stockData: data})
+              if (data.error === 429) { //run again
+                this.getStockData(stock)
+              } else {
+                this.setState({stockData: data})
+              }
             }
           })
           .catch(error => {

@@ -148,8 +148,13 @@ export default class FundamentalsCompanyProfile2 extends Component {
           console.log(queryString)
           finnHub(p.throttle, queryString)
           .then((data) => {
+
             if (this.baseState.mounted === true) {
+              if (data.error === 429) { //run again
+                this.getStockData()
+              } else {
               that.setState({stockData: Object.assign({}, data)})
+              }
             }
           })
           .catch(error => {

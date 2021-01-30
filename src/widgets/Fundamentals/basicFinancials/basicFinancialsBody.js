@@ -42,21 +42,23 @@ export default class FundamentalsBasicFinancials extends React.Component {
     }
 
     if (this.props.apiKey !== '' ) {
-      const that = this
+      // const that = this
       // console.log( p.filters)
       const sourceStock = p.filters.metricSource
-      const sourceSymbol = sourceStock.slice(sourceStock.indexOf('-') + 1, sourceStock.length)
-      let queryString = `https://finnhub.io/api/v1/stock/metric?symbol=${sourceSymbol}&metric=all&token=${p.apiKey}`
+      // const sourceSymbol = sourceStock.slice(sourceStock.indexOf('-') + 1, sourceStock.length)
+      // let queryString = `https://finnhub.io/api/v1/stock/metric?symbol=${sourceSymbol}&metric=all&token=${p.apiKey}`
+      
+      this.getCompanyMetrics(sourceStock)
       // console.log(queryString)
-      finnHub(p.throttle, queryString)
-      .then((data) => {
-        if (this.baseState.mounted === true) {
-          that.setState({metricList: Object.keys(data.metric)})
-        }
-      })
-      .catch(error => {
-        console.log(error.message)
-      });
+      // finnHub(p.throttle, queryString)
+      // .then((data) => {
+      //   if (this.baseState.mounted === true) {
+      //     that.setState({metricList: Object.keys(data.metric)})
+      //   }
+      // })
+      // .catch(error => {
+      //   console.log(error.message)
+      // });
 
       // load initial data
       p.trackedStocks.sKeys().forEach(el => this.getCompanyMetrics(el))
@@ -86,9 +88,13 @@ export default class FundamentalsBasicFinancials extends React.Component {
       finnHub(this.props.throttle, querySting)
       .then((data) => {
           if (this.baseState.mounted === true) {
-            let updateData = Object.assign({}, that.state.metricData)
-            updateData[symbol] = data.metric
-            that.setState({metricData: updateData})
+            if (data.error === 429) { //run again
+              this.getCompanyMetrics(symbol)
+            } else {
+              let updateData = Object.assign({}, that.state.metricData)
+              updateData[symbol] = data.metric
+              that.setState({metricData: updateData})
+            }
           }
         })
         .catch(error => {

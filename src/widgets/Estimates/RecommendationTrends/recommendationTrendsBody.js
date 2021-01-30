@@ -156,8 +156,12 @@ export default class EstimatesRecommendationTrends extends Component {
       finnHub(p.throttle, queryString)
       .then((data) => {
         if (that.baseState.mounted === true) {
-          // console.log(queryString,data)
-          this.setState({stockData: data}, ()=>this.createChartDataList())
+          if (data.error === 429) { //run again
+            this.getStockData()
+          } else {
+            // console.log(queryString,data)
+            this.setState({stockData: data}, ()=>this.createChartDataList())
+          }
         }
       })
       .catch(error => {

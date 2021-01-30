@@ -10,29 +10,20 @@ function GetStockPrice(context, stockDescription, apiKey, throttle) {
     const queryString = `https://finnhub.io/api/v1/quote?symbol=${stockSymbol}&token=${apiKey}`
     finnHub(throttle, queryString)
       .then((data) => {
-        // console.log("updating stock data")
-        const {
-          c: a, //current price
-          // h: b, //current days high price
-          // l: c, //current days low price
-          // o: d, //current days open price
-          // pc: e, //previous days close price
-        } = data;
-        //create object from destructured data above.
+        if (data.error === 429) { //run again
+          GetStockPrice(context, stockDescription, apiKey, throttle)
+        } else {
         stockPriceData = {
-          currentPrice: a, 
-          // dayHighPrice: b,
-          // dayLowPrice: c,
-          // dayOpenPrice: d,
-          // prevClosePrice: e,
+          currentPrice: data.c, 
         };
-
         that.setState((prevState) => {
           // console.log("setting streamingPriceData")
           let newstreamingPriceData = Object.assign({}, prevState.streamingPriceData);
           newstreamingPriceData[`US-${stockSymbol}`] = stockPriceData;
           return { streamingPriceData: newstreamingPriceData };
+          
         });
+      }
       })
       .catch(error => {
         console.log(error.message)

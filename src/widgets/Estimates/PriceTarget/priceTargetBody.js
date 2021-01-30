@@ -123,9 +123,12 @@ export default class PriceTargetBody extends Component {
       finnHub(p.throttle, queryString)
       .then((data) => {
         if (that.baseState.mounted === true) {
-          // console.log(data)
-          this.setState({targetData: data})
-          
+          if (data.error === 429) { //run again
+            this.getStockData()
+          } else {
+            // console.log(data)
+            this.setState({targetData: data})
+          }
         }
       })
       .catch(error => {

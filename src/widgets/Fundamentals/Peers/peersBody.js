@@ -56,14 +56,18 @@ export default class FundamentalsPeers extends Component {
         finnHub(this.props.throttle, apiString)  
         .then((data) => {
           if (this.baseState.mounted === true) {
-            let updateStockList = Object.assign({}, data)
-            for (const key in updateStockList) {
-              let addStockData = updateStockList[key]
-              let addStockKey = updateStockList[key]['symbol']
-              updateStockList[addStockKey] = addStockData
-              delete updateStockList[key]
+            if (data.error === 429) { //run again
+              this.getSymbolList()
+            } else {
+              let updateStockList = Object.assign({}, data)
+              for (const key in updateStockList) {
+                let addStockData = updateStockList[key]
+                let addStockKey = updateStockList[key]['symbol']
+                updateStockList[addStockKey] = addStockData
+                delete updateStockList[key]
+              }
+              that.setState({ availableStocks: Object.assign({}, updateStockList)});
             }
-            that.setState({ availableStocks: Object.assign({}, updateStockList)});
           }
         })
         .catch((error) => {
@@ -150,9 +154,12 @@ export default class FundamentalsPeers extends Component {
       finnHub(p.throttle, queryString)
       .then((data) => {
         if (that.baseState.mounted === true) {
-          // console.log(data)
-          this.setState({peersList: data})
-          
+          if (data.error === 429) { //run again
+            this.getStockData()
+          } else {
+            // console.log(data)
+            this.setState({peersList: data})
+          }
         }
       })
       .catch(error => {

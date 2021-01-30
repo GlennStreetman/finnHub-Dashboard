@@ -211,8 +211,12 @@ export default class EstimatesEarningsCalendar extends Component {
           finnHub(p.throttle, queryString)
           .then((data) => {
             if (that.baseState.mounted === true) {
-              // console.log(data, queryString)
-              this.setState({stockData: data})
+              if (data.error === 429) { //run again
+                this.getStockData()
+              } else {
+                // console.log(data, queryString)
+                this.setState({stockData: data})
+              }
             }
           })
           .catch(error => {

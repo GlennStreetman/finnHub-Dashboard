@@ -53,7 +53,11 @@ export default class widgetName extends Component {
         if (that.baseState.mounted === true) {
           //update state
           console.log(data)
-          this.setState({stockData: data})
+          if (data.error === 429) { //run again
+            this.getStockData(stock)
+          } else {
+            this.setState({stockData: data})
+          }
         }
       })
       .catch(error => {
@@ -97,6 +101,12 @@ export function newWidgetNameProps(that, key = "newWidgetNameProps") {
   }
 
 
-  fetch('https://finnhub.io/api/v1/stock/split?symbol=TSLA&from=2001-02-23& to=2021-01-29&token=bsuu7qv48v6qu589jlj0')
-    .then(response => response.json())
-    .then(data => console.log(data))
+  // fetch('https://finnhub.io/api/v1/stock/split?symbol=TSLA&from=2001-02-23&to=2021-01-29&token=bsuu7qv48v6qu589jlj0')
+  //   .then(response => response.json())
+  //   .then(data => console.log(data))
+
+  // fetch('https://finnhub.io/api/v1/stock/split?symbol=TSLA&from=2001-02-23&to=2021-01-29&token=bsuu7qv48v6qu589jlj0')
+  // .then((response) => {
+  //   console.log(response) 
+  //   return (response.json())})
+  // .then(data => console.log(data))

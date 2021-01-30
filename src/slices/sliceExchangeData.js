@@ -8,16 +8,24 @@ export const rGetSymbolList = createAsyncThunk(
         // console.log(apiString)
         return finnHub(reqObj['throttle'], apiString)
         .then((data) => {
-            let updateStockList = {}
-            for (const stockObj in data) {
-                data[stockObj]['exchange'] = reqObj.exchange
-                let addStockKey = reqObj.exchange + "-" + data[stockObj]['symbol']
-                updateStockList[addStockKey] = data[stockObj]
-                updateStockList[addStockKey]['key'] = addStockKey
-            }  
-            return {
-                'data': updateStockList, 
-                'exchange': reqObj.exchange,
+            if (data.error === 429) { //run again
+                rGetSymbolList(reqObj)
+                return {
+                    'data': {}, 
+                    'exchange': reqObj.exchange,
+                }
+            } else {
+                let updateStockList = {}
+                for (const stockObj in data) {
+                    data[stockObj]['exchange'] = reqObj.exchange
+                    let addStockKey = reqObj.exchange + "-" + data[stockObj]['symbol']
+                    updateStockList[addStockKey] = data[stockObj]
+                    updateStockList[addStockKey]['key'] = addStockKey
+                }  
+                return {
+                    'data': updateStockList, 
+                    'exchange': reqObj.exchange,
+                }
             }
         })
     }

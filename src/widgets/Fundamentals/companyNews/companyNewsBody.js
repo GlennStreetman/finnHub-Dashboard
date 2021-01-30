@@ -84,7 +84,7 @@ export default class FundamentalsCompanyNews extends React.Component {
     return shortHeadLine;
   }
   
-  getCompanyNews(symbol, fromDate, toDate) {
+  getCompanyNews(symbol) {
     const p = this.props
     if (p.apiKey !== '' && symbol !== undefined) {
       
@@ -104,18 +104,22 @@ export default class FundamentalsCompanyNews extends React.Component {
       finnHub(p.throttle, querryString)
         .then((data) => {
           if (this.baseState.mounted === true) {
-            let filteredNews = [];
-            let newsCount = 0;
-            for (var news in data) {
-              if (data[news]["source"] !== "seekingalpha.com" && newsCount < 100) {
-                filteredNews.push(data[news]);
-                newsCount += 1;
-              }
-            }
-            try {
-              that.setState({ companyNews: filteredNews });
-            } catch (err) {
-              console.log("Could not update news.");
+            if (data.error === 429) { //run again
+              this.getCompanyNews(symbol)
+            } else {
+              let filteredNews = [];
+                let newsCount = 0;
+                for (var news in data) {
+                  if (data[news]["source"] !== "seekingalpha.com" && newsCount < 100) {
+                    filteredNews.push(data[news]);
+                    newsCount += 1;
+                  }
+                }
+                try {
+                  that.setState({ companyNews: filteredNews });
+                } catch (err) {
+                  console.log("Could not update news.");
+                }
             }
           }
         })

@@ -130,9 +130,11 @@ export default class FundamentalsIPOCalendar extends Component {
         finnHub(p.throttle, queryString)
         .then((data) => {
           if (that.baseState.mounted === true) {
-            //update state
-            // console.log(data)
-            this.setState({IPOData: data['ipoCalendar']})
+            if (data.error === 429) { //run again
+              this.getStockData()
+            } else {
+              this.setState({IPOData: data['ipoCalendar']})
+            }
           }
         })
         .catch(error => {

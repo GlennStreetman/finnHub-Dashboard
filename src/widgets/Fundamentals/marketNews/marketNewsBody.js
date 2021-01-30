@@ -65,18 +65,22 @@ export default class FundamentalsMarketNews extends React.Component {
       finnHub(p.throttle, querryString)
         .then((data) => {
           if (this.baseState.mounted === true) {
-            const filteredNews = [];
-            let newsCount = 0;
-            for (const news in data) {
-              if (data[news]["source"] !== "seekingalpha.com" && newsCount < 100) {
-                filteredNews.push(data[news]);
-                newsCount += 1;
+            if (data.error === 429) { //run again
+              this.getCompanyNews()
+            } else {
+              const filteredNews = [];
+              let newsCount = 0;
+              for (const news in data) {
+                if (data[news]["source"] !== "seekingalpha.com" && newsCount < 100) {
+                  filteredNews.push(data[news]);
+                  newsCount += 1;
+                }
               }
-            }
-            try {
-              that.setState({ companyNews: filteredNews });
-            } catch (err) {
-              console.log("Could not update news.");
+              try {
+                that.setState({ companyNews: filteredNews });
+              } catch (err) {
+                console.log("Could not update news.");
+              }
             }
           }
         })
