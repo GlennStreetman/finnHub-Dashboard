@@ -16,41 +16,41 @@ const createFunctionQueueObject = function (maxRequestPerInterval, interval, eve
         que.maxRequestPerInterval = 1;
     }
 
-    if (interval < 200) {
-        console.warn('An interval of less than 200ms can create performance issues.');
-    }
+    // if (interval < 200) {
+    //     console.warn('An interval of less than 200ms can create performance issues.');
+    // }
 
-    que.dequeue = function(that) {
-        that.running = 1
+    que.dequeue = function() {
+        this.running = 1
         // console.log('running deque')
-        let threshold = that.lastCalled + that.interval;
+        let threshold = this.lastCalled + this.interval;
         let now = Date.now();
 
         // Adjust the timer if it was called too early 
         if (now < threshold) {
-            
-            setTimeout(() => that.dequeue(that), threshold - now);
+            setTimeout(() => this.dequeue(), threshold - now);
             return;
-        } else if (now < that.suspend){
+        } else if (now < this.suspend){
             // console.log("Finnhub API calls suspended", that.openRequests, maxRequestPerInterval, that.suspend-now)
-            setTimeout(() => that.dequeue(that), that.suspend - now);
+            setTimeout(() => this.dequeue(), this.suspend - now);
             return;
-        } else if (that.openRequests >= that.maxRequestPerInterval){
+        } else if (this.openRequests >= this.maxRequestPerInterval){
             // console.log("Open finnhub.io request limit exceeded, temp pause requests.")
-            // that.openRequests = that.openRequests -= 1
-            setTimeout(() => that.dequeue(that), 100);
+            setTimeout(() => this.dequeue(), 100);
             return;
         } else {
-            let callbacks = that.queue.splice(0, that.maxRequestPerInterval);
+            //max requests should default to 1 if evenly spaced. 
+            let callbacks = this.queue.splice(0, this.maxRequestPerInterval);
             for(let x = 0; x < callbacks.length; x++) {
+                console.log("Enque: " + callbacks.length, "outstanding: "+ this.queue.length,"Open: " + this.openRequests, new Date())
                 callbacks[x]();
-                that.openRequests = that.openRequests += 1
+                this.openRequests = this.openRequests += 1
             }
-            that.lastCalled = Date.now();
-            if (that.queue.length) {
-                setTimeout(() => that.dequeue(that), that.interval);
+            this.lastCalled = Date.now();
+            if (this.queue.length) {
+                setTimeout(() => this.dequeue(), this.interval);
             } else {
-                that.running = 0
+                this.running = 0
             }
             return
         }
@@ -59,8 +59,9 @@ const createFunctionQueueObject = function (maxRequestPerInterval, interval, eve
     que.enqueue = function(callback) {
         this.queue.push(callback);
         if (this.running === 0) {
-            setTimeout(() => this.dequeue(this), this.interval);
-        } else {console.log('queue running')}
+            setTimeout(() => this.dequeue(), this.interval);
+        } 
+        // else {console.log('queue running')}
     }
 
     que.setSuspend = function (milliseconds) {
@@ -78,31 +79,40 @@ const createFunctionQueueObject = function (maxRequestPerInterval, interval, eve
 
 //add all API calls to throttleQue object using function below.
 //throttle =  que object returned by function above.
+
+
 const finnHub = (throttle, apiString, id) => {
+    
     return new Promise((resolve, reject) => {
         throttle.enqueue(function() { 
             fetch(apiString)
             .then((response) => {
                 if (response.status === 429) {
-                    console.log('429')
-                    throttle.setSuspend(4000)
+                    console.log('--429--')
+                    throttle.setSuspend(31000)
                     // finnHub(throttle, apiString)
+                    return {429: 429}
                 } else {
                     return response.json()
                 }
             })
             .then((data) => {
-                // data.requestID = id
-                throttle.openRequests = throttle.openRequests -= 1
-                id.data = data
-                resolve(id)
+                if (data[429] !== undefined) {
+                    // console.log('------------>429', throttle)
+                    resolve (finnHub(throttle, apiString, id))
+                    throttle.openRequests = throttle.openRequests -= 1
+                } else {
+                    throttle.openRequests = throttle.openRequests -= 1
+                    id.data = data
+                    resolve(id)
+                }
             })
             .catch(error => {
                 console.log(error.message)
                 throttle.openRequests = throttle.openRequests -= 1
-                // error.requestID = id
+                error.requestID = id
                 id.data = {err: error}
-                resolve(finnHub(throttle, apiString))
+                resolve(id)
             });
         })
     })

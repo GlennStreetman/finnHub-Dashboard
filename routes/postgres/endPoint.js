@@ -82,11 +82,14 @@ router.get("/endPoint", cors(),(req, res) => {
                     }
                 // console.log('requestID -->', requestID)
                 requestList.push(finnHub(throttle, apiString, requestID))
+                // finnHub(throttle, apiString, requestID)
             }
         }
-            // console.log("requestList:", requestList)
+            console.log("----------starting promise chain---------")
+            // console.log(throttle.queue)
             Promise.all(requestList)
             .then((response) => {
+                console.log("DONE")
                 for (const Obj in response){
                     const id = response[Obj].key
                     const stock = response[Obj].stock

@@ -20,36 +20,36 @@ export default function createFunctionQueueObject (maxRequestPerInterval, interv
     //     console.warn('An interval of less than 200ms can create performance issues.');
     // }
 
-    que.dequeue = function(that) {
-        that.running = 1
+    que.dequeue = function() {
+        this.running = 1
         // console.log('running deque')
-        let threshold = that.lastCalled + that.interval;
+        let threshold = this.lastCalled + this.interval;
         let now = Date.now();
 
         // Adjust the timer if it was called too early 
         if (now < threshold) {
-            setTimeout(() => that.dequeue(that), threshold - now);
+            setTimeout(() => this.dequeue(), threshold - now);
             return;
-        } else if (now < that.suspend){
+        } else if (now < this.suspend){
             console.log("Finnhub API calls suspended")
-            setTimeout(() => that.dequeue(that), that.suspend - now);
+            setTimeout(() => this.dequeue(), this.suspend - now);
             return;
-        } else if (that.openRequests >= that.maxRequestPerInterval){
+        } else if (this.openRequests >= this.maxRequestPerInterval){
             // console.log("Open finnhub.io request limit exceeded, temp pause requests.")
-            setTimeout(() => that.dequeue(that), 100);
+            setTimeout(() => this.dequeue(), 100);
             return;
         } else {
             //max requests should default to 1 if evenly spaced. 
-            let callbacks = that.queue.splice(0, that.maxRequestPerInterval);
+            let callbacks = this.queue.splice(0, this.maxRequestPerInterval);
             for(let x = 0; x < callbacks.length; x++) {
                 callbacks[x](); //runs callback from queue
-                that.openRequests = that.openRequests += 1
+                this.openRequests = this.openRequests += 1
             }
-            that.lastCalled = Date.now();
-            if (that.queue.length) { 
-                setTimeout(() => that.dequeue(that), that.interval);
+            this.lastCalled = Date.now();
+            if (this.queue.length) { 
+                setTimeout(() => this.dequeue(), this.interval);
             } else {
-                that.running = 0
+                this.running = 0
             }
             return
         }
@@ -58,7 +58,7 @@ export default function createFunctionQueueObject (maxRequestPerInterval, interv
     que.enqueue = function(callback) {
         this.queue.push(callback);
         if (this.running === 0) {
-            setTimeout(() => this.dequeue(this), this.interval);
+            setTimeout(() => this.dequeue(), this.interval);
         } 
         // else {console.log('queue running')}
     }
