@@ -76,7 +76,7 @@ class WidgetContainer extends React.Component {
       // get the mouse cursor position at startup:
       xAxis = e.clientX;
       yAxis = e.clientY;
-      console.log(xAxis, yAxis)
+      // console.log(xAxis, yAxis)
       document.onmouseup = closeDragElement;
       // call a function whenever the cursor moves:
       document.onmousemove = elementDrag;

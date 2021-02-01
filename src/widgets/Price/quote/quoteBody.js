@@ -20,7 +20,8 @@ export default class PriceQuote extends React.Component {
 
   componentDidMount(){
     const p = this.props
-    const stocks = p.trackedStocks.sKeys()
+    console.log(p.trackedStocks)
+    const stocks = p.trackedStocks.sKeys && p.trackedStocks.sKeys()
     for (const x in stocks) {
       this.getStockData(p.trackedStocks[stocks[x]]['symbol'], p.trackedStocks[stocks[x]]['key'])
     }
