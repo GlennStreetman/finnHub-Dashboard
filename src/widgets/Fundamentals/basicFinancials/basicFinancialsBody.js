@@ -7,7 +7,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-        targetStock: 'US-AAPL',
+        // targetStock: 'US-AAPL',
         metricList: [],
         metricData: {},
         metricIncrementor: 1,
@@ -42,34 +42,23 @@ export default class FundamentalsBasicFinancials extends React.Component {
     }
 
     if (this.props.apiKey !== '' ) {
-      // const that = this
-      // console.log( p.filters)
-      const sourceStock = p.filters.metricSource
-      // const sourceSymbol = sourceStock.slice(sourceStock.indexOf('-') + 1, sourceStock.length)
-      // let queryString = `https://finnhub.io/api/v1/stock/metric?symbol=${sourceSymbol}&metric=all&token=${p.apiKey}`
-      
-      this.getCompanyMetrics(sourceStock)
-      // console.log(queryString)
-      // finnHub(p.throttle, queryString)
-      // .then((data) => {
-      //   if (this.baseState.mounted === true) {
-      //     that.setState({metricList: Object.keys(data.metric)})
-      //   }
-      // })
-      // .catch(error => {
-      //   console.log(error.message)
-      // });
-
-      // load initial data
       p.trackedStocks.sKeys().forEach(el => this.getCompanyMetrics(el))
     }
   }
 
   componentDidUpdate(prevProps, PrevState) {
+    
+    const s = this.state
+    const p = this.props
+    // console.log(s.metricData[s.targetStock], s.metricList.length)
     if (this.props.trackedStocks !== prevProps.trackedStocks) {
       this.props.trackedStocks.sKeys().forEach(el => {
         prevProps.trackedStocks.sKeys().indexOf(el) === -1 && this.getCompanyMetrics(el)
       })
+    }
+    if (p.filters.metricSource !== undefined && s.metricData[p.filters.metricSource] !== undefined && s.metricList.length === 0) {
+      console.log('updating metric list')
+      this.setState({metricList: Object.keys(s.metricData[p.filters.metricSource])})
     }
     
   }
@@ -109,6 +98,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
   }
 
   changeSource(el){
+    console.log(el)
     const p = this.props
     p.updateWidgetFilters(p.widgetKey, 'metricSource', el)
     p.updateWidgetFilters(p.widgetKey, 'metricSelection', [])
