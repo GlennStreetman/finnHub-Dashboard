@@ -333,6 +333,7 @@ class App extends React.Component {
     }
     //setup widgets, and their individual stock lists.
     let updateWidgetList = JSON.parse(newWidgetList);
+    console.log(newWidgetList,"---------------")
     for (const widget in updateWidgetList){
       const widgetStockObj = updateWidgetList[widget]
       const trackedStockObj = widgetStockObj.trackedStocks
@@ -345,13 +346,12 @@ class App extends React.Component {
             return (this.key)
           }
         }
-        widgetStockObj.trackedStocks['sKeys'] = function(){
-          const stockList = Object.keys(this)
-          const index = stockList.indexOf('sKeys')
-          stockList.splice(index,1) 
-          return stockList
-        }
-        // console.log(trackedStockObj, stock)
+      }
+      widgetStockObj.trackedStocks['sKeys'] = function(){
+        const stockList = Object.keys(this)
+        const index = stockList.indexOf('sKeys')
+        stockList.splice(index,1) 
+        return stockList
       }
     }
 
