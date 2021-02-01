@@ -101,7 +101,7 @@ export function newWidgetNameProps(that, key = "newWidgetNameProps") {
   }
 
 
-  // fetch('https://finnhub.io/api/v1/stock/split?symbol=TSLA&from=2001-02-23&to=2021-01-29&token=bsuu7qv48v6qu589jlj0')
+  // fetch('https://finnhub.io/api/v1/search?q=WMT3.BA&token=bsuu7qv48v6qu589jlj0')
   //   .then(response => response.json())
   //   .then(data => console.log(data))
 

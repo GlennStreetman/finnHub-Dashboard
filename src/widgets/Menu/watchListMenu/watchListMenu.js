@@ -157,7 +157,7 @@ class WatchListMenu extends React.PureComponent {
 
           </>
         )}
-        <div className='widgetBodyTableDiv'>
+        <div className='.widgetTableDiv' style={{overflow: 'scroll'}}>
           <table className='widgetBodyTable'>
             <thead>
               <tr>

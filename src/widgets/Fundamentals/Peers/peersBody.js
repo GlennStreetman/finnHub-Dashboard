@@ -41,6 +41,7 @@ export default class FundamentalsPeers extends Component {
 
     changeStockSelection(e) {
       const target = e.target.value;
+      console.log(target)
       this.setState({ targetStock: target }, () => this.getStockData());
     }
 
@@ -157,7 +158,7 @@ export default class FundamentalsPeers extends Component {
           if (data.error === 429) { //run again
             this.getStockData()
           } else {
-            // console.log(data)
+            console.log(data)
             this.setState({peersList: data})
           }
         }

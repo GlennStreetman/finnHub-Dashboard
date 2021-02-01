@@ -50,7 +50,6 @@ export default class FundamentalsBasicFinancials extends React.Component {
     
     const s = this.state
     const p = this.props
-    // console.log(s.metricData[s.targetStock], s.metricList.length)
     if (this.props.trackedStocks !== prevProps.trackedStocks) {
       this.props.trackedStocks.sKeys().forEach(el => {
         prevProps.trackedStocks.sKeys().indexOf(el) === -1 && this.getCompanyMetrics(el)
