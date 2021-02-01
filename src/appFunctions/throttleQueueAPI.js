@@ -89,7 +89,7 @@ const finnHub = (throttle, apiString, id) => {
             .then((response) => {
                 if (response.status === 429) {
                     console.log('--429--')
-                    throttle.setSuspend(31000)
+                    throttle.setSuspend(61000)
                     // finnHub(throttle, apiString)
                     return {429: 429}
                 } else {

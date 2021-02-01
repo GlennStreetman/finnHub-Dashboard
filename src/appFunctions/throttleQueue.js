@@ -87,7 +87,7 @@ export const finnHub = (throttle, apiString) => {
             fetch(apiString)
             .then((response) => {
                 if (response.status === 429) {
-                    console.log('429')
+                    console.log('429 endpoint')
                     throttle.setSuspend(4000)
                     const errorObj = {error: 429} 
                     return errorObj
