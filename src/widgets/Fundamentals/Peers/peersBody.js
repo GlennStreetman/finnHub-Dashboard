@@ -158,7 +158,7 @@ export default class FundamentalsPeers extends Component {
           if (data.error === 429) { //run again
             this.getStockData()
           } else {
-            console.log(data)
+            // console.log(data)
             this.setState({peersList: data})
           }
         }

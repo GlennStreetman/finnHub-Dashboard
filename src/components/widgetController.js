@@ -24,61 +24,79 @@ class WidgetController extends React.Component {
         this.state = {
             widgetLockDown: 0, //1: Hide buttons, 0: Show buttons
         }
+        this.renderWidgetGroup = this.renderWidgetGroup.bind(this);
+        
 
     }
 
+    renderWidgetGroup(widgetObjList, objectRef) {
+        const p = this.props
+        const widgetGroup = widgetObjList.map((el) => {
+        
+        let thisWidgetProps = {
+            key: el.widgetId,
+            moveWidget: p.moveWidget,
+            removeWidget: p.removeWidget,
+            stateRef: el.widgetConfig, //used by app.js to move and remove widgets.
+            widgetBodyProps: returnBodyProps(this, el.widgetType, el.widgetID),
+            widgetKey: el.widgetID,
+            widgetLockDown: this.props.widgetLockDown,
+            changeWidgetName: this.props.changeWidgetName,
+            zIndex: this.props.zIndex,
+            updateZIndex: this.props.updateZIndex,
+            showStockWidgets: this.props.showStockWidgets,
+            snapWidget: this.props.snapWidget,
+            widgetList: el,
+        }
+        if (el.widgetConfig === 'menuWidget') {
+            thisWidgetProps.menuWidgetToggle = p.menuWidgetToggle
+            thisWidgetProps.showMenu = p[el.widgetID]
+            
+        }
+            return <div style={{padding: "1px"}}>{React.createElement(WidgetContainer, thisWidgetProps)}</div>
+                
+        })
+        return widgetGroup
+    } 
+
+
     render(){
-        
-        let widgetState = this.props.widgetList;
-        let menuState = this.props.menuList;
-        let that = this;
-        
-        //render all finnHub API widgets.
-        let widgetRender = Object.keys(widgetState).map((el) => (
-            <WidgetContainer
-                key={el}
-                moveWidget={this.props.moveWidget}
-                removeWidget={this.props.removeWidget}
-                stateRef="widgetList" //used by app.js to move and remove widgets.
-                widgetBodyProps={returnBodyProps(that, widgetState[el]["widgetType"], el)}
-                widgetKey={el}
-                widgetList={widgetState[el]}
-                widgetLockDown={this.props.widgetLockDown}
-                changeWidgetName={this.props.changeWidgetName}
-                zIndex={this.props.zIndex}
-                updateZIndex={this.props.updateZIndex}
-                showStockWidgets={this.props.showStockWidgets}
-            />
-        ));
-        
-        //render all menu widgets.
-        let menuRender = Object.keys(menuState).map((el) => (
-            <WidgetContainer
-                key={el}
-                menuWidgetToggle={this.props.menuWidgetToggle}
-                moveWidget={this.props.moveWidget}
-                removeWidget={this.props.removeWidget}
-                stateRef="menuList" //used by app.js to move and remove widgets.
-                showMenu={this.props[el]}
-                widgetBodyProps={returnBodyProps(that, el)}
-                widgetKey={el}
-                widgetList={menuState[el]}
-                widgetLockDown={this.props.widgetLockDown}
-                changeWidgetName={this.props.changeWidgetName}
-                zIndex={this.props.zIndex}
-                updateZIndex={this.props.updateZIndex}
-                showStockWidgets={this.props.showStockWidgets}
-            />
+        const p = this.props
+        // let that = this;
+        const allWidgets = {...p.widgetList, ...p.menuList}
+        //create widget groups.
+        const widgetGroups = {} //{0: [...widgets], 1: [...widgets], etc}
+        for (const w in allWidgets) {
+            const thisColumn = allWidgets[w].column
+            if (widgetGroups[thisColumn] === undefined) {
+                widgetGroups[thisColumn] = []
+            }
+            widgetGroups[thisColumn].push(allWidgets[w])
+        }
+
+
+        const renderWidgetColumns = Object.keys(widgetGroups).map((el) => (
+            <div style={{padding: "1px",}}>
+                {this.renderWidgetGroup(widgetGroups[el])}
+            </div>
         ))
+
+        const widgetMasterStyle = {
+            display: "flex",
+            "flexDirection": "row",
+            top: "60px",
+            left: "5px",
+            padding: "1px",
+        };
 
         return this.props.login === 1 ? (
             <>
-                {widgetRender}
-                {menuRender}
+                <div className='widgetMaster' style={widgetMasterStyle}>
+                    {renderWidgetColumns}
+                </div>
             </>
         ) : (
             <>
-                {menuRender}
             </>
         )
     }

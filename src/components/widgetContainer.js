@@ -94,17 +94,18 @@ class WidgetContainer extends React.Component {
       let newX = xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5
       let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
       // if (newY >= 60) {
-      that.props.moveWidget(that.props.stateRef, that.props.widgetKey, newY, newX);
+      that.props.moveWidget(that.props.stateRef, that.props.widgetKey, newX, newY);
       // } else {
       //   console.log("under 60, stop")
       //   that.props.moveWidget(that.props.stateRef, that.props.widgetKey, 60, newX);
-      // }
+      // }  
     }
 
     function closeDragElement() {
       // stop moving when mouse button is released:
       document.onmouseup = null;
       document.onmousemove = null;
+      that.props.snapWidget(that.props.widgetList['widgetConfig'], that.props.widgetKey, xAxis, yAxis)
     }
   }
 
@@ -119,17 +120,22 @@ class WidgetContainer extends React.Component {
   }
 
   render() {
+    const that = this;
     //Add widgets to the list below that should not have access to the stock search pane
     const hideStockSearchMenu = ["DashBoardMenu"]
 
     const compStyle = {
       display: this.state.show,
-      top: this.props.widgetList["xAxis"],
-      left: this.props.widgetList["yAxis"],
       zIndex: this.props.zIndex.indexOf(this.props.widgetKey),
     };
 
-    const that = this;
+    if (that.props.widgetList.column !== 'drag'){ 
+      compStyle['top'] = this.props.widgetList["yAxis"]
+      compStyle['left'] = this.props.widgetList["xAxis"]
+    }  else {
+      compStyle['position'] = 'abosolute'
+    }
+    // console.log(that.props, "BROKEN HERE")
     let widgetProps = that.props.widgetBodyProps();
     if (this.props.widgetKey !== "dashBoardMenu") {
       widgetProps["showEditPane"] = that.state.showEditPane;
@@ -137,8 +143,6 @@ class WidgetContainer extends React.Component {
       widgetProps['searchText'] = this.state.searchText
       widgetProps['changeSearchText'] = this.changeSearchText
     } 
-
-    // const tab = {'textIndent': '25px',}
 
     return (
       <div key={this.props.widgetKey + "container" + this.state.show} id={this.props.widgetKey + "box"} 

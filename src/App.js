@@ -71,6 +71,8 @@ class App extends React.Component {
     this.processLogin = this.processLogin.bind(this);
     this.removeWidget = this.removeWidget.bind(this);
     this.saveCurrentDashboard = this.saveCurrentDashboard.bind(this);
+    this.snapWidget = this.snapWidget.bind(this);
+    this.snapOrder = this.snapOrder.bind(this);
     this.toggleWidgetVisability = this.toggleWidgetVisability.bind(this);
     this.toggleBackGroundMenu = this.toggleBackGroundMenu.bind(this);
     this.updateWidgetFilters = this.updateWidgetFilters.bind(this);
@@ -168,8 +170,8 @@ class App extends React.Component {
       widgetID: widgetName,
       widgetType: widgetDescription,
       widgetHeader: widgetHeader,
-      xAxis: "40px",
-      yAxis: "40px",
+      xAxis: "5rem",
+      yAxis: "5rem",
       widgetConfig: widgetConfig,
     };
     this.setState({ menuList: newMenuList });
@@ -178,11 +180,92 @@ class App extends React.Component {
   moveWidget(stateRef, widgetId, xxAxis, yyAxis) {
     //updates x and y pixel location of target widget.
     //stateref should be "widgetList" or "menuList"
-    let updatedWidgetLocation = Object.assign({}, this.state[stateRef]);
+    const ref = stateRef === "menuWidget" ? "menuList" : "widgetList"
+    let updatedWidgetLocation = Object.assign({}, this.state[ref]);
+    updatedWidgetLocation[widgetId]['column'] = 'drag'
     updatedWidgetLocation[widgetId]["xAxis"] = xxAxis;
     updatedWidgetLocation[widgetId]["yAxis"] = yyAxis;
-    this.setState({ [stateRef]: updatedWidgetLocation });
+    this.setState({ ref: updatedWidgetLocation });
     this.updateZIndex(widgetId)
+  }
+
+  snapOrder(widget, column, yyAxis, wType){
+    // console.log("1", widget, column, yyAxis, wType)
+    const s = this.state
+    const allWidgets = {...s.menuList, ...s.widgetList} 
+    const targetColumn = {} //{columnOrder = {id, height, updatedorder, widgetType}}
+    //find widgets from matching column and create update object, targetColumn
+    for (const w in allWidgets) {
+      if (allWidgets[w]['column'] === column) {
+        
+        targetColumn[allWidgets[w]['columnOrder']] = {
+          id: allWidgets[w]['widgetID'],
+          height: document.getElementById(allWidgets[w]['widgetID'] + "box").clientHeight,
+          widgetType: allWidgets[w]['widgetConfig'],
+        }
+      }
+    }
+    // console.log("2:", targetColumn)
+    let totalHeight = 0
+    let updateOrder = false
+    let targetLocation = 0
+    //evaluate all objects in targetColumn to check if order needs to be updated based off of yAxis drag point.
+    for (const w in targetColumn) { 
+      // console.log(yyAxis, totalHeight + (targetColumn[w]['height']/2), "---" )
+      const wN = Number (w)
+      if (updateOrder === true) {
+        //all widgets below target widget, after first one detected.
+        // console.log("---alltrue---")
+        targetColumn[w]['updateOrder'] = wN + 1
+      } else if (yyAxis < (totalHeight + (targetColumn[w]['height']/2))) {
+        //first widget detected we need to insert new target above.
+        // console.log("found first")
+        updateOrder = true
+        targetLocation = wN
+        targetColumn[wN]['updateOrder'] =  wN + 1
+      } else {
+        //if target widget goes after.
+        // console.log("greater")
+        targetColumn[wN]['updateOrder'] =  wN + 0
+        totalHeight = totalHeight + targetColumn[wN]['height']
+      }
+    }
+    //insert widget into update list
+    targetColumn[widget] = {
+      id: widget,
+      updateOrder: targetLocation,
+      widgetType: wType,
+    }
+    
+    // console.log("3:",targetColumn, "end 3")
+    // insert updates into widget and menu list.
+    const newMenu = {...s.menuList}
+    const newWidget = {...s.widgetList}
+    for (const w in targetColumn) {
+      // console.log(targetColumn[w])
+      if (targetColumn[w]['widgetType'] === 'stockWidget') {
+        newWidget[targetColumn[w]['id']]['column'] = column
+        newWidget[targetColumn[w]['id']]['columnOrder'] = targetColumn[w]['updateOrder']
+      } else {
+        newMenu[targetColumn[w]['id']]['column'] = column
+        newMenu[targetColumn[w]['id']]['columnOrder'] = targetColumn[w]['updateOrder']
+      }
+    }
+    // console.log("4:",newMenu, newWidget)
+    this.setState({
+      menuList: newMenu, 
+      widgetList: newWidget
+    })
+  }
+  // totalHeight = totalHeight + targetColumn[w].height
+
+  snapWidget(stateRef, widgetId, xxAxis, yyAxis){
+    // let updatedWidgetLocation = Object.assign({}, this.state[stateRef]);
+    // updatedWidgetLocation[widgetId]['column'] = Math.floor(xxAxis / 400)
+    // updatedWidgetLocation[widgetId]["xAxis"] = '-';
+    this.snapOrder(widgetId, Math.floor(xxAxis / 400), yyAxis, stateRef)
+    // this.setState({ [stateRef]: updatedWidgetLocation });
+    // this.updateZIndex(widgetId)
   }
 
   updateWidgetFilters(widgetID, dataKey, data){
@@ -333,7 +416,7 @@ class App extends React.Component {
     }
     //setup widgets, and their individual stock lists.
     let updateWidgetList = JSON.parse(newWidgetList);
-    console.log(newWidgetList,"---------------")
+    // console.log(newWidgetList,"---------------")
     for (const widget in updateWidgetList){
       const widgetStockObj = updateWidgetList[widget]
       const trackedStockObj = widgetStockObj.trackedStocks
@@ -557,6 +640,7 @@ class App extends React.Component {
             updateDefaultExchange={this.updateDefaultExchange}
             uploadGlobalStockList={this.uploadGlobalStockList}
             syncGlobalStockList={this.syncGlobalStockList}
+            snapWidget={this.snapWidget}
           />
         {loginScreen}
         {backGroundMenu()}
