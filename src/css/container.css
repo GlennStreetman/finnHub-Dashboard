@@ -1,6 +1,5 @@
 .widgetBox {
   overflow: hidden;
-  /* position: absolute; */
   z-index: 1;
   border: 2px solid black;
   border-radius: 10px;
@@ -10,7 +9,6 @@
 
 .widgetBox:hover {
   overflow: hidden;
-  /* position: absolute; */
   z-index: 99 !important;
   border: 2px solid black;
   border-radius: 10px;

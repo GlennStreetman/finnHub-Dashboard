@@ -14,6 +14,7 @@ class WidgetContainer extends React.Component {
       searchText: '',
     };
 
+    this.widgetRef = React.createRef();
     this.dragElement = this.dragElement.bind(this);
     this.showPane = this.showPane.bind(this);
     this.updateHeader = this.updateHeader.bind(this);
@@ -63,54 +64,61 @@ class WidgetContainer extends React.Component {
   }
 
   dragElement() {
+    const widgetState = this.widgetRef.current;
+    widgetState.state.widgetID = this.props.widgetList.widgetID
     let that = this;
     let xAxis = 0;
     let yAxis = 0;
 
     document.getElementById(this.props.widgetList["widgetID"]).onmousedown = dragMouseDown;
-    let widgetWidth = document.getElementById(this.props.widgetKey + "box").clientWidth;
+    // let widgetWidth = document.getElementById(this.props.widgetKey + "box").clientWidth;
+    let widgetWidth = 200
 
     function dragMouseDown(e) {
       e = e || window.event;
       e.preventDefault();
-      // get the mouse cursor position at startup:
-      xAxis = e.clientX;
-      yAxis = e.clientY;
-      // console.log(xAxis, yAxis)
-      document.onmouseup = closeDragElement;
-      // call a function whenever the cursor moves:
-      document.onmousemove = elementDrag;
+
+      xAxis = e.clientX + window.scrollX
+      yAxis = e.clientY 
+      that.props.setDrag(that.props.stateRef, that.props.widgetKey)
+      .then((data)=>{
+        document.onmouseup = closeDragElement;
+        document.onmousemove = elementDrag;
+      })
     }
 
     function elementDrag(e) {
       e = e || window.event;
       e.preventDefault();
 
-      xAxis = e.clientX;
-      yAxis = e.clientY;
-      // set the element's new position:
-      // let newX = xAxis - widgetWidth + 25;
-      // let newY = yAxis - 25;
+      xAxis = e.clientX + window.scrollX;
+      yAxis = e.clientY + window.scrollY;
+      
       let newX = xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5
       let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
-      // if (newY >= 60) {
-      that.props.moveWidget(that.props.stateRef, that.props.widgetKey, newX, newY);
-      // } else {
-      //   console.log("under 60, stop")
-      //   that.props.moveWidget(that.props.stateRef, that.props.widgetKey, 60, newX);
-      // }  
+
+      that.props.moveWidget(that.props.stateRef, that.props.widgetKey, newX, newY, widgetState.state);
     }
 
-    function closeDragElement() {
+    function closeDragElement(e) {
       // stop moving when mouse button is released:
+      // if (this.props.widgetList.column !== "drag") { 
+      xAxis = e.clientX + window.scrollX;
+      yAxis = e.clientY + window.scrollY;
+      let newX = xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5
+      let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
+      const snapWidget = () => {
+        that.props.snapWidget(that.props.widgetList['widgetConfig'], that.props.widgetKey, xAxis, yAxis)
+      }
       document.onmouseup = null;
       document.onmousemove = null;
-      that.props.snapWidget(that.props.widgetList['widgetConfig'], that.props.widgetKey, xAxis, yAxis)
+      that.props.moveWidget(that.props.stateRef, that.props.widgetKey, newX, newY, widgetState.state, snapWidget);
+
     }
   }
 
   showWidget(){
-    if (this.props.stateRef === "menuList" && this.props.showMenu === 0){
+    if (this.props.stateRef === "menuWidget" && this.props.showMenu === 0){
       return "none"
     } else if (this.props.showStockWidgets === 0) {
       return "none"
@@ -123,19 +131,18 @@ class WidgetContainer extends React.Component {
     const that = this;
     //Add widgets to the list below that should not have access to the stock search pane
     const hideStockSearchMenu = ["DashBoardMenu"]
-
+  // console.log("drag state:", that.props.widgetList.column)
     const compStyle = {
-      display: this.state.show,
-      zIndex: this.props.zIndex.indexOf(this.props.widgetKey),
+      display: this.state.show
     };
-
-    if (that.props.widgetList.column !== 'drag'){ 
+    // zIndex: this.props.zIndex.indexOf(this.props.widgetKey),
+    if (that.props.widgetList.column === 'drag'){ 
+      // console.log("drag state:", that.props.widgetList.column)
+      compStyle['position'] = 'absolute'
       compStyle['top'] = this.props.widgetList["yAxis"]
-      compStyle['left'] = this.props.widgetList["xAxis"]
-    }  else {
-      compStyle['position'] = 'abosolute'
-    }
-    // console.log(that.props, "BROKEN HERE")
+      compStyle['left'] = this.props.widgetList["xAxis"] 
+    } 
+    
     let widgetProps = that.props.widgetBodyProps();
     if (this.props.widgetKey !== "dashBoardMenu") {
       widgetProps["showEditPane"] = that.state.showEditPane;
@@ -143,10 +150,19 @@ class WidgetContainer extends React.Component {
       widgetProps['searchText'] = this.state.searchText
       widgetProps['changeSearchText'] = this.changeSearchText
     } 
+    widgetProps.ref = this.widgetRef
+
+    if (this.props.widgetCopy) {
+      widgetProps['widgetCopy'] = this.props.widgetCopy
+    }
 
     return (
-      <div key={this.props.widgetKey + "container" + this.state.show} id={this.props.widgetKey + "box"} 
-      className="widgetBox" style={compStyle} onMouseOut={() => {this.props.updateZIndex(this.props.widgetKey)}}>
+      <div 
+        key={this.props.widgetKey + "container" + that.props.widgetList.column} 
+        id={this.props.widgetKey + "box"} 
+        style={compStyle} 
+        className="widgetBox"  
+      >
         {this.props.widgetLockDown === 0 ? (
           <div className="widgetHeader">
             {this.state.showEditPane === 0 ? (
@@ -184,8 +200,8 @@ class WidgetContainer extends React.Component {
           {this.props.widgetLockDown === 0 ? (
             <button
               onClick={() => {
-                if (this.props.stateRef === "widgetList") {
-                  this.props.removeWidget(this.props.stateRef, this.props.widgetKey);
+                if (this.props.stateRef === "stockWidget") {
+                  this.props.removeWidget("widgetList", this.props.widgetKey);
                 } else {
                   this.props.menuWidgetToggle(this.props.widgetKey);
                 }

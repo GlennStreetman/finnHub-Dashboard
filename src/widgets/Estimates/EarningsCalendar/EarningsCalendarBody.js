@@ -25,16 +25,20 @@ export default class EstimatesEarningsCalendar extends Component {
 
     componentDidMount(){
       const p = this.props
-      if (p.filters['startDate'] === undefined) {
-        const startDateOffset = -604800*1000*52 //1 year backward. Limited to 1 year on free version.
-        const endDateOffset = 0 //today.
-        p.updateWidgetFilters(p.widgetKey, 'startDate', startDateOffset)
-        p.updateWidgetFilters(p.widgetKey, 'endDate', endDateOffset)
-        p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
-      } 
+      if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+        this.setState({...p.widgetCopy})
+      } else {
+        if (p.filters['startDate'] === undefined) {
+          const startDateOffset = -604800*1000*52 //1 year backward. Limited to 1 year on free version.
+          const endDateOffset = 0 //today.
+          p.updateWidgetFilters(p.widgetKey, 'startDate', startDateOffset)
+          p.updateWidgetFilters(p.widgetKey, 'endDate', endDateOffset)
+          p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
+        } 
 
-      if (p.trackedStocks.sKeys()[0] !== undefined) {
-        this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData())
+        if (p.trackedStocks.sKeys()[0] !== undefined) {
+          this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData())
+        }
       }
     }
 

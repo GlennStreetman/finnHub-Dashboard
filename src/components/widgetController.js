@@ -5,13 +5,11 @@ import {returnBodyProps} from "../registers/widgetControllerReg.js"
 function MenuWidgetToggle(context) {
     //Create dashboard menu if first time looking at, else toggle visability
     return function toggleFunction(menuName, dashName = "pass", that = context ){
-        // console.log("toggling ", menuName)
         if (that.state.menuList[menuName] === undefined) {
-            console.log("new menu")
+
             that.newMenuContainer(menuName, dashName, "menuWidget");
             that.setState({ [menuName]: 1 });
         } else {
-            // console.log("toggle menu")
             that.state[menuName] === 1 ? that.setState({ [menuName]: 0 }) : that.setState({ [menuName]: 1 });
         }
     }
@@ -20,66 +18,90 @@ function MenuWidgetToggle(context) {
 class WidgetController extends React.Component {
     constructor(props) {
         super(props);
-        
         this.state = {
             widgetLockDown: 0, //1: Hide buttons, 0: Show buttons
         }
         this.renderWidgetGroup = this.renderWidgetGroup.bind(this);
-        
-
     }
 
-    renderWidgetGroup(widgetObjList, objectRef) {
+    renderWidgetGroup(widgetObjList) {
         const p = this.props
-        const widgetGroup = widgetObjList.map((el) => {
-        
-        let thisWidgetProps = {
-            key: el.widgetId,
-            moveWidget: p.moveWidget,
-            removeWidget: p.removeWidget,
-            stateRef: el.widgetConfig, //used by app.js to move and remove widgets.
-            widgetBodyProps: returnBodyProps(this, el.widgetType, el.widgetID),
-            widgetKey: el.widgetID,
-            widgetLockDown: this.props.widgetLockDown,
-            changeWidgetName: this.props.changeWidgetName,
-            zIndex: this.props.zIndex,
-            updateZIndex: this.props.updateZIndex,
-            showStockWidgets: this.props.showStockWidgets,
-            snapWidget: this.props.snapWidget,
-            widgetList: el,
-        }
-        if (el.widgetConfig === 'menuWidget') {
-            thisWidgetProps.menuWidgetToggle = p.menuWidgetToggle
-            thisWidgetProps.showMenu = p[el.widgetID]
-            
-        }
-            return <div style={{padding: "1px"}}>{React.createElement(WidgetContainer, thisWidgetProps)}</div>
-                
-        })
-        return widgetGroup
-    } 
+        if (widgetObjList !== undefined && widgetObjList[0]['pass'] === undefined) {
+            // console.log("Presort:", widgetObjList)
+            widgetObjList.sort((a,b) => (a.columnOrder > b.columnOrder) ? 1 : -1)
+            // console.log("Post Sort:", widgetObjList)
+            const p = this.props
+            const widgetGroup = widgetObjList.map((el) => {
+            const thisWidgetProps = {
+                key: el.widgetId,
+                moveWidget: p.moveWidget,
+                removeWidget: p.removeWidget,
+                stateRef: el.widgetConfig, //used by app.js to move and remove widgets.
+                widgetBodyProps: returnBodyProps(this, el.widgetType, el.widgetID),
+                widgetKey: el.widgetID,
+                widgetLockDown: p.widgetLockDown,
+                changeWidgetName: p.changeWidgetName,
+                zIndex: p.zIndex,
+                showStockWidgets: p.showStockWidgets,
+                snapWidget: p.snapWidget,
+                setDrag: p.setDrag,
+                widgetList: el,
+            }
+            if (el.widgetConfig === 'menuWidget') {
+                thisWidgetProps['menuWidgetToggle'] = this.props.menuWidgetToggle
+                thisWidgetProps['showMenu'] = p[el.widgetID]    
+            }
+            if (p.widgetCopy.widgetID === el.widgetID){
+                thisWidgetProps.widgetCopy = p.widgetCopy
+            }
+                return (
+                <div key={el.widgetID+'thisKey'} style={{padding: "1px"}}>
+                    {React.createElement(WidgetContainer, thisWidgetProps)}
+                </div>
+                )
+                    
+            })
+            return widgetGroup
+        } else {
+            const phantomStyle = {
+                padding: "1px",
+                height:"10px",
+                width:'400px',
 
+            }
+            return ( //empty column place holder.
+            <div 
+                key={widgetObjList[0]['pass']+"phantom"} 
+                style={phantomStyle} 
+            />
+            ) 
+        }
+    } 
 
     render(){
         const p = this.props
-        // let that = this;
         const allWidgets = {...p.widgetList, ...p.menuList}
-        //create widget groups.
-        const widgetGroups = {} //{0: [...widgets], 1: [...widgets], etc}
+        const widgetGroups = Array.from({length: 32},  (i, x) => {return [{'pass':x}]})
         for (const w in allWidgets) {
             const thisColumn = allWidgets[w].column
-            if (widgetGroups[thisColumn] === undefined) {
+            // console.log(widgetGroups, thisColumn)
+            if (thisColumn === 'drag') {
+                widgetGroups[32] = []
+                widgetGroups[32].push(allWidgets[w])
+            } else { if (widgetGroups[thisColumn][0]['pass'] !== undefined) {
                 widgetGroups[thisColumn] = []
             }
             widgetGroups[thisColumn].push(allWidgets[w])
+            }
+            // widgetGroups[thisColumn] = [allWidgets[w]]
         }
+    // console.log("WIDGETGROUPS:", widgetGroups)
 
-
-        const renderWidgetColumns = Object.keys(widgetGroups).map((el) => (
-            <div style={{padding: "1px",}}>
+        const renderWidgetColumns = Object.keys(widgetGroups).map((el) => {
+            return <div key={el+"divkey"} style={{padding: "1px",}}>
                 {this.renderWidgetGroup(widgetGroups[el])}
             </div>
-        ))
+        })
 
         const widgetMasterStyle = {
             display: "flex",
@@ -88,6 +110,7 @@ class WidgetController extends React.Component {
             left: "5px",
             padding: "1px",
         };
+
 
         return this.props.login === 1 ? (
             <>
