@@ -90,7 +90,7 @@ class App extends React.Component {
 
   componentDidMount(){
     // this.state.throttle.suspend = Date.now()+2000
-    console.log(Date.now(), this.state.throttle.suspend)
+    // console.log(Date.now(), this.state.throttle.suspend)
   }
 
   componentDidUpdate(prevProps, prevState){
@@ -169,23 +169,24 @@ class App extends React.Component {
     this.setState({ menuList: newMenuList });
   }
 
-  setDrag(stateRef, widgetId){
-    // console.log("DRAG", stateRef, widgetId)
+  setDrag(stateRef, widgetId, widgetCopy){
     const ref = stateRef === "menuWidget" ? "menuList" : "widgetList";
     let updatedWidgetLocation = Object.assign({}, this.state[ref]);
     updatedWidgetLocation[widgetId]['column'] = 'drag';
     return new Promise((resolve, reject) => {
-      this.setState({ ref: updatedWidgetLocation }, ()=>{resolve(true)})
+      this.setState({ ref: updatedWidgetLocation, widgetCopy: widgetCopy }, ()=>{
+        resolve(true)
+        })
   })}
 
-  moveWidget(stateRef, widgetId, xxAxis, yyAxis, widgetCopy, callback=()=>{}) {
+  moveWidget(stateRef, widgetId, xxAxis, yyAxis, callback=()=>{}) {
     //updates x and y pixel location of target widget.
     //stateref should be "widgetList" or "menuList"
     const widgetListRef = stateRef === "menuWidget" ? "menuList" : "widgetList"
     let updatedWidgetLocation = Object.assign({}, this.state[widgetListRef]);
     updatedWidgetLocation[widgetId]["xAxis"] = xxAxis;
     updatedWidgetLocation[widgetId]["yAxis"] = yyAxis;
-    this.setState({ widgetListRef: updatedWidgetLocation, widgetCopy: widgetCopy }, callback());
+    this.setState({ widgetListRef: updatedWidgetLocation }, callback());
   }
 
   snapOrder(widget, column, yyAxis, wType){

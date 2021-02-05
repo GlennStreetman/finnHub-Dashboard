@@ -32,17 +32,21 @@ export default class FundamentalsBasicFinancials extends React.Component {
   componentDidMount(){
     const p = this.props
     //initial setup the first time widget is loaded.
-    if (p.filters['metricSelection'] === undefined) {
-      let newList = []
-      p.updateWidgetFilters(p.widgetKey, 'metricSelection', newList)
-      p.trackedStocks.sKeys()[0] === undefined ?
-        p.updateWidgetFilters(p.widgetKey, 'metricSource', 'US-AAPL') :
-        p.updateWidgetFilters(p.widgetKey, 'metricSource', p.trackedStocks.sKeys()[0])
-        p.updateWidgetFilters(p.widgetKey, 'Note', 'Metric source for dashboard display purposes.')
-    }
+    if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+      this.setState({...p.widgetCopy})
+    } else {
+      if (p.filters['metricSelection'] === undefined) {
+        let newList = []
+        p.updateWidgetFilters(p.widgetKey, 'metricSelection', newList)
+        p.trackedStocks.sKeys()[0] === undefined ?
+          p.updateWidgetFilters(p.widgetKey, 'metricSource', 'US-AAPL') :
+          p.updateWidgetFilters(p.widgetKey, 'metricSource', p.trackedStocks.sKeys()[0])
+          p.updateWidgetFilters(p.widgetKey, 'Note', 'Metric source for dashboard display purposes.')
+      }
 
-    if (this.props.apiKey !== '' ) {
-      p.trackedStocks.sKeys().forEach(el => this.getCompanyMetrics(el))
+      if (this.props.apiKey !== '' ) {
+        p.trackedStocks.sKeys().forEach(el => this.getCompanyMetrics(el))
+      }
     }
   }
 

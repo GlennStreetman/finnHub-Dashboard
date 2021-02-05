@@ -25,7 +25,7 @@ class WidgetController extends React.Component {
     }
 
     renderWidgetGroup(widgetObjList) {
-        const p = this.props
+        // const p = this.props
         if (widgetObjList !== undefined && widgetObjList[0]['pass'] === undefined) {
             // console.log("Presort:", widgetObjList)
             widgetObjList.sort((a,b) => (a.columnOrder > b.columnOrder) ? 1 : -1)

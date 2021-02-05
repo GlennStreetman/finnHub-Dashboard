@@ -23,9 +23,11 @@ export default class FundamentalsCompanyProfile2 extends Component {
 
   componentDidMount(){
     const p = this.props
-    console.log('getting stock data')
-    this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData())
-    
+    if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+      this.setState({...p.widgetCopy})
+    } else {
+      this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData())
+    }
   }
 
   componentDidUpdate(prevProps, prevState){

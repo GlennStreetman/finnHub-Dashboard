@@ -23,7 +23,12 @@ export default class FundamentalsMarketNews extends React.Component {
   }
 
   componentDidMount() {
-    this.getCompanyNews();
+    const p = this.props
+    if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+      this.setState({...p.widgetCopy})
+    } else {
+      this.getCompanyNews();
+    }
   }
 
 

@@ -66,6 +66,7 @@ class WidgetContainer extends React.Component {
   dragElement() {
     const widgetState = this.widgetRef.current;
     widgetState.state.widgetID = this.props.widgetList.widgetID
+    // console.log("WSTATE:", widgetState.state)
     let that = this;
     let xAxis = 0;
     let yAxis = 0;
@@ -80,7 +81,7 @@ class WidgetContainer extends React.Component {
 
       xAxis = e.clientX + window.scrollX
       yAxis = e.clientY 
-      that.props.setDrag(that.props.stateRef, that.props.widgetKey)
+      that.props.setDrag(that.props.stateRef, that.props.widgetKey, widgetState.state)
       .then((data)=>{
         document.onmouseup = closeDragElement;
         document.onmousemove = elementDrag;
@@ -96,8 +97,8 @@ class WidgetContainer extends React.Component {
       
       let newX = xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5
       let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
-
-      that.props.moveWidget(that.props.stateRef, that.props.widgetKey, newX, newY, widgetState.state);
+      //copy widget state THEN move widget.
+      that.props.moveWidget(that.props.stateRef, that.props.widgetKey, newX, newY);
     }
 
     function closeDragElement(e) {
@@ -112,7 +113,7 @@ class WidgetContainer extends React.Component {
       }
       document.onmouseup = null;
       document.onmousemove = null;
-      that.props.moveWidget(that.props.stateRef, that.props.widgetKey, newX, newY, widgetState.state, snapWidget);
+      that.props.moveWidget(that.props.stateRef, that.props.widgetKey, newX, newY, snapWidget);
 
     }
   }

@@ -19,8 +19,11 @@ export default class widgetName extends Component {
 
     componentDidMount(){
       const p = this.props
-      p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData()) 
-
+      if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) { //loads saved data on component drag.
+        this.setState({...p.widgetCopy})
+      } else {
+        p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData()) 
+      }
     }
 
     componentDidUpdate(prevProps, prevState){

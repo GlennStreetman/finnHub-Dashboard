@@ -25,7 +25,11 @@ export default class EstimatesRecommendationTrends extends Component {
 
     componentDidMount(){
       const p = this.props
-      p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData())
+      if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+        this.setState({...p.widgetCopy})
+      } else {
+        p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData())
+      }
     }
 
     componentDidUpdate(prevProps, prevState){

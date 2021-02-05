@@ -56,6 +56,7 @@ export default function createFunctionQueueObject (maxRequestPerInterval, interv
     }
 
     que.enqueue = function(callback) {
+        console.log("que" + Date.now())
         this.queue.push(callback);
         if (this.running === 0) {
             setTimeout(() => this.dequeue(), this.interval);

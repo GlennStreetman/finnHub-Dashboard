@@ -20,12 +20,14 @@ export default class PriceQuote extends React.Component {
 
   componentDidMount(){
     const p = this.props
-    // console.log(p.trackedStocks)
-    const stocks = p.trackedStocks.sKeys && p.trackedStocks.sKeys()
-    for (const x in stocks) {
-      this.getStockData(p.trackedStocks[stocks[x]]['symbol'], p.trackedStocks[stocks[x]]['key'])
+    if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+      this.setState({...p.widgetCopy})
+    } else {
+      const stocks = p.trackedStocks.sKeys && p.trackedStocks.sKeys()
+      for (const x in stocks) {
+        this.getStockData(p.trackedStocks[stocks[x]]['symbol'], p.trackedStocks[stocks[x]]['key'])
+      }
     }
-    // this.setState({stockData: startingStockData})
   }
 
   componentDidUpdate(prevProps){

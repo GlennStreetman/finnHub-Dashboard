@@ -30,18 +30,20 @@ export default class PriceCandles extends React.Component {
 
   componentDidMount() {
     const p = this.props
-    if (p.filters['startDate'] === undefined) {
-      const startDateSetBack = 31536000*1000 //1 week
-      const endDateSetBack = 0
-      p.updateWidgetFilters(p.widgetKey, 'startDate', startDateSetBack)
-      p.updateWidgetFilters(p.widgetKey, 'endDate', endDateSetBack)
-      p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
-      p.updateWidgetFilters(p.widgetKey, 'resolution', 'W')
-    } 
-    
-    
-    if (p.trackedStocks.sKeys().length > 0) {
-      this.getCandleData();
+    if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+      this.setState({...p.widgetCopy})
+    } else {
+      if (p.filters['startDate'] === undefined) {
+        const startDateSetBack = 31536000*1000 //1 week
+        const endDateSetBack = 0
+        p.updateWidgetFilters(p.widgetKey, 'startDate', startDateSetBack)
+        p.updateWidgetFilters(p.widgetKey, 'endDate', endDateSetBack)
+        p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
+        p.updateWidgetFilters(p.widgetKey, 'resolution', 'W')
+      } 
+      if (p.trackedStocks.sKeys().length > 0) {
+        this.getCandleData();
+      }
     }
   }
 

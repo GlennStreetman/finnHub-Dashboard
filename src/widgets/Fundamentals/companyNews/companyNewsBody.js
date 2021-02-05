@@ -34,18 +34,19 @@ export default class FundamentalsCompanyNews extends React.Component {
   componentDidMount() {
     const p = this.props
     const s = this.state
-    if (p.filters['startDate'] === undefined) {
-      const startDateSetBack = 604800*1000 //1 week
-      const endDateSetBack = 0
-      p.updateWidgetFilters(p.widgetKey, 'startDate', startDateSetBack)
-      p.updateWidgetFilters(p.widgetKey, 'endDate', endDateSetBack)
-      p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
-    } 
-
-
-
-    if (p.trackedStocks.sKeys().length > 0 && s.newsSelection !== undefined && p.filters !== undefined) {
-      this.getCompanyNews(s.newsSelection, p.filters.startDate, p.filters.endDate);
+    if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+      this.setState({...p.widgetCopy})
+    } else {
+      if (p.filters['startDate'] === undefined) {
+        const startDateSetBack = 604800*1000 //1 week
+        const endDateSetBack = 0
+        p.updateWidgetFilters(p.widgetKey, 'startDate', startDateSetBack)
+        p.updateWidgetFilters(p.widgetKey, 'endDate', endDateSetBack)
+        p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
+      } 
+      if (p.trackedStocks.sKeys().length > 0 && s.newsSelection !== undefined && p.filters !== undefined) {
+        this.getCompanyNews(s.newsSelection, p.filters.startDate, p.filters.endDate);
+      }
     }
   }
 

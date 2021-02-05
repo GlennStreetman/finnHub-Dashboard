@@ -22,9 +22,12 @@ export default class FundamentalsNewsSentiment extends Component {
 
     componentDidMount(){
       const p = this.props
-      p.trackedStocks.sKeys()[0] !== undefined && 
+      if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+        this.setState({...p.widgetCopy})
+      } else {
+        p.trackedStocks.sKeys()[0] !== undefined && 
         this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData()) 
-      
+      }
     }
 
     componentDidUpdate(prevProps, prevState){
@@ -104,21 +107,6 @@ export default class FundamentalsNewsSentiment extends Component {
         </>
     return stockTable
     }
-    
-  //   mapStockData(){
-  //     const s = this.state
-  //     const rows = Object.keys(s.stockData).map((key) => 
-  //       <tr key={s.stockData[key]}>
-  //         <td>{ `${key}: `}</td>
-  //         {/* <td>{s.stockData[key]}</td> */}
-  //         <td>
-  //           s.stockData[key]
-  //           {/* {key === 'logo' ? <img width='25%' src={s.stockData[key]}  alt={s.stockData[key]}></img> :  s.stockData[key]} */}
-  //         </td>
-  //       </tr>
-  //     )
-  //   return rows
-  // }
 
     getStockData(){
       if (this.state.targetStock !== undefined) {

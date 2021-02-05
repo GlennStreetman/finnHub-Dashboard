@@ -22,14 +22,18 @@ export default class FundamentalsIPOCalendar extends Component {
 
     componentDidMount(){
       const p = this.props
-      if (p.filters['startDate'] === undefined) {
-        const startDateOffset = -604800*1000*52 //1 year backward.
-        const endDateOffset = 604800*1000*52 //1 year forward.
-        p.updateWidgetFilters(p.widgetKey, 'startDate', startDateOffset)
-        p.updateWidgetFilters(p.widgetKey, 'endDate', endDateOffset)
-        p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
-      } 
-      this.getStockData()
+      if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+        this.setState({...p.widgetCopy})
+      } else {
+        if (p.filters['startDate'] === undefined) {
+          const startDateOffset = -604800*1000*52 //1 year backward.
+          const endDateOffset = 604800*1000*52 //1 year forward.
+          p.updateWidgetFilters(p.widgetKey, 'startDate', startDateOffset)
+          p.updateWidgetFilters(p.widgetKey, 'endDate', endDateOffset)
+          p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
+        } 
+        this.getStockData()
+      }
     }
 
     componentDidUpdate(prevProps, prevState){

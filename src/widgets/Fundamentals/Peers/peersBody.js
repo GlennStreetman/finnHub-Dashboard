@@ -23,9 +23,12 @@ export default class FundamentalsPeers extends Component {
 
     componentDidMount(){
       const p = this.props
-      p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData()) 
-      this.getSymbolList()
-      
+      if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+        this.setState({...p.widgetCopy})
+      } else {
+        p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData()) 
+        this.getSymbolList()
+      }
     }
 
     componentDidUpdate(prevProps, prevState){

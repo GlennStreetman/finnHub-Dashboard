@@ -25,7 +25,11 @@ export default class EstimatesEPSSurprises extends Component {
 
 componentDidMount(){
   const p = this.props
-  p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData())
+  if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+      this.setState({...p.widgetCopy})
+  } else {
+    p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData())
+  }
 }
 
 componentDidUpdate(prevProps, prevState){
@@ -141,7 +145,7 @@ createChartOptions(chartData) {
 }
 
 getStockData(){
-  console.log('EPS: getting stock data!')
+  // console.log('EPS: getting stock data!')
   const p = this.props
   const s = this.state
   const that = this
