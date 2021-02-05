@@ -195,7 +195,7 @@ class App extends React.Component {
     allWidgets = allWidgets.filter(w => (w['column'] === column ? true : false))
     allWidgets = allWidgets.sort((a,b) => (a.columnOrder > b.columnOrder) ? 1 : -1)
 
-    // console.log("1.Sorted Column", allWidgets)
+    console.log("1.Sorted Column", allWidgets)
 
     let targetLocation = 0
     let foundInsertPoint = false
@@ -253,6 +253,12 @@ class App extends React.Component {
     addColumn[s.menuList.WatchListMenu.column] = []
     addColumn[s.menuList.DashBoardMenu.column].push(s.DashBoardMenu)
     addColumn[s.menuList.WatchListMenu.column].push(s.WatchListMenu)
+    for (const w in s.widgetList) {
+      if (addColumn[s.widgetList[w].column] !== undefined ) {
+        addColumn[s.widgetList[w].column].push(1)
+      }
+    }
+    console.log(addColumn)
     let column = Math.floor(xxAxis / 400)
     for (const x in addColumn) {
       if (addColumn[x].reduce((a,b) => a + b, 0) === 0){
