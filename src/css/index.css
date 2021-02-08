@@ -15,7 +15,14 @@ code {
   align-items: center;
   padding: 2px;
   margin-inline: 2px;
-  /* margin-bottom: 25px; */
+  color: white;
+}
+
+.form-stack {
+  /* display: flex; */
+  align-items: center;
+  padding: 2px;
+  margin-inline: 2px;
   color: white;
 }
 

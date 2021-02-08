@@ -12,7 +12,7 @@ const DOMAIN = process.env.DOMAIN_KEY || 1;
 const mailgun = require('mailgun-js')({ apiKey: API_KEY, domain: DOMAIN });
 
 router.use(function timeLog (req, res, next) {
-  console.log('Time: ', Date.now())
+  // console.log('Time: ', Date.now())
   next()
 });
 

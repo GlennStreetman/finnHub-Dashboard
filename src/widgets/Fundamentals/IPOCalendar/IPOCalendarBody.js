@@ -64,9 +64,10 @@ export default class FundamentalsIPOCalendar extends Component {
       const pf = this.props.filters
         return <>
           <div className="stockSearch">
-            <form className="form-inline">
+            <form className="form-stack">
               <label htmlFor="start">Start date:</label>
               <input className="btn" id="start" type="date" name="startDate" onChange={this.updateFilter} value={this.findDate(pf.startDate)}></input>
+              <br />
               <label htmlFor="end">End date:</label>
               <input className="btn" id="end" type="date" name="endDate" onChange={this.updateFilter} value={this.findDate(pf.endDate)}></input>
             </form>

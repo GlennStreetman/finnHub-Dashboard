@@ -26,15 +26,13 @@ export default class FundamentalsCompanyProfile2 extends Component {
     if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
       this.setState({...p.widgetCopy})
     } else {
+      console.log("setup")
       this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData())
     }
   }
 
-  componentDidUpdate(prevProps, prevState){
+  componentDidUpdate(prevProps){
     const p = this.props
-    if (prevState.targetStock !== this.state.targetStock) {
-      this.getStockData()
-    }
     if (prevProps.trackedStocks.sKeys()[0] !== p.trackedStocks.sKeys()[0]) {
       this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData())
     }
@@ -46,7 +44,7 @@ export default class FundamentalsCompanyProfile2 extends Component {
 
   changeStockSelection(e) {
     const target = e.target.value;
-    this.setState({ targetStock: target });
+    this.setState({ targetStock: target }, ()=> this.getStockData());
   }
 
   editWidgetStockList(stock) {
@@ -147,7 +145,7 @@ export default class FundamentalsCompanyProfile2 extends Component {
           const p = this.props
           const that = this
           const queryString = `https://finnhub.io/api/v1/stock/profile2?symbol=${thisStock}&token=${p.apiKey}`
-          console.log(queryString)
+          // console.log(queryString)
           finnHub(p.throttle, queryString)
           .then((data) => {
 

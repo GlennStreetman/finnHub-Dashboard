@@ -16,13 +16,13 @@ function emailIsValid(email) {
 };
 
 router.use(function timeLog(req, res, next) {
-  console.log("Time: ", new Date());
+  // console.log("Time: ", new Date());
   next();
 });
 
 router.get("*", (req, res) => {
   //Disabled, can be updated in future to redirect if not logged in.
-  console.log("New: " + req.session.login);
+  // console.log("New: " + req.session.login);
   const URLLogin = process.env.live ? `build/index.html` : `public/index.html`;
   const URLApp = process.env.live ? `build/index.html` : `public/index.html`;
   req.session.login === true ? res.sendFile(__dirname, URLLogin) : res.sendFile(__dirname, URLApp);

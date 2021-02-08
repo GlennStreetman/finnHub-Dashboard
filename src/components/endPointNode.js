@@ -17,7 +17,17 @@ export default class EndPointNode extends React.Component {
             typeof checkObject === 'object' && checkObject !== null && this.setState({[key]: false})
         }
 
-        this.renderNodeData()
+        // this.renderNodeData()
+    }
+
+    componentDidUpdate(prevProps){
+        const p = this.props
+        if (p.nodeData !== prevProps.nodeData) {
+            for (const key in this.props.nodeData) {
+                const checkObject = this.props.nodeData[key]
+                typeof checkObject === 'object' && checkObject !== null && this.setState({[key]: false})
+            }
+        }
     }
 
     toggleDataButton(el){

@@ -270,9 +270,10 @@ export default class FundamentalsCompanyNews extends React.Component {
             <div>
             {React.createElement(StockSearchPane, searchPaneProps(this))}
               <div className="stockSearch">
-                <form className="form-inline">
+                <form className="form-stack">
                   <label htmlFor="start">Start date:</label>
                   <input className="btn" id="start" type="date" name="startDate" onChange={this.updateFilter} value={startDate}></input>
+                  <br />
                   <label htmlFor="end">End date:</label>
                   <input className="btn" id="end" type="date" name="endDate" onChange={this.updateFilter} value={endDate}></input>
                 </form>

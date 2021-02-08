@@ -13,5 +13,6 @@ module.exports = function earningsCalendarEndPoint(stockList, filters, apiKey){
         const queryString = `https://finnhub.io/api/v1/calendar/earnings?from=${findDate(filters.startDate)}1&to=${findDate(filters.endDate)}1&symbol=${stockSymbole}&token=${apiKey}`
         queryStringObj[stockSymbole] = (queryString)
     }
+    // console.log(queryStringObj)
         return queryStringObj
 }

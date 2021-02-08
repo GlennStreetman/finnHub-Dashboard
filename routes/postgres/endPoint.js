@@ -7,7 +7,7 @@ const cors = require('cors')
 const {widgetDict} = require("../../src/registers/endPointsReg.js")
 
 router.use(function timeLog(req, res, next) {
-    console.log("Time: ", new Date());
+    // console.log("Time: ", new Date());
     next();
     });
 
@@ -17,7 +17,7 @@ router.get("/endPoint", cors(),(req, res) => {
     const apiKey = format('%L', req.query['apiKey'])
     const dashBoardName = format('%L', req.query['dashBoardName'])
     const returnDashBoardQuery = `
-        SELECT widgetlist
+        SELECT widgetlist, globalstocklist
         FROM dashboard
         WHERE dashboardname = ${dashBoardName} AND
             userID = (SELECT id FROM users WHERE apiKey = ${apiKey} limit 1)
@@ -33,39 +33,58 @@ router.get("/endPoint", cors(),(req, res) => {
                 console.log(err)
             } else {
                 const data = JSON.parse(rows.rows[0].widgetlist)
+                const stockList = JSON.parse(rows.rows[0].globalstocklist)
+                const resObj = {data: data, stockList: stockList} 
                 // console.log(data)
-                resolve(data)
+                resolve(resObj)
             }
         })
     })}
 
     const buildEndPoint = (dashboard) => {return new Promise((resolve, reject) => {
     //builds query strings for finnHub API calls.
-        const resObject = {}
-        for (const widgetKey in dashboard) {
-            const thisWidget = dashboard[widgetKey]
+        const resObject = {
+            widget: {},
+            security: {},
+            streamingData: {},
+        }
+        for (const stock in dashboard.stockList){
+            if (dashboard.stockList[stock].exchange === 'US'){
+                const socket = {
+                    type: 'subscirbe',
+                    symbol: dashboard.stockList[stock].symbol}
+                resObject.streamingData[dashboard.stockList[stock].symbol] = socket}
+            }
+
+        for (const widgetKey in dashboard.data) {
+            const thisWidget = dashboard.data[widgetKey]
             const widgetFunction = widgetDict[thisWidget.widgetType] //function to create query string
             const queryStringList = widgetFunction(
                 thisWidget.trackedStocks, 
                 thisWidget.filters, 
                 req.query['apiKey'])
-            // dashboard[key].apiStrings = queryStringList
-            const id = thisWidget.widgetID
-            resObject[id] = {}
-                resObject[id].name = thisWidget.widgetHeader
-                resObject[id].finnhubEndpoint = thisWidget.widgetType
-                resObject[id].filters = thisWidget.filters
-                resObject[id].stockData = {}
-                    // resObject[id].stockData.apiString = queryStringList[0]
-        //    console.log(queryStringList)
+            //Info for each widget
+            const id = resObject.widget[thisWidget.widgetHeader] ? thisWidget.widgetID : thisWidget.widgetHeader
+            resObject.widget[id] = {
+                name: thisWidget.widgetHeader,
+                Endpoint: thisWidget.widgetType,
+                filters: thisWidget.filters,
+                stockData: {},
+            }
             for (const stock in queryStringList) {
-                resObject[id].stockData[stock] = {
+                resObject.widget[id].stockData[stock] = {
                     'apiString': queryStringList[stock]
                 } 
-                // console.log(resObject[id].stockData[stock])  
+            //Info for each STOCK/security
+                if (resObject.security[stock] === undefined) {resObject.security[stock] = {} }
+                resObject.security[stock][id] = {
+                    apiString: queryStringList[stock],
+                    EndPoint: thisWidget.widgetType,
+                    filters: thisWidget.filters,
+                    stockData: {},
+                }
             }
         }
-        // console.log("res Object -->", resObject)
         resolve(resObject)
     })}
 
@@ -73,9 +92,9 @@ router.get("/endPoint", cors(),(req, res) => {
         const throttle = createFunctionQueueObject(25, 1000, true) 
         let requestList = []
         //create list of promises to be pushed to Promise.all
-        for(const key in resObject) {
-            for(const stock in resObject[key].stockData){
-                const apiString = resObject[key].stockData[stock].apiString
+        for(const key in resObject.widget) {
+            for(const stock in resObject.widget[key].stockData){
+                const apiString = resObject.widget[key].stockData[stock].apiString
                 const requestID = {
                     key: key,
                     stock: stock,
@@ -94,8 +113,8 @@ router.get("/endPoint", cors(),(req, res) => {
                     const id = response[Obj].key
                     const stock = response[Obj].stock
                     const data = response[Obj].data
-                    // console.log(id, stock, data)
-                    resObject[id].stockData[stock].data = data
+                    resObject.widget[id].stockData[stock].data = data
+                    resObject.security[stock][id].stockData = data
                 }
                 resolve(resObject)
             })

@@ -16,7 +16,7 @@ const mailgun = require('mailgun-js')({ apiKey: API_KEY, domain: DOMAIN });
 
 // middleware specific to this router
 router.use(function timeLog (req, res, next) {
-  console.log('Time: ', Date.now())
+  // console.log('Time: ', Date.now())
   next()
 });
 

@@ -42,7 +42,7 @@ const createFunctionQueueObject = function (maxRequestPerInterval, interval, eve
             //max requests should default to 1 if evenly spaced. 
             let callbacks = this.queue.splice(0, this.maxRequestPerInterval);
             for(let x = 0; x < callbacks.length; x++) {
-                console.log("Enque: " + callbacks.length, "outstanding: "+ this.queue.length,"Open: " + this.openRequests, new Date())
+                // console.log("Enque: " + callbacks.length, "outstanding: "+ this.queue.length,"Open: " + this.openRequests, new Date())
                 callbacks[x]();
                 this.openRequests = this.openRequests += 1
             }

@@ -101,9 +101,10 @@ export default class EstimatesEarningsCalendar extends Component {
     let searchForm = ( 
       <>
         <div className="stockSearch">
-          <form className="form-inline">
+          <form className="form-stack">
             <label htmlFor="start">Start date:</label>
             <input className="btn" id="start" type="date" name="startDate" onChange={this.updateFilter} value={startDate}></input>
+            <br />
             <label htmlFor="end">End date:</label>
             <input className="btn" id="end" type="date" name="endDate" onChange={this.updateFilter} value={endDate}></input>
           </form>
@@ -218,7 +219,7 @@ export default class EstimatesEarningsCalendar extends Component {
               if (data.error === 429) { //run again
                 this.getStockData()
               } else {
-                // console.log(data, queryString)
+                // console.log("UPDATING",data, queryString)
                 this.setState({stockData: data})
               }
             }

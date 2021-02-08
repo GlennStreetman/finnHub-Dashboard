@@ -31,14 +31,17 @@ class StockSearchPane extends React.Component {
       <option key={el} value={el}>{el}</option>
     )
     const helpText = <>
-        'Click manage account to update manage exchange list.' <br />
-        'Enter stock name or symbol to right to search for stocks to add to watchlist.'
+        Select Exchange to search. <br />
+        Click manage account to update exchange list. 
       </>
+      const helpText2 = <>
+        Enter stock name or symbol to search for stocks. <br />
+    </>
 
     return (
       <div className="stockSearch">
         <form
-          className="form-inline"
+          className="form-stack"
           onSubmit={(e) => { //submit stock to be added/removed from global & widget stocklist.
             if (this.props.rUpdateStock !== undefined && widgetKey === 'WatchListMenu') {
               const stockKey = this.props.rUpdateStock.key
@@ -61,12 +64,13 @@ class StockSearchPane extends React.Component {
           <select value={this.props.defaultExchange} name='exchangeList' onChange={this.changeDefault}>
             {exchangeOptions}
           </select></>
-          }
+          } 
+          <br />
+          <ToolTip textFragment={helpText2} hintName='sspe2' />
           <label htmlFor="stockSearch">Symbol: </label>
-          <input size='40' autoComplete="off" className="btn" type="text" id="stockSearch" list="stockSearch1" value={this.state.inputText} onChange={this.handleChange} />
+          <input size='18' autoComplete="off" className="btn" type="text" id="stockSearch" list="stockSearch1" value={this.state.inputText} onChange={this.handleChange} />
           <datalist id="stockSearch1">
-            <StockDataList 
-              // availableStocks={this.state.filteredStocks} 
+            <StockDataList  
               defaultExchange={this.props.defaultExchange}
               inputText={this.props.searchText}
             />

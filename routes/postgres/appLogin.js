@@ -8,7 +8,7 @@ const db = process.env.live === '1' ?
   require("../../db/databaseLocalPG.js") ;
 
   router.use(function timeLog(req, res, next) {
-    console.log("Time: ", new Date());
+    // console.log("Time: ", new Date());
     next();
   });
 
