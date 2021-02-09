@@ -1,5 +1,5 @@
 import React from "react";
-
+  
 class AccountMenu extends React.Component {
   constructor(props) {
     super(props);
@@ -12,6 +12,7 @@ class AccountMenu extends React.Component {
       editField: "",
       inputText: "",
       serverMessage: "",
+      ratelimit: 0,
     };
 
     this.baseState = {mounted: true}
@@ -38,12 +39,16 @@ class AccountMenu extends React.Component {
     .then((response) => response.json())
     .then((data) => {
       if (baseState.mounted === true) {
-        let dataSet = data["userData"];
-        this.setState({ loginName: dataSet["loginname"] });
-        this.setState({ email: dataSet["email"] });
-        this.setState({ apiKey: dataSet["apikey"] });
-        this.setState({ webHook: dataSet["webhook"] }); 
-      }
+        const dataSet = data["userData"];
+        const rateLimit = dataSet.ratelimit !== null ? dataSet.ratelimit : 25
+        this.setState({ 
+          loginName: dataSet["loginname"],
+          email: dataSet["email"],
+          apiKey: dataSet["apikey"],
+          webHook: dataSet["webhook"],
+          rateLimit: rateLimit,
+        })
+        }
     })
     .catch((error) => {
       console.error("Failed to retrieve user data" + error);
@@ -68,14 +73,19 @@ class AccountMenu extends React.Component {
       console.log('updating apikey')
       this.props.updateAPIKey(newValue)
     }
+    if (changeField === 'ratelimit') {
+      this.props.throttle.updateInterval(newValue)
+    }
     fetch("/accountData", options)
       .then((response) => response.json())
       .then((data) => {
         if (baseState.mounted === true) {
           this.getAccountData(baseState);
-          this.setState({ editToggle: 0 });
-          this.setState({ inputText: "" });
-          this.setState({serverMessage: data.message});
+          this.setState({ 
+            editToggle: 0,
+            inputText: "",
+            serverMessage: data.message,
+          });
         }
       });
   }
@@ -87,13 +97,23 @@ class AccountMenu extends React.Component {
   }
 
   render() {
-    let messageStyle = {
-      'text-align': 'center',
+    const divOutline = {
+      border: '5px solid',
+      borderRadius: '10px',
+      backgroundColor: 'white',
+      padding: '5px',
+      borderColor: '#1d69ab',
+    }
+    const messageStyle = {
+      'textAlign': 'center',
     }
     return (
       <>
         {this.state.editToggle === 0 && (
-          <>
+          
+          
+          <div style={divOutline}>
+            <b>Account Data:</b>
             <table>
               <tbody>
                 <tr>
@@ -131,12 +151,19 @@ class AccountMenu extends React.Component {
                     <button onClick={() => this.props.toggleBackGroundMenu("exchangeMenu")}>edit</button>
                   </td>
                 </tr>
+                <tr>
+                  <td>API Rate Limit: </td>
+                  <td>{this.state.rateLimit}</td>
+                  <td>
+                    <button onClick={() => this.showEditPane("ratelimit")}>edit</button>
+                  </td>
+                </tr>
               </tbody>
             </table>
             {this.state.serverMessage !== "" && (
                 <div style={messageStyle}><b >{this.state.serverMessage}</b></div>
             )}
-          </>
+          </div>
         )}
         {this.state.editToggle === 1 && (
           <table>
@@ -173,6 +200,7 @@ class AccountMenu extends React.Component {
 
 export function accountMenuProps(that, key = "AccountMenu") {
   let propList = {
+    throttle: that.state.throttle,
     apiKey: that.state.apiKey,
     widgetKey: key,
     updateAPIKey: that.updateAPIKey,

@@ -31,9 +31,8 @@ router.get("*", (req, res) => {
 router.get("/accountData", (req, res) => {
   // thisRequest = req.query;
   if (req.session.login === true) {
-    let accountDataQuery = `SELECT loginName, email, apiKey, webHook FROM users WHERE id =$1`;
+    let accountDataQuery = `SELECT loginName, email, apiKey, webHook, ratelimit FROM users WHERE id =$1`;
     let queryValues = [req.session.uID];
-    // console.log(newQuery)
     let resultSet = {};
     db.query(accountDataQuery, queryValues, (err, rows) => {
       let result = rows.rows[0];

@@ -27,6 +27,7 @@ class login extends React.Component {
 
   componentDidMount(){
     console.log("Loading loggin screen.")
+    // console.log("PROPS: ", this.props)
     // console.log(this.props.queryData)
     if (this.props.queryData.reset === '1') {
       const user = this.props.queryData.users
@@ -56,9 +57,10 @@ class login extends React.Component {
     .then((data) => {
       // console.log("Loggin status: ", data)
       if (data.login === 1) {
-        this.props.updateLogin(data.apiKey, 1)
+        this.props.updateLogin(data.apiKey, 1, data.ratelimit)
         this.props.updateExchangeList(data.exchangelist)
         this.props.updateDefaultExchange(data.defaultexchange)
+        if (data.ratelimit > 0) {this.props.throttle.updateInterval(data.ratelimit)}
       } else {
         console.log("Not logged in:", data)
       }
@@ -119,7 +121,7 @@ class login extends React.Component {
   }
  
   checkPassword() {
-
+  
     fetch("/login?loginText=" + this.state.loginText + "&pwText=" + this.state.pwText)
       .then((response) => response.json())
       .then((data) => {
@@ -128,6 +130,7 @@ class login extends React.Component {
           this.props.updateLogin(data["key"], data["login"]);
           this.props.updateExchangeList(data.exchangelist)
           this.props.updateDefaultExchange(data.defaultexchange)
+          if (data.ratelimit > 0) {this.props.throttle.updateInterval(data.ratelimit)}
         } else {
           this.setState({ serverResponse: data.response});
         }

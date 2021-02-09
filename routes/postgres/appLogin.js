@@ -15,7 +15,7 @@ const db = process.env.live === '1' ?
 router.get("/login", (req, res) => {
     let loginText = format('%L', req.query["loginText"])
     let pwText = format('%L', req.query["pwText"])
-    let loginQuery = `SELECT id, loginname, apikey, confirmemail,exchangelist, defaultexchange
+    let loginQuery = `SELECT id, loginname, apikey, ratelimit, confirmemail,exchangelist, defaultexchange
                 FROM users WHERE loginName =${loginText} 
                 AND password = '${md5(pwText)}'`;
     let info = { key: "", login: 0 };
@@ -24,9 +24,10 @@ router.get("/login", (req, res) => {
         let login = rows.rows[0]
       // console.log(login)
         if (err) {
-          res.json({message: "login error"});
+          res.json({message: "Login error"});
         } else if (rows.rowCount === 1 && login.confirmemail === '1') {
           info["key"] = login.apikey;
+          info['ratelimit'] = login.ratelimit
           info["login"] = 1;
           info["response"] = 'success';
           info["exchangelist"] = rows.rows[0]['exchangelist']
@@ -58,7 +59,7 @@ router.get("/checkLogin", (req, res) => {
   let resData = { login: 0 };
   let uID = req.session["uID"];
   let apiKeysQuery = `
-    SELECT apikey, webhook, exchangelist, defaultexchange 
+    SELECT apikey, webhook, ratelimit, exchangelist, defaultexchange 
     FROM users
     WHERE id = ${uID}
     `;
@@ -76,6 +77,7 @@ router.get("/checkLogin", (req, res) => {
           resData.exchangelist = rows.rows[0].exchangelist;
           resData.defaultexchange = rows.rows[0].defaultexchange;
           resData.login = 1;
+          resData.ratelimit = rows.rows[0].ratelimit
           resolve(resData);
         }
       });

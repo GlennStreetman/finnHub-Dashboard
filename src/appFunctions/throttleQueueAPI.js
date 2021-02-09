@@ -12,13 +12,9 @@ const createFunctionQueueObject = function (maxRequestPerInterval, interval, eve
     que.running = 0 //0 not yet started, 1 running
 
     if (evenlySpaced) {
-        que.interval = que.interval / que.maxRequestPerInterval;
+        que.interval = (que.interval * 1000) / que.maxRequestPerInterval;
         que.maxRequestPerInterval = 1;
     }
-
-    // if (interval < 200) {
-    //     console.warn('An interval of less than 200ms can create performance issues.');
-    // }
 
     que.dequeue = function() {
         this.running = 1

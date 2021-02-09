@@ -122,15 +122,19 @@ class App extends React.Component {
         console.log("failed to load dashboards", err);
       }
     }
+    
   }
 
   componentWillUnmount(){
     if (this.state.socket !== '') {this.state.socket.close()}
   }
 
-  processLogin(setKey, setLogin) {
-    this.setState({ login: setLogin });
-    this.setState({ apiKey: setKey });
+  processLogin(setKey, setLogin, ratelimit) {
+    this.setState({ 
+      login: setLogin, 
+      apiKey: setKey,
+      apiRateLimit: ratelimit
+    });
   }
 
   newWidgetContainer(widgetDescription, widgetHeader, widgetConfig) {
@@ -565,6 +569,7 @@ class App extends React.Component {
       queryData = {quaryData}
       updateExchangeList={this.updateExchangeList}
       updateDefaultExchange={this.updateDefaultExchange}
+      throttle={this.state.throttle}
       /> : <></>
 
       const backGroundSelection = {

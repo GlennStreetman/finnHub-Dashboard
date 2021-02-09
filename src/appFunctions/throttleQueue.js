@@ -12,13 +12,14 @@ export default function createFunctionQueueObject (maxRequestPerInterval, interv
     que.running = 0 //0 not yet started, 1 running
 
     if (evenlySpaced) {
-        que.interval = que.interval / que.maxRequestPerInterval;
+        que.interval = (que.interval) / que.maxRequestPerInterval;
         que.maxRequestPerInterval = 1;
     }
 
-    // if (interval < 200) {
-    //     console.warn('An interval of less than 200ms can create performance issues.');
-    // }
+    que.updateInterval = function(newRateLimit){
+        console.log("Updating internval to:", newRateLimit)
+        this.interval = 1000 / newRateLimit
+    }
 
     que.dequeue = function() {
         this.running = 1

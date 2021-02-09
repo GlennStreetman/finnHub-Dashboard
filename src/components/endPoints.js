@@ -68,6 +68,14 @@ export default class EndPointMenu extends React.Component {
     }
 
     render() {
+        const divOutline = {
+            border: '5px solid',
+            borderRadius: '10px',
+            backgroundColor: 'white',
+            padding: '5px',
+            borderColor: '#1d69ab',
+          }
+
         const dataStyle = {
             overflow: 'scroll',
             border: '10px solid',
@@ -90,18 +98,21 @@ export default class EndPointMenu extends React.Component {
 
         return (
             this.state.showData === false ? <>
-                <table key="endTable">
-                    <thead key="endHead">
-                        <tr key="endHeadRow">
-                            <td key="headItemDash">Dashboard</td>
-                            <td key="headItemEnd">API Endpoint</td>
-                            <td key="headItemPrev">Preview</td>
-                        </tr>
-                    </thead>
-                    <tbody key="endBody">
-                        {this.renderEndPointRows()}
-                    </tbody>
-                </table>
+                <div style={divOutline}>
+                    <b>Your dashboard REST API endpoints</b>
+                    <table>
+                        <thead>
+                            <tr>
+                                <td >Dashboard</td>
+                                <td >API Endpoint</td>
+                                <td >Preview</td>
+                            </tr>
+                        </thead>
+                        <tbody key="endBody">
+                            {this.renderEndPointRows()}
+                        </tbody>
+                    </table>
+                </div>
             </> : <div style={dataStyle}>
                     {this.state.showLoader === true ? <>
                         <div style={loader} /> <br /> 

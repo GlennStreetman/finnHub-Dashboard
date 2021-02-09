@@ -21,7 +21,7 @@ CREATE TABLE menusetup
     CONSTRAINT oneperuser UNIQUE (userid)
 ),
 
-CREATE TABLE public.users
+CREATE TABLE users
 (
     id serial NOT NULL,
     loginname text,
@@ -35,6 +35,7 @@ CREATE TABLE public.users
     resetpassword text,
     exchangelist text,
     defaultexchange text,
+    ratelimit int,
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT users_email_key UNIQUE (email),
     CONSTRAINT users_loginname_key UNIQUE (loginname)
