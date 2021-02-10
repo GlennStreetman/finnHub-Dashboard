@@ -215,7 +215,7 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
     defaultExchange: that.props.defaultExchange,
     updateDefaultExchange: that.props.updateDefaultExchange,
     uploadGlobalStockList: that.props.uploadGlobalStockList,
-    helpText: helpText,
+    helpText: [helpText, 'WLM'],
     syncGlobalStockList: that.props.syncGlobalStockList
   };
   return propList;

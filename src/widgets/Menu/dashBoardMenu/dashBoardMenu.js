@@ -154,7 +154,7 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
     currentDashBoard: that.props.currentDashBoard,
     saveCurrentDashboard: that.props.saveCurrentDashboard,
     newDashBoard: that.props.newDashboard,
-    helpText: helpText,
+    helpText: [helpText, 'DBM'],
   };
   return propList;
 }
