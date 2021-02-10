@@ -107,6 +107,10 @@ export default class FundamentalsCompanyNews extends React.Component {
           if (this.baseState.mounted === true) {
             if (data.error === 429) { //run again
               this.getCompanyNews(symbol)
+            } else if (data.error === 401) {
+              console.log("problem with API key, reseting api queue.")
+              p.throttle.resetQueue()
+              p.updateAPIFlag(2)
             } else {
               let filteredNews = [];
                 let newsCount = 0;

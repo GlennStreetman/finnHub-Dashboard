@@ -132,24 +132,22 @@ class WidgetContainer extends React.Component {
     const that = this;
     //Add widgets to the list below that should not have access to the stock search pane
     const hideStockSearchMenu = ["DashBoardMenu"]
-  // console.log("drag state:", that.props.widgetList.column)
     const compStyle = {
       display: this.state.show
     };
-    // zIndex: this.props.zIndex.indexOf(this.props.widgetKey),
     if (that.props.widgetList.column === 'drag'){ 
-      // console.log("drag state:", that.props.widgetList.column)
       compStyle['position'] = 'absolute'
       compStyle['top'] = this.props.widgetList["yAxis"]
       compStyle['left'] = this.props.widgetList["xAxis"] 
     } 
-    
+
     let widgetProps = that.props.widgetBodyProps();
     if (this.props.widgetKey !== "dashBoardMenu") {
       widgetProps["showEditPane"] = that.state.showEditPane;
       widgetProps["showPane"] = that.showPane;
       widgetProps['searchText'] = this.state.searchText
       widgetProps['changeSearchText'] = this.changeSearchText
+      widgetProps['updateAPIFlag'] = this.props.updateAPIFlag
     } 
     widgetProps.ref = this.widgetRef
 

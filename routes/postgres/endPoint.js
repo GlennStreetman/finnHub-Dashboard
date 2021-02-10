@@ -17,22 +17,23 @@ router.get("/endPoint", cors(),(req, res) => {
     const apiKey = format('%L', req.query['apiKey'])
     const dashBoardName = format('%L', req.query['dashBoardName'])
     const returnDashBoardQuery = `
-        SELECT widgetlist, globalstocklist
-        FROM dashboard
+        SELECT d.globalstocklist, w.*
+        FROM dashboard as d
+        LEFT JOIN widgets as w ON d.id = w.dashboardkey
         WHERE dashboardname = ${dashBoardName} AND
             userID = (SELECT id FROM users WHERE apiKey = ${apiKey} limit 1)
-        limit 1
     `
-
+    // console.log(returnDashBoardQuery)
     const getDashBoard = () => {return new Promise((resolve, reject) => {
         //returns dashboard object from DB.
         db.query(returnDashBoardQuery, (err, rows) => {
 
             if (err) {
                 res.json({message: "Problem generating endpoint."});
-                console.log(err)
+                console.log(err, "ERROR returnDashBoardQuery: ",returnDashBoardQuery)
+                reject(err)
             } else {
-                const data = JSON.parse(rows.rows[0].widgetlist)
+                const data = rows.rows
                 const stockList = JSON.parse(rows.rows[0].globalstocklist)
                 const resObj = {data: data, stockList: stockList} 
                 // console.log(data)
@@ -43,11 +44,13 @@ router.get("/endPoint", cors(),(req, res) => {
 
     const buildEndPoint = (dashboard) => {return new Promise((resolve, reject) => {
     //builds query strings for finnHub API calls.
+        // console.log("building end point", dashboard)
         const resObject = {
             widget: {},
             security: {},
             streamingData: {},
         }
+        //build socket list, US stocks only.
         for (const stock in dashboard.stockList){
             if (dashboard.stockList[stock].exchange === 'US'){
                 const socket = {
@@ -55,36 +58,41 @@ router.get("/endPoint", cors(),(req, res) => {
                     symbol: dashboard.stockList[stock].symbol}
                 resObject.streamingData[dashboard.stockList[stock].symbol] = socket}
             }
-
-        for (const widgetKey in dashboard.data) {
-            const thisWidget = dashboard.data[widgetKey]
-            const widgetFunction = widgetDict[thisWidget.widgetType] //function to create query string
+        
+        for (const widget in dashboard.data) {
+            // console.log('buildendpoint widget:', dashboard.data[widgetKey])
+            const thisWidget = dashboard.data[widget]
+            const widgetFunction = widgetDict[thisWidget.widgettype] //function to create query string
+            const thisTrackedStocks = JSON.parse(thisWidget.trackedstocks)
+            const thisFilter = JSON.parse(thisWidget.filters)
             const queryStringList = widgetFunction(
-                thisWidget.trackedStocks, 
-                thisWidget.filters, 
+                thisTrackedStocks, 
+                thisFilter, 
                 req.query['apiKey'])
             //Info for each widget
-            const id = resObject.widget[thisWidget.widgetHeader] ? thisWidget.widgetID : thisWidget.widgetHeader
-            resObject.widget[id] = {
-                name: thisWidget.widgetHeader,
-                Endpoint: thisWidget.widgetType,
-                filters: thisWidget.filters,
+            const wid = resObject.widget[thisWidget.widgetHeader] ? thisWidget.widgetid : thisWidget.widgetheader
+            resObject.widget[wid] = {
+                name: thisWidget.widgetheader,
+                Endpoint: thisWidget.widgettype,
+                filters: thisFilter,
                 stockData: {},
             }
             for (const stock in queryStringList) {
-                resObject.widget[id].stockData[stock] = {
+                resObject.widget[wid].stockData[stock] = {
                     'apiString': queryStringList[stock]
                 } 
+            // console.log('QUERY LIST:',queryStringList)
             //Info for each STOCK/security
                 if (resObject.security[stock] === undefined) {resObject.security[stock] = {} }
-                resObject.security[stock][id] = {
+                resObject.security[stock][wid] = {
                     apiString: queryStringList[stock],
-                    EndPoint: thisWidget.widgetType,
-                    filters: thisWidget.filters,
+                    EndPoint: thisWidget.widgettype,
+                    filters: thisFilter,
                     stockData: {},
                 }
             }
         }
+        // console.log(resObject)
         resolve(resObject)
     })}
 
@@ -99,7 +107,7 @@ router.get("/endPoint", cors(),(req, res) => {
                     key: key,
                     stock: stock,
                     }
-                // console.log('requestID -->', requestID)
+                // console.log('REQUEST -->', requestID, apiString)
                 requestList.push(finnHub(throttle, apiString, requestID))
                 // finnHub(throttle, apiString, requestID)
             }
@@ -108,7 +116,7 @@ router.get("/endPoint", cors(),(req, res) => {
             // console.log(throttle.queue)
             Promise.all(requestList)
             .then((response) => {
-                console.log("DONE generating endpoint")
+                console.log("--------------DONE generating endpoint-------------------")
                 for (const Obj in response){
                     const id = response[Obj].key
                     const stock = response[Obj].stock
@@ -124,19 +132,19 @@ router.get("/endPoint", cors(),(req, res) => {
 
     getDashBoard()
     .then((data) => {
-        //build endpoint from dashboard
+        console.log("1.BUILDING")
         return buildEndPoint(data)
     })
     .then((data) => {
-        // console.log(data)
+        console.log("2.Data")
         return requestQueryData(data)
     })
     .then((data) => {
-        console.log("endpoint request complete")
+        console.log("3.endpoint request complete")
         res.json(data)
     })
     .catch((err => {
-        console.log(err)
+        console.log("Endpoint request error:", err)
     }))
 });
 

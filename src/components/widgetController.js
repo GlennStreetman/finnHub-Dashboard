@@ -46,6 +46,7 @@ class WidgetController extends React.Component {
                 snapWidget: p.snapWidget,
                 setDrag: p.setDrag,
                 widgetList: el,
+                updateAPIFlag: p.updateAPIFlag,
             }
             if (el.widgetConfig === 'menuWidget') {
                 thisWidgetProps['menuWidgetToggle'] = this.props.menuWidgetToggle

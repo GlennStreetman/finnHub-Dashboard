@@ -93,7 +93,12 @@ export const finnHub = (throttle, apiString) => {
                     throttle.setSuspend(4000)
                     const errorObj = {error: 429} 
                     return errorObj
-                } else {
+                } else if (response.status === 401) {
+                    //401 indicates problem with API key
+                    const errorObj = {error: 401} 
+                    return errorObj
+                } 
+                else {
                     return response.json()
                 }
             })

@@ -69,22 +69,24 @@ export default class EndPointMenu extends React.Component {
 
     render() {
         const divOutline = {
-            border: '5px solid',
+            borderWidth: '5px',
+            borderStyle: 'solid',
+            borderColor: '#1d69ab',
             borderRadius: '10px',
             backgroundColor: 'white',
             padding: '5px',
-            borderColor: '#1d69ab',
-          }
+        }
 
         const dataStyle = {
             overflow: 'scroll',
-            border: '10px solid',
+            borderWidth: '5px',
+            borderStyle: 'solid',
+            borderColor: '#1d69ab',
             borderRadius: '10px',
             backgroundColor: 'white',
             width: '80%',
             height: '100%',
             padding: '10px',
-            borderColor: '#1d69ab',
         }
         const loader = {
             border: '16px solid #f3f3f3',

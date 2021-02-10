@@ -170,6 +170,10 @@ export default class FundamentalsSECFilings extends Component {
         if (that.baseState.mounted === true) {
           if (data.error === 429) { //run again
             this.getStockData()
+          } else if (data.error === 401) {
+            console.log("problem with API key, reseting api queue.")
+            p.throttle.resetQueue()
+            p.updateAPIFlag(2)
           } else {  
             //update state
             this.setState({stockData: data})

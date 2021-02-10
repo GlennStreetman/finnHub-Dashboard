@@ -12,13 +12,13 @@ const createFunctionQueueObject = function (maxRequestPerInterval, interval, eve
     que.running = 0 //0 not yet started, 1 running
 
     if (evenlySpaced) {
-        que.interval = (que.interval * 1000) / que.maxRequestPerInterval;
+        que.interval = (que.interval) / que.maxRequestPerInterval;
         que.maxRequestPerInterval = 1;
     }
 
     que.dequeue = function() {
         this.running = 1
-        // console.log('running deque')
+        // console.log('running deque:', this.running)
         let threshold = this.lastCalled + this.interval;
         let now = Date.now();
 
@@ -53,9 +53,11 @@ const createFunctionQueueObject = function (maxRequestPerInterval, interval, eve
     }
 
     que.enqueue = function(callback) {
+        // console.log("Enqueing")
         this.queue.push(callback);
         if (this.running === 0) {
-            setTimeout(() => this.dequeue(), this.interval);
+            // console.log("starting queue:", this.interval)
+            this.dequeue()
         } 
         // else {console.log('queue running')}
     }
@@ -78,7 +80,7 @@ const createFunctionQueueObject = function (maxRequestPerInterval, interval, eve
 
 
 const finnHub = (throttle, apiString, id) => {
-    
+    // console.log("creating promise: ", apiString)
     return new Promise((resolve, reject) => {
         throttle.enqueue(function() { 
             fetch(apiString)
@@ -89,12 +91,13 @@ const finnHub = (throttle, apiString, id) => {
                     // finnHub(throttle, apiString)
                     return {429: 429}
                 } else {
+                    // console.log("RESPONSE:", response.json())
                     return response.json()
                 }
             })
             .then((data) => {
                 if (data[429] !== undefined) {
-                    // console.log('------------>429', throttle)
+                    console.log('------------>429', throttle)
                     resolve (finnHub(throttle, apiString, id))
                     throttle.openRequests = throttle.openRequests -= 1
                 } else {
@@ -104,7 +107,7 @@ const finnHub = (throttle, apiString, id) => {
                 }
             })
             .catch(error => {
-                console.log(error.message)
+                console.log("ERRORRESPONSE:", error.message)
                 throttle.openRequests = throttle.openRequests -= 1
                 error.requestID = id
                 id.data = {err: error}

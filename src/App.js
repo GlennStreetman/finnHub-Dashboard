@@ -36,7 +36,7 @@ class App extends React.Component {
     this.state = {
       // AboutMenu: 0, //1 = show, 0 = hide
       // AccountMenu: 0, //1 = show, 0 = hide
-      apiFlag: 0, //set to 1 when retrieval of apiKey is needed
+      apiFlag: 0, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
       apiKey: "", //API key retrieved from login database.
       backGroundMenu: '', //reference to none widet info displayed when s.showWidget === 0
       currentDashBoard: "", //dashboard being displayed
@@ -52,7 +52,7 @@ class App extends React.Component {
       showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
       throttle: ThrottleQueue(25, 1000, true), //all finnhub API requests should be done with finnHub function.
       streamingPriceData: {}, //data shared between some widgets and watchlist menu. Updated by socket data.
-      WatchListMenu: 0, //1 = show, 0 = hide
+      WatchListMenu: 1, //1 = show, 0 = hide
       widgetLockDown: 0, //1 removes buttons from all widgets.
       widgetList: {}, //lists of all widgets.
       zIndex: [], //list widgets. Index location sets zIndex
@@ -399,7 +399,13 @@ class App extends React.Component {
           this.setState(loadDash)
         //show about menu by default if login does not return API key.
         if (this.state.apiKey === '' && this.state.apiFlag === 0) {
-          this.setState({apiFlag: 1})
+          console.log("API key not returned")
+          this.setState({
+            apiFlag: 1,
+            WatchListMenu: 0,
+            AboutMenu: 0,
+            showStockWidgets: 0,
+          }, ()=>{this.toggleBackGroundMenu('about')})
         }
       })
       .catch((error) => {
@@ -511,7 +517,15 @@ class App extends React.Component {
   }
 
   updateAPIFlag(val){
-    this.setState({apiFlag: val})
+    if (val > 0) {
+      this.setState({
+        apiFlag: val,
+        showStockWidgets: 0,
+        backGroundMenu: "about",
+      })
+    } else {
+      this.setState({apiFlag: val})
+    }
   }
 
   logOut(){
@@ -587,8 +601,8 @@ class App extends React.Component {
       const backGroundSelection = {
         'endPoint': React.createElement(EndPointMenu, endPointProps(this)),
         'manageAccount': React.createElement(AccountMenu, accountMenuProps(this)),
-        'about': <AboutMenu />,
-        'exchangeMenu': React.createElement(ExchangeMenu, exchangeMenuProps(this))
+        'about': React.createElement(AboutMenu,{apiFlag: this.state.apiFlag,}),
+        'exchangeMenu': React.createElement(ExchangeMenu, exchangeMenuProps(this)),
       }
       
       const backGroundMenu = () => {
@@ -639,6 +653,7 @@ class App extends React.Component {
             changeWidgetName={this.changeWidgetName}
             updateWidgetFilters={this.updateWidgetFilters}
             throttle={this.state.throttle}
+            updateAPIFlag={this.updateAPIFlag}
             updateAPIKey={this.updateAPIKey}
             zIndex={this.state.zIndex}
             newDashboard={this.newDashboard}

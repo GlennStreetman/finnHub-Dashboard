@@ -58,6 +58,10 @@ export default class widgetName extends Component {
           console.log(data)
           if (data.error === 429) { //run again
             this.getStockData(stock)
+          } else if (data.error === 401) {
+            console.log("problem with API key, reseting api queue.")
+            p.throttle.resetQueue()
+            p.updateAPIFlag(2)
           } else {
             this.setState({stockData: data})
           }

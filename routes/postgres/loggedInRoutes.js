@@ -50,7 +50,7 @@ router.get("/accountData", (req, res) => {
 });
 
 router.post("/accountData", (req, res) => {
-  console.log(req.body);
+  // console.log(req.body);
   if (req.session.login === true) {  
     
     if (req.body.field !== "email") {
@@ -60,7 +60,7 @@ router.post("/accountData", (req, res) => {
     let newValue = req.body.newValue;
     // console.log(updateField, newValue)
     let updateQuery = format("UPDATE users SET %I = %L WHERE id=%L", updateField, newValue, req.session.uID);
-    console.log(updateQuery);
+    // console.log(updateQuery);
     // let queryValues = [updateField, newValue, req.session.uID]
     db.query(updateQuery, (err) => {
       if (err) {
@@ -83,13 +83,13 @@ router.post("/accountData", (req, res) => {
         VALUES (${req.session.uID}, '${newValue}', '${queryString}')
         `;
       
-      console.log(updateQuery);
+      // console.log(updateQuery);
       db.query(updateQuery, (err) => {
         if (err) {
           // console.log(err)
           res.json({message: `Problem updating email.`});
         } else {
-          console.log(res);
+          // console.log(res);
           const data = {
             from: "Glenn Streetman <glennstreetman@gmail.com>",
             to: newValue,
@@ -164,7 +164,7 @@ router.get("/dashboard", (req, res) => {
             }
             // console.log("KEYS:", r.savedDashBoards, "---",resultKey, newObject)
             r.savedDashBoards[resultKey].widgetlist[newObject.widgetID] = newObject
-            console.log(r)
+            // console.log(r)
         }
         
         db.query(getMenuSetup, (err, rows) => {
@@ -174,7 +174,7 @@ router.get("/dashboard", (req, res) => {
           // console.log("menu setup retrieved");
           const result = rows.rows;
           r.default = rows.rows[0].defaultmenu
-          console.log("MENUSETUPROWS", rows.rows)
+          // console.log("MENUSETUPROWS", rows.rows)
           for (const row in result) {
             const thisRow = result[row]
             r.menuSetup[thisRow['widgetid']] = {
@@ -194,7 +194,7 @@ router.get("/dashboard", (req, res) => {
             }
           }
           // resultSet["menuSetup"] = result;
-          console.log("returning dashboard and menu data:", r);
+          console.log("returning dashboard and menu data");
           res.json(r);
         }});
       }
@@ -330,11 +330,11 @@ router.post("/dashboard", (req, res) => {
 
     saveDashBoardSetup(req.session.uID)
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         return updateMenuSetup(data);
       })
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         res.json({message: "true"});
       })
       .catch((err) => res.json(err));
@@ -386,7 +386,7 @@ router.get("/deleteSavedDashboard", (req, res) => {
             console.log("error on checking default dash");
             reject("Error on checking default dash");
           } else {
-            console.log(rows.rows[0].id, deleteDash);
+            // console.log(rows.rows[0].id, deleteDash);
             rows.rows[0].defaultmenu === undefined ? resolve("success") : reject("Updating default not needed");
           }
         });
@@ -409,15 +409,15 @@ router.get("/deleteSavedDashboard", (req, res) => {
 
     deleteDashboard()
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         return checkDefaultMenu();
       })
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         return updateDefaultMenu();
       })
       .then((data) => {
-        console.log(data);
+        // console.log(data);
         res.json({message: "success"});
       })
       .catch((err) => {

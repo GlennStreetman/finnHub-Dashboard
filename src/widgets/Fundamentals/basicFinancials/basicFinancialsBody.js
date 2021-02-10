@@ -71,6 +71,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
   }
 
   getCompanyMetrics(symbol) {
+    const p = this.props
     if (this.props.apiKey !== '') {
       let that = this
       let querySting = "https://finnhub.io/api/v1/stock/metric?symbol=" + 
@@ -82,6 +83,10 @@ export default class FundamentalsBasicFinancials extends React.Component {
           if (this.baseState.mounted === true) {
             if (data.error === 429) { //run again
               this.getCompanyMetrics(symbol)
+            } else if (data.error === 401) {
+              console.log("problem with API key, reseting api queue.")
+              p.throttle.resetQueue()
+              p.updateAPIFlag(2)
             } else {
               let updateData = Object.assign({}, that.state.metricData)
               updateData[symbol] = data.metric

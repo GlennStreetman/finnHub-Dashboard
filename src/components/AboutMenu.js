@@ -23,9 +23,18 @@ class AboutMenu extends React.PureComponent {
         <div className="bodyTxt">
           <p>
           <b>FinnDash:</b> An App that allows you to visualize your FinnHub.IO API data by arranging and configuring financial widgets.<br /><br />
-          <b>Getting Started: </b> <br />
-          1. Register for your free Finnhub.io API key --> <a href='https://finnhub.io/register' target="_blank" rel="noopener noreferrer">FinnHub Register</a><br />
-          2. After registering for your Finnhub API key click Manage Account and update your API Key info.<br />
+          <b>Getting Started: </b> <br /> 
+          {this.props.apiFlag > 0 ? (<mark>
+          1. Register for your free Finnhub.io API key --`&gt;`? <a href='https://finnhub.io/register' target="_blank" rel="noopener noreferrer">FinnHub Register</a><br />
+          2. After registering for your Finnhub API key click Manage Account and update your API Key info.
+          <br />
+          </mark>
+          ) : ( <>
+            1. Register for your free Finnhub.io API key --`&gt;`? <a href='https://finnhub.io/register' target="_blank" rel="noopener noreferrer">FinnHub Register</a><br />
+            2. After registering for your Finnhub API key click Manage Account and update your API Key info.
+            <br />
+            </>
+          )}
           3. Once your API key is saved click 'add widget' to begin designing a new widget dashboard.<br />
           4. After your dashboard is setup remember to click "Show Dashboard Menu" and save your new dashboard before exiting.<br />
           <b>Widget Setup: </b> <br />
@@ -40,7 +49,10 @@ class AboutMenu extends React.PureComponent {
           Created by Glenn Streetman. Contact: glennstreetman@gmail.com<br />
           </p>
         </div>
+        {this.props.apiFlag > 0 ? (<mark>Warning: Problem with API key.</mark>) : (<></>)}
       </div>
+
+
     );
   }
 }

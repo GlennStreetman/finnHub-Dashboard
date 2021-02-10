@@ -21,7 +21,7 @@ class TopNav extends React.Component {
     if (p.apiFlag === 1 && p.apiFlag !== prevProps.apiFlag) {
       // show welcome menu if finnhub apiKey not setup.
       this.setState({AboutAPIKeyReminder: 1})
-      this.props.menuWidgetToggle("AboutMenu", "Welcome to FinnDash")
+      // this.props.menuWidgetToggle("AboutMenu", "Welcome to FinnDash")
     }
   }
 

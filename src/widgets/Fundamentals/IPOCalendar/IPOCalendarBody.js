@@ -137,6 +137,10 @@ export default class FundamentalsIPOCalendar extends Component {
           if (that.baseState.mounted === true) {
             if (data.error === 429) { //run again
               this.getStockData()
+            } else if (data.error === 401) {
+              console.log("problem with API key, reseting api queue.")
+              p.throttle.resetQueue()
+              p.updateAPIFlag(2)
             } else {
               this.setState({IPOData: data['ipoCalendar']})
             }

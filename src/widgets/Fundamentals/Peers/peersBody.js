@@ -54,7 +54,8 @@ export default class FundamentalsPeers extends Component {
     }
 
     getSymbolList() {
-      let that = this
+      const that = this
+      const p = this.props
       // console.log("Getting symbol names for :", this.state.targetStock )
       const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=US&token=${that.props.apiKey}`
         finnHub(this.props.throttle, apiString)  
@@ -62,6 +63,10 @@ export default class FundamentalsPeers extends Component {
           if (this.baseState.mounted === true) {
             if (data.error === 429) { //run again
               this.getSymbolList()
+            } else if (data.error === 401) {
+              console.log("problem with API key, reseting api queue.")
+              p.throttle.resetQueue()
+              p.updateAPIFlag(2)
             } else {
               let updateStockList = Object.assign({}, data)
               for (const key in updateStockList) {
@@ -160,6 +165,10 @@ export default class FundamentalsPeers extends Component {
         if (that.baseState.mounted === true) {
           if (data.error === 429) { //run again
             this.getStockData()
+          } else if (data.error === 401) {
+            console.log("problem with API key, reseting api queue.")
+            p.throttle.resetQueue()
+            p.updateAPIFlag(2)
           } else {
             // console.log(data)
             this.setState({peersList: data})

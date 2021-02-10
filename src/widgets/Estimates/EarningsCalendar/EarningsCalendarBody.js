@@ -121,7 +121,7 @@ export default class EstimatesEarningsCalendar extends Component {
       const s = this.state
       const actual = s.display === 'EPS' ? 'epsActual' : 'revenueActual'
       const estimate = s.display === 'EPS' ? 'epsEstimate' : 'revenueEstimate'
-      let sortedData = s.stockData['earningsCalendar'].sort((a,b) => (new Date(a.date) > new Date(b.date) ? 1 : -1 ))
+      let sortedData = s.stockData['earningsCalendar'] !== undefined ? s.stockData['earningsCalendar'].sort((a,b) => (new Date(a.date) > new Date(b.date) ? 1 : -1 )) : []
       let tableData = sortedData.map((el)=> {
 
         return <tr key={"row" + el.date}>
@@ -218,6 +218,10 @@ export default class EstimatesEarningsCalendar extends Component {
             if (that.baseState.mounted === true) {
               if (data.error === 429) { //run again
                 this.getStockData()
+              } else if (data.error === 401) {
+                console.log("problem with API key, reseting api queue.")
+                p.throttle.resetQueue()
+                p.updateAPIFlag(2)
               } else {
                 // console.log("UPDATING",data, queryString)
                 this.setState({stockData: data})
