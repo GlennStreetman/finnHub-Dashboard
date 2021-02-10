@@ -27,7 +27,7 @@ CREATE TABLE widgets
     xaxis text,
     yaxis text,
     CONSTRAINT widgets_pkey PRIMARY KEY (wid),
-    CONSTRAINT fk_dashboard FOREIGN KEY(dashboardkey) REFERENCES dashboard(id),
+    CONSTRAINT fk_dashboard FOREIGN KEY(dashboardkey) REFERENCES dashboard(id) ON DELETE CASCADE,
     CONSTRAINT widgetsid UNIQUE (dashboardkey, widgetid)
 ),
 

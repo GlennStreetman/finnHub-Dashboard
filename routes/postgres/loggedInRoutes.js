@@ -346,7 +346,6 @@ router.get("/deleteSavedDashboard", (req, res) => {
     const uId = req.session["uID"];
     const deleteDash = format("%L", req.query["dashID"]);
     const deleteSQL = `
-      DELETE FROM widgets WHERE dashboardkey = ${deleteDash} ;
       DELETE FROM dashBoard WHERE userID=${uId} AND id=${deleteDash};
     `;
     let checkDefault = `
