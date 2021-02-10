@@ -26,7 +26,6 @@ export default class FundamentalsCompanyProfile2 extends Component {
     if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
       this.setState({...p.widgetCopy})
     } else {
-      console.log("setup")
       this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData())
     }
   }

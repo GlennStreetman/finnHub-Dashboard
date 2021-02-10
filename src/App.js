@@ -315,11 +315,11 @@ class App extends React.Component {
 
   updateGlobalStockList(event, stockRef, stockObj={}) {
     //pass stockRef to delete, pass in stockObj to update.
-    console.log("update global: ", stockRef, stockObj)
+    // console.log("update global: ", stockRef, stockObj)
     const s = this.state
     const currentStockObj = {...s.globalStockList}
     if (currentStockObj[stockRef] === undefined) {
-      console.log('updating global list:', stockRef)
+      // console.log('updating global list:', stockRef)
       currentStockObj[stockRef] = {...stockObj}
       currentStockObj[stockRef]['dStock'] = function(ex){
         //pass in exchange list
@@ -376,6 +376,7 @@ class App extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         console.log('Dashboard and menu data retrieved.')
+<<<<<<< HEAD
         console.log(data)
         let dashboards = data.savedDashBoards;
         let newList = {}; //replace numeric keys, returned by dataset, with widget IDs.
@@ -383,16 +384,31 @@ class App extends React.Component {
           let newKey = dashboards[oldKey]["dashboardname"];
           let newData = dashboards[oldKey];
           newList[newKey] = newData;
+=======
+        const parseDashBoard = data.savedDashBoards
+        for (const dash in parseDashBoard) {
+          parseDashBoard[dash].globalstocklist = JSON.parse(parseDashBoard[dash].globalstocklist)
+          const thisDash = parseDashBoard[dash].widgetlist
+          for (const widget in thisDash) {
+            thisDash[widget].filters = JSON.parse(thisDash[widget].filters)
+            thisDash[widget].trackedStocks = JSON.parse(thisDash[widget].trackedStocks)
+          }
+>>>>>>> deserialize
         }
-        // console.log("new Dash Data ", newList)
-        this.setState({ dashBoardData: newList });
-        if( data.menuSetup[0] !== undefined) {
-          this.setState({ menuList: JSON.parse(data["menuSetup"][0]["menulist"]) });
-          this.setState({ currentDashBoard: data["menuSetup"][0]["defaultmenu"] });
+        const loadDash = {
+          dashBoardData: parseDashBoard,
+          currentDashBoard: data.default,
         }
+        if( Object.keys(data.menuSetup).length > 0) {
+          const menuList = {}
+          for (const menu in data.menuSetup) {
+            menuList[menu] = data.menuSetup[menu]
+          }
+          loadDash['menuList'] = menuList
+          }
+          this.setState(loadDash)
         //show about menu by default if login does not return API key.
         if (this.state.apiKey === '' && this.state.apiFlag === 0) {
-          console.log("changing api flag")
           this.setState({apiFlag: 1})
         }
       })
@@ -403,7 +419,8 @@ class App extends React.Component {
 
   loadDashBoard(newGlobalList, newWidgetList) {
     //setup global stock list.
-    let updateGlobalList = JSON.parse(newGlobalList);
+    // console.log("HERE",newGlobalList, newWidgetList)
+    let updateGlobalList = newGlobalList;
     for (const stock in updateGlobalList) {      
       updateGlobalList[stock]['dStock'] = function(ex){
         if (ex.length === 1) {
@@ -421,8 +438,7 @@ class App extends React.Component {
       return stockList
     }
     //setup widgets, and their individual stock lists.
-    let updateWidgetList = JSON.parse(newWidgetList);
-    // console.log(newWidgetList,"---------------")
+    let updateWidgetList = newWidgetList;
     for (const widget in updateWidgetList){
       const widgetStockObj = updateWidgetList[widget]
       const trackedStockObj = widgetStockObj.trackedStocks
@@ -436,16 +452,21 @@ class App extends React.Component {
           }
         }
       }
-      widgetStockObj.trackedStocks['sKeys'] = function(){
-        const stockList = Object.keys(this)
-        const index = stockList.indexOf('sKeys')
-        stockList.splice(index,1) 
-        return stockList
+      if (widgetStockObj.trackedStocks !== null) {
+        widgetStockObj.trackedStocks['sKeys'] = function(){
+          const stockList = Object.keys(this)
+          const index = stockList.indexOf('sKeys')
+          stockList.splice(index,1) 
+          return stockList
+        }
       }
     }
 
-    this.setState({ globalStockList: updateGlobalList });
-    this.setState({ widgetList: updateWidgetList });
+    delete updateWidgetList.null
+    this.setState({ 
+      globalStockList: updateGlobalList,
+      widgetList: updateWidgetList, 
+    });
   }
 
   saveCurrentDashboard(dashboardName) {

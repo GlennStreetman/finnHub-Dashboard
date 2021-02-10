@@ -84,7 +84,7 @@ class WidgetController extends React.Component {
         const widgetGroups = Array.from({length: 32},  (i, x) => {return [{'pass':x}]})
         for (const w in allWidgets) {
             const thisColumn = allWidgets[w].column
-            // console.log(widgetGroups, thisColumn)
+            // console.log(thisColumn)
             if (thisColumn === 'drag') {
                 widgetGroups[32] = []
                 widgetGroups[32].push(allWidgets[w])
