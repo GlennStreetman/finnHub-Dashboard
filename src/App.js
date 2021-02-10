@@ -375,20 +375,42 @@ class App extends React.Component {
     fetch("/dashBoard")
       .then((response) => response.json())
       .then((data) => {
+        console.log("DASHBOARDDATA",data)
         console.log('Dashboard and menu data retrieved.')
-        let dashboards = data.savedDashBoards;
-        let newList = {}; //replace numeric keys, returned by dataset, with widget IDs.
-        for (const oldKey in dashboards) {
-          let newKey = dashboards[oldKey]["dashboardname"];
-          let newData = dashboards[oldKey];
-          newList[newKey] = newData;
-        }
+        // let dashboards = data.savedDashBoards;
+        // let newList = {}; //replace numeric keys, returned by dataset, with widget IDs.
+        // for (const oldKey in dashboards) {
+        //   let newKey = dashboards[oldKey]["dashboardname"];
+        //   let newData = dashboards[oldKey];
+        //   newList[newKey] = newData;
+        // }
         // console.log("new Dash Data ", newList)
-        this.setState({ dashBoardData: newList });
-        if( data.menuSetup[0] !== undefined) {
-          this.setState({ menuList: JSON.parse(data["menuSetup"][0]["menulist"]) });
-          this.setState({ currentDashBoard: data["menuSetup"][0]["defaultmenu"] });
+        const parseDashBoard = data.savedDashBoards
+        console.log(parseDashBoard)
+        for (const dash in parseDashBoard) {
+          parseDashBoard[dash].globalstocklist = JSON.parse(parseDashBoard[dash].globalstocklist)
+          const thisDash = parseDashBoard[dash].widgetlist
+          for (const widget in thisDash) {
+            thisDash[widget].filters = JSON.parse(thisDash[widget].filters)
+            thisDash[widget].trackedStocks = JSON.parse(thisDash[widget].trackedStocks)
+          }
         }
+        console.log(parseDashBoard)
+        const loadDash = {
+          dashBoardData: parseDashBoard,
+          currentDashBoard: data.default,
+        }
+        if( Object.keys(data.menuSetup).length > 0) {
+          const menuList = {}
+          for (const menu in data.menuSetup) {
+            // console.log(menu, data.menuSetup)
+            menuList[menu] = data.menuSetup[menu]
+          }
+          loadDash['menuList'] = menuList
+          // this.setState({ menuList: JSON.parse(data["menuSetup"][0]["menulist"]) });
+          }
+          console.log("LOADDASH:", loadDash)
+          this.setState(loadDash, ()=> {console.log("UPDATED STATE", this.state)})
         //show about menu by default if login does not return API key.
         if (this.state.apiKey === '' && this.state.apiFlag === 0) {
           console.log("changing api flag")
@@ -402,7 +424,8 @@ class App extends React.Component {
 
   loadDashBoard(newGlobalList, newWidgetList) {
     //setup global stock list.
-    let updateGlobalList = JSON.parse(newGlobalList);
+    // console.log("HERE",newGlobalList, newWidgetList)
+    let updateGlobalList = newGlobalList;
     for (const stock in updateGlobalList) {      
       updateGlobalList[stock]['dStock'] = function(ex){
         if (ex.length === 1) {
@@ -420,8 +443,8 @@ class App extends React.Component {
       return stockList
     }
     //setup widgets, and their individual stock lists.
-    let updateWidgetList = JSON.parse(newWidgetList);
-    // console.log(newWidgetList,"---------------")
+    let updateWidgetList = newWidgetList;
+    console.log(updateWidgetList,"---------------")
     for (const widget in updateWidgetList){
       const widgetStockObj = updateWidgetList[widget]
       const trackedStockObj = widgetStockObj.trackedStocks
@@ -443,8 +466,10 @@ class App extends React.Component {
       }
     }
 
-    this.setState({ globalStockList: updateGlobalList });
-    this.setState({ widgetList: updateWidgetList });
+    this.setState({ 
+      globalStockList: updateGlobalList,
+      widgetList: updateWidgetList, 
+    });
   }
 
   saveCurrentDashboard(dashboardName) {

@@ -80,6 +80,7 @@ class WidgetController extends React.Component {
 
     render(){
         const p = this.props
+        
         const allWidgets = {...p.widgetList, ...p.menuList}
         const widgetGroups = Array.from({length: 32},  (i, x) => {return [{'pass':x}]})
         for (const w in allWidgets) {

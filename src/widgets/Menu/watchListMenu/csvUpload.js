@@ -30,7 +30,7 @@ const mapStateToProps =  (state, ownProps) => {
         const stock = ul[s]
         const exchange = stock.slice(0,stock.indexOf('-'))
         const updateStock = state.exchangeData[exchange] ? {...state.exchangeData[exchange][stock]} : 'pass'
-        if (updateStock !== null) {
+        if (updateStock !== 'pass') {
             updateObj[stock] = updateStock
             updateObj[stock].dStock = function(ex){
                 //pass in exchange list
