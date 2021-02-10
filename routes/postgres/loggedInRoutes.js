@@ -126,6 +126,7 @@ router.get("/dashboard", (req, res) => {
     let resultSet = {};
     db.query(getSavedDashBoards, (err, rows) => {
       if (err) {
+        console.log(err)
         res.json({message: "Failed to retrieve dashboards"});
       } else {
         let result = rows.rows;

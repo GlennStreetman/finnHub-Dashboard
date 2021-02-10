@@ -376,6 +376,7 @@ class App extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         console.log('Dashboard and menu data retrieved.')
+        console.log(data)
         let dashboards = data.savedDashBoards;
         let newList = {}; //replace numeric keys, returned by dataset, with widget IDs.
         for (const oldKey in dashboards) {
