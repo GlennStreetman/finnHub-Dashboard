@@ -376,15 +376,6 @@ class App extends React.Component {
       .then((response) => response.json())
       .then((data) => {
         console.log('Dashboard and menu data retrieved.')
-<<<<<<< HEAD
-        console.log(data)
-        let dashboards = data.savedDashBoards;
-        let newList = {}; //replace numeric keys, returned by dataset, with widget IDs.
-        for (const oldKey in dashboards) {
-          let newKey = dashboards[oldKey]["dashboardname"];
-          let newData = dashboards[oldKey];
-          newList[newKey] = newData;
-=======
         const parseDashBoard = data.savedDashBoards
         for (const dash in parseDashBoard) {
           parseDashBoard[dash].globalstocklist = JSON.parse(parseDashBoard[dash].globalstocklist)
@@ -393,7 +384,6 @@ class App extends React.Component {
             thisDash[widget].filters = JSON.parse(thisDash[widget].filters)
             thisDash[widget].trackedStocks = JSON.parse(thisDash[widget].trackedStocks)
           }
->>>>>>> deserialize
         }
         const loadDash = {
           dashBoardData: parseDashBoard,
