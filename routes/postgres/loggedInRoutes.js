@@ -142,7 +142,7 @@ router.get("/dashboard", (req, res) => {
         for (const row in result) {
           if (r.savedDashBoards[result[row].dashboardname] === undefined){
             r.savedDashBoards[result[row].dashboardname] = {
-              dashboarname: result[row].dashboardname,
+              dashboardname: result[row].dashboardname,
               globalstocklist: result[row].globalstocklist,
               id:  result[row].id,
               widgetlist: {}
@@ -343,10 +343,12 @@ router.post("/dashboard", (req, res) => {
 router.get("/deleteSavedDashboard", (req, res) => {
   
   if (req.session.login === true) {  
-    let uId = req.session["uID"];
-    let thisRequest = req.query;
-    let deleteDash = format("%L", thisRequest["dashID"]);
-    let deleteSQL = `DELETE FROM dashBoard WHERE userID=${uId} AND id=${deleteDash}`;
+    const uId = req.session["uID"];
+    const deleteDash = format("%L", req.query["dashID"]);
+    const deleteSQL = `
+      DELETE FROM widgets WHERE dashboardkey = ${deleteDash} ;
+      DELETE FROM dashBoard WHERE userID=${uId} AND id=${deleteDash};
+    `;
     let checkDefault = `
     SELECT dashboard.id 
     FROM menuSetup 
