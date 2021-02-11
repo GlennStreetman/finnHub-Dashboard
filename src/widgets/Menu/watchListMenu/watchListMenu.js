@@ -40,10 +40,11 @@ class WatchListMenu extends React.PureComponent {
 
         {this.props.showEditPane === 0 &&
           <>
-            <td key={el + "desc"}>
-              {this.props.showEditPane === 1 ? g[el].dStock(p.exchangeList) + 
-              ": " + 
-              g[el]['description'] : g[el].dStock(p.exchangeList)}
+            <td key={el + "symb"}>
+              {g[el].dStock(p.exchangeList)}
+            </td>
+            <td className="leftTE" key={el + 'desc'}>
+              {g[el].description}
             </td>
             <td className="rightTEFade" key={el + "prc" + this.returnKey(p.streamingPriceData[el])}>
               {p.streamingPriceData[el] ? (
@@ -113,8 +114,6 @@ class WatchListMenu extends React.PureComponent {
         that.setState({uploadList: newStockList})
       }
     });
-
-
   }
 
   render() {
@@ -163,7 +162,8 @@ class WatchListMenu extends React.PureComponent {
               <tr>
                 {this.props.showEditPane === 0 &&
                   <>
-                    <td className="centerTE">Description</td>
+                    <td className="centerTE">Symbol</td>
+                    <td className="centerTE">Name</td>
                     <td className="centerTE">Price</td>
                   </>
                 }
