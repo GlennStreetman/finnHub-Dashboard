@@ -1,4 +1,4 @@
-// import {endPoint} from './routes/postgres/endPoint.mjs'
+
 const express = require("express");
 require('dotenv').config()
 const port = process.env.NODE_ENV || 5000;
@@ -6,88 +6,55 @@ const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const FileStore = require("session-file-store")(session);
 const bodyParser = require("body-parser");
-
 const app = express();
-let fileStoreOptions = {};
+const path = require("path");
+app.use(cookieParser());
+app.use(bodyParser.json()); // support json encoded bodies
+const fileStoreOptions = {};
+app.use(
+  session({
+    store: new FileStore(fileStoreOptions),
+    secret: process.env.session_secret,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, sameSite: true },
+  })
+
+);
+
+//LOAD CONFIG.
 console.log("env=", process.env.live)
 if (process.env.live === '1') {
-  console.log("loading live server config")
-  //enable below to run HTTP server. Used with Heroku
-  const path = require("path");
-  app.listen(process.env.PORT || port, function () {
-    console.log("Listening to http://localhost:" + port);
-  })
-  app.use(cookieParser());
-  app.use(bodyParser.json()); // support json encoded bodies
-  app.use(express.static(path.join(__dirname, 'build')));
-  app.use(
-    session({
-      store: new FileStore(fileStoreOptions),
-      secret: process.env.session_secret,
-      resave: false,
-      saveUninitialized: true,
-      cookie: { secure: false, sameSite: true },
+    console.log("loading live server config")
+    app.listen(process.env.PORT || port, function () {
+      console.log("Listening to http://localhost:" + port);
     })
-
-  );
-    console.log("loading routes")
-    //live routes, postgres db.
-    const login = require('./routes/postgres/appLogin')
-    const loggedIn = require('./routes/postgres/loggedInRoutes')
-    const appRegister =  require('./routes/postgres/registerRoutesPG')
-    const recover =  require('./routes/postgres/recoverAccount')
-    const endPoint =  require('./routes/postgres/endPoint')
-    app.use('/', login)    
-    app.use('/', loggedIn)
-    app.use('/', appRegister)
-    app.use('/', endPoint)
-    app.use('/', recover)
-
+    app.use(express.static(path.join(__dirname, 'build')));
 } else {
-  console.log("loading dev server config")
-  //remember to updated proxy setting in package.json when switching between http and https
-  //used for local testing.  
-  //enable below to run HTTPS server.
-  //see the below link for info on updating https info
-  //https://nodejs.org/api/https.html#https_https_createserver_options_requestlistener
-  // const fs = require('fs')
-  // const https = require('https')
-  // path = require("path");
-  // https.createServer({
-  //   pfx: fs.readFileSync(path.join(__dirname, 'ssl', 'cert.pfx')),
-  //   passphrase: 'glennPSKey',
-  // }, app).listen(port, function () {
-  //   console.log(`serving the direcotry @ https`)
-  // })
-
-  //enable below to run HTTP server.
-  const path = require("path");
-  app.listen(port, function () {console.log(`serving the direcotry @ http`)})
-
-
-  app.use(cookieParser());
-  app.use(bodyParser.json()); // support json encoded bodies
-  app.use(express.static(path.join(__dirname, 'build')));
-  app.use(
-    session({
-      store: new FileStore(fileStoreOptions),
-      secret: process.env.session_secret,
-      resave: false,
-      saveUninitialized: true,
-      cookie: { secure: false, sameSite: true },
-    })
-  );
-
-  //dev routes
-  const login = require('./routes/postgres/appLogin')
-  const loggedIn = require('./routes/postgres/loggedInRoutes')
-  const appRegister =  require('./routes/postgres/registerRoutesPG')
-  const recover =  require('./routes/postgres/recoverAccount')
-  const endPoint =  require('./routes/postgres/endPoint')
-  app.use('/', login)    
-  app.use('/', loggedIn)
-  app.use('/', appRegister)
-  app.use('/', endPoint)
-  app.use('/', recover)
+    console.log("loading dev server config")
+    const path = require("path");
+    app.listen(port, function () {console.log(`serving the direcotry @ http`)})
+    app.use(express.static(path.join(__dirname, 'build')));
 
 }
+
+//SETUP ROUTES
+const login = require('./routes/appLogin')
+const appRegister =  require('./routes/registerRoutesPG')
+const recover =  require('./routes/recoverAccount')
+const endPoint =  require('./routes/endPoint')
+const logUIError =  require('./routes/logUiError')
+//routes below require login
+const accountData = require('./routes/loggedIn/accountData')
+const dashboard = require('./routes/loggedIn/dashboard')
+const deleeteSavedDashboard = require('./routes/loggedIn/deleteSavedDashboard')
+
+app.use('/', login)    
+app.use('/', appRegister)
+app.use('/', endPoint)
+app.use('/', recover)
+app.use('/', logUIError)
+//loggin
+app.use('/', accountData)
+app.use('/', dashboard)
+app.use('/', deleeteSavedDashboard)

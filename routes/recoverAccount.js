@@ -2,8 +2,8 @@ const express = require('express');
 const router =  express.Router();
 const format = require('pg-format');
 const db = process.env.live === '1' ? 
-  require("../../db/databaseLive.js") :  
-  require("../../db/databaseLocalPG.js") ;
+  require("../db/databaseLive.js") :  
+  require("../db/databaseLocalPG.js") ;
 const cryptoRandomString = require('crypto-random-string');
 const md5 = require("md5");
 

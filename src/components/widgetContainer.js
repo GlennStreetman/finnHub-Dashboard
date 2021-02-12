@@ -1,6 +1,7 @@
 import React from "react";
 import {widgetLookUp} from '../registers/widgetContainerReg.js'
 import ToolTip from './../components/toolTip.js'
+import ErrorBoundary from './widgetErrorBoundary';
 
 //creates widget container. Used by all widgets.
 class WidgetContainer extends React.Component {
@@ -192,9 +193,9 @@ class WidgetContainer extends React.Component {
         ) : (
           <div className="widgetHeader">{this.state.renderHeader}</div>
         )}
-
-        {React.createElement(widgetLookUp[this.props.widgetList["widgetType"]], widgetProps)}
-
+        <ErrorBoundary widgetType={this.props.widgetList["widgetType"]}>
+          {React.createElement(widgetLookUp[this.props.widgetList["widgetType"]], widgetProps)}
+        </ErrorBoundary>
         <div className="widgetFooter">
           {this.props.widgetLockDown === 0 ? (
             <button

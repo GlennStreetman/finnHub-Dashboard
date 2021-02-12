@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const format = require("pg-format");
-const db = process.env.live === "1" ? require("../../db/databaseLive.js") : require("../../db/databaseLocalPG.js");
-const {finnHub, createFunctionQueueObject} = require("../../src/appFunctions/throttleQueueAPI.js");
+const db = process.env.live === "1" ? require("../db/databaseLive.js") : require("../db/databaseLocalPG.js");
+const {finnHub, createFunctionQueueObject} = require("../src/appFunctions/throttleQueueAPI.js");
 const cors = require('cors')
-const {widgetDict} = require("../../src/registers/endPointsReg.js")
+const {widgetDict} = require("../src/registers/endPointsReg.js")
 
 router.use(function timeLog(req, res, next) {
     // console.log("Time: ", new Date());

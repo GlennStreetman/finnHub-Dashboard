@@ -4,8 +4,8 @@ const router = express.Router();
 const format = require('pg-format');
 const md5 = require("md5");
 const db = process.env.live === '1' ? 
-  require("../../db/databaseLive.js") :  
-  require("../../db/databaseLocalPG.js") ;
+  require("../db/databaseLive.js") :  
+  require("../db/databaseLocalPG.js") ;
 
   router.use(function timeLog(req, res, next) {
     // console.log("Time: ", new Date());
@@ -35,7 +35,7 @@ router.get("/login", (req, res) => {
           req.session.uID = login.id;
           req.session.userName = rows.rows[0]['loginname'];
           req.session.login = true
-          console.log(req.session)
+          // console.log(req.session)
           res.json(info);
         } else if (rows.rowCount === 1 && login.confirmemail !== '1') {
         // console.log(login)
@@ -50,7 +50,7 @@ router.get("/login", (req, res) => {
 
 router.get("/logOut", (req, res) => {
     req.session.login = false;
-    console.log(req.session.userName, req.session.login);
+    // console.log(req.session.userName, req.session.login);
     res.json("true");
 });
 
@@ -65,7 +65,7 @@ router.get("/checkLogin", (req, res) => {
     `;
   const retrieveAPIKeys = () => {
     console.log("getting APIKeys");
-    console.log(req.session);
+    // console.log(req.session);
 
     return new Promise((resolve, reject) => {
       db.query(apiKeysQuery, (err, rows) => {
@@ -87,7 +87,7 @@ router.get("/checkLogin", (req, res) => {
   if (req.session.login === true) {
     retrieveAPIKeys()
       .then((data) => {
-        console.log("login data: ", data);
+        // console.log("login data: ", data);
         res.json(data);
       })
       .catch((err) => {
