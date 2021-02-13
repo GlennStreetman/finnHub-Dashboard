@@ -137,7 +137,7 @@ router.post("/register", (req, res) => {
 });
 
 //verifys emails address.
-router.get("/verify", (req, res) => {
+router.get("/verify", (req, res, next) => {
   let verifyID = format('%L', req.query['id'])
   let verifyUpdate = `
   UPDATE users
@@ -157,7 +157,7 @@ router.get("/verify", (req, res) => {
 });
 
  //checks answer to secret question.
-router.get("/secretQuestion", (req, res) => {
+router.get("/secretQuestion", (req, res, next) => {
   console.log('------secretquestion-------')
   console.log(req.session)
   let loginText = md5(req.query["loginText"])
@@ -187,7 +187,7 @@ router.get("/secretQuestion", (req, res) => {
 });
 
 //verifys an email address. Used by both Manage Account screen and upon registering a new account.
-router.get("/verifyChange", (req, res) => {
+router.get("/verifyChange", (req, res, next) => {
   let verifyID = format('%L', req.query['id'])
   let verifyUpdate = `
     UPDATE users

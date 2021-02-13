@@ -12,7 +12,7 @@ const db = process.env.live === '1' ?
     next();
   });
 
-router.get("/login", (req, res) => {
+router.get("/login", (req, res, next) => {
     let loginText = format('%L', req.query["loginText"])
     let pwText = format('%L', req.query["pwText"])
     let loginQuery = `SELECT id, loginname, apikey, ratelimit, confirmemail,exchangelist, defaultexchange
@@ -48,14 +48,14 @@ router.get("/login", (req, res) => {
     });
 });
 
-router.get("/logOut", (req, res) => {
+router.get("/logOut", (req, res, next) => {
     req.session.login = false;
     // console.log(req.session.userName, req.session.login);
     res.json("true");
 });
 
 //checks login status when site is initialy loaded.
-router.get("/checkLogin", (req, res) => {
+router.get("/checkLogin", (req, res, next) => {
   let resData = { login: 0 };
   let uID = req.session["uID"];
   let apiKeysQuery = `

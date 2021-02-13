@@ -11,7 +11,7 @@ router.use(function timeLog(req, res, next) {
     next();
     });
 
-router.get("/endPoint", cors(),(req, res) => {
+router.get("/endPoint", cors(),(req, res, next) => {
     console.log("Generating new endpoint data");
     // const data = {}
     const apiKey = format('%L', req.query['apiKey'])

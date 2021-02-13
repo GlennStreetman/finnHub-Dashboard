@@ -13,7 +13,7 @@ const db = process.env.live === "1" ? require("../../db/databaseLive.js") : requ
 //   return /\S+@\S+\.\S+/.test(email);
 // };
 
-router.get("/newRoute", (req, res) => {
+router.get("/newRoute", (req, res, next) => {
     if (req.session.login === true) {
         const queryParam = format("%L", req.query["PLACEHOLDER"]);
         let NEWQUERY = `SELECT FROM  WHERE id =$1 AND PLACEHOLDER = ${queryParam}`;

@@ -14,7 +14,7 @@ function emailIsValid(email) {
 };
 
 
-router.get("/accountData", (req, res) => {
+router.get("/accountData", (req, res, next) => {
   // thisRequest = req.query;
   if (req.session.login === true) {
     let accountDataQuery = `SELECT loginName, email, apiKey, webHook, ratelimit FROM users WHERE id =$1`;

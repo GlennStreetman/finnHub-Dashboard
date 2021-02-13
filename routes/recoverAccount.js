@@ -16,7 +16,7 @@ router.use(function timeLog (req, res, next) {
   next()
 });
 
-router.get("/forgot", (req, res) => {
+router.get("/forgot", (req, res, next) => {
     console.log("reseting password")
     let loginName = format('%L', req.query["loginText"]);
     let forgotQuery = `SELECT id, loginName, email FROM users WHERE email = ${loginName}`;
@@ -68,7 +68,7 @@ router.get("/forgot", (req, res) => {
   });
 
   //find secret question
-  router.get("/findSecret", (req, res) => {
+  router.get("/findSecret", (req, res, next) => {
     console.log('-------findsecret-------')
     console.log(req.session)
     console.log(req.query)
@@ -99,7 +99,7 @@ router.get("/forgot", (req, res) => {
     })
   });
 
-  router.get("/reset", (req, res) => {
+  router.get("/reset", (req, res, next) => {
     console.log('----reset-----')
     console.log(req.query)
     let verifyID = format('%L', req.query['id'])
@@ -129,7 +129,7 @@ router.get("/forgot", (req, res) => {
     })
   });
 
-  router.get("/newPW", (req, res) => {
+  router.get("/newPW", (req, res, next) => {
     console.log('----new PW --------')
     console.log(req.query)
     console.log(req.session)

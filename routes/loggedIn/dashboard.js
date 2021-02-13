@@ -4,98 +4,95 @@ const format = require("pg-format");
 
 const db = process.env.live === "1" ? require("../../db/databaseLive.js") : require("../../db/databaseLocalPG.js");
 
-router.get("/dashboard", (req, res) => {
+router.get("/dashboard", (req, res, next) => {
     // console.log("------------------GETTING DASHBOARD-------------")
     if (req.session.login === true) { 
-    // SELECT d.id, d.dashBoardName, d.globalStockList, widgetList 
-    const getSavedDashBoards = `
-        SELECT *
-        FROM dashBoard AS d
-        LEFT JOIN widgets AS w ON d.id = w.dashboardkey
-        WHERE d.userID =${req.session.uID}`;
-        // SELECT menuList, defaultMenu 
-    const getMenuSetup = `
-        SELECT *
-        FROM menuSetup AS m
-        LEFT JOIN menus AS s ON m.id = s.menukey
-        WHERE userID =${req.session.uID}`;
-    
-        // console.log("QUERIES:", getSavedDashBoards, getMenuSetup)
-    const r = { //resultset
-        savedDashBoards: {},
-        menuSetup: {},
-        default: '',
-    };
-    db.query(getSavedDashBoards, (err, rows) => {
-        if (err) {
-        console.log(err)
-        res.json({message: "Failed to retrieve dashboards"});
-        } else {
-        const result = rows.rows;
-        // console.log('RESULTS', result)
-        for (const row in result) {
-            if (r.savedDashBoards[result[row].dashboardname] === undefined){
-            r.savedDashBoards[result[row].dashboardname] = {
-                dashboardname: result[row].dashboardname,
-                globalstocklist: result[row].globalstocklist,
-                id:  result[row].id,
-                widgetlist: {}
-            }
-            }
-            const resultKey = result[row].dashboardname
-            const newObject = {
-            column: result[row].columnid, 
-            columnOrder: result[row].columnorder,
-            filters: result[row].filters,
-            trackedStocks: result[row].trackedstocks,
-            widgetConfig: result[row].widgetconfig,
-            widgetHeader: result[row].widgetheader,
-            widgetID: result[row].widgetid, 
-            widgetType: result[row].widgettype,
-            yAxis: result[row].yaxis,
-            xAxis: result[row].xaxis,
-            }
-            // console.log("KEYS:", r.savedDashBoards, "---",resultKey, newObject)
-            r.savedDashBoards[resultKey].widgetlist[newObject.widgetID] = newObject
-            // console.log(r)
-        }
+        const getSavedDashBoards = `
+            SELECT *
+            FROM dashBoard AS d
+            LEFT JOIN widgets AS w ON d.id = w.dashboardkey
+            WHERE d.userID =${req.session.uID}`;
+        const getMenuSetup = `
+            SELECT *
+            FROM menuSetup AS m
+            LEFT JOIN menus AS s ON m.id = s.menukey
+            WHERE userID =${req.session.uID}`;
         
-        db.query(getMenuSetup, (err, rows) => {
+            // console.log("QUERIES:", getSavedDashBoards, getMenuSetup)
+        const r = { //resultset
+            savedDashBoards: {},
+            menuSetup: {},
+            default: '',
+        };
+        db.query(getSavedDashBoards, (err, rows) => {
             if (err) {
-            res.json({message: "Failed to retrieve menu setup."});
+                // console.log(err)
+                res.json({message: "Failed to retrieve dashboards"});
             } else {
-            // console.log("menu setup retrieved");
-            const result = rows.rows;
-            r.default = rows.rows[0].defaultmenu
-            // console.log("MENUSETUPROWS", rows.rows)
-            for (const row in result) {
-            const thisRow = result[row]
-            r.menuSetup[thisRow['widgetid']] = {
-                // id: thisRow.id,
-                // userid: thisRow.userid,
-                // defaultmenu: thisRow.defaultmenu,
-                // menulist: {
-                column: thisRow.columnid,
-                columnOrder: thisRow.columnorder,
-                widgetConfig: thisRow.widgetconfig,
-                widgetHeader: thisRow.widgetheader,
-                widgetID: thisRow.widgetid,
-                widgetType: thisRow.widgettype,
-                xAxis: thisRow.xaxis,
-                yAxis: thisRow.yaxis,
-                // },
+                const result = rows.rows;
+                for (const row in result) {
+                    if (r.savedDashBoards[result[row].dashboardname] === undefined){
+                        r.savedDashBoards[result[row].dashboardname] = {
+                            dashboardname: result[row].dashboardname,
+                            globalstocklist: result[row].globalstocklist,
+                            id:  result[row].id,
+                            widgetlist: {}
+                    }
+                    }
+                    const resultKey = result[row].dashboardname
+                    const newObject = {
+                    column: result[row].columnid, 
+                    columnOrder: result[row].columnorder,
+                    filters: result[row].filters,
+                    trackedStocks: result[row].trackedstocks,
+                    widgetConfig: result[row].widgetconfig,
+                    widgetHeader: result[row].widgetheader,
+                    widgetID: result[row].widgetid, 
+                    widgetType: result[row].widgettype,
+                    yAxis: result[row].yaxis,
+                    xAxis: result[row].xaxis,
+                    }
+                    // console.log("KEYS:", r.savedDashBoards, "---",resultKey, newObject)
+                    r.savedDashBoards[resultKey].widgetlist[newObject.widgetID] = newObject
+                    // console.log(r)
             }
+            
+            db.query(getMenuSetup, (err, rows) => {
+                if (err) {
+                res.json({message: "Failed to retrieve menu setup."});
+                } else {
+                // console.log("menu setup retrieved");
+                const result = rows.rows;
+                r.default = rows.rows[0].defaultmenu
+                // console.log("MENUSETUPROWS", rows.rows)
+                for (const row in result) {
+                const thisRow = result[row]
+                r.menuSetup[thisRow['widgetid']] = {
+                    // id: thisRow.id,
+                    // userid: thisRow.userid,
+                    // defaultmenu: thisRow.defaultmenu,
+                    // menulist: {
+                    column: thisRow.columnid,
+                    columnOrder: thisRow.columnorder,
+                    widgetConfig: thisRow.widgetconfig,
+                    widgetHeader: thisRow.widgetheader,
+                    widgetID: thisRow.widgetid,
+                    widgetType: thisRow.widgettype,
+                    xAxis: thisRow.xaxis,
+                    yAxis: thisRow.yaxis,
+                    // },
+                }
+                }
+                // resultSet["menuSetup"] = result;
+                console.log("returning dashboard and menu data");
+                res.json(r);
+            }});
             }
-            // resultSet["menuSetup"] = result;
-            console.log("returning dashboard and menu data");
-            res.json(r);
-        }});
-        }
-    });
+        });
     } else {res.json({message: "Not logged in."})}
 });
 
-router.post("/dashboard", (req, res) => {
+router.post("/dashboard", (req, res, next) => {
     
     if (req.session.login === true) {  
     // console.log("--------post dashboard-------------", req.body)

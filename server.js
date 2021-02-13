@@ -8,6 +8,7 @@ const FileStore = require("session-file-store")(session);
 const bodyParser = require("body-parser");
 const app = express();
 const path = require("path");
+const morgan = require('morgan')
 app.use(cookieParser());
 app.use(bodyParser.json()); // support json encoded bodies
 const fileStoreOptions = {};
@@ -21,6 +22,7 @@ app.use(
   })
 
 );
+app.use(morgan('dev'))
 
 //LOAD CONFIG.
 console.log("env=", process.env.live)
@@ -58,3 +60,19 @@ app.use('/', logUIError)
 app.use('/', accountData)
 app.use('/', dashboard)
 app.use('/', deleeteSavedDashboard)
+app.use((req,res,next) => {
+  //ALL OTHER ROUTES
+  const error = new Error('Not Found');
+  error.status(404)
+  next(error)
+})
+
+app.use((error, req, res, next) => {
+  //ALL NEXT
+  res.status(error.status || 500)
+  res.json({
+    error: {
+      message: error.message
+    }
+  })
+})

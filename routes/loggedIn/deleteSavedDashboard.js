@@ -3,7 +3,7 @@ const router = express.Router();
 const format = require("pg-format");
 const db = process.env.live === "1" ? require("../../db/databaseLive.js") : require("../../db/databaseLocalPG.js");
 
-router.get("/deleteSavedDashboard", (req, res) => {
+router.get("/deleteSavedDashboard", (req, res, next) => {
 
     if (req.session.login === true) {  
     const uId = req.session["uID"];
