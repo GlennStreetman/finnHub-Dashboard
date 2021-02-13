@@ -63,7 +63,7 @@ app.use('/', deleeteSavedDashboard)
 app.use((req,res,next) => {
   //ALL OTHER ROUTES
   const error = new Error('Not Found');
-  error.status(404)
+  error.status = 404
   next(error)
 })
 

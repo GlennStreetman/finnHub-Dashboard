@@ -92,7 +92,7 @@ router.get("/dashboard", (req, res, next) => {
                 } else {
                     console.log("no dashboard retrieved")
                     const error = new Error('No dashboard');
-                    error.status(500)
+                    error.status = 500
                     next(error)
                 }
             }});
