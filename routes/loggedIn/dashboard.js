@@ -29,6 +29,7 @@ router.get("/dashboard", (req, res, next) => {
                 console.log(err)
                 res.json({message: "Failed to retrieve dashboards"});
             } else {
+                const thisNext = next
                 const result = rows.rows;
                 for (const row in result) {
                     if (r.savedDashBoards[result[row].dashboardname] === undefined){
@@ -57,7 +58,7 @@ router.get("/dashboard", (req, res, next) => {
                     // console.log(r)
             }
             
-            db.query(getMenuSetup, (err, rows , next) => {
+            db.query(getMenuSetup, (err, rows , thisNext) => {
                 if (err) {
                     console.log(err)
                     res.json({message: "Failed to retrieve menu setup."});
@@ -93,7 +94,7 @@ router.get("/dashboard", (req, res, next) => {
                     console.log("no dashboard retrieved")
                     const error = new Error('No dashboard');
                     error.status = 500
-                    next(error)
+                    thisNext(error)
                 }
             }});
             }
