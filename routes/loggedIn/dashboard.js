@@ -17,16 +17,16 @@ router.get("/dashboard", (req, res, next) => {
             FROM menuSetup AS m
             LEFT JOIN menus AS s ON m.id = s.menukey
             WHERE userID =${req.session.uID}`;
-        
+        console.log(getMenuSetup)
             // console.log("QUERIES:", getSavedDashBoards, getMenuSetup)
         const r = { //resultset
             savedDashBoards: {},
             menuSetup: {},
             default: '',
         };
-        db.query(getSavedDashBoards, (err, rows) => {
+        db.query(getSavedDashBoards, (err, rows, next) => {
             if (err) {
-                // console.log(err)
+                console.log(err)
                 res.json({message: "Failed to retrieve dashboards"});
             } else {
                 const result = rows.rows;
@@ -57,35 +57,44 @@ router.get("/dashboard", (req, res, next) => {
                     // console.log(r)
             }
             
-            db.query(getMenuSetup, (err, rows) => {
+            db.query(getMenuSetup, (err, rows , next) => {
                 if (err) {
-                res.json({message: "Failed to retrieve menu setup."});
+                    console.log(err)
+                    res.json({message: "Failed to retrieve menu setup."});
                 } else {
-                // console.log("menu setup retrieved");
-                const result = rows.rows;
-                r.default = rows.rows[0].defaultmenu
-                // console.log("MENUSETUPROWS", rows.rows)
-                for (const row in result) {
-                const thisRow = result[row]
-                r.menuSetup[thisRow['widgetid']] = {
-                    // id: thisRow.id,
-                    // userid: thisRow.userid,
-                    // defaultmenu: thisRow.defaultmenu,
-                    // menulist: {
-                    column: thisRow.columnid,
-                    columnOrder: thisRow.columnorder,
-                    widgetConfig: thisRow.widgetconfig,
-                    widgetHeader: thisRow.widgetheader,
-                    widgetID: thisRow.widgetid,
-                    widgetType: thisRow.widgettype,
-                    xAxis: thisRow.xaxis,
-                    yAxis: thisRow.yaxis,
-                    // },
+                    console.log("menu setup retrieved");
+                    
+                    const result = rows.rows;
+                    if (rows.rows[0] !== undefined) {
+                        r.default = rows.rows[0].defaultmenu
+                        // console.log("MENUSETUPROWS", rows.rows)
+                        for (const row in result) {
+                        const thisRow = result[row]
+                        r.menuSetup[thisRow['widgetid']] = {
+                            // id: thisRow.id,
+                            // userid: thisRow.userid,
+                            // defaultmenu: thisRow.defaultmenu,
+                            // menulist: {
+                            column: thisRow.columnid,
+                            columnOrder: thisRow.columnorder,
+                            widgetConfig: thisRow.widgetconfig,
+                            widgetHeader: thisRow.widgetheader,
+                            widgetID: thisRow.widgetid,
+                            widgetType: thisRow.widgettype,
+                            xAxis: thisRow.xaxis,
+                            yAxis: thisRow.yaxis,
+                            // },
+                        }
+                    }
+                    // resultSet["menuSetup"] = result;
+                    console.log("returning dashboard and menu data");
+                    res.json(r);
+                } else {
+                    console.log("no dashboard retrieved")
+                    const error = new Error('No dashboard');
+                    error.status(500)
+                    next(error)
                 }
-                }
-                // resultSet["menuSetup"] = result;
-                console.log("returning dashboard and menu data");
-                res.json(r);
             }});
             }
         });
