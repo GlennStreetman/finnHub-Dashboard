@@ -106,13 +106,12 @@ class login extends React.Component {
     fetch("/register", options)
       .then((response) => response.json())
       .then((data) => {
-        // console.log(data);
-        if (data === "true") {
-          // console.log("its true");
+        console.log(data);
+        if (data.message === "new user created") {
           this.clearText(0);
           this.setState({ serverResponse: "Thank you for registering, please check your email and follow the confirmation link." });
         } else {
-          this.setState({ serverResponse: data });
+          this.setState({ serverResponse: data.message });
         }
       })
       .catch((error) => {

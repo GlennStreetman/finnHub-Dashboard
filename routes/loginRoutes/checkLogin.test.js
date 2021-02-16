@@ -1,0 +1,77 @@
+
+const request = require("supertest");
+const express = require("express");
+const app = express();
+const router = express.Router();
+
+require('dotenv').config()
+const path = require("path");
+app.use(express.static(path.join(__dirname, 'build')));
+app.use(express.urlencoded({ extended: false }));
+const bodyParser = require("body-parser");
+app.use(bodyParser.json()); // support json encoded bodies
+
+const cookieParser = require("cookie-parser");
+app.use(cookieParser());
+const session = require("express-session");
+const FileStore = require("session-file-store")(session);
+const fileStoreOptions = {};
+app.use(
+    session({
+    store: new FileStore(fileStoreOptions),
+    secret: process.env.session_secret,
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false, sameSite: true },
+    })
+)
+
+//set login to true
+const setLogin = router.get("/setLogin", (req, res, next) => {
+    
+    req.session.login = true
+    req.session.uId = 1
+    console.log('force connection:', req.session)
+    res.json({message:'loggedin'})
+});
+
+const checkLogin = require("./checkLogin.js");
+const db = require("../../db/databaseLocalPG.js");
+app.use('/', checkLogin) //route to be tested needs to be bound to the router.
+app.use('/', setLogin)
+
+
+beforeAll(() => {
+    global.sessionStorage = {}
+    return (db.connect()
+        .then(() => console.log("connected to developement postgres server"))
+        .catch(err => console.log("Failed to connect to DB:", err)))
+    });
+
+afterAll(()=>{
+    db.end()
+})
+
+test("Check logged out: get/checkLogin", (done) => {
+    request(app)
+        .get("/checkLogin")
+        .expect("Content-Type", /json/)
+        .expect({
+            login: 0,
+        })
+        .expect(200, done);
+});
+
+test("Check logged in: get/checkLogin", (done) => {
+    request(app)
+        .get("/setLogin")
+        .then(response => {
+            request(app)
+                .get("/checkLogin")
+                .expect("Content-Type", /json/)
+                .expect({
+                    login: 1,
+                })
+                .expect(200, done);
+    })
+});

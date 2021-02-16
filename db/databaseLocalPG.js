@@ -2,6 +2,7 @@ console.log("loading development postgres connection")
 
 const { Client } = require('pg')
 // const fs = require('fs');
+// console.log(process.env.pguser, process.env.pghost, process.env.pgdatabase, process.env.pgpassword, process.env.pgport)
 const db = new Client({
     sslmode: 'disable',
     user: process.env.pguser ,
@@ -11,9 +12,11 @@ const db = new Client({
     port: process.env.pgport ,
 })
 
-db.connect()
-.then(() => console.log("connected to developement postgres server"))
-.catch(err => console.log(err))
+
+
+// db.connect()
+// .then(() => console.log("connected to developement postgres server"))
+// .catch(err => console.log(err))
 
 module.exports = db;
 

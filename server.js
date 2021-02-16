@@ -1,47 +1,66 @@
 
 const express = require("express");
+const app = express();
 require('dotenv').config()
 const port = process.env.NODE_ENV || 5000;
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
-const FileStore = require("session-file-store")(session);
 const bodyParser = require("body-parser");
-const app = express();
-const path = require("path");
-const morgan = require('morgan')
-app.use(cookieParser());
 app.use(bodyParser.json()); // support json encoded bodies
+const path = require("path");
+const morgan = require('morgan') //request logger middleware.
+app.use(cookieParser());
+const FileStore = require("session-file-store")(session);
 const fileStoreOptions = {};
-app.use(
-  session({
-    store: new FileStore(fileStoreOptions),
-    secret: process.env.session_secret,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false, sameSite: true },
-  })
 
-);
 app.use(morgan('dev'))
 
 //LOAD CONFIG.
 console.log("env=", process.env.live)
 if (process.env.live === '1') {
+    app.use(
+      session({
+        store: new FileStore(fileStoreOptions),
+        secret: process.env.session_secret,
+        resave: false,
+        saveUninitialized: true,
+        cookie: { secure: true, sameSite: true },
+      }))
     console.log("loading live server config")
     app.listen(process.env.PORT || port, function () {
       console.log("Listening to http://localhost:" + port);
     })
     app.use(express.static(path.join(__dirname, 'build')));
+    const db = require("../db/databaseLive.js") 
+
+    db.connect()
+      .then(() => console.log("connected to developement postgres server"))
+      .catch(err => console.log(err))
+
 } else {
+    app.use(
+      session({
+        store: new FileStore(fileStoreOptions),
+        secret: process.env.session_secret,
+        resave: false,
+        saveUninitialized: true,
+        cookie: { secure: false, sameSite: true },
+      }))
     console.log("loading dev server config")
     const path = require("path");
     app.listen(port, function () {console.log(`serving the direcotry @ http`)})
     app.use(express.static(path.join(__dirname, 'build')));
+    const db = require("./db/databaseLocalPG.js") 
 
+    db.connect()
+      .then(() => console.log("connected to developement postgres server"))
+      .catch(err => console.log(err))
 }
 
 //SETUP ROUTES
-const login = require('./routes/appLogin')
+const login = require('./routes/loginRoutes/login')
+const checkLogin = require('./routes/loginRoutes/checkLogin')
+
 const appRegister =  require('./routes/registerRoutesPG')
 const recover =  require('./routes/recoverAccount')
 const endPoint =  require('./routes/endPoint')
@@ -51,7 +70,9 @@ const accountData = require('./routes/loggedIn/accountData')
 const dashboard = require('./routes/loggedIn/dashboard')
 const deleeteSavedDashboard = require('./routes/loggedIn/deleteSavedDashboard')
 
-app.use('/', login)    
+app.use('/', login)
+app.use('/', checkLogin)
+
 app.use('/', appRegister)
 app.use('/', endPoint)
 app.use('/', recover)

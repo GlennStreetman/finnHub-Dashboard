@@ -40,7 +40,8 @@ router.post("/register", (req, res) => {
     confirmEmail, 
     resetPassword,
     exchangelist,
-    defaultexchange
+    defaultexchange,
+    ratelimit
     ) 
   VALUES (
     ${loginText},
@@ -51,7 +52,8 @@ router.post("/register", (req, res) => {
     '${validateKey}', 
     '0',
     'US',
-    'US')
+    'US',
+    30)
     RETURNING *`;
 
   function emailIsValid(email) {
