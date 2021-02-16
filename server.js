@@ -61,7 +61,11 @@ if (process.env.live === '1') {
 const login = require('./routes/loginRoutes/login')
 const checkLogin = require('./routes/loginRoutes/checkLogin')
 
-const appRegister =  require('./routes/registerRoutesPG')
+const register =  require('./routes/accountRegistration/register')
+const secretQuestion =  require('./routes/accountRegistration/secretQuestion')
+const verifyEmail =  require('./routes/accountRegistration/verifyEmail')
+const verifyChange =  require('./routes/accountRegistration/verifyChange')
+
 const recover =  require('./routes/recoverAccount')
 const endPoint =  require('./routes/endPoint')
 const logUIError =  require('./routes/logUiError')
@@ -73,7 +77,11 @@ const deleeteSavedDashboard = require('./routes/loggedIn/deleteSavedDashboard')
 app.use('/', login)
 app.use('/', checkLogin)
 
-app.use('/', appRegister)
+app.use('/', register)
+app.use('/', secretQuestion)
+app.use('/', verifyEmail)
+app.use('/', verifyChange)
+
 app.use('/', endPoint)
 app.use('/', recover)
 app.use('/', logUIError)

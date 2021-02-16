@@ -5,8 +5,8 @@ const cryptoRandomString = require('crypto-random-string');
 const URL = process.env.live === '1' ? `https://finn-dash.herokuapp.com` : `http://localhost:5000`
 const md5 = require("md5");
 const db = process.env.live === '1' ? 
-  require("../db/databaseLive.js") :  
-  require("../db/databaseLocalPG.js") ;
+  require("../../db/databaseLive.js") :  
+  require("../../db/databaseLocalPG.js") ;
 //mailgun config data, needs to be set to be imported if not available in process.env
 const API_KEY = process.env.API_KEY || 1;
 const DOMAIN = process.env.DOMAIN_KEY || 1;
@@ -102,7 +102,7 @@ router.post("/register", (req, res) => {
               from: 'Glenn Streetman <glennstreetman@gmail.com>',
               to: req.body.emailText,
               subject: 'finnHub Verify Email',
-              text: `Please visit the following link to verify your email address and login to finnDash: ${URL}/verify?id=${validateKey}`
+              text: `Please visit the following link to verify your email address and login to finnDash: ${URL}/verifyEmail?id=${validateKey}`
           };
           console.log(data)
           mailgun.messages().send(data, (error) => {
@@ -136,79 +136,6 @@ router.post("/register", (req, res) => {
     } else {
       res.json({message: "Enter a valid email address"});
     }
-});
-
-//verifys emails address.
-router.get("/verify", (req, res, next) => {
-  let verifyID = format('%L', req.query['id'])
-  let verifyUpdate = `
-  UPDATE users
-  SET confirmEmail = 1
-  WHERE confirmEmail = ${verifyID}
-  `
-  console.log(verifyUpdate)
-  db.query(verifyUpdate, (err) => {
-    if (err) {
-      res.json({message: "Could not validate email address."});
-      // console.log(verifyUpdate)
-    } else {
-      console.log('email verified')
-      res.redirect('/')
-    }
-  })
-});
-
- //checks answer to secret question.
-router.get("/secretQuestion", (req, res, next) => {
-  console.log('------secretquestion-------')
-  console.log(req.session)
-  let loginText = md5(req.query["loginText"])
-  // let loginName = format('%L', req.query["user"])
-  
-  let newQuery = `
-    SELECT id, loginname 
-    FROM users 
-    WHERE secretAnswer = '${loginText}' AND 
-    loginName = '${req.session.userName}'`;
-  console.log(newQuery);
-  console.log(req.query['user'])
-  db.query(newQuery, [], (err, rows) => {
-    if (err) {
-      res.json({message: "Secret question did not match."});
-    } else {
-      if (rows !== undefined) {
-
-        req.session.reset = 1;
-        res.json({message: "correct"});
-      } else {
-
-        res.json({message: "Secret question answer did not match."});
-      }
-    }
-  });
-});
-
-//verifys an email address. Used by both Manage Account screen and upon registering a new account.
-router.get("/verifyChange", (req, res, next) => {
-  let verifyID = format('%L', req.query['id'])
-  let verifyUpdate = `
-    UPDATE users
-    SET email = (SELECT newEmail FROM newEmail WHERE queryString = ${verifyID} limit 1)
-    WHERE id = (SELECT userID FROM newEmail WHERE queryString = ${verifyID} limit 1)
-    ;
-    DELETE FROM newEmail 
-    WHERE userID  = (SELECT userID FROM newEmail WHERE queryString = ${verifyID})
-  `
-  console.log(verifyUpdate)
-  db.query(verifyUpdate, (err) => {
-    if (err) {
-      res.json({message: "Could not update email address."});
-      // console.log(verifyUpdate)
-    } else {
-      console.log('email verified')
-      res.redirect('/')
-    }
-  })
 });
 
 module.exports = router;

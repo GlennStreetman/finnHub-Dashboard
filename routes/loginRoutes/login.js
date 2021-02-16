@@ -30,6 +30,7 @@ router.get("/login", (req, res, next) => {
         if (err) {
             res.json({message: "Login error"});
         } else if (rows.rowCount === 1 && login.confirmemail === '1') {
+            console.log("USER:", login.loginname, "succesfuly logged in.")
             info["key"] = login.apikey;
             info['ratelimit'] = login.ratelimit
             info["login"] = 1;
