@@ -36,11 +36,9 @@ beforeAll(() => {
         .catch(err => console.log("Failed to connect to DB:", err)))
     });
 
-afterAll(()=>{
-    db.end()
+afterAll((done)=>{
+    db.end(done)
 })
-
-
 
 //good login
 test("Check good login get/login", (done) => {

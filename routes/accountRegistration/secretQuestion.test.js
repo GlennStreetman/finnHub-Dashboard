@@ -29,56 +29,45 @@ const db = require("../../db/databaseLocalPG.js");
 //required for sesssion management and sending cookies with requests
 const request = require("supertest");
 
-const checkLogin = require("./checkLogin.js");
-const login = require("./login.js");
-app.use('/', checkLogin) //route to be tested needs to be bound to the router.
+const secretQuestion = require("./secretQuestion.js");
+const login = require("./../loginRoutes/login.js");
+app.use('/', secretQuestion) //route to be tested needs to be bound to the router.
 app.use('/', login) //needed fo all routes that require login.
 
 beforeAll(() => {
     global.sessionStorage = {}
-    
-    return (db.connect()
-        .then(() => console.log("connected to developement postgres server"))
-        .catch(err => console.log("Failed to connect to DB:", err)))
-});
+    db.connect()
+    return (console.log('test setup complete'))
+})
 
 afterAll((done)=>{
     db.end(done())
 })
 
-test("Check logged out: get/checkLogin", (done) => {
+test("Check correct secret question answer get/secretQuestion", (done) => {       
     request(app)
-        .get("/checkLogin")
+        .get(`/secretQuestion?loginText=goodbye&user=test`)
         .expect("Content-Type", /json/)
-        .expect({
-            login: 0,
-        })
         .expect(200, done);
-});
+})
 
-describe('Get login cookie:', ()=>{
-    beforeEach(function (done) {
-        request(app)
-            .get("/login?loginText=test&pwText=testpw")
-            .end(function (err, res) {
-            if (err) {
-                throw err;
-            }
-            done();
-        });
+test("Check incorrect secret question answer get/secretQuestion", (done) => {       
+    request(app)
+        .get(`/secretQuestion?loginText=badAnswer&user=test`)
+        .expect("Content-Type", /json/)
+        .expect(406, done);
+})
 
-    })
-    test("Check logged in: get/checkLogin", (done) => {       
-        request(app)
-            .get("/checkLogin")
-            .expect("Content-Type", /json/)
-            .expect({
-                login: 1,
-            })
-            .expect(200, done(console.log("LOGGIN CHEC SUCCESS!")));
-        })
-    })
+test("Check no secret question answer get/secretQuestion", (done) => {       
+    request(app)
+        .get(`/secretQuestion?loginText=&user=test`)
+        .expect("Content-Type", /json/)
+        .expect(406, done);
+})
 
-
-
-
+test("Check not secret question user get/secretQuestion", (done) => {       
+    request(app)
+        .get(`/secretQuestion?loginText=badAnswer&user=`)
+        .expect("Content-Type", /json/)
+        .expect(406, done);
+})

@@ -6,29 +6,30 @@ const db = process.env.live === '1' ?
 const md5 = require("md5");
 //checks answer to secret question.
 router.get("/secretQuestion", (req, res, next) => {
-    console.log('------secretquestion-------')
-    console.log(req.session)
     let loginText = md5(req.query["loginText"])
-    // let loginName = format('%L', req.query["user"])
+    let user = req.query["user"]
     
     let newQuery = `
-    SELECT id, loginname 
-    FROM users 
-    WHERE secretAnswer = '${loginText}' AND 
-    loginName = '${req.session.userName}'`;
-    console.log(newQuery);
-    console.log(req.query['user'])
-    db.query(newQuery, [], (err, rows) => {
+        SELECT id, loginname 
+        FROM users 
+        WHERE secretAnswer = '${loginText}' AND 
+        loginname = '${user}'
+    `;
+    console.log(newQuery)
+
+    db.query(newQuery, (err, rows) => {
     if (err) {
-        res.json({message: "Secret question did not match."});
+        res.statusCode = 401
+        res.json({message: "Problem returning secret question."});
     } else {
-        if (rows !== undefined) {
-
-        req.session.reset = 1;
-        res.json({message: "correct"});
+        if (rows.rows[0] !== undefined) {
+            console.log("ROWS:", rows.rows[0])
+            req.session.reset = 1; //used by new password route.
+            res.statusCode = 200
+            res.json({message: "correct"});
         } else {
-
-        res.json({message: "Secret question answer did not match."});
+            res.statusCode = 406
+            res.json({message: "Secret question answer did not match."});
         }
     }
     });
