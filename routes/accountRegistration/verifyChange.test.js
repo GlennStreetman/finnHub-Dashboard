@@ -53,10 +53,13 @@ test("Verify email get/verifyChange", (done) => {
         .expect(302)
         .then(() => {
             const testEmailUpdate = `SELECT * FROM users where email = 'test2@test.com'`
-                db.query(testEmailUpdate, (err, rows) => { 
-                    // console.log("UPDATEING EMAIL", rows.rowCount)
+                db.query(testEmailUpdate, (err, rows) => {
+                    if (err) {
+                        console.log("Problem verifying get/verifyChange")
+                    } else {
                     expect(rows.rowCount).toBe(1)
                     done()
+                    }
                 })
         })
 })
