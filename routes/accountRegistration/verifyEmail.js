@@ -10,10 +10,10 @@ router.get("/verifyEmail", (req, res, next) => {
     let verifyID = format('%L', req.query['id'])
     let verifyUpdate = `
     UPDATE users
-    SET confirmEmail = 1
-    WHERE confirmEmail = ${verifyID}
+    SET emailconfirmed = true, confirmemaillink = ''
+    WHERE confirmemaillink = ${verifyID}
     `
-    // console.log(verifyUpdate)
+    console.log(verifyUpdate)
     db.query(verifyUpdate, (err, rows) => {
         // console.log(rows)
         if (err) {

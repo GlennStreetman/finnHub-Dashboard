@@ -8,16 +8,16 @@ require("../../db/databaseLocalPG.js") ;
 
 //checks login status when site is initialy loaded.
 router.get("/checkLogin", (req, res, next) => {
-    console.log("/checkLogin", req.session)
-    let resData = { login: 0 };
-    let uID = req.session["uID"];
-    let apiKeysQuery = `
+    const resData = { login: 0 };
+    const uID = req.session["uID"];
+    const apiKeysQuery = `
         SELECT apikey, webhook, ratelimit, exchangelist, defaultexchange 
         FROM users
         WHERE id = ${uID}
     `;
+    // console.log(apiKeysQuery)
     const retrieveAPIKeys = () => {
-        console.log("getting APIKeys");
+        // console.log("getting APIKeys");
         // console.log(req.session);
 
         return new Promise((resolve, reject) => {
@@ -36,17 +36,20 @@ router.get("/checkLogin", (req, res, next) => {
             });
         });
     };
-
+    // console.log("CHECK LOGIN SESSION", req.session)
     if (req.session.login === true) {
         retrieveAPIKeys()
         .then((data) => {
-            console.log("login data: ", data);
+            res.statusCode = 200
+            // console.log("-login data-: ", data);
             res.json(data);
         })
         .catch((err) => {
+            res.statusCode = 401
             res.json(err);
         });
     } else {
+        res.statusCode = 406
         console.log("not logged in");
         res.json({ login: 0 });
     }

@@ -60,13 +60,17 @@ if (process.env.live === '1') {
 //SETUP ROUTES
 const login = require('./routes/loginRoutes/login')
 const checkLogin = require('./routes/loginRoutes/checkLogin')
-
+//accountRegistration
 const register =  require('./routes/accountRegistration/register')
 const secretQuestion =  require('./routes/accountRegistration/secretQuestion')
 const verifyEmail =  require('./routes/accountRegistration/verifyEmail')
 const verifyChange =  require('./routes/accountRegistration/verifyChange')
+//account
+const findSecret =  require('./routes/accounts/findSecret')
+const forgot =  require('./routes/accounts/forgot')
+const newPW =  require('./routes/accounts/newPW')
+const reset =  require('./routes/accounts/reset')
 
-const recover =  require('./routes/recoverAccount')
 const endPoint =  require('./routes/endPoint')
 const logUIError =  require('./routes/logUiError')
 //routes below require login
@@ -76,14 +80,18 @@ const deleeteSavedDashboard = require('./routes/loggedIn/deleteSavedDashboard')
 
 app.use('/', login)
 app.use('/', checkLogin)
-
+//accountRegistration
 app.use('/', register)
 app.use('/', secretQuestion)
 app.use('/', verifyEmail)
 app.use('/', verifyChange)
+//account
+app.use('/', findSecret)
+app.use('/', forgot)
+app.use('/', newPW)
+app.use('/', reset)
 
 app.use('/', endPoint)
-app.use('/', recover)
 app.use('/', logUIError)
 //loggin
 app.use('/', accountData)

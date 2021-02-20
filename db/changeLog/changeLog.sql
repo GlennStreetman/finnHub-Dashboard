@@ -53,3 +53,15 @@ CREATE TABLE uierror
   CONSTRAINT uniqueerror UNIQUE (errormessage, widget)
 );
 
+
+
+confirmemaillink text,
+emailconfirmed Boolean,
+resetpasswordlink text,
+passwordconfirmed Boolean,
+
+Alter table users
+RENAME COLUMN confirmemail to confirmemaillink
+RENAME COLUMN resetpassword to resetpasswordlink,
+ADD COLUMN emailconfirmed Boolean DEFAULT false,
+ADD COLUMN passwordconfirmed Boolean DEFAULT false,

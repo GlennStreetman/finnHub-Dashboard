@@ -34,12 +34,34 @@ const login = require("./login.js");
 app.use('/', checkLogin) //route to be tested needs to be bound to the router.
 app.use('/', login) //needed fo all routes that require login.
 
-beforeAll(() => {
+beforeAll((done) => {
     global.sessionStorage = {}
-    
-    return (db.connect()
-        .then(() => console.log("connected to developement postgres server"))
-        .catch(err => console.log("Failed to connect to DB:", err)))
+
+    const setupDB = `
+    INSERT INTO users (
+        loginname, email, password,	secretquestion,	
+        secretanswer, apikey, webhook, emailconfirmed, 
+        passwordconfirmed, exchangelist, defaultexchange, ratelimit
+    )
+    VALUES (	
+        'loginCheck',	'loginCheck@test.com',	'735a2320bac0f32172023078b2d3ae56',	'hello',	
+        '69faab6268350295550de7d587bc323d',	'',	'',	'1',	
+        '1',	'US',	'US',	30	
+    )
+    ON CONFLICT
+    DO NOTHING
+    ;`
+
+    db.connect()
+    db.query(setupDB, (err) => {
+        if (err) {
+            console.log("verifyEmail beforeAll setup error.");
+        } else {
+            console.log("verifyEmail db setup success")
+            done()
+        }
+    })
+
 });
 
 afterAll((done)=>{
@@ -50,32 +72,37 @@ test("Check logged out: get/checkLogin", (done) => {
     request(app)
         .get("/checkLogin")
         .expect("Content-Type", /json/)
-        .expect({
-            login: 0,
-        })
-        .expect(200, done);
+        .expect({login: 0,})
+        .expect(406)
+        .end(done)
 });
 
 describe('Get login cookie:', ()=>{
+    let cookieJar = ''
     beforeEach(function (done) {
         request(app)
-            .get("/login?loginText=test&pwText=testpw")
-            .end(function (err, res) {
-            if (err) {
-                throw err;
-            }
-            done();
+            .get("/login?loginText=loginCheck&pwText=testpw")
+            .then(res => {
+                cookieJar = res.header['set-cookie']
+                expect(200)
+                done()
+            })
         });
 
-    })
     test("Check logged in: get/checkLogin", (done) => {       
         request(app)
             .get("/checkLogin")
+            .set('Cookie', cookieJar)
             .expect("Content-Type", /json/)
             .expect({
                 login: 1,
+                apiKey: '',
+                exchangelist: 'US',
+                defaultexchange: 'US',
+                ratelimit: 30,
             })
-            .expect(200, done(console.log("LOGGIN CHEC SUCCESS!")));
+            .expect(200)
+            .end(done)
         })
     })
 

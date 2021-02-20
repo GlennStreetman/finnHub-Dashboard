@@ -11,7 +11,7 @@ router.get("/verifyChange", (req, res, next) => {
     let verifyUpdate = `
     UPDATE users
     SET email = (SELECT newemail FROM newEmail WHERE queryString = ${verifyID} limit 1) 
-    , confirmemail = 1
+    , emailconfirmed = true, confirmemaillink = ''
     WHERE id = (SELECT userID FROM newEmail WHERE queryString = ${verifyID} limit 1)
     ;
     DELETE FROM newEmail 

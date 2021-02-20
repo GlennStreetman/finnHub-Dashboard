@@ -34,10 +34,30 @@ const login = require("./../loginRoutes/login.js");
 app.use('/', secretQuestion) //route to be tested needs to be bound to the router.
 app.use('/', login) //needed fo all routes that require login.
 
-beforeAll(() => {
-    global.sessionStorage = {}
+beforeAll((done) => {
+    const setupDB = `
+    INSERT INTO users (
+        loginname, email, password,	secretquestion,	
+        secretanswer, apikey, webhook, confirmemaillink, 
+        resetpasswordlink, exchangelist, defaultexchange, ratelimit
+    )
+    VALUES (	
+        'secretQuestionTest',	'secretQuestionTest@test.com',	'735a2320bac0f32172023078b2d3ae56',	'hello',	
+        '69faab6268350295550de7d587bc323d',	'',	'',	'1',	
+        '1',	'US',	'US',	30	
+    )
+    ON CONFLICT
+    DO NOTHING
+    ;`
+
     db.connect()
-    return (console.log('test setup complete'))
+    db.query(setupDB, (err) => {
+        if (err) {
+            console.log("verifyEmail beforeAll setup error.");
+        } else {
+            done()
+        }
+    })  
 })
 
 afterAll((done)=>{
@@ -46,28 +66,28 @@ afterAll((done)=>{
 
 test("Check correct secret question answer get/secretQuestion", (done) => {       
     request(app)
-        .get(`/secretQuestion?loginText=goodbye&user=test`)
+        .get(`/secretQuestion?loginText=goodbye&user=secretQuestionTest`)
         .expect("Content-Type", /json/)
         .expect(200, done);
 })
 
 test("Check incorrect secret question answer get/secretQuestion", (done) => {       
     request(app)
-        .get(`/secretQuestion?loginText=badAnswer&user=test`)
+        .get(`/secretQuestion?loginText=badAnswer&user=secretQuestionTest`)
         .expect("Content-Type", /json/)
         .expect(406, done);
 })
 
 test("Check no secret question answer get/secretQuestion", (done) => {       
     request(app)
-        .get(`/secretQuestion?loginText=&user=test`)
+        .get(`/secretQuestion?loginText=&user=secretQuestionTest`)
         .expect("Content-Type", /json/)
         .expect(406, done);
 })
 
-test("Check not secret question user get/secretQuestion", (done) => {       
+test("Check not secret question or user get/secretQuestion", (done) => {       
     request(app)
-        .get(`/secretQuestion?loginText=badAnswer&user=`)
+        .get(`/secretQuestion?loginText=&user=`)
         .expect("Content-Type", /json/)
         .expect(406, done);
 })

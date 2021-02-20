@@ -19,26 +19,40 @@ const verifyChange = require("./verifyChange.js");
 app.use('/', verifyChange) //route to be tested needs to be bound to the router.
 
 
-beforeAll(() => {
+beforeAll((done) => {
     const setupDB = `
-        UPDATE users 
-        SET confirmemail = '071e3afe81e12ff2cebcd41164a7a295'
-        , email = ''
-        WHERE loginname = 'test2';
+        INSERT INTO users (
+            loginname, email, password,	secretquestion,	
+            secretanswer, apikey, webhook, confirmemaillink, 
+            resetpasswordlink, exchangelist, defaultexchange, ratelimit
+        )
+        VALUES (	
+            'verifyChangeTest',	'oldEmail@test.com',	'735a2320bac0f32172023078b2d3ae56',	'hello',	
+            '69faab6268350295550de7d587bc323d',	'',	'',	'verifyChange12345',	
+            '0',	'US',	'US',	30	
+        )
+        ON CONFLICT
+        DO NOTHING
+        ;
 
+        UPDATE users
+        SET email = 'oldEmail@test.com'
+        WHERE loginname = 'verifyChangeTest'
+        ;  
+        
         INSERT INTO newemail (userid, newemail, querystring)
-        VALUES ((SELECT id from users where loginname = 'test2'), 
-            'test2@test.com', '071e3afe81e12ff2cebcd41164a7a295');
+        VALUES ((SELECT id from users where loginname = 'verifyChangeTest'), 
+        'newEmail@test.com', 'verifyChange12345');
     `
     // console.log(setupDB)
     db.connect()
     db.query(setupDB, (err) => {
         if (err) {
-        console.log("verifyChange beforeAll setup error.");
+            console.log("verifyChange beforeAll setup error.");
         } else {
-        console.log("verifyChange db setup success")
+            console.log("verifyChange db setup success")
+            done()
         }
-    return (console.log('verifyChange setup complete'))
     })
 })
 
@@ -46,13 +60,13 @@ afterAll((done)=>{
     db.end(done())
 })
 
+//succeed in verifying change to user verifyChangeTest
 test("Verify email get/verifyChange", (done) => {       
     request(app)
-        .get(`/verifyChange?id=071e3afe81e12ff2cebcd41164a7a295`)
-        .expect("Content-Type", /text\/plain/)
+        .get(`/verifyChange?id=verifyChange12345`)
         .expect(302)
         .then(() => {
-            const testEmailUpdate = `SELECT * FROM users where email = 'test2@test.com'`
+            const testEmailUpdate = `SELECT * FROM users where email = 'newEmail@test.com'`
                 db.query(testEmailUpdate, (err, rows) => {
                     if (err) {
                         console.log("Problem verifying get/verifyChange")
@@ -64,9 +78,17 @@ test("Verify email get/verifyChange", (done) => {
         })
 })
 
+//fail in verifying change to user verifyChangeTest. Used verify link a second time.
+test("Verify email get/verifyChange", (done) => {       
+    request(app)
+        .get(`/verifyChange?id=verifyChange12345!`)
+        .expect("Content-Type", /json/)
+        .expect(406, done)
+})
+
 test("bad verify link get/verifyChange", (done) => {       
     request(app)
-        .get(`/verifyChange?id=071e3afe81e12ff2cebcd41164a`)
+        .get(`/verifyChange?id=badLink`)
         .expect("Content-Type", /json/)
         .expect(406, done)
 })

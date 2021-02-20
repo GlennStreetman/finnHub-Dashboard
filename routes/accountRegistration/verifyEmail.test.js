@@ -19,21 +19,35 @@ const verifyEmail = require("./verifyEmail.js");
 app.use('/', verifyEmail) //route to be tested needs to be bound to the router.
 
 
-beforeAll(() => {
+beforeAll((done) => {
     const setupDB = `
-        UPDATE users 
-        SET confirmemail = '071e3afe81e12ff2cebcd41164a7a295'
-        WHERE loginname = 'test2';
-    `
+        INSERT INTO users (
+            loginname, email, password,	secretquestion,	
+            secretanswer, apikey, webhook, confirmemaillink, 
+            resetpasswordlink, exchangelist, defaultexchange, ratelimit
+        )
+        VALUES (	
+            'verifyEmailTest',	'verifyEmailTest@test.com',	'735a2320bac0f32172023078b2d3ae56',	'hello',	
+            '69faab6268350295550de7d587bc323d',	'',	'',	'testConfirmEmail',	
+            '1',	'US',	'US',	30	
+        )
+        ON CONFLICT
+        DO NOTHING
+        ;
 
+        UPDATE users 
+        SET confirmemaillink = 'testConfirmEmail', emailconfirmed = false
+        WHERE loginname = 'verifyEmailTest';
+    `
+    // console.log(setupDB)
     db.connect()
     db.query(setupDB, (err) => {
         if (err) {
-        console.log("verifyEmail beforeAll setup error.");
+            console.log("verifyEmail beforeAll setup error.");
         } else {
-        console.log("verifyEmail db setup success")
+            console.log("verifyEmail db setup success")
+            done()
         }
-    return (console.log('verifyEmail setup complete'))
     })
 })
 
@@ -44,11 +58,11 @@ afterAll((done)=>{
 //good verify link
 test("Verify email get/verifyEmail", (done) => {       
     request(app)
-        .get(`/verifyEmail?id=071e3afe81e12ff2cebcd41164a7a295`)
+        .get(`/verifyEmail?id=testConfirmEmail`)
         .expect("Content-Type", /text\/plain/)
         .expect(302)
         .then(() => {
-            const testEmailUpdate = `SELECT * FROM users where email = 'test2@test.com' AND confirmemail = '1'`
+            const testEmailUpdate = `SELECT * FROM users where email = 'verifyEmailTest@test.com' AND emailconfirmed = '1'`
             // console.log("TEST SELECT", testEmailUpdate)
                 db.query(testEmailUpdate, (err, rows) => { 
                     // console.log('ROWS: ', rows)
@@ -65,7 +79,7 @@ test("Verify email get/verifyEmail", (done) => {
 //bad verify link
 test("Verify email get/verifyEmail", (done) => {       
     request(app)
-        .get(`/verifyEmail?id=071e3afe81eff2cebcd41164a7a295`)
+        .get(`/verifyEmail?id=badVerifyLink`)
         .expect("Content-Type", /text\/plain/)
         .expect(406)
         done()

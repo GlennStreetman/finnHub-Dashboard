@@ -32,18 +32,32 @@ const request = require("supertest");
 const register = require("./register.js");
 app.use('/', register) //route to be tested needs to be bound to the router.
 
-beforeAll(() => {
+beforeAll((done) => {
     global.sessionStorage = {}
+    const setupDB = `
+    ;INSERT INTO users (
+        loginname, email, password,	secretquestion,	
+        secretanswer, apikey, webhook, confirmemaillink, 
+        resetpasswordlink, exchangelist, defaultexchange, ratelimit
+    )
+    VALUES (	
+        'registertest_taken',	'registertest_taken@test.com',	'735a2320bac0f32172023078b2d3ae56',	'hello',	
+        '69faab6268350295550de7d587bc323d',	'',	'',	'071e3afe81e12ff2cebcd41164a7a295',	
+        '1',	'US',	'US',	30	
+    )
+    ON CONFLICT
+    DO NOTHING
+    
+    ;DELETE FROM users WHERE loginname = 'registerTest'`
+    
     db.connect()
-    const deletePrevTest = `DELETE FROM users WHERE loginname = 'test3'`
-    db.query(deletePrevTest, (err) => {
+    db.query(setupDB, (err) => {
         if (err) {
-        console.log("user check error");
+            console.log("verifyEmail beforeAll setup error.");
         } else {
-        console.log("old tests removed from db.")
+            done()
         }
     })
-    return (console.log('test setup complete'))
 })
 
 afterAll((done)=>{
@@ -56,11 +70,11 @@ test("Valid new login post/register", (done) => {
     request(app)
         .post("/register")
         .send({
-            loginText: "test3",
-            pwText: "dontlogin",
-            emailText: "test@test.com",
-            secretQuestion: "testquestion",
-            secretAnswer: "testquestion",
+            loginText: "registerTest",
+            pwText: "testpw",
+            emailText: "registerTest@test.com",
+            secretQuestion: "hellotest",
+            secretAnswer: "goodbye",
         })
         // .set('Accept', 'application/json')
         .expect("Content-Type", /json/)
@@ -77,9 +91,9 @@ test("Invalid email post/register", (done) => {
         .send({
             loginText: "test3",
             pwText: "dontlogin",
-            emailText: "test@test.com",
-            secretQuestion: "testquestion",
-            secretAnswer: "testquestion",
+            emailText: "testtest.com",
+            secretQuestion: "hellotest",
+            secretAnswer: "goodbye",
         })
         .expect(406, done);
 });
@@ -160,12 +174,28 @@ test("User name already taken post/register", (done) => {
     request(app)
         .post("/register")
         .send({
-            loginText: "test",
-            pwText: "dontlogin",
-            emailText: "test@test.com",
+            loginText: "registertest_taken",
+            pwText: "testPW",
+            emailText: "registertest_taken@test.com",
             secretQuestion: "testquestion",
             secretAnswer: "testanswer",
         })
+        .expect({message: "User name or password already taken"})
+        .expect(406, done);
+});
+
+test("Email already taken post/register", (done) => {
+
+    request(app)
+        .post("/register")
+        .send({
+            loginText: "registertest_taken_emailTaken",
+            pwText: "testPW",
+            emailText: "registertest_taken@test.com",
+            secretQuestion: "testquestion",
+            secretAnswer: "testanswer",
+        })
+        .expect({message: "User name or password already taken"})
         .expect(406, done);
 });
 

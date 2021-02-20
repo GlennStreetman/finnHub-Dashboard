@@ -5,8 +5,8 @@ const cryptoRandomString = require('crypto-random-string');
 const URL = process.env.live === '1' ? `https://finn-dash.herokuapp.com` : `http://localhost:5000`
 const md5 = require("md5");
 const db = process.env.live === '1' ? 
-  require("../../db/databaseLive.js") :  
-  require("../../db/databaseLocalPG.js") ;
+    require("../../db/databaseLive.js") :  
+    require("../../db/databaseLocalPG.js") ;
 //mailgun config data, needs to be set to be imported if not available in process.env
 const API_KEY = process.env.API_KEY || 1;
 const DOMAIN = process.env.DOMAIN_KEY || 1;
@@ -31,8 +31,8 @@ router.post("/register", (req, res) => {
         email, 
         secretQuestion, 
         secretAnswer, 
-        confirmEmail, 
-        resetPassword,
+        confirmemaillink, 
+        resetpasswordlink,
         exchangelist,
         defaultexchange,
         ratelimit
@@ -68,13 +68,14 @@ router.post("/register", (req, res) => {
     }
 
     const checkUserStatus = () => {
+        // console.log(checkUser)
         return new Promise((resolve, reject)=> {
         db.query(checkUser, (err, rows) => {
             if (err) {
             console.log("user check error");
             reject("User check error");
             } else if (rows.rowCount !== 0) {
-            console.log("User name already taken.");
+            // console.log("User name already taken. REJECTING");
             reject("User Name Already Taken");
             } else {
             resolve("User Name Available")
@@ -84,6 +85,7 @@ router.post("/register", (req, res) => {
     }
 
     const checkEmailUnique = () => {
+        // console.log(checkEmail)
         return new Promise((resolve,reject)=>{
         db.query(checkEmail, (err, rows) => {
             if (err) {
@@ -102,7 +104,7 @@ router.post("/register", (req, res) => {
         // console.log("creating user:")
         // console.log(createUser)
         db.query(createUser, (err, res) => {
-            console.log(res)
+            // console.log(res)
             if (res !== undefined) {
             // console.log(req.body.emailText)
             const data = {
@@ -112,13 +114,13 @@ router.post("/register", (req, res) => {
                 text: `Please visit the following link to verify your email address and login to finnDash: ${URL}/verifyEmail?id=${validateKey}`
             };
             // console.log(data)
-            if (req.body.emailText !== 'test@test.com') {
+            if (req.body.emailText.indexOf('@test.com') === -1) {
                 mailgun.messages().send(data, (error) => {
                     if (error) {
                     console.log(error)
                     } else {
                     // console.log(body);
-                    console.log("email sent")
+                    // console.log("email sent")
                     }
                 });
             }
@@ -133,7 +135,6 @@ router.post("/register", (req, res) => {
         if (emailIsValid(emailText) === true && validateInfo() === true) {
             checkUserStatus()
             .then(data => {
-                // console.log(data)
                 return checkEmailUnique()
             }).then(data => {
                 // console.log(data)
@@ -142,7 +143,8 @@ router.post("/register", (req, res) => {
                 res.statusCode = 200
                 res.json({message: 'new user created'})
             }).catch((err) => {
-                res.json(err)
+                res.statusCode = 406
+                res.json({message: "User name or password already taken"})
             })
         } else {
             res.statusCode = 406

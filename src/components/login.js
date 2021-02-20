@@ -36,18 +36,18 @@ class login extends React.Component {
         // console.log("PROPS: ", this.props)
         // console.log(this.props.queryData)
         if (this.props.queryData.reset === '1') {
-        const user = this.props.queryData.users
-        // console.log(user)
-        fetch(`/findSecret?user=${user}`)
-        .then((response) => response.json())
-        .then((data) => {
-            if (data) {
-            this.setState({loginState: 3})
-            this.setState({secretQuestion: data.question})
-            this.setState({userName: data.user})
-            } else {
-            console.log("No response from server")
-            }
+            const user = this.props.queryData.users
+            // console.log(user)
+            fetch(`/findSecret?user=${user}`)
+            .then((response) => response.json())
+            .then((data) => {
+                if (data) {
+                this.setState({loginState: 3})
+                this.setState({secretQuestion: data.question})
+                this.setState({userName: data.user})
+                } else {
+                console.log("No response from server")
+                }
         })
         .catch((error) => {
             console.error("No server response", error);
@@ -184,7 +184,7 @@ forgotLogin() {
     .then((response) => response.json())
     .then((data) => {
         if (data) {
-        this.setState({ serverResponse: data });
+        this.setState({ serverResponse: data.message });
         }
     })
     .catch((error) => {

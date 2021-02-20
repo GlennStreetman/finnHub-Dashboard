@@ -11,10 +11,10 @@ router.get("/login", (req, res, next) => {
     let loginText = format('%L', req.query["loginText"])
     let pwText = format('%L', req.query["pwText"])
     // console.log(pwText)
-    let loginQuery = `SELECT id, loginname, apikey, ratelimit, confirmemail,exchangelist, defaultexchange
+    let loginQuery = `SELECT id, loginname, apikey, ratelimit, emailconfirmed,exchangelist, defaultexchange
         FROM users WHERE loginName =${loginText} 
         AND password = '${md5(pwText)}'`;
-    // console.log(loginQuery)
+    console.log(loginQuery)
     let info = { //return object.
         key: "", 
         login: 0,
@@ -25,11 +25,13 @@ router.get("/login", (req, res, next) => {
     };
 
     db.query(loginQuery, (err, rows) => {
-        let login = rows.rows[0]
-
+        const login = rows.rows[0]
+        console.log("LOGIN:", login, rows.rowCount)
         if (err) {
+            res.statusCode = 401
             res.json({message: "Login error"});
-        } else if (rows.rowCount === 1 && login.confirmemail === '1') {
+        } else if (rows.rowCount === 1 && login.emailconfirmed === true) {
+            res.statusCode = 200
             console.log("USER:", login.loginname, "succesfuly logged in.")
             info["key"] = login.apikey;
             info['ratelimit'] = login.ratelimit
@@ -42,14 +44,17 @@ router.get("/login", (req, res, next) => {
             req.session.login = true
 
             res.json(info);
-        } else if (rows.rowCount === 1 && login.confirmemail !== '1') {
-
+        } else if (rows.rowCount === 1 && login.emailconfirmed !== true) {
+            res.statusCode = 406
+            console.log("Email not confirmed")
             info["response"] = 'Please confirm your email address.';
             res.json(info)
         } else {
-
-        info["response"] = "Login/Password did not match."
-        res.json(info)
+            // console.log("TESTS:", rows.rowCount, login.emailconfirmed)
+            res.statusCode = 406
+            console.log("Login and password did not match.")
+            info["response"] = "Login/Password did not match."
+            res.json(info)
         }
     });
 });

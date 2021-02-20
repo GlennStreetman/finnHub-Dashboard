@@ -15,7 +15,7 @@ router.get("/secretQuestion", (req, res, next) => {
         WHERE secretAnswer = '${loginText}' AND 
         loginname = '${user}'
     `;
-    console.log(newQuery)
+    // console.log("CHECK SECRET QUESTION", newQuery)
 
     db.query(newQuery, (err, rows) => {
     if (err) {
@@ -23,9 +23,11 @@ router.get("/secretQuestion", (req, res, next) => {
         res.json({message: "Problem returning secret question."});
     } else {
         if (rows.rows[0] !== undefined) {
-            console.log("ROWS:", rows.rows[0])
+            // console.log("ROWS:", rows.rows[0])
             req.session.reset = 1; //used by new password route.
+            req.session.userName = user
             res.statusCode = 200
+            // console.log("UPDATED QUESTION:", req.session)
             res.json({message: "correct"});
         } else {
             res.statusCode = 406
