@@ -30,7 +30,7 @@ class AboutMenu extends React.PureComponent {
                   FinnHub Register
                 </a>
                 <br />
-                2. After registering for your Finnhub API key click Manage Account and update your API Key info.
+                2. After registering for your Finnhub API key, login, then click Manage Account and update your API Key info.
                 <br />
               </mark>
             ) : (
@@ -40,7 +40,7 @@ class AboutMenu extends React.PureComponent {
                   FinnHub Register
                 </a>
                 <br />
-                2. After registering for your Finnhub API key click Manage Account and update your API Key info.
+                2. After registering for your Finnhub API key, login, then click Manage Account and update your API Key info.
                 <br />
               </>
             )}
