@@ -1,11 +1,19 @@
 .login-splash {
   display: flex;
   justify-content: center;
-  padding: 5%;
+  padding-top: 5%;
+  padding-bottom: 1%;
+}
+
+.login-Message {
+  display: flex;
+  justify-content: center;
+  color: red;
 }
 
 .login-container {
   display: flex;
+  width: 20%;
   flex-direction: column;
   align-items: center;
   justify-content: center;

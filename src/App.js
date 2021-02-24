@@ -255,7 +255,7 @@ class App extends React.Component {
     const quaryData = queryString.parse(window.location.search)
     const loginScreen = this.state.login === 0 && this.state.backGroundMenu === '' ? 
       <Login 
-      updateLogin={this.processLogin}
+      processLogin={this.processLogin}
       queryData = {quaryData}
       updateExchangeList={this.updateExchangeList}
       updateDefaultExchange={this.updateDefaultExchange}

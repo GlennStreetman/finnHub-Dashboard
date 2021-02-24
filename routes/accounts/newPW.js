@@ -31,7 +31,7 @@ router.get("/newPW", (req, res, next) => {
     } else {
         // console.log("password not updated");
         res.statusCode = 406
-        res.json({message: "password not updated, restart process."});
+        res.json({message: "Password not updated, restart process."});
     }
     });
 });

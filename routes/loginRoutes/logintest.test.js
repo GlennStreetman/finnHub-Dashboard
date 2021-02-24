@@ -101,14 +101,9 @@ test("Wrong login name get/login", (done) => {
         .get("/login?loginText=badUserName&pwText=testpw")
         .expect("Content-Type", /json/)
         .expect({
-            response: 'Login/Password did not match.',
-            key: "", 
-            login: 0,
-            ratelimit: 25,
-            exchangelist: '',
-            defaultexchange: '',
+            message: 'Login and Password did not match.',
         })
-        .expect(406, done);
+        .expect(401, done);
 });
 
 //bad pw
@@ -117,14 +112,9 @@ test("Wrong pw get/login", (done) => {
         .get("/login?loginText=loginTest&pwText=badPw")
         .expect("Content-Type", /json/)
         .expect({
-            response: 'Login/Password did not match.',
-            key: "", 
-            login: 0,
-            ratelimit: 25,
-            exchangelist: '',
-            defaultexchange: '',
+            message: 'Login and Password did not match.',
         })
-        .expect(406, done);
+        .expect(401, done);
 });
 
 //missing paramaters.
@@ -133,14 +123,9 @@ test("Missing paramaters get/login", (done) => {
         .get("/login?loginText=&pwText=")
         .expect("Content-Type", /json/)
         .expect({
-            response: 'Login/Password did not match.',
-            key: "", 
-            login: 0,
-            ratelimit: 25,
-            exchangelist: '',
-            defaultexchange: '',
+            message: 'Login and Password did not match.',
         })
-        .expect(406, done);
+        .expect(401, done);
 });
 
 //confirm email.
@@ -149,14 +134,9 @@ test("Email not confirmed get/login", (done) => {
         .get("/login?loginText=loginTest_notVerified&pwText=testpw")
         .expect("Content-Type", /json/)
         .expect({
-            response: 'Please confirm your email address.',
-            key: "", 
-            login: 0,
-            ratelimit: 25,
-            exchangelist: '',
-            defaultexchange: '',
+            message: 'Email not confirmed. Please check email for confirmation message.',
         })
-        .expect(406, done);
+        .expect(401, done);
 });
 
 // bad data
@@ -165,12 +145,7 @@ test("Check missing paramaters get/login", (done) => {
         .get("/login?loginText=SELECT%*%FROM%USERS&pwText=")
         .expect("Content-Type", /json/)
         .expect({
-            response: 'Login/Password did not match.',
-            key: "", 
-            login: 0,
-            ratelimit: 25,
-            exchangelist: '',
-            defaultexchange: '',
+            message: 'Login and Password did not match.',
         })
-        .expect(406, done);
+        .expect(401, done);
 });

@@ -6,7 +6,7 @@ const md5 = require("md5");
 const db = process.env.live === '1' ? 
 require("../../db/databaseLive.js") :  
 require("../../db/databaseLocalPG.js") ;
-
+ 
 router.get("/login", (req, res, next) => {
     let loginText = format('%L', req.query["loginText"])
     let pwText = format('%L', req.query["pwText"])
@@ -14,7 +14,7 @@ router.get("/login", (req, res, next) => {
     let loginQuery = `SELECT id, loginname, apikey, ratelimit, emailconfirmed,exchangelist, defaultexchange
         FROM users WHERE loginName =${loginText} 
         AND password = '${md5(pwText)}'`;
-    console.log(loginQuery)
+    // console.log(loginQuery)
     let info = { //return object.
         key: "", 
         login: 0,
@@ -26,13 +26,12 @@ router.get("/login", (req, res, next) => {
 
     db.query(loginQuery, (err, rows) => {
         const login = rows.rows[0]
-        console.log("LOGIN:", login, rows.rowCount)
+        // console.log("LOGIN:", login, rows.rowCount)
         if (err) {
-            res.statusCode = 401
+            res.statusCode = 400
             res.json({message: "Login error"});
         } else if (rows.rowCount === 1 && login.emailconfirmed === true) {
             res.statusCode = 200
-            console.log("USER:", login.loginname, "succesfuly logged in.")
             info["key"] = login.apikey;
             info['ratelimit'] = login.ratelimit
             info["login"] = 1;
@@ -42,27 +41,24 @@ router.get("/login", (req, res, next) => {
             req.session.uID = login.id;
             req.session.userName = rows.rows[0]['loginname'];
             req.session.login = true
-
             res.json(info);
         } else if (rows.rowCount === 1 && login.emailconfirmed !== true) {
-            res.statusCode = 406
+            res.statusCode = 401
             console.log("Email not confirmed")
-            info["response"] = 'Please confirm your email address.';
-            res.json(info)
+            res.json({message: `Email not confirmed. Please check email for confirmation message.`})
         } else {
-            // console.log("TESTS:", rows.rowCount, login.emailconfirmed)
-            res.statusCode = 406
+            res.statusCode = 401
             console.log("Login and password did not match.")
-            info["response"] = "Login/Password did not match."
-            res.json(info)
+            res.json({message: `Login and Password did not match.`})
         }
     });
 });
 
 router.get("/logOut", (req, res, next) => {
+    console.log("LOGOUT: ", req.session.userName, req.session.login);
     req.session.login = false;
-    // console.log(req.session.userName, req.session.login);
-    res.json("true");
+    res.statusCode = 200
+    res.json({message: "Logged Out"});
 });
 
 

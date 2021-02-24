@@ -77,8 +77,8 @@ describe('Get login cookie:', ()=>{
                 .set('Cookie', cookieJar)
                 .then(()=>{
                     // expect("Content-Type", /json/)
-                    expect({message: "password not updated, restart process."})
-                    expect(406)
+                    expect({message: "Password not updated, restart process."})
+                    expect(401)
                     done()
                 })  
         })

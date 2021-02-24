@@ -76,7 +76,7 @@ test("bad email get/forgot", (done) => {
         .expect(
             {message: "Email not found."}
         )
-        .expect(406, done);
+        .expect(401, done);
 })
 
 test("no email get/forgot", (done) => {       
@@ -86,7 +86,7 @@ test("no email get/forgot", (done) => {
         .expect(
             {message: "Email not found."}
         )
-        .expect(406, done);
+        .expect(401, done);
 })
 
 test("bad param get/forgot", (done) => {       
@@ -96,7 +96,7 @@ test("bad param get/forgot", (done) => {
         .expect(
             {message: "Email not found."}
         )
-        .expect(406, done);
+        .expect(401, done);
 })
 
 test("missing param get/forgot", (done) => {       
@@ -106,6 +106,6 @@ test("missing param get/forgot", (done) => {
         .expect(
             {message: "Email not found."}
         )
-        .expect(406, done);
+        .expect(401, done);
 })
 

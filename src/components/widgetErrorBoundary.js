@@ -45,7 +45,7 @@ export default class ErrorBoundary extends React.Component {
     }
 
     render() {
-        const p = this.props
+        // const p = this.props
         const s = this.state
         if (this.state.hasError) {
         // Add logic for development mode vs live.

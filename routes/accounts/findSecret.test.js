@@ -90,19 +90,19 @@ test("reset pw !== 1 get/findSecret", (done) => {
     request(app)
         .get(`/findSecret?user=findSecretTest_not_verified`)
         .expect("Content-Type", /json/)
-        .expect(406, done);
+        .expect(401, done);
 })
 
 test("bad user get/findSecret", (done) => {       
     request(app)
         .get(`/findSecret?user=badUser`)
         .expect("Content-Type", /json/)
-        .expect(406, done);
+        .expect(401, done);
 })
 
 test("missing param get/findSecret", (done) => {       
     request(app)
         .get(`/findSecret?user=`)
         .expect("Content-Type", /json/)
-        .expect(406, done);
+        .expect(401, done);
 })

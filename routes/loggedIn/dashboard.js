@@ -17,7 +17,7 @@ router.get("/dashboard", (req, res, next) => {
             FROM menuSetup AS m
             LEFT JOIN menus AS s ON m.id = s.menukey
             WHERE userID =${req.session.uID}`;
-        console.log(getMenuSetup)
+        // console.log(getMenuSetup)
             // console.log("QUERIES:", getSavedDashBoards, getMenuSetup)
         const r = { //resultset
             savedDashBoards: {},
@@ -62,7 +62,7 @@ router.get("/dashboard", (req, res, next) => {
                     console.log(err)
                     res.json({message: "Failed to retrieve menu setup."});
                 } else {
-                    console.log("menu setup retrieved");
+                    // console.log("menu setup retrieved");
                     
                     const result = rows.rows;
                     if (rows.rows[0] !== undefined) {
@@ -71,10 +71,6 @@ router.get("/dashboard", (req, res, next) => {
                         for (const row in result) {
                         const thisRow = result[row]
                         r.menuSetup[thisRow['widgetid']] = {
-                            // id: thisRow.id,
-                            // userid: thisRow.userid,
-                            // defaultmenu: thisRow.defaultmenu,
-                            // menulist: {
                             column: thisRow.columnid,
                             columnOrder: thisRow.columnorder,
                             widgetConfig: thisRow.widgetconfig,
@@ -83,7 +79,6 @@ router.get("/dashboard", (req, res, next) => {
                             widgetType: thisRow.widgettype,
                             xAxis: thisRow.xaxis,
                             yAxis: thisRow.yaxis,
-                            // },
                         }
                     }
                     // resultSet["menuSetup"] = result;
@@ -98,7 +93,10 @@ router.get("/dashboard", (req, res, next) => {
             }});
             }
         });
-    } else {res.json({message: "Not logged in."})}
+    } else {
+        res.statusCode = 401
+        res.json({message: "Not logged in."})
+    }
 });
 
 router.post("/dashboard", (req, res, next) => {
@@ -107,8 +105,6 @@ router.post("/dashboard", (req, res, next) => {
     // console.log("--------post dashboard-------------", req.body)
     let dashBoardName = format("%L", req.body.dashBoardName);
     let globalStockList = format("%L", JSON.stringify(req.body.globalStockList));
-    // let widgetList = format("%L", JSON.stringify(req.body.widgetList));
-    // let menuList = format("%L", JSON.stringify(req.body.menuList));
 
     const saveDashBoardSetup = (userID) => {
         return new Promise((resolve, reject) => {
@@ -120,7 +116,7 @@ router.post("/dashboard", (req, res, next) => {
         DO UPDATE SET globalstocklist = EXCLUDED.globalstocklist
         RETURNING ID
         `;
-        // console.log(saveDashBoardSetupQuery)
+        // console.log("SAVE DASHBOARD SETUP:", saveDashBoardSetupQuery)
         db.query(saveDashBoardSetupQuery, (err, rows) => {
             if (err) {
             reject("Failed to save dashboard", err);
@@ -128,6 +124,7 @@ router.post("/dashboard", (req, res, next) => {
             } else {
             // console.log("dashboard data updated.", rows.rows[0].id);
             const widgetList = req.body.widgetList
+            // console.log('---------------WIDGETLIST-----------: ', widgetList)
             let querList = `DELETE FROM widgets WHERE dashboardkey = ${rows.rows[0].id};` //upsert for each widget in widgetlist
             for (const widget in widgetList){
                 const w = widgetList[widget]
@@ -153,7 +150,6 @@ router.post("/dashboard", (req, res, next) => {
                 DO UPDATE SET columnid = EXCLUDED.columnid , columnorder = EXCLUDED.columnorder, filters = EXCLUDED.filters,
                 trackedStocks = EXCLUDED.trackedStocks, widgetconfig = EXCLUDED.widgetconfig, 
                 widgetheader = EXCLUDED.widgetheader,xaxis = EXCLUDED.xaxis, yaxis = EXCLUDED.yAxis;
-
                 `
                 querList = querList + saveWidget
             }
@@ -215,10 +211,10 @@ router.post("/dashboard", (req, res, next) => {
             // console.log(queryList)
             db.query(queryList, (err, rows) => {
                 if (err) {
-                reject("Failed to save menu", err);
-                console.log("Failed to save menu", err);
+                    reject("Failed to save menu", err);
+                    console.log("Failed to save menu", err);
                 } else {
-                res.json({message: "Save Complete"});
+                    resolve("saved")
                 }
             })
             
@@ -229,15 +225,21 @@ router.post("/dashboard", (req, res, next) => {
 
     saveDashBoardSetup(req.session.uID)
         .then((data) => {
-        // console.log(data);
-        return updateMenuSetup(data);
+            // console.log(data);
+            return updateMenuSetup(data);
         })
         .then((data) => {
-        // console.log(data);
-        res.json({message: "true"});
+            res.statusCode = 200
+            res.json({message: "Save Complete"});
         })
-        .catch((err) => res.json(err));
-    } else {res.json({message: "Not logged in."})}
+        .catch((err) => {
+            res.statusCode = 401
+            res.json(err)
+        });
+    } else {
+        res.statusCode = 401
+        res.json({message: "Not logged in."})
+    }
 });
 
 module.exports = router;

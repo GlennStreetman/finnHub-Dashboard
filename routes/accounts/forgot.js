@@ -40,17 +40,17 @@ router.get("/forgot", (req, res, next) => {
             db.query(resetPasswordCode, (err, rows) => {
                 if (err) {
                     console.log("Error on password reset /forgot")
-                    res.statusCode = 401
+                    res.statusCode = 400
                     res.json({message: "Error during password reset. Check email"});
                 } else if (rows.rowCount !== 1) {
                     console.log("Failed to update user info, try restarting reset process.");
-                    res.statusCode = 406
+                    res.statusCode = 401
                     res.json({message: "Email not found."});
                 } else {
                     mailgun.messages().send(mailgunData, (error, body) => {
                     if (err) {
                         console.log(error)
-                        res.statusCode = 401
+                        res.statusCode = 400
                         res.json({message: "Problem sending email message."});
                     } else {
 
@@ -62,7 +62,7 @@ router.get("/forgot", (req, res, next) => {
             })
         } else {
             console.log("failed email check");
-            res.statusCode = 406
+            res.statusCode = 401
             res.json({message: "Email not found."});
         }
     });
