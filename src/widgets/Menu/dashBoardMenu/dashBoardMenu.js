@@ -15,8 +15,9 @@ class DashBoardMenu extends React.PureComponent {
   }
 
   componentDidMount() {
-    if (this.props.currentDashBoard !== null) {
-      this.setState({inputText: this.props.currentDashBoard})
+    const p = this.props
+    if (p.currentDashBoard !== undefined) {
+      this.setState({inputText: p.currentDashBoard})
     }
   }
 
@@ -57,7 +58,7 @@ class DashBoardMenu extends React.PureComponent {
 
   render() {
     let dashBoardData = this.props.dashBoardData;
-    let savedDashBoards = Object.keys(dashBoardData).map((el) => (
+    let savedDashBoards = Object.keys({...dashBoardData}).map((el) => (
       <tr key={dashBoardData[el].id + "tr"}>
         <td className="centerTE">
           <button onClick={() => this.deleteDashBoard(dashBoardData[el].id)}>

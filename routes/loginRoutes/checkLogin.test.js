@@ -73,7 +73,7 @@ test("Check logged out: get/checkLogin", (done) => {
         .get("/checkLogin")
         .expect("Content-Type", /json/)
         .expect({login: 0,})
-        .expect(406)
+        .expect(401)
         .end(done)
 });
 
@@ -84,7 +84,6 @@ describe('Get login cookie:', ()=>{
             .get("/login?loginText=loginCheck&pwText=testpw")
             .then(res => {
                 cookieJar = res.header['set-cookie']
-                expect(200)
                 done()
             })
         });

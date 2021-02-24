@@ -7,10 +7,8 @@ const db = process.env.live === '1' ?
 
 //user visits reset link, from their email, and get redirected to reset password screen in app.
 router.get("/reset", (req, res, next) => {
-    // console.log('----reset-----')
     // console.log(req.query)
     let verifyID = format('%L', req.query['id'])
-    // let user = format('%L', req.query['users'])
     req.session.userName = req.query['users']
     let verifyUpdate = `
     UPDATE users
@@ -21,14 +19,11 @@ router.get("/reset", (req, res, next) => {
     // console.log(verifyUpdate)
     db.query(verifyUpdate, (err, rows) => {
     if (err) {
-        res.statusCode = 401
-        res.json({message: "Error during password reset process."});
+        res.status(400).json({message: "Error during password reset process."});
     } else if (rows.rowCount === 1) {
-        res.statusCode = 302
-        res.redirect(`/?reset=1&users=${rows.rows[0].loginname}`)
+        res.status(302).redirect(`/?reset=1&users=${rows.rows[0].loginname}`)
     } else {
-        res.statusCode = 302
-        res.redirect(`/?message=Problem%validating%reset%link,%please%restart%process.`)
+        res.status(302).redirect(`/?message=Problem%validating%reset%link,%please%restart%process.`)
     }
     })
 });

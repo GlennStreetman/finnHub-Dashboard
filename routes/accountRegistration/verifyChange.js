@@ -21,18 +21,12 @@ router.get("/verifyChange", (req, res, next) => {
     // console.log(verifyUpdate)
     db.query(verifyUpdate, (err, rows) => {
     if (err) {
-        // console.log("FAIL", err)
-        res.statusCode = 401
-        res.json({message: "Could not update email address."});
+        console.log("FAILED verifyChange: ", err)
+        res.status(400).json({message: "Could not update email address."});
     } else if (rows[0].rowCount === 1) {
-        // console.log("SUCCESS:", rows[0].rowCount)
-        // console.log('email verified')
-        res.statusCode = 302 //redirect is auto 302
-        res.redirect('/')
+        res.status(302).redirect('/')
     } else {
-        // console.log("FAIL")
-        res.statusCode = 406
-        res.json({message: "Failed to verify new email address."});
+        res.status(401).json({message: "Failed to verify new email address."});
     }
     })
 });

@@ -49,8 +49,8 @@ export default class EndPointMenu extends React.Component {
 
     renderEndPointRows(){
         const p = this.props
-        // console.log(Object.keys(p.dashBoardData))
-        return Object.keys(p.dashBoardData).map((el) => 
+        const thisDashboard = {...p.dashBoardData}
+        return Object.keys(thisDashboard).map((el) => 
             <tr key={el + "row"}>
                 <td key={el + "dash"}>{el}</td>
                 <td key={el + "api"}>{`${window.location.origin}/endPoint?apiKey=${p.apiKey}&dashBoardName=${el}`}</td>

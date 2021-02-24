@@ -71,26 +71,22 @@ router.get("/deleteSavedDashboard", (req, res, next) => {
         deleteDashboard()
             .then((data) => {
             // console.log(data);
-            return checkDefaultMenu();
+                return checkDefaultMenu();
             })
             .then((data) => {
             // console.log(data);
-            return updateDefaultMenu();
+                return updateDefaultMenu();
             })
             .then((data) => {
-            // console.log(data);
-            res.statusCode = 200
-            res.json({message: "Dashboard deleted"});
+                res.status(200).json({message: "Dashboard deleted"});
             })
             .catch((err) => {
-            console.log("ERROR:", err);
-            res.statusCode = 401
-            res.json({message: 'Problem deleting dashboard.'});
+                console.log("ERROR:", err);
+                res.status(400).json({message: 'Problem deleting dashboard.'});
             });
     } else {
         console.log("NOT LOGGED IN")
-        res.statusCode = 406
-        res.json({message: "Not logged in."})
+        res.status(401).json({message: "Not logged in."})
     }
 });
 

@@ -16,16 +16,14 @@ router.get("/verifyEmail", (req, res, next) => {
     console.log(verifyUpdate)
     db.query(verifyUpdate, (err, rows) => {
         // console.log(rows)
-        if (err) {
-        res.statusCode = 401
-        res.json({message: "Could not validate email address."});
+    if (err) {
+        console.log("ERROR verifyEMail: ", err)
+        res.status(302).redirect('/?message=2');
     } else if (rows.rowCount === 1) {
         console.log('email verified')
-        res.statusCode = 302
-        res.redirect('/')
+        res.status(302).redirect('/?message=1')
     } else {
-        res.statusCode = 406
-        res.json({message: "Failed to verify new email address."});
+        res.status(302).redirect('/?message=2');
     }
     })
 });

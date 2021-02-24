@@ -19,8 +19,8 @@ router.get("/findSecret", (req, res, next) => {
     // console.log(verifyUpdate)
     db.query(verifyUpdate, (err, rows) => {
         if (err) {
-            res.statusCode = 400
-            res.json({message: "Error during password reset process."});
+            console.log("ERROR /verifyUpdate: ", err)
+            res.status(400).json({message: "Error during password reset process."});
         } else if (rows.rowCount === 1) {
             const secretQuestion = rows.rows[0].secretquestion
             const data = {
@@ -28,11 +28,9 @@ router.get("/findSecret", (req, res, next) => {
                 user: req.query['user'],
             }
             console.log(`Secret Questions returned for user ${userID}.`)
-            res.statusCode = 200
-            res.json(data)
+            res.status(200).json(data)
         } else {
-            res.statusCode = 401
-            res.json({message: 'Problem with reset password link.'})
+            res.status(401).json({message: 'Problem with reset password link.'})
         }
     })
 });

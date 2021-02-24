@@ -24,18 +24,15 @@ router.get("/accountData", (req, res, next) => {
         const result = rows.rows[0];
         // console.log(result)
         if (err) {
-            res.statusCode = 401
-            res.json({message: "Could not retrieve user data"});
+            console.log("/accountData ERROR:", err)
+            res.status(400).json({message: "Could not retrieve user data"});
         } else {
-            res.statusCode = 200
             resultSet["userData"] = result;
-            console.log("account data retrieved");
-            res.json(resultSet);
+            res.status(200).json(resultSet);
         }
         });
     } else {
-        res.statusCode = 406
-        res.json({message: "Not logged in."})
+        res.status(401).json({message: "Not logged in."})
     }
 });
 
@@ -55,11 +52,10 @@ router.post("/accountData", (req, res) => {
             // let queryValues = [updateField, newValue, req.session.uID]
             db.query(updateQuery, (err) => {
                 if (err) {
-                    res.statusCode = 401
-                    res.json({message: `Failed to update ${updateField}`});
+                    console.log("/accountData update query error: ", err)
+                    res.status(400).json({message: `Failed to update ${updateField}`});
                 } else {
-                    res.statusCode = 200
-                    res.json({
+                    res.status(200).json({
                         message: `${updateField} updated`,
                         data: newValue,
                     });
@@ -81,9 +77,8 @@ router.post("/accountData", (req, res) => {
             // console.log(updateQuery);
             db.query(updateQuery, (err) => {
                 if (err) {
-                // console.log(err)
-                res.statusCode = 401
-                res.json({message: `Problem updating email.`});
+                console.log('post /accountData update query error: ',err)
+                res.status(400).json({message: `Problem updating email.`});
                 } else {
                 // console.log(res);
                 const data = {
@@ -96,27 +91,21 @@ router.post("/accountData", (req, res) => {
                 if (req.body.newValue.indexOf('@test.com') === -1) {
                     mailgun.messages().send(data, (error) => {
                         if (error) {
-                            console.log(error);
-                            res.statusCode = 401
-                            res.json({message: "Failed to send verification email"});
+                            console.log('post /accountData (req.body.newValue) error: ',err)
+                            res.status(400).json({message: "Failed to send verification email"});
                         } else {
-                            res.statusCode = 200
-                            res.json({message: "Please check email to verify change."});
+                            res.status(200).json({message: "Please check email to verify change."});
                         }
                     });
                 } else {
-                    //for test purposes
-                    res.statusCode = 200
-                    res.json({message: "Please check email to verify change."});
+                    res.status(200).json({message: "Please check email to verify change."});
                 }
                 }
             });
             } else {
-                res.statusCode = 406
-                res.json({message: `email not valid`})
+                res.status(401).json({message: `email not valid`})
             }} else {
-                res.statusCode = 406
-                res.json({message: `Error processing request Field: ${req.body.field}`})
+                res.status(401).json({message: `Error processing request Field: ${req.body.field}`})
             }
     } else {res.json({message: "Not logged in."})}
 });

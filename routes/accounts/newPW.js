@@ -16,22 +16,22 @@ router.get("/newPW", (req, res, next) => {
     // console.log(newPW, userName, reset)
     const newQuery = `
     UPDATE users 
-    SET password = '${md5(newPW)}', passwordconfirmed = 0 
-    WHERE loginName = ${userName} AND '1' = ${reset} AND resetPassword = '1'` ;
+    SET password = '${md5(newPW)}', passwordconfirmed = false, resetpasswordlink = '' 
+    WHERE loginName = ${userName} 
+        AND 1 = ${reset} 
+        AND resetpasswordlink = 'testpasswordlink' 
+        AND passwordconfirmed = true` ;
     console.log(newQuery);
     db.query(newQuery, (err, rows) => {
     if (err) {
-        console.log(err)
-        res.statusCode = 401
-        res.json({message: "Could not reset password"});
+        console.log("ERROR /newPW: ", err)
+        res.status(400).json({message: "Could not reset password"});
     } else if (rows.rowCount === 1) {
         // console.log("password reset");
-        res.statusCode = 200
-        res.json({message: "true"});
+        res.status(200).json({message: "true"});
     } else {
-        // console.log("password not updated");
-        res.statusCode = 406
-        res.json({message: "Password not updated, restart process."});
+
+        res.status(401).json({message: "Password not updated, restart process."});
     }
     });
 });

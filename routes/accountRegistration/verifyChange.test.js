@@ -83,19 +83,22 @@ test("Verify email get/verifyChange", (done) => {
     request(app)
         .get(`/verifyChange?id=verifyChange12345!`)
         .expect("Content-Type", /json/)
-        .expect(406, done)
+        .expect({message: "Failed to verify new email address."})
+        .expect(401, done)
 })
 
 test("bad verify link get/verifyChange", (done) => {       
     request(app)
         .get(`/verifyChange?id=badLink`)
         .expect("Content-Type", /json/)
-        .expect(406, done)
+        .expect({message: "Failed to verify new email address."})
+        .expect(401, done)
 })
 
 test("missing verify param get/verifyChange", (done) => {       
     request(app)
         .get(`/verifyChange`)
         .expect("Content-Type", /json/)
-        .expect(406, done)
+        .expect({message: "Failed to verify new email address."})
+        .expect(401, done)
 })

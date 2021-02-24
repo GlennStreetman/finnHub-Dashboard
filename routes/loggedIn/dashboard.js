@@ -62,8 +62,6 @@ router.get("/dashboard", (req, res, next) => {
                     console.log(err)
                     res.json({message: "Failed to retrieve menu setup."});
                 } else {
-                    // console.log("menu setup retrieved");
-                    
                     const result = rows.rows;
                     if (rows.rows[0] !== undefined) {
                         r.default = rows.rows[0].defaultmenu
@@ -79,23 +77,17 @@ router.get("/dashboard", (req, res, next) => {
                             widgetType: thisRow.widgettype,
                             xAxis: thisRow.xaxis,
                             yAxis: thisRow.yaxis,
+                            }
                         }
+                        res.status(200).json(r);
+                    } else {
+                        res.status(401).json({message: "No dashboards retrieved"})
                     }
-                    // resultSet["menuSetup"] = result;
-                    console.log("returning dashboard and menu data");
-                    res.json(r);
-                } else {
-                    console.log("no dashboard retrieved")
-                    const error = new Error('No dashboard');
-                    error.status = 500
-                    res.json(error)
-                }
             }});
             }
         });
     } else {
-        res.statusCode = 401
-        res.json({message: "Not logged in."})
+        res.status(401).json({message: "Not logged in."})
     }
 });
 
@@ -228,17 +220,15 @@ router.post("/dashboard", (req, res, next) => {
             // console.log(data);
             return updateMenuSetup(data);
         })
-        .then((data) => {
-            res.statusCode = 200
-            res.json({message: "Save Complete"});
+        .then(() => {
+            res.status(200).json({message: "Save Complete"});
         })
         .catch((err) => {
-            res.statusCode = 401
-            res.json(err)
+            console.log("/dashboard post error, updateMenuSetup: ", err)
+            res.status(400).json({message: "Problem saving dashboard."})
         });
     } else {
-        res.statusCode = 401
-        res.json({message: "Not logged in."})
+        res.status(401).json({message: "Not logged in."})
     }
 });
 

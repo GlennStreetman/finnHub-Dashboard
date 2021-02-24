@@ -8,6 +8,6 @@ export const newPW = async function newPW(loginText, pwText) {
             return data
 
     } else {
-        return ({ serverResponse: "Password entries do not match." });
+        return ({ message: "Password entries do not match." });
     }
 }

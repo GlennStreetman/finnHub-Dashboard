@@ -146,7 +146,7 @@ test("Check not logged in: get/deleteSavedDashboard", (done) => {
         .expect({
             message: "Not logged in."
         })
-        .expect(406)
+        .expect(401)
         .end(done)
     })
 
@@ -183,7 +183,7 @@ test("Check not logged in: get/deleteSavedDashboard", (done) => {
                 .expect({
                     message: "Not logged in."
                 })
-                .expect(406)
+                .expect(401)
                 .end(done)
             })     
             })

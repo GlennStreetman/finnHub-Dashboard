@@ -80,7 +80,7 @@ test("Check not logged in: get/accountData", (done) => {
         .expect({
             message: "Not logged in."
         })
-        .expect(406)
+        .expect(401)
         .end(done)
     })
 
@@ -122,7 +122,7 @@ describe('Get login cookie:', ()=>{
                 .expect({
                     message: "Not logged in."
                 })
-                .expect(406)
+                .expect(401)
                 .end(done)
             })
         })
@@ -180,7 +180,7 @@ describe('Get login cookie:', ()=>{
                 .set('Cookie', cookieJar)
                 .expect("Content-Type", /json/)
                 .expect({message: `email not valid`})
-                .expect(406, done)
+                .expect(401, done)
             })
             
 })    

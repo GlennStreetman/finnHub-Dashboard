@@ -34,12 +34,40 @@ const secretQuestion = require("./../accountRegistration/secretQuestion.js");
 app.use('/', newPW) //route to be tested needs to be bound to the router.
 app.use('/', secretQuestion) //needed fo all routes that require login.
 
-beforeAll(() => {
+beforeAll((done) => {
+    const setupDB = `
+    INSERT INTO users (
+        loginname, email, password,	secretquestion,	
+        secretanswer, apikey, webhook, confirmemaillink, 
+        passwordconfirmed, exchangelist, defaultexchange, ratelimit,
+        resetpasswordlink
+    )
+    VALUES (	
+        'newPWTest', 'newPWTest@test.com', '735a2320bac0f32172023078b2d3ae56',	'hello',	
+        'goodbye',	'',	'',	'',	
+        true,	'US',	'US',	30,
+        'testpasswordlink'
+    )
+    ON CONFLICT
+    DO NOTHING
+    ;
+    UPDATE users 
+    SET passwordconfirmed = true,  resetpasswordlink = 'testpasswordlink'
+    WHERE loginname = 'newPWTest'
+`
+
     global.sessionStorage = {}
     db.connect(err => {
         if (err) {
             console.log('connection error', err.stack)
-        } 
+        } else {
+            db.query(setupDB, (err) => {
+                if (err) {
+                    console.log("Problem setting up reset test.");
+                } 
+                done()
+            }) 
+        }
     })
 })
 
@@ -47,42 +75,45 @@ afterAll((done)=>{
     db.end(done())
 })
 
+test("Fail to set new password get/newPW", (done) => {       
+    request(app)
+        .get(`/newPW?newPassword=testpw`)
+        .expect({message: "Password not updated, restart process."})
+        .expect(401, done)
+    })
+
 describe('Get login cookie:', ()=>{
     let cookieJar = ''
     beforeAll(function (done) {
         request(app)
-            .get("/secretQuestion?loginText=goodbye&user=test_newPW")
+            .get("/secretQuestion?loginText=goodbye&user=newPWTest")
             .then(res => {
                 cookieJar = res.header['set-cookie']
-                // expect("Content-Type", /json/)
-                expect({message: "correct"})
-                expect(200)
+                console.log(cookieJar)
                 done()
             })
     })
 
-    test("Get secret question get/newPW", (done) => {       
-        // console.log("-----------------STARTING TESTS-----------")
+    test("Set new password get/newPW", (done) => {       
         request(app)
             .get(`/newPW?newPassword=testpw`)
             .set('Cookie', cookieJar)
-        .then(() => {
-            // expect("Content-Type", /json/)
-            expect({message: "true"})
-            expect(200)
+            .expect({message: "true"})
+            .expect(200)
+            .then(() => {
+                request(app)
+                    .get(`/newPW?newPassword=testpw`)
+                    .set('Cookie', cookieJar)
+                    .expect({message: "Password not updated, restart process."})
+                    .expect(401, done)
+            })
         })
-        .then(() => {
-            request(app)
-                .get(`/newPW?newPassword=testpw`)
-                .set('Cookie', cookieJar)
-                .then(()=>{
-                    // expect("Content-Type", /json/)
-                    expect({message: "Password not updated, restart process."})
-                    expect(401)
-                    done()
-                })  
-        })
-        
-    })
+    
 })
+
+
+
+
+
+
 

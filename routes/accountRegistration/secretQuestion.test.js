@@ -75,19 +75,22 @@ test("Check incorrect secret question answer get/secretQuestion", (done) => {
     request(app)
         .get(`/secretQuestion?loginText=badAnswer&user=secretQuestionTest`)
         .expect("Content-Type", /json/)
-        .expect(406, done);
+        .expect({message: "Secret question and answer did not match."})
+        .expect(401, done);
 })
 
 test("Check no secret question answer get/secretQuestion", (done) => {       
     request(app)
         .get(`/secretQuestion?loginText=&user=secretQuestionTest`)
         .expect("Content-Type", /json/)
-        .expect(406, done);
+        .expect({message: "Secret question and answer did not match."})
+        .expect(401, done);
 })
 
 test("Check not secret question or user get/secretQuestion", (done) => {       
     request(app)
         .get(`/secretQuestion?loginText=&user=`)
         .expect("Content-Type", /json/)
-        .expect(406, done);
+        .expect({message: "Secret question and answer did not match."})
+        .expect(401, done);
 })

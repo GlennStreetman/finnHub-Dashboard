@@ -99,7 +99,7 @@ app.use('/', dashboard)
 app.use('/', deleeteSavedDashboard)
 app.use((req,res,next) => {
   //ALL OTHER ROUTES
-  const error = new Error('Not Found');
+  const error = new Error('PATH Not Found');
   error.status = 404
   next(error)
 })

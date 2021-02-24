@@ -14,7 +14,7 @@ class login extends React.Component {
         this.state = {
             showMenu: 0, //0 = login, 1 = recover, 2 = register, 3 = secret question, 4 reset password
             secretQuestion: "", //Secret Question
-            serverResponse: "", //message from server
+            message: "", //message from server
             userName: "",
             text0: "", 
             text1: "", 
@@ -65,6 +65,12 @@ class login extends React.Component {
             console.error("No server response", error);
         });
         }
+        if (this.props.queryData.message === '1'){
+            this.setState({message: "Thank you for registering. Please login."})
+        }
+        if (this.props.queryData.message === '2'){
+            this.setState({message: "Problem validating email address."})
+        }
         
         this.checkLoginStatus(p.processLogin, p.updateExchangeList, p.updateDefaultExchange, p.throttle)
     }
@@ -93,7 +99,7 @@ class login extends React.Component {
             warn4: "",
             warn5: "",
             warn6: "",
-            showMenu: showMenuRef 
+            showMenu: showMenuRef,
         });
     }
 
@@ -107,12 +113,13 @@ class login extends React.Component {
     completeLogin(data){
         const p = this.props
         if (data.login) {
+            this.setState({message: ""})
             p.processLogin(data["key"], data["login"]);
             p.updateExchangeList(data.exchangelist)
             p.updateDefaultExchange(data.defaultexchange)
             if (data.ratelimit > 0) {this.props.throttle.updateInterval(data.ratelimit)}
         } else {
-            this.setState({serverResponse: data.message})
+            this.setState({message: data.message})
         }
     }
 
@@ -124,50 +131,58 @@ class login extends React.Component {
             // console.log("0")
             this.checkPassword(s.text0, s.text1)
             .then((data) => {
-                this.completeLogin(data)
+                console.log("attempting login")
+                if (data.status === 200) {
+                    this.completeLogin(data)
+                } else {
+                    console.log("Failed to login", data)
+                    this.setState({message: data.message})
+                }
             })
             .catch(() => {
-                this.setState({serverResponse: "No response from server. Check network connection."})
+                this.setState({message: "No response from server. Check network connection."})
             })},
         1: () => {
             // console.log("1")
             this.forgotLogin(s.text0)
             .then((data) => {
-                this.setState({ serverResponse: data.message })
+                this.setState({ message: data.message })
             })
             .catch(() => {
-                this.setState({serverResponse: "No response from server. Check network connection."})
+                this.setState({message: "No response from server. Check network connection."})
             })},
         2: () => {
             // console.log("2")
             this.registerAccount(s.text0 , s.text1 , s.text2 , s.text3 , s.text4 , s.text5 , this.emailIsValid)
             .then((data) => {
-                if (data.serverResponse === 'Please review warnings') {
-                    console.log(data)
+                if (data.message === 'Please review warnings') {
                     this.setState({...data})
-                } else {
+                } else if (data.status === 200) {
                     this.setState({...data}, ()=>this.clearText(0))
+                } else {
+                    this.setState({...data})
                 }
-                // this.setState({ serverResponse: data.message })
+                // this.setState({ message: data.message })
             })
             .catch(() => {
-                this.setState({serverResponse: "No response from server. Check network connection."})
+                this.setState({message: "No response from server. Check network connection."})
             })},
         3: () => {
             // console.log("3")
             this.secretQuestion(s.text0, s.userName)
             .then((data) => {
+                console.log(data)
                 if (data.question) {
                     this.setState({
-                        serverResponse: "username: " + data["users"],
+                        message: "username: " + data["users"],
                         secretQuestion: data["question"]
                     }, ()=>this.clearText(4))
-                } else {
-                    this.setState({ serverResponse: "Wrong answer, try again." });
+                } else {  
+                    this.setState({ message: "Wrong answer, try again." });
                 }
             })
             .catch(() => {
-                this.setState({serverResponse: "No response from server. Check network connection."})
+                this.setState({message: "No response from server. Check network connection."})
             })
         },
         4: () => {
@@ -175,13 +190,13 @@ class login extends React.Component {
             this.newPW(s.text0, s.text1)
             .then((data)=>{
                 if (data.message === 'true') {
-                    this.setState({ serverResponse: "Password Updated." }, ()=>this.clearText(0));
+                    this.setState({ message: "Password Updated." }, ()=>this.clearText(0));
                 } else {
                     this.setState(data)
                 }
             })
             .catch(() => {
-                this.setState({serverResponse: "No response from server. Check network connection."})
+                this.setState({message: "No response from server. Check network connection."})
             })
         },
         };
@@ -247,7 +262,7 @@ class login extends React.Component {
                     {/* render titles and text input fields */}
                     {renderInputs}
                     <div className="login-div">
-                        <input className="loginBtn" type="submit" value="Submit" onClick={submitFunctionLookup[this.state.showMenu]} />
+                        <input href='#home' className="loginBtn" type="submit" value="Submit" onClick={submitFunctionLookup[this.state.showMenu]} />
                     </div>
                     {/* render hyperlinks */}
                     <div className="div-inline-login">
@@ -265,7 +280,7 @@ class login extends React.Component {
                 </div>
             </div>
             <div className='login-Message'>
-                {this.state.serverResponse}
+                {this.state.message}
             </div>
         </>
         );

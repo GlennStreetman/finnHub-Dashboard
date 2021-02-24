@@ -81,7 +81,8 @@ test("Verify email get/verifyEmail", (done) => {
     request(app)
         .get(`/verifyEmail?id=badVerifyLink`)
         .expect("Content-Type", /text\/plain/)
-        .expect(406)
+        .expect({message: "Failed to verify new email address."})
+        .expect(401)
         done()
 })
 
@@ -90,6 +91,7 @@ test("Verify email get/verifyEmail", (done) => {
     request(app)
         .get(`/verifyEmail?id=`)
         .expect("Content-Type", /text\/plain/)
-        .expect(406)
+        .expect({message: "Failed to verify new email address."})
+        .expect(401)
         done()
 })

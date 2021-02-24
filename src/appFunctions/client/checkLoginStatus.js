@@ -9,7 +9,7 @@ export const checkLoginStatus = function checkLoginStatus(updateLogin, updateExc
         updateDefaultExchange(data.defaultexchange)
         if (data.ratelimit > 0) {throttle.updateInterval(data.ratelimit)}
     } else {
-        console.log("Not logged in:", data)
+        console.log("Not logged in")
     }
     })
 }

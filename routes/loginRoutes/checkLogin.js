@@ -40,18 +40,13 @@ router.get("/checkLogin", (req, res, next) => {
     if (req.session.login === true) {
         retrieveAPIKeys()
         .then((data) => {
-            res.statusCode = 200
-            // console.log("-login data-: ", data);
-            res.json(data);
+            res.status(200).json(data);
         })
         .catch((err) => {
-            res.statusCode = 401
-            res.json(err);
+            res.status(401).json(err);
         });
     } else {
-        res.statusCode = 406
-        console.log("not logged in");
-        res.json({ login: 0 });
+        res.status(401).json({ login: 0 });
     }
 });
 

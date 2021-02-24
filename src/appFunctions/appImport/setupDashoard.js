@@ -80,7 +80,7 @@ export const GetSavedDashBoards = function getSavedDashBoards() {
         dashBoardData: parseDashBoard,
         currentDashBoard: data.default,
     }
-    if( Object.keys(data.menuSetup).length > 0) {
+    if (data.menuSetup && Object.keys(data.menuSetup).length > 0) {
         const menuList = {}
         for (const menu in data.menuSetup) {
         menuList[menu] = data.menuSetup[menu]
@@ -89,7 +89,10 @@ export const GetSavedDashBoards = function getSavedDashBoards() {
         }
         this.setState(loadDash)
     //show about menu by default if login does not return API key.
-    if (this.state.apiKey === '' && this.state.apiFlag === 0) {
+    if (
+        (this.state.apiKey === '' && this.state.apiFlag === 0) || 
+        (this.state.apiKey === null && this.state.apiFlag === 0)
+        ) {
         console.log("API key not returned")
         this.setState({
         apiFlag: 1,

@@ -95,7 +95,8 @@ test("Invalid email post/register", (done) => {
             secretQuestion: "hellotest",
             secretAnswer: "goodbye",
         })
-        .expect(406, done);
+        .expect({message: "Enter a valid email address & check other info."})
+        .expect(401, done);
 });
 
 test("No email post/register", (done) => {
@@ -110,7 +111,8 @@ test("No email post/register", (done) => {
             secretQuestion: "testquestion",
             secretAnswer: "testquestion",
         })
-        .expect(406, done);
+        .expect({message: "Enter a valid email address & check other info."})
+        .expect(401, done);
 });
 
 test("No user post/register", (done) => {
@@ -124,7 +126,8 @@ test("No user post/register", (done) => {
             secretQuestion: "testquestion",
             secretAnswer: "testquestion",
         })
-        .expect(406, done);
+        .expect({message: "Enter a valid email address & check other info."})
+        .expect(401, done);
 });
 
 test("No password post/register", (done) => {
@@ -138,7 +141,8 @@ test("No password post/register", (done) => {
             secretQuestion: "testquestion",
             secretAnswer: "testquestion",
         })
-        .expect(406, done);
+        .expect({message: "Enter a valid email address & check other info."})
+        .expect(401, done);
 });
 
 test("No secret question post/register", (done) => {
@@ -152,7 +156,8 @@ test("No secret question post/register", (done) => {
             secretQuestion: "",
             secretAnswer: "testquestion",
         })
-        .expect(406, done);
+        .expect({message: "Enter a valid email address & check other info."})
+        .expect(401, done);
 });
 
 test("No secret answer post/register", (done) => {
@@ -166,7 +171,8 @@ test("No secret answer post/register", (done) => {
             secretQuestion: "testquestion",
             secretAnswer: "",
         })
-        .expect(406, done);
+        .expect({message: "Enter a valid email address & check other info."})
+        .expect(401, done);
 });
 
 test("User name already taken post/register", (done) => {
@@ -180,8 +186,8 @@ test("User name already taken post/register", (done) => {
             secretQuestion: "testquestion",
             secretAnswer: "testanswer",
         })
-        .expect({message: "User name or password already taken"})
-        .expect(406, done);
+        .expect({message: "Username or email already taken"})
+        .expect(400, done);
 });
 
 test("Email already taken post/register", (done) => {
@@ -195,8 +201,8 @@ test("Email already taken post/register", (done) => {
             secretQuestion: "testquestion",
             secretAnswer: "testanswer",
         })
-        .expect({message: "User name or password already taken"})
-        .expect(406, done);
+        .expect({message: "Username or email already taken"})
+        .expect(400, done);
 });
 
 

@@ -5,7 +5,7 @@ export const checkPassword = async function checkPassword(loginText, pwText) {
     }
     
     let data = await res.json()
-    // console.log(data)
+    data.status = res.status
     return data;
 }
 

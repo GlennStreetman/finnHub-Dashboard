@@ -5,6 +5,7 @@ export const secretQuestion = async function secretQuestion(loginText, userName)
         throw new Error();
     }
     let data = await res.json()
+    console.log("SECRET QUESTION RESPONSE: ", data)
     return data
 }
 

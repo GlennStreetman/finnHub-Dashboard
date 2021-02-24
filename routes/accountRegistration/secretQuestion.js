@@ -19,19 +19,17 @@ router.get("/secretQuestion", (req, res, next) => {
 
     db.query(newQuery, (err, rows) => {
     if (err) {
-        res.statusCode = 401
-        res.json({message: "Problem returning secret question."});
+        console.log("ERROR SECRET QUESTION:", err)
+        res.status(400).json({message: "Problem returning secret question."});
     } else {
         if (rows.rows[0] !== undefined) {
             // console.log("ROWS:", rows.rows[0])
             req.session.reset = 1; //used by new password route.
             req.session.userName = user
-            res.statusCode = 200
             // console.log("UPDATED QUESTION:", req.session)
-            res.json({message: "correct"});
+            res.status(200).json({message: "correct"});
         } else {
-            res.statusCode = 406
-            res.json({message: "Secret question answer did not match."});
+            res.status(401).json({message: "Secret question and answer did not match."});
         }
     }
     });
