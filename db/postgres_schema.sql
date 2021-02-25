@@ -78,7 +78,7 @@ CREATE TABLE users
     ratelimit int,
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT users_login_key UNIQUE (loginname),
-    CONSTRAINT users_email_key UNIQUE (email),
+    CONSTRAINT users_email_key UNIQUE (email)
 );
 
 CREATE TABLE newEmail

@@ -24,7 +24,7 @@ if (process.env.live === '1') {
         secret: process.env.session_secret,
         resave: false,
         saveUninitialized: true,
-        cookie: { secure: true, sameSite: true },
+        cookie: { secure: false, sameSite: true },
       }))
     console.log("loading live server config")
     app.listen(process.env.PORT || port, function () {
