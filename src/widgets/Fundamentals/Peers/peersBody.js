@@ -64,9 +64,9 @@ export default class FundamentalsPeers extends Component {
             if (data.error === 429) { //run again
               this.getSymbolList()
             } else if (data.error === 401) {
-              console.log("problem with API key, reseting api queue.")
-              p.throttle.resetQueue()
-              p.updateAPIFlag(2)
+              console.log("Problem with API key access.")
+              // p.throttle.resetQueue()
+              // p.updateAPIFlag(2)
             } else {
               let updateStockList = Object.assign({}, data)
               for (const key in updateStockList) {
@@ -166,9 +166,9 @@ export default class FundamentalsPeers extends Component {
           if (data.error === 429) { //run again
             this.getStockData()
           } else if (data.error === 401) {
-            console.log("problem with API key, reseting api queue.")
-            p.throttle.resetQueue()
-            p.updateAPIFlag(2)
+            console.log("Problem with API key access.")
+            // p.throttle.resetQueue()
+            // p.updateAPIFlag(2)
           } else {
             // console.log(data)
             this.setState({peersList: data})
