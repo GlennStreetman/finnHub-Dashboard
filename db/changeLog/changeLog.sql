@@ -61,7 +61,7 @@ resetpasswordlink text,
 passwordconfirmed Boolean,
 
 Alter table users
-RENAME COLUMN confirmemail to confirmemaillink
+RENAME COLUMN confirmemail to confirmemaillink,
 RENAME COLUMN resetpassword to resetpasswordlink,
 ADD COLUMN emailconfirmed Boolean DEFAULT false,
-ADD COLUMN passwordconfirmed Boolean DEFAULT false,
+ADD COLUMN passwordconfirmed Boolean DEFAULT false
