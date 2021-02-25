@@ -6,14 +6,13 @@ const db = process.env.live === '1' ?
 const md5 = require("md5");
 //checks answer to secret question.
 router.get("/secretQuestion", (req, res, next) => {
-    let loginText = md5(req.query["loginText"])
-    let user = req.query["user"]
-    
-    let newQuery = `
+    const loginText = md5(req.query["loginText"])
+    const user = req.query["user"]
+    console.log(loginText, user)
+    const newQuery = `
         SELECT id, loginname 
         FROM users 
-        WHERE secretAnswer = '${loginText}' AND 
-        loginname = '${user}'
+        WHERE secretAnswer = '${loginText}' AND loginname = '${user}'
     `;
     // console.log("CHECK SECRET QUESTION", newQuery)
 
@@ -26,7 +25,7 @@ router.get("/secretQuestion", (req, res, next) => {
             // console.log("ROWS:", rows.rows[0])
             req.session.reset = 1; //used by new password route.
             req.session.userName = user
-            // console.log("UPDATED QUESTION:", req.session)
+            console.log("Secret question success. :", req.session)
             res.status(200).json({message: "correct"});
         } else {
             res.status(401).json({message: "Secret question and answer did not match."});

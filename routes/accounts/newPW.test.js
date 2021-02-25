@@ -1,7 +1,7 @@
 //setup express
 const express = require("express");
 const app = express();
-// const router = express.Router();
+const md5 = require("md5");
 require('dotenv').config()
 const path = require("path");
 app.use(express.static(path.join(__dirname, 'build')));
@@ -44,7 +44,7 @@ beforeAll((done) => {
     )
     VALUES (	
         'newPWTest', 'newPWTest@test.com', '735a2320bac0f32172023078b2d3ae56',	'hello',	
-        'goodbye',	'',	'',	'',	
+        '${md5('goodbye')}',	'',	'',	'',	
         true,	'US',	'US',	30,
         'testpasswordlink'
     )
@@ -54,7 +54,7 @@ beforeAll((done) => {
     UPDATE users 
     SET passwordconfirmed = true,  resetpasswordlink = 'testpasswordlink'
     WHERE loginname = 'newPWTest'
-`
+`   
 
     global.sessionStorage = {}
     db.connect(err => {
@@ -88,6 +88,7 @@ describe('Get login cookie:', ()=>{
         request(app)
             .get("/secretQuestion?loginText=goodbye&user=newPWTest")
             .then(res => {
+                console.log("SECRET RESPONSE", res.statusCode)
                 cookieJar = res.header['set-cookie']
                 console.log(cookieJar)
                 done()
