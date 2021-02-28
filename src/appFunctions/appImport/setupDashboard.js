@@ -59,52 +59,40 @@ export const NewDashboard = function newDashboard(){
     })
 }
 
-export const GetSavedDashBoards = function getSavedDashBoards() {
-    console.log('Getting saved dashboards')
-    this.state.throttle.resetQueue()
-
-    fetch("/dashBoard")
-    .then((response) => response.json())
-    .then((data) => {
-    console.log('Dashboard and menu data retrieved.')
-    const parseDashBoard = data.savedDashBoards
-    for (const dash in parseDashBoard) {
-        parseDashBoard[dash].globalstocklist = JSON.parse(parseDashBoard[dash].globalstocklist)
-        const thisDash = parseDashBoard[dash].widgetlist
-        for (const widget in thisDash) {
-        thisDash[widget].filters = JSON.parse(thisDash[widget].filters)
-        thisDash[widget].trackedStocks = JSON.parse(thisDash[widget].trackedStocks)
+export const GetSavedDashBoards = async function getSavedDashBoards() {
+    let res = await fetch("/dashBoard")
+    let data = await res.json()
+    
+    if (res.status === 200) {
+        console.log(200)
+        const parseDashBoard = data.savedDashBoards
+        for (const dash in parseDashBoard) {
+            parseDashBoard[dash].globalstocklist = JSON.parse(parseDashBoard[dash].globalstocklist)
+            const thisDash = parseDashBoard[dash].widgetlist
+            for (const widget in thisDash) {
+                thisDash[widget].filters = JSON.parse(thisDash[widget].filters)
+                thisDash[widget].trackedStocks = JSON.parse(thisDash[widget].trackedStocks)
+            }
         }
-    }
-    const loadDash = {
-        dashBoardData: parseDashBoard,
-        currentDashBoard: data.default,
-    }
-    if (data.menuSetup && Object.keys(data.menuSetup).length > 0) {
+        const loadDash = {
+            dashBoardData: parseDashBoard,
+            currentDashBoard: data.default,
+        }
         const menuList = {}
         for (const menu in data.menuSetup) {
-        menuList[menu] = data.menuSetup[menu]
+            menuList[menu] = data.menuSetup[menu]
         }
         loadDash['menuList'] = menuList
-        }
-        this.setState(loadDash)
-    //show about menu by default if login does not return API key.
-    if (
-        (this.state.apiKey === '' && this.state.apiFlag === 0) || 
-        (this.state.apiKey === null && this.state.apiFlag === 0)
-        ) {
-        console.log("API key not returned")
-        this.setState({
-        apiFlag: 1,
-        WatchListMenu: 0,
-        AboutMenu: 0,
-        showStockWidgets: 0,
-        }, ()=>{this.toggleBackGroundMenu('about')})
+        // console.log("DONE")
+        return (loadDash)
+
+    } else if (res.status === 401) {
+        console.log(401)
+        return ({dashBoardData: {message: data.message}})
+    } else {
+        console.log("error", res)
+        return [{dashBoardData: {message: data.message}}]
     }
-    })
-    .catch((error) => {
-    console.error("Failed to recover dashboards", error);
-    });
 }
 
 export const SaveCurrentDashboard = function saveCurrentDashboard(dashboardName) {

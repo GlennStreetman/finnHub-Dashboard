@@ -2,7 +2,6 @@ import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import EndPointNode from "../../../components/endPointNode.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
-import {dStock, sStock} from "../../../appFunctions/formatStockSymbols.js";
 
 export default class FundamentalsFinancialsAsReported extends Component {
     constructor(props) {
@@ -56,7 +55,7 @@ export default class FundamentalsFinancialsAsReported extends Component {
       const row = stockList.map((el) =>
         this.props.showEditPane === 1 ? (
           <tr key={el + "container"}>
-            <td key={el + "name"}>{dStock(el, p.exchangeList)}</td>
+            <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
             <td key={el + "buttonC"}>
               <button
                 key={el + "button"}
@@ -88,9 +87,9 @@ export default class FundamentalsFinancialsAsReported extends Component {
 
     renderStockData(){
       const p = this.props
-      const newSymbolList = this.props.trackedStocks.sKeys().map((el) => (
+      const newSymbolList = p.trackedStocks.sKeys().map((el) => (
         <option key={el + "ddl"} value={el}>
-          {dStock(el, p.exchangeList)}
+          {p.trackedStocks[el].dStock(p.exchangeList)}
         </option>
       ))
       
@@ -109,9 +108,9 @@ export default class FundamentalsFinancialsAsReported extends Component {
     getStockData(){
       const p = this.props
       const s = this.state
-      const stock = sStock(s.targetStock)
+      const target = p.trackedStocks[s.targetStock].symbol
       const that = this
-      const queryString = `https://finnhub.io/api/v1/stock/financials-reported?symbol=${stock}&token=${p.apiKey}`
+      const queryString = `https://finnhub.io/api/v1/stock/financials-reported?symbol=${target}&token=${p.apiKey}`
       finnHub(p.throttle, queryString)
       .then((data) => {
         if (that.baseState.mounted === true) {

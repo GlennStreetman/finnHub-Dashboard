@@ -10,6 +10,7 @@ module.exports = function candleWidgetEndPoint(stockList, filters, apiKey){
     let queryStringObj = {}
   
     for (const stock in stockList) {
+      const key = stockList[stock].key
       const stockSymbole = stockList[stock].symbol
       const queryString = "https://finnhub.io/api/v1/stock/candle?symbol=" +
         stockSymbole +
@@ -21,7 +22,7 @@ module.exports = function candleWidgetEndPoint(stockList, filters, apiKey){
         endUnix +
         "&token=" + apiKey
   
-        queryStringObj[stockSymbole] = (queryString)
+        queryStringObj[key] = (queryString)
       }
       return queryStringObj
   }

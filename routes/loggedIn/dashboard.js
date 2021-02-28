@@ -54,7 +54,7 @@ router.get("/dashboard", (req, res, next) => {
                     }
                     // console.log("KEYS:", r.savedDashBoards, "---",resultKey, newObject)
                     r.savedDashBoards[resultKey].widgetlist[newObject.widgetID] = newObject
-                    // console.log(r)
+                    
             }
             
             db.query(getMenuSetup, (err, rows) => {
@@ -79,6 +79,8 @@ router.get("/dashboard", (req, res, next) => {
                             yAxis: thisRow.yaxis,
                             }
                         }
+                        console.log("dashboard DATA: ", r)
+                        console.log("WIDGETS", r.savedDashBoards["TEST"].widgetlist)
                         res.status(200).json(r);
                     } else {
                         res.status(401).json({message: "No dashboards retrieved"})

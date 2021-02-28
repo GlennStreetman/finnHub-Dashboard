@@ -80,7 +80,7 @@ const createFunctionQueueObject = function (maxRequestPerInterval, interval, eve
 
 
 const finnHub = (throttle, apiString, id) => {
-    // console.log("creating promise: ", apiString)
+    // console.log("creating promise: ", throttle, apiString, id)
     return new Promise((resolve, reject) => {
         throttle.enqueue(function() { 
             fetch(apiString)

@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
-import {sStock} from "../../../appFunctions/formatStockSymbols.js";
 import RecTrendChart from "./recTrendChart.js";
 
 export default class EstimatesRecommendationTrends extends Component {
@@ -155,8 +154,9 @@ export default class EstimatesRecommendationTrends extends Component {
     getStockData(){
       const p = this.props
       const s = this.state
+      const target = p.trackedStocks[s.targetStock].symbol
       const that = this
-      const queryString = `https://finnhub.io/api/v1/stock/recommendation?symbol=${sStock(s.targetStock)}&token=${p.apiKey}`
+      const queryString = `https://finnhub.io/api/v1/stock/recommendation?symbol=${target}&token=${p.apiKey}`
       finnHub(p.throttle, queryString)
       .then((data) => {
         if (that.baseState.mounted === true) {

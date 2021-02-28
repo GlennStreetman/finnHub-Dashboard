@@ -1,7 +1,6 @@
 import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
-import {sStock} from "../../../appFunctions/formatStockSymbols.js";
 
 export default class EstimatesEarningsCalendar extends Component {
     constructor(props) {
@@ -211,8 +210,9 @@ export default class EstimatesEarningsCalendar extends Component {
       const s = this.state
       const pf = this.props.filters
       const that = this
+      const targetStockSymbole = p.trackedStocks[s.targetStock].symbol
       if (pf.startDate !== undefined && this.findDate(pf.endDate) !== undefined && s.targetStock !== undefined) {
-          const queryString = `https://finnhub.io/api/v1/calendar/earnings?from=${this.findDate(pf.startDate)}1&to=${this.findDate(pf.endDate)}1&symbol=${sStock(s.targetStock)}&token=${p.apiKey}`
+          const queryString = `https://finnhub.io/api/v1/calendar/earnings?from=${this.findDate(pf.startDate)}1&to=${this.findDate(pf.endDate)}1&symbol=${targetStockSymbole}&token=${p.apiKey}`
           finnHub(p.throttle, queryString)
           .then((data) => {
             if (that.baseState.mounted === true) {

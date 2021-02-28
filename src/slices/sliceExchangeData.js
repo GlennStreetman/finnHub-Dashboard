@@ -4,6 +4,7 @@ import {finnHub} from "./../appFunctions/throttleQueue.js";
 export const rGetSymbolList = createAsyncThunk(
     'newSymbolList',
     (reqObj) => { //{exchange, apiKey, finnHub} Not passing thunk api as second arg.
+        // console.log("GETTING EXCHANGE DATA")
         const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${reqObj.exchange}&token=${reqObj.apiKey}`
         // console.log(apiString)
         return finnHub(reqObj['throttle'], apiString)
@@ -45,7 +46,7 @@ const exchangeData = createSlice({
     
     extraReducers: {
     [rGetSymbolList.pending]: (state) => {
-        // console.log('getting stock data')
+        // console.log('1 getting stock data')
         return {...state}
     },
     [rGetSymbolList.rejected]: (state, action) => {
@@ -53,7 +54,7 @@ const exchangeData = createSlice({
         return {...state}
     },
     [rGetSymbolList.fulfilled]: (state, action) => {
-        // console.log("updating stock data:", action.payload)
+        // console.log("3updating stock data:", action.payload)
         return {...state, [action.payload.exchange]: action.payload.data}
     },
 }

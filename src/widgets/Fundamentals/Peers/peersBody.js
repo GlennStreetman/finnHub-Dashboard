@@ -57,8 +57,8 @@ export default class FundamentalsPeers extends Component {
       const that = this
       const p = this.props
       // console.log("Getting symbol names for :", this.state.targetStock )
-      const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=US&token=${that.props.apiKey}`
-        finnHub(this.props.throttle, apiString)  
+      const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=US&token=${p.apiKey}`
+        finnHub(p.throttle, apiString)  
         .then((data) => {
           if (this.baseState.mounted === true) {
             if (data.error === 429) { //run again

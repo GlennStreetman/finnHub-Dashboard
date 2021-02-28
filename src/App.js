@@ -18,7 +18,8 @@ import {
   UpdateWidgetFilters,
   UpdateWidgetStockList,
 } from "./appFunctions/appImport/widgetLogic.js";
-import { LoadDashBoard, NewDashboard, GetSavedDashBoards, SaveCurrentDashboard } from "./appFunctions/appImport/setupDashoard.js";
+import { LoadDashBoard, NewDashboard, GetSavedDashBoards, SaveCurrentDashboard } 
+  from "./appFunctions/appImport/setupDashboard.js";
 import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid.js";
 
 //component imports
@@ -34,6 +35,9 @@ import { WidgetController, MenuWidgetToggle } from "./components/widgetControlle
 import { connect } from "react-redux";
 import { rGetSymbolList } from "./slices/sliceExchangeData.js";
 import { rUpdateExchangeList } from "./slices/sliceExchangeList.js";
+import { rbuildFinndashDataset } from "./slices/sliceFinData.js";
+import { tUpdateDashboardData } from "./thunks/thunkFetchFinnhub.js";
+
 
 class App extends React.Component {
   constructor(props) {
@@ -111,10 +115,51 @@ class App extends React.Component {
 
   componentDidUpdate(prevProps, prevState) {
     const s = this.state;
-
+    const p = this.props;
+    
     if (s.login === 1 && prevState.login === 0) {
       console.log("loggin detected");
-      this.getSavedDashBoards();
+      this.getSavedDashBoards()
+      .then(data => {
+
+        this.setState(data)
+        data.apiKey = s.apiKey
+        // console.log("RESPONSE:", data)
+        p.rbuildFinndashDataset(data)
+        
+      })
+      .catch((error) => {
+          console.error("Failed to recover dashboards", error);
+          this.setState({dashBoardData: {message: "Problem retrieving dashboards."}})
+          });
+      ;
+    }
+    // console.log(p.rfinnHubData)
+    // console.log(p?.rfinnHubData?.created)
+    if (prevProps.rfinnHubData.created === false && this.props.rfinnHubData.created === true) {
+      const dataset = this.props.rfinnHubData.dataSet
+      console.log("HERE")
+      for (const dashboard in dataset ){
+        console.log("RUNNING", dashboard, Object.values(dataset[dashboard]))
+        const reqObj = {
+          endPoint: dashboard,
+          securityList: Object.values(dataset[dashboard])
+        }
+        this.props.tUpdateDashboardData(reqObj)
+      } 
+    }
+
+    if (
+        (s.apiKey === '' && s.apiFlag === 0) || 
+        (s.apiKey === null && s.apiFlag === 0)
+    ) {
+        console.log("API key not returned")
+        this.setState({
+        apiFlag: 1,
+        WatchListMenu: 0,
+        AboutMenu: 0,
+        showStockWidgets: 0,
+        }, ()=>{this.toggleBackGroundMenu('about')})
     }
 
     if (s.globalStockList !== prevState.globalStockList) {
@@ -354,5 +399,13 @@ class App extends React.Component {
   }
 }
 
-const mapStateToProps = (state) => ({ rExchangeList: state.exchangeList.exchangeList });
-export default connect(mapStateToProps, { rGetSymbolList, rUpdateExchangeList })(App);
+const mapStateToProps = (state) => ({
+  rExchangeList: state.exchangeList.exchangeList,
+  rfinnHubData: state.finnHubData 
+});
+export default connect(mapStateToProps, { 
+  rGetSymbolList, 
+  rUpdateExchangeList, 
+  rbuildFinndashDataset,
+  tUpdateDashboardData,
+ })(App);

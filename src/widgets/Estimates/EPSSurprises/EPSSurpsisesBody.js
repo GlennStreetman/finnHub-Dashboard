@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
-import {sStock} from "../../../appFunctions/formatStockSymbols.js";
+
 import ReactChart from "./reactChart.js";
   
 export default class EstimatesEPSSurprises extends Component {
@@ -149,7 +149,8 @@ getStockData(){
   const p = this.props
   const s = this.state
   const that = this
-  const queryString = `https://finnhub.io/api/v1/stock/earnings?symbol=${sStock(s.targetStock)}&token=${p.apiKey}`
+  const target = p.trackedStocks[s.targetStock].symbol
+  const queryString = `https://finnhub.io/api/v1/stock/earnings?symbol=${target}&token=${p.apiKey}`
   finnHub(p.throttle, queryString)
   .then((data) => {
     if (that.baseState.mounted === true) {

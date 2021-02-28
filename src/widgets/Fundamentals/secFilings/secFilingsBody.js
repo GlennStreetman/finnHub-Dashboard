@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
-import {dStock, sStock} from "../../../appFunctions/formatStockSymbols.js";
+
 // import EndPointNode from "../../../components/endPointNode.js";
 
 export default class FundamentalsSECFilings extends Component {
@@ -57,7 +57,7 @@ export default class FundamentalsSECFilings extends Component {
       let row = stockList.map((el) =>
         this.props.showEditPane === 1 ? (
           <tr key={el + "container"}>
-            <td key={el + "name"}>{dStock(el, p.exchangeList)}</td>
+            <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
             <td key={el + "buttonC"}>
               <button
                 key={el + "button"}
@@ -121,7 +121,7 @@ export default class FundamentalsSECFilings extends Component {
       if (s.stockData !== undefined) {
       let newSymbolList = p.trackedStocks.sKeys().map((el) => (
         <option key={el + "ddl"} value={el}>
-          {dStock(el, p.exchangeList)}
+          {p.trackedStocks[el].dStock(p.exchangeList)}
         </option>
       ));
         
@@ -163,8 +163,8 @@ export default class FundamentalsSECFilings extends Component {
       const p = this.props
       const s = this.state
       const that = this
-      const stock = sStock(s.targetStock)
-      const queryString = `https://finnhub.io/api/v1/stock/filings?symbol=${stock}&token=${p.apiKey}`
+      const target = p.trackedStocks[s.targetStock].symbol
+      const queryString = `https://finnhub.io/api/v1/stock/filings?symbol=${target}&token=${p.apiKey}`
       finnHub(p.throttle, queryString)
       .then((data) => {
         if (that.baseState.mounted === true) {

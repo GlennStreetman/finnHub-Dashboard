@@ -1,12 +1,15 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
 import exchangeData from './slices/sliceExchangeData.js'
 import exchangeList from './slices/sliceExchangeList.js'
+import finnHubData from './slices/sliceFinData.js'
+import finnHubQueue from './slices/sliceFinnHubQueue.js'
 
 export default configureStore({
   reducer: {
     'exchangeData': exchangeData,
     'exchangeList': exchangeList,
-
+    'finnHubData': finnHubData, 
+    'finnHubQueue': finnHubQueue,
   },
   middleware: () =>
     getDefaultMiddleware ({

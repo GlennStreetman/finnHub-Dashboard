@@ -40,7 +40,6 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle)
             lastUpdate = new Date().getTime();
             let updatedPrice = Object.assign({}, that.state.streamingPriceData);
             for (const prop in streamingStockData) {
-              // console.log("thisSTock----->", prop)
               if (updatedPrice[prop] !== undefined) {
                 updatedPrice[prop]["currentPrice"] = streamingStockData[prop][0]
             } else {

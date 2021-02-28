@@ -138,12 +138,12 @@ export default class FundamentalsCompanyProfile2 extends Component {
     getStockData(){
       if (this.state.targetStock !== undefined){
       // console.log("--------getting stocks data")
-      const stock = this.state.targetStock
-        if (stock.slice(0, stock.indexOf('-')) === 'US') {
-          const thisStock = stock.slice(stock.indexOf('-') + 1, stock.length)
-          const p = this.props
+      const p = this.props
+      const s = this.state
+      const stock = p.trackedStocks[s.targetStock]
+        if (stock.exchange === 'US') {
           const that = this
-          const queryString = `https://finnhub.io/api/v1/stock/profile2?symbol=${thisStock}&token=${p.apiKey}`
+          const queryString = `https://finnhub.io/api/v1/stock/profile2?symbol=${stock.symbol}&token=${p.apiKey}`
           // console.log(queryString)
           finnHub(p.throttle, queryString)
           .then((data) => {
