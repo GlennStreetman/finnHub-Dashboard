@@ -1,6 +1,6 @@
 import React from "react";
 
-class DashBoardMenu extends React.PureComponent {
+export default class DashBoardMenu extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -16,7 +16,7 @@ class DashBoardMenu extends React.PureComponent {
 
   componentDidMount() {
     const p = this.props
-    if (p.currentDashBoard !== undefined) {
+    if (p.currentDashBoard !== undefined && p.currentDashBoard !== null) {
       this.setState({inputText: p.currentDashBoard})
     }
   }
@@ -160,4 +160,10 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
   return propList;
 }
 
-export default DashBoardMenu;
+// const DashBoardMenuFunction = (props, ref) => {
+//   const propObj = {...props}
+//   propObj.ref = ref
+//   return (React.createElement(DashBoardMenu, {...propObj}))
+// }
+
+// export default DashBoardMenuFunction

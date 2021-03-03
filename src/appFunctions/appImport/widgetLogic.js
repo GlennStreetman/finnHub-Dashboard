@@ -51,7 +51,10 @@ export const RemoveWidget = function removeWidget(stateRef, widgetID) {
     //stateref should be "widgetList" or "menuList"
     let newWidgetList = Object.assign(this.state[stateRef]);
     delete newWidgetList[widgetID];
-    this.setState({ stateRef: newWidgetList });
+    this.setState({ 
+        stateRef: newWidgetList, 
+        rebuildDataSet: 1,
+    });
 }
 
 export const UpdateWidgetFilters = function updateWidgetFilters(widgetID, dataKey, data){
@@ -60,7 +63,10 @@ export const UpdateWidgetFilters = function updateWidgetFilters(widgetID, dataKe
         updatedWidgetList[widgetID].filters = {}
     }
     updatedWidgetList[widgetID].filters[dataKey] = data
-    this.setState({widgetList: updatedWidgetList})
+    this.setState({
+        widgetList: updatedWidgetList,
+        rebuildDataSet: 1,
+    })
 }
 
 export const UpdateWidgetStockList = function updateWidgetStockList(widgetId, symbol, stockObj={}) {
@@ -90,11 +96,14 @@ export const UpdateWidgetStockList = function updateWidgetStockList(widgetId, sy
     }
 
       // updateWidgetStockList[widgetId]["trackedStocks"] = trackingSymbolList;
-        this.setState({ widgetList: updateWidgetStockList });
+        this.setState({ 
+            widgetList: updateWidgetStockList,
+            rebuildDataSet: 1,
+        });
     }
 }
 
 export const ToggleWidgetVisability = function toggleWidgetVisability(){
     const s = this.state
     this.setState({showStockWidgets: s.showStockWidgets === 0 ? 1 : 0})
-  }
+}

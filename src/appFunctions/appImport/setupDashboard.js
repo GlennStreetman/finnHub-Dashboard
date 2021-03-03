@@ -50,6 +50,7 @@ export const LoadDashBoard = function loadDashBoard(newGlobalList, newWidgetList
 }
 
 export const NewDashboard = function newDashboard(){
+    //Does not save dashboard, just clears everything.
     this.state.throttle.resetQueue()
     this.setState({
         currentDashBoard: "",

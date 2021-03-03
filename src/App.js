@@ -9,14 +9,9 @@ import ThrottleQueue from "./appFunctions/throttleQueue.js";
 //appImport
 import { Logout, ProcessLogin } from "./appFunctions/appImport/appLogin.js";
 import {
-  NewMenuContainer,
-  NewWidgetContainer,
-  LockWidgets,
-  ToggleWidgetVisability,
-  ChangeWidgetName,
-  RemoveWidget,
-  UpdateWidgetFilters,
-  UpdateWidgetStockList,
+  NewMenuContainer, NewWidgetContainer, LockWidgets,
+  ToggleWidgetVisability, ChangeWidgetName, RemoveWidget,
+  UpdateWidgetFilters,UpdateWidgetStockList,
 } from "./appFunctions/appImport/widgetLogic.js";
 import { LoadDashBoard, NewDashboard, GetSavedDashBoards, SaveCurrentDashboard } 
   from "./appFunctions/appImport/setupDashboard.js";
@@ -64,6 +59,7 @@ class App extends React.Component {
       login: 0, //login state. 0 logged out, 1 logged in.
       loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
       menuList: {}, //lists of all menu widgets.
+      rebuildDataSet: 0, //Set to 1 to trigger finnHub Dataset rebuild. 
       socket: "", //socket connection for streaming stock data.
       showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
       throttle: ThrottleQueue(25, 1000, true), //all finnhub API requests should be done with finnHub function.
@@ -85,16 +81,16 @@ class App extends React.Component {
     this.newWidgetContainer = NewWidgetContainer.bind(this);
     this.changeWidgetName = ChangeWidgetName.bind(this);
     this.lockWidgets = LockWidgets.bind(this);
-    this.removeWidget = RemoveWidget.bind(this);
-    this.updateWidgetFilters = UpdateWidgetFilters.bind(this);
-    this.updateWidgetStockList = UpdateWidgetStockList.bind(this);
+    this.removeWidget = RemoveWidget.bind(this); //push change to redux --> REBUILD
+    this.updateWidgetFilters = UpdateWidgetFilters.bind(this); //push change to redux --> REBUILD
+    this.updateWidgetStockList = UpdateWidgetStockList.bind(this); //push change to redux --> REBUILD
     this.toggleWidgetVisability = ToggleWidgetVisability.bind(this);
 
     //App logic for setting up dashboards.
     this.loadDashBoard = LoadDashBoard.bind(this);
-    this.newDashboard = NewDashboard.bind(this);
-    this.getSavedDashBoards = GetSavedDashBoards.bind(this);
-    this.saveCurrentDashboard = SaveCurrentDashboard.bind(this);
+    this.newDashboard = NewDashboard.bind(this); //no changes pushed to redux
+    this.getSavedDashBoards = GetSavedDashBoards.bind(this); //push change to redux --> REBUILD
+    this.saveCurrentDashboard = SaveCurrentDashboard.bind(this); //redux should update as dashboard is build. Save doesnt trigger rebuild.
 
     //app logic for MOVING widgets and snapping them into location.
     this.setDrag = SetDrag.bind(this);
@@ -121,12 +117,10 @@ class App extends React.Component {
       console.log("loggin detected");
       this.getSavedDashBoards()
       .then(data => {
-
+        console.log("UPDATE DASH DATA", data)
         this.setState(data)
         data.apiKey = s.apiKey
-        // console.log("RESPONSE:", data)
         p.rbuildFinndashDataset(data)
-        
       })
       .catch((error) => {
           console.error("Failed to recover dashboards", error);
@@ -134,16 +128,14 @@ class App extends React.Component {
           });
       ;
     }
-    // console.log(p.rfinnHubData)
-    // console.log(p?.rfinnHubData?.created)
+
     if (prevProps.rfinnHubData.created === false && this.props.rfinnHubData.created === true) {
+      console.log('GET FINNHUB DATA')
       const dataset = this.props.rfinnHubData.dataSet
-      console.log("HERE")
-      for (const dashboard in dataset ){
-        console.log("RUNNING", dashboard, Object.values(dataset[dashboard]))
+      for (const endPoint in dataset ){
         const reqObj = {
-          endPoint: dashboard,
-          securityList: Object.values(dataset[dashboard])
+          endPoint: dataset[endPoint],
+          endPointName: endPoint,
         }
         this.props.tUpdateDashboardData(reqObj)
       } 
@@ -182,6 +174,18 @@ class App extends React.Component {
       } catch (err) {
         console.log("failed to load dashboards", err);
       }
+    }
+
+    if (s.rebuildDataSet === 1) {
+      this.setState({rebuildDataSet: 0}, ()=>{
+        console.log("REBUILDING")
+        const data = {
+          apiKey: s.apiKey,
+          currentDashboard: s.currentDashBoard,
+          dashBoardData: s.dashBoardData
+        }
+        p.rbuildFinndashDataset(data)
+      })
     }
   }
 

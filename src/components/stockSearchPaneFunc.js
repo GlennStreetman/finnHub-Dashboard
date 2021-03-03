@@ -9,7 +9,6 @@ class StockSearchPane extends React.Component {
     this.state = {
 
     };
-
     this.handleChange = this.handleChange.bind(this);
     this.changeDefault = this.changeDefault.bind(this);
   }
@@ -94,19 +93,19 @@ const mapStateToProps = (state, ownProps) => {
 
 export default connect(mapStateToProps)(StockSearchPane);
 
-export function searchPaneProps(that) {
+export function searchPaneProps(p) {
   const propList = {
-    updateGlobalStockList: that.props.updateGlobalStockList,
-    showSearchPane: () => that.props.showPane("showEditPane", 1),
-    apiKey: that.props.apiKey,
-    updateWidgetStockList: that.props.updateWidgetStockList,
-    widgetKey: that.props.widgetKey,
-    throttle: that.props.throttle,
-    exchangeList: that.props.exchangeList,
-    defaultExchange: that.props.defaultExchange,
-    updateDefaultExchange: that.props.updateDefaultExchange,
-    searchText: that.props.searchText,
-    changeSearchText: that.props.changeSearchText,
+    updateGlobalStockList: p.updateGlobalStockList,
+    showSearchPane: () => p.showPane("showEditPane", 1),
+    apiKey: p.apiKey,
+    updateWidgetStockList: p.updateWidgetStockList,
+    widgetKey: p.widgetKey,
+    throttle: p.throttle,
+    exchangeList: p.exchangeList,
+    defaultExchange: p.defaultExchange,
+    updateDefaultExchange: p.updateDefaultExchange,
+    searchText: p.searchText,
+    changeSearchText: p.changeSearchText,
   };
   return propList;
 }

@@ -1,46 +1,64 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import  {finnHub} from "./../appFunctions/throttleQueueAPI.js";
+const _ = require('lodash')
 
 export const tUpdateDashboardData = createAsyncThunk( //{endPoint, [securityList]}
     'rEnqueue',
     (req, thunkAPI) => { //l{ist of securities} 
-        console.log("THUNKING", req)
-        // const finnData = thunkAPI.getState().finnHubData //finnHubData
+    // console.log("!1REQ", req)
         const finnQueue = thunkAPI.getState().finnHubQueue.throttle //finnHubData
-        // console.log("GETSTATE", finnQueue)
-        //for each request check if data is avaiable.
-        let requestList = []
-        for (const security of req.securityList) {
-            // console.log('security: ', security, )
-            if (
-                (security.updated === undefined) ||
-                (Date.now() - security.updated >= 1*1000*60*60*3)
-            ) {//DATA NOT STALE (3 hour placeholder for now)
-                // console.log("NOT STALE")
-                const requestID = {
-                    key: security.key,
-                    stock: security.symbol,
-                    }
-                requestList.push(finnHub(finnQueue, security.apiString, requestID))
-            }   
+        let requestList = []  //for each request check if data is avaiable.
+        for (const widget in req.endPoint) { //for each widget
+            
+            const widgetName = widget
+            const thisWidget = req.endPoint[widget]
+            // console.log("!2", widgetName, thisWidget)
+            for(const stock in thisWidget) { //for each stock in widget
+                // console.log("!3", stock, thisWidget[stock])
+                const thisStock = thisWidget[stock]
+                if (
+                    (thisStock.updated === undefined) ||
+                    (Date.now() - thisStock.updated >= 1*1000*60*60*3) //more than 3 hours old.
+                ) {//DATA NOT STALE 
+                    // console.log("STALE DATA DETECTED.")
+                    const requestID = {
+                        key: thisStock.key,
+                        endPoint: req.endPointName,
+                        widgetID: widgetName,
+                        thisStock: thisStock,
+                        }
+                    // console.log("!4", thisStock.apiString, requestID)
+                    requestList.push(finnHub(finnQueue, thisStock.apiString, requestID))
+                }   
+            }
         }
-        console.log('requestList: ', requestList)
+        // console.log('requestList: ', requestList)
         return Promise.all(requestList)
         .then((res) => {
-            const e = req.endPoint
-            const resObj = {dataSet: {[e]: {}}}
-            for (const r of req.securityList) {
-                const key = r.key
-                resObj.dataSet[e][key] =  {...r}
+            // console.log("res",res)
+            const resObj = {dataSet: {}}
+            for (const resStock of res) {
+                resObj.dataSet[resStock.endPoint] = {}
             }
-            for (const r in res) {
-                const key = res[r].key
-                const data = res[r].data
-                resObj.dataSet[e][key].data = data
-                resObj.dataSet[e][key].updated = Date.now()
+            // console.log("RESPONSE1:", resObj)
+            for (const resStock of res) {
+                const thisEndPoint = resStock.endPoint
+                const thisWidget = resStock.widgetID
+                resObj.dataSet[thisEndPoint][thisWidget] = {}
+            }
+
+            for (const resStock of res) {
+                const thisEndPoint = resStock.endPoint
+                const thisWidget = resStock.widgetID
+                const stockInfo = _.cloneDeep(resStock.thisStock)
+                const data =  _.cloneDeep(resStock.data)
+                const thisKey = resStock.key
+                stockInfo.data = data
+                stockInfo.updated = Date.now()
+                resObj.dataSet[thisEndPoint][thisWidget][thisKey] = stockInfo
             }
 
             return (resObj)
         })
-    }
-)
+    })
+        

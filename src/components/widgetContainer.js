@@ -11,7 +11,7 @@ class WidgetContainer extends React.Component {
       renderHeader: this.props.widgetList["widgetHeader"],
       renderBody: this.props.widgetList["widgetType"],
       showEditPane: 0, //0: Hide, 1: Show
-      show: 'block',
+      show: 'block', //block = visable, none = hidden
       searchText: '',
     };
 
@@ -20,7 +20,7 @@ class WidgetContainer extends React.Component {
     this.showPane = this.showPane.bind(this);
     this.updateHeader = this.updateHeader.bind(this);
     this.handleChange = this.handleChange.bind(this);
-    this.showWidget = this.showWidget.bind(this);
+    this.showWidget = this.showWidget.bind(this); //updates show.
     this.changeSearchText = this.changeSearchText.bind(this);
   }
 
@@ -65,7 +65,9 @@ class WidgetContainer extends React.Component {
   }
 
   dragElement() {
+    // console.log(this.widgetRef)
     const widgetState = this.widgetRef.current;
+    if (widgetState.state === undefined) {widgetState.state = {}}
     widgetState.state.widgetID = this.props.widgetList.widgetID
     // console.log("WSTATE:", widgetState.state)
     let that = this;
@@ -129,6 +131,7 @@ class WidgetContainer extends React.Component {
     }
   }
 
+
   render() {
     const that = this;
     //Add widgets to the list below that should not have access to the stock search pane
@@ -149,13 +152,18 @@ class WidgetContainer extends React.Component {
       widgetProps['searchText'] = this.state.searchText
       widgetProps['changeSearchText'] = this.changeSearchText
       widgetProps['updateAPIFlag'] = this.props.updateAPIFlag
+      widgetProps['widgetType'] = this.props.widgetList["widgetType"]
     } 
-    widgetProps.ref = this.widgetRef
-
+    // widgetProps.ref = this.widgetRef
     if (this.props.widgetCopy) {
       widgetProps['widgetCopy'] = this.props.widgetCopy
     }
+    
+    const myRef = this.widgetRef
 
+    // const thisWidget = widgetLookUp[this.props.widgetList["widgetType"]](widgetProps, myRef)
+    // console.log("myRef", myRef)
+    
     return (
       <div 
         key={this.props.widgetKey + "container" + that.props.widgetList.column} 
@@ -194,7 +202,7 @@ class WidgetContainer extends React.Component {
           <div className="widgetHeader">{this.state.renderHeader}</div>
         )}
         <ErrorBoundary widgetType={this.props.widgetList["widgetType"]}>
-          {React.createElement(widgetLookUp[this.props.widgetList["widgetType"]], widgetProps)}
+          {React.createElement(widgetLookUp[this.props.widgetList["widgetType"]], {ref: myRef, ...widgetProps })}
         </ErrorBoundary>
         <div className="widgetFooter">
           {this.props.widgetLockDown === 0 ? (

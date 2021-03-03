@@ -4,7 +4,7 @@ import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchP
 import CsvUpload from './csvUpload.js'
 import ToolTip from '../../../components/toolTip.js'
 
-class WatchListMenu extends React.PureComponent {
+export default class WatchListMenu extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -221,4 +221,10 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
   return propList;
 }
 
-export default WatchListMenu;
+// const WatchListMenuFunction = (props, ref) => {
+//   const propObj = {...props}
+//   propObj.ref = ref
+//   return (React.createElement(WatchListMenu, {...propObj}))
+// }
+
+// export default WatchListMenuFunction
