@@ -53,7 +53,7 @@ function PriceCandles(p, ref) {
                 p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
                 p.updateWidgetFilters(p.widgetKey, 'resolution', 'W')
             } 
-    }}, [p])
+    }}, [])
 
     useEffect(()=>{ 
         //if stock not selected default to first stock.
@@ -114,6 +114,7 @@ function PriceCandles(p, ref) {
                 },
             ],
             };
+            console.log("setting candle options")
             setOptions(options)
             // }
         }
