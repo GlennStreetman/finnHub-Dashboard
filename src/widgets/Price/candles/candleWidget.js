@@ -10,17 +10,17 @@ function PriceCandles(p, ref) {
     const [options, setOptions] = useState({})
     const [selectResolution, setSelectResolution] = useState([1, 5, 15, 30, 60, "D", "W", "M"])
     
-    // redux connections
+    // redux connections -> slice out and use intermediary function after converting to immutable data.
     const rCandleData = useSelector((state) => {
-        console.log("CandleState", state, p.widgetType, p.widgetKey)
-        if (state.finnHubData.created === true) {
-            console.log("created")
-            const CandleData = state.finnHubData.dataSet[p.widgetType][p.widgetKey]
+        // console.log("CandleState", state, p.widgetType, p.widgetKey)
+        if (state.finnHubData !== undefined && state.finnHubData.created === true) {
+            const CandleData = state.finnHubData.dataSet[`${p.widgetKey}-${candleSelection}`]
             return (CandleData)
         }
     })
 
     useImperativeHandle(ref, () => (
+        //used to copy widgets when being dragged.
         {
             state: {
                 candleSelection: candleSelection,

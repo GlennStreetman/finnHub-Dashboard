@@ -1,5 +1,7 @@
 import React from "react";
 import { connect } from "react-redux";
+import Immutable from 'immutable';
+const {getIn } = require('immutable');
 //list of stock data used for auto complete on stock search.
 class StockDataList extends React.Component {
   constructor(props) {
@@ -9,13 +11,16 @@ class StockDataList extends React.Component {
 
   createDataList() {
     //creates datalist used for autocomplete of stock names.
-    const availableStocks = this.props.rFilteredStocks;
-    const stockListKey = availableStocks.map((el) => (
-      <option key={el + "op"} value={el}>
-        {el}
-      </option>
-    ));
-    return stockListKey;
+    if (this.props.rFilteredStocks !== undefined) {
+      const availableStocks = this.props.rFilteredStocks;
+      const stockListKey = availableStocks.map((el) => (
+        <option key={el + "op"} value={el}>
+          {el}
+        </option>
+      ));
+      return stockListKey;
+    } 
+    
   }
 
   render() {
@@ -26,26 +31,24 @@ class StockDataList extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   const p = ownProps
-  const exchangeData = state.exchangeData[p.defaultExchange]
+  const thisExchange = getIn(state.exchangeData.exchangeData, [p.defaultExchange])
   const newFilteredList = []
-  const availableStockCount = exchangeData !== undefined ?  Object.keys(exchangeData).length : 0;
-  const stockList = exchangeData !== undefined ? Object.keys(exchangeData): []
-  
-  for (let resultCount = 0, filteredCount = 0; 
-    resultCount < 20 && filteredCount < availableStockCount; 
-    filteredCount++) {
-      let stockSearchPhrase = exchangeData[stockList[filteredCount]]['symbol'].toUpperCase() +
-        '-' + 
-        exchangeData[stockList[filteredCount]]['description'].toUpperCase()
-      if (stockSearchPhrase.includes(p.inputText) === true) {
-        resultCount = resultCount + 1;
-        newFilteredList.push(stockSearchPhrase);
-        // filterObject[stockList[filteredCount]] = stockListObject[stockList[filteredCount]] 
+  if (thisExchange !== undefined) {
+    const availableStockCount = thisExchange.size;
+    let thisSequence = Array.from(thisExchange.keys())
+    for (let resultCount = 0, filteredCount = 0; 
+      resultCount < 20 && filteredCount < availableStockCount; 
+      filteredCount++) {
+        let stockSearchPhrase = thisSequence[filteredCount]
+        if (stockSearchPhrase.includes(p.inputText) === true) {
+          resultCount = resultCount + 1;
+          newFilteredList.push(stockSearchPhrase);
+        }
       }
-    }
 
-  return {rExchangeList: state.exchangeList.exchangeList,
-    rFilteredStocks: newFilteredList,
+    return {rExchangeList: state.exchangeList.exchangeList,
+      rFilteredStocks: newFilteredList,
+    }
   }
 }
 

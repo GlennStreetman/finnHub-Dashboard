@@ -1,7 +1,6 @@
 import React from "react";
 import "./App.css";
 import queryString from "query-string";
-
 //app functions
 import { GetStockPrice, LoadStockData } from "./appFunctions/getStockPrices.js";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData.js";
@@ -30,7 +29,7 @@ import { WidgetController, MenuWidgetToggle } from "./components/widgetControlle
 import { connect } from "react-redux";
 import { rGetSymbolList } from "./slices/sliceExchangeData.js";
 import { rUpdateExchangeList } from "./slices/sliceExchangeList.js";
-import { rbuildFinndashDataset } from "./slices/sliceFinData.js";
+import { rbuildFinndashDataset, rResetUpdateFlag } from "./slices/sliceFinData.js";
 import { tUpdateDashboardData } from "./thunks/thunkFetchFinnhub.js";
 
 
@@ -128,18 +127,25 @@ class App extends React.Component {
           });
       ;
     }
-
-    if (prevProps.rfinnHubData.created === false && this.props.rfinnHubData.created === true) {
+    //on load build dataset.
+    if (prevProps.rfinnHubData.created === false && p.rfinnHubData.created === true) {
       console.log('GET FINNHUB DATA')
-      const dataset = this.props.rfinnHubData.dataSet
-      for (const endPoint in dataset ){
-        const reqObj = {
-          endPoint: dataset[endPoint],
-          endPointName: endPoint,
-        }
-        this.props.tUpdateDashboardData(reqObj)
-      } 
+      const dataset = p.rfinnHubData.dataSet
+      console.log('!1dataset', dataset)
+      this.props.tUpdateDashboardData(dataset)
     }
+    
+    // if (this.props.rfinnHubData.created === 'updated') {
+    //   console.log('----------UPDATE FINNHUB DATA-----------')
+    //   this.props.rResetUpdateFlag()
+    //     console.log("REBUILDING")
+    //     const data = {
+    //       apiKey: s.apiKey,
+    //       currentDashboard: s.currentDashBoard,
+    //       dashBoardData: s.dashBoardData
+    //     }
+    //     p.rbuildFinndashDataset(data)
+    // }
 
     if (
         (s.apiKey === '' && s.apiFlag === 0) || 
@@ -196,6 +202,8 @@ class App extends React.Component {
   }
 
   updateGlobalStockList(event, stockRef, stockObj = {}) {
+    console.log("updating global stock list")
+    console.log()
     //pass stockRef to delete, pass in stockObj to update.
     // console.log("update global: ", stockRef, stockObj)
     const s = this.state;
@@ -412,4 +420,6 @@ export default connect(mapStateToProps, {
   rUpdateExchangeList, 
   rbuildFinndashDataset,
   tUpdateDashboardData,
+  rResetUpdateFlag,
+
  })(App);

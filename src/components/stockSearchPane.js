@@ -2,6 +2,8 @@ import React from "react";
 import StockDataList from "./stockDataList.js";
 import { connect } from "react-redux";
 import ToolTip from './toolTip.js'
+import { getIn, } from "immutable";
+
 //compnoent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
 class StockSearchPane extends React.Component {
   constructor(props) {
@@ -43,12 +45,15 @@ class StockSearchPane extends React.Component {
           className="form-stack"
           onSubmit={(e) => { //submit stock to be added/removed from global & widget stocklist.
             if (this.props.rUpdateStock !== undefined && widgetKey === 'WatchListMenu') {
-              const stockKey = this.props.rUpdateStock.key
-              this.props.updateGlobalStockList(e, stockKey, this.props.rUpdateStock);
+              const thisStock = this.props.rUpdateStock.toJS()
+              const stockKey = thisStock.key
+              this.props.updateGlobalStockList(e, stockKey, thisStock);
               this.props.showSearchPane();
-            } else if (widgetKey / 1 !== undefined) { //Not menu widget. Menus named, widgets numbered.
-              const stockKey = this.props.rUpdateStock.key
-              this.props.updateWidgetStockList(widgetKey, stockKey, this.props.rUpdateStock);
+              e.preventDefault();
+            } else if (widgetKey / 1 !== undefined && this.props.rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
+              const thisStock = this.props.rUpdateStock.toJS()
+              const stockKey = thisStock.key
+              this.props.updateWidgetStockList(widgetKey, stockKey, thisStock);
               e.preventDefault();
             
             } else {
@@ -84,9 +89,11 @@ class StockSearchPane extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   // console.log("OWNPROPS:", ownProps)
   const p = ownProps
-  const inputSymbol = p.defaultExchange + "-" + p.searchText.slice(0, p.searchText.indexOf("-"))
-  const updateStock = state.exchangeData[p.defaultExchange] ? state.exchangeData[p.defaultExchange][inputSymbol] : {}
-
+  const thisExchange = getIn(state.exchangeData.exchangeData, [p.defaultExchange])
+  const inputSymbol = p.searchText
+  // const updateStock = state.exchangeData[p.defaultExchange] ? state.exchangeData[p.defaultExchange][inputSymbol] : {}
+  const updateStock = thisExchange !== undefined ? getIn(thisExchange, [inputSymbol]) : undefined
+  // console.log("update Stock", updateStock)
   return {
     rUpdateStock: updateStock,
   }

@@ -15,6 +15,7 @@
     "crypto-random-string": "^3.3.1",
     "express": "^4.17.1",
     "express-session": "^1.17.1",
+    "immutable": "^4.0.0-rc.12",
     "lodash": "^4.17.21",
     "mailgun-js": "^0.22.0",
     "md5": "^2.3.0",
@@ -34,7 +35,8 @@
     "react-tooltip": "^4.2.15",
     "redux": "^4.0.5",
     "session-file-store": "^1.4.0",
-    "thunk": "0.0.1"
+    "thunk": "0.0.1",
+    "with-immutable-props-to-js": "^2.1.0"
   },
   "scripts": {
     "server": "nodemon --ignore sessions/ server.js",

@@ -85,25 +85,32 @@ const finnHub = (throttle, apiString, id) => {
         throttle.enqueue(function() { 
             fetch(apiString)
             .then((response) => {
+                // console.log("1111!!!", response)
                 if (response.status === 429) {
                     console.log('--429--')
                     throttle.setSuspend(61000)
                     // finnHub(throttle, apiString)
                     return {429: 429}
                 } else {
-                    // console.log("RESPONSE:", response.json())
+                    console.log("HERE", response.status)
                     return response.json()
                 }
             })
             .then((data) => {
+                // console.log('data!!!', data)
                 if (data[429] !== undefined) {
                     console.log('------------>429', throttle)
                     resolve (finnHub(throttle, apiString, id))
                     throttle.openRequests = throttle.openRequests -= 1
                 } else {
                     throttle.openRequests = throttle.openRequests -= 1
-                    id.data = data
-                    resolve(id)
+                    const resObj = {
+                        key: id,
+                        apiString: apiString,
+                        data: data
+                    }
+                    console.log("sending response obj", resObj)
+                    resolve(resObj)
                 }
             })
             .catch(error => {

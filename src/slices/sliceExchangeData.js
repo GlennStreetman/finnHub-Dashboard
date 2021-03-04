@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {finnHub} from "./../appFunctions/throttleQueue.js";
+const { fromJS } = require('immutable');
 
 export const rGetSymbolList = createAsyncThunk(
     'newSymbolList',
@@ -35,27 +36,34 @@ export const rGetSymbolList = createAsyncThunk(
 const exchangeData = createSlice({
     name: 'exchangedata',
     initialState: {
-        exchangeData: {}, //keys for  exchange data objects
+        // exchangeData: {}, //keys for  exchange data objects
     },
     reducers: { //reducers can reference eachother with slice.caseReducers.reducer(state)
         rUpdateExchangeData: (state, action) => {
             // const ap = action.payload
-            const s = state
-            return {...s, exchangeData: {}}}  
+            // state = Map(action.payload)
+        }
+            // return {...s, exchangeData: {}}}  
         },
     
     extraReducers: {
     [rGetSymbolList.pending]: (state) => {
         // console.log('1 getting stock data')
-        return {...state}
+        // return {...state}
     },
     [rGetSymbolList.rejected]: (state, action) => {
         console.log('failed to retrieve stock data for: ', action)
-        return {...state}
+        // return {...state}
     },
     [rGetSymbolList.fulfilled]: (state, action) => {
         // console.log("3updating stock data:", action.payload)
-        return {...state, [action.payload.exchange]: action.payload.data}
+        const updateObj = {[action.payload.exchange]: action.payload.data}
+        const updateObjImmutable = fromJS(updateObj)
+        const oldState = state.exchangeData
+        // if (oldState !== undefined){console.log("OLDSTATE", oldState.toObject())}
+        // const map = fromJS(updateObj)
+        const map = oldState !== undefined ? updateObjImmutable.merge(state.exchangeData) : updateObjImmutable
+        state.exchangeData = map
     },
 }
 })
