@@ -5,7 +5,7 @@ export const tUpdateDashboardData = createAsyncThunk( //{endPoint, [securityList
     'rEnqueue',
     (req, thunkAPI) => { //l{ist of securities} 
         const finnQueue = thunkAPI.getState().finnHubQueue.throttle //finnHubData
-        console.log('finnQueue', finnQueue)
+        // console.log('finnQueue', finnQueue)
         let requestList = []  //for each request check if data is avaiable.
         const thisRequest = req.entries()
         // console.log('thisRequest', thisRequest)
@@ -17,19 +17,10 @@ export const tUpdateDashboardData = createAsyncThunk( //{endPoint, [securityList
             if (
                 (endPoint.updated === undefined) ||
                 (Date.now() - endPoint.updated >= 1*1000*60*60*3) //more than 3 hours old.
-            ) {//DATA NOT STALE 
-                // console.log("STALE DATA DETECTED.")
-                // const requestID = {
-                //     key: thisStock.key,
-                //     endPoint: req.endPointName,
-                //     widgetID: widgetName,
-                //     thisStock: thisStock,
-                //     }
-                console.log("!4", endPoint, reqKey)
+            ) {
                 requestList.push(finnHub(finnQueue, endPoint, reqKey))
             }   
         }
-        console.log('requestList: ', requestList)
         return Promise.all(requestList)
         .then((res) => {
             // console.log("res",res)

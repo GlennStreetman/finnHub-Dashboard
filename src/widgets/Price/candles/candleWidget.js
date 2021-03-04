@@ -2,6 +2,7 @@ import React , {useState, useEffect, useImperativeHandle, forwardRef} from "reac
 import { useSelector } from 'react-redux';
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPaneFunc.js";
 import CreateCandleStickChart from "./createCandleStickChart.js";
+import { getIn, } from "immutable";
 
 function PriceCandles(p, ref) {
     
@@ -10,11 +11,14 @@ function PriceCandles(p, ref) {
     const [options, setOptions] = useState({})
     const [selectResolution, setSelectResolution] = useState([1, 5, 15, 30, 60, "D", "W", "M"])
     
-    // redux connections -> slice out and use intermediary function after converting to immutable data.
-    const rCandleData = useSelector((state) => {
+    // redux connections -> slice out and use intermediary function after converting to immutable data?
+    const rCandleData = useSelector((state) => { //break up into multiple peaces, 2 objects in data
         // console.log("CandleState", state, p.widgetType, p.widgetKey)
         if (state.finnHubData !== undefined && state.finnHubData.created === true) {
-            const CandleData = state.finnHubData.dataSet[`${p.widgetKey}-${candleSelection}`]
+            const CandleData = getIn(state.finnHubData.dataSet, [`${p.widgetKey}-${candleSelection}`, 'data'])
+            // console.log(CandleData)
+            // const CandleData = state.finnHubData.dataSet[`${p.widgetKey}-${candleSelection}`]
+            // console.log("generating candle data", state.finnHubData , `${p.widgetKey}-${candleSelection}`)
             return (CandleData)
         }
     })
@@ -61,8 +65,9 @@ function PriceCandles(p, ref) {
 
     useEffect(()=> {
         if (rCandleData !== undefined){
-            const data = rCandleData[candleSelection]?.data
-            if (data !== undefined) {
+            // const data = rCandleData[candleSelection]?.data
+            // if (data !== undefined) {
+            const data = rCandleData
                 const nodeCount = data["c"].length;
                 const chartData = []
                 for (let nodei = 0; nodei < nodeCount; nodei++) {
@@ -110,7 +115,7 @@ function PriceCandles(p, ref) {
             ],
             };
             setOptions(options)
-            }
+            // }
         }
     }, [candleSelection, p.showEditPane, rCandleData, p.filters.endDate, p.filters.startDate])
 

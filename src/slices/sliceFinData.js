@@ -37,7 +37,6 @@ const finnHubData = createSlice({
                         const trackedStocks = widgetList[w].trackedStocks
                         const endPointData = endPointFunction(trackedStocks, filters, ap.apiKey)
                         delete endPointData.undefined
-
                         
                         for (const s in trackedStocks) {
                             if (trackedStocks[s].key !== undefined) {
@@ -90,7 +89,7 @@ const finnHubData = createSlice({
                 // console.log("3 UPDATA DATA STORE:", action.payload)
                 const ap = action.payload
                 const newState = state.dataSet.withMutations((map)=>{
-                    console.log("HERE!", state.dataSet)
+                    // console.log("HERE!", state.dataSet)
                     for (const x in ap) {
                         const updateObj = {
                             apiString: ap[x].apiString,

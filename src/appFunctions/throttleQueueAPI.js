@@ -92,7 +92,7 @@ const finnHub = (throttle, apiString, id) => {
                     // finnHub(throttle, apiString)
                     return {429: 429}
                 } else {
-                    console.log("HERE", response.status)
+                    // console.log("HERE", response.status)
                     return response.json()
                 }
             })
@@ -109,7 +109,7 @@ const finnHub = (throttle, apiString, id) => {
                         apiString: apiString,
                         data: data
                     }
-                    console.log("sending response obj", resObj)
+                    // console.log("sending response obj", resObj)
                     resolve(resObj)
                 }
             })

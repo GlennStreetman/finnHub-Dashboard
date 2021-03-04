@@ -1,6 +1,5 @@
 import React from "react";
 import { connect } from "react-redux";
-import Immutable from 'immutable';
 const {getIn } = require('immutable');
 //list of stock data used for auto complete on stock search.
 class StockDataList extends React.Component {

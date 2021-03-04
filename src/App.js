@@ -116,7 +116,7 @@ class App extends React.Component {
       console.log("loggin detected");
       this.getSavedDashBoards()
       .then(data => {
-        console.log("UPDATE DASH DATA", data)
+        // console.log("UPDATE DASH DATA", data)
         this.setState(data)
         data.apiKey = s.apiKey
         p.rbuildFinndashDataset(data)
@@ -129,9 +129,9 @@ class App extends React.Component {
     }
     //on load build dataset.
     if (prevProps.rfinnHubData.created === false && p.rfinnHubData.created === true) {
-      console.log('GET FINNHUB DATA')
+      // console.log('GET FINNHUB DATA')
       const dataset = p.rfinnHubData.dataSet
-      console.log('!1dataset', dataset)
+      // console.log('!1dataset', dataset)
       this.props.tUpdateDashboardData(dataset)
     }
     
