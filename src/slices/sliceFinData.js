@@ -26,10 +26,12 @@ const finnHubData = createSlice({
             const ap = action.payload
             const apD = ap.dashBoardData
             const resList = []
+            const endPointAPIList = {} //list of lists. Each list []
+            //nested loops that create a list of endpoints for this dataset.
             for (const d in apD) { //for each dashboard
                 const widgetList = apD[d].widgetlist 
-                for (const w in widgetList) { //for each widget
-                    const widgetName = w 
+                for (const w in widgetList) {  //for each widget
+                    const widgetName = w  
                     if (w !== null && w !== 'null') { 
                         const endPoint = widgetList[w].widgetType
                         const filters = widgetList[w].filters
@@ -37,41 +39,43 @@ const finnHubData = createSlice({
                         const trackedStocks = widgetList[w].trackedStocks
                         const endPointData = endPointFunction(trackedStocks, filters, ap.apiKey)
                         delete endPointData.undefined
-                        
+                        endPointAPIList[widgetName] = endPointData
                         for (const s in trackedStocks) {
                             if (trackedStocks[s].key !== undefined) {
-                                const dataName = `${widgetName}-${trackedStocks[s].key}`
+                                const key = trackedStocks[s].key
+                                const dataName = `${widgetName}-${key}`
                                 resList.push(dataName)
                             }
                         }
-                        // const thisMap = Map({test: 'test1', test2: "test2"})
-                        const newState =  state.dataSet.withMutations((map)=>{
-                            //remove old datasets, create nodes for new datasets.
-                            map.keySeq().forEach((k) => {
-                                resList.indexOf(k) > -1 ? 
-                                    resList.splice(resList.indexOf(k), 1) :
-                                    map.delete(k)
-                            })
-                            
-                            for (const x of resList) {
-                                map.set(x, null)
-                            }
-                            
-                            for (const security in endPointData) {
-                                map.set(`${widgetName}-${security}`, {apiString: endPointData[security]})
-                            }
-                        })
-                        state.dataSet = newState
-                        state.created = flag
-                        
-                        // state.created === false ? state.created = true : state.created = 'updated' 
-
                     }
                 }
             }
+        // map endpoints to result list
+        const newState =  state.dataSet.withMutations((map)=>{
+            //remove old datasets, create nodes for new datasets.
+            map.keySeq().forEach((k) => {
+                //if resList item exists in old list, delete from reslist, else delete from oldState
+                resList.indexOf(k) > -1 ? 
+                    resList.splice(resList.indexOf(k), 1) :
+                    map.delete(k)
+            })
+            
+            for (const x of resList) { //Map remainnig resList items into state.
+                map.set(x, null)
+            }
+            
+            for (const widget in endPointAPIList) {
+                const thisWidget = endPointAPIList[widget]
+                for (const security in thisWidget) {
+                    map.set(`${widget}-${security}`, {apiString: thisWidget[security]})
+                }
+            }
+        })
+        state.dataSet = newState
+        state.created = flag
+                        
         },
         rResetUpdateFlag: (state, action) => {
-            console.log("UPDATE FLAG------------")
             state.created = true
             
         },

@@ -11,14 +11,10 @@ function PriceCandles(p, ref) {
     const [options, setOptions] = useState({})
     const [selectResolution, setSelectResolution] = useState([1, 5, 15, 30, 60, "D", "W", "M"])
     
-    // redux connections -> slice out and use intermediary function after converting to immutable data?
-    const rCandleData = useSelector((state) => { //break up into multiple peaces, 2 objects in data
+    const rCandleData = useSelector((state) => { 
         // console.log("CandleState", state, p.widgetType, p.widgetKey)
         if (state.finnHubData !== undefined && state.finnHubData.created === true) {
             const CandleData = getIn(state.finnHubData.dataSet, [`${p.widgetKey}-${candleSelection}`, 'data'])
-            // console.log(CandleData)
-            // const CandleData = state.finnHubData.dataSet[`${p.widgetKey}-${candleSelection}`]
-            // console.log("generating candle data", state.finnHubData , `${p.widgetKey}-${candleSelection}`)
             return (CandleData)
         }
     })

@@ -1,20 +1,21 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {finnHub} from "./../appFunctions/throttleQueue.js";
-const { fromJS } = require('immutable');
+import { exchangeDataDB } from './indexedDB.js'
 
-export const rGetSymbolList = createAsyncThunk(
+
+export const tGetSymbolList = createAsyncThunk(
     'newSymbolList',
     (reqObj) => { //{exchange, apiKey, finnHub} Not passing thunk api as second arg.
-        // console.log("GETTING EXCHANGE DATA")
+        
         const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${reqObj.exchange}&token=${reqObj.apiKey}`
         // console.log(apiString)
         return finnHub(reqObj['throttle'], apiString)
         .then((data) => {
             if (data.error === 429) { //run again
-                rGetSymbolList(reqObj)
+                tGetSymbolList(reqObj)
                 return {
                     'data': {}, 
-                    'exchange': reqObj.exchange,
+                    'ex': exchangeDataDB,
                 }
             } else {
                 let updateStockList = {}
@@ -33,39 +34,77 @@ export const rGetSymbolList = createAsyncThunk(
     }
     )
 
+export const tUpdateExchangeData = createAsyncThunk(
+        'getSymbolList',
+        async (reqObj, thunkAPI) => {
+            const ap = reqObj
+            console.log('ap', ap)
+            const db = await exchangeDataDB()
+            console.log('db', db)
+            // const store = db.transaction('exchangeDB').objectStore('exchangeDB')
+            // console.log('store', store)
+            const value = await db.get('exchangeDB',ap)
+            console.log('FINISHED', ap, value)
+            return (value)
+        })
+
 const exchangeData = createSlice({
     name: 'exchangedata',
     initialState: {
-        // exchangeData: {}, //keys for  exchange data objects
+        exchangeDB: exchangeDataDB
     },
-    reducers: { //reducers can reference eachother with slice.caseReducers.reducer(state)
-        rUpdateExchangeData: (state, action) => {
-            // const ap = action.payload
-            // state = Map(action.payload)
-        }
-            // return {...s, exchangeData: {}}}  
-        },
+    reducers: { 
+            // rUpdateExchangeData: (state, action) => {
+            //     // const ap = action.payload
+            //     // const s = state
+            //     state.exchangeData = {}  
+            // },
+    },      
     
     extraReducers: {
-    [rGetSymbolList.pending]: (state) => {
-        // console.log('1 getting stock data')
-        // return {...state}
+    [tGetSymbolList.pending]: (state) => {
+        console.log('1 getting stock data')
+        return state
     },
-    [rGetSymbolList.rejected]: (state, action) => {
+    [tGetSymbolList.rejected]: (state, action) => {
         console.log('failed to retrieve stock data for: ', action)
-        // return {...state}
+        return state
     },
-    [rGetSymbolList.fulfilled]: (state, action) => {
-        // console.log("3updating stock data:", action.payload)
-        const updateObj = {[action.payload.exchange]: action.payload.data}
-        const updateObjImmutable = fromJS(updateObj)
-        const oldState = state.exchangeData
-        // if (oldState !== undefined){console.log("OLDSTATE", oldState.toObject())}
-        // const map = fromJS(updateObj)
-        const map = oldState !== undefined ? updateObjImmutable.merge(state.exchangeData) : updateObjImmutable
-        state.exchangeData = map
+    [tGetSymbolList.fulfilled]: async(state, action) => {
+
+        let data = action.payload
+        const updateObj = {
+            ex: data.exchange,
+            data: data.data,
+            updated: Date.now(),
+        }
+        console.log(updateObj)
+
+        const db = await exchangeDataDB()
+        // const store = db.transaction('exchangeDB').objectStore('exchangeDB')
+        const value = (db.add('exchangeDB',updateObj)) || 0
+        console.log('Added to store:', value)
+        console.log(db)
+        return state
+        
     },
-}
+
+    [tUpdateExchangeData.pending]: (state) => {
+        console.log('1 getting exchange data')
+        return {...state}
+    },
+    [tUpdateExchangeData.rejected]: (state, action) => {
+        console.log('failed to retrieve exchange data for: ', action)
+        return {...state}
+    },
+    [tUpdateExchangeData.fulfilled]: (state, action) => {
+        console.log('!3 FINISHED tUpdateExchangeData', action)
+        // const apx = action.payload['ex']
+        const apd = action.payload['data']
+        let returnObj = apd
+        state.exchangeData = returnObj
+    }
+    }
 })
 
 export const {

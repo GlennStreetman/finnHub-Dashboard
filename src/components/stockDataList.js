@@ -1,6 +1,6 @@
 import React from "react";
 import { connect } from "react-redux";
-const {getIn } = require('immutable');
+// const {getIn } = require('immutable');
 //list of stock data used for auto complete on stock search.
 class StockDataList extends React.Component {
   constructor(props) {
@@ -30,23 +30,30 @@ class StockDataList extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   const p = ownProps
-  const thisExchange = getIn(state.exchangeData.exchangeData, [p.defaultExchange])
+  const thisExchange = state.exchangeData.exchangeData
+  // console.log('!!!thisExchange', thisExchange)
   const newFilteredList = []
   if (thisExchange !== undefined) {
-    const availableStockCount = thisExchange.size;
-    let thisSequence = Array.from(thisExchange.keys())
+    const availableStockCount = Object.keys(thisExchange).length;
+    // console.log(availableStockCount)
+    const exchangeKeys = Object.keys(thisExchange) //list
     for (let resultCount = 0, filteredCount = 0; 
-      resultCount < 20 && filteredCount < availableStockCount; 
-      filteredCount++) {
-        let stockSearchPhrase = thisSequence[filteredCount]
-        if (stockSearchPhrase.includes(p.inputText) === true) {
-          resultCount = resultCount + 1;
-          newFilteredList.push(stockSearchPhrase);
-        }
+    resultCount < 20 && filteredCount < availableStockCount; 
+    filteredCount++) {
+      const thisKey = exchangeKeys[filteredCount]
+      const thisSearchPhrase = `${thisExchange[thisKey].key}: ${thisExchange[thisKey].description}`
+      if (thisSearchPhrase.includes(p.inputText) === true) {
+        resultCount = resultCount + 1;
+        newFilteredList.push(thisSearchPhrase);
       }
-
-    return {rExchangeList: state.exchangeList.exchangeList,
+    }
+    // console.log('newFilteredList', newFilteredList)
+    return {
       rFilteredStocks: newFilteredList,
+    }
+  } else {
+    return {
+      rFilteredStocks: undefined,
     }
   }
 }

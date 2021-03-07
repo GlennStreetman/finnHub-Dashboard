@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
 import {finnHub} from "../../../appFunctions/throttleQueue.js";
 
+//rewriet as functional component, 
+//stockData. & targetStock. need to bewritten to use the stock key instaed of ticker symbol.
 export default class EstimatesEarningsCalendar extends Component {
     constructor(props) {
         super(props);

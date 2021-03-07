@@ -27,7 +27,7 @@ import { WidgetController, MenuWidgetToggle } from "./components/widgetControlle
 
 //redux imports
 import { connect } from "react-redux";
-import { rGetSymbolList } from "./slices/sliceExchangeData.js";
+import { tGetSymbolList } from "./slices/sliceExchangeData.js";
 import { rUpdateExchangeList } from "./slices/sliceExchangeList.js";
 import { rbuildFinndashDataset, rResetUpdateFlag } from "./slices/sliceFinData.js";
 import { tUpdateDashboardData } from "./thunks/thunkFetchFinnhub.js";
@@ -292,7 +292,7 @@ class App extends React.Component {
           apiKey: s.apiKey,
           throttle: s.throttle,
         };
-        p.rGetSymbolList(newPayload);
+        p.tGetSymbolList(newPayload);
         // }
       }
 
@@ -416,7 +416,7 @@ const mapStateToProps = (state) => ({
   rfinnHubData: state.finnHubData 
 });
 export default connect(mapStateToProps, { 
-  rGetSymbolList, 
+  tGetSymbolList, 
   rUpdateExchangeList, 
   rbuildFinndashDataset,
   tUpdateDashboardData,

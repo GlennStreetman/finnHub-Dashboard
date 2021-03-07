@@ -41,14 +41,15 @@ class StockSearchPane extends React.Component {
         <form
           className="form-stack"
           onSubmit={(e) => { //submit stock to be added/removed from global & widget stocklist.
+
               if (this.props.rUpdateStock !== undefined && widgetKey === 'WatchListMenu') {
-              const thisStock = this.props.rUpdateStock.toJS()
+              const thisStock = this.props.rUpdateStock
               const stockKey = thisStock.key
               this.props.updateGlobalStockList(e, stockKey, thisStock);
               this.props.showSearchPane();
               e.preventDefault();
             } else if (widgetKey / 1 !== undefined && this.props.rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
-              const thisStock = this.props.rUpdateStock.toJS()
+              const thisStock = this.props.rUpdateStock
               const stockKey = thisStock.key
               this.props.updateWidgetStockList(widgetKey, stockKey, thisStock);
               e.preventDefault();
@@ -86,10 +87,9 @@ class StockSearchPane extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   // console.log("OWNPROPS:", ownProps)
   const p = ownProps
-  const thisExchange = state.exchangeData[p.defaultExchange]
-  const inputSymbol = p.defaultExchange + "-" + p.searchText.slice(0, p.searchText.indexOf("-"))
-  // const updateStock = state.exchangeData[p.defaultExchange] ? state.exchangeData[p.defaultExchange][inputSymbol] : {}
-  const updateStock = thisExchange !== undefined ? thisExchange.get(inputSymbol).toJS : {}
+  const thisExchange = state.exchangeData.exchangeData
+  const inputSymbol = p.searchText.slice(0, p.searchText.indexOf(":"))
+  const updateStock = thisExchange !== undefined ? thisExchange[inputSymbol] : {}
   return {
     rUpdateStock: updateStock,
   }

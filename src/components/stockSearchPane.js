@@ -2,18 +2,24 @@ import React from "react";
 import StockDataList from "./stockDataList.js";
 import { connect } from "react-redux";
 import ToolTip from './toolTip.js'
-import { getIn, } from "immutable";
+// import { getIn, } from "immutable";
+import { tUpdateExchangeData } from "./../slices/sliceExchangeData.js";
 
 //compnoent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
 class StockSearchPane extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-
+      
     };
 
     this.handleChange = this.handleChange.bind(this);
     this.changeDefault = this.changeDefault.bind(this);
+  }
+
+  componentDidMount(){
+    // console.log("1!", this.props.defaultExchange)
+    this.props.tUpdateExchangeData(this.props.defaultExchange)
   }
 
   handleChange(e) {
@@ -45,13 +51,13 @@ class StockSearchPane extends React.Component {
           className="form-stack"
           onSubmit={(e) => { //submit stock to be added/removed from global & widget stocklist.
             if (this.props.rUpdateStock !== undefined && widgetKey === 'WatchListMenu') {
-              const thisStock = this.props.rUpdateStock.toJS()
+              const thisStock = this.props.rUpdateStock
               const stockKey = thisStock.key
               this.props.updateGlobalStockList(e, stockKey, thisStock);
               this.props.showSearchPane();
               e.preventDefault();
             } else if (widgetKey / 1 !== undefined && this.props.rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
-              const thisStock = this.props.rUpdateStock.toJS()
+              const thisStock = this.props.rUpdateStock
               const stockKey = thisStock.key
               this.props.updateWidgetStockList(widgetKey, stockKey, thisStock);
               e.preventDefault();
@@ -87,19 +93,19 @@ class StockSearchPane extends React.Component {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  // console.log("OWNPROPS:", ownProps)
+
   const p = ownProps
-  const thisExchange = getIn(state.exchangeData.exchangeData, [p.defaultExchange])
-  const inputSymbol = p.searchText
-  // const updateStock = state.exchangeData[p.defaultExchange] ? state.exchangeData[p.defaultExchange][inputSymbol] : {}
-  const updateStock = thisExchange !== undefined ? getIn(thisExchange, [inputSymbol]) : undefined
-  // console.log("update Stock", updateStock)
+  const thisExchange = state.exchangeData.exchangeData
+  const inputSymbol = p.searchText.slice(0, p.searchText.indexOf(":"))
+  const updateStock = thisExchange !== undefined ? thisExchange[inputSymbol] : {}
   return {
     rUpdateStock: updateStock,
   }
 }
 
-export default connect(mapStateToProps)(StockSearchPane);
+export default connect(mapStateToProps, {tUpdateExchangeData})(StockSearchPane);
+// export default StockSearchPane;
+
 
 export function searchPaneProps(that) {
   const propList = {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { rGetSymbolList } from './../slices/sliceExchangeData.js'
+import { tGetSymbolList } from './../slices/sliceExchangeData.js'
 import { rUpdateExchangeList } from './../slices/sliceExchangeList.js'
 
 export default function ExchangeMenu(p) {
@@ -95,7 +95,7 @@ function changeExchange(ex){
                 'apiKey': p.apiKey,
                 'throttle': p.throttle,
             }
-            dispatch(rGetSymbolList(newPayload))
+            dispatch(tGetSymbolList(newPayload))
         }
     }
     
