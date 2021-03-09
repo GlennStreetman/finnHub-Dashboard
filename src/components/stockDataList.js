@@ -1,6 +1,5 @@
 import React from "react";
 import { connect } from "react-redux";
-// const {getIn } = require('immutable');
 //list of stock data used for auto complete on stock search.
 class StockDataList extends React.Component {
   constructor(props) {
@@ -30,7 +29,8 @@ class StockDataList extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   const p = ownProps
-  const thisExchange = state.exchangeData.exchangeData
+  // console.log('exd------------', state.exchangeData.exchangeData?.data)
+  const thisExchange = state.exchangeData.exchangeData?.data
   // console.log('!!!thisExchange', thisExchange)
   const newFilteredList = []
   if (thisExchange !== undefined) {
@@ -52,6 +52,7 @@ const mapStateToProps = (state, ownProps) => {
       rFilteredStocks: newFilteredList,
     }
   } else {
+    // console.log("------------no exchange data loaded------")
     return {
       rFilteredStocks: undefined,
     }

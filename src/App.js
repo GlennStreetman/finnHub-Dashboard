@@ -27,7 +27,7 @@ import { WidgetController, MenuWidgetToggle } from "./components/widgetControlle
 
 //redux imports
 import { connect } from "react-redux";
-import { tGetSymbolList } from "./slices/sliceExchangeData.js";
+import { tGetSymbolList, tUpdateExchangeData } from "./slices/sliceExchangeData.js";
 import { rUpdateExchangeList } from "./slices/sliceExchangeList.js";
 import { rbuildFinndashDataset, rResetUpdateFlag } from "./slices/sliceFinData.js";
 import { tUpdateDashboardData } from "./thunks/thunkFetchFinnhub.js";
@@ -310,9 +310,13 @@ class App extends React.Component {
   }
 
   updateDefaultExchange(ex) {
+    //needs to check local storage and send stock data as part of payload.
     if (ex.target) {
+      //runs on dropdown update.
       this.setState({ defaultExchange: ex.target.value });
+      this.props.tUpdateExchangeData(ex.target.value)
     } else {
+      //runs on login
       this.setState({ defaultExchange: ex });
     }
   }
@@ -421,5 +425,6 @@ export default connect(mapStateToProps, {
   rbuildFinndashDataset,
   tUpdateDashboardData,
   rResetUpdateFlag,
+  tUpdateExchangeData,
 
  })(App);

@@ -1,12 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 import {widgetDict} from './../registers/endPointsReg.js'
 import {tUpdateDashboardData} from './../thunks/thunkFetchFinnhub.js'
-// const _ = require('lodash')
-const { Map } = require('immutable')
 
 // DS = {
 //     widgetID-Stock: {
-//         data: 
+//         xxxxdata: <---Move data to mongoDB
 //         updated: 3 hours stale
 //         apiString: MUST BE EQUAL
 //     }
@@ -15,7 +13,7 @@ const { Map } = require('immutable')
 const finnHubData = createSlice({
     name: 'finnHubData',
     initialState: {
-        dataSet: Map(),
+        dataSet: {},
         created: false    
     }, 
     reducers: { //reducers can reference eachother with slice.caseReducers.reducer(state)
@@ -35,7 +33,7 @@ const finnHubData = createSlice({
                     if (w !== null && w !== 'null') { 
                         const endPoint = widgetList[w].widgetType
                         const filters = widgetList[w].filters
-                        const endPointFunction = widgetDict[endPoint] //generates finnhub API strings
+                        const endPointFunction = widgetDict[endPoint] //returns function that generates finnhub API strings
                         const trackedStocks = widgetList[w].trackedStocks
                         const endPointData = endPointFunction(trackedStocks, filters, ap.apiKey)
                         delete endPointData.undefined
@@ -50,29 +48,42 @@ const finnHubData = createSlice({
                     }
                 }
             }
-        // map endpoints to result list
-        const newState =  state.dataSet.withMutations((map)=>{
-            //remove old datasets, create nodes for new datasets.
-            map.keySeq().forEach((k) => {
+        
+            for (const x in state.dataSet) {
                 //if resList item exists in old list, delete from reslist, else delete from oldState
-                resList.indexOf(k) > -1 ? 
-                    resList.splice(resList.indexOf(k), 1) :
-                    map.delete(k)
-            })
-            
-            for (const x of resList) { //Map remainnig resList items into state.
-                map.set(x, null)
+                resList.indexOf(x) > -1 ? 
+                    resList.splice(resList.indexOf(x), 1) :
+                    delete state.dataSet[x]
             }
-            
+            for (const x of resList) { //Map remainnig resList items into state.
+                state.dataSet[x] = null
+            }
+
             for (const widget in endPointAPIList) {
                 const thisWidget = endPointAPIList[widget]
                 for (const security in thisWidget) {
-                    map.set(`${widget}-${security}`, {apiString: thisWidget[security]})
+                    state.dataSet[`${widget}-${security}`] = {apiString: thisWidget[security]}
                 }
             }
-        })
-        state.dataSet = newState
-        state.created = flag
+            state.created = flag
+        // map endpoints to result list
+        // const newState =  state.dataSet.withMutations((map)=>{
+        //     //remove old datasets, create nodes for new datasets.
+        //     map.keySeq().forEach((k) => {
+        //         //if resList item exists in old list, delete from reslist, else delete from oldState
+        //         resList.indexOf(k) > -1 ? 
+        //             resList.splice(resList.indexOf(k), 1) :
+        //             map.delete(k)
+        //     })
+            
+            // for (const x of resList) { //Map remainnig resList items into state.
+            //     map.set(x, null)
+            // }
+            
+
+        // })
+        // state.dataSet = newState
+
                         
         },
         rResetUpdateFlag: (state, action) => {
@@ -82,7 +93,7 @@ const finnHubData = createSlice({
     },
         extraReducers: {
             [tUpdateDashboardData.pending]: (state, action) => {
-                // console.log('1. Getting stock data!')
+                console.log('1. Getting stock data!')
                 // return {...state}
             },
             [tUpdateDashboardData.rejected]: (state, action) => {
@@ -90,21 +101,16 @@ const finnHubData = createSlice({
                 // return {...state}
             },
             [tUpdateDashboardData.fulfilled]: (state, action) => {
-                // console.log("3 UPDATA DATA STORE:", action.payload)
+                console.log("3 UPDATA DATA STORE:", action.payload)
                 const ap = action.payload
-                const newState = state.dataSet.withMutations((map)=>{
-                    // console.log("HERE!", state.dataSet)
                     for (const x in ap) {
                         const updateObj = {
                             apiString: ap[x].apiString,
                             updated: ap[x].updated,
                             data: ap[x].data,
                         }
-                        map.set(x, updateObj) 
+                        state.dataSet[x] =  updateObj
                     }
-                    
-                })
-                state.dataSet = newState
             },
         }
     

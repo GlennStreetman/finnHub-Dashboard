@@ -2,7 +2,6 @@ import React from "react";
 import StockDataList from "./stockDataList.js";
 import { connect } from "react-redux";
 import ToolTip from './toolTip.js'
-// import { getIn, } from "immutable";
 import { tUpdateExchangeData } from "./../slices/sliceExchangeData.js";
 
 //compnoent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
@@ -18,7 +17,7 @@ class StockSearchPane extends React.Component {
   }
 
   componentDidMount(){
-    // console.log("1!", this.props.defaultExchange)
+    console.log("1!", this.props.defaultExchange)
     this.props.tUpdateExchangeData(this.props.defaultExchange)
   }
 
@@ -95,7 +94,8 @@ class StockSearchPane extends React.Component {
 const mapStateToProps = (state, ownProps) => {
 
   const p = ownProps
-  const thisExchange = state.exchangeData.exchangeData
+  // console.log('EXD', state.exchangeData.exchangeData?.data)
+  const thisExchange = state.exchangeData.exchangeData?.data
   const inputSymbol = p.searchText.slice(0, p.searchText.indexOf(":"))
   const updateStock = thisExchange !== undefined ? thisExchange[inputSymbol] : {}
   return {

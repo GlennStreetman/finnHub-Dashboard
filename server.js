@@ -6,7 +6,6 @@ const port = process.env.NODE_ENV || 5000;
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
 const bodyParser = require("body-parser");
-app.use(bodyParser.json()); // support json encoded bodies
 const path = require("path");
 const morgan = require('morgan') //request logger middleware.
 app.use(cookieParser());
@@ -14,6 +13,7 @@ const FileStore = require("session-file-store")(session);
 const fileStoreOptions = {};
 
 app.use(morgan('dev'))
+app.use(bodyParser.json()); // support json encoded bodies
 
 //LOAD CONFIG.
 console.log("env=", process.env.live)
@@ -37,7 +37,7 @@ if (process.env.live === '1') {
       .then(() => console.log("connected to developement postgres server"))
       .catch(err => console.log(err))
 
-} else {
+} else { //development setup
     app.use(
       session({
         store: new FileStore(fileStoreOptions),
@@ -50,7 +50,9 @@ if (process.env.live === '1') {
     const path = require("path");
     app.listen(port, function () {console.log(`serving the direcotry @ http`)})
     app.use(express.static(path.join(__dirname, 'build')));
-    const db = require("./db/databaseLocalPG.js") 
+    const db = require("./db/databaseLocalPG.js")
+    const mongo = require('./db/mongoLocal.js') 
+
 
     db.connect()
       .then(() => console.log("connected to developement postgres server"))
@@ -77,6 +79,8 @@ const logUIError =  require('./routes/logUiError')
 const accountData = require('./routes/loggedIn/accountData')
 const dashboard = require('./routes/loggedIn/dashboard')
 const deleeteSavedDashboard = require('./routes/loggedIn/deleteSavedDashboard')
+//mongoDB
+const postFinnHubData = require('./routes/mongoDB/postFinnHubData')
 
 app.use('/', login)
 app.use('/', checkLogin)
@@ -97,6 +101,8 @@ app.use('/', logUIError)
 app.use('/', accountData)
 app.use('/', dashboard)
 app.use('/', deleeteSavedDashboard)
+//mongoDB
+app.use('/', postFinnHubData)
 app.use((req,res,next) => {
   //ALL OTHER ROUTES
   const error = new Error('PATH Not Found');

@@ -9,7 +9,7 @@ export const tGetSymbolList = createAsyncThunk(
         
         const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${reqObj.exchange}&token=${reqObj.apiKey}`
         // console.log(apiString)
-        return finnHub(reqObj['throttle'], apiString)
+        return finnHub(reqObj['throttle'], apiString) //replace with usestate.
         .then((data) => {
             if (data.error === 429) { //run again
                 tGetSymbolList(reqObj)
@@ -37,15 +37,19 @@ export const tGetSymbolList = createAsyncThunk(
 export const tUpdateExchangeData = createAsyncThunk(
         'getSymbolList',
         async (reqObj, thunkAPI) => {
+            //receives default exchange symbol, retrieves data from local, loads into redux state.
             const ap = reqObj
-            console.log('ap', ap)
-            const db = await exchangeDataDB()
-            console.log('db', db)
-            // const store = db.transaction('exchangeDB').objectStore('exchangeDB')
-            // console.log('store', store)
-            const value = await db.get('exchangeDB',ap)
+            // console.log('1ap', ap)
+            const db = await exchangeDataDB() //open connection
+            // console.log('2db', db)
+            const value = await db.get('exchangeDB',ap) //get data
             console.log('FINISHED', ap, value)
-            return (value)
+            const returnObj = {
+                ex: ap,
+                data: value
+            }
+            console.log("-----------returning---------", returnObj)
+            return (returnObj)
         })
 
 const exchangeData = createSlice({
@@ -54,11 +58,11 @@ const exchangeData = createSlice({
         exchangeDB: exchangeDataDB
     },
     reducers: { 
-            // rUpdateExchangeData: (state, action) => {
-            //     // const ap = action.payload
-            //     // const s = state
-            //     state.exchangeData = {}  
-            // },
+            rUpdateExchangeData: (state, action) => {
+                const ap = action.payload
+                console.log("UPDATING EXCHANGE LIST", ap)
+                state.exchangeData = ap  
+            },
     },      
     
     extraReducers: {
@@ -71,26 +75,28 @@ const exchangeData = createSlice({
         return state
     },
     [tGetSymbolList.fulfilled]: async(state, action) => {
+        try {
+            let data = action.payload
+            const updateObj = {
+                ex: data.exchange,
+                data: data.data,
+                updated: Date.now(),
+            }
+            // console.log('updateObj', updateObj, data)
+            if (updateObj.ex !== undefined) {
+                const db = await exchangeDataDB()
 
-        let data = action.payload
-        const updateObj = {
-            ex: data.exchange,
-            data: data.data,
-            updated: Date.now(),
-        }
-        console.log(updateObj)
-
-        const db = await exchangeDataDB()
-        // const store = db.transaction('exchangeDB').objectStore('exchangeDB')
-        const value = (db.add('exchangeDB',updateObj)) || 0
-        console.log('Added to store:', value)
-        console.log(db)
+                const value = (db.put('exchangeDB',updateObj)) || 0
+                console.log('Added to store:', value, updateObj)
+                // console.log(db)
+            }
+        } catch {console.log('failed to retrieve exchange data')}
         return state
         
     },
 
     [tUpdateExchangeData.pending]: (state) => {
-        console.log('1 getting exchange data')
+        // console.log('1 getting exchange data')
         return {...state}
     },
     [tUpdateExchangeData.rejected]: (state, action) => {
@@ -101,8 +107,8 @@ const exchangeData = createSlice({
         console.log('!3 FINISHED tUpdateExchangeData', action)
         // const apx = action.payload['ex']
         const apd = action.payload['data']
-        let returnObj = apd
-        state.exchangeData = returnObj
+        console.log('-----------apd--------------', apd)
+        if (apd !== undefined) {state.exchangeData = apd} else {return {...state}}
     }
     }
 })
