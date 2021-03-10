@@ -29,8 +29,10 @@ import { WidgetController, MenuWidgetToggle } from "./components/widgetControlle
 import { connect } from "react-redux";
 import { tGetSymbolList, tUpdateExchangeData } from "./slices/sliceExchangeData.js";
 import { rUpdateExchangeList } from "./slices/sliceExchangeList.js";
-import { rbuildFinndashDataset, rResetUpdateFlag } from "./slices/sliceFinData.js";
+import { rBuildDataModel, rResetUpdateFlag } from "./slices/sliceDataModel.js";
 import { tUpdateDashboardData } from "./thunks/thunkFetchFinnhub.js";
+import { tFinnHubDataMongo } from "./thunks/thunkCheckMongoDB.js";
+
 
 
 class App extends React.Component {
@@ -113,13 +115,14 @@ class App extends React.Component {
     const p = this.props;
     
     if (s.login === 1 && prevState.login === 0) {
-      console.log("loggin detected");
+      console.log("Loggin detected, setting up dashboards.");
       this.getSavedDashBoards()
       .then(data => {
-        // console.log("UPDATE DASH DATA", data)
+        console.log("UPDATE DASH DATA", data)
+        //data = {apikey: str, currentDashBoard: str, dashBoardData: {}, menuList: {}}
         this.setState(data)
         data.apiKey = s.apiKey
-        p.rbuildFinndashDataset(data)
+        p.rBuildDataModel(data)
       })
       .catch((error) => {
           console.error("Failed to recover dashboards", error);
@@ -127,15 +130,17 @@ class App extends React.Component {
           });
       ;
     }
-    //on load build dataset.
-    if (prevProps.rfinnHubData.created === false && p.rfinnHubData.created === true) {
-      // console.log('GET FINNHUB DATA')
-      const dataset = p.rfinnHubData.dataSet
-      // console.log('!1dataset', dataset)
-      this.props.tUpdateDashboardData(dataset)
+    //on load build dataset. //REVISE UPDATE FLAGS
+    if (prevProps.dataModel.created === false && p.dataModel.created === true) {
+      console.log("RUNNING DATA BUILD")
+      let setupData = async function(dataset, that){
+        await that.props.tFinnHubDataMongo('run')
+        await that.props.tUpdateDashboardData(dataset)
+      }
+      setupData(p.rBuildDataModel.dataSet, this)
     }
     
-    // if (this.props.rfinnHubData.created === 'updated') {
+    // if (this.props.rBuildDataModel.created === 'updated') {
     //   console.log('----------UPDATE FINNHUB DATA-----------')
     //   this.props.rResetUpdateFlag()
     //     console.log("REBUILDING")
@@ -144,7 +149,7 @@ class App extends React.Component {
     //       currentDashboard: s.currentDashBoard,
     //       dashBoardData: s.dashBoardData
     //     }
-    //     p.rbuildFinndashDataset(data)
+    //     p.rBuildDataModel(data)
     // }
 
     if (
@@ -190,7 +195,7 @@ class App extends React.Component {
           currentDashboard: s.currentDashBoard,
           dashBoardData: s.dashBoardData
         }
-        p.rbuildFinndashDataset(data)
+        p.rBuildDataModel(data)
       })
     }
   }
@@ -417,13 +422,14 @@ class App extends React.Component {
 
 const mapStateToProps = (state) => ({
   rExchangeList: state.exchangeList.exchangeList,
-  rfinnHubData: state.finnHubData 
+  dataModel: state.dataModel 
 });
 export default connect(mapStateToProps, { 
   tGetSymbolList, 
   rUpdateExchangeList, 
-  rbuildFinndashDataset,
+  rBuildDataModel,
   tUpdateDashboardData,
+  tFinnHubDataMongo,
   rResetUpdateFlag,
   tUpdateExchangeData,
 

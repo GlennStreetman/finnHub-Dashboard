@@ -1,8 +1,8 @@
 import React , {useState, useEffect, useImperativeHandle, forwardRef} from "react";
-import { useSelector } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
+import { rBuildVisableData } from './../../../slices/sliceShowData.js'
 import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPaneFunc.js";
 import CreateCandleStickChart from "./createCandleStickChart.js";
-import { getIn, } from "immutable";
 
 function PriceCandles(p, ref) {
     
@@ -11,10 +11,13 @@ function PriceCandles(p, ref) {
     const [options, setOptions] = useState({})
     const [selectResolution, setSelectResolution] = useState([1, 5, 15, 30, 60, "D", "W", "M"])
     
+    const dispatch = useDispatch()
+
     const rCandleData = useSelector((state) => { 
         // console.log("CandleState", state, p.widgetType, p.widgetKey)
-        if (state.finnHubData !== undefined && state.finnHubData.created === true) {
-            const CandleData = getIn(state.finnHubData.dataSet, [`${p.widgetKey}-${candleSelection}`, 'data'])
+        if (state.dataModel !== undefined && state.dataModel.created === true) {
+            const CandleData = state.showData.dataSet[p.widgetKey]
+            // console.log('CandleData', CandleData)
             return (CandleData)
         }
     })
@@ -60,7 +63,7 @@ function PriceCandles(p, ref) {
     }, [p.trackedStocks, candleSelection])
 
     useEffect(()=> {
-        if (rCandleData !== undefined){
+        if (rCandleData !== undefined && Object.keys(rCandleData).length > 0){
             // const data = rCandleData[candleSelection]?.data
             // if (data !== undefined) {
             const data = rCandleData
@@ -115,6 +118,15 @@ function PriceCandles(p, ref) {
             // }
         }
     }, [candleSelection, p.showEditPane, rCandleData, p.filters.endDate, p.filters.startDate])
+
+    useEffect(()=>{
+        const payload = {
+            key: p.widgetKey,
+            data: {[`${p.widgetKey}-${candleSelection}`]: {}} 
+        }
+        dispatch(rBuildVisableData(payload))
+
+    }, [candleSelection, p.widgetKey, dispatch])
 
     function updateWidgetList(stock) {
         if (stock.indexOf(":") > 0) {

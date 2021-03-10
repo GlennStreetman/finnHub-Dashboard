@@ -43,12 +43,12 @@ export const tUpdateExchangeData = createAsyncThunk(
             const db = await exchangeDataDB() //open connection
             // console.log('2db', db)
             const value = await db.get('exchangeDB',ap) //get data
-            console.log('FINISHED', ap, value)
+            // console.log('FINISHED', ap, value)
             const returnObj = {
                 ex: ap,
                 data: value
             }
-            console.log("-----------returning---------", returnObj)
+            // console.log("-----------returning---------", returnObj)
             return (returnObj)
         })
 
@@ -60,14 +60,14 @@ const exchangeData = createSlice({
     reducers: { 
             rUpdateExchangeData: (state, action) => {
                 const ap = action.payload
-                console.log("UPDATING EXCHANGE LIST", ap)
+                // console.log("UPDATING EXCHANGE LIST", ap)
                 state.exchangeData = ap  
             },
     },      
     
     extraReducers: {
     [tGetSymbolList.pending]: (state) => {
-        console.log('1 getting stock data')
+        // console.log('1 getting stock data')
         return state
     },
     [tGetSymbolList.rejected]: (state, action) => {
@@ -87,7 +87,7 @@ const exchangeData = createSlice({
                 const db = await exchangeDataDB()
 
                 const value = (db.put('exchangeDB',updateObj)) || 0
-                console.log('Added to store:', value, updateObj)
+                // console.log('Added to store:', value, updateObj)
                 // console.log(db)
             }
         } catch {console.log('failed to retrieve exchange data')}
@@ -104,10 +104,10 @@ const exchangeData = createSlice({
         return {...state}
     },
     [tUpdateExchangeData.fulfilled]: (state, action) => {
-        console.log('!3 FINISHED tUpdateExchangeData', action)
+        // console.log('!3 FINISHED tUpdateExchangeData', action)
         // const apx = action.payload['ex']
         const apd = action.payload['data']
-        console.log('-----------apd--------------', apd)
+        // console.log('-----------apd--------------', apd)
         if (apd !== undefined) {state.exchangeData = apd} else {return {...state}}
     }
     }

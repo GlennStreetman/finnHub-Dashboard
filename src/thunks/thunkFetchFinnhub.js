@@ -1,19 +1,22 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import  {finnHub} from "./../appFunctions/throttleQueueAPI.js";
 
+//receives full user dataset from redux
+//If fresh data not loaded from mongo, send to finnHub.
+//sends finnhub data to mongoDB AND updates sliceShowData & slicefinnHubData
 export const tUpdateDashboardData = createAsyncThunk( //{endPoint, [securityList]}
     'rEnqueue',
     (req, thunkAPI) => { //l{ist of securities} 
         const finnQueue = thunkAPI.getState().finnHubQueue.throttle //finnHubData
-        // console.log('finnQueue', finnQueue)
+        console.log('-----------Retrieving missing data from finnhub.---------')
         let requestList = []  //for each request check if data is avaiable.
         const thisRequest = req
-        console.log('thisRequest', thisRequest)
+        // console.log('thisRequest', thisRequest)
         for (const n in thisRequest) { //for each widget
-            console.log("N", n)
+            // console.log("N", n)
             const endPoint = thisRequest[n].apiString
             const reqKey = n
-            console.log('!!1', reqKey, endPoint)
+            // console.log('!!1', reqKey, endPoint)
             if (
                 (endPoint.updated === undefined) ||
                 (Date.now() - endPoint.updated >= 1*1000*60*60*3) //more than 3 hours old.
@@ -39,9 +42,11 @@ export const tUpdateDashboardData = createAsyncThunk( //{endPoint, [securityList
                 body: JSON.stringify(resObj),
                 };
             // console.log("Sending mongoDB updates", options)
-            fetch("/mongoUpdate", options)
+            fetch("/finnDashData", options)
             .then((response) => {return response.json()})
-            .then(data => {console.log(data)})
+            .then(data => {
+                console.log('finndash data saved to mongoDB.')
+            })
             // console.log("res2", res)
             return (resObj)
         })

@@ -1,23 +1,16 @@
 import { createSlice } from '@reduxjs/toolkit';
-import {widgetDict} from './../registers/endPointsReg.js'
-import {tUpdateDashboardData} from './../thunks/thunkFetchFinnhub.js'
+import {widgetDict} from '../registers/endPointsReg.js'
+import {tUpdateDashboardData} from '../thunks/thunkFetchFinnhub.js'
+import {tFinnHubDataMongo} from '../thunks/thunkCheckMongoDB.js'
 
-// DS = {
-//     widgetID-Stock: {
-//         xxxxdata: <---Move data to mongoDB
-//         updated: 3 hours stale
-//         apiString: MUST BE EQUAL
-//     }
-// }
-
-const finnHubData = createSlice({
+const dataModel = createSlice({
     name: 'finnHubData',
     initialState: {
         dataSet: {},
         created: false    
     }, 
     reducers: { //reducers can reference eachother with slice.caseReducers.reducer(state)
-        rbuildFinndashDataset: (state, action) => { //{apiKey, currentDashboard, dashboardData, menuList}
+        rBuildDataModel: (state, action) => { //{apiKey, currentDashboard, dashboardData, menuList}
             //receivies dashboard object and builds dataset from scratch.
             console.log("REBUILDING DATASET")
             const flag = state.created === false ?  true : 'updated'
@@ -65,59 +58,59 @@ const finnHubData = createSlice({
                     state.dataSet[`${widget}-${security}`] = {apiString: thisWidget[security]}
                 }
             }
-            state.created = flag
-        // map endpoints to result list
-        // const newState =  state.dataSet.withMutations((map)=>{
-        //     //remove old datasets, create nodes for new datasets.
-        //     map.keySeq().forEach((k) => {
-        //         //if resList item exists in old list, delete from reslist, else delete from oldState
-        //         resList.indexOf(k) > -1 ? 
-        //             resList.splice(resList.indexOf(k), 1) :
-        //             map.delete(k)
-        //     })
-            
-            // for (const x of resList) { //Map remainnig resList items into state.
-            //     map.set(x, null)
-            // }
-            
-
-        // })
-        // state.dataSet = newState
-
-                        
+            state.created = flag                       
         },
         rResetUpdateFlag: (state, action) => {
             state.created = true
             
         },
     },
-        extraReducers: {
-            [tUpdateDashboardData.pending]: (state, action) => {
-                console.log('1. Getting stock data!')
-                // return {...state}
-            },
-            [tUpdateDashboardData.rejected]: (state, action) => {
-                console.log('2. failed to retrieve stock data for: ', action)
-                // return {...state}
-            },
-            [tUpdateDashboardData.fulfilled]: (state, action) => {
-                console.log("3 UPDATA DATA STORE:", action.payload)
-                const ap = action.payload
-                    for (const x in ap) {
-                        const updateObj = {
-                            apiString: ap[x].apiString,
-                            updated: ap[x].updated,
-                            data: ap[x].data,
-                        }
-                        state.dataSet[x] =  updateObj
+    extraReducers: {
+        [tUpdateDashboardData.pending]: (state, action) => {
+            // console.log('1. Getting stock data!')
+            // return {...state}
+        },
+        [tUpdateDashboardData.rejected]: (state, action) => {
+            console.log('2. failed to retrieve stock data for: ', action)
+            // return {...state}
+        },
+        [tUpdateDashboardData.fulfilled]: (state, action) => {
+            // console.log("3 UPDATA DATA STORE:", action.payload)
+            const ap = action.payload
+                for (const x in ap) {
+                    const updateObj = {
+                        apiString: ap[x].apiString,
+                        updated: ap[x].updated,
+                        data: ap[x].data,
                     }
-            },
-        }
+                    state.dataSet[x] =  updateObj
+                }
+        },
+        [tFinnHubDataMongo.pending]: (state, action) => {
+            // console.log('1. Getting stock data!')
+            // return {...state}
+        },
+        [tFinnHubDataMongo.rejected]: (state, action) => {
+            console.log('2. failed showData from Mongo: ', action)
+            // return {...state}
+        },
+        [tFinnHubDataMongo.fulfilled]: (state, action) => {
+            console.log("Merge update fields into dataSet from mongoDB")
+            const ap = action.payload
+            for (const x in ap) {
+                const apiString = ap[x].key
+                const updated = ap[x].updated
+                if (state.dataSet[apiString] !== undefined) {
+                    state.dataSet[apiString].updated = updated
+                }
+            }
+        },
+    }
     
 })
 
 export const {
-    rbuildFinndashDataset,
+    rBuildDataModel,
     rResetUpdateFlag,
-} = finnHubData.actions
-export default finnHubData.reducer
+} = dataModel.actions
+export default dataModel.reducer
