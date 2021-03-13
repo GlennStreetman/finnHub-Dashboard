@@ -4,7 +4,7 @@ const client = process.env.live === '1' ?
     require("../../db/mongoLocal.js") :  
     require("../../db/mongoLocal.js") ;
 
-//deletes old records then returns dataSet to user
+//receives list of data to find [...data]
 router.get('/finnDashData', async (req, res) => {
     if (req.session.login === true) {
         try {
@@ -24,7 +24,7 @@ router.get('/finnDashData', async (req, res) => {
             await findDataSet.forEach((data)=>{
                 resList.push(data)
             })
-            client.close()
+            // client.close()
             // console.log('3Got data', resList)
             res.status(200).json({resList})
 
@@ -32,7 +32,7 @@ router.get('/finnDashData', async (req, res) => {
         catch(err){
             console.log(err)
             res.status(500).json({message: `Problem finding user dataset.`});
-        }     
+        }       
     }
 })
 
@@ -69,7 +69,7 @@ router.post("/finnDashData", async (req, res) => {
                 await dataSet.updateOne(filters, update, options) 
                 .catch((err)=>{console.log('Problem updating dataset', err)})           
             }
-            client.close()
+            // client.close()
             res.status(200).json({message: `Updates Complete`});
         }
         catch(err){

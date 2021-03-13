@@ -17,7 +17,7 @@ class StockSearchPane extends React.Component {
   }
 
   componentDidMount(){
-    console.log("1!", this.props.defaultExchange)
+    // console.log("1!", this.props.defaultExchange)
     this.props.tUpdateExchangeData(this.props.defaultExchange)
   }
 
@@ -111,10 +111,8 @@ export function searchPaneProps(that) {
   const propList = {
     updateGlobalStockList: that.props.updateGlobalStockList,
     showSearchPane: () => that.props.showPane("showEditPane", 1),
-    apiKey: that.props.apiKey,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: that.props.widgetKey,
-    throttle: that.props.throttle,
     exchangeList: that.props.exchangeList,
     defaultExchange: that.props.defaultExchange,
     updateDefaultExchange: that.props.updateDefaultExchange,

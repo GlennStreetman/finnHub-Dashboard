@@ -218,7 +218,7 @@ class WidgetContainer extends React.Component {
               <i className="fa fa-times" aria-hidden="true"></i>
             </button>
           ) : (
-            <>-</>
+            <></>
           )}
         </div>
       </div>

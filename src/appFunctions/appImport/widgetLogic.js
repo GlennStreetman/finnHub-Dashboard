@@ -1,3 +1,5 @@
+import { rBuildDataModel } from "../../slices/sliceDataModel.js";
+
 export const NewMenuContainer = function newMenuContainer(widgetDescription, widgetHeader, widgetConfig) {
     const widgetName = widgetDescription;
     // this.updateZIndex(widgetName)
@@ -16,22 +18,37 @@ export const NewMenuContainer = function newMenuContainer(widgetDescription, wid
 }
 
 export const NewWidgetContainer = function newWidgetContainer(widgetDescription, widgetHeader, widgetConfig) {
-const widgetName = new Date().getTime();
-// this.updateZIndex(widgetName)
-let newWidgetList = Object.assign({}, this.state.widgetList);
-newWidgetList[widgetName] = {
-    column: 0,
-    columnOrder: -1,
-    widgetID: widgetName,
-    widgetType: widgetDescription,
-    widgetHeader: widgetHeader,
-    xAxis: "5rem",
-    yAxis: "5rem",
-    trackedStocks: this.state.globalStockList,
-    widgetConfig: widgetConfig,
-    filters: {}
-};
-this.setState({ widgetList: newWidgetList }); 
+    const widgetName = new Date().getTime();
+    const s = this.state
+    const saveCurrent = ()=>{this.saveCurrentDashboard(s.currentDashBoard)}
+    let newWidgetList = Object.assign({}, this.state.widgetList);
+    newWidgetList[widgetName] = {
+        column: 0,
+        columnOrder: -1,
+        widgetID: widgetName,
+        widgetType: widgetDescription,
+        widgetHeader: widgetHeader,
+        xAxis: "5rem",
+        yAxis: "5rem",
+        trackedStocks: s.globalStockList,
+        widgetConfig: widgetConfig,
+        filters: {}
+    };
+    const newDashboardData = s.dashBoardData
+    newDashboardData[s.currentDashBoard].widgetlist = newWidgetList 
+    this.setState({ 
+        widgetList: newWidgetList,
+        dashBoardData: newDashboardData,
+        // rebuildDataSet: 1,
+    }, ()=>{
+        console.log("-----HERE-------")
+        saveCurrent()
+        this.props.rBuildDataModel({
+            apiKey: this.state.apiKey,
+            dashBoardData: this.state.dashBoardData
+        })
+    }); 
+
 }
 
 export const ChangeWidgetName = function changeWidgetName(stateRef, widgetID, newName) {
@@ -53,7 +70,6 @@ export const RemoveWidget = function removeWidget(stateRef, widgetID) {
     delete newWidgetList[widgetID];
     this.setState({ 
         stateRef: newWidgetList, 
-        rebuildDataSet: 1,
     });
 }
 
@@ -65,13 +81,14 @@ export const UpdateWidgetFilters = function updateWidgetFilters(widgetID, dataKe
     updatedWidgetList[widgetID].filters[dataKey] = data
     this.setState({
         widgetList: updatedWidgetList,
-        rebuildDataSet: 1,
     })
 }
 
 export const UpdateWidgetStockList = function updateWidgetStockList(widgetId, symbol, stockObj={}) {
     //adds if not present, else removes stock from widget specific stock list.
     // console.log(widgetId, symbol, stockObj, 'updating stock list')
+    const s = this.state
+    const saveCurrent = ()=>{this.saveCurrentDashboard(this.state.currentDashBoard)}
     if (isNaN(widgetId) === false) {
       let updateWidgetStockList = Object.assign({}, this.state.widgetList); //copy widget list
       const trackingSymbolList = Object.assign({}, updateWidgetStockList[widgetId]["trackedStocks"]); //copy target widgets stock object
@@ -95,10 +112,18 @@ export const UpdateWidgetStockList = function updateWidgetStockList(widgetId, sy
         updateWidgetStockList[widgetId]["trackedStocks"] = trackingSymbolList
     }
 
-      // updateWidgetStockList[widgetId]["trackedStocks"] = trackingSymbolList;
+        const newDashboardData = s.dashBoardData
+        newDashboardData[s.currentDashBoard].widgetlist = updateWidgetStockList 
         this.setState({ 
             widgetList: updateWidgetStockList,
-            rebuildDataSet: 1,
+            dashBoardData: newDashboardData,
+            // rebuildDataSet: 1,
+        }, ()=>{
+            saveCurrent()
+            this.props.rBuildDataModel({
+                apiKey: this.state.apiKey,
+                dashBoardData: this.state.dashBoardData
+            })
         });
     }
 }

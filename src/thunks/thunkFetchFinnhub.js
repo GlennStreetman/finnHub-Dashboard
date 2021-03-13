@@ -1,29 +1,28 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import  {finnHub} from "./../appFunctions/throttleQueueAPI.js";
 
-//receives full user dataset from redux
-//If fresh data not loaded from mongo, send to finnHub.
+//receives list of keys to be retrieved from finnHub as an parameter.
+//If data is not fresh dispatch api request.
 //sends finnhub data to mongoDB AND updates sliceShowData & slicefinnHubData
-export const tUpdateDashboardData = createAsyncThunk( //{endPoint, [securityList]}
-    'rEnqueue',
+export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
+    'GetFinnhubData',
     (req, thunkAPI) => { //l{ist of securities} 
-        const finnQueue = thunkAPI.getState().finnHubQueue.throttle //finnHubData
-        console.log('-----------Retrieving missing data from finnhub.---------')
-        let requestList = []  //for each request check if data is avaiable.
-        const thisRequest = req
-        // console.log('thisRequest', thisRequest)
-        for (const n in thisRequest) { //for each widget
-            // console.log("N", n)
-            const endPoint = thisRequest[n].apiString
-            const reqKey = n
-            // console.log('!!1', reqKey, endPoint)
+        // console.log('--------thisRequest------------', req)
+        const finnQueue = thunkAPI.getState().finnHubQueue.throttle
+        const dataSet = thunkAPI.getState().dataModel.dataSet //finnHubData
+        let requestList = []  
+        for (const ep in req) { //for each widget
+            const reqKey = req[ep]
+            const reqObj = dataSet[reqKey]
+            const endPoint = reqObj.apiString
             if (
-                (endPoint.updated === undefined) ||
-                (Date.now() - endPoint.updated >= 1*1000*60*60*3) //more than 3 hours old.
+                (reqObj.updated === undefined) ||
+                (Date.now() - reqObj.updated >= 1*1000*60*60*3) //more than 3 hours old.
             ) {
                 requestList.push(finnHub(finnQueue, endPoint, reqKey))
             }   
         }
+        console.log("finnHub Request List: ", requestList)
         return Promise.all(requestList)
         .then((res) => {
             // console.log("res",res)

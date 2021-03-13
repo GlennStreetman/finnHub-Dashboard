@@ -114,7 +114,7 @@ export const SaveCurrentDashboard = function saveCurrentDashboard(dashboardName)
     fetch("/dashBoard", options)
         .then((data) => console.log('dashboard data retrieved'))
         .then(() => {
-            console.log("updating dashboard", data);
+            // console.log("updating dashboard", data);
             this.getSavedDashBoards();
         });
     // e.preventDefault();

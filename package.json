@@ -8,6 +8,8 @@
     "@testing-library/jest-dom": "^4.2.4",
     "@testing-library/react": "^9.5.0",
     "@testing-library/user-event": "^7.2.1",
+    "@types/jest": "^26.0.20",
+    "@types/node": "^14.14.34",
     "body-parser": "^1.19.0",
     "canvasjs": "^1.8.3",
     "cookie-parser": "^1.4.5",
@@ -32,19 +34,20 @@
     "react-papaparse": "^3.11.1",
     "react-redux": "^7.2.2",
     "react-router-dom": "^5.2.0",
-    "react-scripts": "3.4.3",
+    "react-scripts": "^3.4.3",
     "react-test-renderer": "^17.0.1",
     "react-tooltip": "^4.2.15",
     "redux": "^4.0.5",
     "session-file-store": "^1.4.0",
     "thunk": "0.0.1",
+    "typescript": "^4.2.3",
     "with-immutable-props-to-js": "^2.1.0"
   },
   "scripts": {
     "server": "nodemon --ignore sessions/ server.js",
     "client": "SET PORT=3000 && react-scripts start",
     "start": "node server.js",
-    "build": "react-scripts build",
+    "build": "tsc",
     "eject": "react-scripts eject",
     "test": "jest"
   },
@@ -65,6 +68,9 @@
   },
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.13.8",
+    "@types/react": "^17.0.3",
+    "@types/react-dom": "^17.0.2",
+    "@types/react-redux": "^7.1.16",
     "dotenv": "^8.2.0",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-plugin-import": "^2.22.1",
@@ -72,6 +78,7 @@
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.0.0",
     "redux-devtools": "^3.7.0",
-    "supertest": "^6.1.3"
+    "supertest": "^6.1.3",
+    "ts-node": "^9.1.1"
   }
 }

@@ -92,17 +92,17 @@ export default class widgetName extends Component {
 export function newWidgetNameProps(that, key = "newWidgetNameProps") {
     let propList = {
       apiKey: that.props.apiKey,
+      defaultExchange: that.props.defaultExchange,
+      exchangeList: that.props.exchangeList,
+      filters: that.props.widgetList[key]["filters"],
       showPane: that.showPane,
       trackedStocks: that.props.widgetList[key]["trackedStocks"],
-      filters: that.props.widgetList[key]["filters"],
+      throttle: that.props.throttle,
+      updateDefaultExchange: that.props.updateDefaultExchange,
       updateWidgetFilters: that.props.updateWidgetFilters,
       updateGlobalStockList: that.props.updateGlobalStockList,
       updateWidgetStockList: that.props.updateWidgetStockList,
       widgetKey: key,
-      throttle: that.props.throttle,
-      exchangeList: that.props.exchangeList,
-      defaultExchange: that.props.defaultExchange,
-      updateDefaultExchange: that.props.updateDefaultExchange,
     };
     return propList;
   }

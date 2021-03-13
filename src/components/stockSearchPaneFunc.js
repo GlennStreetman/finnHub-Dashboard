@@ -2,6 +2,7 @@ import React from "react";
 import StockDataList from "./stockDataList.js";
 import { connect } from "react-redux";
 import ToolTip from './toolTip.js'
+import { tUpdateExchangeData } from "./../slices/sliceExchangeData.js";
 //compnoent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
 class StockSearchPane extends React.Component {
   constructor(props) {
@@ -11,6 +12,11 @@ class StockSearchPane extends React.Component {
     };
     this.handleChange = this.handleChange.bind(this);
     this.changeDefault = this.changeDefault.bind(this);
+  }
+
+  componentDidMount(){
+    console.log("get setup")
+    this.props.tUpdateExchangeData(this.props.defaultExchange)
   }
 
   handleChange(e) {
@@ -87,7 +93,7 @@ class StockSearchPane extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   // console.log("OWNPROPS:", ownProps)
   const p = ownProps
-  const thisExchange = state.exchangeData.exchangeData
+  const thisExchange = state.exchangeData.exchangeData?.data
   const inputSymbol = p.searchText.slice(0, p.searchText.indexOf(":"))
   const updateStock = thisExchange !== undefined ? thisExchange[inputSymbol] : {}
   return {
@@ -95,16 +101,14 @@ const mapStateToProps = (state, ownProps) => {
   }
 }
 
-export default connect(mapStateToProps)(StockSearchPane);
+export default connect(mapStateToProps, {tUpdateExchangeData})(StockSearchPane);
 
 export function searchPaneProps(p) {
   const propList = {
     updateGlobalStockList: p.updateGlobalStockList,
     showSearchPane: () => p.showPane("showEditPane", 1),
-    apiKey: p.apiKey,
     updateWidgetStockList: p.updateWidgetStockList,
     widgetKey: p.widgetKey,
-    throttle: p.throttle,
     exchangeList: p.exchangeList,
     defaultExchange: p.defaultExchange,
     updateDefaultExchange: p.updateDefaultExchange,

@@ -86,7 +86,7 @@ const exchangeData = createSlice({
             if (updateObj.ex !== undefined) {
                 const db = await exchangeDataDB()
 
-                const value = (db.put('exchangeDB',updateObj)) || 0
+                db.put('exchangeDB',updateObj)
                 // console.log('Added to store:', value, updateObj)
                 // console.log(db)
             }

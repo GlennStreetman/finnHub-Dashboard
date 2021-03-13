@@ -1,256 +1,209 @@
-import React , {useState, useEffect, useImperativeHandle, forwardRef} from "react";
-import { useSelector, useDispatch } from 'react-redux';
-import { rBuildVisableData } from './../../../slices/sliceShowData.js'
-import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPaneFunc.js";
+import * as React from "react";
+import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
+import { useAppDispatch, useAppSelector } from './../../../hooks.js';
+import { rBuildVisableData } from '../../../slices/sliceShowData.js';
+import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB.js';
+// import { DataNode, DataSet } from './../../../slices/sliceDataModel.js';
+import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc.js";
 import CreateCandleStickChart from "./createCandleStickChart.js";
-
+const useDispatch = useAppDispatch;
+const useSelector = useAppSelector;
 function PriceCandles(p, ref) {
-    
+    const ChartData = [];
     const [candleSelection, setCandleSelection] = useState('');
-    const [chartData, setChartData] = useState([])
-    const [options, setOptions] = useState({})
-    const [selectResolution, setSelectResolution] = useState([1, 5, 15, 30, 60, "D", "W", "M"])
-    
-    const dispatch = useDispatch()
-
-    const rCandleData = useSelector((state) => { 
-        // console.log("CandleState", state, p.widgetType, p.widgetKey)
-        if (state.dataModel !== undefined && state.dataModel.created === true) {
-            const CandleData = state.showData.dataSet[p.widgetKey]
+    const [chartData, setChartData] = useState(ChartData);
+    const [options, setOptions] = useState({});
+    const [selectResolution, setSelectResolution] = useState([1, 5, 15, 30, 60, "D", "W", "M"]);
+    const dispatch = useDispatch();
+    const rCandleData = useSelector((state) => {
+        if (state.dataModel !== undefined &&
+            state.dataModel.created === true &&
+            state.showData.dataSet[p.widgetKey] !== undefined) {
+            const CandleData = state.showData.dataSet[p.widgetKey][candleSelection];
             // console.log('CandleData', CandleData)
-            return (CandleData)
+            return (CandleData);
         }
-    })
-
+    });
     useImperativeHandle(ref, () => (
-        //used to copy widgets when being dragged.
-        {
-            state: {
-                candleSelection: candleSelection,
-                chartData: chartData,
-                options: options,
-                selectResolution: selectResolution,
-            },
-        }
-    ))
-
-    useEffect(()=>{ 
+    //used to copy widgets when being dragged.
+    {
+        state: {
+            candleSelection: candleSelection,
+            chartData: chartData,
+            options: options,
+            selectResolution: selectResolution,
+        },
+    }));
+    useEffect(() => {
         //on mount, use widget copy if available, or run setup.
         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            console.log('use widget copy candles')
-            setCandleSelection(p.widgetCopy.candleSelection)
-            setChartData(p.widgetCopy.chartData)
-            setOptions(p.widgetCopy.options)
-            setSelectResolution(p.widgetCopy.selectResolution)
-        } else {
+            console.log('use widget copy candles');
+            setCandleSelection(p.widgetCopy.candleSelection);
+            setChartData(p.widgetCopy.chartData);
+            setOptions(p.widgetCopy.options);
+            setSelectResolution(p.widgetCopy.selectResolution);
+        }
+        else {
             if (p.filters['startDate'] === undefined) {
-                console.log("Setting up candles")
-                const startDateSetBack = 31536000*1000 //1 week
-                const endDateSetBack = 0
-                p.updateWidgetFilters(p.widgetKey, 'startDate', startDateSetBack)
-                p.updateWidgetFilters(p.widgetKey, 'endDate', endDateSetBack)
-                p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
-                p.updateWidgetFilters(p.widgetKey, 'resolution', 'W')
-            } 
-    }}, [])
-
-    useEffect(()=>{ 
+                console.log("Setting up candles");
+                const startDateSetBack = 31536000 * 1000; //1 week
+                const endDateSetBack = 0;
+                p.updateWidgetFilters(p.widgetKey, 'startDate', startDateSetBack);
+                p.updateWidgetFilters(p.widgetKey, 'endDate', endDateSetBack);
+                p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.');
+                p.updateWidgetFilters(p.widgetKey, 'resolution', 'W');
+            }
+        }
+    }, []);
+    useEffect(() => {
         //if stock not selected default to first stock.
         if (p.trackedStocks.sKeys().length > 0 && candleSelection === '') {
-            const setDefault = p.trackedStocks[p.trackedStocks.sKeys()[0]].key
-            setCandleSelection(setDefault)
+            const setDefault = p.trackedStocks[p.trackedStocks.sKeys()[0]].key;
+            setCandleSelection(setDefault);
         }
-    }, [p.trackedStocks, candleSelection])
-
-    useEffect(()=> {
-        if (rCandleData !== undefined && Object.keys(rCandleData).length > 0){
-            // const data = rCandleData[candleSelection]?.data
-            // if (data !== undefined) {
-            const data = rCandleData
-                const nodeCount = data["c"].length;
-                const chartData = []
-                for (let nodei = 0; nodei < nodeCount; nodei++) {
-                    let newNode = {
+    }, [p.trackedStocks, candleSelection]);
+    useEffect(() => {
+        if (rCandleData !== undefined && Object.keys(rCandleData).length > 0) {
+            const data = rCandleData; //returned from finnHub API
+            const nodeCount = data["c"].length;
+            const chartData = [];
+            for (let nodei = 0; nodei < nodeCount; nodei++) {
+                const yData = [
+                    data["o"][nodei],
+                    data["h"][nodei],
+                    data["l"][nodei],
+                    data["c"][nodei]
+                ];
+                const newNode = {
                     x: new Date(data["t"][nodei] * 1000),
-                    y: [data["o"][nodei], data["h"][nodei], data["l"][nodei], data["c"][nodei]], //open, high, low, close
-                    };
-                    chartData.push(newNode)
-                    setChartData(chartData)
-                }
+                    y: yData, //open, high, low, close
+                };
+                chartData.push(newNode);
+                setChartData(chartData);
+            }
             //SET CHART OPTIONS
-            const now = Date.now()
-            const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800*1000
-            const startUnix = now - startUnixOffset
-            const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
-            const endUnix = now - endUnixOffset
+            const now = Date.now();
+            const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800 * 1000;
+            const startUnix = now - startUnixOffset;
+            const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0;
+            const endUnix = now - endUnixOffset;
             const startDate = new Date(startUnix).toISOString().slice(0, 10);
             const endDate = new Date(endUnix).toISOString().slice(0, 10);
-            
             const options = {
-            width: 400,
-            height: 200,
-            theme: "light2", // "light1", "light2", "dark1", "dark2"
-            animationEnabled: true,
-            exportEnabled: true,
-            title: {
-                text: candleSelection + ": " + startDate + " - " + endDate,
-            },
-            axisX: {
-                valueFormatString: "YYYY-MM-DD",
-            },
-            axisY: {
-                prefix: "$",
-                title: "Price (in USD)",
-            },
-            data: [
-                {
-                type: "candlestick",
-                showInLegend: true,
-                name: candleSelection,
-                yValueFormatString: "$###0.00",
-                xValueFormatString: "YYYY-MM-DD",
-                dataPoints: chartData,
+                width: 400,
+                height: 200,
+                theme: "light2",
+                animationEnabled: true,
+                exportEnabled: true,
+                title: {
+                    text: candleSelection + ": " + startDate + " - " + endDate,
                 },
-            ],
+                axisX: {
+                    valueFormatString: "YYYY-MM-DD",
+                },
+                axisY: {
+                    prefix: "$",
+                    title: "Price (in USD)",
+                },
+                data: [
+                    {
+                        type: "candlestick",
+                        showInLegend: true,
+                        name: candleSelection,
+                        yValueFormatString: "$###0.00",
+                        xValueFormatString: "YYYY-MM-DD",
+                        dataPoints: chartData,
+                    },
+                ],
             };
-            console.log("setting candle options")
-            setOptions(options)
+            console.log("setting candle options");
+            setOptions(options);
             // }
         }
-    }, [candleSelection, p.showEditPane, rCandleData, p.filters.endDate, p.filters.startDate])
-
-    useEffect(()=>{
+    }, [candleSelection, p.showEditPane, rCandleData, p.filters.endDate, p.filters.startDate]);
+    useEffect(() => {
+        //on change in candle selection set visable to empty object.
         const payload = {
             key: p.widgetKey,
-            data: {[`${p.widgetKey}-${candleSelection}`]: {}} 
-        }
-        dispatch(rBuildVisableData(payload))
-
-    }, [candleSelection, p.widgetKey, dispatch])
-
+            securityList: [[`${candleSelection}`]]
+        };
+        dispatch(rBuildVisableData(payload));
+    }, [candleSelection, p.widgetKey, dispatch]);
     function updateWidgetList(stock) {
         if (stock.indexOf(":") > 0) {
             const stockSymbole = stock.slice(0, stock.indexOf(":"));
             p.updateWidgetStockList(p.widgetKey, stockSymbole);
-        } else {
+        }
+        else {
             p.updateWidgetStockList(p.widgetKey, stock);
         }
     }
-
     function updateFilter(e) {
-    // const target = e.target;
-    // const name = target.name;
-    if (isNaN(new Date(e.target.value).getTime()) === false){
-        const now = Date.now()
-        const target = new Date(e.target.value).getTime();
-        const offset = now - target
-        const name = e.target.name;
-        p.updateWidgetFilters(p.widgetKey, name, offset);
-    };
+        // const target = e.target;
+        // const name = target.name;
+        if (isNaN(new Date(e.target.value).getTime()) === false) {
+            const now = Date.now();
+            const target = new Date(e.target.value).getTime();
+            const offset = now - target;
+            const name = e.target.name;
+            p.updateWidgetFilters(p.widgetKey, name, offset);
+        }
+        ;
     }
-
     function changeStockSelection(e) {
         const target = e.target.value;
-        setCandleSelection(target)
+        const key = `${p.widgetKey}-${target}`;
+        setCandleSelection(target);
+        // @ts-ignore: Unreachable code error
+        dispatch(tSearchMongoDB([key]));
     }
-
     function editCandleListForm() {
         let candleList = p.trackedStocks.sKeys();
-        let candleSelectionRow = candleList.map((el) =>
-        p.showEditPane === 1 ? (
-            <tr key={el + "container"}>
-            <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
-            <td key={el + "buttonC"}>
-                <button
-                key={el + "button"}
-                onClick={() => {
-                    updateWidgetList(el);
-                }}
-                >
-                <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
-                </button>
-            </td>
-            </tr>
-        ) : (
-            <tr key={el + "pass"}></tr>
-        )
-        );
-        let stockCandleTable = (
-        <table>
-            <tbody>{candleSelectionRow}</tbody>
-        </table>
-        );
+        let candleSelectionRow = candleList.map((el) => p.showEditPane === 1 ? (React.createElement("tr", { key: el + "container" },
+            React.createElement("td", { key: el + "name" }, p.trackedStocks[el].dStock(p.exchangeList)),
+            React.createElement("td", { key: el + "buttonC" },
+                React.createElement("button", { key: el + "button", onClick: () => {
+                        updateWidgetList(el);
+                    } },
+                    React.createElement("i", { className: "fa fa-times", "aria-hidden": "true", key: el + "icon" }))))) : (React.createElement("tr", { key: el + "pass" })));
+        let stockCandleTable = (React.createElement("table", null,
+            React.createElement("tbody", null, candleSelectionRow)));
         return stockCandleTable;
     }
-
     function displayCandleGraph() {
-        let newSymbolList = p.trackedStocks.sKeys().map((el) => (
-        <option key={el + "ddl"} value={el}>
-            {p.trackedStocks[el].dStock(p.exchangeList)}
-        </option>
-        ));
-
-        let symbolSelectorDropDown = (
-        <>
-            <div className="div-inline">
-            {"  Selection:  "}
-            <select className="btn" value={candleSelection} onChange={changeStockSelection}>
-                {newSymbolList}
-            </select>
-            </div>
-            <div className="graphDiv">
-            <CreateCandleStickChart candleData={options} />
-            </div>
-        </>
-        );
+        let newSymbolList = p.trackedStocks.sKeys().map((el) => (React.createElement("option", { key: el + "ddl", value: el }, p.trackedStocks[el].dStock(p.exchangeList))));
+        let symbolSelectorDropDown = (React.createElement(React.Fragment, null,
+            React.createElement("div", { className: "div-inline" },
+                "  Selection:  ",
+                React.createElement("select", { className: "btn", value: candleSelection, onChange: changeStockSelection }, newSymbolList)),
+            React.createElement("div", { className: "graphDiv" },
+                React.createElement(CreateCandleStickChart, { candleData: options }))));
         return symbolSelectorDropDown;
     }
-
-    let resolutionList = selectResolution.map((el) => (
-        <option key={el + "rsl"} value={el}>
-            {el}
-        </option>
-    ));
-
-    const now = Date.now()
-    const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800*1000
-    const startUnix = now - startUnixOffset
-    const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
-    const endUnix = now - endUnixOffset
+    let resolutionList = selectResolution.map((el) => (React.createElement("option", { key: el + "rsl", value: el }, el)));
+    const now = Date.now();
+    const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800 * 1000;
+    const startUnix = now - startUnixOffset;
+    const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0;
+    const endUnix = now - endUnixOffset;
     const startDate = new Date(startUnix).toISOString().slice(0, 10);
     const endDate = new Date(endUnix).toISOString().slice(0, 10);
-
-    return (
-        <>
-            {p.showEditPane === 1 && (
-            <>
-                <div className="searchPane">
-                {React.createElement(StockSearchPane, searchPaneProps(p))}
-                <div className="stockSearch">
-                    <form className="form-inline">
-                    <label htmlFor="start">Start date:</label>
-                    <input className="btn" id="start" type="date" name="startDate" onChange={updateFilter} value={startDate}></input>
-                    <label htmlFor="end">End date:</label>
-                    <input className="btn" id="end" type="date" name="endDate" onChange={updateFilter} value={endDate}></input>
-                    <label htmlFor="resBtn">Resolution:</label>
-                    <select id="resBtn" className="btn" name='resolution' value={p.filters.resolution} onChange={updateFilter}>
-                        {resolutionList}
-                    </select>
-                    </form>
-                </div>
-                </div>
-                <div>{Object.keys(p.trackedStocks).length > 0 ? editCandleListForm() : <></>}</div>
-            </>
-            )}
-            {p.showEditPane === 0 && (
-            Object.keys(p.trackedStocks).length > 0 ? displayCandleGraph() : <></>
-            )}
-        </>
-    );
+    return (React.createElement(React.Fragment, null,
+        p.showEditPane === 1 && (React.createElement(React.Fragment, null,
+            React.createElement("div", { className: "searchPane" },
+                React.createElement(StockSearchPane, searchPaneProps(p)),
+                React.createElement("div", { className: "stockSearch" },
+                    React.createElement("form", { className: "form-inline" },
+                        React.createElement("label", { htmlFor: "start" }, "Start date:"),
+                        React.createElement("input", { className: "btn", id: "start", type: "date", name: "startDate", onChange: updateFilter, value: startDate }),
+                        React.createElement("label", { htmlFor: "end" }, "End date:"),
+                        React.createElement("input", { className: "btn", id: "end", type: "date", name: "endDate", onChange: updateFilter, value: endDate }),
+                        React.createElement("label", { htmlFor: "resBtn" }, "Resolution:"),
+                        React.createElement("select", { id: "resBtn", className: "btn", name: 'resolution', value: p.filters.resolution, onChange: updateFilter }, resolutionList)))),
+            React.createElement("div", null, Object.keys(p.trackedStocks).length > 0 ? editCandleListForm() : React.createElement(React.Fragment, null)))),
+        p.showEditPane === 0 && (Object.keys(p.trackedStocks).length > 0 ? displayCandleGraph() : React.createElement(React.Fragment, null))));
 }
-
-export default forwardRef(PriceCandles)
-
+export default forwardRef(PriceCandles);
 export function candleWidgetProps(that, key = "Candles") {
     let propList = {
         apiKey: that.props.apiKey,
@@ -268,6 +221,3 @@ export function candleWidgetProps(that, key = "Candles") {
     };
     return propList;
 }
-
-
-

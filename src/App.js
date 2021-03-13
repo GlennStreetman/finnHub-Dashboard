@@ -30,8 +30,8 @@ import { connect } from "react-redux";
 import { tGetSymbolList, tUpdateExchangeData } from "./slices/sliceExchangeData.js";
 import { rUpdateExchangeList } from "./slices/sliceExchangeList.js";
 import { rBuildDataModel, rResetUpdateFlag } from "./slices/sliceDataModel.js";
-import { tUpdateDashboardData } from "./thunks/thunkFetchFinnhub.js";
-import { tFinnHubDataMongo } from "./thunks/thunkCheckMongoDB.js";
+import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub.js";
+import { tGetMongoDB } from "./thunks/thunkGetMongoDB.js";
 
 
 
@@ -82,16 +82,16 @@ class App extends React.Component {
     this.newWidgetContainer = NewWidgetContainer.bind(this);
     this.changeWidgetName = ChangeWidgetName.bind(this);
     this.lockWidgets = LockWidgets.bind(this);
-    this.removeWidget = RemoveWidget.bind(this); //push change to redux --> REBUILD
-    this.updateWidgetFilters = UpdateWidgetFilters.bind(this); //push change to redux --> REBUILD
-    this.updateWidgetStockList = UpdateWidgetStockList.bind(this); //push change to redux --> REBUILD
+    this.removeWidget = RemoveWidget.bind(this); 
+    this.updateWidgetFilters = UpdateWidgetFilters.bind(this); 
+    this.updateWidgetStockList = UpdateWidgetStockList.bind(this); 
     this.toggleWidgetVisability = ToggleWidgetVisability.bind(this);
 
     //App logic for setting up dashboards.
     this.loadDashBoard = LoadDashBoard.bind(this);
-    this.newDashboard = NewDashboard.bind(this); //no changes pushed to redux
-    this.getSavedDashBoards = GetSavedDashBoards.bind(this); //push change to redux --> REBUILD
-    this.saveCurrentDashboard = SaveCurrentDashboard.bind(this); //redux should update as dashboard is build. Save doesnt trigger rebuild.
+    this.newDashboard = NewDashboard.bind(this); 
+    this.getSavedDashBoards = GetSavedDashBoards.bind(this); 
+    this.saveCurrentDashboard = SaveCurrentDashboard.bind(this); 
 
     //app logic for MOVING widgets and snapping them into location.
     this.setDrag = SetDrag.bind(this);
@@ -131,27 +131,16 @@ class App extends React.Component {
       ;
     }
     //on load build dataset. //REVISE UPDATE FLAGS
-    if (prevProps.dataModel.created === false && p.dataModel.created === true) {
+    if ((prevProps.dataModel.created === false && p.dataModel.created === true) || (p.dataModel.created === 'updated')) {
       console.log("RUNNING DATA BUILD")
+      p.rResetUpdateFlag()
       let setupData = async function(dataset, that){
-        await that.props.tFinnHubDataMongo('run')
-        await that.props.tUpdateDashboardData(dataset)
+        await that.props.tGetMongoDB()
+        await that.props.tGetFinnhubData(dataset)
       }
-      setupData(p.rBuildDataModel.dataSet, this)
+      setupData(Object.keys(p.dataModel.dataSet), this)
     }
     
-    // if (this.props.rBuildDataModel.created === 'updated') {
-    //   console.log('----------UPDATE FINNHUB DATA-----------')
-    //   this.props.rResetUpdateFlag()
-    //     console.log("REBUILDING")
-    //     const data = {
-    //       apiKey: s.apiKey,
-    //       currentDashboard: s.currentDashBoard,
-    //       dashBoardData: s.dashBoardData
-    //     }
-    //     p.rBuildDataModel(data)
-    // }
-
     if (
         (s.apiKey === '' && s.apiFlag === 0) || 
         (s.apiKey === null && s.apiFlag === 0)
@@ -190,12 +179,18 @@ class App extends React.Component {
     if (s.rebuildDataSet === 1) {
       this.setState({rebuildDataSet: 0}, ()=>{
         console.log("REBUILDING")
-        const data = {
-          apiKey: s.apiKey,
-          currentDashboard: s.currentDashBoard,
-          dashBoardData: s.dashBoardData
-        }
-        p.rBuildDataModel(data)
+        // const data = {
+        //   apiKey: s.apiKey,
+        //   currentDashboard: s.currentDashBoard,
+        //   dashBoardData: s.dashBoardData
+        // }
+        
+      console.log("RUNNING DATA BUILD")
+      let setupData = async function(dataset, that){
+        await that.props.tGetMongoDB()
+        await that.props.tGetFinnhubData(dataset)
+      }
+      setupData(Object.keys(p.dataModel.dataSet), this)
       })
     }
   }
@@ -357,6 +352,8 @@ class App extends React.Component {
       <>
         <TopNav
           apiFlag={this.state.apiFlag}
+          currentDashBoard={this.state.currentDashBoard}
+          saveCurrentDashboard={this.saveCurrentDashboard} //saveCurrentDashboard
           login={this.state.login}
           logOut={this.logOut}
           newWidgetContainer={this.newWidgetContainer}
@@ -387,9 +384,9 @@ class App extends React.Component {
           updateWidgetStockList={this.updateWidgetStockList}
           loadDashBoard={this.loadDashBoard}
           saveCurrentDashboard={this.saveCurrentDashboard}
+          currentDashBoard={this.state.currentDashBoard}
           getSavedDashBoards={this.getSavedDashBoards}
           dashBoardData={this.state.dashBoardData}
-          currentDashBoard={this.state.currentDashBoard}
           changeWidgetName={this.changeWidgetName}
           updateWidgetFilters={this.updateWidgetFilters}
           throttle={this.state.throttle}
@@ -428,8 +425,8 @@ export default connect(mapStateToProps, {
   tGetSymbolList, 
   rUpdateExchangeList, 
   rBuildDataModel,
-  tUpdateDashboardData,
-  tFinnHubDataMongo,
+  tGetFinnhubData,
+  tGetMongoDB,
   rResetUpdateFlag,
   tUpdateExchangeData,
 

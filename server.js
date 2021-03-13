@@ -81,6 +81,7 @@ const dashboard = require('./routes/loggedIn/dashboard')
 const deleeteSavedDashboard = require('./routes/loggedIn/deleteSavedDashboard')
 //mongoDB
 const finnHubData = require('./routes/mongoDB/finnHubData')
+const findMongoData = require('./routes/mongoDB/findMongoData')
 
 app.use('/', login)
 app.use('/', checkLogin)
@@ -103,6 +104,7 @@ app.use('/', dashboard)
 app.use('/', deleeteSavedDashboard)
 //mongoDB
 app.use('/', finnHubData)
+app.use('/', findMongoData)
 app.use((req,res,next) => {
   //ALL OTHER ROUTES
   const error = new Error('PATH Not Found');
