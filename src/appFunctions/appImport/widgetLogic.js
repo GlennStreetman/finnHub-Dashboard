@@ -52,7 +52,7 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
         dashBoardData: newDashBoardData,
     }, ()=>{
         this.saveCurrentDashboard(s.currentDashBoard)
-        console.log('---------NEW DASHBOARD DATA------', s.dashBoardData)
+        // console.log('---------NEW DASHBOARD DATA------', s.dashBoardData)
         this.props.rBuildDataModel({
             apiKey: this.state.apiKey,
             dashBoardData: newDashBoardData
@@ -90,6 +90,7 @@ export const RemoveWidget = function removeWidget(stateRef, widgetID) {
 
 export const UpdateWidgetFilters = function updateWidgetFilters(widgetID, dataKey, data){
     const s = this.state
+    console.log(dataKey, data)
     const newWidgetList = produce(s.widgetList, (draftState) => {
         draftState[widgetID].filters[dataKey] = data
     })

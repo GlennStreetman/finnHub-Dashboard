@@ -208,7 +208,9 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
             const offset = now - target
             const name = e.target.name;
             p.updateWidgetFilters(p.widgetKey, name, offset);
-        };
+        } else {
+            p.updateWidgetFilters(p.widgetKey, e.target.name, e.target.value)
+        }
     }
 
     function changeStockSelection(e) {
