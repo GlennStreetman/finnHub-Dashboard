@@ -18,7 +18,7 @@ router.get("/dashboard", (req, res, next) => {
             LEFT JOIN menus AS s ON m.id = s.menukey
             WHERE userID =${req.session.uID}`;
         // console.log(getMenuSetup)
-            // console.log("QUERIES:", getSavedDashBoards, getMenuSetup)
+        console.log("QUERIES:", getSavedDashBoards, getMenuSetup)
         const r = { //resultset
             savedDashBoards: {},
             menuSetup: {},

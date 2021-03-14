@@ -1,6 +1,6 @@
 import React from "react";
-import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
-import {finnHub} from "../../../appFunctions/throttleQueue.js";
+import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane";
+import {finnHub} from "../../../appFunctions/throttleQueue";
 
 //Widget body component. Shows stock detail info and recent news. Maybe a graph?
 export default class FundamentalsBasicFinancials extends React.Component {

@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
-import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
-import {finnHub} from "../../../appFunctions/throttleQueue.js";
+import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane";
+import {finnHub} from "../../../appFunctions/throttleQueue";
 
 //rewriet as functional component, 
 //stockData. & targetStock. need to bewritten to use the stock key instaed of ticker symbol.

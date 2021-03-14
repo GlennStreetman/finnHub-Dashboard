@@ -1,8 +1,8 @@
 import React from "react";
-import StockDataList from "./stockDataList.js";
+import StockDataList from "./stockDataList";
 import { connect } from "react-redux";
 import ToolTip from './toolTip.js'
-import { tUpdateExchangeData } from "./../slices/sliceExchangeData.js";
+import { tUpdateExchangeData } from "./../slices/sliceExchangeData";
 
 //compnoent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
 class StockSearchPane extends React.Component {

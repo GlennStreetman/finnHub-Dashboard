@@ -4,7 +4,9 @@
   "compileOnSave": true,
   "noImplicitAny": false,
   "compilerOptions": {
+    "baseUrl": ".",
     "lib": [
+      "DOM",
       "es2019",
       "es2020.promise",
       "es2020.bigint",
@@ -23,10 +25,14 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
     "isolatedModules": true,
-    "allowJs": true,
+    "allowJs": false,
     "noEmit": true
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "node_modules",
+    "build"
   ]
 }

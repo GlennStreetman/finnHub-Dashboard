@@ -31,7 +31,7 @@ if (process.env.live === '1') {
       console.log("Listening to http://localhost:" + port);
     })
     app.use(express.static(path.join(__dirname, 'build')));
-    const db = require("./db/databaseLive.js") 
+    const db = require("./db/databaseLive") 
 
     db.connect()
       .then(() => console.log("connected to developement postgres server"))
@@ -50,8 +50,8 @@ if (process.env.live === '1') {
     const path = require("path");
     app.listen(port, function () {console.log(`serving the direcotry @ http`)})
     app.use(express.static(path.join(__dirname, 'build')));
-    const db = require("./db/databaseLocalPG.js")
-    const mongo = require('./db/mongoLocal.js') 
+    const db = require("./db/databaseLocalPG")
+    const mongo = require('./db/mongoLocal') 
 
 
     db.connect()

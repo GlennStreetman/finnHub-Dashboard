@@ -2,36 +2,36 @@ import React from "react";
 import "./App.css";
 import queryString from "query-string";
 //app functions
-import { GetStockPrice, LoadStockData } from "./appFunctions/getStockPrices.js";
-import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData.js";
-import ThrottleQueue from "./appFunctions/throttleQueue.js";
+import { GetStockPrice, LoadStockData } from "./appFunctions/getStockPrices";
+import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
+import ThrottleQueue from "./appFunctions/throttleQueue";
 //appImport
-import { Logout, ProcessLogin } from "./appFunctions/appImport/appLogin.js";
+import { Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
 import {
-  NewMenuContainer, NewWidgetContainer, LockWidgets,
+  NewMenuContainer, AddNewWidgetContainer, LockWidgets,
   ToggleWidgetVisability, ChangeWidgetName, RemoveWidget,
   UpdateWidgetFilters,UpdateWidgetStockList,
-} from "./appFunctions/appImport/widgetLogic.js";
+} from "./appFunctions/appImport/widgetLogic";
 import { LoadDashBoard, NewDashboard, GetSavedDashBoards, SaveCurrentDashboard } 
-  from "./appFunctions/appImport/setupDashboard.js";
-import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid.js";
+  from "./appFunctions/appImport/setupDashboard";
+import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
 
 //component imports
-import TopNav from "./components/topNav.js";
-import Login from "./components/login.js";
-import AboutMenu from "./components/AboutMenu.js";
-import AccountMenu, { accountMenuProps } from "./components/accountMenu.js";
-import EndPointMenu, { endPointProps } from "./components/endPoints.js";
-import ExchangeMenu, { exchangeMenuProps } from "./components/exchangeMenu.js";
+import TopNav from "./components/topNav";
+import Login from "./components/login";
+import AboutMenu from "./components/AboutMenu";
+import AccountMenu, { accountMenuProps } from "./components/accountMenu";
+import EndPointMenu, { endPointProps } from "./components/endPoints";
+import ExchangeMenu, { exchangeMenuProps } from "./components/exchangeMenu";
 import { WidgetController, MenuWidgetToggle } from "./components/widgetController";
 
 //redux imports
 import { connect } from "react-redux";
-import { tGetSymbolList, tUpdateExchangeData } from "./slices/sliceExchangeData.js";
-import { rUpdateExchangeList } from "./slices/sliceExchangeList.js";
-import { rBuildDataModel, rResetUpdateFlag } from "./slices/sliceDataModel.js";
-import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub.js";
-import { tGetMongoDB } from "./thunks/thunkGetMongoDB.js";
+import { tGetSymbolList, tUpdateExchangeData } from "./slices/sliceExchangeData";
+import { rUpdateExchangeList } from "./slices/sliceExchangeList";
+import { rBuildDataModel, rResetUpdateFlag } from "./slices/sliceDataModel";
+import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
+import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 
 
 
@@ -79,7 +79,7 @@ class App extends React.Component {
 
     //app logic for creating/removing, modifying, populating widgets.
     this.newMenuContainer = NewMenuContainer.bind(this);
-    this.newWidgetContainer = NewWidgetContainer.bind(this);
+    this.AddNewWidgetContainer = AddNewWidgetContainer.bind(this);
     this.changeWidgetName = ChangeWidgetName.bind(this);
     this.lockWidgets = LockWidgets.bind(this);
     this.removeWidget = RemoveWidget.bind(this); 
@@ -108,6 +108,7 @@ class App extends React.Component {
     this.uploadGlobalStockList = this.uploadGlobalStockList.bind(this); //pass in object to replace global list
     this.syncGlobalStockList = this.syncGlobalStockList.bind(this); //pushes global stock list to all widgets.
     this.toggleBackGroundMenu = this.toggleBackGroundMenu.bind(this);
+
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -117,27 +118,27 @@ class App extends React.Component {
     if (s.login === 1 && prevState.login === 0) {
       console.log("Loggin detected, setting up dashboards.");
       this.getSavedDashBoards()
-      .then(data => {
-        console.log("UPDATE DASH DATA", data)
-        //data = {apikey: str, currentDashBoard: str, dashBoardData: {}, menuList: {}}
-        this.setState(data)
-        data.apiKey = s.apiKey
-        p.rBuildDataModel(data)
+      .then(loginDataAndDashboards => {
+        // console.log("UPDATE DASH DATA", loginDataAndDashboards)
+        this.setState(loginDataAndDashboards)
+        // console.log("DATA IS SET!!!!", p)
+        p.rBuildDataModel(loginDataAndDashboards)
       })
       .catch((error) => {
           console.error("Failed to recover dashboards", error);
-          this.setState({dashBoardData: {message: "Problem retrieving dashboards."}})
+          // this.setState({dashBoardData: {message: "Problem retrieving dashboards."}})
           });
       ;
     }
     //on load build dataset. //REVISE UPDATE FLAGS
-    if ((prevProps.dataModel.created === false && p.dataModel.created === true) || (p.dataModel.created === 'updated')) {
+    if ((prevProps.dataModel.created === 'false' && p.dataModel.created === 'true') || (p.dataModel.created === 'updated')) {
       console.log("RUNNING DATA BUILD")
       p.rResetUpdateFlag()
       let setupData = async function(dataset, that){
         await that.props.tGetMongoDB()
         await that.props.tGetFinnhubData(dataset)
       }
+      console.log('p.dataModel.dataSet', p.dataModel.dataSet)
       setupData(Object.keys(p.dataModel.dataSet), this)
     }
     
@@ -200,6 +201,7 @@ class App extends React.Component {
       this.state.socket.close();
     }
   }
+
 
   updateGlobalStockList(event, stockRef, stockObj = {}) {
     console.log("updating global stock list")
@@ -290,7 +292,6 @@ class App extends React.Component {
         const newPayload = {
           exchange: newList[stock],
           apiKey: s.apiKey,
-          throttle: s.throttle,
         };
         p.tGetSymbolList(newPayload);
         // }
@@ -356,7 +357,7 @@ class App extends React.Component {
           saveCurrentDashboard={this.saveCurrentDashboard} //saveCurrentDashboard
           login={this.state.login}
           logOut={this.logOut}
-          newWidgetContainer={this.newWidgetContainer}
+          AddNewWidgetContainer={this.AddNewWidgetContainer}
           newMenuContainer={this.newMenuContainer}
           menuList={this.state.menuList}
           updateAPIFlag={this.updateAPIFlag}
@@ -389,7 +390,7 @@ class App extends React.Component {
           dashBoardData={this.state.dashBoardData}
           changeWidgetName={this.changeWidgetName}
           updateWidgetFilters={this.updateWidgetFilters}
-          throttle={this.state.throttle}
+          // throttle={this.state.throttle}
           updateAPIFlag={this.updateAPIFlag}
           updateAPIKey={this.updateAPIKey}
           zIndex={this.state.zIndex}

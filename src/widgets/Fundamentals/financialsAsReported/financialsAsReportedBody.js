@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
-import EndPointNode from "../../../components/endPointNode.js";
-import {finnHub} from "../../../appFunctions/throttleQueue.js";
+import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane";
+import EndPointNode from "../../../components/endPointNode";
+import {finnHub} from "../../../appFunctions/throttleQueue";
 
 export default class FundamentalsFinancialsAsReported extends Component {
     constructor(props) {

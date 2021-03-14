@@ -1,6 +1,6 @@
 import React from "react";
-import {finnHub} from "../appFunctions/throttleQueue.js";
-import EndPointNode from "./endPointNode.js";
+import {finnHub} from "../appFunctions/throttleQueue";
+import EndPointNode from "./endPointNode";
 
 export default class EndPointMenu extends React.Component {
     constructor(props) {

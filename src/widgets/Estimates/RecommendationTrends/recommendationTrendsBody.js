@@ -1,7 +1,7 @@
 import React, { Component } from 'react'
-import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
-import {finnHub} from "../../../appFunctions/throttleQueue.js";
-import RecTrendChart from "./recTrendChart.js";
+import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane";
+import {finnHub} from "../../../appFunctions/throttleQueue";
+import RecTrendChart from "./recTrendChart";
 
 export default class EstimatesRecommendationTrends extends Component {
     constructor(props) {

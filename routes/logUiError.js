@@ -1,7 +1,7 @@
 const express = require("express");  
 const router = express.Router();
 const format = require("pg-format"); //USE FOR ALL QUERY STRING parameters. Helps prevent SQL injection.
-const db = process.env.live === "1" ? require("../db/databaseLive.js") : require("../db/databaseLocalPG.js");
+const db = process.env.live === "1" ? require("../db/databaseLive") : require("../db/databaseLocalPG");
 
 
 router.post("/logUiError", (req, res) => {

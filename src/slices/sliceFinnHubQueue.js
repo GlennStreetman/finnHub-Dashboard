@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import  {createFunctionQueueObject} from "./../appFunctions/throttleQueueAPI.js";
+import  {createFunctionQueueObject} from "./../appFunctions/throttleQueueAPI";
 
 const finnHubQueue = createSlice({
     name: 'finnQueue',

@@ -1,5 +1,5 @@
 import React from "react";
-import WidgetContainer from "./widgetContainer.js";
+import WidgetContainer from "./widgetContainer";
 import {returnBodyProps} from "../registers/widgetControllerReg.js"
 
 function MenuWidgetToggle(context) {

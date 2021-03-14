@@ -1,9 +1,9 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import exchangeData from './slices/sliceExchangeData.js'
-import exchangeList from './slices/sliceExchangeList.js'
-import dataModel from './slices/sliceDataModel.js'
-import finnHubQueue from './slices/sliceFinnHubQueue.js'
-import showData from './slices/sliceShowData.js'
+import exchangeData from './slices/sliceExchangeData'
+import exchangeList from './slices/sliceExchangeList'
+import dataModel from './slices/sliceDataModel'
+import finnHubQueue from './slices/sliceFinnHubQueue'
+import showData from './slices/sliceShowData'
 
 export const store = configureStore({
   reducer: {

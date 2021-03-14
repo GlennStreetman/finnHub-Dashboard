@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import {finnHub} from "../../../appFunctions/throttleQueue.js";
+import {finnHub} from "../../../appFunctions/throttleQueue";
 
 
 export default class FundamentalsIPOCalendar extends Component {

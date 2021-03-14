@@ -2,8 +2,8 @@ import React , {useState, useEffect, useImperativeHandle, forwardRef} from "reac
 import { useSelector, useDispatch } from 'react-redux';
 import { rBuildVisableData } from '../../../../slices/sliceShowData.js'
 import { tSearchMongoDB } from '../../../../thunks/thunkSearchMongoDB.js'
-import StockSearchPane, {searchPaneProps} from "../../../../components/stockSearchPaneFunc.js";
-import CreateCandleStickChart from "../createCandleStickChart.js";
+import StockSearchPane, {searchPaneProps} from "../../../../components/stockSearchPaneFunc";
+import CreateCandleStickChart from "../createCandleStickChart";
 
 function PriceCandles(p, ref) {
     

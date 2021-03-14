@@ -1,5 +1,5 @@
 import React from "react";
-import {finnHub} from "../../../appFunctions/throttleQueue.js";
+import {finnHub} from "../../../appFunctions/throttleQueue";
 
 export default class FundamentalsMarketNews extends React.Component {
   constructor(props) {

@@ -1,4 +1,4 @@
-import {finnHub} from "./throttleQueue.js";
+import {finnHub} from "./throttleQueue";
 
 function GetStockPrice(context, stockDescription, apiKey, throttle) {
   //US ONLY

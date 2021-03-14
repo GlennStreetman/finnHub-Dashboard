@@ -1,25 +1,25 @@
 //Import props function from each widget/menu here and add to returnBodyProps function below.
-import { dashBoardMenuProps } from "./../widgets/Menu/dashBoardMenu/dashBoardMenu.js";
-import { watchListMenuProps } from "./../widgets/Menu/watchListMenu/watchListMenu.js";
+import { dashBoardMenuProps } from "./../widgets/Menu/dashBoardMenu/dashBoardMenu";
+import { watchListMenuProps } from "./../widgets/Menu/watchListMenu/watchListMenu";
 
-import { recommendationTrendsProps } from "./../widgets/Estimates/RecommendationTrends/recommendationTrendsBody.js";
-import { priceTargetProps } from "./../widgets/Estimates/PriceTarget/priceTargetBody.js";
-import { EPSSurprisesProps } from "./../widgets/Estimates/EPSSurprises/EPSSurpsisesBody.js";
-import {EarningsCalendarProps} from "../widgets/Estimates/EarningsCalendar/EarningsCalendarBody.js";
+import { recommendationTrendsProps } from "./../widgets/Estimates/RecommendationTrends/recommendationTrendsBody";
+import { priceTargetProps } from "./../widgets/Estimates/PriceTarget/priceTargetBody";
+import { EPSSurprisesProps } from "./../widgets/Estimates/EPSSurprises/EPSSurpsisesBody";
+import {EarningsCalendarProps} from "../widgets/Estimates/EarningsCalendar/EarningsCalendarBody";
 
-import { newsWidgetProps } from "./../widgets/Fundamentals/companyNews/companyNewsBody.js";
-import { marketNewsProps } from "./../widgets/Fundamentals/marketNews/marketNewsBody.js";
-import { metricsProps } from "./../widgets/Fundamentals/basicFinancials/basicFinancialsBody.js";
-import { companyProfile2Props } from "./../widgets/Fundamentals/companyProfile2/companyProfile2Body.js";
-import { newsSentimentsProps } from "../widgets/Fundamentals/newsSentiment/newsSentimentBody.js";
-import { peersProps } from "../widgets/Fundamentals/Peers/peersBody.js";
-import { financialsAsReportedProps } from "../widgets/Fundamentals/financialsAsReported/financialsAsReportedBody.js";
-import { secFilingsProps } from "../widgets/Fundamentals/secFilings/secFilingsBody.js";
-import { IPOCalendarProps } from "../widgets/Fundamentals/IPOCalendar/IPOCalendarBody.js";
+import { newsWidgetProps } from "./../widgets/Fundamentals/companyNews/companyNewsBody";
+import { marketNewsProps } from "./../widgets/Fundamentals/marketNews/marketNewsBody";
+import { metricsProps } from "./../widgets/Fundamentals/basicFinancials/basicFinancialsBody";
+import { companyProfile2Props } from "./../widgets/Fundamentals/companyProfile2/companyProfile2Body";
+import { newsSentimentsProps } from "../widgets/Fundamentals/newsSentiment/newsSentimentBody";
+import { peersProps } from "../widgets/Fundamentals/Peers/peersBody";
+import { financialsAsReportedProps } from "../widgets/Fundamentals/financialsAsReported/financialsAsReportedBody";
+import { secFilingsProps } from "../widgets/Fundamentals/secFilings/secFilingsBody";
+import { IPOCalendarProps } from "../widgets/Fundamentals/IPOCalendar/IPOCalendarBody";
 
-import { candleWidgetProps } from "../widgets/Price/candles/candleWidget.js";
-import { quoteBodyProps } from "../widgets/Price/quote/quoteBody.js";
-import {PriceSplitsProps} from "../widgets/Price/splits/PriceSplitsBody.js";
+import { candleWidgetProps } from "../widgets/Price/candles/candleWidget";
+import { quoteBodyProps } from "../widgets/Price/quote/quoteBody";
+import {PriceSplitsProps} from "../widgets/Price/splits/PriceSplitsBody";
 
 export function returnBodyProps(that, key, ref = "pass") {
     let widgetBodyProps = {

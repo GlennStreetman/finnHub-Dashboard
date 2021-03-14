@@ -1,5 +1,5 @@
 
-import {GetSavedDashBoards} from "./setupDashboard.js";
+import {GetSavedDashBoards} from "./setupDashboard";
 
 global.fetch = jest.fn(() =>
     Promise.resolve({

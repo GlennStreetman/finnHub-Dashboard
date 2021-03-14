@@ -1,14 +1,14 @@
 import * as React from "react"
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 
-import { useAppDispatch, useAppSelector } from './../../../hooks.js';
-import { rBuildVisableData } from '../../../slices/sliceShowData.js'
-import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB.js'
+import { useAppDispatch, useAppSelector } from './../../../hooks';
+import { rBuildVisableData } from '../../../slices/sliceShowData'
+import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
 
 // import { DataNode, DataSet } from './../../../slices/sliceDataModel.js';
 
-import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc.js";
-import CreateCandleStickChart from "./createCandleStickChart.js";
+import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import CreateCandleStickChart from "./createCandleStickChart";
 
 
 const useDispatch = useAppDispatch
@@ -34,8 +34,22 @@ const useSelector = useAppSelector
 
 // }
 
+interface FinnHubCandleData {
+    c: number[],
+    h: number[],
+    l: number[],
+    o: number[],
+    s: string,
+    t: number[],
+    v: number[],
+}
+
+function isCandleData(arg: any): arg is FinnHubCandleData {
+    return arg.c !== undefined
+}
+
+
 function PriceCandles(p: { [key: string]: any }, ref: any) {
-    console.log("PRINT THIS")
     const ChartData: Object[] = []
     const [candleSelection, setCandleSelection] = useState('');
     const [chartData, setChartData] = useState(ChartData)
@@ -44,10 +58,10 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
 
     const dispatch = useDispatch()
 
+    //finnhub data stored in redux
     const rCandleData = useSelector((state) => {
-
         if (state.dataModel !== undefined &&
-            state.dataModel.created === true &&
+            state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
             const CandleData = state.showData.dataSet[p.widgetKey][candleSelection]
             // console.log('CandleData', CandleData)
@@ -80,10 +94,11 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                 console.log("Setting up candles")
                 const startDateSetBack = 31536000 * 1000 //1 week
                 const endDateSetBack = 0
+                p.updateWidgetFilters(p.widgetKey, 'resolution', 'W')
                 p.updateWidgetFilters(p.widgetKey, 'startDate', startDateSetBack)
                 p.updateWidgetFilters(p.widgetKey, 'endDate', endDateSetBack)
                 p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
-                p.updateWidgetFilters(p.widgetKey, 'resolution', 'W')
+
             }
         }
     }, [])
@@ -103,64 +118,65 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     }
 
     useEffect(() => { //CREATE CANDLE DATA
-        console.log('rCandleData', rCandleData)
         if (rCandleData !== undefined && Object.keys(rCandleData).length > 0) {
             const data: any = rCandleData //returned from finnHub API
-            const nodeCount: number = data["c"].length;
-            const chartData: Object[] = []
-            for (let nodei = 0; nodei < nodeCount; nodei++) {
-                const yData: number[] = [
-                    data["o"][nodei],
-                    data["h"][nodei],
-                    data["l"][nodei],
-                    data["c"][nodei]
-                ]
-                const newNode: ChartNode = {
-                    x: new Date(data["t"][nodei] * 1000),
-                    y: yData, //open, high, low, close
-                };
-                chartData.push(newNode)
-                setChartData(chartData)
-            }
-            //SET CHART OPTIONS
-            const now = Date.now()
-            const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800 * 1000
-            const startUnix = now - startUnixOffset
-            const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
-            const endUnix = now - endUnixOffset
-            const startDate = new Date(startUnix).toISOString().slice(0, 10);
-            const endDate = new Date(endUnix).toISOString().slice(0, 10);
+            if (isCandleData(data)) {
+                const nodeCount: number = data["c"].length;
+                const chartData: Object[] = []
+                for (let nodei = 0; nodei < nodeCount; nodei++) {
+                    const yData: number[] = [
+                        data["o"][nodei],
+                        data["h"][nodei],
+                        data["l"][nodei],
+                        data["c"][nodei]
+                    ]
+                    const newNode: ChartNode = {
+                        x: new Date(data["t"][nodei] * 1000),
+                        y: yData, //open, high, low, close
+                    };
+                    chartData.push(newNode)
+                    setChartData(chartData)
+                }
+                //SET CHART OPTIONS
+                const now = Date.now()
+                const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800 * 1000
+                const startUnix = now - startUnixOffset
+                const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
+                const endUnix = now - endUnixOffset
+                const startDate = new Date(startUnix).toISOString().slice(0, 10);
+                const endDate = new Date(endUnix).toISOString().slice(0, 10);
 
-            const options = {
-                width: 400,
-                height: 200,
-                theme: "light2", // "light1", "light2", "dark1", "dark2"
-                animationEnabled: true,
-                exportEnabled: true,
-                title: {
-                    text: candleSelection + ": " + startDate + " - " + endDate,
-                },
-                axisX: {
-                    valueFormatString: "YYYY-MM-DD",
-                },
-                axisY: {
-                    prefix: "$",
-                    title: "Price (in USD)",
-                },
-                data: [
-                    {
-                        type: "candlestick",
-                        showInLegend: true,
-                        name: candleSelection,
-                        yValueFormatString: "$###0.00",
-                        xValueFormatString: "YYYY-MM-DD",
-                        dataPoints: chartData,
+                const options = {
+                    width: 400,
+                    height: 200,
+                    theme: "light2", // "light1", "light2", "dark1", "dark2"
+                    animationEnabled: true,
+                    exportEnabled: true,
+                    title: {
+                        text: candleSelection + ": " + startDate + " - " + endDate,
                     },
-                ],
-            };
-            console.log("setting candle options")
-            setOptions(options)
-            // }
+                    axisX: {
+                        valueFormatString: "YYYY-MM-DD",
+                    },
+                    axisY: {
+                        prefix: "$",
+                        title: "Price (in USD)",
+                    },
+                    data: [
+                        {
+                            type: "candlestick",
+                            showInLegend: true,
+                            name: candleSelection,
+                            yValueFormatString: "$###0.00",
+                            xValueFormatString: "YYYY-MM-DD",
+                            dataPoints: chartData,
+                        },
+                    ],
+                };
+                console.log("setting candle options")
+                setOptions(options)
+                // }
+            }
         }
     }, [candleSelection, p.showEditPane, rCandleData, p.filters.endDate, p.filters.startDate])
 
@@ -315,6 +331,14 @@ export function candleWidgetProps(that, key = "Candles") {
     };
     return propList;
 }
+
+export const candleWidgetFilters: object = {
+    resolution: 'W',
+    startDate: 31536000000,
+    "endDate": 0,
+    "Description": 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
+}
+
 
 
 

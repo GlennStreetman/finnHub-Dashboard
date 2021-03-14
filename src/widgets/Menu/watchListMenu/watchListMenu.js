@@ -1,6 +1,6 @@
 import Papa from 'papaparse'
 import React from "react";
-import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
+import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane";
 import CsvUpload from './csvUpload.js'
 import ToolTip from '../../../components/toolTip.js'
 

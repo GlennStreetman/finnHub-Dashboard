@@ -1,15 +1,15 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import {finnHub} from "./../appFunctions/throttleQueue.js";
+import {finnHub} from "./../appFunctions/throttleQueue";
 import { exchangeDataDB } from './indexedDB.js'
 
 
 export const tGetSymbolList = createAsyncThunk(
     'newSymbolList',
-    (reqObj) => { //{exchange, apiKey, finnHub} Not passing thunk api as second arg.
-        
+    (reqObj, thunkAPI) => { //{exchange, apiKey, finnHub} Not passing thunk api as second arg.
+        const finnQueue = thunkAPI.getState().finnHubQueue.throttle
         const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${reqObj.exchange}&token=${reqObj.apiKey}`
         // console.log(apiString)
-        return finnHub(reqObj['throttle'], apiString) //replace with usestate.
+        return finnHub(finnQueue, apiString) //replace with usestate.
         .then((data) => {
             if (data.error === 429) { //run again
                 tGetSymbolList(reqObj)

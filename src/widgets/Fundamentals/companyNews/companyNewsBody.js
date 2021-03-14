@@ -1,6 +1,6 @@
 import React from "react";
-import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane.js";
-import {finnHub} from "../../../appFunctions/throttleQueue.js";
+import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchPane";
+import {finnHub} from "../../../appFunctions/throttleQueue";
 
 // import Moment from "react-moment";
 

@@ -1,11 +1,11 @@
 import React from "react";
  
-import {checkPassword} from "../appFunctions/client/checkPassword.js";
-import {forgotLogin} from "../appFunctions/client/forgotLogin.js";
-import {secretQuestion} from "../appFunctions/client/secretQuestion.js";
-import {newPW} from "../appFunctions/client/newPW.js";
-import {checkLoginStatus} from "../appFunctions/client/checkLoginStatus.js";
-import {registerAccount} from "../appFunctions/client/registerAccount.js";
+import {checkPassword} from "../appFunctions/client/checkPassword";
+import {forgotLogin} from "../appFunctions/client/forgotLogin";
+import {secretQuestion} from "../appFunctions/client/secretQuestion";
+import {newPW} from "../appFunctions/client/newPW";
+import {checkLoginStatus} from "../appFunctions/client/checkLoginStatus";
+import {registerAccount} from "../appFunctions/client/registerAccount";
 // import e from "express";
 
 class login extends React.Component {

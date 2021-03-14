@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import  {finnHub} from "./../appFunctions/throttleQueueAPI.js";
+import  {finnHub} from "./../appFunctions/throttleQueueAPI";
 
 //receives list of keys to be retrieved from finnHub as an parameter.
 //If data is not fresh dispatch api request.
@@ -7,7 +7,7 @@ import  {finnHub} from "./../appFunctions/throttleQueueAPI.js";
 export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
     'GetFinnhubData',
     (req, thunkAPI) => { //l{ist of securities} 
-        // console.log('--------thisRequest------------', req)
+        console.log('--------thisRequest------------', req)
         const finnQueue = thunkAPI.getState().finnHubQueue.throttle
         const dataSet = thunkAPI.getState().dataModel.dataSet //finnHubData
         let requestList = []  
@@ -25,7 +25,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
         console.log("finnHub Request List: ", requestList)
         return Promise.all(requestList)
         .then((res) => {
-            // console.log("res",res)
+            console.log("res",res)
             const resObj = {}
             for (const resStock of res) {
                 // resObj.dataSet[resStock.endPoint] = {}

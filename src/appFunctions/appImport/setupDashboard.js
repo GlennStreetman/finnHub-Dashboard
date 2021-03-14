@@ -97,13 +97,14 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
 }
 
 export const SaveCurrentDashboard = function saveCurrentDashboard(dashboardName) {
-    console.log("saving current dashboard");
+    
     const data = {
         dashBoardName: dashboardName,
         globalStockList: this.state.globalStockList,
         widgetList: this.state.widgetList,
         menuList: this.state.menuList,
     };
+    console.log("saving current dashboard", data);
 
     const options = {
         method: "POST",
