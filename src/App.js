@@ -61,6 +61,7 @@ class App extends React.Component {
       loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
       menuList: {}, //lists of all menu widgets.
       rebuildDataSet: 0, //Set to 1 to trigger finnHub Dataset rebuild. 
+      enableDrag: false,
       socket: "", //socket connection for streaming stock data.
       showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
       throttle: ThrottleQueue(25, 1000, true), //all finnhub API requests should be done with finnHub function.
@@ -116,13 +117,13 @@ class App extends React.Component {
     const p = this.props;
     
     if (s.login === 1 && prevState.login === 0) {
-      console.log("Loggin detected, setting up dashboards.");
+      console.log("Loggin detected, setting up dashboards.", s.apiKey);
       this.getSavedDashBoards()
       .then(loginDataAndDashboards => {
         // console.log("UPDATE DASH DATA", loginDataAndDashboards)
         this.setState(loginDataAndDashboards)
         // console.log("DATA IS SET!!!!", p)
-        p.rBuildDataModel(loginDataAndDashboards)
+        p.rBuildDataModel({...loginDataAndDashboards, apiKey: s.apiKey})
       })
       .catch((error) => {
           console.error("Failed to recover dashboards", error);
@@ -138,7 +139,7 @@ class App extends React.Component {
         await that.props.tGetMongoDB()
         await that.props.tGetFinnhubData(dataset)
       }
-      console.log('p.dataModel.dataSet', p.dataModel.dataSet)
+      // console.log('p.dataModel.dataSet', p.dataModel.dataSet)
       setupData(Object.keys(p.dataModel.dataSet), this)
     }
     
@@ -410,6 +411,7 @@ class App extends React.Component {
           snapWidget={this.snapWidget}
           setDrag={this.setDrag}
           widgetCopy={this.state.widgetCopy}
+          // enableDrag={this.enableDrag}
         />
         {loginScreen}
         {backGroundMenu()}

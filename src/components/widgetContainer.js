@@ -88,6 +88,7 @@ class WidgetContainer extends React.Component {
       .then((data)=>{
         document.onmouseup = closeDragElement;
         document.onmousemove = elementDrag;
+        // document.onmousedown = that.props.enableDrag()
       })
     }
 

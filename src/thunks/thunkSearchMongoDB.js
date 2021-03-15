@@ -7,13 +7,13 @@ export const tSearchMongoDB = createAsyncThunk( //{endPoint, [securityList]}
     //if stale pop from list 
     try {
         // const ap = req.payload
-        console.log("!!!AP", req)
+        console.log("Get Mongo Data")
         const options = {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(req),
             };
-        console.log("Searching mongoDB with: ", req)
+        // console.log("Searching mongoDB with: ", req)
         const getData = await fetch('/findMongoData', options)
         const foundData = await getData.json()
         const resObj = {}

@@ -84,7 +84,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     useEffect(() => { //USE WIDGET COPY
         //on mount, use widget copy if available, or run setup.
         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            console.log('use widget copy candles')
+            console.log('use widget copy candles', p.widgetCopy)
             setCandleSelection(p.widgetCopy.candleSelection)
             setChartData(p.widgetCopy.chartData)
             setOptions(p.widgetCopy.options)
@@ -173,7 +173,6 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                         },
                     ],
                 };
-                console.log("setting candle options")
                 setOptions(options)
                 // }
             }

@@ -36,23 +36,23 @@ const dataModel = createSlice({
 
             const ap: any = action.payload
             const apD: any = ap.dashBoardData
-            console.log("Building DATASET", apD, Object.keys(apD))
+            console.log("Building DATASET")
             const resList: string[] = []
             const endPointAPIList: EndPointAPIList = {} //list of lists. Each list []
             //nested loops that create a list of endpoints for this dataset.
             for (const d in apD) { //for each dashboard
                 const widgetList = apD[d].widgetlist
-                console.log('d', d, widgetList)
+                // console.log('d', d, widgetList)
                 for (const w in widgetList) {  //for each widget
                     const widgetName: string = w
                     if (w !== null && w !== 'null') {
-                        console.log('widgetList[w]', widgetList[w])
+                        // console.log('widgetList[w]', widgetList[w])
                         const endPoint: string = widgetList[w].widgetType
                         const filters: Object = widgetList[w].filters
                         // @ts-ignore: Unreachable code error
                         const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
                         const trackedStocks = widgetList[w].trackedStocks
-                        console.log('MAKE ENDPOINT', widgetName, filters, ap.apiKey)
+                        // console.log('MAKE ENDPOINT', widgetName, filters, ap.apiKey)
                         const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, ap.apiKey)
                         delete endPointData.undefined
                         endPointAPIList[widgetName] = endPointData
@@ -85,12 +85,12 @@ const dataModel = createSlice({
                 }
             }
             const flag: boolean | string = state.created === 'false' ? 'true' : 'updated'
-            console.log("UPDATING FLAG", flag)
+            // console.log("UPDATING FLAG", flag)
             state.created = flag
 
         },
         rResetUpdateFlag: (state) => {
-            console.log("reseting update flag")
+            // console.log("reseting update flag")
             state.created = 'true'
 
         },

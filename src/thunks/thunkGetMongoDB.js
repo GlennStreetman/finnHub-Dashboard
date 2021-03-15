@@ -20,7 +20,7 @@ export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
             }
         }
         // console.log('3resOBJ', freshData, resObj)
-        console.log('-----------UPDATE FROM MONGO COMPLETE-------------')
+        console.log('UPDATE FROM MONGO COMPLETE')
         return(resObj)
 
     }catch(err){

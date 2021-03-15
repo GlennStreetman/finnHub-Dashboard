@@ -62,16 +62,16 @@ const showData = createSlice({
         },
         // @ts-ignore: Unreachable code error
         [tGetFinnhubData.fulfilled]: (state, action) => {
-            console.log("Merge fresh finnHub data into showData", action.payload)
+            // console.log("Merge fresh finnHub data into showData", action.payload)
             const ap: any = action.payload
             for (const key in ap) {
                 const apiString: string = key
                 const widgetRef: string = apiString.slice(0, apiString.indexOf('-'))
                 const security: string = apiString.slice(apiString.indexOf('-') + 1, apiString.length)
-                console.log(key, widgetRef, security)
+                // console.log(key, widgetRef, security)
                 if (state.dataSet[widgetRef] !== undefined &&
                     state.dataSet[widgetRef][security] !== undefined) {
-                    console.log('MERGE FINAL', widgetRef, security, ap[key].data)
+                    // console.log('MERGE FINAL', widgetRef, security, ap[key].data)
                     state.dataSet[widgetRef][security] = ap[key].data
                 }
             }
@@ -88,7 +88,7 @@ const showData = createSlice({
         },
         // @ts-ignore: Unreachable code error
         [tGetMongoDB.fulfilled]: (state, action) => {
-            console.log("Merge fresh mongoDB data into showData")
+            // console.log("Merge fresh mongoDB data into showData")
             const ap: any = action.payload
             for (const x in ap) {
                 const apiString: string = ap[x].key
@@ -116,7 +116,7 @@ const showData = createSlice({
         [tSearchMongoDB.fulfilled]: (state, action) => {
 
             const ap: any = action.payload
-            console.log("Merge found data from Mongo", ap)
+            // console.log("Merge found data from Mongo", ap)
             for (const x in ap) {
                 const apiString: string = ap[x].key
                 const widgetRef: string = apiString.slice(0, apiString.indexOf('-'))

@@ -19,7 +19,7 @@ export const NewMenuContainer = function newMenuContainer(widgetDescription, wid
 
 export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescription, widgetHeader, widgetConfig, defaultFilters={}) {
     //receives info for new widget. Returns updated widgetlist & dashboard data
-    console.log("NEW WIDGET:", widgetDescription, widgetHeader, widgetConfig, defaultFilters)
+    // console.log("NEW WIDGET:", widgetDescription, widgetHeader, widgetConfig, defaultFilters)
     const s = this.state
 
     const widgetName = new Date().getTime();
@@ -42,7 +42,7 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
 
     const currentDashBoard = s.currentDashBoard
     const newDashBoardData = produce(s.dashBoardData, (draftState) => {
-        console.log(s.dashBoardData[currentDashBoard])
+        // console.log(s.dashBoardData[currentDashBoard])
         draftState[currentDashBoard].widgetlist[widgetName] = newWidget
     })
 
@@ -75,7 +75,7 @@ export const LockWidgets = function lockWidgets(toggle){
 }
 
 export const RemoveWidget = function removeWidget(stateRef, widgetID) {
-    console.log(stateRef, widgetID)
+    // console.log("REMOVE WIDGET", stateRef, widgetID)
     const s = this.state
     const newWidgetList = produce(s[stateRef], (draftState) => {
         delete draftState[widgetID]
@@ -90,7 +90,7 @@ export const RemoveWidget = function removeWidget(stateRef, widgetID) {
 
 export const UpdateWidgetFilters = function updateWidgetFilters(widgetID, dataKey, data){
     const s = this.state
-    console.log(dataKey, data)
+    // console.log("UPDATEWIDGETFILTERS", dataKey, data)
     const newWidgetList = produce(s.widgetList, (draftState) => {
         draftState[widgetID].filters[dataKey] = data
     })

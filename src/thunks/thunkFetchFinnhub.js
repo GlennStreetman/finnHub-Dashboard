@@ -7,7 +7,7 @@ import  {finnHub} from "./../appFunctions/throttleQueueAPI";
 export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
     'GetFinnhubData',
     (req, thunkAPI) => { //l{ist of securities} 
-        console.log('--------thisRequest------------', req)
+        // console.log('--------thisRequest------------', req)
         const finnQueue = thunkAPI.getState().finnHubQueue.throttle
         const dataSet = thunkAPI.getState().dataModel.dataSet //finnHubData
         let requestList = []  
@@ -22,10 +22,10 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                 requestList.push(finnHub(finnQueue, endPoint, reqKey))
             }   
         }
-        console.log("finnHub Request List: ", requestList)
+        // console.log("finnHub Request List: ", requestList)
         return Promise.all(requestList)
         .then((res) => {
-            console.log("res",res)
+            // console.log("res",res)
             const resObj = {}
             for (const resStock of res) {
                 // resObj.dataSet[resStock.endPoint] = {}
