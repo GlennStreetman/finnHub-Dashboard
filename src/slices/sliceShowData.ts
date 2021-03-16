@@ -36,10 +36,10 @@ const showData = createSlice({
             //payload {key: string, {...widget-ex-stck: {empty obj}}}
             // console.log('rBuildVisableData', action.payload)
             const ap: any = action.payload
-            for (const security in ap) {
-                const key: string = ap.key
-                const thisSecurity: string = ap[security]
-                state.dataSet[key] = {}
+            const key: string = ap.key
+            state.dataSet[key] = {}
+            for (const security in ap.securityList) {
+                const thisSecurity: string = ap.securityList[security]
                 state.dataSet[key][thisSecurity] = {}
             }
         },

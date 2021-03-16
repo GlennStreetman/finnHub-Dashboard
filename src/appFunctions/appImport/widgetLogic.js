@@ -3,17 +3,18 @@ import produce from "immer"
 export const NewMenuContainer = function newMenuContainer(widgetDescription, widgetHeader, widgetConfig) {
     const widgetName = widgetDescription;
     // this.updateZIndex(widgetName)
-    let newMenuList = Object.assign({}, this.state.menuList);
-    newMenuList[widgetName] = {
-        column: 0,
-        columnOrder: -1,
-        widgetID: widgetName,
-        widgetType: widgetDescription,
-        widgetHeader: widgetHeader,
-        xAxis: "5rem",
-        yAxis: "5rem",
-        widgetConfig: widgetConfig,
-    };
+    let newMenuList = produce(this.state.menuList, (draftState) => {
+        draftState[widgetName] = {
+            column: 0,
+            columnOrder: -1,
+            widgetID: widgetName,
+            widgetType: widgetDescription,
+            widgetHeader: widgetHeader,
+            xAxis: "5rem",
+            yAxis: "5rem",
+            widgetConfig: widgetConfig,
+        };
+    });
     this.setState({ menuList: newMenuList });
 }
 
@@ -111,33 +112,39 @@ export const UpdateWidgetStockList = function updateWidgetStockList(widgetId, sy
     const s = this.state
     const saveCurrent = ()=>{this.saveCurrentDashboard(this.state.currentDashBoard)}
     if (isNaN(widgetId) === false) {
-      let updateWidgetStockList = Object.assign({}, this.state.widgetList); //copy widget list
-      const trackingSymbolList = Object.assign({}, updateWidgetStockList[widgetId]["trackedStocks"]); //copy target widgets stock object
 
-        if (Object.keys(trackingSymbolList).indexOf(symbol) === -1) {
-        //add
-            trackingSymbolList[symbol] = {...stockObj}
-            trackingSymbolList[symbol]['dStock'] = function(ex){
-                if (ex.length === 1) {
-                return (this.symbol)
-                } else {
-                return (this.key)
+        const newWidgetList = produce(s.widgetList, (draftState) => {
+            const trackingSymbolList = draftState[widgetId]["trackedStocks"]; //copy target widgets stock object
+
+            if (Object.keys(trackingSymbolList).indexOf(symbol) === -1) {
+            //add
+                trackingSymbolList[symbol] = {...stockObj}
+                trackingSymbolList[symbol]['dStock'] = function(ex){
+                    if (ex.length === 1) {
+                    return (this.symbol)
+                    } else {
+                    return (this.key)
+                    }
                 }
+            draftState[widgetId]["trackedStocks"] = trackingSymbolList;
+
+
+            } else {
+                //remove
+                delete trackingSymbolList[symbol]
+                draftState[widgetId]["trackedStocks"] = trackingSymbolList
             }
-        updateWidgetStockList[widgetId]["trackedStocks"] = trackingSymbolList;
 
+            // draftState.dashBoardData[s.currentDashBoard].widgetlist = updateWidgetStockList 
+            })
+        
+        const updatedDashBoard = produce(s.dashBoardData, draftState=>{
+            draftState[s.currentDashBoard].widgetlist = newWidgetList
+        })
 
-    } else {
-        //remove
-        delete trackingSymbolList[symbol]
-        updateWidgetStockList[widgetId]["trackedStocks"] = trackingSymbolList
-    }
-
-        const newDashboardData = s.dashBoardData
-        newDashboardData[s.currentDashBoard].widgetlist = updateWidgetStockList 
         this.setState({ 
-            widgetList: updateWidgetStockList,
-            dashBoardData: newDashboardData,
+            widgetList: newWidgetList,
+            dashBoardData: updatedDashBoard,
             // rebuildDataSet: 1,
         }, ()=>{
             saveCurrent()
@@ -148,6 +155,7 @@ export const UpdateWidgetStockList = function updateWidgetStockList(widgetId, sy
         });
     }
 }
+
 
 export const ToggleWidgetVisability = function toggleWidgetVisability(){
     const s = this.state

@@ -1,5 +1,6 @@
 module.exports = function quoteWidgetEndPoint(stockList, filters, apiKey){
     //filters should be empty
+    console.log('quoteEndPoint', stockList, apiKey)
     let queryStringObj = {}
     delete stockList.sKeys
     for (const stock in stockList) {

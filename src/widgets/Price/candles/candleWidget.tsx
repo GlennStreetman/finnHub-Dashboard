@@ -1,7 +1,7 @@
 import * as React from "react"
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 
-import { useAppDispatch, useAppSelector } from './../../../hooks';
+import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { rBuildVisableData } from '../../../slices/sliceShowData'
 import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
 
@@ -10,29 +10,8 @@ import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 import CreateCandleStickChart from "./createCandleStickChart";
 
-
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
-
-//upstream objects need to be defined.
-// interface P {
-//     changeSearchText: Function,
-//     defaultExchange: string,
-//     exchangeList: string[],
-//     filters: object,
-//     searchText: string,
-//     showEditPane: number,
-//     showPane: Function,
-//     trackedStocks: object,
-//     updateDefaultExchange: Function,
-//     updateGlobalStockList: Function,
-//     updateWidgetFilters: Function,
-//     updateWidgetStockList: Function, 
-//     widgetCopy: object
-//     widgetKey: string,
-//     widgetType: string,
-
-// }
 
 interface FinnHubCandleData {
     c: number[],
@@ -44,10 +23,9 @@ interface FinnHubCandleData {
     v: number[],
 }
 
-function isCandleData(arg: any): arg is FinnHubCandleData {
+function isCandleData(arg: any): arg is FinnHubCandleData { //defined shape of candle data. CHeck used before rendering.
     return arg.c !== undefined
 }
-
 
 function PriceCandles(p: { [key: string]: any }, ref: any) {
     const ChartData: Object[] = []
@@ -59,13 +37,13 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     const dispatch = useDispatch()
 
     //finnhub data stored in redux
-    const rCandleData = useSelector((state) => {
+    const rShowData = useSelector((state) => {
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
-            const CandleData = state.showData.dataSet[p.widgetKey][candleSelection]
+            const showData = state.showData.dataSet[p.widgetKey][candleSelection]
             // console.log('CandleData', CandleData)
-            return (CandleData)
+            return (showData)
         }
     })
 
@@ -118,8 +96,8 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     }
 
     useEffect(() => { //CREATE CANDLE DATA
-        if (rCandleData !== undefined && Object.keys(rCandleData).length > 0) {
-            const data: any = rCandleData //returned from finnHub API
+        if (rShowData !== undefined && Object.keys(rShowData).length > 0) {
+            const data: any = rShowData //returned from finnHub API
             if (isCandleData(data)) {
                 const nodeCount: number = data["c"].length;
                 const chartData: Object[] = []
@@ -177,7 +155,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                 // }
             }
         }
-    }, [candleSelection, p.showEditPane, rCandleData, p.filters.endDate, p.filters.startDate])
+    }, [candleSelection, p.showEditPane, rShowData, p.filters.endDate, p.filters.startDate])
 
     useEffect(() => {
         //on change in candle selection set visable to empty object.

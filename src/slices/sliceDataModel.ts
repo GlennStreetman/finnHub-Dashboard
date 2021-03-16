@@ -1,7 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { widgetDict } from '../registers/endPointsReg.js'
-import { tGetFinnhubData } from '../thunks/thunkFetchFinnhub.js'
-import { tGetMongoDB } from '../thunks/thunkGetMongoDB.js'
+import { widgetDict } from '../registers/endPointsReg'
+import { tGetFinnhubData } from '../thunks/thunkFetchFinnhub'
+import { tGetMongoDB } from '../thunks/thunkGetMongoDB'
+
 
 interface DataNode {
     apiString?: string,
@@ -14,7 +15,7 @@ interface DataSet {
     created: string
 }
 
-interface EndPointObj {
+export interface EndPointObj {
     [key: string]: string
 }
 
