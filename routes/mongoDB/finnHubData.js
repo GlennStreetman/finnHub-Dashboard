@@ -4,7 +4,7 @@ const client = process.env.live === '1' ?
     require("../../db/mongoLocal.js") :  
     require("../../db/mongoLocal.js") ;
 
-//receives list of data to find [...data]
+//gets user, none statle, finnhub dtata. This process deletes stale records.
 router.get('/finnDashData', async (req, res) => {
     if (req.session.login === true) {
         try {

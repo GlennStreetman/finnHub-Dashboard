@@ -22,7 +22,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                 requestList.push(finnHub(finnQueue, endPoint, reqKey))
             }   
         }
-        // console.log("finnHub Request List: ", requestList)
+        console.log("finnHub Request List: ", requestList)
         return Promise.all(requestList)
         .then((res) => {
             // console.log("res",res)

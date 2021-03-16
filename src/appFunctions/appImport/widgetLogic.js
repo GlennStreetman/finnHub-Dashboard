@@ -90,20 +90,34 @@ export const RemoveWidget = function removeWidget(stateRef, widgetID) {
 }
 
 export const UpdateWidgetFilters = function updateWidgetFilters(widgetID, dataKey, data){
-    const s = this.state
-    // console.log("UPDATEWIDGETFILTERS", dataKey, data)
-    const newWidgetList = produce(s.widgetList, (draftState) => {
-        draftState[widgetID].filters[dataKey] = data
-    })
-    
-    // const updatedWidgetList = {...this.state.widgetList}
-    // if (updatedWidgetList[widgetID].filters === undefined) {
-    //     updatedWidgetList[widgetID].filters = {}
-    // }
-    // updatedWidgetList[widgetID].filters[dataKey] = data
-    this.setState({
-        widgetList: newWidgetList,
-    })
+    try {
+        const s = this.state
+        // console.log("UPDATEWIDGETFILTERS", dataKey, data)
+        const newWidgetList = produce(s.widgetList, (draftState) => {
+            draftState[widgetID].filters[dataKey] = data
+        })
+
+        const newDashBoardData = produce(s.dashBoardData, draftState=>{
+            draftState[s.currentDashBoard].widgetlist[widgetID].filters[dataKey] = data 
+        })
+        
+        this.setState({
+            widgetList: newWidgetList,
+            dashBoardData: newDashBoardData,
+        }, async ()=>{
+            //delete records from mongoDB then rebuild dataset.
+            let res = await fetch(`/deleteFinnDashData?widgetID=${widgetID}`)
+            let data = await res.json()
+            console.log("DATA", data)
+            if (res.status === 200) {
+                this.props.rBuildDataModel({
+                    apiKey: this.state.apiKey,
+                    dashBoardData: this.state.dashBoardData
+                })
+            } else {console.log("Problem updating widget filters.") }
+
+        })
+    }catch{console.log("Problem updating widget filters.")}
 }
 
 export const UpdateWidgetStockList = function updateWidgetStockList(widgetId, symbol, stockObj={}) {
