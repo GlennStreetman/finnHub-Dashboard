@@ -38,14 +38,14 @@ export default class FundamentalsBasicFinancials extends React.Component {
       if (p.filters['metricSelection'] === undefined) {
         let newList = []
         p.updateWidgetFilters(p.widgetKey, 'metricSelection', newList)
-        p.trackedStocks.sKeys()[0] === undefined ?
+        Object.keys(p.trackedStocks)[0] === undefined ?
           p.updateWidgetFilters(p.widgetKey, 'metricSource', 'US-AAPL') :
-          p.updateWidgetFilters(p.widgetKey, 'metricSource', p.trackedStocks.sKeys()[0])
+          p.updateWidgetFilters(p.widgetKey, 'metricSource', Object.keys(p.trackedStocks)[0])
           p.updateWidgetFilters(p.widgetKey, 'Note', 'Metric source for dashboard display purposes.')
       }
 
       if (this.props.apiKey !== '' ) {
-        p.trackedStocks.sKeys().forEach(el => this.getCompanyMetrics(el))
+        Object.keys(p.trackedStocks).forEach(el => this.getCompanyMetrics(el))
       }
     }
   }
@@ -55,8 +55,8 @@ export default class FundamentalsBasicFinancials extends React.Component {
     const s = this.state
     const p = this.props
     if (this.props.trackedStocks !== prevProps.trackedStocks) {
-      this.props.trackedStocks.sKeys().forEach(el => {
-        prevProps.trackedStocks.sKeys().indexOf(el) === -1 && this.getCompanyMetrics(el)
+      Object.keys(this.props.trackedStocks).forEach(el => {
+        Object.keys(prevProps.trackedStocks).indexOf(el) === -1 && this.getCompanyMetrics(el)
       })
     }
     if (p.filters.metricSource !== undefined && s.metricData[p.filters.metricSource] !== undefined && s.metricList.length === 0) {
@@ -187,7 +187,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
     let end = increment;
     let metricSlice = this.state.metricList.slice(start, end);
     let selectionSlice = p.filters.metricSelection.slice(start, end);
-    let stockSelectionSlice = p.trackedStocks.sKeys().slice(start, end);
+    let stockSelectionSlice = Object.keys(p.trackedStocks).slice(start, end);
     // console.log(selectionSlice)
     let mapMetrics = metricSlice.map((el, index) => (
       <tr key={el + "metricRow" + index}>
@@ -315,7 +315,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
       // console.log(title)
       return (<td className='tdHead' key={thisKey + el +  "title"}>{title}</td>)}
       )
-    let bodyRows = p.trackedStocks.sKeys().map((el) => { return (
+    let bodyRows = Object.keys(p.trackedStocks).map((el) => { return (
     <tr key={thisKey + el + "tr1"}>
     <td key={thisKey + el + "td1"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
     {this.mapStockData(el)}
@@ -347,7 +347,7 @@ export default class FundamentalsBasicFinancials extends React.Component {
           {this.getMetrics()}
           </>
         )}
-        {this.props.trackedStocks.sKeys().length > 0 && this.props.showEditPane === 0  ? this.renderStockData() : <></>}       
+        {Object.keys(this.props.trackedStocks).length > 0 && this.props.showEditPane === 0  ? this.renderStockData() : <></>}       
       </>
     );
   }

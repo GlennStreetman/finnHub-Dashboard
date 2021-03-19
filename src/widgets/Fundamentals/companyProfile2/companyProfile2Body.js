@@ -26,14 +26,14 @@ export default class FundamentalsCompanyProfile2 extends Component {
     if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
       this.setState({...p.widgetCopy})
     } else {
-      this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData())
+      this.setState({targetStock: Object.keys(p.trackedStocks)[0]}, () => this.getStockData())
     }
   }
 
   componentDidUpdate(prevProps){
     const p = this.props
-    if (prevProps.trackedStocks.sKeys()[0] !== p.trackedStocks.sKeys()[0]) {
-      this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData())
+    if (Object.keys(prevProps.trackedStocks)[0] !== Object.keys(p.trackedStocks)[0]) {
+      this.setState({targetStock: Object.keys(p.trackedStocks)[0]}, () => this.getStockData())
     }
   }
 
@@ -63,7 +63,7 @@ export default class FundamentalsCompanyProfile2 extends Component {
 
   stockListForm() { 
     const p = this.props
-    const stockList = p.trackedStocks.sKeys();
+    const stockList = Object.keys(p.trackedStocks);
     let row = stockList.map((el) =>
       this.props.showEditPane === 1 ? (
         <tr key={el + "container"}>
@@ -93,7 +93,7 @@ export default class FundamentalsCompanyProfile2 extends Component {
 
   renderStockData(){
     const p = this.props
-    const newSymbolList = p.trackedStocks.sKeys().map((el) => (
+    const newSymbolList = Object.keys(p.trackedStocks).map((el) => (
       <option key={el + "ddl"} value={el}>
         {p.trackedStocks[el].dStock(p.exchangeList)}
       </option>

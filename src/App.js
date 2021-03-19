@@ -40,12 +40,6 @@ class App extends React.Component {
     super(props);
 
     const defaultGlobalStockList = {};
-    defaultGlobalStockList["sKeys"] = function () {
-      const stockList = Object.keys(this);
-      const index = stockList.indexOf("sKeys");
-      stockList.splice(index, 1);
-      return stockList;
-    };
 
     this.state = {
       apiFlag: 0, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.

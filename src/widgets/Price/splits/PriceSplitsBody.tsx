@@ -99,8 +99,8 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
 
     useEffect(() => {
         //if stock not selected default to first stock.
-        if (p.trackedStocks.sKeys().length > 0 && targetStock === '') {
-            const setDefault = p.trackedStocks[p.trackedStocks.sKeys()[0]].key
+        if (Object.keys(p.trackedStocks).length > 0 && targetStock === '') {
+            const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
             setTargetStock(setDefault)
         }
     }, [p.trackedStocks, targetStock])
@@ -122,7 +122,7 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
     function renderSearchPane() {
         //add search pane rendering logic here. Additional filters need to be added below.
 
-        const stockList = p.trackedStocks.sKeys();
+        const stockList = Object.keys(p.trackedStocks);
         const stockListRows = stockList.map((el) =>
             <tr key={el + "container"}>
                 <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
@@ -191,7 +191,7 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
 
 
     function renderStockData() {
-        let newStockList = p.trackedStocks.sKeys().map((el) => (
+        let newStockList = Object.keys(p.trackedStocks).map((el) => (
             <option key={el + "ddl"} value={el}>
                 {p.trackedStocks[el].dStock(p.exchangeList)}
             </option>

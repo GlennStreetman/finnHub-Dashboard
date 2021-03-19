@@ -24,14 +24,14 @@ export default class PriceTargetBody extends Component {
       if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
         this.setState({...p.widgetCopy})
       } else {
-        p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData()) 
+        Object.keys(p.trackedStocks)[0] !== undefined && this.setState({targetStock: Object.keys(p.trackedStocks)[0]}, () => this.getStockData()) 
       }
     }
 
     componentDidUpdate(prevProps, prevState){
       const p = this.props
-      if (prevProps.trackedStocks.sKeys()[0] !== p.trackedStocks.sKeys()[0]) {
-        this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData())
+      if (Object.keys(prevProps.trackedStocks)[0] !== Object.keys(p.trackedStocks)[0]) {
+        this.setState({targetStock: Object.keys(p.trackedStocks)[0]}, () => this.getStockData())
       }
     }
 
@@ -63,7 +63,7 @@ export default class PriceTargetBody extends Component {
     renderSearchPane(){
       //add search pane rendering logic here. Additional filters need to be added below.
     const p = this.props
-    const stockList = p.trackedStocks.sKeys();
+    const stockList = Object.keys(p.trackedStocks);
     const stockListRows = stockList.map((el) =>
         <tr key={el + "container"}>
           <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
@@ -99,7 +99,7 @@ export default class PriceTargetBody extends Component {
           <td key={el + "name"}>{s.targetData[el]}</td>
         </tr>
       )
-      const newSymbolList = p.trackedStocks.sKeys().map((el) => (
+      const newSymbolList = Object.keys(p.trackedStocks).map((el) => (
         <option key={el + "ddl"} value={el}>
           {p.trackedStocks[el].dStock(p.exchangeList)}
         </option>
@@ -154,7 +154,7 @@ export default class PriceTargetBody extends Component {
               {this.renderSearchPane()}
               </>
             )}
-            {p.trackedStocks.sKeys().length > 0 && 
+            {Object.keys(p.trackedStocks).length > 0 && 
             this.props.showEditPane === 0  ? this.renderStockData() : <></>}       
           </>
         )

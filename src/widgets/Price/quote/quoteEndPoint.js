@@ -3,7 +3,6 @@ module.exports = function quoteWidgetEndPoint(stockList, filters, apiKey){
     // console.log('quoteEndPoint', stockList, apiKey)
     let queryStringObj = {}
     const thisList = {...stockList}
-    delete thisList.sKeys
     for (const stock in thisList) {
       const stockSymbole = thisList[stock].symbol
       const key = thisList[stock].key

@@ -22,7 +22,7 @@ export default class widgetName extends Component {
       if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) { //loads saved data on component drag.
         this.setState({...p.widgetCopy})
       } else {
-        p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData()) 
+        Object.keys(p.trackedStocks)[0] !== undefined && this.setState({targetStock: Object.keys(p.trackedStocks)[0]}, ()=>this.getStockData()) 
       }
     }
 

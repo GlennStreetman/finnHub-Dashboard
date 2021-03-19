@@ -12,12 +12,6 @@ export const LoadDashBoard = function loadDashBoard(newGlobalList, newWidgetList
         }
     }
 
-    updateGlobalList['sKeys'] = function(){
-        const stockList = Object.keys(this)
-        const index = stockList.indexOf('sKeys')
-        stockList.splice(index,1) 
-        return stockList
-    }
     //setup widgets, and their individual stock lists.
     let updateWidgetList = newWidgetList;
     for (const widget in updateWidgetList){
@@ -33,17 +27,6 @@ export const LoadDashBoard = function loadDashBoard(newGlobalList, newWidgetList
             }
             }
         }
-        // console.log("2")
-        if (widgetStockObj.trackedStocks !== null) {
-            // console.log("-----------------SETING UP SKEYS-----------------", updateWidgetList, widget)
-            widgetStockObj.trackedStocks['sKeys'] = function(){
-            const stockList = Object.keys(this)
-            const index = stockList.indexOf('sKeys')
-            stockList.splice(index,1) 
-            return stockList
-            } 
-        } else {console.log("--------------PROBLEM SETTING UP sKeys--------",widget )}
-        // console.log("trackedStocks---->", Object.keys(widgetStockObj.trackedStocks), widget)
     }
 
     delete updateWidgetList.null

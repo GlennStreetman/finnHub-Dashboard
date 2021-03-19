@@ -37,8 +37,8 @@ export default class EstimatesEarningsCalendar extends Component {
           p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
         } 
 
-        if (p.trackedStocks.sKeys()[0] !== undefined) {
-          this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData())
+        if (Object.keys(p.trackedStocks)[0] !== undefined) {
+          this.setState({targetStock: Object.keys(p.trackedStocks)[0]}, ()=>this.getStockData())
         }
       }
     }
@@ -46,8 +46,8 @@ export default class EstimatesEarningsCalendar extends Component {
     componentDidUpdate(prevProps, prevState){
       const p = this.props
 
-      if (prevProps.trackedStocks.sKeys()[0] === undefined && p.trackedStocks.sKeys()[0] !== undefined) {
-        this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=> this.getStockData())
+      if (Object.keys(prevProps.trackedStocks)[0] === undefined && Object.keys(p.trackedStocks)[0] !== undefined) {
+        this.setState({targetStock: Object.keys(p.trackedStocks)[0]}, ()=> this.getStockData())
       }
     }
 
@@ -74,7 +74,7 @@ export default class EstimatesEarningsCalendar extends Component {
     renderSearchPane(){
       //add search pane rendering logic here. Additional filters need to be added below.
     const p = this.props
-    const stockList = p.trackedStocks.sKeys();
+    const stockList = Object.keys(p.trackedStocks);
     const stockListRows = stockList.map((el) =>
         <tr key={el + "container"}>
           <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
@@ -167,8 +167,7 @@ export default class EstimatesEarningsCalendar extends Component {
             {el}
           </option>
         ));
-        // console.log(p.trackedStocks, p.trackedStocks.sKeys(), '<-----------------')
-        let newStockList = p.trackedStocks.sKeys().map((el) => (
+        let newStockList = Object.keys(p.trackedStocks).map((el) => (
           <option key={el + "ddl"} value={el}>
             {p.trackedStocks[el].dStock(p.exchangeList)}
           </option>

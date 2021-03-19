@@ -30,15 +30,15 @@ export default class FundamentalsSECFilings extends Component {
       if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
         this.setState({...p.widgetCopy})
       } else {
-        p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData()) 
+        Object.keys(p.trackedStocks)[0] !== undefined && this.setState({targetStock: Object.keys(p.trackedStocks)[0]}, ()=>this.getStockData()) 
       }
     }
 
     componentDidUpdate(prevProps, prevState){
       const p = this.props
       
-      if (prevProps.trackedStocks.sKeys()[0] === undefined && p.trackedStocks.sKeys()[0] !== undefined) {
-        this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData())
+      if (Object.keys(prevProps.trackedStocks)[0] === undefined && Object.keys(p.trackedStocks)[0] !== undefined) {
+        this.setState({targetStock: Object.keys(p.trackedStocks)[0]}, () => this.getStockData())
       }
     }
 
@@ -53,7 +53,7 @@ export default class FundamentalsSECFilings extends Component {
 
     renderSearchPane(){
       const p = this.props
-      let stockList = p.trackedStocks.sKeys();
+      let stockList = Object.keys(p.trackedStocks);
       let row = stockList.map((el) =>
         this.props.showEditPane === 1 ? (
           <tr key={el + "container"}>
@@ -119,7 +119,7 @@ export default class FundamentalsSECFilings extends Component {
       const p = this.props
       const s = this.state
       if (s.stockData !== undefined) {
-      let newSymbolList = p.trackedStocks.sKeys().map((el) => (
+      let newSymbolList = Object.keys(p.trackedStocks).map((el) => (
         <option key={el + "ddl"} value={el}>
           {p.trackedStocks[el].dStock(p.exchangeList)}
         </option>

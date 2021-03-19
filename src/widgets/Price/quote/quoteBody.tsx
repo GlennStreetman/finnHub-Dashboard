@@ -69,7 +69,7 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
             isInitialMount.current = false;
         } else {
             console.log("Loading Quote Widget")
-            const stockList: string[] = p.trackedStocks.sKeys()
+            const stockList: string[] = Object.keys(p.trackedStocks)
             const payload: object = {
                 key: p.widgetKey,
                 securityList: stockList,

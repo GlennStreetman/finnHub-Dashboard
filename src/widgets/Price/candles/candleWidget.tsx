@@ -107,8 +107,8 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
 
     useEffect(() => {
         //if stock not selected default to first stock.
-        if (p.trackedStocks.sKeys().length > 0 && candleSelection === '') {
-            const setDefault = p.trackedStocks[p.trackedStocks.sKeys()[0]].key
+        if (Object.keys(p.trackedStocks).length > 0 && candleSelection === '') {
+            const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
             setCandleSelection(setDefault)
         }
     }, [p.trackedStocks, candleSelection])
@@ -215,7 +215,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     }
 
     function editCandleListForm() {
-        let candleList = p.trackedStocks.sKeys();
+        let candleList = Object.keys(p.trackedStocks);
         let candleSelectionRow = candleList.map((el) =>
             p.showEditPane === 1 ? (
                 <tr key={el + "container"}>
@@ -244,7 +244,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     }
 
     function displayCandleGraph() {
-        let newSymbolList = p.trackedStocks.sKeys().map((el) => (
+        let newSymbolList = Object.keys(p.trackedStocks).map((el) => (
             <option key={el + "ddl"} value={el}>
                 {p.trackedStocks[el].dStock(p.exchangeList)}
             </option>

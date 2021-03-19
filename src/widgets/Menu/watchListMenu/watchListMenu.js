@@ -33,9 +33,9 @@ export default class WatchListMenu extends React.PureComponent {
       
     const p = this.props
     const g = p.globalStockList;
-    if (g.sKeys !== undefined) {
+    if (Object.keys(g) !== undefined) {
     // console.log(g, '-------------')
-    const stockListKey = g.sKeys().map((el) => ( 
+    const stockListKey = Object.keys(g).map((el) => ( 
     <tr key={el + "row"}>
 
         {this.props.showEditPane === 0 &&

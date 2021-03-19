@@ -24,15 +24,15 @@ export default class FundamentalsFinancialsAsReported extends Component {
       if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
       this.setState({...p.widgetCopy})
       } else {
-        p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, ()=>this.getStockData()) 
+        Object.keys(p.trackedStocks)[0] !== undefined && this.setState({targetStock: Object.keys(p.trackedStocks)[0]}, ()=>this.getStockData()) 
       }
     }
 
     componentDidUpdate(prevProps, prevState){
       const p = this.props
       
-      if (prevProps.trackedStocks.sKeys()[0] === undefined && p.trackedStocks.sKeys()[0] !== undefined) {
-        this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData())
+      if (Object.keys(prevProps.trackedStocks)[0] === undefined && Object.keys(p.trackedStocks)[0] !== undefined) {
+        this.setState({targetStock: Object.keys(p.trackedStocks)[0]}, () => this.getStockData())
       }
     }
 
@@ -51,7 +51,7 @@ export default class FundamentalsFinancialsAsReported extends Component {
 
     renderSearchPane(){
       const p = this.props
-      const stockList = this.props.trackedStocks.sKeys(); 
+      const stockList = Object.keys(this.props.trackedStocks); 
       const row = stockList.map((el) =>
         this.props.showEditPane === 1 ? (
           <tr key={el + "container"}>
@@ -87,7 +87,7 @@ export default class FundamentalsFinancialsAsReported extends Component {
 
     renderStockData(){
       const p = this.props
-      const newSymbolList = p.trackedStocks.sKeys().map((el) => (
+      const newSymbolList = Object.keys(p.trackedStocks).map((el) => (
         <option key={el + "ddl"} value={el}>
           {p.trackedStocks[el].dStock(p.exchangeList)}
         </option>

@@ -26,15 +26,15 @@ export default class FundamentalsPeers extends Component {
       if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
         this.setState({...p.widgetCopy})
       } else {
-        p.trackedStocks.sKeys()[0] !== undefined && this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData()) 
+        Object.keys(p.trackedStocks)[0] !== undefined && this.setState({targetStock: Object.keys(p.trackedStocks)[0]}, () => this.getStockData()) 
         this.getSymbolList()
       }
     }
 
     componentDidUpdate(prevProps, prevState){
       const p = this.props
-      if (prevProps.trackedStocks.sKeys()[0] !== p.trackedStocks.sKeys()[0]) {
-        this.setState({targetStock: p.trackedStocks.sKeys()[0]}, () => this.getStockData())
+      if (Object.keys(prevProps.trackedStocks)[0] !== Object.keys(p.trackedStocks)[0]) {
+        this.setState({targetStock: Object.keys(p.trackedStocks)[0]}, () => this.getStockData())
       }
     }
 
@@ -99,7 +99,7 @@ export default class FundamentalsPeers extends Component {
     renderSearchPane(){
       //add search pane rendering logic here. Additional filters need to be added below.
     const p = this.props
-    const stockList = p.trackedStocks.sKeys();
+    const stockList = Object.keys(p.trackedStocks);
     const stockListRows = stockList.map((el) =>
         <tr key={el + "container"}>
           <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
@@ -135,7 +135,7 @@ export default class FundamentalsPeers extends Component {
           <td key={el + "name"}>{this.getStockName(el)}</td>
         </tr>
       )
-      const newSymbolList = this.props.trackedStocks.sKeys().map((el) => (
+      const newSymbolList = Object.keys(this.props.trackedStocks).map((el) => (
         <option key={el + "ddl"} value={el}>
           {p.trackedStocks[el].dStock(p.exchangeList)}
         </option>
