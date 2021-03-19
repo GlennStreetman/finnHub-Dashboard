@@ -1,6 +1,7 @@
 //dropdown menu: widget Object, Widget default name, family, Dropdown list description
 //imported by topNav component.
 import { candleWidgetFilters } from './../widgets/Price/candles/candleWidget';
+import { priceSplitsFilters } from './../widgets/Price/splits/PriceSplitsBody';
 
 export let estimateOptions = [
     ["EstimatesEarningsCalendar" ,"Earnings Calendar: ", "stockWidget", "Earnings Calendar"],  
@@ -21,9 +22,9 @@ export let fundamentalsOptions = [
     ["FundamentalsSECFilings", "SEC Filings: ", "stockWidget", "SEC Filings"],
   ]
 
- 
+
 export let priceOptions = [
     ["PriceCandles", "Price Candle: ", "stockWidget", "Candles", candleWidgetFilters],
     ["PriceQuote", "Price Quote: ", "stockWidget", "Quote"],
-    ["PriceSplits", "Price Split: ", "stockWidget", "Splits"],
+    ["PriceSplits", "Price Split: ", "stockWidget", "Splits", priceSplitsFilters],
   ] 

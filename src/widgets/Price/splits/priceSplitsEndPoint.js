@@ -1,17 +1,18 @@
 function findDate(offset){
-  const returnDate = new Date(Date.now() + offset).toISOString().slice(0, 10) 
-  return returnDate
+    // console.log('offset', offset)
+    const returnDate = new Date(Date.now() + offset).toISOString().slice(0, 10) 
+    return returnDate
 }
 
-module.exports = function quoteWidgetEndPoint(stockList, filters, apiKey){
-    //filters should be empty
+module.exports = function priceSplitEndPoint(stockList, filters, apiKey){
     let queryStringObj = {}
     for (const stock in stockList) {
-      const stockSymbole = stockList[stock].symbol
-      
-      const queryString = `https://finnhub.io/api/v1/stock/split?symbol=${stockSymbole}&from=${findDate(filters.startDate)}&to=${findDate(filters.endDate)}&token=${apiKey}`
-  
-        queryStringObj[stockSymbole] = (queryString)
-      }
-      return queryStringObj
-  }
+        if (stockList[stock].symbol !== undefined){
+            const stockSymbole = stockList[stock].symbol
+            const stockKey = stockList[stock].key
+            const queryString = `https://finnhub.io/api/v1/stock/split?symbol=${stockSymbole}&from=${findDate(filters.startDate)}&to=${findDate(filters.endDate)}&token=${apiKey}`
+            queryStringObj[stockKey] = (queryString)
+        }
+    }
+    return queryStringObj
+}

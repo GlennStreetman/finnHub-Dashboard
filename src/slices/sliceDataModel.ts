@@ -37,7 +37,7 @@ const dataModel = createSlice({
 
             const ap: any = action.payload
             const apD: any = ap.dashBoardData
-            console.log("Building DATASET")
+            // console.log("Building DATASET")
             const resList: string[] = []
             const endPointAPIList: EndPointAPIList = {} //list of lists. Each list []
             //nested loops that create a list of endpoints for this dataset.
@@ -56,6 +56,7 @@ const dataModel = createSlice({
                         // console.log('MAKE ENDPOINT', widgetName, filters, ap.apiKey)
                         const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, ap.apiKey)
                         delete endPointData.undefined
+                        // console.log("ENDPOINT LIST", endPointData)
                         endPointAPIList[widgetName] = endPointData
                         for (const s in trackedStocks) {
                             if (trackedStocks[s].key !== undefined) {
@@ -67,17 +68,18 @@ const dataModel = createSlice({
                     }
                 }
             }
-
+            // console.log('resList', resList)
             for (const x in state.dataSet) {
                 //if resList item exists in old list, delete from reslist, else delete from oldState
                 resList.indexOf(x) > -1 ?
                     resList.splice(resList.indexOf(x), 1) :
                     delete state.dataSet[x]
             }
+            // console.log('resList2', resList)
             for (const x of resList) { //Map remainnig resList items into state.
                 state.dataSet[x] = {}
             }
-
+            // console.log('endPointAPIList', endPointAPIList)
             for (const widget in endPointAPIList) {
                 const thisWidget = endPointAPIList[widget]
                 for (const security in thisWidget) {
@@ -132,7 +134,7 @@ const dataModel = createSlice({
         },
         // @ts-ignore: Unreachable code error
         [tGetMongoDB.fulfilled]: (state, action) => {
-            console.log("Merge update fields into dataSet from mongoDB")
+            // console.log("3Merge update fields into dataSet from mongoDB", action)
             const ap = action.payload
             for (const x in ap) {
                 const apiString = ap[x].key

@@ -124,7 +124,7 @@ export const UpdateWidgetStockList = function updateWidgetStockList(widgetId, sy
     //adds if not present, else removes stock from widget specific stock list.
     // console.log(widgetId, symbol, stockObj, 'updating stock list')
     const s = this.state
-    const saveCurrent = ()=>{this.saveCurrentDashboard(this.state.currentDashBoard)}
+    // const saveCurrent = ()=>{this.saveCurrentDashboard(this.state.currentDashBoard)}
     if (isNaN(widgetId) === false) {
 
         const newWidgetList = produce(s.widgetList, (draftState) => {
@@ -161,7 +161,7 @@ export const UpdateWidgetStockList = function updateWidgetStockList(widgetId, sy
             dashBoardData: updatedDashBoard,
             // rebuildDataSet: 1,
         }, ()=>{
-            saveCurrent()
+            this.saveCurrentDashboard(this.state.currentDashBoard)
             this.props.rBuildDataModel({
                 apiKey: this.state.apiKey,
                 dashBoardData: this.state.dashBoardData

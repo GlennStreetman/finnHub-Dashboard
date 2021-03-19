@@ -1,11 +1,9 @@
 import * as React from "react"
-import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
+import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { rBuildVisableData } from '../../../slices/sliceShowData'
 import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
-
-// import { DataNode, DataSet } from './../../../slices/sliceDataModel.js';
 
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 import CreateCandleStickChart from "./createCandleStickChart";
@@ -23,17 +21,35 @@ interface FinnHubCandleData {
     v: number[],
 }
 
+
 function isCandleData(arg: any): arg is FinnHubCandleData { //defined shape of candle data. CHeck used before rendering.
     return arg.c !== undefined
 }
 
 function PriceCandles(p: { [key: string]: any }, ref: any) {
-    const ChartData: Object[] = []
-    const [candleSelection, setCandleSelection] = useState('');
-    const [chartData, setChartData] = useState(ChartData)
-    const [options, setOptions] = useState({})
-    const [selectResolution, setSelectResolution] = useState([1, 5, 15, 30, 60, "D", "W", "M"])
 
+    const startingCandleSelection = () => {
+        if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+            return (p.widgetCopy.candleSelection)
+        } else { return ('') }
+    }
+
+    const startingCandleData = () => {
+        if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+            return (p.widgetCopy.chartData)
+        } else { return ([]) }
+    }
+
+    const startingOptions = () => {
+        if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+            return (p.widgetCopy.options)
+        } else { return ({}) }
+    }
+
+    const [candleSelection, setCandleSelection] = useState(startingCandleSelection());
+    const [chartData, setChartData] = useState(startingCandleData())
+    const [options, setOptions] = useState(startingOptions())
+    const isInitialMount = useRef(true);
     const dispatch = useDispatch()
 
     //finnhub data stored in redux
@@ -54,34 +70,42 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                 candleSelection: candleSelection,
                 chartData: chartData,
                 options: options,
-                selectResolution: selectResolution,
             },
         }
     ))
 
-    useEffect(() => { //USE WIDGET COPY
-        //on mount, use widget copy if available, or run setup.
-        if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            console.log('use widget copy candles', p.widgetCopy)
-            setCandleSelection(p.widgetCopy.candleSelection)
-            setChartData(p.widgetCopy.chartData)
-            setOptions(p.widgetCopy.options)
-            setSelectResolution(p.widgetCopy.selectResolution)
+    useEffect(() => {
+        //On mount, use widget copy, else build visable data.
+        //On update, if change in candle selection, rebuild visable data.
+        if (isInitialMount.current && p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+            isInitialMount.current = false;
         } else {
-            if (p.filters['startDate'] === undefined) {
-                console.log("Setting up candles")
-                const startDateSetBack = 31536000 * 1000 //1 week
-                const endDateSetBack = 0
-                p.updateWidgetFilters(p.widgetKey, 'resolution', 'W')
-                p.updateWidgetFilters(p.widgetKey, 'startDate', startDateSetBack)
-                p.updateWidgetFilters(p.widgetKey, 'endDate', endDateSetBack)
-                p.updateWidgetFilters(p.widgetKey, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
-
+            console.log("Loading Candle Widget")
+            if (isInitialMount.current === true) { isInitialMount.current = false }
+            const payload = {
+                key: p.widgetKey,
+                securityList: [[`${candleSelection}`]]
             }
+            dispatch(rBuildVisableData(payload))
         }
-    }, [])
+    }, [candleSelection, p.widgetKey, p.widgetCopy, dispatch])
 
-    useEffect(() => { //SET DEFAULT STOCK
+    useEffect((filters: object = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
+        //Setup filters if not yet done.
+        if (filters['startDate'] === undefined) {
+            console.log("Setting up candles filters")
+            const startDateSetBack: number = 31536000 * 1000 //1 week
+            const endDateSetBack: number = 0
+            update(key, 'resolution', 'W')
+            update(key, 'startDate', startDateSetBack)
+            update(key, 'endDate', endDateSetBack)
+            update(key, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
+
+        }
+        // }
+    }, [p.filters, p.updateWidgetFilters, p.widgetKey])
+
+    useEffect(() => {
         //if stock not selected default to first stock.
         if (p.trackedStocks.sKeys().length > 0 && candleSelection === '') {
             const setDefault = p.trackedStocks[p.trackedStocks.sKeys()[0]].key
@@ -95,7 +119,9 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         y: number[],
     }
 
-    useEffect(() => { //CREATE CANDLE DATA
+    useEffect(() => {
+        //CREATE CANDLE DATA
+        console.log("Calculating candle data")
         if (rShowData !== undefined && Object.keys(rShowData).length > 0) {
             const data: any = rShowData //returned from finnHub API
             if (isCandleData(data)) {
@@ -117,14 +143,14 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                 }
                 //SET CHART OPTIONS
                 const now = Date.now()
-                const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800 * 1000
-                const startUnix = now - startUnixOffset
-                const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
-                const endUnix = now - endUnixOffset
-                const startDate = new Date(startUnix).toISOString().slice(0, 10);
-                const endDate = new Date(endUnix).toISOString().slice(0, 10);
+                const startUnixOffset: number = p.filters.startDate !== undefined ? p.filters.startDate : 604800 * 1000
+                const startUnix: number = now - startUnixOffset
+                const endUnixOffset: number = p.filters.startDate !== undefined ? p.filters.endDate : 0
+                const endUnix: number = now - endUnixOffset
+                const startDate: string = new Date(startUnix).toISOString().slice(0, 10);
+                const endDate: string = new Date(endUnix).toISOString().slice(0, 10);
 
-                const options = {
+                const options: Object = {
                     width: 400,
                     height: 200,
                     theme: "light2", // "light1", "light2", "dark1", "dark2"
@@ -155,17 +181,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                 // }
             }
         }
-    }, [candleSelection, p.showEditPane, rShowData, p.filters.endDate, p.filters.startDate])
-
-    useEffect(() => {
-        //on change in candle selection set visable to empty object.
-        const payload = {
-            key: p.widgetKey,
-            securityList: [[`${candleSelection}`]]
-        }
-        dispatch(rBuildVisableData(payload))
-
-    }, [candleSelection, p.widgetKey, dispatch])
+    }, [candleSelection, rShowData, p.filters.endDate, p.filters.startDate])
 
     function updateWidgetList(stock) {
         if (stock.indexOf(":") > 0) {
@@ -250,7 +266,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         return symbolSelectorDropDown;
     }
 
-    let resolutionList = selectResolution.map((el) => (
+    let resolutionList = [1, 5, 15, 30, 60, "D", "W", "M"].map((el) => (
         <option key={el + "rsl"} value={el}>
             {el}
         </option>

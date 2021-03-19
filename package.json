@@ -20,8 +20,6 @@
     "express-session": "^1.17.1",
     "idb": "^6.0.0",
     "immer": "^8.0.1",
-    "immutable": "^4.0.0-rc.12",
-    "lodash": "^4.17.21",
     "mailgun-js": "^0.22.0",
     "md5": "^2.3.0",
     "mongodb": "^3.6.4",

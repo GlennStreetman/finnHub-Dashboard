@@ -83,6 +83,7 @@ const finnHub = (throttle, apiString, id) => {
     // console.log("creating promise: ", throttle, apiString, id)
     return new Promise((resolve, reject) => {
         throttle.enqueue(function() { 
+            console.log("------------fetch throttleQueAPI--------", apiString)
             fetch(apiString)
             .then((response) => {
                 // console.log("1111!!!", response)

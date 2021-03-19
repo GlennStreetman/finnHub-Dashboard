@@ -86,6 +86,7 @@ export const finnHub = (throttle, apiString) => {
     // console.log('running finnhub: ', throttle, apiString)
     return new Promise((resolve, reject) => {
         throttle.enqueue(function() { 
+            // console.log("fetch throttleQue", apiString)
             fetch(apiString)
             .then((response) => {
                 if (response.status === 429) {
