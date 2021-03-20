@@ -1,12 +1,12 @@
 //setup express
-const express = require("express");
+import express from 'express';
 const app = express();
 // const router = express.Router();
 require('dotenv').config()
-const path = require("path");
+import path from 'path';
 app.use(express.static(path.join(__dirname, 'build')));
 app.use(express.urlencoded({ extended: false }));
-const bodyParser = require("body-parser");
+import bodyParser from 'body-parser';
 app.use(bodyParser.json()); // support json encoded bodies
 
 //postgres test db.

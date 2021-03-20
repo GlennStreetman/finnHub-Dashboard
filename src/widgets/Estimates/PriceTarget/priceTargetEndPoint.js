@@ -1,5 +1,5 @@
 
-module.exports = function recommendationTrendsEndPoint(stockList, filters, apiKey){
+export default function recommendationTrendsEndPoint(stockList, filters, apiKey){
 
     let queryStringObj = {}
 

@@ -1,4 +1,4 @@
-module.exports = function quoteWidgetEndPoint(stockList, filters, apiKey){
+export default function quoteWidgetEndPoint(stockList, filters, apiKey){
     //filters should be empty
     // console.log('quoteEndPoint', stockList, apiKey)
     let queryStringObj = {}

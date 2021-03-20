@@ -1,5 +1,5 @@
 
-module.exports = function EPSSuprisesEndPoint(stockList, filters, apiKey){
+export default function EPSSuprisesEndPoint(stockList, filters, apiKey){
 
     let queryStringObj = {}
 

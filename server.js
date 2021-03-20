@@ -1,15 +1,50 @@
+import express from "express";
+import dotenv from 'dotenv';
+import cookieParser from "cookie-parser";
+import session from "express-session";
+import bodyParser from "body-parser";
+import path from "path";
+import morgan from 'morgan'; //request logger middleware.
+import sessionFileStore  from 'session-file-store';
+import dbLive from './db/databaseLive.js';
+import devDB from "./db/databaseLocalPG.js"
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
 
-const express = require("express");
+// import mongo from "./db/mongoLocal.js"
+
+//SETUP ROUTES
+import login  from './routes/loginRoutes/login.js'
+import checkLogin  from './routes/loginRoutes/checkLogin.js'
+//accountRegistration
+import register  from './routes/accountRegistration/register.js'
+import secretQuestion   from './routes/accountRegistration/secretQuestion.js'
+import verifyEmail  from './routes/accountRegistration/verifyEmail.js'
+import verifyChange  from './routes/accountRegistration/verifyChange.js'
+//account
+import findSecret  from './routes/accounts/findSecret.js'
+import forgot  from './routes/accounts/forgot.js'
+import newPW  from './routes/accounts/newPW.js'
+import reset  from './routes/accounts/reset.js'
+
+import endPoint  from './routes/endPoint.js'
+import logUIError  from './routes/logUiError.js'
+//routes below re-quire login
+import accountData  from './routes/loggedIn/accountData.js'
+import dashboard  from './routes/loggedIn/dashboard.js'
+import deleeteSavedDashboard  from './routes/loggedIn/deleteSavedDashboard.js'
+//mongoDB
+import finnHubData  from './routes/mongoDB/finnHubData.js'
+import findMongoData  from './routes/mongoDB/findMongoData.js'
+import deleteFinnDashData  from './routes/mongoDB/deleteMongoRecords.js'
+
 const app = express();
-require('dotenv').config()
-const port = process.env.NODE_ENV || 5000;
-const cookieParser = require("cookie-parser");
-const session = require("express-session");
-const bodyParser = require("body-parser");
-const path = require("path");
-const morgan = require('morgan') //request logger middleware.
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+dotenv.config()
 app.use(cookieParser());
-const FileStore = require("session-file-store")(session);
+const port = process.env.NODE_ENV || 5000;
+const FileStore = sessionFileStore(session)
 const fileStoreOptions = {};
 
 app.use(morgan('dev'))
@@ -31,10 +66,10 @@ if (process.env.live === '1') {
       console.log("Listening to http://localhost:" + port);
     })
     app.use(express.static(path.join(__dirname, 'build')));
-    const db = require("./db/databaseLive") 
+    const db = dbLive
 
     db.connect()
-      .then(() => console.log("connected to developement postgres server"))
+      .then(() => console.log("connected to LIVE postgres server"))
       .catch(err => console.log(err))
 
 } else { //development setup
@@ -47,42 +82,14 @@ if (process.env.live === '1') {
         cookie: { secure: false, sameSite: true },
       }))
     console.log("loading dev server config")
-    const path = require("path");
+    // const path  from "path");
     app.listen(port, function () {console.log(`serving the direcotry @ http`)})
     app.use(express.static(path.join(__dirname, 'build')));
-    const db = require("./db/databaseLocalPG")
-    const mongo = require('./db/mongoLocal') 
-
-
+    const db = devDB
     db.connect()
       .then(() => console.log("connected to developement postgres server"))
-      .catch(err => console.log(err))
+      .catch(err => console.log("ERROR ON PG LOGIN", err))
 }
-
-//SETUP ROUTES
-const login = require('./routes/loginRoutes/login')
-const checkLogin = require('./routes/loginRoutes/checkLogin')
-//accountRegistration
-const register =  require('./routes/accountRegistration/register')
-const secretQuestion =  require('./routes/accountRegistration/secretQuestion')
-const verifyEmail =  require('./routes/accountRegistration/verifyEmail')
-const verifyChange =  require('./routes/accountRegistration/verifyChange')
-//account
-const findSecret =  require('./routes/accounts/findSecret')
-const forgot =  require('./routes/accounts/forgot')
-const newPW =  require('./routes/accounts/newPW')
-const reset =  require('./routes/accounts/reset')
-
-const endPoint =  require('./routes/endPoint')
-const logUIError =  require('./routes/logUiError')
-//routes below require login
-const accountData = require('./routes/loggedIn/accountData')
-const dashboard = require('./routes/loggedIn/dashboard')
-const deleeteSavedDashboard = require('./routes/loggedIn/deleteSavedDashboard')
-//mongoDB
-const finnHubData = require('./routes/mongoDB/finnHubData')
-const findMongoData = require('./routes/mongoDB/findMongoData')
-const deleteFinnDashData = require('./routes/mongoDB/deleteMongoRecords')
 
 app.use('/', login)
 app.use('/', checkLogin)

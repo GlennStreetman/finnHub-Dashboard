@@ -1,9 +1,10 @@
-const express = require('express');
+import express from 'express';
+import format from 'pg-format';
+import dbLive from "../../db/databaseLive.js"
+import devDB from "../../db/databaseLocalPG.js"
+
 const router =  express.Router();
-const format = require('pg-format');
-const db = process.env.live === '1' ? 
-    require("../../db/databaseLive.js") :  
-    require("../../db/databaseLocalPG.js") ;
+const db = process.env.live === '1' ? dbLive : devDB
 
 //user visits reset link, from their email, and get redirected to reset password screen in app.
 router.get("/reset", (req, res, next) => {
@@ -28,4 +29,4 @@ router.get("/reset", (req, res, next) => {
     })
 });
 
-module.exports = router;
+export default router

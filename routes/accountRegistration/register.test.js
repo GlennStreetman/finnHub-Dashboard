@@ -1,16 +1,19 @@
 //setup express
-const express = require("express");
+import express from 'express';
+import path from 'path';
+import session from 'express-session';
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
 const app = express();
 // const router = express.Router();
 require('dotenv').config()
-const path = require("path");
+
 app.use(express.static(path.join(__dirname, 'build')));
 app.use(express.urlencoded({ extended: false }));
-const bodyParser = require("body-parser");
 app.use(bodyParser.json()); // support json encoded bodies
-const cookieParser = require("cookie-parser");
+
 app.use(cookieParser());
-const session = require("express-session");
+
 const FileStore = require("session-file-store")(session);
 const fileStoreOptions = {};
 app.use(

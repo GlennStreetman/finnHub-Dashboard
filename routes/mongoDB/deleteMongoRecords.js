@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
+import mongoLocal from '../../db/mongoLocal.js'
+
 const router =  express.Router();
-const client = process.env.live === '1' ? 
-    require("../../db/mongoLocal.js") :  
-    require("../../db/mongoLocal.js") ;
+const client = process.env.live === '1' ? mongoLocal : mongoLocal
 
 //Recieves widget key as a paramater. Deletes corresponding records. req.query['user']
 router.get('/deleteFinnDashData', async (req, res) => {
@@ -29,5 +29,5 @@ router.get('/deleteFinnDashData', async (req, res) => {
     }
 })
 
-module.exports = router;
+export default router
 

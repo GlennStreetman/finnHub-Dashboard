@@ -1,4 +1,4 @@
-module.exports = function basicFinancialsEndPoint(stockList, filters, apiKey){
+export default function peersEndPoint(stockList, filters, apiKey){
 
     let queryStringObj = {}
 

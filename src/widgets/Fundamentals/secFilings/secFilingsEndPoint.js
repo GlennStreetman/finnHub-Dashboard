@@ -2,7 +2,7 @@ function sStock(stock){
     return stock.slice(stock.indexOf("-")+1, stock.length)
 }
 
-module.exports = function secFilingsEndPoint(stockList, filters, apiKey){
+export default function secFilingsEndPoint(stockList, filters, apiKey){
     //filters used after data is returned.
     let queryStringObj = {}
 

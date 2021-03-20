@@ -3,7 +3,7 @@ function findDate(offset){
     return returnDate
   }
 
-module.exports = function IPOCalendarEndPoint(stockList, filters, apiKey){
+export default function IPOCalendarEndPoint(stockList, filters, apiKey){
     const queryString = `https://finnhub.io/api/v1/calendar/ipo?from=${findDate(filters.startDate)}&to=${findDate(filters.endDate)}&token=${apiKey}`
     let queryStringObj = {}
     queryStringObj['IPOS'] = queryString

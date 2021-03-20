@@ -266,7 +266,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         return symbolSelectorDropDown;
     }
 
-    let resolutionList = [1, 5, 15, 30, 60, "D", "W", "M"].map((el) => (
+    let resolutionList = ['1', '5', '15', '30', '60', "D", "W", "M"].map((el) => (
         <option key={el + "rsl"} value={el}>
             {el}
         </option>

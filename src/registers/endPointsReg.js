@@ -1,22 +1,22 @@
 //import all API string generator functions here and register below to widgetDict.
-const candleWidgetEndPoint = require("../widgets/Price/candles/candlesEndPoint");
-const quoteWidgetEndPoint = require("../widgets/Price/quote/quoteEndPoint");
-const priceSplitsEndPoint = require("../widgets/Price/splits/priceSplitsEndPoint");
-const basicFinancialsEndPoint = require("../widgets/Fundamentals/basicFinancials/basicFinancialsEndPoint");
-const companyNewsEndPoint = require("../widgets/Fundamentals/companyNews/companyNewsEndPoint");
-const companyProfileEndPoint = require("../widgets/Fundamentals/companyProfile2/companyProfile2EndPoint");
-const marketNewsEndPoint = require("../widgets/Fundamentals/marketNews/marketNewsEndPoint");
-const newsSentimentEndPoint = require("../widgets/Fundamentals/newsSentiment/newsSentimentEndPoint");
-const peersEndPoint = require("../widgets/Fundamentals/Peers/peersEndPoint");
-const financialsAsReportedEndPoint = require("../widgets/Fundamentals/financialsAsReported/financialsAsReportedEndPoint");
-const secFilingsEndPoint = require("../widgets/Fundamentals/secFilings/secFilingsEndPoint");
-const IPOCalendarEndPoint = require("../widgets/Fundamentals/IPOCalendar/IPOCalendarEndPoint")
-const recommendationTrendsEndPoint = require("../widgets/Estimates/RecommendationTrends/RecommendationTrendsEndPoint")
-const priceTargetEndPoint = require("../widgets/Estimates/PriceTarget/priceTargetEndPoint")
-const EPSSuprisesEndPoint = require("../widgets/Estimates/EPSSurprises/EPSSurprisesEndPoint")
-const EarningsCalendarEndPoint = require("../widgets/Estimates/EarningsCalendar/EarningsCalendarEndPoint")
+import candleWidgetEndPoint  from "../widgets/Price/candles/candlesEndPoint.js";
+import quoteWidgetEndPoint  from "../widgets/Price/quote/quoteEndPoint.js";
+import priceSplitsEndPoint  from "../widgets/Price/splits/priceSplitsEndPoint.js";
+import basicFinancialsEndPoint  from "../widgets/Fundamentals/basicFinancials/basicFinancialsEndPoint.js";
+import companyNewsEndPoint  from "../widgets/Fundamentals/companyNews/companyNewsEndPoint.js";
+import companyProfileEndPoint  from "../widgets/Fundamentals/companyProfile2/companyProfile2EndPoint.js";
+import marketNewsEndPoint  from "../widgets/Fundamentals/marketNews/marketNewsEndPoint.js";
+import newsSentimentEndPoint  from "../widgets/Fundamentals/newsSentiment/newsSentimentEndPoint.js";
+import peersEndPoint  from "../widgets/Fundamentals/Peers/peersEndPoint.js";
+import financialsAsReportedEndPoint  from "../widgets/Fundamentals/financialsAsReported/financialsAsReportedEndPoint.js";
+import secFilingsEndPoint  from "../widgets/Fundamentals/secFilings/secFilingsEndPoint.js";
+import IPOCalendarEndPoint  from "../widgets/Fundamentals/IPOCalendar/IPOCalendarEndPoint.js";
+import recommendationTrendsEndPoint  from "../widgets/Estimates/RecommendationTrends/RecommendationTrendsEndPoint.js";
+import priceTargetEndPoint  from "../widgets/Estimates/PriceTarget/priceTargetEndPoint.js";
+import EPSSuprisesEndPoint  from "../widgets/Estimates/EPSSurprises/EPSSurprisesEndPoint.js";
+import EarningsCalendarEndPoint  from "../widgets/Estimates/EarningsCalendar/EarningsCalendarEndPoint.js";
 
-const widgetDict = {
+export const widgetDict = {
     PriceCandles: candleWidgetEndPoint,
     PriceQuote: quoteWidgetEndPoint,
     PriceSplits: priceSplitsEndPoint,
@@ -34,5 +34,3 @@ const widgetDict = {
     EstimatesEPSSurprises: EPSSuprisesEndPoint,
     EstimatesEarningsCalendar: EarningsCalendarEndPoint,
 }
-
-module.exports.widgetDict = widgetDict

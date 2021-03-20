@@ -1,10 +1,14 @@
-const express = require("express");
+import express from "express";
+import format from "pg-format";
+import cors from 'cors';
+import {widgetDict} from "./../src/registers/endPointsReg.js"
+import {finnHub, createFunctionQueueObject} from "../src/appFunctions/throttleQueueAPI.js";
+import dbLive from "../db/databaseLive.js";
+import devDB from '../db/databaseLocalPG.js'
+
+const db = process.env.live === "1" ? dbLive : devDB;
 const router = express.Router();
-const format = require("pg-format");
-const db = process.env.live === "1" ? require("../db/databaseLive") : require("../db/databaseLocalPG");
-const {finnHub, createFunctionQueueObject} = require("../src/appFunctions/throttleQueueAPI");
-const cors = require('cors')
-const {widgetDict} = require("../src/registers/endPointsReg")
+
 
 router.use(function timeLog(req, res, next) {
     // console.log("Time: ", new Date());
@@ -148,4 +152,4 @@ router.get("/endPoint", cors(),(req, res, next) => {
     }))
 });
 
-module.exports = router;
+export default router 

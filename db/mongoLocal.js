@@ -1,8 +1,8 @@
-const MongoClient = require('mongodb').MongoClient;
+import MongoClient from 'mongodb'
 
 const uri = 'mongodb://localhost:27017';
 // Create a new MongoClient
 const client = new MongoClient(uri);
 
-module.exports = client
+export default client
 

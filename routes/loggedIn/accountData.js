@@ -1,13 +1,18 @@
-const express = require("express");  
+import express from 'express';  
+import format from 'pg-format';
+import cryptoRandomString from 'crypto-random-string';
+import dbLive from "./../../db/databaseLive.js"
+import devDB from "./../../db/databaseLocalPG.js"
+import mGun from 'mailgun-js'
+
+
 const router = express.Router();
-const format = require("pg-format");
-const cryptoRandomString = require("crypto-random-string");
-const db = process.env.live === "1" ? require("../../db/databaseLive.js") : require("../../db/databaseLocalPG.js");
+const db = process.env.live === "1" ? dbLive : devDB;
 const URL = process.env.live === '1' ? `https://finn-dash.herokuapp.com` : `http://localhost:5000`
 
 const API_KEY = process.env.API_KEY || 1;
 const DOMAIN = process.env.DOMAIN_KEY || 1;
-const mailgun = require("mailgun-js")({ apiKey: API_KEY, domain: DOMAIN });
+const mailgun = mGun({ apiKey: API_KEY, domain: DOMAIN });
 
 function emailIsValid(email) {
     return /\S+@\S+\.\S+/.test(email);
@@ -110,4 +115,4 @@ router.post("/accountData", (req, res) => {
     } else {res.json({message: "Not logged in."})}
 });
 
-module.exports = router;
+export default router;

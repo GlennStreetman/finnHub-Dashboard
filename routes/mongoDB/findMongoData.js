@@ -1,8 +1,8 @@
-const express = require('express');
+import express from 'express';
+import mongoLocal from '../../db/mongoLocal.js'
+
 const router =  express.Router();
-const client = process.env.live === '1' ? 
-    require("../../db/mongoLocal.js") :  
-    require("../../db/mongoLocal.js") ;
+const client = process.env.live === '1' ? mongoLocal : mongoLocal
 
 //receives list of data to find [...data]
 router.post('/findMongoData', async (req, res) => {
@@ -42,5 +42,5 @@ router.post('/findMongoData', async (req, res) => {
 })
 
 
-module.exports = router;
+export default router
 

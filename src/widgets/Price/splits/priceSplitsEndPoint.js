@@ -4,7 +4,7 @@ function findDate(offset){
     return returnDate
 }
 
-module.exports = function priceSplitEndPoint(stockList, filters, apiKey){
+export default function priceSplitEndPoint(stockList, filters, apiKey){
     let queryStringObj = {}
     for (const stock in stockList) {
         if (stockList[stock].symbol !== undefined){

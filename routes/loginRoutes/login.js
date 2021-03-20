@@ -1,20 +1,22 @@
 // const { json } = require('body-parser');
-const express = require("express");
+import express from 'express';
+import format from 'pg-format';
+import md5 from 'md5';
+import dbLive from "../../db/databaseLive.js";
+import devDB from '../../db/databaseLocalPG.js';
+
 const router = express.Router();
-const format = require('pg-format');
-const md5 = require("md5");
-const db = process.env.live === '1' ? 
-require("../../db/databaseLive.js") :  
-require("../../db/databaseLocalPG.js") ;
+const db = process.env.live === '1' ? dbLive : devDB
  
 router.get("/login", (req, res, next) => {
+    
     let loginText = format('%L', req.query["loginText"])
     let pwText = format('%L', req.query["pwText"])
-    // console.log(pwText)
+    console.log("Processing login request:",loginText,pwText )
     let loginQuery = `SELECT id, loginname, apikey, ratelimit, emailconfirmed,exchangelist, defaultexchange
         FROM users WHERE loginName =${loginText} 
         AND password = '${md5(pwText)}'`;
-    // console.log(loginQuery)
+    console.log(loginQuery)
     let info = { //return object.
         key: "", 
         login: 0,
@@ -26,7 +28,7 @@ router.get("/login", (req, res, next) => {
 
     db.query(loginQuery, (err, rows) => {
         const login = rows.rows[0]
-        // console.log("LOGIN:", login, rows.rowCount)
+        console.log("LOGIN:", login, rows.rowCount)
         if (err) {
             console.log("LOGIN ERROR:", err)
             res.status(400).json({message: "Login error"});
@@ -58,4 +60,4 @@ router.get("/logOut", (req, res, next) => {
 });
 
 
-module.exports = router;
+export default router

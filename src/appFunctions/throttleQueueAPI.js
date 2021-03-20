@@ -1,6 +1,6 @@
-const fetch = require('node-fetch');
+import fetch from 'node-fetch';
 //returns queue object. Open new apiCalls by running finnHub function bellow.
-const createFunctionQueueObject = function (maxRequestPerInterval, interval, evenlySpaced) {
+export const createFunctionQueueObject = function (maxRequestPerInterval, interval, evenlySpaced) {
     let que = {}
     que.maxRequestPerInterval = maxRequestPerInterval
     que.interval = interval
@@ -79,7 +79,7 @@ const createFunctionQueueObject = function (maxRequestPerInterval, interval, eve
 //throttle =  que object returned by function above.
 
 
-const finnHub = (throttle, apiString, id) => {
+export const finnHub = (throttle, apiString, id) => {
     // console.log("creating promise: ", throttle, apiString, id)
     return new Promise((resolve, reject) => {
         throttle.enqueue(function() { 
@@ -124,5 +124,3 @@ const finnHub = (throttle, apiString, id) => {
         })
     })
 }
-
-module.exports = {finnHub, createFunctionQueueObject}

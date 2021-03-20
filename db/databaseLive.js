@@ -1,16 +1,19 @@
-console.log("loading live server postgres connection")
-const { Client } = require('pg')
+import Client from 'pg'
+import dotenv from 'dotenv';
+dotenv.config()
 
-const db = new Client({
+// console.log("loading live server postgres connection")
+
+const dbLive = new Client.Client({
   connectionString: process.env.DATABASE_URL,
   ssl: {
     rejectUnauthorized: false
   }
 })
 
-db.connect();
+// dbLive.connect();
 
-module.exports = db;
+export default dbLive
 
 //remember to setup env variables to connect
 //https://node-postgres.com/features/connecting#environment-variables

@@ -1,4 +1,4 @@
-module.exports = function marketNewsEndPoint(stockList, filters, apiKey){
+export default function marketNewsEndPoint(stockList, filters, apiKey){
     //filters used after data is returned.
     let queryStringObj = {}
     

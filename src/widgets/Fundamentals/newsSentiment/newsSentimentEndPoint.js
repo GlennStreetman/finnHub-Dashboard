@@ -1,4 +1,4 @@
-module.exports = function companySentimentEndPoint(stockList, filters, apiKey){
+export default function companySentimentEndPoint(stockList, filters, apiKey){
     //filters used after data is returned.
     let queryStringObj = {}
 

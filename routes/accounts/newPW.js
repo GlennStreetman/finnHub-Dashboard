@@ -1,10 +1,12 @@
-const express = require('express');
+import express from 'express';
+import format from 'pg-format';
+import dbLive from "./../../db/databaseLive.js"
+import devDB from "./../../db/databaseLocalPG.js"
+import md5 from 'md5';
+
 const router =  express.Router();
-const format = require('pg-format');
-const db = process.env.live === '1' ? 
-    require("../../db/databaseLive.js") :  
-    require("../../db/databaseLocalPG.js") ;
-const md5 = require("md5");
+const db = process.env.live === "1" ? dbLive : devDB;
+
 
 //redirect to /newPW from /reset route.
 //username and resesion reset flag should be set by redirect.
@@ -36,4 +38,4 @@ router.get("/newPW", (req, res, next) => {
     });
 });
 
-module.exports = router;
+export default router

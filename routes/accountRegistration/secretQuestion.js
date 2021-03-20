@@ -1,9 +1,11 @@
-const express = require('express');
+import express from 'express';
+import dbLive from "./../../db/databaseLive.js"
+import devDB from "./../../db/databaseLocalPG.js"
+import md5 from 'md5';
+
 const router =  express.Router();
-const db = process.env.live === '1' ? 
-    require("../../db/databaseLive.js") :  
-    require("../../db/databaseLocalPG.js") ;
-const md5 = require("md5");
+const db = process.env.live === "1" ? dbLive : devDB;
+
 //checks answer to secret question.
 router.get("/secretQuestion", (req, res, next) => {
     const loginText = md5(req.query["loginText"])
@@ -34,4 +36,4 @@ router.get("/secretQuestion", (req, res, next) => {
     });
 });
 
-module.exports = router;
+export default router

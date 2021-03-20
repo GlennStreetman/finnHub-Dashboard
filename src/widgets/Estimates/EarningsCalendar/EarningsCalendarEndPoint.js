@@ -4,7 +4,7 @@ function findDate(offset){
   }
 
 
-module.exports = function earningsCalendarEndPoint(stockList, filters, apiKey){
+export default function earningsCalendarEndPoint(stockList, filters, apiKey){
     // console.log(stockList, filters, apiKey)
     let queryStringObj = {}
 

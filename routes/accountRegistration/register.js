@@ -1,15 +1,20 @@
-const express = require("express");
-const router = express.Router();
-const format = require("pg-format");
-const cryptoRandomString = require("crypto-random-string");
+import express from "express";
+import format  from "pg-format";
+import cryptoRandomString from "crypto-random-string";
+import md5 from "md5";
+import dbLive from '../../db/databaseLive.js';
+import devDB from "../../db/databaseLocalPG.js";
+import mailgun from "mailgun-js";
+
 const URL = process.env.live === "1" ? `https://finn-dash.herokuapp.com` : `http://localhost:5000`;
-const md5 = require("md5");
-const db = process.env.live === "1" ? require("../../db/databaseLive.js") : require("../../db/databaseLocalPG.js");
+const db = process.env.live === "1" ? dbLive : devDB;
+
+const router = express.Router();
 //mailgun config data, needs to be set to be imported if not available in process.env
 const API_KEY = process.env.API_KEY || 1;
 const DOMAIN = process.env.DOMAIN_KEY || 1;
 
-const mailgun = require("mailgun-js")({ apiKey: API_KEY, domain: DOMAIN });
+mailgun({ apiKey: API_KEY, domain: DOMAIN })
 
 router.post("/register", (req, res) => {
   // console.log(req.body)
@@ -156,4 +161,4 @@ router.post("/register", (req, res) => {
   }
 });
 
-module.exports = router;
+export default router

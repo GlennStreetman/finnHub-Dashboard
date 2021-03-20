@@ -2,7 +2,7 @@ function sStock(stock){
     return stock.slice(stock.indexOf("-")+1, stock.length)
 }
 
-module.exports = function financialsAsReportedEndPoint(stockList, filters, apiKey){
+export default function financialsAsReportedEndPoint(stockList, filters, apiKey){
     //filters used after data is returned.
     let queryStringObj = {}
 

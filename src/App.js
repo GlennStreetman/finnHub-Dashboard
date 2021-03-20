@@ -427,4 +427,4 @@ export default connect(mapStateToProps, {
   rResetUpdateFlag,
   tUpdateExchangeData,
 
- })(App);
+})(App);

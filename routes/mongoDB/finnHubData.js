@@ -1,8 +1,9 @@
-const express = require('express');
+import express from 'express';
+import mongoLocal from '../../db/mongoLocal.js'
+
+
 const router =  express.Router();
-const client = process.env.live === '1' ? 
-    require("../../db/mongoLocal.js") :  
-    require("../../db/mongoLocal.js") ;
+const client = process.env.live === '1' ? mongoLocal : mongoLocal
 
 //gets user, none statle, finnhub dtata. This process deletes stale records.
 router.get('/finnDashData', async (req, res) => {
@@ -79,5 +80,5 @@ router.post("/finnDashData", async (req, res) => {
     }
 })
 
-module.exports = router;
+export default router
 
