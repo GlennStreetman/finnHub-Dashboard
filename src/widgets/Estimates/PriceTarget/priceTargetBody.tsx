@@ -1,6 +1,5 @@
 import * as React from "react"
 import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
-import ReactChart from "./reactChart";
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { rBuildVisableData } from '../../../slices/sliceShowData'
@@ -12,24 +11,21 @@ const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
 interface FinnHubAPIData { //rename
-    actual: number,
-    estimate: number,
-    period: string, //YYYY-MM-DD
+    lastUpdated: string,
     symbol: string,
+    targetHigh: number,
+    targetLow: number,
+    targetMean: number,
+    targetMedian: number
 }
 
 interface FinnHubAPIDataArray {
     [index: number]: FinnHubAPIData
 }
 
-interface dataListObject {
-    x: Date,
-    y: string
-}
-
+//add any additional type guard functions here used for live code.
 function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
-    console.log('!arg', arg)
-    if (arg !== undefined && Object.keys(arg).length > 0 && arg[0].actual) {
+    if (arg !== undefined && Object.keys(arg).length > 0 && arg.lastUpdated) {
         // console.log("returning true", arg)
         return true
     } else {
@@ -38,7 +34,7 @@ function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
     }
 }
 //RENAME FUNCTION
-function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
+function PriceTargetBody(p: { [key: string]: any }, ref: any) {
 
     const startingstockData = () => {
         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
@@ -48,13 +44,12 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
 
     const startingTargetStock = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            return (p.widgetCopy.targetStock)
+            return (p.widgetCopy.targetSTock)
         } else { return ('') }
     }
 
     const [stockData, setStockData] = useState(startingstockData());
     const [targetStock, setTargetStock] = useState(startingTargetStock());
-    const [chartOptions, setChartOptions] = useState({})
     const isInitialMount = useRef(true); //update to false after first render.
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
@@ -73,8 +68,7 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
         {
             state: {
                 stockData: stockData,
-                targetStock: targetStock,
-                chartOptions: chartOptions,
+                targetStock: targetStock, //REMOVE IF NO TARGET STOCK
             },
         }
     ))
@@ -104,69 +98,8 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
     }, [p.trackedStocks, targetStock])
 
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        if (isFinnHubData(rShowData) === true) {
-            setStockData(rShowData)
-        }
+        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) }
     }, [rShowData])
-
-    useEffect(() => {
-        console.log('stock data updated, created chart objects.')
-        const actualList: dataListObject[] = []
-        const estimateList: dataListObject[] = []
-
-        for (const i in stockData) {
-            const n = stockData
-            actualList.push({ 'x': new Date(n[i]['period']), 'y': n[i]['actual'] })
-            estimateList.push({ 'x': new Date(n[i]['period']), 'y': n[i]['estimate'] })
-        }
-
-        const chartData = {
-            actual: actualList,
-            estimate: estimateList,
-        }
-        console.log("new chart data", chartData)
-
-        const options = {
-            width: 400,
-            height: 200,
-            theme: "light2",
-            animationEnabled: true,
-            exportEnabled: true,
-            title: {
-                text: `${targetStock}: EPS Surprises'`
-            },
-            axisX: {
-                title: ""
-            },
-            axisY: {
-                title: "Quarterly EPS",
-                suffix: ""
-            },
-            legend: {
-                cursor: "pointer",
-                itemclick: 'toggleDataSeries'
-            },
-            data: [{
-                type: "scatter",
-                name: "Actual",
-                markerType: "circle",
-                showInLegend: true,
-                // toolTipContent: "<span style=\"color:#4F81BC \">{name}</span><br>Active Users: {x}<br>CPU Utilization: {y}%",
-                dataPoints: chartData.actual
-            },
-            {
-                type: "scatter",
-                name: "Estimate",
-                markerType: "cross",
-                showInLegend: true,
-                // toolTipContent: "<span style=\"color:#4F81BC \">{name}</span><br>Active Users: {x}<br>CPU Utilization: {y}%",
-                dataPoints: chartData.estimate
-            }]
-        }
-        setChartOptions(options);
-
-    }, [stockData, targetStock])
-
 
     function changeStockSelection(e) { //DELETE IF no target stock
         const target = e.target.value;
@@ -181,7 +114,6 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
         const stockListRows = stockList.map((el) =>
             <tr key={el + "container"}>
                 <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
-
                 <td key={el + "buttonC"}>
                     <button
                         key={el + "button"}
@@ -204,26 +136,28 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
     }
 
     function renderStockData() {
-        let newSymbolList = Object.keys(p.trackedStocks).map((el) => (
+        // console.log("rendering stock data")
+        const stockDataRows = Object.keys(stockData).map((el) =>
+            <tr key={el + "row"}>
+                <td key={el + "symbol"}>{el}</td>
+                <td key={el + "name"}>{stockData[el]}</td>
+            </tr>
+        )
+        const newSymbolList = Object.keys(p.trackedStocks).map((el) => (
             <option key={el + "ddl"} value={el}>
                 {p.trackedStocks[el].dStock(p.exchangeList)}
             </option>
-        ));
-
-        let chartBody = (
-            <>
-                <div className="div-inline">
-                    {"  Selection:  "}
-                    <select className="btn" value={targetStock} onChange={changeStockSelection}>
-                        {newSymbolList}
-                    </select>
-                </div>
-                <div className="graphDiv">
-                    <ReactChart chartOptions={chartOptions} />
-                </div>
-            </>
-        );
-        return chartBody;
+        ))
+        return <>
+            <select className="btn" value={targetStock} onChange={changeStockSelection}>
+                {newSymbolList}
+            </select>
+            <table>
+                <tbody>
+                    {stockDataRows}
+                </tbody>
+            </table>
+        </>
     }
 
     return (
@@ -243,9 +177,9 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
     )
 }
 //RENAME
-export default forwardRef(EstimatesEPSSurprises)
+export default forwardRef(PriceTargetBody)
 //RENAME
-export function EPSSurprisesProps(that, key = "newWidgetNameProps") {
+export function priceTargetProps(that, key = "newWidgetNameProps") {
     let propList = {
         apiKey: that.props.apiKey,
         defaultExchange: that.props.defaultExchange,
