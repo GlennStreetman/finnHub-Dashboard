@@ -13,7 +13,7 @@ import secFilingsEndPoint  from "../widgets/Fundamentals/secFilings/secFilingsEn
 import IPOCalendarEndPoint  from "../widgets/Fundamentals/IPOCalendar/IPOCalendarEndPoint.js";
 import recommendationTrendsEndPoint  from "../widgets/Estimates/RecommendationTrends/RecommendationTrendsEndPoint.js";
 import priceTargetEndPoint  from "../widgets/Estimates/PriceTarget/priceTargetEndPoint.js";
-import EPSSuprisesEndPoint  from "../widgets/Estimates/EPSSurprises/EPSSurprisesEndPoint.js";
+import EPSSuprisesEndPoint  from "../widgets/Estimates/EPSSurprises/EPSSurprisesEndPoint";
 import EarningsCalendarEndPoint  from "../widgets/Estimates/EarningsCalendar/EarningsCalendarEndPoint";
 
 export const widgetDict = {
