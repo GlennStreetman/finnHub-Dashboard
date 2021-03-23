@@ -1,15 +1,14 @@
 import express from 'express';
-import mongoLocal from '../../db/mongoLocal.js'
+import {getDB} from '../../db/mongoLocal.js'
 
 const router =  express.Router();
-const client = process.env.live === '1' ? mongoLocal : mongoLocal
 
 //Recieves widget key as a paramater. Deletes corresponding records. req.query['user']
 router.get('/deleteFinnDashData', async (req, res) => {
     if (req.session.login === true) {
-        console.log("-----running delete!-------")
+        // console.log("-----running delete!-------")
         try {
-            await client.connect()
+            const client = getDB()
             const database = client.db('finnDash');
             const dataSet = database.collection('dataSet');
             const widgetSearch = RegExp(`^${req.query['widgetID']}`, 'i')
@@ -18,7 +17,7 @@ router.get('/deleteFinnDashData', async (req, res) => {
                 key: {$regex: widgetSearch},
             })
             console.log('deleteList.deletedCount: ', req.session.uID, widgetSearch, deleteList.deletedCount)
-            console.log("-----delete complete-----")
+            // console.log("-----delete complete-----")
             res.status(200).json({message: 'Records deleted.'})
 
         }

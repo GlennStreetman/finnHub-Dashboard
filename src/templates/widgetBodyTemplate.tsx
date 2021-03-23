@@ -1,33 +1,33 @@
 import * as React from "react"
 import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
 
-import { useAppDispatch, useAppSelector } from '../../../hooks';
-import { rBuildVisableData } from '../../../slices/sliceShowData'
-import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
+import { useAppDispatch, useAppSelector } from '../hooks';
+import { rBuildVisableData } from '../slices/sliceShowData'
+import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB'
 
-import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import StockSearchPane, { searchPaneProps } from "../components/stockSearchPaneFunc";
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
-interface finnHubSplitNode {
-    date: number,
-    fromFactor: number,
-    symbol: number,
-    toFactor: number,
+interface FinnHubAPIData { //rename
+    //defined shape of data returns by finnHub
 }
 
-interface finnHubSplitArray {
-    [index: number]: finnHubSplitNode
+interface FinnHubAPIDataArray {
+    [index: number]: FinnHubAPIData
 }
 
-interface filters {
+interface filters { //Any paramas not related to stock used by finnHub endpoint.
+    //remove if not needed, else define
     description: string,
     endDate: number,
     startDate: number,
+    //additional filters...
 }
 
-function isFinnHubSplitList(arg: any): arg is finnHubSplitArray { //typeguard
+//add any additional type guard functions here used for live code.
+function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
     if (arg !== undefined && Object.keys(arg).length > 0 && arg[0].date) {
         // console.log("returning true", arg)
         return true
@@ -36,8 +36,8 @@ function isFinnHubSplitList(arg: any): arg is finnHubSplitArray { //typeguard
         return false
     }
 }
-
-function PriceSplits(p: { [key: string]: any }, ref: any) {
+//RENAME FUNCTION
+function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
 
     const startingstockData = () => {
         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
@@ -45,7 +45,7 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
         } else { return ([]) }
     }
 
-    const startingTargetStock = () => {
+    const startingTargetStock = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
             return (p.widgetCopy.targetSTock)
         } else { return ('') }
@@ -53,10 +53,10 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
 
     const [stockData, setStockData] = useState(startingstockData());
     const [targetStock, setTargetStock] = useState(startingTargetStock());
-    const isInitialMount = useRef(true);
-    const dispatch = useDispatch();
+    const isInitialMount = useRef(true); //update to false after first render.
+    const dispatch = useDispatch(); //allows widget to run redux actions.
 
-    const rShowData = useSelector((state) => {
+    const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
@@ -66,18 +66,19 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
     })
 
     useImperativeHandle(ref, () => (
-        //used to copy widgets when being dragged.
+        //used to copy widgets when being dragged. example: if widget body renders time series data into chart, copy chart data.
+        //add additional slices of state to list if they help reduce re-render time.
         {
             state: {
                 stockData: stockData,
-                targetStock: targetStock,
+                targetStock: targetStock, //REMOVE IF NO TARGET STOCK
             },
         }
     ))
 
     useEffect(() => {
         //On mount, use widget copy, else build visable data.
-        //On update, if change in candle selection, rebuild visable data.
+        //On update, if change in target stock, rebuild visable data.
         if (isInitialMount.current && p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
             isInitialMount.current = false;
         } else {
@@ -91,18 +92,21 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
     }, [targetStock, p.widgetKey, p.widgetCopy, dispatch])
 
     useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
+        //DELETE IF NO FILTERS
         //Setup filters if not yet done.
+        //example update commented out below. 
         if (filters['startDate'] === undefined) {
-            const startDateOffset = -604800 * 1000 * 52 * 20 //20 year backward. Limited to 1 year on free version.
-            const endDateOffset = 0 //today.
-            update(key, 'startDate', startDateOffset)
-            update(key, 'endDate', endDateOffset)
-            update(key, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
+            // const startDateOffset = -604800 * 1000 * 52 * 20 //20 year backward. Limited to 1 year on free version.
+            // const endDateOffset = 0 //today.
+            // update(key, 'startDate', startDateOffset)
+            // update(key, 'endDate', endDateOffset)
+            // update(key, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
 
         }
     }, [p.filters, p.updateWidgetFilters, p.widgetKey])
 
     useEffect(() => {
+        //DELETE IF NO TARGET STOCK
         //if stock not selected default to first stock.
         if (Object.keys(p.trackedStocks).length > 0 && targetStock === '') {
             const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
@@ -110,8 +114,8 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
         }
     }, [p.trackedStocks, targetStock])
 
-    useEffect(() => {
-        if (isFinnHubSplitList(rShowData) === true) { setStockData(rShowData) }
+    useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
+        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) }
     }, [rShowData])
 
     function updateFilter(e) {
@@ -170,62 +174,15 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
         return searchForm
     }
 
-    function stockTable() {
-        // console.log('stockData', stockData)
-        if (Object.keys(stockData).length) {
-            const stockList: finnHubSplitNode[] = Object.values(stockData)
-            let sortedData = stockList.sort((a, b) => (new Date(a.date) > new Date(b.date) ? 1 : -1))
-            let tableData = sortedData.map((el) => {
-
-                return <tr key={"row" + el.date}>
-                    <td>{el.date}</td>
-                    <td>{el.fromFactor}</td>
-                    <td>{el.toFactor}</td>
-                </tr>
-
-            })
-            return tableData
-        }
-    }
-
-    function changeStockSelection(e) {
+    function changeStockSelection(e) { //DELETE IF no target stock
         const target = e.target.value;
         const key = `${p.widgetKey}-${target}`
         setTargetStock(target)
         dispatch(tSearchMongoDB([key]))
     }
 
-
     function renderStockData() {
-        let newStockList = Object.keys(p.trackedStocks).map((el) => (
-            <option key={el + "ddl"} value={el}>
-                {p.trackedStocks[el].dStock(p.exchangeList)}
-            </option>
-        ));
-
-        if (stockData !== undefined) {
-            let symbolSelectorDropDown = (
-                <>
-                    <div className="div-inline">
-                        {"  Stock:  "}
-                        <select className="btn" value={targetStock} onChange={changeStockSelection}>
-                            {newStockList}
-                        </select>
-                    </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <td>Date</td>
-                                <td>From:</td>
-                                <td>To:</td>
-                            </tr>
-                        </thead>
-                        <tbody>{stockTable()}</tbody>
-                    </table>
-                </>
-            );
-            return symbolSelectorDropDown;
-        }
+        //RENDER LOGIN HERE FOR STOCK DATA.
     }
 
     return (
@@ -244,30 +201,32 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
         </>
     )
 }
-
-export default forwardRef(PriceSplits)
-
-export function PriceSplitsProps(that, key = "newWidgetNameProps") {
+//RENAME
+export default forwardRef(NewWidgetEndpointBody)
+//RENAME
+export function NewWidgetProps(that, key = "newWidgetNameProps") {
     let propList = {
         apiKey: that.props.apiKey,
+        defaultExchange: that.props.defaultExchange,
+        exchangeList: that.props.exchangeList,
+        filters: that.props.widgetList[key]["filters"],
         showPane: that.showPane,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        filters: that.props.widgetList[key]["filters"],
+        throttle: that.props.throttle,
+        updateDefaultExchange: that.props.updateDefaultExchange,
         updateWidgetFilters: that.props.updateWidgetFilters,
         updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
-        throttle: that.props.throttle,
-        exchangeList: that.props.exchangeList,
-        defaultExchange: that.props.defaultExchange,
-        updateDefaultExchange: that.props.updateDefaultExchange,
     };
     return propList;
 }
 
-export const priceSplitsFilters: object = {
-    startDate: -604800 * 1000 * 52 * 20, //20 years
-    endDate: 0,
-    "Description": 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
+//rename
+export const priceSplitsFilters: object = { //IF widget uses filters remember to define default filters here and add to topNavReg as 5th paramater.
+    // startDate: -604800 * 1000 * 52 * 20, //20 years
+    // endDate: 0,
+    //... additional filters...
+    // "Description": 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
 }
 

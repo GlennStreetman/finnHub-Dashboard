@@ -22,6 +22,7 @@ interface FinnHubQuoteDataRaw {
     l: number,
     o: number,
     pc: number,
+    t: number,
 }
 
 export interface FinnHubQuoteObj {
@@ -93,6 +94,8 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
                         dayOpenPrice: data.o,
                         prevClosePrice: data.pc,
                     }
+                } else {
+                    if (Object.keys(data).length > 0) console.log("Problem with Quote data", rShowData, key)
                 }
                 // console.log('key', Object.keys(rShowData), key, data)
             }

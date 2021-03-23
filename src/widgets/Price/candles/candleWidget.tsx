@@ -7,6 +7,7 @@ import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
 
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 import CreateCandleStickChart from "./createCandleStickChart";
+import types from './../../../types'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -19,6 +20,13 @@ interface FinnHubCandleData {
     s: string,
     t: number[],
     v: number[],
+}
+
+interface filters {
+    description: string,
+    resolution: string,
+    startDate: number,
+    endDate: number,
 }
 
 
@@ -80,7 +88,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         if (isInitialMount.current && p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
             isInitialMount.current = false;
         } else {
-            console.log("Loading Candle Widget")
+            // console.log("Loading Candle Widget")
             if (isInitialMount.current === true) { isInitialMount.current = false }
             const payload = {
                 key: p.widgetKey,
@@ -90,9 +98,9 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         }
     }, [candleSelection, p.widgetKey, p.widgetCopy, dispatch])
 
-    useEffect((filters: object = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
+    useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: string = p.widgetKey) => {
         //Setup filters if not yet done.
-        if (filters['startDate'] === undefined) {
+        if (filters['startDate'] !== undefined && types.reWID.test(key) === true && isInitialMount.current !== false) {
             console.log("Setting up candles filters")
             const startDateSetBack: number = 31536000 * 1000 //1 week
             const endDateSetBack: number = 0
@@ -101,6 +109,8 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
             update(key, 'endDate', endDateSetBack)
             update(key, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
 
+        } else {
+            if (isInitialMount.current !== false) console.log("Problem setting up candle filters: ", types.reWID.test(key), filters['startDate'])
         }
         // }
     }, [p.filters, p.updateWidgetFilters, p.widgetKey])
@@ -121,7 +131,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
 
     useEffect(() => {
         //CREATE CANDLE DATA
-        console.log("Calculating candle data")
+        // console.log("Calculating candle data")
         if (rShowData !== undefined && Object.keys(rShowData).length > 0) {
             const data: any = rShowData //returned from finnHub API
             if (isCandleData(data)) {
@@ -179,7 +189,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                 };
                 setOptions(options)
                 // }
-            }
+            } else { console.log("Failed candle data type guard:", data) }
         }
     }, [candleSelection, rShowData, p.filters.endDate, p.filters.startDate])
 

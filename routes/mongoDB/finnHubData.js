@@ -1,16 +1,15 @@
 import express from 'express';
-import mongoLocal from '../../db/mongoLocal.js'
+import {getDB} from '../../db/mongoLocal.js'
 
 
 const router =  express.Router();
-const client = process.env.live === '1' ? mongoLocal : mongoLocal
 
 //gets user, none statle, finnhub dtata. This process deletes stale records.
 router.get('/finnDashData', async (req, res) => {
     if (req.session.login === true) {
         try {
             // console.log("1get FinndashData")
-            await client.connect()
+            const client = getDB()
             const database = client.db('finnDash');
             const dataSet = database.collection('dataSet');
             await dataSet.deleteMany({ //delete stale records for user
@@ -41,11 +40,11 @@ router.get('/finnDashData', async (req, res) => {
 router.post("/finnDashData", async (req, res) => {
     if (req.session.login === true) { 
         try {
-            await client.connect()
+            const client = getDB()
             const database = client.db('finnDash');
             const dataSet = database.collection('dataSet');
 
-            console.log('1 updating mongodb finnhubdata')
+            // console.log('1 updating mongodb finnhubdata')
             const updateData = req.body
             for (const record in updateData) {
                 const u = updateData[record]
@@ -66,7 +65,7 @@ router.post("/finnDashData", async (req, res) => {
                 const options = {
                     upsert: true
                 }
-                console.log('2:', update)
+                // console.log('2:', update)
                 await dataSet.updateOne(filters, update, options) 
                 .catch((err)=>{console.log('Problem updating dataset', err)})           
             }

@@ -1,9 +1,10 @@
 {
-  "$schema": "https://json.schemastore.org/tsconfig",
   "display": "Node 12",
   "compileOnSave": true,
   "noImplicitAny": false,
   "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "./dist",
     "baseUrl": ".",
     "lib": [
       "DOM",
@@ -13,7 +14,7 @@
       "es2020.string"
     ],
     "module": "esnext",
-    "target": "es2019",
+    "target": "es6",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -29,7 +30,7 @@
     "noEmit": true
   },
   "include": [
-    "src"
+    "src/**/*"
   ],
   "exclude": [
     "node_modules",

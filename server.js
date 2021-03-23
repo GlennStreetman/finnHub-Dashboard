@@ -11,7 +11,7 @@ import devDB from "./db/databaseLocalPG.js"
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 
-// import mongo from "./db/mongoLocal.js"
+import {connectMongo} from "./db/mongoLocal.js"
 
 //SETUP ROUTES
 import login  from './routes/loginRoutes/login.js'
@@ -27,7 +27,7 @@ import forgot  from './routes/accounts/forgot.js'
 import newPW  from './routes/accounts/newPW.js'
 import reset  from './routes/accounts/reset.js'
 
-import endPoint  from './routes/endPoint.js'
+// import endPoint  from './routes/endPoint.js'
 import logUIError  from './routes/logUiError.js'
 //routes below re-quire login
 import accountData  from './routes/loggedIn/accountData.js'
@@ -71,6 +71,7 @@ if (process.env.live === '1') {
     db.connect()
       .then(() => console.log("connected to LIVE postgres server"))
       .catch(err => console.log(err))
+    connectMongo((err)=>{console.log("Connected", err)})
 
 } else { //development setup
     app.use(
@@ -89,6 +90,7 @@ if (process.env.live === '1') {
     db.connect()
       .then(() => console.log("connected to developement postgres server"))
       .catch(err => console.log("ERROR ON PG LOGIN", err))
+      connectMongo((err)=>{console.log("Connected", err)})
 }
 
 app.use('/', login)
@@ -104,7 +106,7 @@ app.use('/', forgot)
 app.use('/', newPW)
 app.use('/', reset)
 
-app.use('/', endPoint)
+// app.use('/', endPoint)
 app.use('/', logUIError)
 //loggin
 app.use('/', accountData)

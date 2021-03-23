@@ -6,14 +6,15 @@ import  {finnHub} from "./../appFunctions/throttleQueueAPI";
 //sends finnhub data to mongoDB AND updates sliceShowData & slicefinnHubData
 export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
     'GetFinnhubData',
-    (req, thunkAPI) => { //l{ist of securities} 
-        // console.log('--------thisRequest------------', req)
+    (req, thunkAPI) => { //l{ist of securities} )
         const finnQueue = thunkAPI.getState().finnHubQueue.throttle
-        const dataSet = thunkAPI.getState().dataModel.dataSet //finnHubData
+        const dataModel = thunkAPI.getState().dataModel.dataSet //finnHubData
         let requestList = []  
+        console.log("Process updates", req, dataModel)
         for (const ep in req) { //for each widget
-            const reqKey = req[ep]
-            const reqObj = dataSet[reqKey]
+            const reqKey = req[ep] 
+            const reqObj = dataModel[reqKey]
+            console.log(reqKey,reqObj)
             const endPoint = reqObj.apiString
             if (
                 (reqObj.updated === undefined) ||
@@ -22,7 +23,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                 requestList.push(finnHub(finnQueue, endPoint, reqKey))
             }   
         }
-        // console.log("finnHub Request List: ", requestList)
+        console.log("finnHub Request List: ", requestList)
         return Promise.all(requestList)
         .then((res) => {
             // console.log("res",res)

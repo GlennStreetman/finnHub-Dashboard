@@ -16,7 +16,7 @@ router.get("/login", (req, res, next) => {
     let loginQuery = `SELECT id, loginname, apikey, ratelimit, emailconfirmed,exchangelist, defaultexchange
         FROM users WHERE loginName =${loginText} 
         AND password = '${md5(pwText)}'`;
-    console.log(loginQuery)
+    // console.log(loginQuery)
     let info = { //return object.
         key: "", 
         login: 0,
@@ -28,7 +28,7 @@ router.get("/login", (req, res, next) => {
 
     db.query(loginQuery, (err, rows) => {
         const login = rows.rows[0]
-        console.log("LOGIN:", login, rows.rowCount)
+        // console.log("LOGIN:", login, rows.rowCount)
         if (err) {
             console.log("LOGIN ERROR:", err)
             res.status(400).json({message: "Login error"});
@@ -54,7 +54,7 @@ router.get("/login", (req, res, next) => {
 }); 
 
 router.get("/logOut", (req, res, next) => {
-    console.log("LOGOUT: ", req.session.userName, req.session.login);
+    // console.log("LOGOUT: ", req.session.userName, req.session.login);
     if (req.session) {req.session.login = false}
     res.status(200).json({message: "Logged Out"});
 });

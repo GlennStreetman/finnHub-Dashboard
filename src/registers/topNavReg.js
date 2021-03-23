@@ -2,9 +2,10 @@
 //imported by topNav component.
 import { candleWidgetFilters } from './../widgets/Price/candles/candleWidget';
 import { priceSplitsFilters } from './../widgets/Price/splits/PriceSplitsBody';
+import { EarningsCalendarFilters } from './../widgets/Estimates/EarningsCalendar/EarningsCalendarBody';
 
 export let estimateOptions = [
-    ["EstimatesEarningsCalendar" ,"Earnings Calendar: ", "stockWidget", "Earnings Calendar"],  
+    ["EstimatesEarningsCalendar" ,"Earnings Calendar: ", "stockWidget", "Earnings Calendar", EarningsCalendarFilters],  
     ["EstimatesEPSSurprises" ,"EPS Surprises: ", "stockWidget", "EPS Surprises"], 
     ["EstimatesPriceTarget" ,"Price Target: ", "stockWidget", "Price Target"], 
     ["EstimatesRecommendationTrends" ,"Recommendation Trends: ", "stockWidget", "Recommendation Trends"], 

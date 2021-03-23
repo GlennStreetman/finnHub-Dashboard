@@ -10,15 +10,20 @@ import StockSearchPane, { searchPaneProps } from "../../../components/stockSearc
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
-interface finnHubSplitNode {
-    date: number,
-    fromFactor: number,
-    symbol: number,
-    toFactor: number,
+interface FinnHubAPIData { //rename
+    date: string,
+    epsActual: number,
+    epsEstimate: number,
+    hour: string,
+    quarter: number, //1,2,3,4
+    revernueActual: number,
+    revenueEstimate: number,
+    symbol: string,
+    year: string, //4 digit year
 }
 
-interface finnHubSplitArray {
-    [index: number]: finnHubSplitNode
+interface FinnHubAPIDataArray {
+    [index: number]: FinnHubAPIData
 }
 
 interface filters {
@@ -27,8 +32,9 @@ interface filters {
     startDate: number,
 }
 
-function isFinnHubSplitList(arg: any): arg is finnHubSplitArray { //typeguard
-    if (arg !== undefined && Object.keys(arg).length > 0 && arg[0].date) {
+//add any additional type guard functions here used for live code.
+function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
+    if (arg !== undefined && Object.keys(arg).length > 0 && arg.earningsCalendar && arg.earningsCalendar[0].date) {
         // console.log("returning true", arg)
         return true
     } else {
@@ -36,8 +42,8 @@ function isFinnHubSplitList(arg: any): arg is finnHubSplitArray { //typeguard
         return false
     }
 }
-
-function PriceSplits(p: { [key: string]: any }, ref: any) {
+//RENAME FUNCTION
+function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
 
     const startingstockData = () => {
         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
@@ -45,7 +51,7 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
         } else { return ([]) }
     }
 
-    const startingTargetStock = () => {
+    const startingTargetStock = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
             return (p.widgetCopy.targetSTock)
         } else { return ('') }
@@ -53,10 +59,11 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
 
     const [stockData, setStockData] = useState(startingstockData());
     const [targetStock, setTargetStock] = useState(startingTargetStock());
-    const isInitialMount = useRef(true);
-    const dispatch = useDispatch();
+    const [display, setDisplay] = useState('EPS') //EPS or Revenue
+    const isInitialMount = useRef(true); //update to false after first render.
+    const dispatch = useDispatch(); //allows widget to run redux actions.
 
-    const rShowData = useSelector((state) => {
+    const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
@@ -66,18 +73,20 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
     })
 
     useImperativeHandle(ref, () => (
-        //used to copy widgets when being dragged.
+        //used to copy widgets when being dragged. example: if widget body renders time series data into chart, copy chart data.
+        //add additional slices of state to list if they help reduce re-render time.
         {
             state: {
                 stockData: stockData,
-                targetStock: targetStock,
+                targetStock: targetStock, //REMOVE IF NO TARGET STOCK
+                display: display,
             },
         }
     ))
 
     useEffect(() => {
         //On mount, use widget copy, else build visable data.
-        //On update, if change in candle selection, rebuild visable data.
+        //On update, if change in target stock, rebuild visable data.
         if (isInitialMount.current && p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
             isInitialMount.current = false;
         } else {
@@ -91,18 +100,18 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
     }, [targetStock, p.widgetKey, p.widgetCopy, dispatch])
 
     useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
-        //Setup filters if not yet done.
         if (filters['startDate'] === undefined) {
-            const startDateOffset = -604800 * 1000 * 52 * 20 //20 year backward. Limited to 1 year on free version.
-            const endDateOffset = 0 //today.
-            update(key, 'startDate', startDateOffset)
-            update(key, 'endDate', endDateOffset)
+            const startDate = -604800 * 1000 * 52 //1 year backward. Limited to 1 year on free version.
+            const endDate = 0 //today.
+            update(key, 'startDate', startDate)
+            update(key, 'endDate', endDate)
             update(key, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
 
         }
     }, [p.filters, p.updateWidgetFilters, p.widgetKey])
 
     useEffect(() => {
+        //DELETE IF NO TARGET STOCK
         //if stock not selected default to first stock.
         if (Object.keys(p.trackedStocks).length > 0 && targetStock === '') {
             const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
@@ -110,8 +119,8 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
         }
     }, [p.trackedStocks, targetStock])
 
-    useEffect(() => {
-        if (isFinnHubSplitList(rShowData) === true) { setStockData(rShowData) }
+    useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
+        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) }
     }, [rShowData])
 
     function updateFilter(e) {
@@ -126,7 +135,6 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
 
     function renderSearchPane() {
         //add search pane rendering logic here. Additional filters need to be added below.
-
         const stockList = Object.keys(p.trackedStocks);
         const stockListRows = stockList.map((el) =>
             <tr key={el + "container"}>
@@ -143,7 +151,6 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
                 </td>
             </tr>
         )
-
         const now = Date.now()
         const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000 * 52
         const startUnix = now + startUnixOffset
@@ -155,9 +162,10 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
         let searchForm = (
             <>
                 <div className="stockSearch">
-                    <form className="form-inline">
+                    <form className="form-stack">
                         <label htmlFor="start">Start date:</label>
                         <input className="btn" id="start" type="date" name="startDate" onChange={updateFilter} value={startDate}></input>
+                        <br />
                         <label htmlFor="end">End date:</label>
                         <input className="btn" id="end" type="date" name="endDate" onChange={updateFilter} value={endDate}></input>
                     </form>
@@ -171,32 +179,50 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
     }
 
     function stockTable() {
-        // console.log('stockData', stockData)
-        if (Object.keys(stockData).length) {
-            const stockList: finnHubSplitNode[] = Object.values(stockData)
-            let sortedData = stockList.sort((a, b) => (new Date(a.date) > new Date(b.date) ? 1 : -1))
-            let tableData = sortedData.map((el) => {
-
-                return <tr key={"row" + el.date}>
-                    <td>{el.date}</td>
-                    <td>{el.fromFactor}</td>
-                    <td>{el.toFactor}</td>
-                </tr>
-
-            })
-            return tableData
-        }
+        const actual = display === 'EPS' ? 'epsActual' : 'revenueActual'
+        const estimate = display === 'EPS' ? 'epsEstimate' : 'revenueEstimate'
+        let sortedData = stockData['earningsCalendar'] !== undefined ? [...stockData['earningsCalendar']].sort((a, b) => (new Date(a.date) > new Date(b.date) ? 1 : -1)) : []
+        let tableData = sortedData.map((el) => {
+            return <tr key={"row" + el.date}>
+                <td className='rightTE' key={"period" + el.date}> {`${el['year']} Q:${el['quarter']}`} </td>
+                {/* <td className='rightTE' key={"estimate" + el.date}>{Number(el[estimate]).toFixed(2)}</td>             */}
+                <td className='rightTE' key={"estimate" + el.date}>{Number(el[estimate]).toLocaleString(
+                    undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2, })}
+                </td>
+                <td className='rightTE' key={"actual" + el.date}>{Number(el[actual]).toLocaleString(
+                    undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2, })}
+                </td>
+                <td className='rightTE' key={"var" + el.date}>{Number(el[actual] - el[estimate]).toLocaleString(
+                    undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2, })}
+                </td>
+                <td className='rightTE' key={"var2" + el.date}>{Number(
+                    ((el[actual] - el[estimate]) / el[estimate]) * 100
+                ).toLocaleString(
+                    undefined, { minimumFractionDigits: 0, maximumFractionDigits: 2, })}
+                </td>
+            </tr>
+        })
+        return tableData
     }
 
-    function changeStockSelection(e) {
+    function changeValueSelection(e) {
+        const target = e.target.value;
+        setDisplay(target)
+    }
+
+    function changeStockSelection(e) { //DELETE IF no target stock
         const target = e.target.value;
         const key = `${p.widgetKey}-${target}`
         setTargetStock(target)
         dispatch(tSearchMongoDB([key]))
     }
 
-
     function renderStockData() {
+        let newSymbolList = ["EPS", "Revenue"].map((el) => (
+            <option key={el} value={el}>
+                {el}
+            </option>
+        ));
         let newStockList = Object.keys(p.trackedStocks).map((el) => (
             <option key={el + "ddl"} value={el}>
                 {p.trackedStocks[el].dStock(p.exchangeList)}
@@ -211,13 +237,21 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
                         <select className="btn" value={targetStock} onChange={changeStockSelection}>
                             {newStockList}
                         </select>
+
+                        {"  Display:  "}
+                        <select className="btn" value={display} onChange={changeValueSelection}>
+                            {newSymbolList}
+                        </select>
+
                     </div>
                     <table>
                         <thead>
                             <tr>
-                                <td>Date</td>
-                                <td>From:</td>
-                                <td>To:</td>
+                                <td>Quarter</td>
+                                <td>{display === 'EPS' ? 'EPS Estimate' : 'Revenue Estimate'}</td>
+                                <td>{display === 'EPS' ? 'EPS Actual' : 'Revenue Actual'}</td>
+                                <td>Variance</td>
+                                <td>Variance%</td>
                             </tr>
                         </thead>
                         <tbody>{stockTable()}</tbody>
@@ -245,9 +279,9 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
     )
 }
 
-export default forwardRef(PriceSplits)
+export default forwardRef(EstimatesEarningsCalendar)
 
-export function PriceSplitsProps(that, key = "newWidgetNameProps") {
+export function EarningsCalendarProps(that, key = "newWidgetNameProps") {
     let propList = {
         apiKey: that.props.apiKey,
         showPane: that.showPane,
@@ -265,9 +299,9 @@ export function PriceSplitsProps(that, key = "newWidgetNameProps") {
     return propList;
 }
 
-export const priceSplitsFilters: object = {
-    startDate: -604800 * 1000 * 52 * 20, //20 years
-    endDate: 0,
-    "Description": 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
+export const EarningsCalendarFilters: filters = { //IF widget uses filters remember to define default filters here and add to topNavReg as 5th paramater.
+    startDate: -604800 * 1000 * 52, //1 year backward. Limited to 1 year on free version.
+    endDate: 0,  //today.
+    description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.',
 }
 

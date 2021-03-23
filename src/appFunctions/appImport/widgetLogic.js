@@ -90,6 +90,7 @@ export const RemoveWidget = function removeWidget(stateRef, widgetID) {
 }
 
 export const UpdateWidgetFilters = function updateWidgetFilters(widgetID, dataKey, data){
+    console.log("updating widget filters.")
     try {
         const s = this.state
         // console.log("UPDATEWIDGETFILTERS", dataKey, data)

@@ -33,8 +33,6 @@ import { rBuildDataModel, rResetUpdateFlag } from "./slices/sliceDataModel";
 import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 
-
-
 class App extends React.Component {
   constructor(props) {
     super(props);
