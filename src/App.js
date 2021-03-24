@@ -10,7 +10,7 @@ import { Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
 import {
   NewMenuContainer, AddNewWidgetContainer, LockWidgets,
   ToggleWidgetVisability, ChangeWidgetName, RemoveWidget,
-  UpdateWidgetFilters,UpdateWidgetStockList,
+  UpdateWidgetFilters,UpdateWidgetStockList, updateWidgetConfig
 } from "./appFunctions/appImport/widgetLogic";
 import { LoadDashBoard, NewDashboard, GetSavedDashBoards, SaveCurrentDashboard } 
   from "./appFunctions/appImport/setupDashboard";
@@ -79,6 +79,7 @@ class App extends React.Component {
     this.updateWidgetFilters = UpdateWidgetFilters.bind(this); 
     this.updateWidgetStockList = UpdateWidgetStockList.bind(this); 
     this.toggleWidgetVisability = ToggleWidgetVisability.bind(this);
+    this.updateWidgetConfig = updateWidgetConfig.bind(this);
 
     //App logic for setting up dashboards.
     this.loadDashBoard = LoadDashBoard.bind(this);
@@ -402,6 +403,7 @@ class App extends React.Component {
           syncGlobalStockList={this.syncGlobalStockList}
           snapWidget={this.snapWidget}
           setDrag={this.setDrag}
+          updateWidgetConfig = {this.updateWidgetConfig}
           widgetCopy={this.state.widgetCopy}
           // enableDrag={this.enableDrag}
         />

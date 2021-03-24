@@ -1,36 +1,39 @@
-export const LoadDashBoard = function loadDashBoard(newGlobalList, newWidgetList) {
+import produce from "immer"
+
+export const LoadDashBoard = async function loadDashBoard(newGlobalList, newWidgetList) {
     //setup global stock list.
     // console.log("HERE",newGlobalList, newWidgetList)
-    let updateGlobalList = newGlobalList;
-    for (const stock in updateGlobalList) {      
-        updateGlobalList[stock]['dStock'] = function(ex){
-            if (ex.length === 1) {
-            return (this.symbol)
-            } else {
-            return (this.key)
+    let updateGlobalList = await produce(newGlobalList, (draftState) => {
+        for (const stock in draftState) {      
+            draftState[stock]['dStock'] = function(ex){
+                if (ex.length === 1) {
+                return (this.symbol)
+                } else {
+                return (this.key)
+                }
             }
         }
-    }
+    })
 
     //setup widgets, and their individual stock lists.
-    let updateWidgetList = newWidgetList;
-    for (const widget in updateWidgetList){
-        // console.log("1")
-        const widgetStockObj = updateWidgetList[widget]
-        const trackedStockObj = widgetStockObj.trackedStocks
-        for (const stock in trackedStockObj) {
-            trackedStockObj[stock]['dStock'] = function(ex){
-            if (ex.length === 1) {
-                return (this.symbol)
-            } else {
-                return (this.key)
-            }
+    let updateWidgetList = await produce(newWidgetList, (draftState)=>{
+        for (const widget in draftState){
+            // console.log("1")
+            const widgetStockObj = draftState[widget]
+            const trackedStockObj = widgetStockObj.trackedStocks
+            for (const stock in trackedStockObj) {
+                trackedStockObj[stock]['dStock'] = function(ex){
+                if (ex.length === 1) {
+                    return (this.symbol)
+                } else {
+                    return (this.key)
+                }
+                }
             }
         }
-    }
+        delete draftState.null
+    })
 
-    delete updateWidgetList.null
-    // console.log("-----------------", updateWidgetList)
     this.setState({ 
         globalStockList: updateGlobalList,
         widgetList: updateWidgetList, 
@@ -61,6 +64,7 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
             for (const widget in thisDash) {
                 thisDash[widget].filters = JSON.parse(thisDash[widget].filters)
                 thisDash[widget].trackedStocks = JSON.parse(thisDash[widget].trackedStocks)
+                thisDash[widget].config = JSON.parse(thisDash[widget].config)
             }
         }
         const loadDash = {

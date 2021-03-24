@@ -46,6 +46,7 @@ router.get("/dashboard", (req, res, next) => {
                     const newObject = {
                     column: result[row].columnid, 
                     columnOrder: result[row].columnorder,
+                    config: result[row].config,
                     filters: result[row].filters,
                     trackedStocks: result[row].trackedstocks,
                     widgetConfig: result[row].widgetconfig,
@@ -129,11 +130,12 @@ router.post("/dashboard", (req, res, next) => {
                 const trackedStocks = JSON.stringify(w.trackedStocks)
                 const saveWidget = `
                 INSERT INTO widgets
-                (dashboardkey, columnid, columnorder, filters, trackedstocks, widgetconfig, widgetheader, widgetid, widgettype, xaxis, yaxis)
+                (dashboardkey, columnid, columnorder, config, filters, trackedstocks, widgetconfig, widgetheader, widgetid, widgettype, xaxis, yaxis)
                 VALUES(
                 ${format("%L", rows.rows[0].id)}, 
                 ${format("%L", w.column)}, 
                 ${format("%L", w.columnOrder)}, 
+                ${format("%L", w.config)}, 
                 ${format("%L", thisFilter)}, 
                 ${format("%L", trackedStocks)}, 
                 ${format("%L", w.widgetConfig)}, 

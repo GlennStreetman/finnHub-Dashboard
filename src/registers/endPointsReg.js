@@ -2,7 +2,7 @@
 import candleWidgetEndPoint  from "../widgets/Price/candles/candlesEndPoint";
 import quoteWidgetEndPoint  from "../widgets/Price/quote/quoteEndPoint";
 import priceSplitsEndPoint  from "../widgets/Price/splits/priceSplitsEndPoint";
-import basicFinancialsEndPoint  from "../widgets/Fundamentals/basicFinancials/basicFinancialsEndPoint.js";
+import basicFinancialsEndPoint  from "../widgets/Fundamentals/basicFinancials/basicFinancialsEndPoint";
 import companyNewsEndPoint  from "../widgets/Fundamentals/companyNews/companyNewsEndPoint.js";
 import companyProfileEndPoint  from "../widgets/Fundamentals/companyProfile2/companyProfile2EndPoint.js";
 import marketNewsEndPoint  from "../widgets/Fundamentals/marketNews/marketNewsEndPoint.js";
@@ -11,7 +11,7 @@ import peersEndPoint  from "../widgets/Fundamentals/Peers/peersEndPoint.js";
 import financialsAsReportedEndPoint  from "../widgets/Fundamentals/financialsAsReported/financialsAsReportedEndPoint.js";
 import secFilingsEndPoint  from "../widgets/Fundamentals/secFilings/secFilingsEndPoint.js";
 import IPOCalendarEndPoint  from "../widgets/Fundamentals/IPOCalendar/IPOCalendarEndPoint.js";
-import recommendationTrendsEndPoint  from "../widgets/Estimates/RecommendationTrends/RecommendationTrendsEndPoint.js";
+import recommendationTrendsEndPoint  from "../widgets/Estimates/RecommendationTrends/RecommendationTrendsEndPoint";
 import priceTargetEndPoint  from "../widgets/Estimates/PriceTarget/priceTargetEndPoint";
 import EPSSuprisesEndPoint  from "../widgets/Estimates/EPSSurprises/EPSSurprisesEndPoint";
 import EarningsCalendarEndPoint  from "../widgets/Estimates/EarningsCalendar/EarningsCalendarEndPoint";

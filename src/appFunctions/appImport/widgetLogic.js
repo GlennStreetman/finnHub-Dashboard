@@ -27,14 +27,15 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
     const newWidget = {
         column: 0,
         columnOrder: -1,
+        config: {}, //used to save user setup for the widget that does not require new api request.
         widgetID: widgetName,
         widgetType: widgetDescription,
         widgetHeader: widgetHeader,
         xAxis: "5rem",
         yAxis: "5rem",
         trackedStocks: s.globalStockList,
-        widgetConfig: widgetConfig,
-        filters: defaultFilters
+        widgetConfig: widgetConfig, //reference to widget type. Menu or data widget.
+        filters: defaultFilters //used to save user setup that requires new api request.
     };
     
     const newWidgetList = produce(s.widgetList, (draftState) => {
@@ -90,7 +91,7 @@ export const RemoveWidget = function removeWidget(stateRef, widgetID) {
 }
 
 export const UpdateWidgetFilters = function updateWidgetFilters(widgetID, dataKey, data){
-    console.log("updating widget filters.")
+    // console.log("updating widget filters.", widgetID, dataKey, data)
     try {
         const s = this.state
         // console.log("UPDATEWIDGETFILTERS", dataKey, data)
@@ -169,6 +170,20 @@ export const UpdateWidgetStockList = function updateWidgetStockList(widgetId, sy
             })
         });
     }
+}
+
+export const updateWidgetConfig = function(widgetID, updateObj){
+    //receives key and value to update in widget config object.
+    console.log("UPDATING CONFIG", widgetID, updateObj, )
+    const s = this.state
+    const updatedDashboardData = produce(s.widgetList, (draftState) =>{
+        for (const x in updateObj) {
+            draftState[widgetID].config[x] = updateObj[x]
+        }
+    })
+    this.setState({widgetList: updatedDashboardData},()=>{
+        // this.saveCurrentDashboard(s.currentDashBoard)
+    })
 }
 
 
