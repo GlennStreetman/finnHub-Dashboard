@@ -22,7 +22,7 @@ export default function IPOCalendarEndPoint(stockList: StockObj[], filters: filt
         console.log("Failed IPO calendar endpoint Typeguard: ", queryString)
     }
 
-    console.log("QUERY STRINGS IPO", queryStringObj)
+    // console.log("QUERY STRINGS IPO", queryStringObj)
 
     return queryStringObj
 }

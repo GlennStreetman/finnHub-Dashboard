@@ -77,13 +77,13 @@ export const SnapOrder = function snapOrder(widget, column, yyAxis, wType){
         const newMenu = draftState.menuList
         const newWidget = draftState.widgetList
         for (const w in allWidgets) {
-            if (allWidgets[w]['widgetConfig'] === 'stockWidget') {
+            if (allWidgets[w]['widgetConfig'] === 'stockWidget' || allWidgets[w]['widgetConfig'] === 'marketWidget') {
                 newWidget[allWidgets[w]['widgetID']]['columnOrder'] = allWidgets[w]['columnOrder']
             } else {
                 newMenu[allWidgets[w]['widgetID']]['columnOrder'] = allWidgets[w]['columnOrder']
             }
         }
-        if (wType === 'stockWidget') {
+        if (wType === 'stockWidget' || wType === 'marketWidget') {
             newWidget[widget].column = column
             newWidget[widget].columnOrder = insertionPoint
         } else {

@@ -24,6 +24,7 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
     const s = this.state
 
     const widgetName = new Date().getTime();
+    const widgetStockList = widgetConfig === 'stockWidget' ? s.globalStockList : {}
     const newWidget = {
         column: 0,
         columnOrder: -1,
@@ -33,7 +34,7 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
         widgetHeader: widgetHeader,
         xAxis: "5rem",
         yAxis: "5rem",
-        trackedStocks: s.globalStockList,
+        trackedStocks: widgetStockList,
         widgetConfig: widgetConfig, //reference to widget type. Menu or data widget.
         filters: defaultFilters //used to save user setup that requires new api request.
     };
@@ -147,6 +148,7 @@ export const UpdateWidgetStockList = function updateWidgetStockList(widgetId, sy
 
             } else {
                 //remove
+                console.log("removing stock",symbol )
                 delete trackingSymbolList[symbol]
                 draftState[widgetId]["trackedStocks"] = trackingSymbolList
             }

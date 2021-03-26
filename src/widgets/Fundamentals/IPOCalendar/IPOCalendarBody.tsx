@@ -91,15 +91,6 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
         }
     }, [p.widgetKey, p.widgetCopy, dispatch])
 
-    useEffect((ts = p.trackedStocks, updateWidgetStockList = p.updateWidgetStockList) => {
-        //DELETE ALL STOCKS ASSOCIATED WITH WIDGET.
-        if (Object.keys(ts).length > 0) {
-            for (const stock in ts) {
-                updateWidgetStockList(p.widgetKey, ts[stock].key);
-            }
-        }
-    }, [p.trackedStocks, p.updateWidgetStockList, p.widgetKey])
-
     useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
         if (filters['startDate'] === undefined) {
             const startDateOffset = -604800 * 1000 * 52
@@ -216,16 +207,16 @@ export default forwardRef(FundamentalsIPOCalendar)
 export function IPOCalendarProps(that, key = "newWidgetNameProps") {
     let propList = {
         apiKey: that.props.apiKey,
-        defaultExchange: that.props.defaultExchange,
-        exchangeList: that.props.exchangeList,
+        // defaultExchange: that.props.defaultExchange,
+        // exchangeList: that.props.exchangeList,
         filters: that.props.widgetList[key]["filters"],
         showPane: that.showPane,
-        trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        throttle: that.props.throttle,
-        updateDefaultExchange: that.props.updateDefaultExchange,
+        // trackedStocks: that.props.widgetList[key]["trackedStocks"],
+        // throttle: that.props.throttle,
+        // updateDefaultExchange: that.props.updateDefaultExchange,
         updateWidgetFilters: that.props.updateWidgetFilters,
-        updateGlobalStockList: that.props.updateGlobalStockList,
-        updateWidgetStockList: that.props.updateWidgetStockList,
+        // updateGlobalStockList: that.props.updateGlobalStockList,
+        // updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
     };
     return propList;

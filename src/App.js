@@ -1,6 +1,7 @@
 import React from "react";
 import "./App.css";
 import queryString from "query-string";
+import produce from "immer"
 //app functions
 import { GetStockPrice, LoadStockData } from "./appFunctions/getStockPrices";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
@@ -226,12 +227,13 @@ class App extends React.Component {
   syncGlobalStockList() {
     const s = this.state;
     console.log("syncing stocks");
-    const updatedWidgetList = { ...s.widgetList };
-    for (const w in updatedWidgetList) {
-      console.log(updatedWidgetList[w]["widgetHeader"]);
-      updatedWidgetList[w]["trackedStocks"] = this.state.globalStockList;
-      console.log(updatedWidgetList[w]["trackedStocks"]);
-    }
+    const updatedWidgetList = produce(s.widgetList, (draftState) => {
+      for (const w in draftState) {
+        if (draftState[w].widgetConfig === 'stockWidget'){
+          draftState[w]["trackedStocks"] = this.state.globalStockList;
+        }
+      }
+    })
     this.setState({ widgetList: updatedWidgetList });
   }
 

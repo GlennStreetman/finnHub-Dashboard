@@ -210,7 +210,7 @@ class WidgetContainer extends React.Component {
           {this.props.widgetLockDown === 0 ? (
             <button
               onClick={() => {
-                if (this.props.stateRef === "stockWidget") {
+                if (this.props.stateRef === "stockWidget" || this.props.stateRef === 'marketWidget') {
                   this.props.removeWidget("widgetList", this.props.widgetKey);
                 } else {
                   this.props.menuWidgetToggle(this.props.widgetKey);

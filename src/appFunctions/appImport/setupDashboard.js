@@ -7,9 +7,9 @@ export const LoadDashBoard = async function loadDashBoard(newGlobalList, newWidg
         for (const stock in draftState) {      
             draftState[stock]['dStock'] = function(ex){
                 if (ex.length === 1) {
-                return (this.symbol)
+                    return (this.symbol)
                 } else {
-                return (this.key)
+                    return (this.key)
                 }
             }
         }

@@ -5,6 +5,7 @@ import { priceSplitsFilters } from './../widgets/Price/splits/PriceSplitsBody';
 import { EarningsCalendarFilters } from './../widgets/Estimates/EarningsCalendar/EarningsCalendarBody';
 import { companyNewsFilters } from './../widgets/Fundamentals/companyNews/companyNewsBody';
 import { IPOCalendarFilters } from './../widgets/Fundamentals/IPOCalendar/IPOCalendarBody';
+import { marketNewsFilters } from './../widgets/Fundamentals/marketNews/marketNewsBody';
 
 export let estimateOptions = [
     ["EstimatesEarningsCalendar" ,"Earnings Calendar: ", "stockWidget", "Earnings Calendar", EarningsCalendarFilters],  
@@ -18,8 +19,8 @@ export let fundamentalsOptions = [
     ["FundamentalsCompanyProfile2","Profile 2:","stockWidget","Company Profile 2"],
     ["FundamentalsCompanyNews", "Company News: ", "stockWidget", "Company News", companyNewsFilters],
     ["FundamentalsFinancialsAsReported", "FinancialsAsReported: ", "stockWidget", "Fin. As Reported"],
-    ["FundamentalsIPOCalendar", "IPO Calendar: ", "stockWidget", "IPO Calendar", IPOCalendarFilters],
-    ["FundamentalsMarketNews", "Market News: ", "stockWidget", "Market News"],
+    ["FundamentalsIPOCalendar", "IPO Calendar: ", "marketWidget", "IPO Calendar", IPOCalendarFilters],
+    ["FundamentalsMarketNews", "Market News: ", "marketWidget", "Market News", marketNewsFilters],
     ["FundamentalsNewsSentiment", "News Sentiment: ", "stockWidget", "News Sentiments"],
     ["FundamentalsPeers", "Peers: ", "stockWidget", "Peers"],
     ["FundamentalsSECFilings", "SEC Filings: ", "stockWidget", "SEC Filings"],
