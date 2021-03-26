@@ -1,34 +1,40 @@
 import * as React from "react"
 import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
+import EndPointNode from "../../../components/endPointNode";
 
-import { useAppDispatch, useAppSelector } from '../hooks';
-import { rBuildVisableData } from '../slices/sliceShowData'
-import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB'
+import { useAppDispatch, useAppSelector } from '../../../hooks';
+import { rBuildVisableData } from '../../../slices/sliceShowData'
+import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
 
-import StockSearchPane, { searchPaneProps } from "../components/stockSearchPaneFunc";
+import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
+interface finnHubFilingObj {
+    accessNumber: string,
+    symbol: string,
+    cik: string,
+    year: number,
+    quarter: number,
+    form: string,
+    startDate: string,
+    endDate: string,
+    fileDate: string,
+    acceptDate: string,
+    report: Object,
+}
+
 interface FinnHubAPIData { //rename
-    //defined shape of data returns by finnHub
-}
+    symbol: string,
+    cik: string,
+    data: finnHubFilingObj,
 
-interface FinnHubAPIDataArray {
-    [index: number]: FinnHubAPIData
-}
-
-interface filters { //Any paramas not related to stock used by finnHub endpoint.
-    //remove if not needed, else define
-    description: string,
-    endDate: number,
-    startDate: number,
-    //additional filters...
 }
 
 //add any additional type guard functions here used for live code.
-function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
-    if (arg !== undefined && Object.keys(arg).length > 0 && arg[0].date) {
+function isFinnHubData(arg: any): arg is FinnHubAPIData { //typeguard
+    if (arg !== undefined && Object.keys(arg).length > 0 && arg.symbol) {
         // console.log("returning true", arg)
         return true
     } else {
@@ -37,7 +43,7 @@ function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
     }
 }
 //RENAME FUNCTION
-function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
+function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
 
     const startingstockData = () => {
         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
@@ -91,20 +97,6 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
         }
     }, [targetStock, p.widgetKey, p.widgetCopy, dispatch])
 
-    useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
-        //DELETE IF NO FILTERS
-        //Setup filters if not yet done.
-        //example update commented out below. 
-        if (filters['startDate'] === undefined) {
-            // const startDateOffset = -604800 * 1000 * 52 * 20 //20 year backward. Limited to 1 year on free version.
-            // const endDateOffset = 0 //today.
-            // update(key, 'startDate', startDateOffset)
-            // update(key, 'endDate', endDateOffset)
-            // update(key, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
-
-        }
-    }, [p.filters, p.updateWidgetFilters, p.widgetKey])
-
     useEffect(() => {
         //DELETE IF NO TARGET STOCK
         //if stock not selected default to first stock.
@@ -118,60 +110,43 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
         if (isFinnHubData(rShowData) === true) { setStockData(rShowData) }
     }, [rShowData])
 
-    function updateFilter(e) {
-        if (isNaN(new Date(e.target.value).getTime()) === false) {
-            const now = Date.now()
-            const target = new Date(e.target.value).getTime();
-            const offset = target - now
-            const name = e.target.name;
-            p.updateWidgetFilters(p.widgetKey, name, offset)
+    function updateWidgetList(stock) {
+        if (stock.indexOf(":") > 0) {
+            const stockSymbol = stock.slice(0, stock.indexOf(":"));
+            p.updateWidgetStockList(p.widgetKey, stockSymbol);
+        } else {
+            p.updateWidgetStockList(p.widgetKey, stock);
         }
     }
 
     function renderSearchPane() {
         //add search pane rendering logic here. Additional filters need to be added below.
-
         const stockList = Object.keys(p.trackedStocks);
-        const stockListRows = stockList.map((el) =>
-            <tr key={el + "container"}>
-                <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
-                <td key={el + "buttonC"}>
-                    <button
-                        key={el + "button"}
-                        onClick={() => {
-                            p.updateWidgetStockList(p.widgetKey, el);
-                        }}
-                    >
-                        <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
-                    </button>
-                </td>
-            </tr>
-        )
-
-        const now = Date.now()
-        const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000 * 52
-        const startUnix = now + startUnixOffset
-        const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
-        const endUnix = now + endUnixOffset
-        const startDate = new Date(startUnix).toISOString().slice(0, 10);
-        const endDate = new Date(endUnix).toISOString().slice(0, 10);
-
-        let searchForm = (
-            <>
-                <div className="stockSearch">
-                    <form className="form-inline">
-                        <label htmlFor="start">Start date:</label>
-                        <input className="btn" id="start" type="date" name="startDate" onChange={updateFilter} value={startDate}></input>
-                        <label htmlFor="end">End date:</label>
-                        <input className="btn" id="end" type="date" name="endDate" onChange={updateFilter} value={endDate}></input>
-                    </form>
-                </div>
-                <table>
-                    <tbody>{stockListRows}</tbody>
-                </table>
-            </>
+        const row = stockList.map((el) =>
+            p.showEditPane === 1 ? (
+                <tr key={el + "container"}>
+                    <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
+                    <td key={el + "buttonC"}>
+                        <button
+                            key={el + "button"}
+                            onClick={() => {
+                                updateWidgetList(el);
+                            }}
+                        >
+                            <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
+                        </button>
+                    </td>
+                </tr>
+            ) : (
+                <tr key={el + "pass"}></tr>
+            )
         );
-        return searchForm
+        let stockListTable = (
+            <table>
+                <tbody>{row}</tbody>
+            </table>
+        );
+        return <>{stockListTable}</>;
     }
 
     function changeStockSelection(e) { //DELETE IF no target stock
@@ -182,8 +157,25 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
     }
 
     function renderStockData() {
-        //RENDER LOGIN HERE FOR STOCK DATA.
+        console.log("RENDERNG FINS AS REPORTED")
+        const newSymbolList = Object.keys(p.trackedStocks).map((el) => (
+            <option key={el + "ddl"} value={el}>
+                {p.trackedStocks[el].dStock(p.exchangeList)}
+            </option>
+        ))
+
+
+        const stockTable =
+            <>
+                <select className="btn" value={targetStock} onChange={changeStockSelection}>
+                    {newSymbolList}
+                </select>
+                <br />
+                {stockData !== undefined && <EndPointNode nodeData={stockData} />}
+            </>
+        return stockTable
     }
+
 
     return (
         <>
@@ -202,9 +194,9 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
     )
 }
 //RENAME
-export default forwardRef(NewWidgetEndpointBody)
+export default forwardRef(FundamentalsFinancialsAsReported)
 //RENAME
-export function NewWidgetProps(that, key = "newWidgetNameProps") {
+export function financialsAsReportedProps(that, key = "newWidgetNameProps") {
     let propList = {
         apiKey: that.props.apiKey,
         defaultExchange: that.props.defaultExchange,
@@ -222,11 +214,4 @@ export function NewWidgetProps(that, key = "newWidgetNameProps") {
     return propList;
 }
 
-//rename
-export const priceSplitsFilters: object = { //IF widget uses filters remember to define default filters here and add to topNavReg as 5th paramater.
-    // startDate: -604800 * 1000 * 52 * 20, //20 years
-    // endDate: 0,
-    //... additional filters...
-    // "Description": 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
-}
 

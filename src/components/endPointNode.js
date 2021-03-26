@@ -1,7 +1,7 @@
 import React from "react";
 
 export default class EndPointNode extends React.Component {
-      
+
     constructor(props) {
         super(props);
             this.state = {
@@ -35,6 +35,7 @@ export default class EndPointNode extends React.Component {
     }
 
     renderNodeData() {
+        console.log("rendering node data")
         //for each item in object, if object return button logic, else return string
         const p = this.props
         const objectKeyZeroToList = Object.keys(p.nodeData).map((el, ind) => {

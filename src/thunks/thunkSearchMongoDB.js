@@ -13,9 +13,10 @@ export const tSearchMongoDB = createAsyncThunk( //{endPoint, [securityList]}
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(req),
             };
-        // console.log("Searching mongoDB with: ", req)
+        console.log("Searching mongoDB with: ", req)
         const getData = await fetch('/findMongoData', options)
         const foundData = await getData.json()
+        console.log('foundData', foundData)
         const resObj = {}
         for (const x in foundData.resList){
             const mongo = foundData.resList[x]

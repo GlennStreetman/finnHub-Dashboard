@@ -48,7 +48,14 @@ const FileStore = sessionFileStore(session)
 const fileStoreOptions = {};
 
 app.use(morgan('dev'))
-app.use(bodyParser.json()); // support json encoded bodies
+app.use(bodyParser.json({
+  limit: 52428800,
+})); // support json encoded bodies
+app.use(bodyParser.urlencoded({
+  parameterLimit: 100000,
+  limit: 52428800,
+  extended: true
+}));
 
 //LOAD CONFIG.
 console.log("env=", process.env.live)
