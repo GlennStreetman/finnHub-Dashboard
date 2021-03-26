@@ -6,7 +6,7 @@ import basicFinancialsEndPoint  from "../widgets/Fundamentals/basicFinancials/ba
 import companyNewsEndPoint  from "../widgets/Fundamentals/companyNews/companyNewsEndPoint";
 import companyProfileEndPoint  from "../widgets/Fundamentals/companyProfile2/companyProfile2EndPoint";
 import marketNewsEndPoint  from "../widgets/Fundamentals/marketNews/marketNewsEndPoint";
-import newsSentimentEndPoint  from "../widgets/Fundamentals/newsSentiment/newsSentimentEndPoint.js";
+import newsSentimentEndPoint  from "../widgets/Fundamentals/newsSentiment/newsSentimentEndPoint";
 import peersEndPoint  from "../widgets/Fundamentals/Peers/peersEndPoint.js";
 import financialsAsReportedEndPoint  from "../widgets/Fundamentals/financialsAsReported/financialsAsReportedEndPoint";
 import secFilingsEndPoint  from "../widgets/Fundamentals/secFilings/secFilingsEndPoint.js";

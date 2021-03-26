@@ -55,7 +55,6 @@ export default class FundamentalsNewsSentiment extends Component {
     changeStockSelection(e) {
       const target = e.target.value;
       this.setState({ targetStock: target }, () => this.getStockData());
-      
     }
 
     renderSearchPane(){
@@ -171,8 +170,3 @@ export function newsSentimentsProps(that, key = "newWidgetNameProps") {
     };
     return propList;
   }
-
-
-  // fetch('https://finnhub.io/api/v1/stock/profile2?symbol=AAPL&token=bsuu7qv48v6qu589jlj0')
-  //   .then(response => response.json())
-  //   .then(data => console.log(data))
