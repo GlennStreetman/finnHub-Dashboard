@@ -1,7 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {finnHub} from "./../appFunctions/throttleQueue";
-// import { exchangeDataDB } from './indexedDB.js'
-
 
 export const tGetSymbolList = createAsyncThunk(
     'newSymbolList',

@@ -9,7 +9,7 @@ import marketNewsEndPoint  from "../widgets/Fundamentals/marketNews/marketNewsEn
 import newsSentimentEndPoint  from "../widgets/Fundamentals/newsSentiment/newsSentimentEndPoint";
 import peersEndPoint  from "../widgets/Fundamentals/Peers/peersEndPoint";
 import financialsAsReportedEndPoint  from "../widgets/Fundamentals/financialsAsReported/financialsAsReportedEndPoint";
-import secFilingsEndPoint  from "../widgets/Fundamentals/secFilings/secFilingsEndPoint.js";
+import secFilingsEndPoint  from "../widgets/Fundamentals/secFilings/secFilingsEndPoint";
 import IPOCalendarEndPoint  from "../widgets/Fundamentals/IPOCalendar/IPOCalendarEndPoint";
 import recommendationTrendsEndPoint  from "../widgets/Estimates/RecommendationTrends/RecommendationTrendsEndPoint";
 import priceTargetEndPoint  from "../widgets/Estimates/PriceTarget/priceTargetEndPoint";
