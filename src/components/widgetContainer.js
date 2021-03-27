@@ -155,6 +155,7 @@ class WidgetContainer extends React.Component {
       widgetProps['updateAPIFlag'] = this.props.updateAPIFlag
       widgetProps['widgetType'] = this.props.widgetList["widgetType"]
       widgetProps['config'] = this.props.widgetList.config
+      widgetProps['updateDashBoards'] = this.props.updateDashBoards
     } 
     // widgetProps.ref = this.widgetRef
     if (this.props.widgetCopy) {

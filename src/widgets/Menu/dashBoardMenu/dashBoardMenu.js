@@ -35,18 +35,6 @@ export default class DashBoardMenu extends React.PureComponent {
     this.setState({ inputText: e.target.value.toUpperCase() });
   }
 
-  deleteDashBoard(dashBoardId) {
-    fetch(`/deleteSavedDashboard?dashID=${dashBoardId}`)
-      .then((response) => response.json())
-      .then((data) => {
-        // console.log(data);
-        this.props.getSavedDashBoards();
-      })
-      .catch((error) => {
-        console.error("Failed to delete dashboard" + error);
-      });
-  }
-
   showCheckMark() {
     if (this.baseState.mounted === true) {
       this.setState({ checkMark: "faIconFade" });
@@ -54,6 +42,23 @@ export default class DashBoardMenu extends React.PureComponent {
         this.setState({ checkMark: "faIcon" })
       }}, 3000);
     }
+  }
+
+  async saveUpdateDashboard(dashboardName){
+    console.log("STARTING SAVE")
+    const p = this.props
+    let savedDash = await p.saveCurrentDashboard(dashboardName)
+    if (savedDash === true) {
+      let returnedDash = await p.getSavedDashBoards()
+      p.updateDashBoards(returnedDash)
+    }
+  }
+
+  async deleteDashBoard(dashBoardId) {
+    const p = this.props
+    await fetch(`/deleteSavedDashboard?dashID=${dashBoardId}`)
+    const afterDelete = await this.props.getSavedDashBoards();
+    p.updateDashBoards(afterDelete)
   }
 
   render() {
@@ -116,7 +121,8 @@ export default class DashBoardMenu extends React.PureComponent {
                     value={this.props.currentDashBoard === this.state.inputText ? "Update" : " Save "}
                     // value="submit"
                     onClick={() => {
-                      this.props.saveCurrentDashboard(this.state.inputText);
+                      this.saveUpdateDashboard(this.state.inputText)
+                      // this.props.saveCurrentDashboard(this.state.inputText);
                       this.showCheckMark();
                     }}
                   />
@@ -159,11 +165,3 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
   };
   return propList;
 }
-
-// const DashBoardMenuFunction = (props, ref) => {
-//   const propObj = {...props}
-//   propObj.ref = ref
-//   return (React.createElement(DashBoardMenu, {...propObj}))
-// }
-
-// export default DashBoardMenuFunction

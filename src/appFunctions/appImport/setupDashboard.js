@@ -88,27 +88,32 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
     }
 }
 
-export const SaveCurrentDashboard = function saveCurrentDashboard(dashboardName) {
-    
-    const data = {
-        dashBoardName: dashboardName,
-        globalStockList: this.state.globalStockList,
-        widgetList: this.state.widgetList,
-        menuList: this.state.menuList,
-    };
-    console.log("saving current dashboard", data);
+export const SaveCurrentDashboard = async function saveCurrentDashboard(dashboardName) {
+    return new Promise ((res) => {
+        const data = {
+            dashBoardName: dashboardName,
+            globalStockList: this.state.globalStockList,
+            widgetList: this.state.widgetList,
+            menuList: this.state.menuList,
+        };
+        console.log("saving current dashboard", data);
 
-    const options = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(data),
-    };
+        const options = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+        };
 
-    fetch("/dashBoard", options)
-        .then((data) => console.log('dashboard data retrieved'))
-        .then(() => {
-            // console.log("updating dashboard", data);
-            this.getSavedDashBoards();
-        });
-    // e.preventDefault();
+        fetch("/dashBoard", options)
+            .then((data) => console.log('dashboard data retrieved'))
+            .then(() => {
+                console.log("loading saved dashboards");
+                res(true)
+                // this.getSavedDashBoards()
+            })
+            .catch((err)=>{
+                console.log("Problem returning saved dashboards", err)
+                res(false)
+            })
+    })
 }

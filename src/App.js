@@ -103,7 +103,7 @@ class App extends React.Component {
     this.uploadGlobalStockList = this.uploadGlobalStockList.bind(this); //pass in object to replace global list
     this.syncGlobalStockList = this.syncGlobalStockList.bind(this); //pushes global stock list to all widgets.
     this.toggleBackGroundMenu = this.toggleBackGroundMenu.bind(this);
-
+    this.updateDashBoards = this.updateDashBoards.bind(this) //when dashboard menu saves or deletes a dashboard, runs to upddate state.
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -278,7 +278,6 @@ class App extends React.Component {
 
   updateExchangeList(ex) {
     const p = this.props;
-    const s = this.state;
 
     if (typeof ex === "string") {
       const newList = ex.split(",");
@@ -306,6 +305,11 @@ class App extends React.Component {
       //runs on login
       this.setState({ defaultExchange: ex });
     }
+  }
+
+  updateDashBoards(data){
+    //{dashboardData, currentDashBoard, menuList}
+    this.setState(data)
   }
 
   render() {
@@ -397,6 +401,7 @@ class App extends React.Component {
           setDrag={this.setDrag}
           updateWidgetConfig = {this.updateWidgetConfig}
           widgetCopy={this.state.widgetCopy}
+          updateDashBoards={this.updateDashBoards}
           // enableDrag={this.enableDrag}
         />
         {loginScreen}
