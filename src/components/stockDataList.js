@@ -29,8 +29,7 @@ class StockDataList extends React.Component {
 
 const mapStateToProps = (state, ownProps) => {
   const p = ownProps
-  // console.log('exd------------', state.exchangeData.exchangeData?.data)
-  const thisExchange = state.exchangeData.exchangeData?.data
+  const thisExchange = state.exchangeData.e?.data
   // console.log('!!!thisExchange', thisExchange)
   const newFilteredList = []
   if (thisExchange !== undefined) {

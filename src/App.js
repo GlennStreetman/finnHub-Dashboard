@@ -28,7 +28,7 @@ import { WidgetController, MenuWidgetToggle } from "./components/widgetControlle
 
 //redux imports
 import { connect } from "react-redux";
-import { tGetSymbolList, tUpdateExchangeData } from "./slices/sliceExchangeData";
+import { tGetSymbolList } from "./slices/sliceExchangeData";
 import { rUpdateExchangeList } from "./slices/sliceExchangeList";
 import { rBuildDataModel, rResetUpdateFlag } from "./slices/sliceDataModel";
 import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
@@ -283,16 +283,6 @@ class App extends React.Component {
     if (typeof ex === "string") {
       const newList = ex.split(",");
 
-      for (const stock in newList) {
-        // if (p.exchangeList.indexOf(newList[stock]) === -1){
-        const newPayload = {
-          exchange: newList[stock],
-          apiKey: s.apiKey,
-        };
-        p.tGetSymbolList(newPayload);
-        // }
-      }
-
       const payload = {
         exchangeList: newList,
         apiKey: this.state.apiKey,
@@ -311,7 +301,7 @@ class App extends React.Component {
     if (ex.target) {
       //runs on dropdown update.
       this.setState({ defaultExchange: ex.target.value });
-      this.props.tUpdateExchangeData(ex.target.value)
+      this.props.tGetSymbolList(ex.target.value, this.state.apiKey)
     } else {
       //runs on login
       this.setState({ defaultExchange: ex });
@@ -427,6 +417,6 @@ export default connect(mapStateToProps, {
   tGetFinnhubData,
   tGetMongoDB,
   rResetUpdateFlag,
-  tUpdateExchangeData,
+  // tUpdateExchangeData,
 
 })(App);

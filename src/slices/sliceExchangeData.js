@@ -1,21 +1,21 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import {finnHub} from "./../appFunctions/throttleQueue";
-import { exchangeDataDB } from './indexedDB.js'
+// import { exchangeDataDB } from './indexedDB.js'
 
 
 export const tGetSymbolList = createAsyncThunk(
     'newSymbolList',
-    (reqObj, thunkAPI) => { //{exchange, apiKey, finnHub} Not passing thunk api as second arg.
+    (reqObj, thunkAPI) => { //{exchange, apiKey}
         const finnQueue = thunkAPI.getState().finnHubQueue.throttle
         const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${reqObj.exchange}&token=${reqObj.apiKey}`
-        // console.log(apiString)
+        console.log('GETTING exchange data', reqObj.exchange, reqObj.apiKey, apiString)
         return finnHub(finnQueue, apiString) //replace with usestate.
         .then((data) => {
             if (data.error === 429) { //run again
                 tGetSymbolList(reqObj)
                 return {
                     'data': {}, 
-                    'ex': exchangeDataDB,
+                    'ex': reqObj.exchange,
                 }
             } else {
                 let updateStockList = {}
@@ -27,35 +27,17 @@ export const tGetSymbolList = createAsyncThunk(
                 }  
                 return {
                     'data': updateStockList, 
-                    'exchange': reqObj.exchange,
+                    'ex': reqObj.exchange,
                 }
             }
         })
     }
     )
 
-export const tUpdateExchangeData = createAsyncThunk(
-        'getSymbolList',
-        async (reqObj, thunkAPI) => {
-            //receives default exchange symbol, retrieves data from local, loads into redux state.
-            const ap = reqObj
-            // console.log('1ap', ap)
-            const db = await exchangeDataDB() //open connection
-            // console.log('2db', db)
-            const value = await db.get('exchangeDB',ap) //get data
-            // console.log('FINISHED', ap, value)
-            const returnObj = {
-                ex: ap,
-                data: value
-            }
-            // console.log("-----------returning---------", returnObj)
-            return (returnObj)
-        })
-
 const exchangeData = createSlice({
     name: 'exchangedata',
     initialState: {
-        exchangeDB: exchangeDataDB
+        e: {}
     },
     reducers: { 
             rUpdateExchangeData: (state, action) => {
@@ -74,41 +56,23 @@ const exchangeData = createSlice({
         console.log('failed to retrieve stock data for: ', action)
         return state
     },
-    [tGetSymbolList.fulfilled]: async(state, action) => {
+    [tGetSymbolList.fulfilled]: (state, action) => {
         try {
             let data = action.payload
             const updateObj = {
-                ex: data.exchange,
+                ex: data.ex,
                 data: data.data,
                 updated: Date.now(),
             }
-            // console.log('updateObj', updateObj, data)
+            console.log('updateObj', updateObj, data)
             if (updateObj.ex !== undefined) {
-                const db = await exchangeDataDB()
-
-                db.put('exchangeDB',updateObj)
-                // console.log('Added to store:', value, updateObj)
-                // console.log(db)
+                console.log("UPDATING", updateObj)
+                state.e = updateObj
             }
-        } catch {console.log('failed to retrieve exchange data')}
-        return state
+        } catch {
+            console.log('failed to retrieve exchange data')
+        }
         
-    },
-
-    [tUpdateExchangeData.pending]: (state) => {
-        // console.log('1 getting exchange data')
-        return {...state}
-    },
-    [tUpdateExchangeData.rejected]: (state, action) => {
-        console.log('failed to retrieve exchange data for: ', action)
-        return {...state}
-    },
-    [tUpdateExchangeData.fulfilled]: (state, action) => {
-        // console.log('!3 FINISHED tUpdateExchangeData', action)
-        // const apx = action.payload['ex']
-        const apd = action.payload['data']
-        // console.log('-----------apd--------------', apd)
-        if (apd !== undefined) {state.exchangeData = apd} else {return {...state}}
     }
     }
 })

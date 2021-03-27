@@ -72,7 +72,7 @@ class login extends React.Component {
             this.setState({message: "Problem validating email address."})
         }
         
-        this.checkLoginStatus(p.processLogin, p.updateExchangeList, p.updateDefaultExchange, p.throttle)
+        this.checkLoginStatus(p.processLogin, p.updateExchangeList, p.updateDefaultExchange,  p.throttle)
     }
 
     emailIsValid(email) {
