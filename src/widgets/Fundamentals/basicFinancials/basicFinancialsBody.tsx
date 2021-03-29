@@ -386,7 +386,6 @@ export function metricsProps(that, key = "newWidgetNameProps") {
         filters: that.props.widgetList[key]["filters"],
         showPane: that.showPane,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        throttle: that.props.throttle,
         updateWidgetConfig: that.props.updateWidgetConfig,
         updateDefaultExchange: that.props.updateDefaultExchange,
         updateWidgetFilters: that.props.updateWidgetFilters,

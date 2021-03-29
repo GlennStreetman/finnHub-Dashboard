@@ -97,7 +97,6 @@ export function newWidgetNameProps(that, key = "newWidgetNameProps") {
       filters: that.props.widgetList[key]["filters"],
       showPane: that.showPane,
       trackedStocks: that.props.widgetList[key]["trackedStocks"],
-      throttle: that.props.throttle,
       updateDefaultExchange: that.props.updateDefaultExchange,
       updateWidgetFilters: that.props.updateWidgetFilters,
       updateGlobalStockList: that.props.updateGlobalStockList,
@@ -106,14 +105,3 @@ export function newWidgetNameProps(that, key = "newWidgetNameProps") {
     };
     return propList;
   }
-
-
-  // fetch('https://finnhub.io/api/v1/search?q=WMT3.BA&token=bsuu7qv48v6qu589jlj0')
-  //   .then(response => response.json())
-  //   .then(data => console.log(data))
-
-  // fetch('https://finnhub.io/api/v1/stock/split?symbol=TSLA&from=2001-02-23&to=2021-01-29&token=bsuu7qv48v6qu589jlj0')
-  // .then((response) => {
-  //   console.log(response) 
-  //   return (response.json())})
-  // .then(data => console.log(data))

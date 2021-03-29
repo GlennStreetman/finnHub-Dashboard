@@ -1,4 +1,4 @@
-function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle) {
+function UpdateTickerSockets(context, socket, apiKey, globalStockList) {
   //opens a series of socket connections to live stream stock prices
   //update limited to once every 3 seconds to have mercy on dom rendering.
   let USList = [] //only subscribe to US stocks
@@ -57,9 +57,9 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList, throttle)
   that.setState({socket: thisSocket})
 }
 
-function LoadTickerSocket(context, prevState, globalStockList, socket, apiKey, updateTickerSockets, throttle) {
+function LoadTickerSocket(context, prevState, globalStockList, socket, apiKey, updateTickerSockets) {
   const that = context
-  if (globalStockList !== prevState.globalStockList && throttle !== undefined && apiKey !== ""){
+  if (globalStockList !== prevState.globalStockList && apiKey !== ""){
     console.log('updating socket')
     // if (socket !== '') { 
     //   socket.close()
@@ -68,7 +68,7 @@ function LoadTickerSocket(context, prevState, globalStockList, socket, apiKey, u
     if (socket === '') {
       socket = new WebSocket(`wss://ws.finnhub.io?token=${apiKey}`)
     }
-    updateTickerSockets(that, socket, apiKey, globalStockList, throttle)
+    updateTickerSockets(that, socket, apiKey, globalStockList)
   }
 }
 

@@ -1,6 +1,7 @@
 import React from "react";
+import EndPointData from './endPointData'
 
-export default class EndPointNode extends React.Component {
+export default class EndPointNode extends React.PureComponent {
 
     constructor(props) {
         super(props);
@@ -16,8 +17,6 @@ export default class EndPointNode extends React.Component {
             const checkObject = this.props.nodeData[key]
             typeof checkObject === 'object' && checkObject !== null && this.setState({[key]: false})
         }
-
-        // this.renderNodeData()
     }
 
     componentDidUpdate(prevProps){
@@ -35,12 +34,37 @@ export default class EndPointNode extends React.Component {
     }
 
     renderNodeData() {
-        console.log("rendering node data")
+        // console.log("rendering node data")
         //for each item in object, if object return button logic, else return string
         const p = this.props
+        // console.log("nodeData", p.nodeData)
         const objectKeyZeroToList = Object.keys(p.nodeData).map((el, ind) => {
-            // console.log(el, p.nodeData[el])
-            if (typeof p.nodeData[el] === 'object' && p.nodeData[el] !== null && this.state[el] === false) {
+            console.log("found data")
+            if (el === 'data' && this.state[el] !== true) {
+                return (
+                    <li className='liNode'  key={ind + 'li'}>
+                        <div className='endPointDivRow' key={ind}>
+                            {el} - <button className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
+                                <i className="fa fa-caret-square-o-down" aria-hidden="true"></i>
+                            </button>
+                            {/* <div className='endPointDivColumn'><EndPointData nodeData={p.nodeData[el]} /></div> */}
+                        </div>
+                    </li>
+                )
+            } else if (el === 'data' ) {
+                return (
+                    <li className='liNode'  key={ind + 'li'}>
+                        <div className='endPointDivRow' key={ind}>
+                            {el} - <button className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
+                                <i className="fa fa-caret-square-o-down" aria-hidden="true"></i>
+                            </button>
+                            <div className='endPointDivColumn'><EndPointData nodeData={p.nodeData[el]} widgetID = {p.nodeData.widgetID}  /></div>
+                        </div>
+                    </li>
+                )
+
+            } else if (typeof p.nodeData[el] === 'object' && p.nodeData[el] !== null && this.state[el] !== true) {
+                // console.log("Closed Node detected", p.nodeData[el])
                 return (
                     <li className='liNode' key={ind + 'li'}>
                         <div key={ind}>
@@ -61,7 +85,7 @@ export default class EndPointNode extends React.Component {
                         </div>
                     </li>
                 )
-            } else {
+            }  else if (el !== 'widgetID') {
                 let thisString = this.props.nodeData[el]
                 // console.log("----------->", thisString)
                 return(

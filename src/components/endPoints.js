@@ -1,5 +1,5 @@
 import React from "react";
-import {finnHub} from "../appFunctions/throttleQueue";
+import produce from "immer"
 import EndPointNode from "./endPointNode";
 
 export default class EndPointMenu extends React.Component {
@@ -14,48 +14,58 @@ export default class EndPointMenu extends React.Component {
         };
 
         this.renderEndPointRows = this.renderEndPointRows.bind(this);
-        this.retrieveEndPointData = this.retrieveEndPointData.bind(this);
         this.backButton = this.backButton.bind(this);
-
+        this.showEndPointData = this.showEndPointData.bind(this);
     }
 
-    retrieveEndPointData(el){
-        const that = this
+    async showEndPointData(el){ //receives dashboard object, builds endpoint display
         const p = this.props
-        const queryString = `${window.location.origin}/endPoint?apiKey=${p.apiKey}&dashBoardName=${el}`
-        this.setState({
-            showData: true,
-            showLoader: true,
-            title: queryString,     
-        }, ()=> {
-            finnHub(this.props.throttle, queryString)
-            .then((data) => {
-            try {
-                that.setState({ 
-                        endPointData: data,
-                        showData: true,
-                        showLoader: false,
-                        });
+        let displayWidgetList = await produce(p.dashBoardData[el].widgetlist, (draftState)=>{
+            // console.log("draftstate", p.dashBoardData, p.dashBoardData[el],draftState)
+            for (const w in draftState){
+                const widgetName = draftState[w].widgetHeader
+                const widgetNameDistinct = draftState[w].widgetHeader + w
+                const widgetDetails = draftState[w]
+                // const id = widgetDetails.widgetID
+                delete widgetDetails.column
+                delete widgetDetails.columnOrder
+                delete widgetDetails.widgetConfig
+                delete widgetDetails.widgetHeader
+                // delete widgetDetails.widgetID
+                delete widgetDetails.xAxis
+                delete widgetDetails.yAxis
+                if (Object.keys(widgetDetails.config).length === 0) delete widgetDetails.config
+                if (Object.keys(widgetDetails.filters).length === 0) delete widgetDetails.filters
+                
+                const keys = Object.keys(widgetDetails.trackedStocks)
+                widgetDetails.data = {}
+                for (const stock of keys) {
+                    widgetDetails.data[stock] = stock
+                }
 
-            } catch (err) {
-                console.log("Could not parse endpoint data.", err);
+                draftState[widgetName] ? draftState[widgetNameDistinct] = widgetDetails : draftState[widgetName] = widgetDetails
+                delete draftState[w]
             }
-            })
-            .catch(error => {
-            console.log(error.message)
-            });
+
         })
+        this.setState({ 
+            endPointData: displayWidgetList,
+            showData: true,
+            showLoader: false,
+        })
+
     }
+
 
     renderEndPointRows(){
         const p = this.props
-        const thisDashboard = {...p.dashBoardData}
+        const thisDashboard = p.dashBoardData
         return Object.keys(thisDashboard).map((el) => 
             <tr key={el + "row"}>
                 <td key={el + "dash"}>{el}</td>
                 <td key={el + "api"}>{`${window.location.origin}/endPoint?apiKey=${p.apiKey}&dashBoardName=${el}`}</td>
                 <td key={el + "prev"}>
-                    <button onClick={()=>{this.retrieveEndPointData(el)}}>
+                    <button onClick={()=>{this.showEndPointData(el)}}>
                         <i className="fa fa-check-square-o" aria-hidden="true"></i>
                     </button>
                 </td>
@@ -115,11 +125,14 @@ export default class EndPointMenu extends React.Component {
                         </tbody>
                     </table>
                 </div>
-            </> : <div style={dataStyle}>
+            </> : //SHOW ENDPOINT
+                <div style={dataStyle}>
                     {this.state.showLoader === true ? <>
                         <div style={loader} /> <br /> 
                         Loading Dashboard 
-                    </>  : <label>Endpoint URL: {this.state.title}</label> }
+                    </>  : <></>
+                    // <label>Endpoint URL: {this.state.title}</label> 
+                    }
                     <EndPointNode nodeData={this.state.endPointData}/>
                     {this.state.showLoader === false ? <>
                     <button onClick={()=>this.backButton()}>
@@ -136,7 +149,6 @@ export function endPointProps(that, key = "AccountMenu") {
     let propList = {
         dashBoardData: that.state.dashBoardData,
         apiKey: that.state.apiKey,
-        throttle: that.state.throttle,
     };
     return propList;
 }

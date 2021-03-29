@@ -163,7 +163,6 @@ export function newsSentimentsProps(that, key = "newWidgetNameProps") {
       updateGlobalStockList: that.props.updateGlobalStockList,
       updateWidgetStockList: that.props.updateWidgetStockList,
       widgetKey: key,
-      throttle: that.props.throttle,
       exchangeList: that.props.exchangeList,
       defaultExchange: that.props.defaultExchange,
       updateDefaultExchange: that.props.updateDefaultExchange,

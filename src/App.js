@@ -5,7 +5,7 @@ import produce from "immer"
 //app functions
 import { GetStockPrice, LoadStockData } from "./appFunctions/getStockPrices";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
-import ThrottleQueue from "./appFunctions/throttleQueue";
+// import ThrottleQueue from "./appFunctions/throttleQueue";
 //appImport
 import { Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
 import {
@@ -57,7 +57,7 @@ class App extends React.Component {
       enableDrag: false,
       socket: "", //socket connection for streaming stock data.
       showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
-      throttle: ThrottleQueue(25, 1000, true), //all finnhub API requests should be done with finnHub function.
+      // throttle: ThrottleQueue(25, 1000, true), //all finnhub API requests should be done with finnHub function.
       streamingPriceData: {}, //data shared between some widgets and watchlist menu. Updated by socket data.
       WatchListMenu: 1, //1 = show, 0 = hide
       widgetCopy: { widgetID: null }, //copy of state of widget being dragged.
@@ -153,7 +153,7 @@ class App extends React.Component {
     if (s.globalStockList !== prevState.globalStockList) {
       // console.log('updating Stock Data')
       LoadStockData(this, s, GetStockPrice);
-      LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets, s.throttle);
+      LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
     }
 
     if (s.login === 1 && s.loadStartingDashBoard === 0 && s.currentDashBoard !== "") {
@@ -322,7 +322,6 @@ class App extends React.Component {
           queryData={quaryData}
           updateExchangeList={this.updateExchangeList}
           updateDefaultExchange={this.updateDefaultExchange}
-          throttle={this.state.throttle}
         />
       ) : (
         <></>

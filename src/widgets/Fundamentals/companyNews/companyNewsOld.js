@@ -298,7 +298,6 @@ export function newsWidgetProps(that, key = "marketNews") {
     apiKey: that.props.apiKey,
     filters: that.props.widgetList[key]["filters"],
     showPane: that.showPane,
-    throttle: that.props.throttle,
     trackedStocks: that.props.widgetList[key]["trackedStocks"],
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetFilters: that.props.updateWidgetFilters,

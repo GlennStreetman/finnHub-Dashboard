@@ -253,7 +253,6 @@ export function EPSSurprisesProps(that, key = "newWidgetNameProps") {
         filters: that.props.widgetList[key]["filters"],
         showPane: that.showPane,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        throttle: that.props.throttle,
         updateDefaultExchange: that.props.updateDefaultExchange,
         updateWidgetFilters: that.props.updateWidgetFilters,
         updateGlobalStockList: that.props.updateGlobalStockList,
