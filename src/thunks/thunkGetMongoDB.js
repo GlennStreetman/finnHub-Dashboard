@@ -6,7 +6,7 @@ export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
     'tgetMongoDb',
     async (req) => { //l{ist of securities} 
     try {
-        // console.log("1running mongo refresh")
+        console.log("1running mongo refresh")
         const getData = await fetch('/finnDashData')
         const freshData = await getData.json()
         const resObj = {}
@@ -17,10 +17,12 @@ export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
                 stale: mongo.stale,
                 data: mongo.data,
                 key: mongo.key,
+                dashboard: mongo.dashboard,
+                widget: mongo.widget,
+                security: mongo.security
             }
         }
-        // console.log('3resOBJ', freshData, resObj)
-        console.log('UPDATE FROM MONGO COMPLETE', resObj)
+        // console.log('UPDATE FROM MONGO COMPLETE', resObj)
         return(resObj)
 
     }catch(err){

@@ -54,24 +54,25 @@ router.post("/finnDashData", async (req, res) => {
                     userID: req.session.uID,
                     key: record,
                 }
-                const widget = record.slice(0, record.indexOf('-'))
+                // const widget = record.slice(0, record.indexOf('-'))
                 const update = {
                     $set:{
                         userID: req.session.uID,
                         key: record,
-                        widget: widget,
+                        widget: u.widget,
                         dashboard: u.dashboard, 
                         description: u.description,
                         retrieved: u.updated,
                         stale: u.updated + 1000 * 60 * 60 * 30,
                         data: u.data,
                         apiString: u.apiString,
+                        security: u.security,
                     }
                 }
                 const options = {
                     upsert: true
                 }
-                console.log('2:', update)
+                // console.log('2:', update)
                 await dataSet.updateOne(filters, update, options) 
                 .catch((err)=>{console.log('Problem updating dataset', err)})           
             }

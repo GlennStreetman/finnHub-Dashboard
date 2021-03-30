@@ -5,14 +5,12 @@ import produce from "immer"
 //app functions
 import { GetStockPrice, LoadStockData } from "./appFunctions/getStockPrices";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
-// import ThrottleQueue from "./appFunctions/throttleQueue";
-//appImport
 import { Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
 import {
   NewMenuContainer, AddNewWidgetContainer, LockWidgets,
   ToggleWidgetVisability, ChangeWidgetName, RemoveWidget,
   UpdateWidgetFilters,UpdateWidgetStockList, updateWidgetConfig
-} from "./appFunctions/appImport/widgetLogic";
+  } from "./appFunctions/appImport/widgetLogic";
 import { LoadDashBoard, NewDashboard, GetSavedDashBoards, SaveCurrentDashboard } 
   from "./appFunctions/appImport/setupDashboard";
 import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
@@ -29,10 +27,12 @@ import { WidgetController, MenuWidgetToggle } from "./components/widgetControlle
 //redux imports
 import { connect } from "react-redux";
 import { tGetSymbolList } from "./slices/sliceExchangeData";
+import { rSetTargetDashboard } from "./slices/sliceShowData";
 import { rUpdateExchangeList } from "./slices/sliceExchangeList";
 import { rBuildDataModel, rResetUpdateFlag } from "./slices/sliceDataModel";
 import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
+
 
 class App extends React.Component {
   constructor(props) {
@@ -110,28 +110,40 @@ class App extends React.Component {
     const s = this.state;
     const p = this.props;
     
-    if (s.login === 1 && prevState.login === 0) {
+    if (s.login === 1 && prevState.login === 0) { //on login build data model.
       console.log("Loggin detected, setting up dashboards.", s.apiKey);
       this.getSavedDashBoards()
       .then(loginDataAndDashboards => {
-        // console.log("UPDATE DASH DATA", loginDataAndDashboards)
-        this.setState(loginDataAndDashboards)
-        // console.log("DATA IS SET!!!!", p)
+        console.log("UPDATE DASH DATA", loginDataAndDashboards)
+        this.setState(loginDataAndDashboards) //{dashboardData: {}, menuList: {}}
+        p.rSetTargetDashboard({targetDashboard: loginDataAndDashboards.currentDashBoard})
         p.rBuildDataModel({...loginDataAndDashboards, apiKey: s.apiKey})
       })
       .catch((error) => {
           console.error("Failed to recover dashboards", error);
-          // this.setState({dashBoardData: {message: "Problem retrieving dashboards."}})
           });
       ;
     }
-    //on load build dataset. //REVISE UPDATE FLAGS
+    
     if ((prevProps.dataModel.created === 'false' && p.dataModel.created === 'true') || (p.dataModel.created === 'updated')) {
+      //Update dataset with finnHub data.
       console.log("RUNNING DATA BUILD")
       p.rResetUpdateFlag()
       let setupData = async function(dataset, that){
         await that.props.tGetMongoDB()
-        await that.props.tGetFinnhubData(dataset)
+        await that.props.tGetFinnhubData({ //get data for default dashboard.
+          targetDashBoard: s.currentDashBoard, 
+          widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist)
+        })
+        const dashBoards = Object.keys(s.dashBoardData) //get data for dashboards not being shown
+        for (const dash of dashBoards) {
+          if (dash !== s.currentDashBoard) {
+            that.props.tGetFinnhubData({ //run in background, do not await.
+              targetDashBoard: dash, 
+              widgetList: Object.keys(s.dashBoardData[dash].widgetlist)
+            })
+          }
+        }
       }
       setupData(Object.keys(p.dataModel.dataSet), this)
     }
@@ -172,20 +184,16 @@ class App extends React.Component {
     }
 
     if (s.rebuildDataSet === 1) {
+      console.log("Rebuilding dataset.")
       this.setState({rebuildDataSet: 0}, ()=>{
-        console.log("REBUILDING")
-        // const data = {
-        //   apiKey: s.apiKey,
-        //   currentDashboard: s.currentDashBoard,
-        //   dashBoardData: s.dashBoardData
-        // }
-        
-      console.log("RUNNING DATA BUILD")
-      let setupData = async function(dataset, that){
-        await that.props.tGetMongoDB()
-        await that.props.tGetFinnhubData(dataset)
-      }
-      setupData(Object.keys(p.dataModel.dataSet), this)
+        let setupData = async function(dataset, that){
+          await that.props.tGetMongoDB()
+          await that.props.tGetFinnhubData({
+            currentDashboard: s.currentDashBoard, 
+            widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetList),
+          })
+        }
+        setupData(Object.keys(p.dataModel.dataSet), this)
       })
     }
   }
@@ -420,6 +428,6 @@ export default connect(mapStateToProps, {
   tGetFinnhubData,
   tGetMongoDB,
   rResetUpdateFlag,
-  // tUpdateExchangeData,
+  rSetTargetDashboard,
 
 })(App);

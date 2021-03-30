@@ -12,11 +12,13 @@ interface DataNode {
 
 interface DataSet {
     dataSet: { [key: string]: DataNode },
+    targetDashboard: string,
 }
 
 
 const initialState: DataSet = {
-    dataSet: {}
+    dataSet: {},
+    targetDashboard: '',
 }
 
 const showData = createSlice({
@@ -47,6 +49,9 @@ const showData = createSlice({
             //resets state after loading new dataset.
             state.dataSet = {}
         },
+        rSetTargetDashboard: (state, action) => {
+            state.targetDashboard = action.payload.targetDashboard
+        }
 
     },
     extraReducers: {
@@ -65,14 +70,16 @@ const showData = createSlice({
             // console.log("Merge fresh finnHub data into showData", action.payload)
             const ap: any = action.payload
             for (const key in ap) {
-                const apiString: string = key
-                const widgetRef: string = apiString.slice(0, apiString.indexOf('-'))
-                const security: string = apiString.slice(apiString.indexOf('-') + 1, apiString.length)
-                // console.log(key, widgetRef, security)
-                if (state.dataSet[widgetRef] !== undefined &&
-                    state.dataSet[widgetRef][security] !== undefined) {
-                    // console.log('MERGE FINAL', widgetRef, security, ap[key].data)
-                    state.dataSet[widgetRef][security] = ap[key].data
+                if (ap[key].dashboard === state.targetDashboard) {
+                    console.log("updating visable data", ap[key])
+                    const widgetRef: string = ap[key].widget
+                    const security: string = ap[key].security
+                    // console.log(key, widgetRef, security)
+                    if (state.dataSet[widgetRef] !== undefined &&
+                        state.dataSet[widgetRef][security] !== undefined) {
+                        // console.log('MERGE FINAL', widgetRef, security, ap[key].data)
+                        state.dataSet[widgetRef][security] = ap[key].data
+                    }
                 }
             }
         },
@@ -91,14 +98,15 @@ const showData = createSlice({
             // console.log("Merge fresh mongoDB data into showData")
             const ap: any = action.payload
             for (const x in ap) {
-                const apiString: string = ap[x].key
-                const widgetRef: string = apiString.slice(0, apiString.indexOf('-'))
-                const security: string = apiString.slice(apiString.indexOf('-') + 1, apiString.length)
-                // console.log(widgetRef, security)
-                if (state.dataSet[widgetRef] !== undefined &&
-                    state.dataSet[widgetRef][security] !== undefined) {
-                    // console.log('HERE', widgetRef, security)
-                    state.dataSet[widgetRef][security] = ap[x].data
+                if (ap[x].dashboard === state.targetDashboard) {
+                    const widgetRef: string = ap[x].widget
+                    const security: string = ap[x].security
+                    // console.log(widgetRef, security)
+                    if (state.dataSet[widgetRef] !== undefined &&
+                        state.dataSet[widgetRef][security] !== undefined) {
+                        // console.log('HERE', widgetRef, security)
+                        state.dataSet[widgetRef][security] = ap[x].data
+                    }
                 }
             }
         },
@@ -135,6 +143,7 @@ export const {
     rSetVisableData,
     rBuildVisableData,
     rResetVisableData,
+    rSetTargetDashboard,
 } = showData.actions
 export default showData.reducer
 

@@ -36,70 +36,40 @@ const dataModel = createSlice({
     reducers: { //reducers can reference eachother with slice.caseReducers.reducer(state)
         rBuildDataModel: (state, action) => { //{apiKey, dashboardData}
             //receivies dashboard object and builds dataset from scratch.
-
             const ap: any = action.payload
             const apD: any = ap.dashBoardData
             // console.log("Building DATASET")
-            const resList: string[] = []
             const endPointAPIList: EndPointAPIList = {} //list of lists. Each list []
-            //nested loops that create a list of endpoints for this dataset.
+            //create dataSet
             for (const d in apD) { //for each dashboard
                 const dashboardName: string = d
+                endPointAPIList[dashboardName] = {}
                 const widgetList = apD[d].widgetlist
-                // console.log('d', d, widgetList)
                 for (const w in widgetList) {  //for each widget
                     const widgetName: string = w
                     if (w !== null && w !== 'null') {
-                        // console.log('widgetList[w]', widgetList[w])
                         const endPoint: string = widgetList[w].widgetType
                         const filters: Object = widgetList[w].filters
                         const widgetDescription: string = widgetList[w].widgetHeader
                         // @ts-ignore: Unreachable code error
                         const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
                         const trackedStocks = widgetList[w].trackedStocks
-                        // console.log('MAKE ENDPOINT', widgetName, filters, ap.apiKey)
                         const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, ap.apiKey)
-
                         delete endPointData.undefined
-                        // console.log("ENDPOINT LIST", endPointData)
-                        endPointAPIList[widgetName] = {
-                            endPointData: endPointData,
-                            widgetDescription: widgetDescription,
-                            dashboardName: dashboardName,
-                        }
-                        for (const s in trackedStocks) {
-                            if (trackedStocks[s].key !== undefined) {
-                                const key = trackedStocks[s].key
-                                const dataName: string = `${widgetName}-${key}`
-                                resList.push(dataName)
+                        endPointAPIList[dashboardName][widgetName] = {}
+                        for (const stock in endPointData) {
+                            endPointAPIList[dashboardName][widgetName][`${stock}`] = {
+                                apiString: endPointData[stock],
+                                description: widgetDescription,
+                                dashboard: dashboardName,
                             }
                         }
                     }
                 }
             }
 
-            for (const x in state.dataSet) {//if resList item exists in old list, delete from reslist, else delete from oldState
-                resList.indexOf(x) > -1 ?
-                    resList.splice(resList.indexOf(x), 1) :
-                    delete state.dataSet[x]
-            }
-
-            for (const x of resList) { //Map remainnig resList items into state.
-                state.dataSet[x] = {}
-            }
-
-            for (const widget in endPointAPIList) {
-                const thisWidget = endPointAPIList[widget]
-                for (const security in thisWidget.endPointData) {
-                    console.log("this widget", thisWidget)
-                    const widgetString: string = `${widget}-${security}`
-                    state.dataSet[widgetString] = {
-                        apiString: thisWidget.endPointData[security],
-                        description: thisWidget.widgetDescription,
-                        dashboard: thisWidget.dashboardName,
-                    }
-                }
-            }
+            //check for stale date and retain info?????
+            state.dataSet = endPointAPIList
             const flag: boolean | string = state.created === 'false' ? 'true' : 'updated'
             // console.log("UPDATING FLAG", flag)
             state.created = flag
@@ -127,12 +97,12 @@ const dataModel = createSlice({
             // console.log("3 UPDATA DATA STORE:", action.payload)
             const ap = action.payload
             for (const x in ap) {
-                const updateObj = {
-                    apiString: ap[x].apiString,
-                    updated: ap[x].updated,
-                    // data: ap[x].data,
-                }
-                state.dataSet[x] = updateObj
+                const db = ap[x].dashboard
+                const widget = ap[x].widget
+                const sec = ap[x].security
+                console.log(db, widget, sec)
+                state.dataSet[db][widget][sec]['apiString'] = ap[x].apiString
+                state.dataSet[db][widget][sec]['updated'] = ap[x].updated
             }
         },
         // @ts-ignore: Unreachable code error
@@ -149,14 +119,20 @@ const dataModel = createSlice({
         [tGetMongoDB.fulfilled]: (state, action) => {
             // console.log("3Merge update fields into dataSet from mongoDB", action)
             const ap = action.payload
+            console.log()
             for (const x in ap) {
-                const apiString = ap[x].key
+                const dashboard = ap[x].dashboard
+                const widget = ap[x].widget
                 const updated = ap[x].updated
                 const stale = ap[x].stale
-                // console.log('stale', stale)
-                if (state.dataSet[apiString] !== undefined) {
-                    state.dataSet[apiString].updated = updated
-                    state.dataSet[apiString].stale = stale
+                const security = ap[x].security
+                if (
+                    state.dataSet[dashboard] !== undefined &&
+                    state.dataSet[dashboard][widget] !== undefined &&
+                    state.dataSet[dashboard][widget][security] !== undefined
+                ) {
+                    state.dataSet[dashboard][widget][security].updated = updated
+                    state.dataSet[dashboard][widget][security].stale = stale
                 }
             }
         },

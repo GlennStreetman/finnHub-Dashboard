@@ -79,11 +79,11 @@ export const createFunctionQueueObject = function (maxRequestPerInterval, interv
 //throttle =  que object returned by function above.
 
 
-export const finnHub = (throttle, reqObj, id) => {
+export const finnHub = (throttle, reqObj) => {
     // console.log("creating promise: ", throttle, apiString, id)
     return new Promise((resolve, reject) => {
         throttle.enqueue(function() { 
-            console.log("------------fetch throttleQueAPI--------", reqObj, reqObj.apiString)
+            // console.log("------------fetch throttleQueAPI--------", reqObj, reqObj.apiString)
             fetch(reqObj.apiString)
             .then((response) => {
                 // console.log("1111!!!", response)
@@ -107,12 +107,12 @@ export const finnHub = (throttle, reqObj, id) => {
                 // console.log('data!!!', data)
                 if (data[429] !== undefined) {
                     console.log('------------>429', throttle)
-                    resolve (finnHub(throttle, reqObj.apiString, id))
+                    resolve (finnHub(throttle, reqObj.apiString))
                     throttle.openRequests = throttle.openRequests -= 1
                 } else if (data[400] !== undefined) {
-                    console.log("broken", reqObj)
                     const resObj = {
-                        key: id,
+                        security: reqObj.security,
+                        widget: reqObj.widget,
                         apiString: reqObj.apiString,
                         data: data,
                         dashboard: reqObj.dashboard,
@@ -122,22 +122,25 @@ export const finnHub = (throttle, reqObj, id) => {
                 } else {
                     throttle.openRequests = throttle.openRequests -= 1
                     const resObj = {
-                        key: id,
+                        security: reqObj.security,
+                        widget: reqObj.widget,
                         apiString: reqObj.apiString,
                         data: data,
                         dashboard: reqObj.dashboard,
                         description: reqObj.description
                     }
-                    // console.log("sending response obj", resObj)
+                    console.log("sending response obj", resObj)
                     resolve(resObj)
                 }
             })
             .catch(error => {
-                console.log("finnHub error:", error.message)
+                console.log("finnHub error:", error.message, reqObj)
                 throttle.openRequests = throttle.openRequests -= 1
-                error.requestID = id
-                id.data = {err: error}
-                resolve(id)
+                const thisError = {
+                    err: error,
+                    req: reqObj,
+                }
+                resolve(thisError)
             });
         })
     })
