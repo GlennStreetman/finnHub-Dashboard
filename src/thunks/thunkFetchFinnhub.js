@@ -14,16 +14,16 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
         for (const ep in req) { //for each widget
             const reqKey = req[ep] 
             const reqObj = dataModel[reqKey]
-            console.log(reqKey,reqObj)
-            const endPoint = reqObj.apiString
+            // console.log(reqKey,reqObj)
+            // const endPoint = reqObj.apiString
             if (
                 (reqObj.updated === undefined) ||
                 (Date.now() - reqObj.updated >= 1*1000*60*60*3) //more than 3 hours old.
             ) {
-                requestList.push(finnHub(finnQueue, endPoint, reqKey))
+                requestList.push(finnHub(finnQueue, reqObj, reqKey))
             }   
         }
-        console.log("finnHub Request List: ", requestList)
+        // console.log("finnHub Request List: ", requestList)
         return Promise.all(requestList)
         .then((res) => {
             // console.log("res",res)
@@ -34,6 +34,8 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                 resObj[resStock.key].apiString = resStock.apiString
                 resObj[resStock.key].data = resStock.data
                 resObj[resStock.key].updated = Date.now()
+                resObj[resStock.key].dashboard =resStock.dashboard
+                resObj[resStock.key].description = resStock.description
             }
             // console.log('resObj', resObj)
             //send to mongoDB HERE  
@@ -45,7 +47,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
             // console.log("Sending mongoDB updates", options)
             fetch("/finnDashData", options)
             .then((response) => {return response.json()})
-            .then(data => {
+            .then(() => {
                 console.log('finndash data saved to mongoDB.')
             })
             // console.log("res2", res)

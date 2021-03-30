@@ -79,12 +79,12 @@ export const createFunctionQueueObject = function (maxRequestPerInterval, interv
 //throttle =  que object returned by function above.
 
 
-export const finnHub = (throttle, apiString, id) => {
+export const finnHub = (throttle, reqObj, id) => {
     // console.log("creating promise: ", throttle, apiString, id)
     return new Promise((resolve, reject) => {
         throttle.enqueue(function() { 
-            console.log("------------fetch throttleQueAPI--------", apiString)
-            fetch(apiString)
+            console.log("------------fetch throttleQueAPI--------", reqObj, reqObj.apiString)
+            fetch(reqObj.apiString)
             .then((response) => {
                 // console.log("1111!!!", response)
                 if (response.status === 429) {
@@ -92,30 +92,48 @@ export const finnHub = (throttle, apiString, id) => {
                     throttle.setSuspend(61000)
                     // finnHub(throttle, apiString)
                     return {429: 429}
-                } else {
+                } else if (response.status === 200) {
                     // console.log("HERE", response.status)
                     return response.json()
-                }
+                } else {
+                    console.log("Response other than 429/200", response)
+                    return{
+                        400: 400,
+                        response: response
+                    }
+                }   
             })
             .then((data) => {
                 // console.log('data!!!', data)
                 if (data[429] !== undefined) {
                     console.log('------------>429', throttle)
-                    resolve (finnHub(throttle, apiString, id))
+                    resolve (finnHub(throttle, reqObj.apiString, id))
                     throttle.openRequests = throttle.openRequests -= 1
+                } else if (data[400] !== undefined) {
+                    console.log("broken", reqObj)
+                    const resObj = {
+                        key: id,
+                        apiString: reqObj.apiString,
+                        data: data,
+                        dashboard: reqObj.dashboard,
+                        description: reqObj.description
+                    }
+                    resolve(resObj)
                 } else {
                     throttle.openRequests = throttle.openRequests -= 1
                     const resObj = {
                         key: id,
-                        apiString: apiString,
-                        data: data
+                        apiString: reqObj.apiString,
+                        data: data,
+                        dashboard: reqObj.dashboard,
+                        description: reqObj.description
                     }
                     // console.log("sending response obj", resObj)
                     resolve(resObj)
                 }
             })
             .catch(error => {
-                console.log("ERRORRESPONSE:", error.message)
+                console.log("finnHub error:", error.message)
                 throttle.openRequests = throttle.openRequests -= 1
                 error.requestID = id
                 id.data = {err: error}

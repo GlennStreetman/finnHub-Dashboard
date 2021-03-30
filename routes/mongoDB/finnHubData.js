@@ -36,36 +36,42 @@ router.get('/finnDashData', async (req, res) => {
     }
 })
 
-//updates MongoDB finnDash.dataset with finnhub data. Single record.
+//updates MongoDB finnDash.dataset with finnhub data.
 router.post("/finnDashData", async (req, res) => {
     if (req.session.login === true) { 
+        console.log("UPDATING FINNDASH DATA")
         try {
             const client = getDB()
             const database = client.db('finnDash');
             const dataSet = database.collection('dataSet');
 
-            // console.log('1 updating mongodb finnhubdata')
+            console.log('1 updating mongodb finnhubdata')
             const updateData = req.body
             for (const record in updateData) {
                 const u = updateData[record]
+
                 const filters = {
                     userID: req.session.uID,
                     key: record,
                 }
+                const widget = record.slice(0, record.indexOf('-'))
                 const update = {
                     $set:{
                         userID: req.session.uID,
                         key: record,
-                        dataSetName: 'default',
+                        widget: widget,
+                        dashboard: u.dashboard, 
+                        description: u.description,
                         retrieved: u.updated,
                         stale: u.updated + 1000 * 60 * 60 * 30,
-                        data: u.data
+                        data: u.data,
+                        apiString: u.apiString,
                     }
                 }
                 const options = {
                     upsert: true
                 }
-                // console.log('2:', update)
+                console.log('2:', update)
                 await dataSet.updateOne(filters, update, options) 
                 .catch((err)=>{console.log('Problem updating dataset', err)})           
             }

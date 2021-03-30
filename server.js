@@ -146,6 +146,7 @@ app.use((req,res,next) => {
   //ALL OTHER ROUTES
   const error = new Error('PATH Not Found');
   error.status = 404
+  console.log(req)
   next(error)
 })
 

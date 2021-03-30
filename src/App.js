@@ -133,7 +133,6 @@ class App extends React.Component {
         await that.props.tGetMongoDB()
         await that.props.tGetFinnhubData(dataset)
       }
-      // console.log('p.dataModel.dataSet', p.dataModel.dataSet)
       setupData(Object.keys(p.dataModel.dataSet), this)
     }
     

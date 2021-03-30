@@ -7,6 +7,8 @@ import { tGetMongoDB } from '../thunks/thunkGetMongoDB'
 interface DataNode {
     apiString?: string,
     updated?: number,
+    description?: string,
+    dashboard?: string,
     stale?: number,
 }
 
@@ -16,7 +18,7 @@ interface DataSet {
 }
 
 export interface EndPointObj {
-    [key: string]: string
+    [key: string]: any
 }
 
 interface EndPointAPIList {
@@ -42,6 +44,7 @@ const dataModel = createSlice({
             const endPointAPIList: EndPointAPIList = {} //list of lists. Each list []
             //nested loops that create a list of endpoints for this dataset.
             for (const d in apD) { //for each dashboard
+                const dashboardName: string = d
                 const widgetList = apD[d].widgetlist
                 // console.log('d', d, widgetList)
                 for (const w in widgetList) {  //for each widget
@@ -50,14 +53,20 @@ const dataModel = createSlice({
                         // console.log('widgetList[w]', widgetList[w])
                         const endPoint: string = widgetList[w].widgetType
                         const filters: Object = widgetList[w].filters
+                        const widgetDescription: string = widgetList[w].widgetHeader
                         // @ts-ignore: Unreachable code error
                         const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
                         const trackedStocks = widgetList[w].trackedStocks
                         // console.log('MAKE ENDPOINT', widgetName, filters, ap.apiKey)
                         const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, ap.apiKey)
+
                         delete endPointData.undefined
                         // console.log("ENDPOINT LIST", endPointData)
-                        endPointAPIList[widgetName] = endPointData
+                        endPointAPIList[widgetName] = {
+                            endPointData: endPointData,
+                            widgetDescription: widgetDescription,
+                            dashboardName: dashboardName,
+                        }
                         for (const s in trackedStocks) {
                             if (trackedStocks[s].key !== undefined) {
                                 const key = trackedStocks[s].key
@@ -68,23 +77,27 @@ const dataModel = createSlice({
                     }
                 }
             }
-            // console.log('resList', resList)
-            for (const x in state.dataSet) {
-                //if resList item exists in old list, delete from reslist, else delete from oldState
+
+            for (const x in state.dataSet) {//if resList item exists in old list, delete from reslist, else delete from oldState
                 resList.indexOf(x) > -1 ?
                     resList.splice(resList.indexOf(x), 1) :
                     delete state.dataSet[x]
             }
-            // console.log('resList2', resList)
+
             for (const x of resList) { //Map remainnig resList items into state.
                 state.dataSet[x] = {}
             }
-            // console.log('endPointAPIList', endPointAPIList)
+
             for (const widget in endPointAPIList) {
                 const thisWidget = endPointAPIList[widget]
-                for (const security in thisWidget) {
+                for (const security in thisWidget.endPointData) {
+                    console.log("this widget", thisWidget)
                     const widgetString: string = `${widget}-${security}`
-                    state.dataSet[widgetString] = { apiString: thisWidget[security] }
+                    state.dataSet[widgetString] = {
+                        apiString: thisWidget.endPointData[security],
+                        description: thisWidget.widgetDescription,
+                        dashboard: thisWidget.dashboardName,
+                    }
                 }
             }
             const flag: boolean | string = state.created === 'false' ? 'true' : 'updated'

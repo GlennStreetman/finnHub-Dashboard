@@ -21,16 +21,16 @@ router.post('/findMongoData', async (req, res) => {
                 userID: req.session.uID,
                 $or: findList
             }
-            console.log('options--------------', options)
+            // console.log('options--------------', options)
             const findDataSet = await dataSet.find(options)
             // console.log(findDataSet)
             const resList = []
             await findDataSet.forEach((data)=>{
-                console.log('---------------sorting data-----------------', data)
+                // console.log('---------------sorting data-----------------', data)
                 resList.push(data)
             })
 
-            console.log('3Got data', resList)
+            // console.log('3Got data', resList)
             res.status(200).json({resList}) //returns list of objects.
 
         }
