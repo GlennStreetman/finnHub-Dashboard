@@ -74,7 +74,7 @@ export default class DashBoardMenu extends React.PureComponent {
         <td className="centerTE">
           <button
             onClick={() => {
-              this.props.loadDashBoard(dashBoardData[el].globalstocklist, dashBoardData[el].widgetlist);
+              this.props.loadSavedDashboard( el ,dashBoardData[el].globalstocklist, dashBoardData[el].widgetlist);
               this.setState({ inputText: dashBoardData[el].dashboardname });
             }}
           >
@@ -157,11 +157,12 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
   let propList = {
     getSavedDashBoards: that.props.getSavedDashBoards,
     dashBoardData: that.props.dashBoardData,
-    loadDashBoard: that.props.loadDashBoard,
+    // loadDashBoard: that.props.loadDashBoard,
     currentDashBoard: that.props.currentDashBoard,
     saveCurrentDashboard: that.props.saveCurrentDashboard,
     newDashBoard: that.props.newDashboard,
     helpText: [helpText, 'DBM'],
+    loadSavedDashboard: that.props.loadSavedDashboard,
   };
   return propList;
 }

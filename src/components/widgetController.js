@@ -51,6 +51,7 @@ class WidgetController extends React.Component {
                 enableDrag: p.enableDrag,
                 updateWidgetConfig: p.updateWidgetConfig,
                 updateDashBoards: p.updateDashBoards,
+                loadSavedDashboard: p.loadSavedDashboard,
             }
             if (el.widgetConfig === 'menuWidget') {
                 thisWidgetProps['menuWidgetToggle'] = this.props.menuWidgetToggle

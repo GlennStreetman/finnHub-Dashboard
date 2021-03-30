@@ -50,7 +50,9 @@ const showData = createSlice({
             state.dataSet = {}
         },
         rSetTargetDashboard: (state, action) => {
-            state.targetDashboard = action.payload.targetDashboard
+            const target = action.payload.targetDashBoard
+            console.log('target', target)
+            state.targetDashboard = target
         }
 
     },
@@ -67,7 +69,7 @@ const showData = createSlice({
         },
         // @ts-ignore: Unreachable code error
         [tGetFinnhubData.fulfilled]: (state, action) => {
-            // console.log("Merge fresh finnHub data into showData", action.payload)
+            console.log("Merge fresh finnHub data into showData", action.payload)
             const ap: any = action.payload
             for (const key in ap) {
                 if (ap[key].dashboard === state.targetDashboard) {

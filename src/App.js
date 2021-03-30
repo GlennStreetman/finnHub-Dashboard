@@ -104,6 +104,7 @@ class App extends React.Component {
     this.syncGlobalStockList = this.syncGlobalStockList.bind(this); //pushes global stock list to all widgets.
     this.toggleBackGroundMenu = this.toggleBackGroundMenu.bind(this);
     this.updateDashBoards = this.updateDashBoards.bind(this) //when dashboard menu saves or deletes a dashboard, runs to upddate state.
+    this.loadSavedDashboard = this.loadSavedDashboard.bind(this)
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -129,7 +130,7 @@ class App extends React.Component {
       //Update dataset with finnHub data.
       console.log("RUNNING DATA BUILD")
       p.rResetUpdateFlag()
-      let setupData = async function(dataset, that){
+      let setupData = async function(that){
         await that.props.tGetMongoDB()
         await that.props.tGetFinnhubData({ //get data for default dashboard.
           targetDashBoard: s.currentDashBoard, 
@@ -145,7 +146,7 @@ class App extends React.Component {
           }
         }
       }
-      setupData(Object.keys(p.dataModel.dataSet), this)
+      setupData(this)
     }
     
     if (
@@ -319,6 +320,21 @@ class App extends React.Component {
     this.setState(data)
   }
 
+  loadSavedDashboard(target ,globalStockList, widgetList) {
+    console.log('target', target)
+    this.props.rSetTargetDashboard({targetDashBoard: target})
+    this.loadDashBoard(globalStockList, widgetList);
+    const updateVisable = async function(that){
+      const s = that.state
+      await that.props.tGetMongoDB()
+      await that.props.tGetFinnhubData({ //get data for default dashboard.
+        targetDashBoard: s.currentDashBoard, 
+        widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist)
+      })
+    }
+    updateVisable(this)
+  }
+
   render() {
     const menuWidgetToggle = MenuWidgetToggle(this);
     const quaryData = queryString.parse(window.location.search);
@@ -379,7 +395,7 @@ class App extends React.Component {
           removeWidget={this.removeWidget}
           apiKey={this.state.apiKey}
           updateWidgetStockList={this.updateWidgetStockList}
-          loadDashBoard={this.loadDashBoard}
+          // loadDashBoard={this.loadDashBoard}
           saveCurrentDashboard={this.saveCurrentDashboard}
           currentDashBoard={this.state.currentDashBoard}
           getSavedDashBoards={this.getSavedDashBoards}
@@ -408,6 +424,7 @@ class App extends React.Component {
           updateWidgetConfig = {this.updateWidgetConfig}
           widgetCopy={this.state.widgetCopy}
           updateDashBoards={this.updateDashBoards}
+          loadSavedDashboard={this.loadSavedDashboard}
           // enableDrag={this.enableDrag}
         />
         {loginScreen}
