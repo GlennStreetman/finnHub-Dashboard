@@ -115,7 +115,7 @@ class App extends React.Component {
       console.log("Loggin detected, setting up dashboards.", s.apiKey);
       this.getSavedDashBoards()
       .then(loginDataAndDashboards => {
-        console.log("UPDATE DASH DATA", loginDataAndDashboards)
+        console.log("UPDATE DASH DATA", loginDataAndDashboards, loginDataAndDashboards.currentDashBoard)
         this.setState(loginDataAndDashboards) //{dashboardData: {}, menuList: {}}
         p.rSetTargetDashboard({targetDashboard: loginDataAndDashboards.currentDashBoard})
         p.rBuildDataModel({...loginDataAndDashboards, apiKey: s.apiKey})
@@ -322,7 +322,7 @@ class App extends React.Component {
 
   loadSavedDashboard(target ,globalStockList, widgetList) {
     console.log('target', target)
-    this.props.rSetTargetDashboard({targetDashBoard: target})
+    this.props.rSetTargetDashboard({targetDashboard: target})
     this.loadDashBoard(globalStockList, widgetList);
     const updateVisable = async function(that){
       const s = that.state

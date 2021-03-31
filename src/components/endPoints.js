@@ -52,6 +52,7 @@ export default class EndPointMenu extends React.Component {
             endPointData: displayWidgetList,
             showData: true,
             showLoader: false,
+            dashboard: el,
         })
 
     }
@@ -133,7 +134,7 @@ export default class EndPointMenu extends React.Component {
                     </>  : <></>
                     // <label>Endpoint URL: {this.state.title}</label> 
                     }
-                    <EndPointNode nodeData={this.state.endPointData}/>
+                    <EndPointNode nodeData={this.state.endPointData} dashboard={this.state.dashboard}/>
                     {this.state.showLoader === false ? <>
                     <button onClick={()=>this.backButton()}>
                         Back

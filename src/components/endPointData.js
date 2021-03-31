@@ -46,14 +46,14 @@ export default class endPointData extends React.Component {
         const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify([`${p.widgetID}-${stock}`]),
+        body: JSON.stringify([`${p.dashboard}-${p.widgetID}-${stock}`]),
         };
         const getData = await fetch('/findMongoData', options)
         const foundData = await getData.json()
-        console.log('foundData', foundData)
+        console.log('foundData', foundData, options)
         const newData = foundData.resList[0]
         const setData = await produce(s.endPointData, (draftState) => {
-            draftState[stock]['data'] = newData.data
+            if (newData !== undefined) draftState[stock]['data'] = newData.data
         }) 
         this.setState({endPointData: setData})
 }
@@ -65,6 +65,7 @@ export default class endPointData extends React.Component {
 
     renderNodeData() {
         console.log("rendering node data")
+        const p = this.props
         //for each item in object, if object return button logic, else return string
         // const p = this.props
         const s = this.state
@@ -81,7 +82,9 @@ export default class endPointData extends React.Component {
                     </li>
                 )
             } else if (typeof s.endPointData[el] === 'object' && s.endPointData[el] !== null) {
-                const thisNode = s.endPointData[el] && s.endPointData[el].data ? <EndPointNode nodeData={s.endPointData[el].data} /> : <>...loading</>
+                const thisNode = s.endPointData[el] && s.endPointData[el].data ? 
+                    <EndPointNode nodeData={s.endPointData[el].data } dashboard={p.dashboard}/> : 
+                    <>...loading</>
                 return (
                     <li className='liNode'  key={ind + 'li'}>
                         <div className='endPointDivRow' key={ind}>

@@ -58,7 +58,13 @@ export default class EndPointNode extends React.PureComponent {
                             {el} - <button className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
                                 <i className="fa fa-caret-square-o-down" aria-hidden="true"></i>
                             </button>
-                            <div className='endPointDivColumn'><EndPointData nodeData={p.nodeData[el]} widgetID = {p.nodeData.widgetID}  /></div>
+                            <div className='endPointDivColumn'>
+                                <EndPointData 
+                                    nodeData={p.nodeData[el]} 
+                                    widgetID = {p.nodeData.widgetID}
+                                    dashboard = {p.dashboard}
+                                />
+                            </div>
                         </div>
                     </li>
                 )
@@ -81,7 +87,12 @@ export default class EndPointNode extends React.PureComponent {
                             {el} - <button className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
                                 <i className="fa fa-caret-square-o-down" aria-hidden="true"></i>
                             </button>
-                            <div className='endPointDivColumn'><EndPointNode nodeData={p.nodeData[el]} /></div>
+                            <div className='endPointDivColumn'>
+                                <EndPointNode 
+                                    nodeData={p.nodeData[el]} 
+                                    dashboard={p.dashboard}
+                                />
+                            </div>
                         </div>
                     </li>
                 )

@@ -49,9 +49,9 @@ const showData = createSlice({
             //resets state after loading new dataset.
             state.dataSet = {}
         },
-        rSetTargetDashboard: (state, action) => {
-            const target = action.payload.targetDashBoard
-            console.log('target', target)
+        rSetTargetDashboard: (state, action) => { //{targetDashboard}
+            const target = action.payload.targetDashboard
+            console.log('target', target, action.payload)
             state.targetDashboard = target
         }
 

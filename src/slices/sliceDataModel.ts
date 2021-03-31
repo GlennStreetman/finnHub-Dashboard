@@ -33,7 +33,7 @@ const initialState: DataSet = {
 const dataModel = createSlice({
     name: 'finnHubData',
     initialState,
-    reducers: { //reducers can reference eachother with slice.caseReducers.reducer(state)
+    reducers: {
         rBuildDataModel: (state, action) => { //{apiKey, dashboardData}
             //receivies dashboard object and builds dataset from scratch.
             const ap: any = action.payload
