@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 class CsvUpload extends PureComponent {
     
     componentDidMount(){
-        
+        console.log("UPLOAD LIST RUNNING")
         const p = this.props
         p.uploadGlobalStockList(p.rUpdateObj)
         p.resetUploadList()       
@@ -20,10 +20,13 @@ const mapStateToProps =  (state, ownProps) => {
     const p = ownProps
     const ul = p.uploadList
     const updateObj = {}
+    console.log("MAPPING")
     for (const s in ul) { //stock in uploadlist
         const stock = ul[s]
         const exchange = stock.slice(0,stock.indexOf('-'))
-        const updateStock = state.exchangeData[exchange] ? {...state.exchangeData[exchange][stock]} : 'pass'
+        console.log(stock, exchange)
+        const updateStock = state.exchangeData.e.ex === exchange ? {...state.exchangeData.e.data[stock]} : 'pass'
+        console.log('updateStock', updateStock)
         if (updateStock !== 'pass') {
             updateObj[stock] = updateStock
             updateObj[stock].dStock = function(ex){

@@ -96,6 +96,7 @@ export default class WatchListMenu extends React.PureComponent {
   }
   
   resetUploadList() {
+    console.log("List Uploaded", this.state.uploadList)
     this.setState({uploadList: null})
   }
 
@@ -111,6 +112,7 @@ export default class WatchListMenu extends React.PureComponent {
             newStockList.push(thisStock)
           }
         }
+        console.log('newStockList', newStockList)
         that.setState({uploadList: newStockList})
       }
     });

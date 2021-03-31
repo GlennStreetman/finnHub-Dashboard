@@ -34,7 +34,7 @@ interface filters {
 
 //add any additional type guard functions here used for live code.
 function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
-    if (arg !== undefined && Object.keys(arg).length > 0 && arg.earningsCalendar && arg.earningsCalendar[0].date) {
+    if (arg !== undefined && Object.keys(arg).length > 0 && arg.earningsCalendar && arg.earningsCalendar[0] && arg.earningsCalendar[0].date) {
         // console.log("returning true", arg)
         return true
     } else {
@@ -120,7 +120,7 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
     }, [p.trackedStocks, targetStock])
 
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) }
+        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) } else { setStockData({}) }
     }, [rShowData])
 
     function updateFilter(e) {
