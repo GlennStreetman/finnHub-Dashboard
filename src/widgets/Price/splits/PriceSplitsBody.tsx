@@ -111,8 +111,16 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
     }, [p.trackedStocks, targetStock])
 
     useEffect(() => {
-        if (isFinnHubSplitList(rShowData) === true) { setStockData(rShowData) }
+        if (isFinnHubSplitList(rShowData) === true) { setStockData(rShowData) } else { setStockData([]) }
     }, [rShowData])
+
+    useEffect(() => { //on change to targetSecurity update widget focus
+        if (p.targetSecurity !== '') {
+            const target = `${p.widgetKey}-${p.targetSecurity}`
+            setTargetStock(p.targetSecurity)
+            dispatch(tSearchMongoDB([target]))
+        }
+    }, [p.targetSecurity, p.widgetKey, dispatch])
 
     function updateFilter(e) {
         if (isNaN(new Date(e.target.value).getTime()) === false) {
@@ -260,6 +268,7 @@ export function PriceSplitsProps(that, key = "newWidgetNameProps") {
         exchangeList: that.props.exchangeList,
         defaultExchange: that.props.defaultExchange,
         updateDefaultExchange: that.props.updateDefaultExchange,
+        targetSecurity: that.props.targetSecurity,
     };
     return propList;
 }

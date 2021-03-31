@@ -128,8 +128,17 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
 
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
         console.log("setting stock data", rShowData)
-        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) }
+        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) } else { setStockData([]) }
     }, [rShowData])
+
+    useEffect(() => { //on change to targetSecurity update widget focus
+        if (p.targetSecurity !== '') {
+            const target = `${p.widgetKey}-${p.targetSecurity}`
+            setTargetStock(p.targetSecurity)
+            dispatch(tSearchMongoDB([target]))
+        }
+    }, [p.targetSecurity, p.widgetKey, dispatch])
+
 
     function updateFilter(e) {
         if (isNaN(new Date(e.target.value).getTime()) === false) {
@@ -338,6 +347,7 @@ export function newsWidgetProps(that, key = "newWidgetNameProps") {
         updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
+        targetSecurity: that.props.targetSecurity,
     };
     return propList;
 }

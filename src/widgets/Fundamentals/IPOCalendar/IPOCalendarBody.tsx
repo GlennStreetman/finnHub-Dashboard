@@ -103,7 +103,7 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
 
 
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) }
+        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) } else { setStockData([]) }
     }, [rShowData])
 
     function updateFilter(e) {

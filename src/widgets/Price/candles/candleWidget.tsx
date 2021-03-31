@@ -36,9 +36,9 @@ function isCandleData(arg: any): arg is FinnHubCandleData { //defined shape of c
 
 function PriceCandles(p: { [key: string]: any }, ref: any) {
 
-    const startingCandleSelection = () => {
+    const startingtargetStock = () => {
         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            return (p.widgetCopy.candleSelection)
+            return (p.widgetCopy.targetStock)
         } else { return ('') }
     }
 
@@ -54,7 +54,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         } else { return ({}) }
     }
 
-    const [candleSelection, setCandleSelection] = useState(startingCandleSelection());
+    const [targetStock, setTargetStock] = useState(startingtargetStock());
     const [chartData, setChartData] = useState(startingCandleData())
     const [options, setOptions] = useState(startingOptions())
     const isInitialMount = useRef(true);
@@ -65,7 +65,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData = state.showData.dataSet[p.widgetKey][candleSelection]
+            const showData = state.showData.dataSet[p.widgetKey][targetStock]
             // console.log('CandleData', CandleData)
             return (showData)
         }
@@ -75,7 +75,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         //used to copy widgets when being dragged.
         {
             state: {
-                candleSelection: candleSelection,
+                targetStock: targetStock,
                 chartData: chartData,
                 options: options,
             },
@@ -88,15 +88,15 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         if (isInitialMount.current && p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
             isInitialMount.current = false;
         } else {
-            // console.log("Loading Candle Widget")
             if (isInitialMount.current === true) { isInitialMount.current = false }
+            console.log("initialMOUNT loading widget", isInitialMount)
             const payload = {
                 key: p.widgetKey,
-                securityList: [[`${candleSelection}`]]
+                securityList: [[`${targetStock}`]]
             }
             dispatch(rBuildVisableData(payload))
         }
-    }, [candleSelection, p.widgetKey, p.widgetCopy, dispatch])
+    }, [targetStock, p.widgetKey, p.widgetCopy, dispatch])
 
     useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: string = p.widgetKey) => {
         //Setup filters if not yet done.
@@ -117,11 +117,20 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
 
     useEffect(() => {
         //if stock not selected default to first stock.
-        if (Object.keys(p.trackedStocks).length > 0 && candleSelection === '') {
+        if (Object.keys(p.trackedStocks).length > 0 && targetStock === '') {
+            console.log("setStock", Object.keys(p.trackedStocks).length, targetStock)
             const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
-            setCandleSelection(setDefault)
+            setTargetStock(setDefault)
         }
-    }, [p.trackedStocks, candleSelection])
+    }, [p.trackedStocks, targetStock])
+
+    useEffect(() => { //on change to targetSecurity update widget focus. Delete if not targetSecurity.
+        if (p.targetSecurity !== '') {
+            const target = `${p.widgetKey}-${p.targetSecurity}`
+            setTargetStock(p.targetSecurity)
+            dispatch(tSearchMongoDB([target]))
+        }
+    }, [p.targetSecurity, p.widgetKey, dispatch])
 
 
     interface ChartNode {
@@ -167,7 +176,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                     animationEnabled: true,
                     exportEnabled: true,
                     title: {
-                        text: candleSelection + ": " + startDate + " - " + endDate,
+                        text: targetStock + ": " + startDate + " - " + endDate,
                     },
                     axisX: {
                         valueFormatString: "YYYY-MM-DD",
@@ -180,7 +189,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                         {
                             type: "candlestick",
                             showInLegend: true,
-                            name: candleSelection,
+                            name: targetStock,
                             yValueFormatString: "$###0.00",
                             xValueFormatString: "YYYY-MM-DD",
                             dataPoints: chartData,
@@ -191,7 +200,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                 // }
             } else { console.log("Failed candle data type guard:", data) }
         }
-    }, [candleSelection, rShowData, p.filters.endDate, p.filters.startDate])
+    }, [targetStock, rShowData, p.filters.endDate, p.filters.startDate])
 
     function updateWidgetList(stock) {
         if (stock.indexOf(":") > 0) {
@@ -219,14 +228,14 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     function changeStockSelection(e) {
         const target = e.target.value;
         const key = `${p.widgetKey}-${target}`
-        setCandleSelection(target)
+        setTargetStock(target)
         // @ts-ignore: Unreachable code error
         dispatch(tSearchMongoDB([key]))
     }
 
     function editCandleListForm() {
         let candleList = Object.keys(p.trackedStocks);
-        let candleSelectionRow = candleList.map((el) =>
+        let CandleListRow = candleList.map((el) =>
             p.showEditPane === 1 ? (
                 <tr key={el + "container"}>
                     <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
@@ -247,7 +256,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         );
         let stockCandleTable = (
             <table>
-                <tbody>{candleSelectionRow}</tbody>
+                <tbody>{CandleListRow}</tbody>
             </table>
         );
         return stockCandleTable;
@@ -264,7 +273,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
             <>
                 <div className="div-inline">
                     {"  Selection:  "}
-                    <select className="btn" value={candleSelection} onChange={changeStockSelection}>
+                    <select className="btn" value={targetStock} onChange={changeStockSelection}>
                         {newSymbolList}
                     </select>
                 </div>
@@ -333,6 +342,7 @@ export function candleWidgetProps(that, key = "Candles") {
         updateWidgetFilters: that.props.updateWidgetFilters,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
+        targetSecurity: that.props.targetSecurity,
     };
     return propList;
 }

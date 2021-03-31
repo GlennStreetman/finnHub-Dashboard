@@ -57,6 +57,11 @@ export default class WatchListMenu extends React.PureComponent {
                 <></>
               )}
             </td>
+            <td><input 
+              type="radio" 
+              key={el+'radio'} 
+              checked={p.targetSecurity === g[el].key} 
+              onChange={() => p.setSecurityFocus(g[el].key)} /></td>
           </>
         }
         {this.props.showEditPane === 1 && 
@@ -167,16 +172,18 @@ export default class WatchListMenu extends React.PureComponent {
                     <td className="centerTE">Symbol</td>
                     <td className="centerTE">Name</td>
                     <td className="centerTE">Price</td>
+                    <td className="centerTE">Focus</td>
                   </>
                 }
-                {this.props.showEditPane === 1 &&  <> 
-                  <td className="centerTE">Exchange</td>
-                  <td className="centerTE">Symbol</td>
-                  <td className="centerTE">Name</td>
-                  <td className="centerTE">Currency</td>
-                  <td className="centerTE">FIGI</td>
-                  <td className="centerTE">MIC</td>
-                  <td className="centerTE">Remove</td>
+                {this.props.showEditPane === 1 &&  
+                  <> 
+                    <td className="centerTE">Exchange</td>
+                    <td className="centerTE">Symbol</td>
+                    <td className="centerTE">Name</td>
+                    <td className="centerTE">Currency</td>
+                    <td className="centerTE">FIGI</td>
+                    <td className="centerTE">MIC</td>
+                    <td className="centerTE">Remove</td>
                   </>
                 }
               </tr>
@@ -217,7 +224,9 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
     updateDefaultExchange: that.props.updateDefaultExchange,
     uploadGlobalStockList: that.props.uploadGlobalStockList,
     helpText: [helpText, 'WLM'],
-    syncGlobalStockList: that.props.syncGlobalStockList
+    syncGlobalStockList: that.props.syncGlobalStockList,
+    setSecurityFocus: that.props.setSecurityFocus,
+    targetSecurity: that.props.targetSecurity,
   };
   return propList;
 }

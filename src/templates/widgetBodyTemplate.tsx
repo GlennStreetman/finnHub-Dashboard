@@ -115,8 +115,16 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
     }, [p.trackedStocks, targetStock])
 
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) }
+        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) } else { setStockData([]) } //<--update if default is object or other data type.
     }, [rShowData])
+
+    useEffect(() => { //on change to targetSecurity update widget focus. Delete if not targetSecurity.
+        if (p.targetSecurity !== '') {
+            const target = `${p.widgetKey}-${p.targetSecurity}`
+            setTargetStock(p.targetSecurity)
+            dispatch(tSearchMongoDB([target]))
+        }
+    }, [p.targetSecurity, p.widgetKey, dispatch])
 
     function updateFilter(e) {
         if (isNaN(new Date(e.target.value).getTime()) === false) {
@@ -174,12 +182,13 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
         return searchForm
     }
 
-    function changeStockSelection(e) { //DELETE IF no target stock
+    function changeStockSelection(e) { //DELETE IF no target stock. target function of selector dropdown.
         const target = e.target.value;
         const key = `${p.widgetKey}-${target}`
         setTargetStock(target)
         dispatch(tSearchMongoDB([key]))
     }
+
 
     function renderStockData() {
         //RENDER LOGIN HERE FOR STOCK DATA.
@@ -217,6 +226,7 @@ export function NewWidgetProps(that, key = "newWidgetNameProps") {
         updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
+        targetSecurity: that.props.targetSecurity,
     };
     return propList;
 }

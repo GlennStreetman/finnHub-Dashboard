@@ -105,8 +105,16 @@ function FundamentalsSECFilings(p: { [key: string]: any }, ref: any) {
     }, [p.trackedStocks, targetStock])
 
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) }
+        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) } else { setStockData([]) }
     }, [rShowData])
+
+    useEffect(() => { //on change to targetSecurity update widget focus
+        if (p.targetSecurity !== '') {
+            const target = `${p.widgetKey}-${p.targetSecurity}`
+            setTargetStock(p.targetSecurity)
+            dispatch(tSearchMongoDB([target]))
+        }
+    }, [p.targetSecurity, p.widgetKey, dispatch])
 
     function changeIncrement(e) {
         const newpageinationInt = pageinationInt + e;
@@ -244,6 +252,7 @@ export function secFilingsProps(that, key = "newWidgetNameProps") {
         updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
+        targetSecurity: that.props.targetSecurity,
     };
     return propList;
 }

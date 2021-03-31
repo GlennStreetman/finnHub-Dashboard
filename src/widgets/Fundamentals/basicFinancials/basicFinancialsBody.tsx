@@ -115,7 +115,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 newData[node] = rShowData[node]['metric']
             }
             setStockData(newData)
-        }
+        } else { setStockData({}) }
     }, [rShowData])
 
     useEffect(() => {

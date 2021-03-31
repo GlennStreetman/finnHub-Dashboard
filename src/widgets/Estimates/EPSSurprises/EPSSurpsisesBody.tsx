@@ -28,7 +28,6 @@ interface dataListObject {
 }
 
 function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
-    console.log('!arg', arg)
     if (arg !== undefined && Object.keys(arg).length > 0 && arg[0].actual) {
         // console.log("returning true", arg)
         return true
@@ -106,11 +105,11 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
         if (isFinnHubData(rShowData) === true) {
             setStockData(rShowData)
-        }
+        } else { setStockData([]) }
     }, [rShowData])
 
     useEffect(() => {
-        console.log('stock data updated, created chart objects.')
+        // console.log('stock data updated, created chart objects.')
         const actualList: dataListObject[] = []
         const estimateList: dataListObject[] = []
 
@@ -124,7 +123,7 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
             actual: actualList,
             estimate: estimateList,
         }
-        console.log("new chart data", chartData)
+        // console.log("new chart data", chartData)
 
         const options = {
             width: 400,
@@ -166,6 +165,14 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
         setChartOptions(options);
 
     }, [stockData, targetStock])
+
+    useEffect(() => { //on change to targetSecurity update widget focus
+        if (p.targetSecurity !== '') {
+            const target = `${p.widgetKey}-${p.targetSecurity}`
+            setTargetStock(p.targetSecurity)
+            dispatch(tSearchMongoDB([target]))
+        }
+    }, [p.targetSecurity, p.widgetKey, dispatch])
 
 
     function changeStockSelection(e) { //DELETE IF no target stock
@@ -258,6 +265,7 @@ export function EPSSurprisesProps(that, key = "newWidgetNameProps") {
         updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
+        targetSecurity: that.props.targetSecurity,
     };
     return propList;
 }

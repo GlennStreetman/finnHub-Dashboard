@@ -100,7 +100,7 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
                 // console.log('key', Object.keys(rShowData), key, data)
             }
             setStockData(newData)
-        }
+        } else { setStockData({}) }
     }, [rShowData])
 
     function returnKey(ref) {
@@ -118,6 +118,36 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
             const dayPrice: number = stockData[stock] ? stockData[stock].currentPrice : 0
             return dayPrice
         }
+    }
+
+    function renderSearchPane() {
+        //add search pane rendering logic here. Additional filters need to be added below.
+        const stockList = Object.keys(p.trackedStocks);
+        const stockListRows = stockList.map((el) =>
+            <tr key={el + "container"}>
+                <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
+                <td key={el + "buttonC"}>
+                    <button
+                        key={el + "button"}
+                        onClick={() => {
+                            p.updateWidgetStockList(p.widgetKey, el);
+                        }}
+                    >
+                        <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
+                    </button>
+                </td>
+            </tr>
+        )
+
+        let searchForm = (
+            <>
+
+                <table>
+                    <tbody>{stockListRows}</tbody>
+                </table>
+            </>
+        );
+        return searchForm
     }
 
     function renderStockData() {
@@ -215,12 +245,25 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
 
 
     return (
+        // <>
+        //     {p.showEditPane === 1 && (
+        //         React.createElement(StockSearchPane, searchPaneProps(p))
+
+        //     )}
+        //     {Object.keys(p.streamingPriceData).length > 0 ? renderStockData() : <></>}
+        // </>
         <>
             {p.showEditPane === 1 && (
-                React.createElement(StockSearchPane, searchPaneProps(p))
-
+                <>
+                    {React.createElement(StockSearchPane, searchPaneProps(p))}
+                    {renderSearchPane()}
+                </>
             )}
-            {Object.keys(p.streamingPriceData).length > 0 ? renderStockData() : <></>}
+            {p.showEditPane === 0 && (
+                <>
+                    {renderStockData()}
+                </>
+            )}
         </>
     );
 }

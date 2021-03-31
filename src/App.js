@@ -64,6 +64,7 @@ class App extends React.Component {
       widgetLockDown: 0, //1 removes buttons from all widgets.
       widgetList: {}, //lists of all widgets.
       zIndex: [], //list widgets. Index location sets zIndex
+      targetSecurity: '' //target security for widgets. Update changes widget focus.
     };
 
     this.baseState = this.state; //used to reset state upon logout.
@@ -102,9 +103,10 @@ class App extends React.Component {
     this.updateGlobalStockList = this.updateGlobalStockList.bind(this); //pass stockRef to delete, pass in stockObj to update.
     this.uploadGlobalStockList = this.uploadGlobalStockList.bind(this); //pass in object to replace global list
     this.syncGlobalStockList = this.syncGlobalStockList.bind(this); //pushes global stock list to all widgets.
-    this.toggleBackGroundMenu = this.toggleBackGroundMenu.bind(this);
+    this.toggleBackGroundMenu = this.toggleBackGroundMenu.bind(this); //hides widgets and shows menu from topbar.
     this.updateDashBoards = this.updateDashBoards.bind(this) //when dashboard menu saves or deletes a dashboard, runs to upddate state.
-    this.loadSavedDashboard = this.loadSavedDashboard.bind(this)
+    this.loadSavedDashboard = this.loadSavedDashboard.bind(this) // loads a dashboard
+    this.setSecurityFocus = this.setSecurityFocus.bind(this) //Sets target security for all widgets that have security dropdown selector 
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -335,6 +337,11 @@ class App extends React.Component {
     updateVisable(this)
   }
 
+  setSecurityFocus(target){
+    this.setState({targetSecurity: target})
+    //trigger saga?
+  }
+
   render() {
     const menuWidgetToggle = MenuWidgetToggle(this);
     const quaryData = queryString.parse(window.location.search);
@@ -425,6 +432,8 @@ class App extends React.Component {
           widgetCopy={this.state.widgetCopy}
           updateDashBoards={this.updateDashBoards}
           loadSavedDashboard={this.loadSavedDashboard}
+          setSecurityFocus={this.setSecurityFocus}
+          targetSecurity={this.state.targetSecurity}
           // enableDrag={this.enableDrag}
         />
         {loginScreen}
