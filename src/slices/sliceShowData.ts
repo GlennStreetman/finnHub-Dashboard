@@ -97,7 +97,7 @@ const showData = createSlice({
         },
         // @ts-ignore: Unreachable code error
         [tGetMongoDB.fulfilled]: (state, action) => {
-            // console.log("Merge fresh mongoDB data into showData")
+            console.log("Merge fresh mongoDB data into showData")
             const ap: any = action.payload
             for (const x in ap) {
                 if (ap[x].dashboard === state.targetDashboard) {
@@ -126,11 +126,10 @@ const showData = createSlice({
         [tSearchMongoDB.fulfilled]: (state, action) => {
 
             const ap: any = action.payload
-            // console.log("Merge found data from Mongo", ap)
+            console.log("Merge found data from Mongo", ap)
             for (const x in ap) {
-                const apiString: string = ap[x].key
-                const widgetRef: string = apiString.slice(0, apiString.indexOf('-'))
-                const security: string = apiString.slice(apiString.indexOf('-') + 1, apiString.length)
+                const widgetRef: string = ap[x].widget
+                const security: string = ap[x].security
                 if (state.dataSet[widgetRef] !== undefined &&
                     state.dataSet[widgetRef][security] !== undefined) {
                     state.dataSet[widgetRef][security] = ap[x].data

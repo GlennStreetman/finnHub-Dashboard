@@ -6,15 +6,18 @@ const router =  express.Router();
 //receives list of data to find [...data]
 router.post('/findMongoData', async (req, res) => {
     if (req.session.login === true) {
+        console.log('req.body', req ,req.body, req.dashboard)
         try {
-            const body = req.body
+            const body = req.body.req
+            const d = req.body.dashboard
             const client = getDB()
             const database = client.db('finnDash');
             const dataSet = database.collection('dataSet');
             const findList = [{key: 'plug'}]
             for (const key in body){
+                const thisKey = d +'-'+ body[key]
                 findList.push({
-                    key: body[key]
+                    key: thisKey
                 })
             }
             const options = {

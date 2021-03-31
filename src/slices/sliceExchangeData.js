@@ -6,7 +6,7 @@ export const tGetSymbolList = createAsyncThunk(
     (reqObj, thunkAPI) => { //{exchange, apiKey}
         const finnQueue = thunkAPI.getState().finnHubQueue.throttle
         const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${reqObj.exchange}&token=${reqObj.apiKey}`
-        console.log('GETTING exchange data', reqObj.exchange, reqObj.apiKey, apiString)
+        // console.log('GETTING exchange data', reqObj.exchange, reqObj.apiKey, apiString)
         return finnHub(finnQueue, apiString) //replace with usestate.
         .then((data) => {
             if (data.error === 429) { //run again
@@ -62,9 +62,9 @@ const exchangeData = createSlice({
                 data: data.data,
                 updated: Date.now(),
             }
-            console.log('updateObj', updateObj, data)
+            // console.log('updateObj', updateObj, data)
             if (updateObj.ex !== undefined) {
-                console.log("UPDATING", updateObj)
+                // console.log("UPDATING", updateObj)
                 state.e = updateObj
             }
         } catch {
