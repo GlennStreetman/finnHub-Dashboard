@@ -15,13 +15,13 @@ export const SetDrag = function setDrag(stateRef, widgetId, widgetCopy){
             [ref]: updatedWidgetLocation, 
             widgetCopy: widgetCopy 
         }, ()=>{ 
-            console.log("DRAG SET")
+            // console.log("DRAG SET")
             resolve(true)})
     })
 }
 
 export const MoveWidget = function moveWidget(stateRef, widgetId, xxAxis, yyAxis, thisCallBack=()=>{}) {
-    console.log('MOVE')
+    // console.log('MOVE')
     const widgetListRef = stateRef === "menuWidget" ? "menuList" : "widgetList"
     const updateWidgetLocation = produce(this.state[widgetListRef], (draftState)=>{
     // let updatedWidgetLocation = Object.assign({}, this.state[widgetListRef]);

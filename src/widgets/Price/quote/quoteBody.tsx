@@ -34,15 +34,30 @@ function isQuoteData(arg: any): arg is FinnHubQuoteDataRaw { //defined shape of 
 }
 
 function PriceQuote(p: { [key: string]: any }, ref: any) {
+    const isInitialMount = useRef(true);
 
-    const startingStockData = () => {
-        if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            return (p.widgetCopy.stockData)
-        } else { return ({}) }
+    const startingstockData = () => {
+        if (isInitialMount.current === true) {
+            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+                const stockData = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
+                return (stockData)
+            } else {
+                return ([])
+            }
+        }
     }
 
-    const [stockData, setStockData] = useState(startingStockData())
-    const isInitialMount = useRef(true);
+    const startingWidgetCoptyRef = () => {
+        if (isInitialMount.current === true) {
+            if (p.widgetCopy !== undefined && p.widgetCopy.widgetID !== null) {
+                return p.widgetCopy.widgetID
+            } else { return -1 }
+        }
+    }
+
+    const [widgetCopy] = useState(startingWidgetCoptyRef())
+    const [stockData, setStockData] = useState(startingstockData())
+
     const dispatch = useDispatch()
 
     const rShowData = useSelector((state) => {
@@ -66,7 +81,7 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
     ))
 
     useEffect(() => {
-        if (isInitialMount.current && p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+        if (isInitialMount.current === true && widgetCopy === p.widgetKey) {
             isInitialMount.current = false;
         } else {
             console.log("Loading Quote Widget")
@@ -77,7 +92,7 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
             }
             dispatch(rBuildVisableData(payload))
         }
-    }, [p.widgetKey, p.trackedStocks, p.widgetCopy, dispatch])
+    }, [p.widgetKey, p.trackedStocks, widgetCopy, dispatch])
 
     useEffect(() => { //CREATE STOCK DATA
 

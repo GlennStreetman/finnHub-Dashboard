@@ -45,23 +45,42 @@ function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
 }
 
 function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
+    const isInitialMount = useRef(true); //update to false after first render.
 
     const startingstockData = () => {
-        if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            return (p.widgetCopy.stockData)
-        } else { return ([]) }
+        if (isInitialMount.current === true) {
+            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+                // console.log('returning draftCopy')
+                const stockData = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
+                return (stockData)
+            } else {
+                // console.log('returning empty copy')
+                return ([])
+            }
+        }
     }
 
     const startingTargetStock = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
-        if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            return (p.widgetCopy.targetSTock)
-        } else { return ('') }
+        if (isInitialMount.current === true) {
+            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+                const targetStock = p.widgetCopy.targetStock
+                return (targetStock)
+            } else { return ('') }
+        }
+    }
+
+    const startingWidgetCoptyRef = () => {
+        if (isInitialMount.current === true) {
+            if (p.widgetCopy !== undefined && p.widgetCopy.widgetID !== null) {
+                return p.widgetCopy.widgetID
+            } else { return -1 }
+        }
     }
 
     const [stockData, setStockData] = useState(startingstockData());
     const [targetStock, setTargetStock] = useState(startingTargetStock());
+    const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [chartOptions, setchartOptions] = useState({})
-    const isInitialMount = useRef(true); //update to false after first render.
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
@@ -69,8 +88,9 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
             const showData: object = state.showData.dataSet[p.widgetKey][targetStock]
+            // console.log("11!!", p.widgetKey, targetStock)
             return (showData)
-        }
+        } else { console.log("broken selector") }
     })
 
     useImperativeHandle(ref, () => (
@@ -78,7 +98,7 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
         //add additional slices of state to list if they help reduce re-render time.
         {
             state: {
-                stockData: stockData,
+                stockData: JSON.parse(JSON.stringify(stockData)),
                 targetStock: targetStock, //REMOVE IF NO TARGET STOCK
             },
         }
@@ -87,7 +107,7 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
     useEffect(() => {
         //On mount, use widget copy, else build visable data.
         //On update, if change in target stock, rebuild visable data.
-        if (isInitialMount.current && p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+        if (isInitialMount.current === true && widgetCopy === p.widgetKey) {
             isInitialMount.current = false;
         } else {
             if (isInitialMount.current === true) { isInitialMount.current = false }
@@ -95,9 +115,10 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
                 key: p.widgetKey,
                 securityList: [[`${targetStock}`]]
             }
+            console.log(payload)
             dispatch(rBuildVisableData(payload))
         }
-    }, [targetStock, p.widgetKey, p.widgetCopy, dispatch])
+    }, [targetStock, p.widgetKey, widgetCopy, dispatch])
 
     useEffect(() => {
         //DELETE IF NO TARGET STOCK
@@ -109,10 +130,14 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
     }, [p.trackedStocks, targetStock])
 
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) } else { setStockData([]) }
+        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) } else {
+            console.log("broken connection")
+            setStockData([])
+        }
     }, [rShowData])
 
     useEffect(() => {
+        // console.log('CALC TREND', stockData, targetStock)
         const sOptions = ['strongSell', 'sell', 'hold', 'buy', 'strongBuy']
         const chartData: DataChartObject = { strongSell: {}, sell: {}, hold: {}, buy: {}, strongBuy: {} }
         for (const i in sOptions) {

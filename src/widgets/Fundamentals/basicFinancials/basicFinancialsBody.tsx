@@ -27,35 +27,48 @@ function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
         return false
     }
 }
-//RENAME FUNCTION
+
 function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
+    const isInitialMount = useRef(true); //update to false after first render.
 
     const startingstockData = () => {
-        if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            const copyData: FinnHubAPIDataArray = p.widgetCopy.stockData
-            return (copyData)
-        } else {
-            const newData: FinnHubAPIDataArray = {}
-            return (newData)
-        }
+        if (isInitialMount.current === true) {
+            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+                const copyData: FinnHubAPIDataArray = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
+                return (copyData)
+            } else {
+                const newData: FinnHubAPIDataArray = {}
+                return (newData)
+            }
+        } else { return ({}) }
     }
 
     const startMetricList = () => {
-        if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            const copyData: string[] = p.widgetCopy.metricList
-            return (copyData)
-        } else {
-            const newData: string[] = []
-            return (newData)
+        if (isInitialMount.current === true) {
+            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+                const copyData: string[] = JSON.parse(JSON.stringify(p.widgetCopy.metricList))
+                return (copyData)
+            } else {
+                const newData: string[] = []
+                return (newData)
+            }
+        } else { return ([]) }
+    }
+
+    const startingWidgetCoptyRef = () => {
+        if (isInitialMount.current === true) {
+            if (p.widgetCopy !== undefined && p.widgetCopy.widgetID !== null) {
+                return p.widgetCopy.widgetID
+            } else { return -1 }
         }
     }
 
+    const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [stockData, setStockData] = useState(startingstockData()); //data for each stock.
     const [metricList, setMetricList] = useState(startMetricList()); //metricList target stocks available metrics
     const [metricIncrementor, setMetricIncrementor] = useState(1);
     const [orderView, setOrderView] = useState(0);
     const [symbolView, setSymbolView] = useState(0);
-    const isInitialMount = useRef(true); //update to false after first render.
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
@@ -84,9 +97,8 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     useEffect(() => {
         //On mount, use widget copy, else build visable data.
         //On update, if change in target stock, rebuild visable data.
-        if (isInitialMount.current && p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+        if (isInitialMount.current === true && widgetCopy === p.widgetKey) {
             isInitialMount.current = false;
-            //am i missing the part where i use the widget copy?
         } else {
             if (isInitialMount.current === true) { isInitialMount.current = false }
             const payload: object = {
@@ -95,7 +107,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             }
             dispatch(rBuildVisableData(payload))
         }
-    }, [p.widgetKey, p.widgetCopy, dispatch, p.trackedStocks])
+    }, [p.widgetKey, widgetCopy, dispatch, p.trackedStocks])
 
     useEffect((key: number = p.widgetKey, trackedStock = p.trackedStocks, keyList: string[] = Object.keys(p.trackedStocks), updateWidgetConfig: Function = p.updateWidgetConfig) => {
         //Setup default metric source if none selected.
@@ -120,7 +132,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
     useEffect(() => {
         if (stockData[p.config.metricSource] !== undefined) {
-            const newList = Object.keys(stockData[p.config.metricSource])
+            const newList = Object.keys(stockData[p.config.metricSource]) ?? []
             // p.updateWidgetconfig(p.apiKey, 'metricList', newList)
             setMetricList(newList)
         }

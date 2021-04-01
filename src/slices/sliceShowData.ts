@@ -126,7 +126,7 @@ const showData = createSlice({
         [tSearchMongoDB.fulfilled]: (state, action) => {
 
             const ap: any = action.payload
-            console.log("Merge found data from Mongo", ap)
+            // console.log("Merge found data from Mongo", ap)
             for (const x in ap) {
                 const widgetRef: string = ap[x].widget
                 const security: string = ap[x].security

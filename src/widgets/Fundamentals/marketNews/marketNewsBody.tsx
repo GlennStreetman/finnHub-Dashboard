@@ -41,11 +41,17 @@ function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
 }
 //RENAME FUNCTION
 function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
+    const isInitialMount = useRef(true); //update to false after first render.
 
     const startingstockData = () => {
-        if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            return (p.widgetCopy.stockData)
-        } else { return ([]) }
+        if (isInitialMount.current === true) {
+            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+                const stockData = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
+                return (stockData)
+            } else {
+                return ([])
+            }
+        }
     }
 
     const startingNewsIncrementor = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
@@ -54,9 +60,17 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
         } else { return (1) }
     }
 
+    const startingWidgetCoptyRef = () => {
+        if (isInitialMount.current === true) {
+            if (p.widgetCopy !== undefined && p.widgetCopy.widgetID !== null) {
+                return p.widgetCopy.widgetID
+            } else { return -1 }
+        }
+    }
+
+    const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [stockData, setStockData] = useState(startingstockData());
     const [newsIncrementor, setNewsIncrementor] = useState(startingNewsIncrementor());
-    const isInitialMount = useRef(true); //update to false after first render.
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
@@ -80,7 +94,7 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
     useEffect(() => {
         //On mount, use widget copy, else build visable data.
         //On update, if change in target stock, rebuild visable data.
-        if (isInitialMount.current && p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+        if (isInitialMount.current === true && widgetCopy === p.widgetKey) {
             isInitialMount.current = false;
         } else {
             if (isInitialMount.current === true) { isInitialMount.current = false }
@@ -90,7 +104,7 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
             }
             dispatch(rBuildVisableData(payload))
         }
-    }, [p.widgetKey, p.widgetCopy, dispatch])
+    }, [p.widgetKey, widgetCopy, dispatch])
 
     useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
 

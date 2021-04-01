@@ -35,17 +35,34 @@ function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
 }
 
 function FundamentalsSECFilings(p: { [key: string]: any }, ref: any) {
+    const isInitialMount = useRef(true); //update to false after first render.
 
     const startingstockData = () => {
-        if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            return (p.widgetCopy.stockData)
-        } else { return ([]) }
+        if (isInitialMount.current === true) {
+            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+                const stockData = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
+                return (stockData)
+            } else {
+                return ([])
+            }
+        }
     }
 
     const startingTargetStock = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
-        if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            return (p.widgetCopy.targetStock)
-        } else { return ('') }
+        if (isInitialMount.current === true) {
+            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+                const targetStock = p.widgetCopy.targetStock
+                return (targetStock)
+            } else { return ('') }
+        }
+    }
+
+    const startingWidgetCoptyRef = () => {
+        if (isInitialMount.current === true) {
+            if (p.widgetCopy !== undefined && p.widgetCopy.widgetID !== null) {
+                return p.widgetCopy.widgetID
+            } else { return -1 }
+        }
     }
 
     const startingPagination = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
@@ -54,11 +71,12 @@ function FundamentalsSECFilings(p: { [key: string]: any }, ref: any) {
         } else { return (1) }
     }
 
+    const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [stockData, setStockData] = useState(startingstockData());
     const [targetStock, setTargetStock] = useState(startingTargetStock());
     const [pageinationInt, setPageinationInt] = useState(startingPagination());
-    const isInitialMount = useRef(true); //update to false after first render.
     const dispatch = useDispatch(); //allows widget to run redux actions.
+
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
@@ -83,7 +101,7 @@ function FundamentalsSECFilings(p: { [key: string]: any }, ref: any) {
     useEffect(() => {
         //On mount, use widget copy, else build visable data.
         //On update, if change in target stock, rebuild visable data.
-        if (isInitialMount.current && p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+        if (isInitialMount.current === true && widgetCopy === p.widgetKey) {
             isInitialMount.current = false;
         } else {
             if (isInitialMount.current === true) { isInitialMount.current = false }
@@ -91,9 +109,10 @@ function FundamentalsSECFilings(p: { [key: string]: any }, ref: any) {
                 key: p.widgetKey,
                 securityList: [[`${targetStock}`]]
             }
+            console.log(payload)
             dispatch(rBuildVisableData(payload))
         }
-    }, [targetStock, p.widgetKey, p.widgetCopy, dispatch])
+    }, [targetStock, p.widgetKey, widgetCopy, dispatch])
 
     useEffect(() => {
         //DELETE IF NO TARGET STOCK
