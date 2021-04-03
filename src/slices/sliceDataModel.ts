@@ -100,9 +100,11 @@ const dataModel = createSlice({
                 const db = ap[x].dashboard
                 const widget = ap[x].widget
                 const sec = ap[x].security
-                console.log(db, widget, sec)
-                state.dataSet[db][widget][sec]['apiString'] = ap[x].apiString
-                state.dataSet[db][widget][sec]['updated'] = ap[x].updated
+                // if (state.dataSet[db] && state.dataSet[db][widget] && state.dataSet[db][widget][sec]) {
+                if (state.dataSet?.[db]?.[widget]?.[sec]) {
+                    state.dataSet[db][widget][sec]['apiString'] = ap[x].apiString
+                    state.dataSet[db][widget][sec]['updated'] = ap[x].updated
+                }
             }
         },
         // @ts-ignore: Unreachable code error
@@ -119,18 +121,13 @@ const dataModel = createSlice({
         [tGetMongoDB.fulfilled]: (state, action) => {
             // console.log("3Merge update fields into dataSet from mongoDB", action)
             const ap = action.payload
-            console.log()
             for (const x in ap) {
                 const dashboard = ap[x].dashboard
                 const widget = ap[x].widget
                 const updated = ap[x].updated
                 const stale = ap[x].stale
                 const security = ap[x].security
-                if (
-                    state.dataSet[dashboard] !== undefined &&
-                    state.dataSet[dashboard][widget] !== undefined &&
-                    state.dataSet[dashboard][widget][security] !== undefined
-                ) {
+                if (state.dataSet?.[dashboard]?.[widget]?.[security]) {
                     state.dataSet[dashboard][widget][security].updated = updated
                     state.dataSet[dashboard][widget][security].stale = stale
                 }

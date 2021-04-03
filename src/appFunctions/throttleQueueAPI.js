@@ -80,20 +80,19 @@ export const createFunctionQueueObject = function (maxRequestPerInterval, interv
 
 
 export const finnHub = (throttle, reqObj) => {
-    // console.log("creating promise: ", throttle, apiString, id)
+    // console.log("creating promise: ", throttle, reqObj)
     return new Promise((resolve, reject) => {
         throttle.enqueue(function() { 
             // console.log("------------fetch throttleQueAPI--------", reqObj, reqObj.apiString)
             fetch(reqObj.apiString)
             .then((response) => {
-                // console.log("1111!!!", response)
                 if (response.status === 429) {
                     console.log('--429--')
                     throttle.setSuspend(61000)
                     // finnHub(throttle, apiString)
                     return {429: 429}
                 } else if (response.status === 200) {
-                    // console.log("HERE", response.status)
+                    // console.log("200", response.status)
                     return response.json()
                 } else {
                     console.log("Response other than 429/200", response)

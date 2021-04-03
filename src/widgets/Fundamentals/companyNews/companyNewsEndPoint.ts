@@ -11,7 +11,6 @@ export default function companyNewsEndPoint(stockList: StockObj[], filters: filt
     const queryStringObj: EndPointObj = {}
 
     for (const stock in stockList) {
-        console.log('STOCKLIST', stockList)
         const f = filters
         const now = Date.now()
         const startUnixOffset = f.startDate !== undefined ? f.startDate : 604800 * 1000

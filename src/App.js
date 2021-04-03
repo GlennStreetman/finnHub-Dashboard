@@ -167,7 +167,7 @@ class App extends React.Component {
     if (s.globalStockList !== prevState.globalStockList) {
       // console.log('updating Stock Data')
       LoadStockData(this, s, GetStockPrice);
-      LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
+      // LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
     }
 
     if (s.login === 1 && s.loadStartingDashBoard === 0 && s.currentDashBoard !== "") {
@@ -236,6 +236,7 @@ class App extends React.Component {
 
   syncGlobalStockList() {
     const s = this.state;
+    const p = this.props;
     console.log("syncing stocks");
     const updatedWidgetList = produce(s.widgetList, (draftState) => {
       for (const w in draftState) {
@@ -244,7 +245,14 @@ class App extends React.Component {
         }
       }
     })
-    this.setState({ widgetList: updatedWidgetList });
+    this.setState({ widgetList: updatedWidgetList },()=>{
+      this.saveCurrentDashboard(this.state.currentDashBoard)
+      this.props.rBuildDataModel({
+          apiKey: this.state.apiKey,
+          dashBoardData: this.state.dashBoardData
+      })
+    });
+
   }
 
   uploadGlobalStockList(newStockObj) {

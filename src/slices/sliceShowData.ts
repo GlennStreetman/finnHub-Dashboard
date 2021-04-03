@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { tGetMongoDB } from '../thunks/thunkGetMongoDB.js'
-import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB.js'
+import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB'
 import { tGetFinnhubData } from '../thunks/thunkFetchFinnhub.js'
 
 //data = {keys : data objects}

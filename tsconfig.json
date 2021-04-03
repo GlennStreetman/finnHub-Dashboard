@@ -3,9 +3,9 @@
   "compileOnSave": true,
   "noImplicitAny": false,
   "compilerOptions": {
-    "rootDir": "src",
-    "outDir": "./dist",
     "baseUrl": ".",
+    "rootDir": "./src",
+    "outDir": "./dist",
     "lib": [
       "DOM",
       "es2019",
@@ -30,10 +30,12 @@
     "noEmit": true
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "node_modules/@types"
   ],
   "exclude": [
     "node_modules",
+    "src/server",
     "build"
   ]
 }

@@ -90,7 +90,7 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
             const showData: object = state.showData.dataSet[p.widgetKey][targetStock]
             // console.log("11!!", p.widgetKey, targetStock)
             return (showData)
-        } else { console.log("broken selector") }
+        } else { console.log("-----------------broken selector----------------", p.widgetKey, targetStock) }
     })
 
     useImperativeHandle(ref, () => (
