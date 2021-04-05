@@ -25,14 +25,14 @@ const showData = createSlice({
     name: 'showData',
     initialState,
     reducers: {
-        rSetVisableData: (state, action) => {
-            //payload = {key: "string", data: {}}
-            //if key exists set data
-            const ap: any = action.payload
-            const key: string = ap.key
-            const data: DataNode = ap.data
-            if (state.dataSet[key]) { state.dataSet[key] = data }
-        },
+        // rSetVisableData: (state, action) => {
+        //     //payload = {key: "string", data: {}}
+        //     //if key exists set data
+        //     const ap: any = action.payload
+        //     const key: string = ap.key
+        //     const data: DataNode = ap.data
+        //     if (state.dataSet[key]) { state.dataSet[key] = data }
+        // },
         rBuildVisableData: (state, action) => {
             //adds new key that is populated by data later.
             //payload {key: string, {...widget-ex-stck: {empty obj}}}
@@ -45,10 +45,10 @@ const showData = createSlice({
                 state.dataSet[key][thisSecurity] = {}
             }
         },
-        rResetVisableData: (state, action) => {
-            //resets state after loading new dataset.
-            state.dataSet = {}
-        },
+        // rResetVisableData: (state, action) => {
+        //     //resets state after loading new dataset.
+        //     state.dataSet = {}
+        // },
         rSetTargetDashboard: (state, action) => { //{targetDashboard}
             const target = action.payload.targetDashboard
             console.log('target', target, action.payload)
@@ -141,9 +141,9 @@ const showData = createSlice({
 // })
 
 export const {
-    rSetVisableData,
+    // rSetVisableData,
     rBuildVisableData,
-    rResetVisableData,
+    // rResetVisableData,
     rSetTargetDashboard,
 } = showData.actions
 export default showData.reducer

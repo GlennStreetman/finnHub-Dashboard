@@ -234,25 +234,27 @@ class App extends React.Component {
     event instanceof Event === true && event.preventDefault();
   }
 
-  syncGlobalStockList() {
+  async syncGlobalStockList() {
     const s = this.state;
-    const p = this.props;
-    console.log("syncing stocks");
-    const updatedWidgetList = produce(s.widgetList, (draftState) => {
-      for (const w in draftState) {
-        if (draftState[w].widgetConfig === 'stockWidget'){
-          draftState[w]["trackedStocks"] = this.state.globalStockList;
+    // let completeUpade = async function(){
+      const updatedWidgetList = produce(s.widgetList, (draftState) => {
+        for (const w in draftState) {
+          if (draftState[w].widgetConfig === 'stockWidget'){
+            draftState[w]["trackedStocks"] = this.state.globalStockList;
+          }
         }
-      }
-    })
-    this.setState({ widgetList: updatedWidgetList },()=>{
-      this.saveCurrentDashboard(this.state.currentDashBoard)
-      this.props.rBuildDataModel({
-          apiKey: this.state.apiKey,
-          dashBoardData: this.state.dashBoardData
       })
-    });
-
+      this.setState({ widgetList: updatedWidgetList }, async ()=>{
+        let savedDash = await this.saveCurrentDashboard(this.state.currentDashBoard)
+        if (savedDash === true) {
+          console.log("dashboards saved")
+          let returnedDash = await this.getSavedDashBoards()
+          console.log(returnedDash)
+          this.updateDashBoards(returnedDash)
+          if (Object.keys(s.globalStockList)[0] !== undefined) this.setSecurityFocus(Object.keys(s.globalStockList)[0])
+        }
+      });
+    // }
   }
 
   uploadGlobalStockList(newStockObj) {
@@ -326,8 +328,15 @@ class App extends React.Component {
   }
 
   updateDashBoards(data){
+    const p = this.props
+    const s = this.state
     //{dashboardData, currentDashBoard, menuList}
-    this.setState(data)
+    this.setState(data, async ()=>{
+        p.rBuildDataModel({
+        apiKey: s.apiKey,
+        dashBoardData: s.dashBoardData
+      })
+    })
   }
 
   loadSavedDashboard(target ,globalStockList, widgetList) {
