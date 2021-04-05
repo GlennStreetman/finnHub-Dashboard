@@ -230,11 +230,3 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
   };
   return propList;
 }
-
-// const WatchListMenuFunction = (props, ref) => {
-//   const propObj = {...props}
-//   propObj.ref = ref
-//   return (React.createElement(WatchListMenu, {...propObj}))
-// }
-
-// export default WatchListMenuFunction

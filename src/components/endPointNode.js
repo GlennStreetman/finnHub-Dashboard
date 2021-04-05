@@ -39,7 +39,7 @@ export default class EndPointNode extends React.PureComponent {
         const p = this.props
         // console.log("nodeData", p.nodeData)
         const objectKeyZeroToList = Object.keys(p.nodeData).map((el, ind) => {
-            console.log("found data")
+            // console.log("found data")
             if (el === 'data' && this.state[el] !== true) {
                 return (
                     <li className='liNode'  key={ind + 'li'}>
@@ -68,9 +68,7 @@ export default class EndPointNode extends React.PureComponent {
                         </div>
                     </li>
                 )
-
             } else if (typeof p.nodeData[el] === 'object' && p.nodeData[el] !== null && this.state[el] !== true) {
-                // console.log("Closed Node detected", p.nodeData[el])
                 return (
                     <li className='liNode' key={ind + 'li'}>
                         <div key={ind}>
@@ -98,16 +96,15 @@ export default class EndPointNode extends React.PureComponent {
                 )
             }  else if (el !== 'widgetID') {
                 let thisString = this.props.nodeData[el]
-                // console.log("----------->", thisString)
                 return(
                     <li className='liNode'  key={ind + 'li'}>
                     <div key={ind}>{el} - {thisString} </div>
                     </li>
                 )
             }
+            else {return (<></>)}
         })
         
-
         return <ul className='ulNode' >{objectKeyZeroToList}</ul>
     }
     

@@ -2,7 +2,7 @@ import express from "express";
 import format from "pg-format";
 import cors from 'cors';
 import {widgetDict} from "./../src/registers/endPointsReg.js"
-import {finnHub, createFunctionQueueObject} from "../src/appFunctions/throttleQueueAPI.js";
+import {finnHub, createFunctionQueueObject} from "../src/appFunctions/throttleQueueAPI";
 import dbLive from "../db/databaseLive.js";
 import devDB from '../db/databaseLocalPG.js'
 

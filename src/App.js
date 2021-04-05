@@ -134,10 +134,15 @@ class App extends React.Component {
       p.rResetUpdateFlag()
       let setupData = async function(that){
         await that.props.tGetMongoDB()
-        await that.props.tGetFinnhubData({ //get data for default dashboard.
-          targetDashBoard: s.currentDashBoard, 
-          widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist)
-        })
+        const targetDash = Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist)
+        for (const widget in targetDash) {
+          console.log('!!!!!widget', targetDash[widget])
+          await that.props.tGetFinnhubData({ //get data for default dashboard.
+            targetDashBoard: s.currentDashBoard, 
+            widgetList: [targetDash[widget]]
+            // widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist)
+          })
+        }
         const dashBoards = Object.keys(s.dashBoardData) //get data for dashboards not being shown
         for (const dash of dashBoards) {
           if (dash !== s.currentDashBoard) {
@@ -167,7 +172,7 @@ class App extends React.Component {
     if (s.globalStockList !== prevState.globalStockList) {
       // console.log('updating Stock Data')
       LoadStockData(this, s, GetStockPrice);
-      // LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
+      LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
     }
 
     if (s.login === 1 && s.loadStartingDashBoard === 0 && s.currentDashBoard !== "") {

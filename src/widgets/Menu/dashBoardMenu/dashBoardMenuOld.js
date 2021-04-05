@@ -1,6 +1,7 @@
 import React from "react";
+import { connect } from "react-redux";
 
-export default class DashBoardMenu extends React.PureComponent {
+class DashBoardMenu extends React.PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -71,6 +72,7 @@ export default class DashBoardMenu extends React.PureComponent {
           </button>
         </td>
         <td key={dashBoardData[el].id + "te"}>{dashBoardData[el].dashboardname}</td>
+        <td>{this.props.dashboardStatus[dashBoardData[el].dashboardname]}</td>
         <td className="centerTE">
           <button
             onClick={() => {
@@ -92,6 +94,7 @@ export default class DashBoardMenu extends React.PureComponent {
               <tr>
                 <td className="centerTE">Remove</td>
                 <td className="centerTE">Description</td>
+                <td className="centerTE">Status</td>
                 <td className="centerTE">Display</td>
               </tr>
             </thead>
@@ -102,6 +105,7 @@ export default class DashBoardMenu extends React.PureComponent {
                 <tr>
                   <td></td>
                   <td>"No previous saves"</td>
+                  <td></td>
                   <td></td>
                 </tr>
               )}
@@ -146,6 +150,16 @@ export default class DashBoardMenu extends React.PureComponent {
     );
   }
 }
+
+const mapStateToProps = (state, ownProps) => {
+  const dashboardStatus = state.dataModel.status
+  return {
+    dashboardStatus: dashboardStatus,
+  }
+}
+
+export default connect(mapStateToProps)(DashBoardMenu);
+// export default StockSearchPane;
 
 export function dashBoardMenuProps(that, key = "DashBoardMenu") {
   const helpText = <>

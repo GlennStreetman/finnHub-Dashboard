@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { tGetMongoDB } from '../thunks/thunkGetMongoDB.js'
 import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB'
-import { tGetFinnhubData } from '../thunks/thunkFetchFinnhub.js'
+import { tGetFinnhubData, resObj } from '../thunks/thunkFetchFinnhub'
 
 //data = {keys : data objects}
 //key should be widget reference.
@@ -59,21 +59,21 @@ const showData = createSlice({
     extraReducers: {
         // @ts-ignore: Unreachable code error
         [tGetFinnhubData.pending]: (state, action) => {
-            // console.log('1. Getting stock data!')
+            console.log('1. Getting stock data!')
             // return {...state}
         },
         // @ts-ignore: Unreachable code error
         [tGetFinnhubData.rejected]: (state, action) => {
-            console.log('2. failed get data from Finnhub: ', action)
+            console.log('2. failed get data from Finnhub: ')
             // return {...state}
         },
         // @ts-ignore: Unreachable code error
         [tGetFinnhubData.fulfilled]: (state, action) => {
-            console.log("Merge fresh finnHub data into showData", action.payload)
-            const ap: any = action.payload
+            // console.log("Merge fresh finnHub data into showData", action.payload)
+            const ap: resObj = action.payload
             for (const key in ap) {
                 if (ap[key].dashboard === state.targetDashboard) {
-                    console.log("updating visable data", ap[key])
+                    // console.log("updating visable data", ap[key])
                     const widgetRef: string = ap[key].widget
                     const security: string = ap[key].security
                     // console.log(key, widgetRef, security)
@@ -97,7 +97,7 @@ const showData = createSlice({
         },
         // @ts-ignore: Unreachable code error
         [tGetMongoDB.fulfilled]: (state, action) => {
-            console.log("Merge fresh mongoDB data into showData")
+            console.log("Merge fresh mongoDB data into showData", action.payload)
             const ap: any = action.payload
             for (const x in ap) {
                 if (ap[x].dashboard === state.targetDashboard) {

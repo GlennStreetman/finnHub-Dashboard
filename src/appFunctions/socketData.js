@@ -16,10 +16,6 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList) {
   
   if (apiKey !== '' && USList !== []) {
     
-    // const newList = USList.map((el) => {
-    //   return  thisSocket.send(JSON.stringify({ type: "subscribe", symbol: el }))
-    // })
-
   try { 
 
     for (const stock in USList) {

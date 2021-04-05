@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { widgetDict } from '../registers/endPointsReg'
-import { tGetFinnhubData } from '../thunks/thunkFetchFinnhub'
+import { tGetFinnhubData, resObj } from '../thunks/thunkFetchFinnhub'
 import { tGetMongoDB } from '../thunks/thunkGetMongoDB'
 
 
@@ -13,7 +13,8 @@ interface DataNode {
 }
 
 interface DataSet {
-    dataSet: { [key: string]: DataNode },
+    dataSet: { [key: string]: DataNode, },
+    status: { [key: string]: string, } //Updating, Ready
     created: string
 }
 
@@ -27,6 +28,7 @@ interface EndPointAPIList {
 
 const initialState: DataSet = {
     dataSet: {},
+    status: {},
     created: 'false',
 }
 
@@ -43,6 +45,7 @@ const dataModel = createSlice({
             //create dataSet
             for (const d in apD) { //for each dashboard
                 const dashboardName: string = d
+                state.status[dashboardName] = 'Ready'
                 endPointAPIList[dashboardName] = {}
                 const widgetList = apD[d].widgetlist
                 for (const w in widgetList) {  //for each widget
@@ -83,7 +86,7 @@ const dataModel = createSlice({
     },
     extraReducers: {
         // @ts-ignore: Unreachable code error
-        [tGetFinnhubData.pending]: (state, actiony) => {
+        [tGetFinnhubData.pending]: (state, action) => {
             // console.log('1. Getting stock data!')
             // return {...state}
         },
@@ -95,9 +98,10 @@ const dataModel = createSlice({
         // @ts-ignore: Unreachable code error
         [tGetFinnhubData.fulfilled]: (state, action) => {
             // console.log("3 UPDATA DATA STORE:", action.payload)
-            const ap = action.payload
+            const ap: resObj = action.payload
             for (const x in ap) {
                 const db = ap[x].dashboard
+                state.status[db] = 'Ready'
                 const widget = ap[x].widget
                 const sec = ap[x].security
                 // if (state.dataSet[db] && state.dataSet[db][widget] && state.dataSet[db][widget][sec]) {
@@ -109,8 +113,9 @@ const dataModel = createSlice({
         },
         // @ts-ignore: Unreachable code error
         [tGetMongoDB.pending]: (state, action) => {
-            // console.log('1. Getting stock data!')
-            // return {...state}
+            console.log('1. Getting stock data!')
+            // const dashboard: string = action.meta.arg.targetDashBoard
+            // state.status[dashboard] = 'Updating'
         },
         // @ts-ignore: Unreachable code error
         [tGetMongoDB.rejected]: (state, action) => {
