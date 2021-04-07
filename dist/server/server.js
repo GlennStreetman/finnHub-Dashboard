@@ -1,6 +1,5 @@
 import express from "express";
 import eg from 'express-graphql';
-import g from 'graphql';
 import dotenv from 'dotenv';
 import cookieParser from "cookie-parser";
 import session from "express-session";
@@ -36,18 +35,8 @@ import deleeteSavedDashboard from './routes/loggedIn/deleteSavedDashboard.js';
 import finnHubData from './routes/mongoDB/finnHubData.js';
 import findMongoData from './routes/mongoDB/findMongoData.js';
 import deleteFinnDashData from './routes/mongoDB/deleteMongoRecords.js';
-//test
-const schema = new g.GraphQLSchema({
-    query: new g.GraphQLObjectType({
-        name: 'helloWorld',
-        fields: () => ({
-            message: {
-                type: g.GraphQLString,
-                resolve: () => 'hello world'
-            }
-        }),
-    })
-});
+//graphQL
+import { schema } from './routes/graphQL/graphQL.js';
 const app = express();
 const __dirname = dirname(fileURLToPath(import.meta.url));
 dotenv.config();

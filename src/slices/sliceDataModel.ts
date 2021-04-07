@@ -45,7 +45,7 @@ const dataModel = createSlice({
             //create dataSet
             for (const d in apD) { //for each dashboard
                 const dashboardName: string = d
-                state.status[dashboardName] = 'Ready'
+                state.status[dashboardName] = 'Building'
                 endPointAPIList[dashboardName] = {}
                 const widgetList = apD[d].widgetlist
                 for (const w in widgetList) {  //for each widget
