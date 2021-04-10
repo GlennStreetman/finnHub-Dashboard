@@ -17,7 +17,7 @@ interface finnHubSplitNode {
     toFactor: number,
 }
 
-interface finnHubSplitArray {
+export interface finnHubSplitArray {
     [index: number]: finnHubSplitNode
 }
 

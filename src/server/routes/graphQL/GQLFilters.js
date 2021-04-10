@@ -1,36 +1,29 @@
 //import all API string generator functions here and register below to widgetDict.
-// import candleWidgetEndPoint  from "../widgets/Price/candles/candlesEndPoint";
-// import quoteWidgetEndPoint  from "../widgets/Price/quote/quoteEndPoint";
-// import priceSplitsEndPoint  from "../widgets/Price/splits/priceSplitsEndPoint";
-import basicFinancialsEndPoint  from "./filters/basicFinancialsGQLFIlters.js";
-// import companyNewsEndPoint  from "../widgets/Fundamentals/companyNews/companyNewsEndPoint";
-// import companyProfileEndPoint  from "../widgets/Fundamentals/companyProfile2/companyProfile2EndPoint";
-// import marketNewsEndPoint  from "../widgets/Fundamentals/marketNews/marketNewsEndPoint";
-// import newsSentimentEndPoint  from "../widgets/Fundamentals/newsSentiment/newsSentimentEndPoint";
-// import peersEndPoint  from "../widgets/Fundamentals/Peers/peersEndPoint";
-// import financialsAsReportedEndPoint  from "../widgets/Fundamentals/financialsAsReported/financialsAsReportedEndPoint";
-// import secFilingsEndPoint  from "../widgets/Fundamentals/secFilings/secFilingsEndPoint";
-// import IPOCalendarEndPoint  from "../widgets/Fundamentals/IPOCalendar/IPOCalendarEndPoint";
+import basicFinancialsGQLFilter  from "./filters/basicFinancialsGQLFIlters.js";
+import companyNewsGQLFilter  from "./filters/companyNewsGQLFilter.js";
 import recommendationTrendsGQLFilter  from "./filters/recommendationTrendsGQLFilter.js";
-// import priceTargetEndPoint  from "../widgets/Estimates/PriceTarget/priceTargetEndPoint";
-import EPSSuprisesEndPoint  from "./filters/EPSSurprisesGQLFilter.js";
-import EarningsCalendarEndPoint  from "./filters/earningsCalendarGQLFilter.js";
+import EPSSuprisesGQLFilter  from "./filters/EPSSurprisesGQLFilter.js";
+import EarningsCalendarGQLFilter  from "./filters/earningsCalendarGQLFilter.js";
+import marketNewsGQLFilter  from "./filters/marketNewsGQLFilters.js";
+import peersGQLFilter  from "./filters/peersGQLFilter.js";
+import secFilingsGQLFilter  from "./filters/secFilingsGQLFilters.js";
+import priceSplitsGQLFilter  from "./filters/priceSplitsGQLFilters.js";
 
 export const filterDict = { //Remember to convert time series data into an object list, time value should be key.
-    // PriceCandles: candleWidgetEndPoint,
-    // PriceQuote: quoteWidgetEndPoint,
-    // PriceSplits: priceSplitsEndPoint,
-    FundamentalsBasicFinancials: basicFinancialsEndPoint,
-    // FundamentalsCompanyNews: companyNewsEndPoint,
-    // FundamentalsCompanyProfile2: companyProfileEndPoint,
-    // FundamentalsMarketNews: marketNewsEndPoint,
-    // FundamentalsNewsSentiment: newsSentimentEndPoint,
-    // FundamentalsPeers: peersEndPoint,
-    // FundamentalsFinancialsAsReported: financialsAsReportedEndPoint,
-    // FundamentalsSECFilings: secFilingsEndPoint,
-    // FundamentalsIPOCalendar: IPOCalendarEndPoint,
+    // PriceCandles: candleWidgetGQLFilter,
+    // PriceQuote: quoteWidgetGQLFilter,
+    PriceSplits: priceSplitsGQLFilter,
+    FundamentalsBasicFinancials: basicFinancialsGQLFilter,
+    FundamentalsCompanyNews: companyNewsGQLFilter,
+    // FundamentalsCompanyProfile2: companyProfileGQLFilter,
+    FundamentalsMarketNews: marketNewsGQLFilter,
+    // FundamentalsNewsSentiment: newsSentimentGQLFilter,
+    FundamentalsPeers: peersGQLFilter,
+    // FundamentalsFinancialsAsReported: financialsAsReportedGQLFilter,
+    FundamentalsSECFilings: secFilingsGQLFilter,
+    // FundamentalsIPOCalendar: IPOCalendarGQLFilter,
     EstimatesRecommendationTrends: recommendationTrendsGQLFilter,
-    // EstimatesPriceTarget: priceTargetEndPoint,
-    EstimatesEPSSurprises: EPSSuprisesEndPoint,
-    EstimatesEarningsCalendar: EarningsCalendarEndPoint,
+    // EstimatesPriceTarget: priceTargetGQLFilter,
+    EstimatesEPSSurprises: EPSSuprisesGQLFilter,
+    EstimatesEarningsCalendar: EarningsCalendarGQLFilter,
 }

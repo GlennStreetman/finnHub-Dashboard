@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useSelector, useDispatch } from 'react-redux';
-import { tGetSymbolList } from './../slices/sliceExchangeData.js'
+import { tGetSymbolList } from './../slices/sliceExchangeData'
 import { rUpdateExchangeList } from './../slices/sliceExchangeList.js'
 
 export default function ExchangeMenu(p) {

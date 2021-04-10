@@ -22,7 +22,7 @@ export let fundamentalsOptions = [
     ["FundamentalsIPOCalendar", "IPO Calendar", "marketWidget", "IPO Calendar", IPOCalendarFilters],
     ["FundamentalsMarketNews", "Market News", "marketWidget", "Market News", marketNewsFilters],
     ["FundamentalsNewsSentiment", "News Sentiment", "stockWidget", "News Sentiments"],
-    ["FundamentalsPeers", "Peers ", "stockWidget", "Peers"],
+    ["FundamentalsPeers", "Peers", "stockWidget", "Peers"],
     ["FundamentalsSECFilings", "SEC Filings", "stockWidget", "SEC Filings"],
 ]
 

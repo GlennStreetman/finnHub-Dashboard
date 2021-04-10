@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { finnHub } from "./../appFunctions/throttleQueue";
+import { finnHub } from "../appFunctions/throttleQueue";
 export const tGetSymbolList = createAsyncThunk('newSymbolList', (reqObj, thunkAPI) => {
     const finnQueue = thunkAPI.getState().finnHubQueue.throttle;
     const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${reqObj.exchange}&token=${reqObj.apiKey}`;
@@ -8,10 +8,11 @@ export const tGetSymbolList = createAsyncThunk('newSymbolList', (reqObj, thunkAP
         .then((data) => {
         if (data.error === 429) { //run again
             tGetSymbolList(reqObj);
-            return {
+            const resObj = {
                 'data': {},
                 'ex': reqObj.exchange,
             };
+            return (resObj);
         }
         else {
             let updateStockList = {};
@@ -21,18 +22,20 @@ export const tGetSymbolList = createAsyncThunk('newSymbolList', (reqObj, thunkAP
                 updateStockList[addStockKey] = data[stockObj];
                 updateStockList[addStockKey]['key'] = addStockKey;
             }
-            return {
-                'data': updateStockList,
+            const resObj = {
+                'data': {},
                 'ex': reqObj.exchange,
             };
+            return (resObj);
         }
     });
 });
+const initialState = {
+    e: {},
+};
 const exchangeData = createSlice({
     name: 'exchangedata',
-    initialState: {
-        e: {}
-    },
+    initialState,
     reducers: {
         rUpdateExchangeData: (state, action) => {
             const ap = action.payload;
@@ -41,14 +44,17 @@ const exchangeData = createSlice({
         },
     },
     extraReducers: {
+        // @ts-ignore: Unreachable code error
         [tGetSymbolList.pending]: (state) => {
             // console.log('1 getting stock data')
             return state;
         },
+        // @ts-ignore: Unreachable code error
         [tGetSymbolList.rejected]: (state, action) => {
             console.log('failed to retrieve stock data for: ', action);
             return state;
         },
+        // @ts-ignore: Unreachable code error
         [tGetSymbolList.fulfilled]: (state, action) => {
             try {
                 let data = action.payload;

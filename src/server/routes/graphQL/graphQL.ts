@@ -92,7 +92,7 @@ const RootQueryType = new g.GraphQLObjectType({
                     SELECT dashboardname as dashboard, globalstocklist as stocks
                     FROM dashboard 
                     WHERE userID = (SELECT id FROM users WHERE apiKey = ${apiKey})`
-                    console.log('getUserQuery', query)
+                    // console.log('getUserQuery', query)
                     db.query(query, (err, rows) => {
                         if (err) {
                             console.log(err)
@@ -130,7 +130,7 @@ const RootQueryType = new g.GraphQLObjectType({
                             FROM users 
                             WHERE apiKey = ${apiKey}) AND dashboardname = ${dashboardName}
                     )`
-                    console.log('getUserQuery', query)
+                    // console.log('getUserQuery', query)
                     db.query(query, (err, rows) => {
                         if (err) {
                             console.log(err)
@@ -189,7 +189,7 @@ const RootQueryType = new g.GraphQLObjectType({
                             WHERE apiKey = ${apiKey}) AND dashboardname = ${dashboardName})
 					AND widgetHeader = ${widget}
                     `
-                    console.log('get widget: ', query)
+                    // console.log('get widget: ', query)
                     try {
                         const returnData = await db.query(query)
                         // console.log('This Data: ', returnData.rows[0])
@@ -199,7 +199,7 @@ const RootQueryType = new g.GraphQLObjectType({
                             widget: returnData.rows[0].widgetid,
                         }
                         if (security) findData['$or'] = security
-                        console.log('Find Data: ', findData)
+                        // console.log('Find Data: ', findData)
 
                         const widgetType = returnData.rows[0].widgettype
                         //GET MONGO DATA
@@ -209,7 +209,7 @@ const RootQueryType = new g.GraphQLObjectType({
                         const findDataSet: finnHubData[] = await dataSet.find(findData)
                         const resList: Object[] = []
                         await findDataSet.forEach((data: finnHubData) => {
-                            console.log('data', data)
+                            // console.log('data', data)
                             if (filterDict[data.widgetType]) {//if finnHub API data needs to be filtered or reformated
                                 data.data = filterDict[data.widgetType](data.data, data.config)
                             }
@@ -272,7 +272,7 @@ const RootQueryType = new g.GraphQLObjectType({
                             WHERE apiKey = ${apiKey}) AND dashboardname = ${dashboardName})
                     ${widgetNameFilters} ${widgetType} 
                     `
-                    console.log('getUserQuery', query)
+                    // console.log('getUserQuery', query)
                     try {
                         const returnData = await db.query(query)
                         // console.log('This Data: ', returnData.rows[0])

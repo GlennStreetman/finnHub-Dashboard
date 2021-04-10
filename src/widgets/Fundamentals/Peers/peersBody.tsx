@@ -10,8 +10,12 @@ import { tGetSymbolList } from "./../../../slices/sliceExchangeData";
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
+export interface FinnHubAPIData { //rename
+    [key: number]: string
+}
+
 //add any additional type guard functions here used for live code.
-function isFinnHubData(arg: any): arg is string[] { //typeguard
+function isFinnHubData(arg: FinnHubAPIData): arg is string[] { //typeguard
     if (arg !== undefined && Object.keys(arg).length > 0) {
         // console.log("returning true", arg)
         return true
@@ -62,7 +66,7 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData: Object = state.showData.dataSet[p.widgetKey][targetStock]
+            const showData: any = state.showData.dataSet[p.widgetKey][targetStock]
             return (showData)
         }
     })

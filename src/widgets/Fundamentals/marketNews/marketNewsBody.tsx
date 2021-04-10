@@ -20,7 +20,7 @@ interface FinnHubAPIData { //rename
 
 }
 
-interface FinnHubAPIDataArray {
+export interface FinnHubAPIDataArray {
     [index: number]: FinnHubAPIData
 }
 

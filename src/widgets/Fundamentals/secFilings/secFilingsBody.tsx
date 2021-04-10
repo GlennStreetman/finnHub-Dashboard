@@ -19,7 +19,7 @@ interface FinnHubAPIData {
     fileingUrl: string,
 }
 
-interface FinnHubAPIDataArray {
+export interface FinnHubAPIDataArray {
     [index: number]: FinnHubAPIData
 }
 
