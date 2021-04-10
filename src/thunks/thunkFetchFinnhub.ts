@@ -1,17 +1,18 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { finnHub, resObj as queResObj } from "../appFunctions/throttleQueueAPI";
 
-//Receives list of widgets to check for updates from target dashboard.
-//If data is not fresh dispatch api request.
-//sends finnhub data to mongoDB AND updates sliceShowData & slicefinnHubData
+//Receives list of widgets and checks stale dates in slice/datamodel to see if updates are needed.
+//If data is not fresh dispatch finnHub api request to throttleQueue.
+//Returns finnhub data to mongoDB AND updates slice/ShowData.
 export interface reqObj {
     targetDashBoard: string,
-    widgetList: string[]
+    widgetList: string[],
 }
 
 export interface resObj {
     [key: string]: queResObj
 }
+
 
 export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
     'GetFinnhubData',
@@ -20,15 +21,18 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
         const dataModel = thunkAPI.getState().dataModel.dataSet[req.targetDashBoard] //finnHubData
         // const thisDashboard = dataModel.dataSet[req.targetDashBoard]
         const getWidgets = req.widgetList
+        console.log('getWidgets', getWidgets)
         let requestList: Promise<any>[] = []
-        for (const w of getWidgets) { //for each widget
+        for (const w of getWidgets) { //for each widget ID
             const thisWidget = dataModel[w]
+            console.log('THIS WIDGET', thisWidget)
             for (const s in thisWidget) { //for each security
                 const reqObj = { ...thisWidget[s] }
                 reqObj.dashboard = req.targetDashBoard
                 reqObj.widget = w
                 reqObj.security = s
-                // console.log('---------------------1req OBJ----------------------', reqObj)
+                reqObj.config = thisWidget[s].config
+                console.log('---------------------1req OBJ----------------------', reqObj)
                 if (
                     (reqObj.updated === undefined) ||
                     (Date.now() - reqObj.updated >= 1 * 1000 * 60 * 60 * 3) //more than 3 hours old.
@@ -37,7 +41,6 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                 }
             }
         }
-        console.log("finnHub Request List: ", requestList)
         return Promise.all(requestList)
             .then((res) => {
                 const resObj: resObj = {}
@@ -45,7 +48,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                     const key: string = `${resStock.dashboard}-${resStock.widget}-${resStock.security}`
                     resObj[key] = resStock
                 }
-                // console.log('resObj', resObj)
+                console.log('resObj', resObj)
                 const options = {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -54,7 +57,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                 fetch("/finnDashData", options)
                     .then((response) => { return response.json() })
                     .then(() => {
-                        console.log('finndash data saved to mongoDB.')
+                        console.log('finndash data saved to mongoDB.', resObj)
                     })
                 return (resObj)
             })

@@ -51,7 +51,7 @@
   },
   "scripts": {
     "tsc": "tsc -p src/server/tsconfig.json",
-    "server": "nodemon --watch 'src/**/*' --ignore sessions/ --trace-warnings --loader ts-node ./dist/server/server.js",
+    "server": "nodemon --watch './dist/server/**/*' --ignore sessions/ --trace-warnings --loader ts-node ./dist/server/server.js",
     "client": "SET PORT=3000 && react-scripts start",
     "start": "node server.js",
     "build": "tsc -p .",

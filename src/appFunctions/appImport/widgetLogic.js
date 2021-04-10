@@ -65,20 +65,18 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
 }
 
 export const ChangeWidgetName = function changeWidgetName(stateRef, widgetID, newName) {
-    //stateref should equal widgetlist or menulist.
-    // console.log(stateRef + ":" + widgetID + ":" + newName);
-    let newWidgetList = Object.assign(this.state[stateRef]);
-    newWidgetList[widgetID]["widgetHeader"] = newName;
-    this.setState({ stateRef: newWidgetList });
-}
-
-export const LockWidgets = function lockWidgets(toggle){
-    console.log("toggle widget lock")
-    this.setState({widgetLockDown: toggle})
+    console.log('Change widget name: ',stateRef, widgetID, newName)
+    const s = this.state
+    const newWidgetList = produce(s[stateRef], (draftState) => {
+        draftState[widgetID].widgetHeader = newName
+    })
+    this.setState({ 
+        [stateRef]: newWidgetList, 
+    });
 }
 
 export const RemoveWidget = function removeWidget(stateRef, widgetID) {
-    // console.log("REMOVE WIDGET", stateRef, widgetID)
+    console.log("REMOVE WIDGET", stateRef, widgetID)
     const s = this.state
     const newWidgetList = produce(s[stateRef], (draftState) => {
         delete draftState[widgetID]
@@ -89,6 +87,11 @@ export const RemoveWidget = function removeWidget(stateRef, widgetID) {
     this.setState({ 
         [stateRef]: newWidgetList, 
     });
+}
+
+export const LockWidgets = function lockWidgets(toggle){
+    console.log("toggle widget lock")
+    this.setState({widgetLockDown: toggle})
 }
 
 export const UpdateWidgetFilters = function updateWidgetFilters(widgetID, dataKey, data){

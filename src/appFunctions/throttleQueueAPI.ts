@@ -96,9 +96,11 @@ export interface resObj {
     apiString: string,
     data: Object,
     dashboard: string,
-    description: string,
+    widgetName: string,
+    widgetType: string,
     status: number,
     updated: number,
+    config: Object,
 }
 
 export const finnHub = (throttle, reqObj) => {
@@ -134,9 +136,11 @@ export const finnHub = (throttle, reqObj) => {
                             apiString: reqObj.apiString,
                             data: reqObj, //
                             dashboard: reqObj.dashboard,
-                            description: reqObj.description,
+                            widgetName: reqObj.widgetName,
+                            widgetType: reqObj.widgetType,
                             status: 429,
                             updated: Date.now(),
+                            config: reqObj.config,
                         }
                         throttle.openRequests = throttle.openRequests -= 1
                         resolve(resObj)
@@ -147,9 +151,11 @@ export const finnHub = (throttle, reqObj) => {
                             apiString: reqObj.apiString,
                             data: reqObj,
                             dashboard: reqObj.dashboard,
-                            description: reqObj.description,
+                            widgetName: reqObj.widgetName,
+                            widgetType: reqObj.widgetType,
                             status: 400,
                             updated: Date.now(),
+                            config: reqObj.config,
                         }
                         throttle.openRequests = throttle.openRequests -= 1
                         resolve(resObj)
@@ -160,9 +166,11 @@ export const finnHub = (throttle, reqObj) => {
                             apiString: reqObj.apiString,
                             data: data,
                             dashboard: reqObj.dashboard,
-                            description: reqObj.description,
+                            widgetName: reqObj.widgetName,
+                            widgetType: reqObj.widgetType,
                             status: 200,
                             updated: Date.now(),
+                            config: reqObj.config,
                         }
                         throttle.openRequests = throttle.openRequests -= 1
                         resolve(resObj)
@@ -177,9 +185,11 @@ export const finnHub = (throttle, reqObj) => {
                         apiString: reqObj.apiString,
                         data: reqObj,
                         dashboard: reqObj.dashboard,
-                        description: reqObj.description,
+                        widgetName: reqObj.widgetName,
+                        widgetType: reqObj.widgetType,
                         status: 400,
                         updated: Date.now(),
+                        config: reqObj.config,
                     }
                     resolve(thisError)
                 });

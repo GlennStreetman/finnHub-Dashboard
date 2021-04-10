@@ -39,6 +39,7 @@ export interface resObj { //returns list of resObjs
     security: string,
     stale: number,
     widget: string,
+    widgetType: string,
 }
 
 //receives list of records to retrieve, returns list of response objects.

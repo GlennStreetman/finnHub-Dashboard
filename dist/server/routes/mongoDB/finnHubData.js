@@ -54,12 +54,14 @@ router.post("/finnDashData", async (req, res) => {
                         key: record,
                         widget: u.widget,
                         dashboard: u.dashboard,
-                        description: u.description,
+                        widgetName: u.widgetName,
                         retrieved: u.updated,
                         stale: u.updated + 1000 * 60 * 60 * 30,
                         data: u.data,
                         apiString: u.apiString,
                         security: u.security,
+                        widgetType: u.widgetType,
+                        config: u.config
                     }
                 };
                 const options = {

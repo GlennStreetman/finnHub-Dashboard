@@ -139,7 +139,7 @@ class App extends React.Component {
           console.log('!!!!!widget', targetDash[widget])
           await that.props.tGetFinnhubData({ //get data for default dashboard.
             targetDashBoard: s.currentDashBoard, 
-            widgetList: [targetDash[widget]]
+            widgetList: [targetDash[widget]],
             // widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist)
           })
         }
@@ -148,7 +148,7 @@ class App extends React.Component {
           if (dash !== s.currentDashBoard) {
             that.props.tGetFinnhubData({ //run in background, do not await.
               targetDashBoard: dash, 
-              widgetList: Object.keys(s.dashBoardData[dash].widgetlist)
+              widgetList: Object.keys(s.dashBoardData[dash].widgetlist),
             })
           }
         }
@@ -353,7 +353,7 @@ class App extends React.Component {
       await that.props.tGetMongoDB()
       await that.props.tGetFinnhubData({ //get data for default dashboard.
         targetDashBoard: s.currentDashBoard, 
-        widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist)
+        widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist),
       })
     }
     updateVisable(this)

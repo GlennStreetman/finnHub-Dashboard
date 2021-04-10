@@ -26,6 +26,10 @@ interface FinnHubAPIDataArray {
     [index: number]: FinnHubAPIData
 }
 
+export interface finnHubDataObj {
+    earningsCalendar: FinnHubAPIDataArray
+}
+
 interface filters {
     description: string,
     endDate: number,
@@ -33,7 +37,7 @@ interface filters {
 }
 
 //add any additional type guard functions here used for live code.
-function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
+function isFinnHubData(arg: any): arg is finnHubDataObj { //typeguard
     if (arg !== undefined && Object.keys(arg).length > 0 && arg.earningsCalendar && arg.earningsCalendar[0] && arg.earningsCalendar[0].date) {
         // console.log("returning true", arg)
         return true

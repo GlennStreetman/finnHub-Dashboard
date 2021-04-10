@@ -57,7 +57,11 @@ class WidgetContainer extends React.Component {
   updateHeader(e) {
     //changes widget name.
     this.setState({ renderHeader: e.target.value });
-    this.props.changeWidgetName(this.props.stateRef, this.props.widgetKey, e.target.value);
+    if (this.props.stateRef === "stockWidget" || this.props.stateRef === 'marketWidget') {
+      this.props.changeWidgetName('widgetList', this.props.widgetKey, e.target.value);
+    } else{
+      this.props.changeWidgetName('menuList', this.props.widgetKey, e.target.value);
+    }
   }
 
   handleChange(e) {

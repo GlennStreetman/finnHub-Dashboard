@@ -1,4 +1,4 @@
-//import all API string generator functions here and register below to widgetDict.
+// import all API string generator functions here and register below to widgetDict.
 import candleWidgetEndPoint  from "../widgets/Price/candles/candlesEndPoint";
 import quoteWidgetEndPoint  from "../widgets/Price/quote/quoteEndPoint";
 import priceSplitsEndPoint  from "../widgets/Price/splits/priceSplitsEndPoint";

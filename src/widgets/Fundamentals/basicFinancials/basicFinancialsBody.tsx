@@ -10,11 +10,11 @@ import StockSearchPane, { searchPaneProps } from "../../../components/stockSearc
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
-interface FinnHubAPIData { //rename
+export interface FinnHubAPIData { //rename
     [index: string]: number | string
 }
 
-interface FinnHubAPIDataArray {
+export interface FinnHubAPIDataArray {
     [index: number]: FinnHubAPIData
 }
 

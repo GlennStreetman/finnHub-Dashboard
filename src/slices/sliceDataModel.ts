@@ -7,9 +7,11 @@ import { tGetMongoDB } from '../thunks/thunkGetMongoDB'
 interface DataNode {
     apiString?: string,
     updated?: number,
-    description?: string,
+    widgetName?: string,
+    widgetType?: string,
     dashboard?: string,
     stale?: number,
+    // config?: Object,
 }
 
 interface DataSet {
@@ -54,6 +56,8 @@ const dataModel = createSlice({
                         const endPoint: string = widgetList[w].widgetType
                         const filters: Object = widgetList[w].filters
                         const widgetDescription: string = widgetList[w].widgetHeader
+                        const widgetType: string = widgetList[w].widgetType
+                        const config: Object = widgetList[w].config
                         // @ts-ignore: Unreachable code error
                         const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
                         const trackedStocks = widgetList[w].trackedStocks
@@ -63,8 +67,10 @@ const dataModel = createSlice({
                         for (const stock in endPointData) {
                             endPointAPIList[dashboardName][widgetName][`${stock}`] = {
                                 apiString: endPointData[stock],
-                                description: widgetDescription,
+                                widgetName: widgetDescription,
                                 dashboard: dashboardName,
+                                widgetType: widgetType,
+                                config: config,
                             }
                         }
                     }
