@@ -18,7 +18,7 @@ interface FinnHubAPIData { //rename
     symbol: string,
 }
 
-interface FinnHubAPIDataArray {
+export interface FinnHubAPIDataArray {
     [index: number]: FinnHubAPIData
 }
 

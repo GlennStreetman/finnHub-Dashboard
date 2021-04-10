@@ -39,6 +39,7 @@ import deleeteSavedDashboard from './routes/loggedIn/deleteSavedDashboard.js'
 import finnHubData from './routes/mongoDB/finnHubData.js'
 import findMongoData from './routes/mongoDB/findMongoData.js'
 import deleteFinnDashData from './routes/mongoDB/deleteMongoRecords.js'
+import updateGQLFilters from './routes/mongoDB/setMongoFilters.js'
 //graphQL
 import {schema} from './routes/graphQL/graphQL.js'
 
@@ -128,6 +129,7 @@ app.use('/', deleeteSavedDashboard)
 app.use('/', finnHubData)
 app.use('/', findMongoData)
 app.use('/', deleteFinnDashData)
+app.use('/', updateGQLFilters)
 app.use('/graphql', eg.graphqlHTTP({
   schema: schema,
   graphiql: true

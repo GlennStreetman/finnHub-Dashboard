@@ -13,7 +13,7 @@ import basicFinancialsEndPoint  from "./filters/basicFinancialsGQLFIlters.js";
 // import IPOCalendarEndPoint  from "../widgets/Fundamentals/IPOCalendar/IPOCalendarEndPoint";
 import recommendationTrendsGQLFilter  from "./filters/recommendationTrendsGQLFilter.js";
 // import priceTargetEndPoint  from "../widgets/Estimates/PriceTarget/priceTargetEndPoint";
-// import EPSSuprisesEndPoint  from "../widgets/Estimates/EPSSurprises/EPSSurprisesEndPoint";
+import EPSSuprisesEndPoint  from "./filters/EPSSurprisesGQLFilter.js";
 import EarningsCalendarEndPoint  from "./filters/earningsCalendarGQLFilter.js";
 
 export const filterDict = { //Remember to convert time series data into an object list, time value should be key.
@@ -31,6 +31,6 @@ export const filterDict = { //Remember to convert time series data into an objec
     // FundamentalsIPOCalendar: IPOCalendarEndPoint,
     EstimatesRecommendationTrends: recommendationTrendsGQLFilter,
     // EstimatesPriceTarget: priceTargetEndPoint,
-    // EstimatesEPSSurprises: EPSSuprisesEndPoint,
+    EstimatesEPSSurprises: EPSSuprisesEndPoint,
     EstimatesEarningsCalendar: EarningsCalendarEndPoint,
 }

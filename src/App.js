@@ -456,7 +456,6 @@ class App extends React.Component {
           loadSavedDashboard={this.loadSavedDashboard}
           setSecurityFocus={this.setSecurityFocus}
           targetSecurity={this.state.targetSecurity}
-          // enableDrag={this.enableDrag}
         />
         {loginScreen}
         {backGroundMenu()}

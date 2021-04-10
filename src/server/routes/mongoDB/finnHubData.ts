@@ -1,6 +1,6 @@
 import express from 'express';
 import { getDB } from '../../db/mongoLocal.js'
-import { finnHubData } from '../../db/mongoTypes'
+// import { finnHubData } from '../../db/mongoTypes'
 
 interface session {
     login: boolean,
@@ -12,17 +12,9 @@ interface thisSession extends Request {
     body: any
 }
 
-// export interface reqObj extends finnHubData {
-//     [key: string]: 
-// }
-
-export interface resObj {
-
-}
-
 const router = express.Router();
 
-//gets user, none statle, finnhub dtata. This process deletes stale records.
+//gets user, none stale, finnhub data. This process deletes stale records.
 router.get('/finnDashData', async (req: thisSession, res: any) => {
     if (req.session.login === true) {
         try {

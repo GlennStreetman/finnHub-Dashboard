@@ -1,7 +1,7 @@
 import express from 'express';
 import { getDB } from '../../db/mongoLocal.js';
 const router = express.Router();
-//gets user, none statle, finnhub dtata. This process deletes stale records.
+//gets user, none stale, finnhub data. This process deletes stale records.
 router.get('/finnDashData', async (req, res) => {
     if (req.session.login === true) {
         try {
