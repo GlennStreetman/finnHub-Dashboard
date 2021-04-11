@@ -1,18 +1,16 @@
 //setup express
 import express from 'express';
-const app = express();
-// const router = express.Router();
-require('dotenv').config();
+import dotenv from 'dotenv';
 import path from 'path';
+import request from 'supertest';
+import bodyParser from 'body-parser';
+import db from '../../db/databaseLocalPG.js';
+import verifyEmail from "./verifyEmail.js";
+const app = express();
+dotenv.config();
 app.use(express.static(path.join(__dirname, 'build')));
 app.use(express.urlencoded({ extended: false }));
-const bodyParser = require("body-parser");
 app.use(bodyParser.json()); // support json encoded bodies
-//postgres test db.
-const db = require("../../db/databaseLocalPG.js");
-//required for sesssion management and sending cookies with requests
-const request = require("supertest");
-const verifyEmail = require("./verifyEmail.js");
 app.use('/', verifyEmail); //route to be tested needs to be bound to the router.
 beforeAll((done) => {
     const setupDB = `

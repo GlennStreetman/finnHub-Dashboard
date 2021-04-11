@@ -56,7 +56,7 @@
     "start": "node server.js",
     "build": "tsc -p .",
     "eject": "react-scripts eject",
-    "test": "jest"
+    "test": "jest --env node"
   },
   "eslintConfig": {
     "extends": "react-app"

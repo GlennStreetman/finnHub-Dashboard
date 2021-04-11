@@ -1,16 +1,20 @@
-const request = require("supertest");
+import request from 'supertest';
 import express from 'express';
-const app = express();
-require('dotenv').config();
+import dotenv from 'dotenv';
 import path from 'path';
+import bodyParser from 'body-parser';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import sessionFileStore from 'session-file-store';
+import login from "./login.js";
+import db from '../../db/databaseLocalPG.js';
+const app = express();
+dotenv.config();
 app.use(express.static(path.join(__dirname, 'build')));
 app.use(express.urlencoded({ extended: false }));
-import bodyParser from 'body-parser';
 app.use(bodyParser.json()); // support json encoded bodies
-import cookieParser from 'cookie-parser';
 app.use(cookieParser());
-import session from 'express-session';
-const FileStore = require("session-file-store")(session);
+const FileStore = sessionFileStore(session);
 const fileStoreOptions = {};
 app.use(session({
     store: new FileStore(fileStoreOptions),
@@ -19,8 +23,6 @@ app.use(session({
     saveUninitialized: true,
     cookie: { secure: false, sameSite: true },
 }));
-const login = require("./login.js");
-const db = require("../../db/databaseLocalPG.js");
 app.use('/', login); //route to be tested needs to be bound to the router.
 beforeAll((done) => {
     global.sessionStorage = {};

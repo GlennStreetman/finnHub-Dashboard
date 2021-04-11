@@ -1,17 +1,24 @@
 //setup express
 import express from 'express';
-const app = express();
-import md5 from 'md5';
-require('dotenv').config()
+import dotenv from 'dotenv'; 
 import path from 'path';
+import md5 from 'md5';
+import cookieParser from 'cookie-parser';
+import session from 'express-session';
+import request from 'supertest';
+import sessionFileStore from 'session-file-store'; 
+import db from '../../db/databaseLocalPG.js';
+import bodyParser from 'body-parser';
+import newPW from "./newPW.js";
+import secretQuestion from "./../accountRegistration/secretQuestion.js";
+
+const app = express();
+dotenv.config()
 app.use(express.static(path.join(__dirname, 'build')));
 app.use(express.urlencoded({ extended: false }));
-const bodyParser = require("body-parser");
 app.use(bodyParser.json()); // support json encoded bodies
-import cookieParser from 'cookie-parser';
 app.use(cookieParser());
-import session from 'express-session';
-const FileStore = require("session-file-store")(session);
+const FileStore = sessionFileStore(session);
 const fileStoreOptions = {};
 app.use(
     session({
@@ -23,14 +30,6 @@ app.use(
     })
 )
 
-//postgres test db.
-const db = require("../../db/databaseLocalPG.js");
-
-//required for sesssion management and sending cookies with requests
-const request = require("supertest");
-
-const newPW = require("./newPW.js");
-const secretQuestion = require("./../accountRegistration/secretQuestion.js");
 app.use('/', newPW) //route to be tested needs to be bound to the router.
 app.use('/', secretQuestion) //needed fo all routes that require login.
 

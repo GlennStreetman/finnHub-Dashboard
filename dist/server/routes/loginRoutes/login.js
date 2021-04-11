@@ -1,4 +1,3 @@
-// const { json } = require('body-parser');
 import express from 'express';
 import format from 'pg-format';
 import md5 from 'md5';

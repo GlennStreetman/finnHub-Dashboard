@@ -1,4 +1,4 @@
-// const { json } = require('body-parser');
+
 import express from 'express';
 import format from 'pg-format';
 import md5 from 'md5';
@@ -7,7 +7,7 @@ import devDB from '../../db/databaseLocalPG.js';
 
 const router = express.Router();
 const db = process.env.live === '1' ? dbLive : devDB
- 
+
 router.get("/login", (req, res, next) => {
     
     let loginText = format('%L', req.query["loginText"])

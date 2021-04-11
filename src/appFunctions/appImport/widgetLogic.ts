@@ -1,7 +1,6 @@
 import produce from "immer"
 import { reqBody } from '../../server/routes/mongoDB/setMongoFilters'
 
-
 export const NewMenuContainer = function newMenuContainer(widgetDescription, widgetHeader, widgetConfig) {
     const widgetName = widgetDescription;
     // this.updateZIndex(widgetName)

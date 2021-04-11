@@ -4,14 +4,18 @@ import path from 'path';
 import session from 'express-session';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
+import dotenv from 'dotenv';
+import request from 'supertest';
+import sessionFileStore from 'session-file-store';
+import db from '../../db/databaseLocalPG.js';
+import register from './register.js';
 const app = express();
-// const router = express.Router();
-require('dotenv').config();
+dotenv.config();
+const FileStore = sessionFileStore(session);
 app.use(express.static(path.join(__dirname, 'build')));
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(cookieParser());
-const FileStore = require("session-file-store")(session);
 const fileStoreOptions = {};
 app.use(session({
     store: new FileStore(fileStoreOptions),
@@ -21,10 +25,6 @@ app.use(session({
     cookie: { secure: false, sameSite: true },
 }));
 //postgres test db.
-const db = require("../../db/databaseLocalPG.js");
-//required for sesssion management and sending cookies with requests
-const request = require("supertest");
-const register = require("./register.js");
 app.use('/', register); //route to be tested needs to be bound to the router.
 beforeAll((done) => {
     global.sessionStorage = {};
