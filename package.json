@@ -54,7 +54,7 @@
     "server": "nodemon --watch './dist/server/**/*' --ignore sessions/ --trace-warnings --loader ts-node ./dist/server/server.js",
     "client": "SET PORT=3000 && react-scripts start",
     "start": "node server.js",
-    "build": "tsc -p .",
+    "build": "react-scripts build",
     "eject": "react-scripts eject",
     "test": "jest --env node"
   },

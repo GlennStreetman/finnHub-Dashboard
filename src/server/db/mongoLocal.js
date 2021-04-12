@@ -1,6 +1,9 @@
 import MongoClient from 'mongodb'
+import dotenv from 'dotenv';
+dotenv.config()
 
-const uri = 'mongodb://localhost:27017';
+const uri = process.env.mongo;
+// const uri = 'mongodb://localhost:27017';
 // Create a new MongoClient
 let _db = new MongoClient.MongoClient(uri);
 
@@ -22,4 +25,3 @@ const getDB = () => _db
 const disconnectDB = () => _db.close()
 
 export {connectMongo, getDB, disconnectDB}
-
