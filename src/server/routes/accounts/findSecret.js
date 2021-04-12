@@ -24,11 +24,12 @@ router.get("/findSecret", (req, res, next) => {
             res.status(400).json({message: "Error during password reset process."});
         } else if (rows.rowCount === 1) {
             const secretQuestion = rows.rows[0].secretquestion
+            console.log('USER INFO: ', userID, req.query['user'])
             const data = {
                 question: secretQuestion,
-                user: userID,
+                user: req.query['user'],
             }
-            console.log(`Secret Questions returned for user ${userID}.`)
+            console.log(`Secret Questions returned for user ${userID}. Data: ${data}`)
             res.status(200).json(data)
         } else {
             res.status(401).json({message: 'Problem with reset password link.'})

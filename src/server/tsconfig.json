@@ -13,7 +13,8 @@
     },
     "exclude": [
         "../../build",
-        "../src"
+        "../src",
+        "**/*.test.js"
     ],
     "include": [
         "."

@@ -25,7 +25,7 @@ router.get("/findSecret", (req, res, next) => {
             const secretQuestion = rows.rows[0].secretquestion;
             const data = {
                 question: secretQuestion,
-                user: userID,
+                user: req.query['user'],
             };
             console.log(`Secret Questions returned for user ${userID}.`);
             res.status(200).json(data);
