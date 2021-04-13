@@ -1,5 +1,3 @@
-
-import { test } from '../../../w'
 import { FinnHubAPIData } from '../../../../widgets/Fundamentals/basicFinancials/basicFinancialsBody'
 
 export default function basicFinancialsGQLFilter(data: FinnHubAPIData, filters: any = {}) {
