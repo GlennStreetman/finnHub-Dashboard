@@ -50,7 +50,7 @@
     "with-immutable-props-to-js": "^2.1.0"
   },
   "scripts": {
-    "tsc": "tsc -p src/server/tsconfig.json",
+    "tsc": "npm run tsc -p src/server/tsconfig.json",
     "server": "nodemon --watch './build/server/**/*' --ignore sessions/ --trace-warnings --loader ts-node ./build/server/server.js",
     "client": "SET PORT=3000 && react-scripts start",
     "start": "node ./build/server/server.js",
