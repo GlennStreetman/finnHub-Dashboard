@@ -56,7 +56,7 @@
     "start": "node ./build/server/server.js",
     "build": "react-scripts build && npx tsc -p src/server/tsconfig.json",
     "heroku-postbuild": "react-scripts build",
-    "heroku-cleanup": "tsc -p src/server/tsconfig.json",
+    "heroku-cleanup": "npm run tsc",
     "eject": "react-scripts eject",
     "test": "jest --env node"
   },
