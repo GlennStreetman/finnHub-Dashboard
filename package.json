@@ -61,7 +61,7 @@
     "client": "SET PORT=3000 && react-scripts start",
     "start": "node ./build/server/server.js",
     "build": "react-scripts build && npx tsc -p src/server/tsconfig.json",
-    "heroku-postbuild": "react-scripts build && npm run tsc",
+    "heroku-postbuild": "react-scripts build && npx run tsc",
     "eject": "react-scripts eject",
     "test": "jest --env node"
   },
