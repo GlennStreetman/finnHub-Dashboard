@@ -56,12 +56,12 @@
     "@types/react-redux": "^7.1.16"
   },
   "scripts": {
-    "tsc": "tsc -p src/server/tsconfig.json",
+    "tsc": "npx tsc -p src/server/tsconfig.json",
     "server": "nodemon --watch './build/server/**/*' --ignore sessions/ --trace-warnings --loader ts-node ./build/server/server.js",
     "client": "SET PORT=3000 && react-scripts start",
     "start": "node ./build/server/server.js",
     "build": "react-scripts build && npx tsc -p src/server/tsconfig.json",
-    "heroku-postbuild": "react-scripts build && npx run tsc",
+    "heroku-postbuild": "react-scripts build && npm run tsc",
     "eject": "react-scripts eject",
     "test": "jest --env node"
   },
