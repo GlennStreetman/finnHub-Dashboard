@@ -1,5 +1,6 @@
 
-import { FinnHubAPIData } from '../../../../widgets/fundamentals/basicFinancials/basicFinancialsBody'
+import { test } from '../../../w'
+import { FinnHubAPIData } from '../../../../widgets/Fundamentals/basicFinancials/basicFinancialsBody'
 
 export default function basicFinancialsGQLFilter(data: FinnHubAPIData, filters: any = {}) {
     //convert time series list to Object: Keys = period, values = object
