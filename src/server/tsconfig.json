@@ -2,7 +2,7 @@
     "extends": "./../../tsconfig.json",
     "compilerOptions": {
         "allowSyntheticDefaultImports": true,
-        "outDir": "../../dist",
+        "outDir": "../../build",
         "allowJs": true,
         "noEmit": false,
         "sourceMap": true,
@@ -12,7 +12,6 @@
         "moduleResolution": "node"
     },
     "exclude": [
-        "../../build",
         "../src",
         "**/*.test.js"
     ],
@@ -20,3 +19,4 @@
         "."
     ]
 }
+//         "../../build",

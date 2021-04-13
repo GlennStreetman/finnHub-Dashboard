@@ -9,12 +9,6 @@ import devDB from '../db/databaseLocalPG.js'
 const db = process.env.live === "1" ? dbLive : devDB;
 const router = express.Router();
 
-
-router.use(function timeLog(req, res, next) {
-    // console.log("Time: ", new Date());
-    next();
-    });
-
 router.get("/endPoint", cors(),(req, res, next) => {
     console.log("Generating new endpoint data");
     // const data = {}

@@ -16,6 +16,7 @@ import { fileURLToPath } from 'url';
 import { connectMongo } from "./db/mongoLocal.js"
 
 //SETUP ROUTES
+import def from './routes/default.js'
 import login from './routes/loginRoutes/login.js'
 import checkLogin from './routes/loginRoutes/checkLogin.js'
 //accountRegistration
@@ -64,7 +65,7 @@ app.use(bodyParser.urlencoded({
 }));
 
 //LOAD CONFIG.
-console.log("env=", process.env.live)
+console.log("env =", process.env.live)
 if (process.env.live === '1') {
   app.use(
     session({
@@ -78,7 +79,8 @@ if (process.env.live === '1') {
   app.listen(process.env.PORT || port, function () {
     console.log("Listening to http://localhost:" + port);
   })
-  app.use(express.static(path.join(__dirname, 'build')));
+  console.log("live path: ", path.join(__dirname, '../../build/'))
+  app.use(express.static(path.join(__dirname, '../../build/')));
   const db = dbLive
 
   db.connect()
@@ -98,13 +100,16 @@ if (process.env.live === '1') {
   console.log("loading dev server config")
   // const path  from "path");
   app.listen(port, function () { console.log(`serving the direcotry @ http`) })
-  app.use(express.static(path.join(__dirname, 'build')));
+  console.log("dev path ", path.join(__dirname, '../../build/'))
+  app.use(express.static(path.join(__dirname, '../../build/'))); //static asset directories are automaticaly served.
   const db = devDB
   db.connect()
     .then(() => console.log("connected to developement postgres server"))
     .catch(err => console.log("ERROR ON PG LOGIN", err))
   connectMongo((err) => { console.log("Connected", err) })
 }
+
+
 
 app.use('/', login)
 app.use('/', checkLogin)
@@ -134,11 +139,14 @@ app.use('/graphql', eg.graphqlHTTP({
   schema: schema,
   graphiql: true
 }))
+app.use('/', def)
+
+
+
 app.use((req, res, next) => {
   //ALL OTHER ROUTES
   const error = new Error('PATH Not Found');
   error.status = 404
-  console.log(req)
   next(error)
 })
 
