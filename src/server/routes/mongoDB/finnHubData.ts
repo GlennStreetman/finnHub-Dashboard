@@ -35,7 +35,7 @@ router.get('/finnDashData', async (req: thisSession, res: any) => {
                 resList.push(data)
             })
             // client.close()
-            console.log('3Got data', resList)
+            // console.log('3Got data', resList)
             res.status(200).json({ resList })
 
         }
@@ -49,13 +49,13 @@ router.get('/finnDashData', async (req: thisSession, res: any) => {
 //updates MongoDB finnDash.dataset with finnhub data.
 router.post("/finnDashData", async (req: thisSession, res: any) => {
     if (req.session.login === true) {
-        console.log("UPDATING FINNDASH DATA")
+        // console.log("UPDATING FINNDASH DATA")
         try {
             const client = getDB()
             const database = client.db('finnDash');
             const dataSet = database.collection('dataSet');
 
-            console.log('1 updating mongodb finnhubdata')
+            // console.log('1 updating mongodb finnhubdata')
             const updateData = req.body
             for (const record in updateData) {
                 const u = updateData[record]

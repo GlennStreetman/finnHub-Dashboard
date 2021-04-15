@@ -70,7 +70,7 @@ router.post('/findMongoData', async (req: findMongoDataPost, res: any) => {
                 resList.push(data)
             })
 
-            console.log('3Got data', resList)
+            // console.log('3Got data', resList)
             res.status(200).json(resList) //returns list of objects.
 
         }

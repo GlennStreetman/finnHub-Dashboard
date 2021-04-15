@@ -20,7 +20,7 @@ import TopNav from "./components/topNav";
 import Login from "./components/login";
 import AboutMenu from "./components/AboutMenu";
 import AccountMenu, { accountMenuProps } from "./components/accountMenu";
-import EndPointMenu, { endPointProps } from "./components/endPoints";
+import EndPointMenu, { endPointProps } from "./components/endPointMenu";
 import ExchangeMenu, { exchangeMenuProps } from "./components/exchangeMenu";
 import { WidgetController, MenuWidgetToggle } from "./components/widgetController";
 
@@ -117,7 +117,7 @@ class App extends React.Component {
       console.log("Loggin detected, setting up dashboards.", s.apiKey);
       this.getSavedDashBoards()
       .then(loginDataAndDashboards => {
-        console.log("UPDATE DASH DATA", loginDataAndDashboards, loginDataAndDashboards.currentDashBoard)
+        // console.log("UPDATE DASH DATA", loginDataAndDashboards, loginDataAndDashboards.currentDashBoard)
         this.setState(loginDataAndDashboards) //{dashboardData: {}, menuList: {}}
         p.rSetTargetDashboard({targetDashboard: loginDataAndDashboards.currentDashBoard})
         p.rBuildDataModel({...loginDataAndDashboards, apiKey: s.apiKey})
@@ -136,7 +136,7 @@ class App extends React.Component {
         await that.props.tGetMongoDB()
         const targetDash = Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist)
         for (const widget in targetDash) {
-          console.log('!!!!!widget', targetDash[widget])
+          // console.log('!!!!!widget', targetDash[widget])
           await that.props.tGetFinnhubData({ //get data for default dashboard.
             targetDashBoard: s.currentDashBoard, 
             widgetList: [targetDash[widget]],

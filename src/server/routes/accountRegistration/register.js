@@ -125,7 +125,7 @@ router.post("/register", (req, res) => {
           if (req.body.emailText.indexOf("@test.com") === -1) {
             mailgun.messages().send(data, (error) => {
               if (error) {
-                console.log(error);
+                console.log("register error", error);
               } else {
                 // console.log(body);
                 // console.log("email sent")

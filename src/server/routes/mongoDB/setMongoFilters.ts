@@ -41,7 +41,7 @@ router.post("/updateGQLFilters", async (req: thisSession, res: any) => {
                     config: updateData.filters
                 }
             }
-            console.log('2:', updateData.filters)
+            // console.log('2:', updateData.filters)
             await dataSet.updateMany(query, update)
                 .catch((err) => { console.log('Problem updating mongo filters.', err) })
             // console.log('3. Done?', dataSet)

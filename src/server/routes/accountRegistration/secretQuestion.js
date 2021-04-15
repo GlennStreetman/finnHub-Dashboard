@@ -10,7 +10,7 @@ const db = process.env.live === "1" ? dbLive : devDB;
 router.get("/secretQuestion", (req, res, next) => {
     const loginText = md5(req.query["loginText"])
     const user = req.query["user"]
-    console.log(loginText, user)
+    // console.log(loginText, user)
     const newQuery = `
         SELECT id, loginname 
         FROM users 

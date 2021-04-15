@@ -41,6 +41,7 @@ import finnHubData from './routes/mongoDB/finnHubData.js'
 import findMongoData from './routes/mongoDB/findMongoData.js'
 import deleteFinnDashData from './routes/mongoDB/deleteMongoRecords.js'
 import updateGQLFilters from './routes/mongoDB/setMongoFilters.js'
+import graphQLRedirect from './routes/graphQL.js'
 //graphQL
 import {schema} from './routes/graphQL/graphQL.js'
 
@@ -79,7 +80,7 @@ if (process.env.live === '1') {
   app.listen(process.env.PORT || port, function () {
     console.log("Listening to http://localhost:" + port);
   })
-  console.log("live path: ", path.join(__dirname, '../../build/'))
+  // console.log("live path: ", path.join(__dirname, '../../build/'))
   app.use(express.static(path.join(__dirname, '../../build/')));
   const db = dbLive
 
@@ -135,9 +136,11 @@ app.use('/', finnHubData)
 app.use('/', findMongoData)
 app.use('/', deleteFinnDashData)
 app.use('/', updateGQLFilters)
+app.use('/', graphQLRedirect)
 app.use('/graphql', eg.graphqlHTTP({
   schema: schema,
-  graphiql: true
+  graphiql: true,
+  pretty: true,
 }))
 app.use('/', def)
 

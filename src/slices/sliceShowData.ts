@@ -51,7 +51,7 @@ const showData = createSlice({
         // },
         rSetTargetDashboard: (state, action) => { //{targetDashboard}
             const target = action.payload.targetDashboard
-            console.log('target', target, action.payload)
+            // console.log('target', target, action.payload)
             state.targetDashboard = target
         }
 
@@ -59,7 +59,7 @@ const showData = createSlice({
     extraReducers: {
         // @ts-ignore: Unreachable code error
         [tGetFinnhubData.pending]: (state, action) => {
-            console.log('1. Getting stock data!')
+            // console.log('1. Getting stock data!')
             // return {...state}
         },
         // @ts-ignore: Unreachable code error
@@ -97,7 +97,7 @@ const showData = createSlice({
         },
         // @ts-ignore: Unreachable code error
         [tGetMongoDB.fulfilled]: (state, action) => {
-            console.log("Merge fresh mongoDB data into showData", action.payload)
+            // console.log("Merge fresh mongoDB data into showData", action.payload)
             const ap: any = action.payload
             for (const x in ap) {
                 if (ap[x].dashboard === state.targetDashboard) {

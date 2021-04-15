@@ -21,18 +21,15 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
         const dataModel = thunkAPI.getState().dataModel.dataSet[req.targetDashBoard] //finnHubData
         // const thisDashboard = dataModel.dataSet[req.targetDashBoard]
         const getWidgets = req.widgetList
-        console.log('getWidgets', getWidgets)
         let requestList: Promise<any>[] = []
         for (const w of getWidgets) { //for each widget ID
             const thisWidget = dataModel[w]
-            console.log('THIS WIDGET', thisWidget)
             for (const s in thisWidget) { //for each security
                 const reqObj = { ...thisWidget[s] }
                 reqObj.dashboard = req.targetDashBoard
                 reqObj.widget = w
                 reqObj.security = s
                 reqObj.config = thisWidget[s].config
-                console.log('---------------------1req OBJ----------------------', reqObj)
                 if (
                     (reqObj.updated === undefined) ||
                     (Date.now() - reqObj.updated >= 1 * 1000 * 60 * 60 * 3) //more than 3 hours old.
@@ -48,7 +45,6 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                     const key: string = `${resStock.dashboard}-${resStock.widget}-${resStock.security}`
                     resObj[key] = resStock
                 }
-                console.log('resObj', resObj)
                 const options = {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
@@ -57,7 +53,6 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                 fetch("/finnDashData", options)
                     .then((response) => { return response.json() })
                     .then(() => {
-                        console.log('finndash data saved to mongoDB.', resObj)
                     })
                 return (resObj)
             })

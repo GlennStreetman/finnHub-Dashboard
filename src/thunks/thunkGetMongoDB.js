@@ -22,7 +22,7 @@ export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
                 security: mongo.security
             }
         }
-        console.log('UPDATE FROM MONGO COMPLETE', resObj)
+        // console.log('UPDATE FROM MONGO COMPLETE', resObj)
         return(resObj)
 
     }catch(err){

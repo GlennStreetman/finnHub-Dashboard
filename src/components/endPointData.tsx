@@ -69,8 +69,21 @@ export default class endPointData extends React.Component<any, any> {
         this.getData(el)
     }
 
+    isLink(el) {
+        const p = this.props
+        if (p.searchList[0] === 'widget') {
+            const url = window.location
+            let baseURL = url.protocol + "/" + url.host + "/" + url.pathname.split('/')[1] + 'graphQL';
+            baseURL = baseURL.replace('http:/localhost:3000', '//localhost:5000') //makes redirect work in dev mode.
+            // const defaultQuery = `{dashboardList(key: "${p.apiKey}") {dashboard}}`
+            const queryProps = `(key: "${p.apiKey}" dashboard: "${p.searchList[1]}" widget: "${p.searchList[2]}" security: "${el}")`
+            const returnValues = `dashboard, widgetType, widgetName, security, data`
+            const thisQuery = `{${p.searchList[0]}${queryProps} {${returnValues}}}`
+            return (<a href={`${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
+        } else return (el)
+    }
+
     renderNodeData() {
-        console.log("rendering node data")
         const p = this.props
         //for each item in object, if object return button logic, else return string
         // const p = this.props
@@ -81,7 +94,7 @@ export default class endPointData extends React.Component<any, any> {
                 return (
                     <li className='liNode' key={ind + 'li'}>
                         <div key={ind}>
-                            {el} - <button className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
+                            {this.isLink(el)} - <button className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
                                 <i className="fa fa-caret-square-o-right" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -89,12 +102,17 @@ export default class endPointData extends React.Component<any, any> {
                 )
             } else if (typeof s.endPointData[el] === 'object' && s.endPointData[el] !== null) {
                 const thisNode = s.endPointData[el] && s.endPointData[el].data ?
-                    <EndPointNode nodeData={s.endPointData[el].data} dashboard={p.dashboard} /> :
+                    <EndPointNode
+                        nodeData={s.endPointData[el].data}
+                        dashboard={p.dashboard}
+                        apiKey={p.apiKey}
+                        searchList={p.searchList}
+                    /> :
                     <>...loading</>
                 return (
                     <li className='liNode' key={ind + 'li'}>
                         <div className='endPointDivRow' key={ind}>
-                            {el} - <button className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
+                            {this.isLink(el)} <button className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
                                 <i className="fa fa-caret-square-o-down" aria-hidden="true"></i>
                             </button>
                             <div className='endPointDivColumn'>{thisNode}</div>

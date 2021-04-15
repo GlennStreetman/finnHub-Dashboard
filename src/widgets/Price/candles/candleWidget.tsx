@@ -111,7 +111,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                 key: p.widgetKey,
                 securityList: [[`${targetStock}`]]
             }
-            console.log(payload)
+            // console.log(payload)
             dispatch(rBuildVisableData(payload))
         }
     }, [targetStock, p.widgetKey, widgetCopy, dispatch])
@@ -136,7 +136,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     useEffect(() => {
         //if stock not selected default to first stock.
         if (Object.keys(p.trackedStocks).length > 0 && targetStock === '') {
-            console.log("setStock", Object.keys(p.trackedStocks).length, targetStock)
+            // console.log("setStock", Object.keys(p.trackedStocks).length, targetStock)
             const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
             setTargetStock(setDefault)
         }

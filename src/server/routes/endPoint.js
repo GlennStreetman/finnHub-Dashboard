@@ -110,11 +110,9 @@ router.get("/endPoint", cors(),(req, res, next) => {
                 // finnHub(throttle, apiString, requestID)
             }
         }
-            console.log("----------starting endpoint promise chain---------")
             // console.log(throttle.queue)
             Promise.all(requestList)
             .then((response) => {
-                console.log("--------------DONE generating endpoint-------------------")
                 for (const Obj in response){
                     const id = response[Obj].key
                     const stock = response[Obj].stock
@@ -130,15 +128,15 @@ router.get("/endPoint", cors(),(req, res, next) => {
 
     getDashBoard()
     .then((data) => {
-        console.log("1.BUILDING")
+        // console.log("1.BUILDING")
         return buildEndPoint(data)
     })
     .then((data) => {
-        console.log("2.Data")
+        // console.log("2.Data")
         return requestQueryData(data)
     })
     .then((data) => {
-        console.log("3.endpoint request complete")
+        // console.log("3.endpoint request complete")
         res.json(data)
     })
     .catch((err => {

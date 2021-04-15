@@ -283,6 +283,7 @@ const RootQueryType = new g.GraphQLObjectType({
                         const findData = {
                             userID: returnData.rows[0].id,
                             dashboard: args.dashboard,
+                            security: args.security,
                             $or: findWidgetIds
                         }
                         // console.log('findData', findData)

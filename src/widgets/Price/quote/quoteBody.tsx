@@ -84,7 +84,7 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
         if (isInitialMount.current === true && widgetCopy === p.widgetKey) {
             isInitialMount.current = false;
         } else {
-            console.log("Loading Quote Widget")
+            // console.log("Loading Quote Widget")
             const stockList: string[] = Object.keys(p.trackedStocks)
             const payload: object = {
                 key: p.widgetKey,

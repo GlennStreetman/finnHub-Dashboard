@@ -1,6 +1,8 @@
 import React from "react";
 import produce from "immer"
 import EndPointNode from "./endPointNode";
+// import { findByLabelText } from "@testing-library/dom";
+
 
 export default class EndPointMenu extends React.Component {
     constructor(props) {
@@ -11,14 +13,16 @@ export default class EndPointMenu extends React.Component {
             showData: false,
             showLoader: false,
             title: '',
+            displayType: [], 
         };
 
         this.renderEndPointRows = this.renderEndPointRows.bind(this);
         this.backButton = this.backButton.bind(this);
-        this.showEndPointData = this.showEndPointData.bind(this);
+        this.showEndPointDataWidget = this.showEndPointDataWidget.bind(this);
+        this.showEndPointDataSecurity = this.showEndPointDataSecurity.bind(this);
     }
 
-    async showEndPointData(el){ //receives dashboard object, builds endpoint display
+    async showEndPointDataWidget(el, searchType){ //receives dashboard object, builds endpoint display
         const p = this.props
         let displayWidgetList = await produce(p.dashBoardData[el].widgetlist, (draftState)=>{
             // console.log("draftstate", p.dashBoardData, p.dashBoardData[el],draftState)
@@ -49,7 +53,39 @@ export default class EndPointMenu extends React.Component {
 
         })
         this.setState({ 
+            displayType: searchType,
             endPointData: displayWidgetList,
+            showData: true,
+            showLoader: false,
+            dashboard: el,
+        })
+
+    }
+
+    async showEndPointDataSecurity(el, searchType){ //receives dashboard object, builds endpoint display.
+        //build set of stocks.
+        //for each stock, get list of widgets
+        //for each widgget for each stock, show details and data
+        const p = this.props
+        const returnObj = {}
+        const widgetList = p.dashBoardData[el].widgetlist 
+        for (const w in widgetList){
+            const stocks = widgetList[w].trackedStocks
+            for (const s in stocks) {
+                if (returnObj[s] === undefined) returnObj[s] = {}
+                returnObj[s].security = stocks[s]
+                returnObj[s][widgetList[w].widgetHeader] = {}
+                returnObj[s][widgetList[w].widgetHeader].widgetType = widgetList[w].widgetType
+                returnObj[s][widgetList[w].widgetHeader].filters = widgetList[w].filters
+                returnObj[s][widgetList[w].widgetHeader].widgetID = widgetList[w].widgetID
+                returnObj[s][widgetList[w].widgetHeader].data = {}
+                returnObj[s][widgetList[w].widgetHeader].data[s] = s
+            }
+        }
+
+        this.setState({ 
+            displayType: searchType,
+            endPointData: returnObj,
             showData: true,
             showLoader: false,
             dashboard: el,
@@ -64,9 +100,13 @@ export default class EndPointMenu extends React.Component {
         return Object.keys(thisDashboard).map((el) => 
             <tr key={el + "row"}>
                 <td key={el + "dash"}>{el}</td>
-                <td key={el + "api"}>{`${window.location.origin}/endPoint?apiKey=${p.apiKey}&dashBoardName=${el}`}</td>
+                <td key={el + "api"}>
+                    <button onClick={()=>{this.showEndPointDataWidget(el, ['widget', el])}}>
+                        <i className="fa fa-check-square-o" aria-hidden="true"></i>
+                    </button>
+                </td>
                 <td key={el + "prev"}>
-                    <button onClick={()=>{this.showEndPointData(el)}}>
+                    <button onClick={()=>{this.showEndPointDataSecurity(el, ['security', el])}}>
                         <i className="fa fa-check-square-o" aria-hidden="true"></i>
                     </button>
                 </td>
@@ -108,23 +148,44 @@ export default class EndPointMenu extends React.Component {
             WebkitAnimation: 'spin 2s linear infinite', /* Safari */
             animation: 'spin 2s linear infinite',
         }
+        
+        const menuConent = {
+            display: "flex",
+            justifyContent: "center",
+            flexDirection: "column",
+            textAlign: "center"
+        }
 
+        const tHeadStyle = {
+            paddingLeft: '10px',
+            paddingRight: '10px',
+        }
+
+        const url = window.location
+        const p = this.props
+        let baseURL = url.protocol + "/" + url.host + "/" + url.pathname.split('/')[1] + 'graphQL';
+        baseURL = baseURL.replace('http:/localhost:3000', '//localhost:5000') //makes redirect work in dev mode.
+        const defaultQuery = `{dashboardList(key: "${p.apiKey}") {dashboard}}`
+        console.log(baseURL)
         return (
             this.state.showData === false ? <>
-                <div style={divOutline}>
-                    <b>Your dashboard REST API endpoints</b>
+                <div style={menuConent}>
+                <div style={divOutline}>  
                     <table>
-                        <thead>
+                        <thead >
                             <tr>
-                                <td >Dashboard</td>
-                                <td >API Endpoint</td>
-                                <td >Preview</td>
+                                <td style={tHeadStyle}>Dashboard</td>
+                                <td style={tHeadStyle}> Widget View</td>
+                                <td style={tHeadStyle}> Security View</td>
                             </tr>
                         </thead>
                         <tbody key="endBody">
                             {this.renderEndPointRows()}
                         </tbody>
                     </table>
+                    
+                </div>
+                <a href={`${baseURL}?query=${defaultQuery}`} target='_blank' rel="noreferrer">View in graphQL</a>
                 </div>
             </> : //SHOW ENDPOINT
                 <div style={dataStyle}>
@@ -134,7 +195,12 @@ export default class EndPointMenu extends React.Component {
                     </>  : <></>
                     // <label>Endpoint URL: {this.state.title}</label> 
                     }
-                    <EndPointNode nodeData={this.state.endPointData} dashboard={this.state.dashboard}/>
+                    <EndPointNode 
+                        nodeData={this.state.endPointData} 
+                        dashboard={this.state.dashboard} 
+                        searchList={this.state.displayType}
+                        apiKey={this.props.apiKey}
+                    />
                     {this.state.showLoader === false ? <>
                     <button onClick={()=>this.backButton()}>
                         Back

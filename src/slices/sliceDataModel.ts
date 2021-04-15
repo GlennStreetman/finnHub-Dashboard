@@ -119,7 +119,7 @@ const dataModel = createSlice({
         },
         // @ts-ignore: Unreachable code error
         [tGetMongoDB.pending]: (state, action) => {
-            console.log('1. Getting stock data!')
+            // console.log('1. Getting stock data!')
             // const dashboard: string = action.meta.arg.targetDashBoard
             // state.status[dashboard] = 'Updating'
         },
