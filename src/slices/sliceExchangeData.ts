@@ -7,8 +7,20 @@ export interface reqObj {
 }
 
 interface resObj {
-    data: Object,
+    data: stockNode[],
     ex: string,
+}
+
+interface stockNode {
+    currency: string,
+    description: string,
+    displaySymbol: string,
+    exchange: string,
+    figi: string,
+    key: string,
+    mic: string,
+    symbol: string,
+    type: string,
 }
 
 export const tGetSymbolList = createAsyncThunk(
@@ -19,15 +31,16 @@ export const tGetSymbolList = createAsyncThunk(
         // console.log('GETTING exchange data', reqObj.exchange, reqObj.apiKey, apiString)
         return finnHub(finnQueue, apiString) //replace with usestate.
             .then((data) => {
-                if (data.error === 429) { //run again
+                if (data.error === 429) { //add back into queue if 429
                     tGetSymbolList(reqObj)
                     const resObj: resObj = {
-                        'data': {},
+                        'data': [],
                         'ex': reqObj.exchange,
                     }
                     return (resObj)
                 } else {
                     let updateStockList = {}
+                    // console.log('data', data)
                     for (const stockObj in data) {
                         data[stockObj]['exchange'] = reqObj.exchange
                         let addStockKey = reqObj.exchange + "-" + data[stockObj]['symbol']
@@ -35,7 +48,7 @@ export const tGetSymbolList = createAsyncThunk(
                         updateStockList[addStockKey]['key'] = addStockKey
                     }
                     const resObj: resObj = {
-                        'data': {},
+                        'data': data,
                         'ex': reqObj.exchange,
                     }
                     return (resObj)
@@ -46,7 +59,7 @@ export const tGetSymbolList = createAsyncThunk(
 
 interface DataNode {
     ex?: string,
-    data?: Object,
+    data?: stockNode[],
     updated?: number,
 }
 
