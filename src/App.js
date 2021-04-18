@@ -181,9 +181,10 @@ class App extends React.Component {
         }, ()=>{this.toggleBackGroundMenu('about')})
     }
 
-    if (s.globalStockList !== prevState.globalStockList) {
-      // console.log('updating Stock Data')
-      LoadStockData(this, s, GetStockPrice);
+    if ((s.globalStockList !== prevState.globalStockList) ){
+    // || (prevState.throttle === undefined && p.throttle !== undefined && s.globalStockList !== undefined)) {
+      console.log('updating Stock Data', p.throttle)
+      LoadStockData(this, s, GetStockPrice, p.throttle);
       LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
     }
 
@@ -491,7 +492,8 @@ class App extends React.Component {
 
 const mapStateToProps = (state) => ({
   rExchangeList: state.exchangeList.exchangeList,
-  dataModel: state.dataModel 
+  dataModel: state.dataModel,
+  throttle: state.finnHubQueue.throttle 
 });
 export default connect(mapStateToProps, { 
   tGetSymbolList, 

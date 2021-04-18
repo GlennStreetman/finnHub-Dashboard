@@ -1,4 +1,5 @@
 function UpdateTickerSockets(context, socket, apiKey, globalStockList) {
+  console.log('updateTickers', context, socket, apiKey, globalStockList)
   //opens a series of socket connections to live stream stock prices
   //update limited to once every 3 seconds to have mercy on dom rendering.
   let USList = [] //only subscribe to US stocks
@@ -17,9 +18,10 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList) {
   if (apiKey !== '' && USList !== []) {
     
   try { 
-
+    // console.log("USLIST", USList)
     for (const stock in USList) {
       thisSocket.addEventListener("open", function (event) {
+        console.log('SOCKET OPEN', { type: "subscribe", symbol: USList[stock] })
         thisSocket.send(JSON.stringify({ type: "subscribe", symbol: USList[stock] }))
       })
     }
@@ -54,9 +56,10 @@ function UpdateTickerSockets(context, socket, apiKey, globalStockList) {
 }
 
 function LoadTickerSocket(context, prevState, globalStockList, socket, apiKey, updateTickerSockets) {
+  // console.log("SOCKETS", context, prevState, globalStockList, socket, apiKey, updateTickerSockets)
   const that = context
   if (globalStockList !== prevState.globalStockList && apiKey !== ""){
-    console.log('updating socket')
+    // console.log('updating socket')
     // if (socket !== '') { 
     //   socket.close()
     // }
