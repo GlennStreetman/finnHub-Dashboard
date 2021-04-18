@@ -166,7 +166,7 @@ export default class EndPointMenu extends React.Component {
         let baseURL = url.protocol + "/" + url.host + "/" + url.pathname.split('/')[1] + 'graphQL';
         baseURL = baseURL.indexOf('localhost') >= 0 ? 
             baseURL.replace('http:/localhost:3000', 'localhost:5000') : //makes redirect work in dev mode.
-            baseURL.replace('https/', '')
+            baseURL.replace('https:/', '')
         const defaultQuery = `{dashboardList(key: "${p.apiKey}") {dashboard}}`
         console.log(baseURL)
         return (
