@@ -37,8 +37,9 @@ export default class EndPointNode extends React.PureComponent {
         const p = this.props
         const url = window.location
         let baseURL = url.protocol + "/" + url.host + "/" + url.pathname.split('/')[1] + 'graphQL';
-        baseURL = baseURL.replace('http:/localhost:3000', '//localhost:5000') //makes redirect work in dev mode.
-        baseURL.replace('https:/', '')
+        baseURL = baseURL.indexOf('localhost') >= 0 ? 
+            baseURL.replace('http:/localhost:3000', 'localhost:5000') : //makes redirect work in dev mode.
+            baseURL.replace('https:/', '')
         // const defaultQuery = `{dashboardList(key: "${p.apiKey}") {dashboard}}`
 
         if (p.searchList.length === 3 && el === 'data' && p.searchList[0] === 'widget') {
@@ -50,12 +51,12 @@ export default class EndPointNode extends React.PureComponent {
             const queryProps = `(key: "${p.apiKey}" dashboard: "${p.searchList[1]}" security: "${el}")`
             const returnValues = `dashboard, widgetType, widgetName`
             const thisQuery = `{${p.searchList[0]}${queryProps} {${returnValues}}}`
-            return(<a href={`${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
+            return(<a href={`//${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
         } else if (p.searchList.length === 4 && el === 'data' && p.searchList[0] === 'security'){
             const queryProps = `(key: "${p.apiKey}" dashboard: "${p.searchList[1]}" security: "${p.searchList[2]}" widgetName: "${p.searchList[3]}")`
             const returnValues = `dashboard, widgetType, widgetName, data`
             const thisQuery = `{${p.searchList[0]}${queryProps} {${returnValues}}}`
-            return(<a href={`${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
+            return(<a href={`//${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
         } else {
             return el
         }
