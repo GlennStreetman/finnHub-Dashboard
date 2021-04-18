@@ -30,12 +30,9 @@ interface filters { //Any paramas not related to stock used by finnHub endpoint.
 
 //add any additional type guard functions here used for live code.
 function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
-    console.log("ARG", arg)
     if (arg !== undefined && Object.keys(arg).length > 0 && arg[0].category) {
-        // console.log("returning true", arg)
         return true
     } else {
-        // console.log("returning false", arg)
         return false
     }
 }
