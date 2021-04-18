@@ -164,7 +164,7 @@ export default class EndPointMenu extends React.Component {
         const url = window.location
         const p = this.props
         let baseURL = url.protocol + "/" + url.host + "/" + url.pathname.split('/')[1] + 'graphQL';
-        baseURL = baseURL.replace('http:/localhost:3000', '//localhost:5000') //makes redirect work in dev mode.
+        baseURL = baseURL.replace('http:/localhost:3000', 'localhost:5000') //makes redirect work in dev mode.
         const defaultQuery = `{dashboardList(key: "${p.apiKey}") {dashboard}}`
         console.log(baseURL)
         return (
@@ -185,7 +185,7 @@ export default class EndPointMenu extends React.Component {
                     </table>
                     
                 </div>
-                <a href={`${baseURL}?query=${defaultQuery}`} target='_blank' rel="noreferrer">View in graphQL</a>
+                <a href={`//${baseURL}?query=${defaultQuery}`} target='_blank' rel="noreferrer">View in graphQL</a>
                 </div>
             </> : //SHOW ENDPOINT
                 <div style={dataStyle}>
