@@ -7,8 +7,12 @@ export interface reqObj {
 }
 
 interface resObj {
-    data: stockNode[],
+    data: stockObj,
     ex: string,
+}
+
+interface stockObj {
+    [key: string]: stockNode
 }
 
 interface stockNode {
@@ -34,7 +38,7 @@ export const tGetSymbolList = createAsyncThunk(
                 if (data.error === 429) { //add back into queue if 429
                     tGetSymbolList(reqObj)
                     const resObj: resObj = {
-                        'data': [],
+                        'data': {},
                         'ex': reqObj.exchange,
                     }
                     return (resObj)
@@ -48,7 +52,7 @@ export const tGetSymbolList = createAsyncThunk(
                         updateStockList[addStockKey]['key'] = addStockKey
                     }
                     const resObj: resObj = {
-                        'data': data,
+                        'data': updateStockList,
                         'ex': reqObj.exchange,
                     }
                     return (resObj)
@@ -59,7 +63,7 @@ export const tGetSymbolList = createAsyncThunk(
 
 interface DataNode {
     ex?: string,
-    data?: stockNode[],
+    data?: stockObj,
     updated?: number,
 }
 

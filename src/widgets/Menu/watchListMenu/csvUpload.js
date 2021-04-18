@@ -26,7 +26,7 @@ const mapStateToProps =  (state, ownProps) => {
         const exchange = stock.slice(0,stock.indexOf('-'))
         // console.log(stock, exchange)
         const updateStock = state.exchangeData.e.ex === exchange ? {...state.exchangeData.e.data[stock]} : 'pass'
-        // console.log('updateStock', updateStock)
+        console.log('updateStock', stock,updateStock)
         if (updateStock !== 'pass') {
             updateObj[stock] = updateStock
             updateObj[stock].dStock = function(ex){
