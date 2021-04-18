@@ -14,10 +14,14 @@ interface DataNode {
     // config?: Object,
 }
 
-interface DataSet {
+interface dataModel {
     dataSet: { [key: string]: DataNode, },
     status: { [key: string]: string, } //Updating, Ready
     created: string
+}
+
+interface setUpdateStatus { //reference to dataset : status
+    [key: string]: string
 }
 
 export interface EndPointObj {
@@ -28,11 +32,13 @@ interface EndPointAPIList {
     [key: string]: EndPointObj
 }
 
-const initialState: DataSet = {
+const initialState: dataModel = {
     dataSet: {},
     status: {},
     created: 'false',
 }
+
+
 
 const dataModel = createSlice({
     name: 'finnHubData',
@@ -42,12 +48,10 @@ const dataModel = createSlice({
             //receivies dashboard object and builds dataset from scratch.
             const ap: any = action.payload
             const apD: any = ap.dashBoardData
-            // console.log("Building DATASET")
             const endPointAPIList: EndPointAPIList = {} //list of lists. Each list []
-            //create dataSet
             for (const d in apD) { //for each dashboard
                 const dashboardName: string = d
-                state.status[dashboardName] = 'Building'
+                state.status[dashboardName] = 'Setup in Progress'
                 endPointAPIList[dashboardName] = {}
                 const widgetList = apD[d].widgetlist
                 for (const w in widgetList) {  //for each widget
@@ -89,6 +93,13 @@ const dataModel = createSlice({
             state.created = 'true'
 
         },
+        rSetUpdateStatus: (state, action) => {
+            //set the status of dashboard updates.
+            const ap: setUpdateStatus = action.payload
+            for (const dataSet in ap) {
+                state.status[dataSet] = ap[dataSet]
+            }
+        },
     },
     extraReducers: {
         // @ts-ignore: Unreachable code error
@@ -107,7 +118,7 @@ const dataModel = createSlice({
             const ap: resObj = action.payload
             for (const x in ap) {
                 const db = ap[x].dashboard
-                state.status[db] = 'Ready'
+                // state.status[db] = 'Ready'
                 const widget = ap[x].widget
                 const sec = ap[x].security
                 // if (state.dataSet[db] && state.dataSet[db][widget] && state.dataSet[db][widget][sec]) {
@@ -151,5 +162,6 @@ const dataModel = createSlice({
 export const {
     rBuildDataModel,
     rResetUpdateFlag,
+    rSetUpdateStatus,
 } = dataModel.actions
 export default dataModel.reducer

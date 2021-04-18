@@ -29,7 +29,7 @@ import { connect } from "react-redux";
 import { tGetSymbolList } from "./slices/sliceExchangeData";
 import { rSetTargetDashboard } from "./slices/sliceShowData";
 import { rUpdateExchangeList } from "./slices/sliceExchangeList";
-import { rBuildDataModel, rResetUpdateFlag } from "./slices/sliceDataModel";
+import { rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus } from "./slices/sliceDataModel";
 import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 
@@ -135,6 +135,9 @@ class App extends React.Component {
       let setupData = async function(that){
         await that.props.tGetMongoDB()
         const targetDash = Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist)
+        p.rSetUpdateStatus({
+          [s.currentDashBoard]: 'Updating'
+        })
         for (const widget in targetDash) {
           // console.log('!!!!!widget', targetDash[widget])
           await that.props.tGetFinnhubData({ //get data for default dashboard.
@@ -143,12 +146,21 @@ class App extends React.Component {
             // widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist)
           })
         }
+        p.rSetUpdateStatus({
+          [s.currentDashBoard]: 'Ready'
+        })
         const dashBoards = Object.keys(s.dashBoardData) //get data for dashboards not being shown
         for (const dash of dashBoards) {
           if (dash !== s.currentDashBoard) {
-            that.props.tGetFinnhubData({ //run in background, do not await.
+            p.rSetUpdateStatus({
+              [dash]: 'Updating'
+            })
+           await that.props.tGetFinnhubData({ //run in background, do not await.
               targetDashBoard: dash, 
               widgetList: Object.keys(s.dashBoardData[dash].widgetlist),
+            })
+            p.rSetUpdateStatus({
+              [dash]: 'Ready'
             })
           }
         }
@@ -196,9 +208,15 @@ class App extends React.Component {
       this.setState({rebuildDataSet: 0}, ()=>{
         let setupData = async function(dataset, that){
           await that.props.tGetMongoDB()
+          p.rSetUpdateStatus({
+            [s.currentDashBoard]: 'Updating'
+          })
           await that.props.tGetFinnhubData({
             currentDashboard: s.currentDashBoard, 
             widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetList),
+          })
+          p.rSetUpdateStatus({
+            [s.currentDashBoard]: 'Ready'
           })
         }
         setupData(Object.keys(p.dataModel.dataSet), this)
@@ -345,15 +363,22 @@ class App extends React.Component {
   }
 
   loadSavedDashboard(target ,globalStockList, widgetList) {
+    const p = this.props
     console.log('target', target)
     this.props.rSetTargetDashboard({targetDashboard: target})
     this.loadDashBoard(globalStockList, widgetList);
     const updateVisable = async function(that){
       const s = that.state
       await that.props.tGetMongoDB()
+      p.rSetUpdateStatus({
+        [s.currentDashBoard]: 'Updating'
+      })
       await that.props.tGetFinnhubData({ //get data for default dashboard.
         targetDashBoard: s.currentDashBoard, 
         widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist),
+      })
+      p.rSetUpdateStatus({
+        [s.currentDashBoard]: 'Ready'
       })
     }
     updateVisable(this)
@@ -476,5 +501,5 @@ export default connect(mapStateToProps, {
   tGetMongoDB,
   rResetUpdateFlag,
   rSetTargetDashboard,
-
+  rSetUpdateStatus,
 })(App);
