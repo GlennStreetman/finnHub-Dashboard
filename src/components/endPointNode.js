@@ -45,7 +45,7 @@ export default class EndPointNode extends React.PureComponent {
             const queryProps = `(key: "${p.apiKey}" dashboard: "${p.searchList[1]}" widget: "${p.searchList[2]}")`
             const returnValues = `dashboard, widgetType, widgetName, security, data`
             const thisQuery = `{${p.searchList[0]}${queryProps} {${returnValues}}}`
-            return(<a href={`${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
+            return(<a href={`//${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
         } else if (p.searchList.length === 2 && p.searchList[0] === 'security'){
             const queryProps = `(key: "${p.apiKey}" dashboard: "${p.searchList[1]}" security: "${el}")`
             const returnValues = `dashboard, widgetType, widgetName`
