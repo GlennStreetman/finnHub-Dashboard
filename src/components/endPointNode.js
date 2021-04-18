@@ -38,6 +38,7 @@ export default class EndPointNode extends React.PureComponent {
         const url = window.location
         let baseURL = url.protocol + "/" + url.host + "/" + url.pathname.split('/')[1] + 'graphQL';
         baseURL = baseURL.replace('http:/localhost:3000', '//localhost:5000') //makes redirect work in dev mode.
+        baseURL.replace('https:/', '')
         // const defaultQuery = `{dashboardList(key: "${p.apiKey}") {dashboard}}`
 
         if (p.searchList.length === 3 && el === 'data' && p.searchList[0] === 'widget') {

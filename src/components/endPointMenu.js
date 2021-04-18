@@ -168,7 +168,7 @@ export default class EndPointMenu extends React.Component {
             baseURL.replace('http:/localhost:3000', 'localhost:5000') : //makes redirect work in dev mode.
             baseURL.replace('https:/', '')
         const defaultQuery = `{dashboardList(key: "${p.apiKey}") {dashboard}}`
-        console.log(baseURL)
+        // console.log(baseURL)
         return (
             this.state.showData === false ? <>
                 <div style={menuConent}>
