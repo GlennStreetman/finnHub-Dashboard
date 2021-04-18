@@ -121,7 +121,7 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
                 key: p.widgetKey,
                 securityList: [[`${targetStock}`]]
             }
-            console.log(payload)
+            // console.log(payload)
             dispatch(rBuildVisableData(payload))
         }
     }, [targetStock, p.widgetKey, widgetCopy, dispatch])
@@ -146,7 +146,7 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
     }, [p.trackedStocks, targetStock])
 
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        console.log("setting stock data", rShowData)
+        // console.log("setting stock data", rShowData)
         if (isFinnHubData(rShowData) === true) { setStockData(rShowData) } else { setStockData([]) }
     }, [rShowData])
 
@@ -320,7 +320,7 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
     function changeStockSelection(e) { //DELETE IF no target stock
         const target = e.target.value;
         const key = `${p.widgetKey}-${target}`
-        console.log("HERE", target, key)
+        // console.log("HERE", target, key)
         setTargetStock(target)
         dispatch(tSearchMongoDB([key]))
         setNewsIncrementor(1)
