@@ -75,12 +75,14 @@ export default class endPointData extends React.Component<any, any> {
         if (p.searchList?.[0] === 'widget') {
             const url = window.location
             let baseURL = url.protocol + "/" + url.host + "/" + url.pathname.split('/')[1] + 'graphQL';
-            baseURL = baseURL.replace('http:/localhost:3000', '//localhost:5000') //makes redirect work in dev mode.
+            baseURL = baseURL.indexOf('localhost') >= 0 ?
+                baseURL.replace('http:/localhost:3000', 'localhost:5000') : //makes redirect work in dev mode.
+                baseURL.replace('https:/', '')
             // const defaultQuery = `{dashboardList(key: "${p.apiKey}") {dashboard}}`
             const queryProps = `(key: "${p.apiKey}" dashboard: "${p.searchList[1]}" widget: "${p.searchList[2]}" security: "${el}")`
             const returnValues = `dashboard, widgetType, widgetName, security, data`
             const thisQuery = `{${p.searchList[0]}${queryProps} {${returnValues}}}`
-            return (<a href={`${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
+            return (<a href={`//${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
         } else return (el)
     }
 
