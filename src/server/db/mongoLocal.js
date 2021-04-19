@@ -9,7 +9,7 @@ let _db = new MongoClient.MongoClient(uri);
 
 const connectMongo = async (callback) => {
     try {
-        MongoClient.connect(uri, (err, db) => {
+        MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, (err, db) => {
             _db = db
             console.log("Connected to MongoDB")
             return callback(err)

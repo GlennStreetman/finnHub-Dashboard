@@ -14,7 +14,7 @@ interface DataNode {
     // config?: Object,
 }
 
-interface dataModel {
+interface dataModelDef {
     dataSet: { [key: string]: DataNode, },
     status: { [key: string]: string, } //Updating, Ready
     created: string
@@ -32,13 +32,11 @@ interface EndPointAPIList {
     [key: string]: EndPointObj
 }
 
-const initialState: dataModel = {
+const initialState: dataModelDef = {
     dataSet: {},
     status: {},
     created: 'false',
 }
-
-
 
 const dataModel = createSlice({
     name: 'finnHubData',

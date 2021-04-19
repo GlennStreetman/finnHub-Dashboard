@@ -41,18 +41,17 @@ export default class EndPointNode extends React.PureComponent {
             baseURL.replace('http:/localhost:3000', 'localhost:5000') : //makes redirect work in dev mode.
             baseURL.replace('https:/', '')
         // const defaultQuery = `{dashboardList(key: "${p.apiKey}") {dashboard}}`
-
-        if (p.searchList.length === 3 && el === 'data' && p.searchList[0] === 'widget') {
+        if (p.searchList?.length === 3 && el === 'data' && p.searchList[0] === 'widget') {
             const queryProps = `(key: "${p.apiKey}" dashboard: "${p.searchList[1]}" widget: "${p.searchList[2]}")`
             const returnValues = `dashboard, widgetType, widgetName, security, data`
             const thisQuery = `{${p.searchList[0]}${queryProps} {${returnValues}}}`
             return(<a href={`//${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
-        } else if (p.searchList.length === 2 && p.searchList[0] === 'security'){
+        } else if (p.searchList?.length === 2 && p.searchList[0] === 'security'){
             const queryProps = `(key: "${p.apiKey}" dashboard: "${p.searchList[1]}" security: "${el}")`
             const returnValues = `dashboard, widgetType, widgetName`
             const thisQuery = `{${p.searchList[0]}${queryProps} {${returnValues}}}`
             return(<a href={`//${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
-        } else if (p.searchList.length === 4 && el === 'data' && p.searchList[0] === 'security'){
+        } else if (p.searchList?.length === 4 && el === 'data' && p.searchList[0] === 'security'){
             const queryProps = `(key: "${p.apiKey}" dashboard: "${p.searchList[1]}" security: "${p.searchList[2]}" widgetName: "${p.searchList[3]}")`
             const returnValues = `dashboard, widgetType, widgetName, data`
             const thisQuery = `{${p.searchList[0]}${queryProps} {${returnValues}}}`
@@ -80,8 +79,8 @@ export default class EndPointNode extends React.PureComponent {
                     </div>
                 </li> 
                 )
-            } else if (el === 'data' ) {//data Object open
-                const pushSearchList = [...p.searchList, el]
+            } else if (el === 'data' && p.searchList && p.searchList.filter(w=>w==='data').length === 0) {//data Object open
+                const pushSearchList = p.searchList ? [...p.searchList, el] : [el]
                 return (
                     <li className='liNode' key={ind + 'dataObj'}>
                         <div className='endPointDivRow' >
@@ -113,7 +112,8 @@ export default class EndPointNode extends React.PureComponent {
                 )
             } else if (typeof p.nodeData[el] === 'object' && p.nodeData[el] !== null) {
                 //open object not data
-                const pushSearchList = [...p.searchList, el]
+                const isSearchList = p.searchList ? p.searchList : []
+                const pushSearchList = [...isSearchList, el]
                 return (
                     <li className='liNode'  key={ind + 'NotData'}>
                         <div className='endPointDivRow' >

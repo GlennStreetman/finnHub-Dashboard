@@ -57,9 +57,10 @@ export default class endPointData extends React.Component<any, any> {
         };
         const getData = await fetch('/findMongoData', options)
         const resData: resObj[] = await getData.json()
+        console.log('resdata', resData, options)
         console.log('HERE', resData, optionBody)
         const setData = await produce(s.endPointData, (draftState) => {
-            if (resData !== undefined) draftState[stock]['data'] = resData[0].data
+            if (resData !== undefined && resData.length) draftState[stock]['data'] = resData[0].data
         })
         this.setState({ endPointData: setData })
     }
@@ -71,7 +72,7 @@ export default class endPointData extends React.Component<any, any> {
 
     isLink(el) {
         const p = this.props
-        if (p.searchList[0] === 'widget') {
+        if (p.searchList?.[0] === 'widget') {
             const url = window.location
             let baseURL = url.protocol + "/" + url.host + "/" + url.pathname.split('/')[1] + 'graphQL';
             baseURL = baseURL.replace('http:/localhost:3000', '//localhost:5000') //makes redirect work in dev mode.

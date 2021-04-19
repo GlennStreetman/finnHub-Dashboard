@@ -19,7 +19,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "jsx": "react",
+    "jsx": "react-jsx",
     "watch": true,
     "noImplicitAny": false,
     "noImplicitThis": false,
@@ -28,7 +28,8 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "allowJs": false,
-    "noEmit": true
+    "noEmit": true,
+    "noFallthroughCasesInSwitch": true
   },
   "include": [
     "src/**/*",

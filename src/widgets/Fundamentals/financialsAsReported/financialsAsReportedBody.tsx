@@ -184,21 +184,25 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     }
 
     function renderStockData() {
-        console.log("RENDERNG FINS AS REPORTED")
         const newSymbolList = Object.keys(p.trackedStocks).map((el) => (
             <option key={el + "ddl"} value={el}>
                 {p.trackedStocks[el].dStock(p.exchangeList)}
             </option>
         ))
 
-
+        const thisKey = { widgetID: p.widgetKey }
+        const thisNodeData = { ...stockData, ...thisKey }
         const stockTable =
             <>
                 <select className="btn" value={targetStock} onChange={changeStockSelection}>
                     {newSymbolList}
                 </select>
                 <br />
-                {stockData !== undefined && <EndPointNode nodeData={stockData} />}
+                {stockData !== undefined && <EndPointNode
+                    nodeData={thisNodeData}
+                    apiKey={p.apiKey}
+                    widgetID={p.widgetKey}
+                />}
             </>
         return stockTable
     }

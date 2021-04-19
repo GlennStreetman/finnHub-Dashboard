@@ -108,7 +108,7 @@ export const finnHub = (throttle, reqObj) => {
     return new Promise((resolve) => {
         throttle.enqueue(function () {
             // console.log("------------fetch throttleQueAPI--------", reqObj, reqObj.apiString)
-            fetch(reqObj.apiString)
+            fetch(reqObj.apiString, { 'Access-Control-Allow-Origin': '*' })
                 .then((response) => {
                     if (response.status === 429) {
                         console.log('--429--')

@@ -23,7 +23,7 @@ export const tSearchMongoDB = createAsyncThunk( //{dashboard, [securityList]}
             const getData = await fetch('/findMongoData', options)
             const resData: resObj[] = await getData.json()
             // const setData = resData[0].data
-            console.log('setData', resData)
+            // console.log('setData', resData)
             const res = {}
             for (const x in resData) {
                 const mongo: resObj = resData[x]
@@ -37,7 +37,7 @@ export const tSearchMongoDB = createAsyncThunk( //{dashboard, [securityList]}
                     security: mongo.security,
                 }
             }
-            console.log('thunk Search Mongo', res)
+            // console.log('thunk Search Mongo', res)
             return (res)
 
         } catch (err) {
