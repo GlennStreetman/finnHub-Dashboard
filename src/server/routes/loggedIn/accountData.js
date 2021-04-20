@@ -21,7 +21,10 @@ function emailIsValid(email) {
 router.get("/accountData", (req, res, next) => {
   // thisRequest = req.query;
     if (req.session.login === true) {
-        const accountDataQuery = `SELECT loginName, email, apiKey, webHook, ratelimit FROM users WHERE id =$1`;
+        const accountDataQuery = `
+        SELECT loginName, email, apiKey, webHook, ratelimit, apialias 
+        FROM users 
+        WHERE id =$1`;
         const queryValues = [req.session.uID];
         const resultSet = {};
         console.log(accountDataQuery)
@@ -46,14 +49,14 @@ router.post("/accountData", (req, res) => {
     if (req.session.login === true) {  
         
         if (req.body.field !== "email" && //NOT EMAIL
-        ['loginname', 'ratelimit', 'webhook', 'apikey', 'exchangelist', 'email'].includes(req.body.field)) {
+        ['loginname', 'ratelimit', 'webhook', 'apikey', 'exchangelist', 'email', 'apialias',].includes(req.body.field)) {
             //NOT EMAIL
             // console.log("updating account data");
             const updateField = req.body.field;
             const newValue = req.body.newValue;
             // console.log(updateField, newValue)
             const updateQuery = format("UPDATE users SET %I = %L WHERE id=%L", updateField, newValue, req.session.uID);
-            // console.log(updateQuery);
+            console.log("updateQuery", updateQuery);
             // let queryValues = [updateField, newValue, req.session.uID]
             db.query(updateQuery, (err) => {
                 if (err) {
@@ -67,7 +70,7 @@ router.post("/accountData", (req, res) => {
                 }
         });
         } else if ( //EMAIL
-            ['loginname', 'ratelimit', 'webhook', 'apikey', 'exchangelist', 'email'].includes(req.body.field)
+            ['loginname', 'ratelimit', 'webhook', 'apikey', 'exchangelist', 'email', 'apialias',].includes(req.body.field)
         ) {
         //EMAIL
             if (emailIsValid(req.body.newValue) === true) {

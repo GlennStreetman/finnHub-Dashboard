@@ -12,7 +12,8 @@ class AccountMenu extends React.Component {
       editField: "",
       inputText: "",
       serverMessage: "",
-      ratelimit: 0,
+      rateLimit: 0,
+      apiAlias: "", //used with graphQL Endpoint
     };
 
     this.baseState = {mounted: true}
@@ -47,6 +48,7 @@ class AccountMenu extends React.Component {
           apiKey: dataSet["apikey"],
           webHook: dataSet["webhook"],
           rateLimit: rateLimit,
+          apiAlias: dataSet["apialias"],
         })
         }
     })
@@ -156,6 +158,13 @@ class AccountMenu extends React.Component {
                   <td>{this.state.rateLimit}</td>
                   <td>
                     <button onClick={() => this.showEditPane("ratelimit")}>edit</button>
+                  </td>
+                </tr>
+                <tr>
+                  <td>API Alias: </td>
+                  <td>{this.state.apiAlias}</td>
+                  <td>
+                    <button onClick={() => this.showEditPane("apialias")}>edit</button>
                   </td>
                 </tr>
               </tbody>

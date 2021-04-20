@@ -66,8 +66,10 @@ RENAME COLUMN resetpassword to resetpasswordlink,
 ADD COLUMN emailconfirmed Boolean DEFAULT false,
 ADD COLUMN passwordconfirmed Boolean DEFAULT false
 
-
---NOT YET UPDATED
 alter table widgets
 ADD COLUMN config text
 
+
+--not yet updates in Heroku
+alter table users
+ADD Column apialias text

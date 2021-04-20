@@ -63,7 +63,7 @@ const Dashboards = new g.GraphQLObjectType({
     name: 'Dashboard',
     description: `
     All Dashboards associated with apiKey.
-    Key should be your finnHub API key.
+    Key should be your finnHub API key or Finndash Alias.
     `,
     fields: () => ({
         dashboard: {
@@ -82,7 +82,7 @@ const RootQueryType = new g.GraphQLObjectType({
         dashboardList: {
             description: "List of all dashboards.",
             args: {
-                key: { type: g.GraphQLNonNull(g.GraphQLString), description: "Required: Finnhub API key" }
+                key: { type: g.GraphQLNonNull(g.GraphQLString), description: "Required: Finnhub API key or Finndash Alias" }
             },
             type: g.GraphQLList(Dashboards),
             resolve: (parrent, args) => {
@@ -91,8 +91,8 @@ const RootQueryType = new g.GraphQLObjectType({
                     const query = `
                     SELECT dashboardname as dashboard, globalstocklist as stocks
                     FROM dashboard 
-                    WHERE userID = (SELECT id FROM users WHERE apiKey = ${apiKey})`
-                    // console.log('getUserQuery', query)
+                    WHERE userID = (SELECT id FROM users WHERE  (apiKey = ${apiKey}) OR apialias = ${apiKey})`
+                    console.log('getUserQuery', query)
                     db.query(query, (err, rows) => {
                         if (err) {
                             console.log(err)
@@ -111,7 +111,7 @@ const RootQueryType = new g.GraphQLObjectType({
         widgetList: {
             description: "List of all widets associated with dashboard.",
             args: {
-                key: { type: g.GraphQLNonNull(g.GraphQLString), description: 'Required: Finnhub API Key' },
+                key: { type: g.GraphQLNonNull(g.GraphQLString), description: 'Required: Finnhub API Key or Finndash Alias' },
                 dashboard: { type: g.GraphQLNonNull(g.GraphQLString), description: 'Required: Dashboard name' },
             },
             type: g.GraphQLList(Widgets),
@@ -128,9 +128,9 @@ const RootQueryType = new g.GraphQLObjectType({
                         WHERE userID = (
                             SELECT id 
                             FROM users 
-                            WHERE apiKey = ${apiKey}) AND dashboardname = ${dashboardName}
+                            WHERE  (apiKey = ${apiKey} OR apialias = ${apiKey})) AND dashboardname = ${dashboardName}
                     )`
-                    // console.log('getUserQuery', query)
+                    console.log('getUserQuery', query)
                     db.query(query, (err, rows) => {
                         if (err) {
                             console.log(err)
@@ -149,7 +149,7 @@ const RootQueryType = new g.GraphQLObjectType({
         widget: {
             description: "For target widget in dashboard, return data for each security.",
             args: {
-                key: { type: g.GraphQLNonNull(g.GraphQLString), description: 'Required: Finnhub API key' },
+                key: { type: g.GraphQLNonNull(g.GraphQLString), description: 'Required: Finnhub API Key or Finndash Alias' },
                 dashboard: { type: g.GraphQLNonNull(g.GraphQLString), description: 'Required: Dashboard name' },
                 widget: { type: g.GraphQLNonNull(g.GraphQLString), description: 'Required: Widget Name' },
                 security: {
@@ -179,14 +179,14 @@ const RootQueryType = new g.GraphQLObjectType({
                     const query = `
                     SELECT w.widgetID, u.id, w.widgettype
                     FROM widgets w
-					LEFT JOIN USERS U ON U.apiKey = ${apiKey}
+					LEFT JOIN USERS U ON U.apiKey = ${apiKey} OR apialias = ${apiKey}
                     WHERE dashboardkey = (
                         SELECT id
                         FROM dashboard
                         WHERE userID = (
                             SELECT id
                             FROM users
-                            WHERE apiKey = ${apiKey}) AND dashboardname = ${dashboardName})
+                            WHERE (apiKey = ${apiKey} OR apialias = ${apiKey})) AND dashboardname = ${dashboardName})
 					AND widgetHeader = ${widget}
                     `
                     // console.log('get widget: ', query)
@@ -226,7 +226,7 @@ const RootQueryType = new g.GraphQLObjectType({
         security: {
             description: "For target security in dashboard, retun data for each widget. Optionaly filter by widget name.",
             args: {
-                key: { type: g.GraphQLNonNull(g.GraphQLString), description: 'Required: Finnhub API key' },
+                key: { type: g.GraphQLNonNull(g.GraphQLString), description: 'Required: Finnhub API key or Finndash Alias' },
                 dashboard: { type: g.GraphQLNonNull(g.GraphQLString), description: 'Required: Dashboard name' },
                 security: { type: g.GraphQLNonNull(g.GraphQLString), description: 'Required: Exchange key - Security ex. US-AAPL' },
                 widgetName: {
@@ -262,15 +262,15 @@ const RootQueryType = new g.GraphQLObjectType({
                     const query = `
                     SELECT w.widgetID, u.id
                     FROM widgets w
-					LEFT JOIN USERS U ON U.apiKey = ${apiKey}
+					LEFT JOIN USERS U ON U.apiKey = ${apiKey} OR apialias = ${apiKey}
                     WHERE dashboardkey = (
                         SELECT id
                         FROM dashboard
                         WHERE userID = (
                             SELECT id
                             FROM users
-                            WHERE apiKey = ${apiKey}) AND dashboardname = ${dashboardName})
-                    ${widgetNameFilters} ${widgetType} 
+                            WHERE (apiKey = ${apiKey} OR apialias = ${apiKey})) AND dashboardname = ${dashboardName})
+                            ${widgetNameFilters} ${widgetType} 
                     `
                     // console.log('getUserQuery', query)
                     try {
