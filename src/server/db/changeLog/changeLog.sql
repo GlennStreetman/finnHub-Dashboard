@@ -70,6 +70,5 @@ alter table widgets
 ADD COLUMN config text
 
 
---not yet updates in Heroku
 alter table users
-ADD Column apialias text
+ADD Column apialias text UNIQUE
