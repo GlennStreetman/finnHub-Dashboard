@@ -40,8 +40,6 @@ export default class EndPointNode extends React.PureComponent {
         baseURL = baseURL.indexOf('localhost') >= 0 ? 
             baseURL.replace('http:/localhost:3000', 'localhost:5000') : //makes redirect work in dev mode.
             baseURL.replace('https:/', '')
-        // const defaultQuery = `{dashboardList(key: "${p.apiKey}") {dashboard}}`
-
         if (p.searchList?.length === 3 && el === 'data' && p.searchList[0] === 'widget') {
             const apiToggle = !(p.apiAlias in [undefined, '']) ? p.apiAlias : p.apiKey 
             const queryProps = `(key: "${apiToggle}" dashboard: "${p.searchList[1]}" widget: "${p.searchList[2]}")`
