@@ -10,11 +10,11 @@ router.get("/checkLogin", (req, res, next) => {
     const resData = { login: 0 };
     const uID = req.session["uID"];
     const apiKeysQuery = `
-        SELECT apikey, webhook, ratelimit, exchangelist, defaultexchange 
+        SELECT apikey, apialias, webhook, ratelimit, exchangelist, defaultexchange
         FROM users
         WHERE id = ${uID}
     `;
-    // console.log(apiKeysQuery)
+    console.log(apiKeysQuery)
     const retrieveAPIKeys = () => {
         // console.log("getting APIKeys");
         // console.log(req.session);
@@ -26,6 +26,7 @@ router.get("/checkLogin", (req, res, next) => {
                     reject(resData);
                 } else {
                 resData.apiKey = rows.rows[0].apikey;
+                resData.apiAlias = rows.rows[0].apialias
                 resData.exchangelist = rows.rows[0].exchangelist;
                 resData.defaultexchange = rows.rows[0].defaultexchange;
                 resData.login = 1;

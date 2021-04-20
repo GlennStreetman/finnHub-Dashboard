@@ -43,6 +43,7 @@ class App extends React.Component {
     this.state = {
       apiFlag: 0, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
       apiKey: "", //API key retrieved from login database.
+      apiALias: "",
       backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
       currentDashBoard: "", //dashboard being displayed
       DashBoardMenu: 0, //1 = show, 0 = hide
@@ -450,14 +451,12 @@ class App extends React.Component {
           removeWidget={this.removeWidget}
           apiKey={this.state.apiKey}
           updateWidgetStockList={this.updateWidgetStockList}
-          // loadDashBoard={this.loadDashBoard}
           saveCurrentDashboard={this.saveCurrentDashboard}
           currentDashBoard={this.state.currentDashBoard}
           getSavedDashBoards={this.getSavedDashBoards}
           dashBoardData={this.state.dashBoardData}
           changeWidgetName={this.changeWidgetName}
           updateWidgetFilters={this.updateWidgetFilters}
-          // throttle={this.state.throttle}
           updateAPIFlag={this.updateAPIFlag}
           updateAPIKey={this.updateAPIKey}
           zIndex={this.state.zIndex}

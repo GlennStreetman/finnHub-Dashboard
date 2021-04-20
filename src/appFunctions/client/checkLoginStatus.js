@@ -1,18 +1,12 @@
-export const checkLoginStatus = function checkLoginStatus(updateLogin, updateExchangeList, updateDefaultExchange){
+export const checkLoginStatus = function checkLoginStatus(processLogin, updateExchangeList, updateDefaultExchange){
     fetch("/checkLogin")
     .then((response) => response.json())
     .then((data) => {
-    // console.log("Loggin status: ", data)
+    console.log("Loggin status: ", data)
         if (data.login === 1) {
-            updateLogin(data.apiKey, 1, data.ratelimit)
+            processLogin(data.apiKey, 1, data.ratelimit, data.apiAlias)
             updateExchangeList(data.exchangelist)
             updateDefaultExchange(data.defaultexchange)
         }
     })
 }
-
-    //     if (data.ratelimit > 0) {throttle.updateInterval(data.ratelimit)}
-    // } else {
-    //     console.log("Not logged in")
-    // }
-    // })

@@ -45,24 +45,21 @@ class login extends React.Component {
     componentDidMount(){
         const p = this.props
         console.log("Loading loggin screen.")
-        // console.log("PROPS: ", this.props)
-        // console.log(this.props.queryData)
         if (this.props.queryData.reset === '1') {
             const user = this.props.queryData.users
-            // console.log(user)
             fetch(`/findSecret?user=${user}`)
             .then((response) => response.json())
             .then((data) => {
                 if (data) {
-                this.setState({showMenu: 3})
-                this.setState({secretQuestion: data.question})
-                this.setState({userName: data.user})
+                    this.setState({showMenu: 3})
+                    this.setState({secretQuestion: data.question})
+                    this.setState({userName: data.user})
                 } else {
                 console.log("No response from server")
                 }
         })
         .catch((error) => {
-            console.error("No server response", error);
+            console.error("No server response: ", error);
         });
         }
         if (this.props.queryData.message === '1'){
@@ -114,13 +111,10 @@ class login extends React.Component {
         const p = this.props
         if (data.login) {
             this.setState({message: ""})
-            p.processLogin(data["key"], data["login"]);
+            console.log('login data: ', data)
+            p.processLogin(data["key"], data["login"], data['ratelimit'], data['apiAlias']);
             p.updateExchangeList(data.exchangelist)
             p.updateDefaultExchange(data.defaultexchange)
-        //     if (data.ratelimit > 0) {this.props.throttle.updateInterval(data.ratelimit)}
-        // } else {
-        //     this.setState({message: data.message})
-        // }
         }
     }
 
@@ -134,6 +128,7 @@ class login extends React.Component {
             .then((data) => {
                 console.log("attempting login")
                 if (data.status === 200) {
+                    console.log('loggin in')
                     this.completeLogin(data)
                 } else {
                     console.log("Failed to login", data)

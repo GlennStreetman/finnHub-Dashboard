@@ -167,7 +167,8 @@ export default class EndPointMenu extends React.Component {
         baseURL = baseURL.indexOf('localhost') >= 0 ? 
             baseURL.replace('http:/localhost:3000', 'localhost:5000') : //makes redirect work in dev mode.
             baseURL.replace('https:/', '')
-        const defaultQuery = `{dashboardList(key: "${p.apiKey}") {dashboard}}`
+        const apiToggle = !(p.apiAlias in [undefined, '']) ? p.apiAlias : p.apiKey 
+        const defaultQuery = `{dashboardList(key: "${apiToggle}") {dashboard}}`
         // console.log(baseURL)
         return (
             this.state.showData === false ? <>
@@ -202,6 +203,7 @@ export default class EndPointMenu extends React.Component {
                         dashboard={this.state.dashboard} 
                         searchList={this.state.displayType}
                         apiKey={this.props.apiKey}
+                        apiAlias={this.props.apiAlias}
                     />
                     {this.state.showLoader === false ? <>
                     <button onClick={()=>this.backButton()}>
@@ -218,6 +220,7 @@ export function endPointProps(that, key = "AccountMenu") {
     let propList = {
         dashBoardData: that.state.dashBoardData,
         apiKey: that.state.apiKey,
+        apiAlias: that.state.apiAlias
     };
     return propList;
 }

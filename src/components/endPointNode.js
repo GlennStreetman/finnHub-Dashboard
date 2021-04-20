@@ -41,18 +41,22 @@ export default class EndPointNode extends React.PureComponent {
             baseURL.replace('http:/localhost:3000', 'localhost:5000') : //makes redirect work in dev mode.
             baseURL.replace('https:/', '')
         // const defaultQuery = `{dashboardList(key: "${p.apiKey}") {dashboard}}`
+
         if (p.searchList?.length === 3 && el === 'data' && p.searchList[0] === 'widget') {
-            const queryProps = `(key: "${p.apiKey}" dashboard: "${p.searchList[1]}" widget: "${p.searchList[2]}")`
+            const apiToggle = !(p.apiAlias in [undefined, '']) ? p.apiAlias : p.apiKey 
+            const queryProps = `(key: "${apiToggle}" dashboard: "${p.searchList[1]}" widget: "${p.searchList[2]}")`
             const returnValues = `dashboard, widgetType, widgetName, security, data`
             const thisQuery = `{${p.searchList[0]}${queryProps} {${returnValues}}}`
             return(<a href={`//${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
         } else if (p.searchList?.length === 2 && p.searchList[0] === 'security'){
-            const queryProps = `(key: "${p.apiKey}" dashboard: "${p.searchList[1]}" security: "${el}")`
+            const apiToggle = !(p.apiAlias in [undefined, '']) ? p.apiAlias : p.apiKey 
+            const queryProps = `(key: "${apiToggle}" dashboard: "${p.searchList[1]}" security: "${el}")`
             const returnValues = `dashboard, widgetType, widgetName`
             const thisQuery = `{${p.searchList[0]}${queryProps} {${returnValues}}}`
             return(<a href={`//${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
         } else if (p.searchList?.length === 4 && el === 'data' && p.searchList[0] === 'security'){
-            const queryProps = `(key: "${p.apiKey}" dashboard: "${p.searchList[1]}" security: "${p.searchList[2]}" widgetName: "${p.searchList[3]}")`
+            const apiToggle = !(p.apiAlias in [undefined, '']) ? p.apiAlias : p.apiKey 
+            const queryProps = `(key: "${apiToggle}" dashboard: "${p.searchList[1]}" security: "${p.searchList[2]}" widgetName: "${p.searchList[3]}")`
             const returnValues = `dashboard, widgetType, widgetName, data`
             const thisQuery = `{${p.searchList[0]}${queryProps} {${returnValues}}}`
             return(<a href={`//${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
@@ -93,6 +97,7 @@ export default class EndPointNode extends React.PureComponent {
                                     widgetID = {p.nodeData.widgetID}
                                     dashboard = {p.dashboard}
                                     apiKey={p.apiKey}
+                                    apiToggle={p.apiToggle}
                                     searchList={pushSearchList}
                                 />
                             </div>
@@ -126,6 +131,7 @@ export default class EndPointNode extends React.PureComponent {
                                     nodeData={p.nodeData[el]} 
                                     dashboard={p.dashboard}
                                     apiKey={p.apiKey}
+                                    apiAlias={p.apiAlias}
                                     searchList={pushSearchList}
                                 />
                             </div>

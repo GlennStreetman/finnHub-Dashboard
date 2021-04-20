@@ -13,7 +13,7 @@ router.get("/login", (req, res, next) => {
     let loginText = format('%L', req.query["loginText"])
     let pwText = format('%L', req.query["pwText"])
     console.log("Processing login request:",loginText,pwText )
-    let loginQuery = `SELECT id, loginname, apikey, ratelimit, emailconfirmed,exchangelist, defaultexchange
+    let loginQuery = `SELECT id, loginname, apikey, apialias, ratelimit, emailconfirmed, exchangelist, defaultexchange
         FROM users WHERE loginName =${loginText} 
         AND password = '${md5(pwText)}'`;
     // console.log(loginQuery)
@@ -34,6 +34,7 @@ router.get("/login", (req, res, next) => {
             res.status(400).json({message: "Login error"});
         } else if (rows.rowCount === 1 && login.emailconfirmed === true) {
             info["key"] = login.apikey;
+            info["apiAlias"] = login.apialias
             info['ratelimit'] = login.ratelimit
             info["login"] = 1;
             info["response"] = 'success';
