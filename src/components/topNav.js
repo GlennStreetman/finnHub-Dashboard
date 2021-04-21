@@ -53,7 +53,7 @@ class TopNav extends React.Component {
                         {d}
                         </a>
                     </li>)
-            } else {return(<></>)}
+            } else return (false)
         })
         return <ul id='ddu' className='sub-menu'>{newList}</ul>
     }

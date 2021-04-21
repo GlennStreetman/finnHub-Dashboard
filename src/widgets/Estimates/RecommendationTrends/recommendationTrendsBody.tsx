@@ -115,7 +115,6 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
                 key: p.widgetKey,
                 securityList: [[`${targetStock}`]]
             }
-            console.log(payload)
             dispatch(rBuildVisableData(payload))
         }
     }, [targetStock, p.widgetKey, widgetCopy, dispatch])

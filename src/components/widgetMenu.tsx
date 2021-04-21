@@ -1,14 +1,17 @@
+/* eslint-disable no-sparse-arrays */
 import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg.js'
+
+// interface widgetSetup {
+//     [key: string]: boolean
+// }
 
 export default function WidgetMenu(p: { [key: string]: any }, ref: any) {
 
     function check(el) {
-        console.log(el)
         const key = el[0]
         const updateObj = {
             [key]: !isChecked(el)
         }
-        console.log(updateObj)
         p.updateWidgetSetup(updateObj)
     }
 
@@ -24,11 +27,11 @@ export default function WidgetMenu(p: { [key: string]: any }, ref: any) {
 
     function widgetMenuRows(widgets) {
         const widgetMap = widgets.map((el) => (
-            <tr>
-                <td>{el[1]}</td>
-                <td>{el[5]}</td>
-                <td>
-                    <input key={el[0] + 'mark'}
+            <tr key={el + 'tr'}>
+                <td key={el + 'td1'}>{el[1]}</td>
+                <td key={el + 'td2'}>{el[5]}</td>
+                <td key={el + 'td3'}>
+                    <input key={el + 'mark'}
                         type="checkbox"
                         onChange={() => check(el)}
                         checked={isChecked(el)}

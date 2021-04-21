@@ -96,7 +96,7 @@ export const SaveCurrentDashboard = async function saveCurrentDashboard(dashboar
             widgetList: this.state.widgetList,
             menuList: this.state.menuList,
         };
-        console.log("saving current dashboard", data);
+        console.log("saving current dashboard");
 
         const options = {
             method: "POST",
