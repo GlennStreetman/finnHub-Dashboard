@@ -26,6 +26,7 @@ CREATE TABLE widgets
     widgettype text,
     xaxis text,
     yaxis text,
+    config text,
     CONSTRAINT widgets_pkey PRIMARY KEY (wid),
     CONSTRAINT fk_dashboard FOREIGN KEY(dashboardkey) REFERENCES dashboard(id) ON DELETE CASCADE,
     CONSTRAINT widgetsid UNIQUE (dashboardkey, widgetid)
@@ -76,6 +77,8 @@ CREATE TABLE users
     exchangelist text,
     defaultexchange text,
     ratelimit int,
+    apialias text UNIQUE,
+    widgetsetup text,
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT users_login_key UNIQUE (loginname),
     CONSTRAINT users_email_key UNIQUE (email)

@@ -53,8 +53,6 @@ CREATE TABLE uierror
   CONSTRAINT uniqueerror UNIQUE (errormessage, widget)
 );
 
-
-
 confirmemaillink text,
 emailconfirmed Boolean,
 resetpasswordlink text,
@@ -72,6 +70,7 @@ ADD COLUMN config text
 alter table users
 ADD Column apialias text UNIQUE
 
---not in Live
 alter table users
 ADD column widgetsetup text
+
+
