@@ -6,13 +6,14 @@ export const Logout = function logOut(){
     });
 }
 
-export const ProcessLogin = function processLogin(setKey, setLogin, ratelimit, apiAlias) {
-    console.log('processing login', setKey, setLogin, ratelimit, apiAlias)
+export const ProcessLogin = function processLogin(setKey, setLogin, ratelimit, apiAlias, widgetSetup) {
+    // console.log('processing login', setKey, setLogin, ratelimit, apiAlias, widgetSetup)
     this.setState({ 
         login: setLogin, 
         apiKey: setKey,
         apiAlias: apiAlias,
         apiRateLimit: ratelimit,
+        widgetSetup: JSON.parse(widgetSetup),
     });
 }
 

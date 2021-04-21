@@ -41,7 +41,9 @@ class AccountMenu extends React.Component {
     .then((data) => {
       if (baseState.mounted === true) {
         const dataSet = data["userData"];
+        console.log('dataset', dataSet)
         const rateLimit = dataSet.ratelimit !== null ? dataSet.ratelimit : 25
+        const widgetSetup = JSON.parse(dataSet['widgetsetup'])
         this.setState({ 
           loginName: dataSet["loginname"],
           email: dataSet["email"],
@@ -49,6 +51,7 @@ class AccountMenu extends React.Component {
           webHook: dataSet["webhook"],
           rateLimit: rateLimit,
           apiAlias: dataSet["apialias"],
+          widgetSetup: widgetSetup,
         })
         }
     })
@@ -167,6 +170,13 @@ class AccountMenu extends React.Component {
                     <button onClick={() => this.showEditPane("apialias")}>edit</button>
                   </td>
                 </tr>
+                <tr>
+                  <td>Manage Widgets: </td>
+                  <td></td>
+                  <td>
+                  <button onClick={() => this.props.toggleBackGroundMenu("widgetMenu")}>edit</button>
+                  </td>
+                </tr>
               </tbody>
             </table>
             {this.state.serverMessage !== "" && (
@@ -178,7 +188,7 @@ class AccountMenu extends React.Component {
           <table>
             <tbody>
               <tr>
-                <td>{"Old apikey: " + this.props.apiKey + ":"}</td>
+                {/* <td>{"Old apikey: " + this.props.apiKey + ":"}</td> */}
                 <td>{this.state[this.state.editField]}</td>
               </tr>
               <tr>

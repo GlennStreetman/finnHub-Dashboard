@@ -40,7 +40,8 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     }, [p.currentDashBoard])
 
     function handleChange(e) {
-        setInputText(e.target.value.toUpperCase())
+        const newName = e.target.value
+        setInputText(newName.trim().toUpperCase())
     }
 
     function showCheckMark() {
@@ -49,12 +50,14 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     }
 
     async function saveUpdateDashboard(dashboardName) {
-        console.log("STARTING SAVE")
-        let savedDash = await p.saveCurrentDashboard(dashboardName)
-        if (savedDash === true) {
-            let returnedDash = await p.getSavedDashBoards()
-            p.updateDashBoards(returnedDash)
-        }
+        const saveDashboardAs = dashboardName.trim()
+        if (saveDashboardAs !== '' && saveDashboardAs !== undefined) {
+            let savedDash = await p.saveCurrentDashboard(saveDashboardAs)
+            if (savedDash === true) {
+                let returnedDash = await p.getSavedDashBoards()
+                p.updateDashBoards(returnedDash)
+            }
+        } else { setInputText('Enter Name') }
     }
 
     async function deleteDashBoard(dashBoardId) {

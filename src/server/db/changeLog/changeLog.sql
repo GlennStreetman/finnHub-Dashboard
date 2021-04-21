@@ -69,6 +69,9 @@ ADD COLUMN passwordconfirmed Boolean DEFAULT false
 alter table widgets
 ADD COLUMN config text
 
-
 alter table users
 ADD Column apialias text UNIQUE
+
+--not in Live
+alter table users
+ADD column widgetsetup text

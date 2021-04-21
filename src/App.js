@@ -20,6 +20,7 @@ import TopNav from "./components/topNav";
 import Login from "./components/login";
 import AboutMenu from "./components/AboutMenu";
 import AccountMenu, { accountMenuProps } from "./components/accountMenu";
+import WidgetMenu, { widgetMenuProps } from "./components/widgetMenu";
 import EndPointMenu, { endPointProps } from "./components/endPointMenu";
 import ExchangeMenu, { exchangeMenuProps } from "./components/exchangeMenu";
 import { WidgetController, MenuWidgetToggle } from "./components/widgetController";
@@ -43,7 +44,7 @@ class App extends React.Component {
     this.state = {
       apiFlag: 0, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
       apiKey: "", //API key retrieved from login database.
-      apiALias: "",
+      apiAlias: "",
       backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
       currentDashBoard: "", //dashboard being displayed
       DashBoardMenu: 0, //1 = show, 0 = hide
@@ -58,14 +59,14 @@ class App extends React.Component {
       enableDrag: false,
       socket: "", //socket connection for streaming stock data.
       showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
-      // throttle: ThrottleQueue(25, 1000, true), //all finnhub API requests should be done with finnHub function.
       streamingPriceData: {}, //data shared between some widgets and watchlist menu. Updated by socket data.
+      targetSecurity: '', //target security for widgets. Update changes widget focus.
       WatchListMenu: 1, //1 = show, 0 = hide
       widgetCopy: { widgetID: null }, //copy of state of widget being dragged.
       widgetLockDown: 0, //1 removes buttons from all widgets.
       widgetList: {}, //lists of all widgets.
+      widgetSetup: {},
       zIndex: [], //list widgets. Index location sets zIndex
-      targetSecurity: '' //target security for widgets. Update changes widget focus.
     };
 
     this.baseState = this.state; //used to reset state upon logout.
@@ -108,6 +109,7 @@ class App extends React.Component {
     this.updateDashBoards = this.updateDashBoards.bind(this) //when dashboard menu saves or deletes a dashboard, runs to upddate state.
     this.loadSavedDashboard = this.loadSavedDashboard.bind(this) // loads a dashboard
     this.setSecurityFocus = this.setSecurityFocus.bind(this) //Sets target security for all widgets that have security dropdown selector 
+    this.updateWidgetSetup = this.updateWidgetSetup.bind(this)
   }
 
   componentDidUpdate(prevProps, prevState) {
@@ -135,7 +137,7 @@ class App extends React.Component {
       p.rResetUpdateFlag()
       let setupData = async function(that){
         await that.props.tGetMongoDB()
-        const targetDash = Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist)
+        const targetDash = s.dashBoardData?.[s.currentDashBoard]?.widgetlist ? Object.keys(s.dashBoardData?.[s.currentDashBoard]?.widgetlist) : {}
         p.rSetUpdateStatus({
           [s.currentDashBoard]: 'Updating'
         })
@@ -184,7 +186,6 @@ class App extends React.Component {
 
     if ((s.globalStockList !== prevState.globalStockList) ){
     // || (prevState.throttle === undefined && p.throttle !== undefined && s.globalStockList !== undefined)) {
-      console.log('updating Stock Data', p.throttle)
       LoadStockData(this, s, GetStockPrice, p.throttle);
       LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
     }
@@ -391,6 +392,29 @@ class App extends React.Component {
     //trigger saga?
   }
 
+  updateWidgetSetup(el){ //widget ref, true/false
+    const s = this.state
+    const newWidgetSetup = {...s.widgetSetup, ...el}
+    this.setState({widgetSetup: newWidgetSetup})
+
+  const data = {
+    field: "widgetsetup",
+    newValue: JSON.stringify(newWidgetSetup),
+  };
+
+  const options = {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  };
+
+  fetch("/accountData", options)
+    .then((response) => response.json())
+    .then((data) => {
+      console.log(data.message)
+    });
+  }
+
   render() {
     const menuWidgetToggle = MenuWidgetToggle(this);
     const quaryData = queryString.parse(window.location.search);
@@ -409,6 +433,7 @@ class App extends React.Component {
     const backGroundSelection = {
       endPoint: React.createElement(EndPointMenu, endPointProps(this)),
       manageAccount: React.createElement(AccountMenu, accountMenuProps(this)),
+      widgetMenu: React.createElement(WidgetMenu, widgetMenuProps(this)),
       about: React.createElement(AboutMenu, { apiFlag: this.state.apiFlag }),
       exchangeMenu: React.createElement(ExchangeMenu, exchangeMenuProps(this)),
     };
@@ -420,25 +445,26 @@ class App extends React.Component {
     return (
       <>
         <TopNav
+          AccountMenu={this.state.AccountMenu}
+          AddNewWidgetContainer={this.AddNewWidgetContainer}
           apiFlag={this.state.apiFlag}
+          backGroundMenu={this.state.backGroundMenu}
           currentDashBoard={this.state.currentDashBoard}
-          saveCurrentDashboard={this.saveCurrentDashboard} //saveCurrentDashboard
+          DashBoardMenu={this.state.DashBoardMenu}
           login={this.state.login}
           logOut={this.logOut}
-          AddNewWidgetContainer={this.AddNewWidgetContainer}
-          newMenuContainer={this.newMenuContainer}
-          menuList={this.state.menuList}
-          updateAPIFlag={this.updateAPIFlag}
-          menuWidgetToggle={menuWidgetToggle}
-          WatchListMenu={this.state.WatchListMenu}
-          AccountMenu={this.state.AccountMenu}
-          DashBoardMenu={this.state.DashBoardMenu}
           lockWidgets={this.lockWidgets}
-          widgetLockDown={this.state.widgetLockDown}
-          toggleWidgetVisability={this.toggleWidgetVisability}
+          menuList={this.state.menuList}
+          menuWidgetToggle={menuWidgetToggle}
+          newMenuContainer={this.newMenuContainer}
           showStockWidgets={this.state.showStockWidgets}
+          saveCurrentDashboard={this.saveCurrentDashboard} //saveCurrentDashboard
           toggleBackGroundMenu={this.toggleBackGroundMenu}
-          backGroundMenu={this.state.backGroundMenu}
+          toggleWidgetVisability={this.toggleWidgetVisability}
+          updateAPIFlag={this.updateAPIFlag}
+          WatchListMenu={this.state.WatchListMenu}
+          widgetLockDown={this.state.widgetLockDown}
+          widgetSetup={this.state.widgetSetup}
         />
         <WidgetController
           login={this.state.login}
@@ -494,6 +520,7 @@ const mapStateToProps = (state) => ({
   dataModel: state.dataModel,
   throttle: state.finnHubQueue.throttle 
 });
+
 export default connect(mapStateToProps, { 
   tGetSymbolList, 
   rUpdateExchangeList, 

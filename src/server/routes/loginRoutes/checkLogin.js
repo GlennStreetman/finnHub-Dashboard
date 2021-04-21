@@ -10,7 +10,7 @@ router.get("/checkLogin", (req, res, next) => {
     const resData = { login: 0 };
     const uID = req.session["uID"];
     const apiKeysQuery = `
-        SELECT apikey, apialias, webhook, ratelimit, exchangelist, defaultexchange
+        SELECT apikey, apialias, webhook, ratelimit, exchangelist, defaultexchange, widgetsetup
         FROM users
         WHERE id = ${uID}
     `;
@@ -31,6 +31,7 @@ router.get("/checkLogin", (req, res, next) => {
                 resData.defaultexchange = rows.rows[0].defaultexchange;
                 resData.login = 1;
                 resData.ratelimit = rows.rows[0].ratelimit
+                resData.widgetsetup = rows.rows[0].widgetsetup
                 resolve(resData);
                 }
             });

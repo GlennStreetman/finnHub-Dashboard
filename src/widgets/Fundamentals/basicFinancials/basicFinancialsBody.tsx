@@ -318,7 +318,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         let findMetrics = p.config.metricSelection
         // console.log(findMetrics)
         let returnMetrics: string[] = []
-        for (var x in findMetrics) {
+        for (const x in findMetrics) {
             try {
                 let metric: string | number = symbolData[findMetrics[x]]
                 returnMetrics.push(metric.toLocaleString(undefined, {
@@ -326,7 +326,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                     maximumFractionDigits: 2,
                 }))
             } catch (err) {
-                console.log('mapStockData err')
+                // console.log('mapStockData err', symbol)
             }
         }
         // console.log(returnMetrics)
