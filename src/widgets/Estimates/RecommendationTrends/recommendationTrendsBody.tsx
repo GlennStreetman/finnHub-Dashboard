@@ -90,7 +90,9 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
             const showData: object = state.showData.dataSet[p.widgetKey][targetStock]
             // console.log("11!!", p.widgetKey, targetStock)
             return (showData)
-        } else { console.log("-----------------broken selector----------------", p.widgetKey, targetStock) }
+        } else {
+            // console.log("-----------------broken selector----------------", p.widgetKey, targetStock) 
+        }
     })
 
     useImperativeHandle(ref, () => (
@@ -129,8 +131,11 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
     }, [p.trackedStocks, targetStock])
 
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) } else {
-            console.log("broken connection")
+        if (isFinnHubData(rShowData) === true) {
+            // console.log("working connection", rShowData)
+            setStockData(rShowData)
+        } else {
+            // console.log("broken connection")
             setStockData([])
         }
     }, [rShowData])

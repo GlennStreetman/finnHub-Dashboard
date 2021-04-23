@@ -13,10 +13,10 @@ router.get("/login", (req, res, next) => {
     let loginText = format('%L', req.query["loginText"])
     let pwText = format('%L', req.query["pwText"])
     console.log("Processing login request:",loginText,pwText )
-    let loginQuery = `SELECT id, loginname, apikey, apialias, ratelimit, emailconfirmed, exchangelist, defaultexchange
+    let loginQuery = `SELECT id, loginname, apikey, apialias, ratelimit, emailconfirmed, exchangelist, defaultexchange, widgetsetup
         FROM users WHERE loginName =${loginText} 
         AND password = '${md5(pwText)}'`;
-    // console.log(loginQuery)
+    console.log(loginQuery)
     let info = { //return object.
         key: "", 
         login: 0,
@@ -24,6 +24,7 @@ router.get("/login", (req, res, next) => {
         response: '',
         exchangelist: '',
         defaultexchange: '',
+        widgetsetup: '',
     };
 
     db.query(loginQuery, (err, rows) => {
@@ -40,6 +41,7 @@ router.get("/login", (req, res, next) => {
             info["response"] = 'success';
             info["exchangelist"] = rows.rows[0]['exchangelist']
             info["defaultexchange"] = rows.rows[0]['defaultexchange']
+            info['widgetsetup'] =  rows.rows[0]['widgetsetup']
             req.session.uID = login.id;
             req.session.userName = rows.rows[0]['loginname'];
             req.session.login = true

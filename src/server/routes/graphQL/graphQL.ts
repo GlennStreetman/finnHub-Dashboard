@@ -2,6 +2,8 @@
 // import eg from 'express-graphql'
 import g from 'graphql'
 import format from 'pg-format';
+import _ from 'lodash'
+
 import { getDB } from '../../db/mongoLocal.js'
 import { filterDict } from './GQLFilters.js'
 
@@ -159,6 +161,13 @@ const RootQueryType = new g.GraphQLObjectType({
                     Do not add extra spaces between commas.
                     Example: "US-AAPL,US-MSFT,US-TSLA".
                 ` },
+                filters: {
+                    type: g.GraphQLString, description: `
+                    Optional: Reduce data returned from 
+                    data return field down to headings included 
+                    in provided list.
+                    `
+                },
             },
             type: g.GraphQLList(widget),
             resolve: (parrent, args) => {
@@ -176,6 +185,7 @@ const RootQueryType = new g.GraphQLObjectType({
                         return returnList
                     }
                     const security = args.security ? securityList() : false
+                    const filters = args.security ? args.filters : false
                     const query = `
                     SELECT w.widgetID, u.id, w.widgettype
                     FROM widgets w
@@ -199,8 +209,6 @@ const RootQueryType = new g.GraphQLObjectType({
                             widget: returnData.rows[0].widgetid,
                         }
                         if (security) findData['$or'] = security
-                        // console.log('Find Data: ', findData)
-
                         const widgetType = returnData.rows[0].widgettype
                         //GET MONGO DATA
                         const client = getDB()
@@ -209,9 +217,52 @@ const RootQueryType = new g.GraphQLObjectType({
                         const findDataSet: finnHubData[] = await dataSet.find(findData)
                         const resList: Object[] = []
                         await findDataSet.forEach((data: finnHubData) => {
-                            // console.log('data', data)
                             if (filterDict[data.widgetType]) {//if finnHub API data needs to be filtered or reformated
                                 data.data = filterDict[data.widgetType](data.data, data.config)
+                            }
+                            if (filters) {
+                                console.log('FILTERING: ', filters)
+                                let newFilter
+                                if (filters.indexOf('*') > -1) {
+                                    newFilter = filters.replace(/\./g, String.fromCharCode(92) + `.`)
+                                    console.log(newFilter)
+                                    newFilter = new RegExp(newFilter.replace(/[*]/g, '.*?'))
+                                } else {
+                                    newFilter = filters
+                                }
+                                console.log('newFilter', newFilter)
+
+
+                                const queryFilteredData = {}
+                                function objRecursive(obj, newObj, path) {
+                                    for (const key in obj) {
+                                        if (typeof obj[key] === "object" && obj[key] !== null) {
+                                            const newObj = {}
+                                            queryFilteredData[key] = newObj
+                                            objRecursive(obj[key], newObj, `${path}${key}.`)
+                                        } else {
+                                            if (newFilter instanceof RegExp) {
+                                                if (newFilter.test(`${path}${key}`) === true) { newObj[key] = obj[key] }
+                                            } else {
+                                                console.log(newFilter, `${path}${key}`, newFilter === `${path}${key}`)
+                                                if (newFilter === `${path}${key}`) { newObj[key] = obj[key] }
+                                            }
+                                        }
+                                    }
+                                }
+                                objRecursive(data.data, queryFilteredData, '')
+
+                                // console.log('queryFilteredData', queryFilteredData)
+                                data.data = queryFilteredData
+                                // const filterList = filters.split(',')
+                                // console.log(typeof data.data, typeof filterList)
+                                // for (const dataPoint in data.data) {
+                                //     if (filterList.indexOf(dataPoint) === -1) {
+                                //         console.log(filterList, filterList.indexOf(dataPoint), filterList[dataPoint])
+                                //         delete data.data[dataPoint]
+                                //     }
+                                // }
+                                //                     /.*?\.buy/
                             }
                             data.widgetType = widgetType
                             resList.push(data)

@@ -6,7 +6,7 @@ export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
     'tgetMongoDb',
     async (req) => { //l{ist of securities} 
     try {
-        console.log("1running mongo refresh")
+        console.log("Getting cached finnhub data")
         const getData = await fetch('/finnDashData')
         const freshData = await getData.json()
         const resObj = {}

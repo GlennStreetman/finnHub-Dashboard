@@ -56,7 +56,6 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
     let data = await res.json()
     
     if (res.status === 200) {
-        console.log(200)
         const parseDashBoard = data.savedDashBoards
         for (const dash in parseDashBoard) {
             parseDashBoard[dash].globalstocklist = JSON.parse(parseDashBoard[dash].globalstocklist)

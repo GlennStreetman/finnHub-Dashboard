@@ -117,7 +117,7 @@ class App extends React.Component {
     const p = this.props;
     
     if (s.login === 1 && prevState.login === 0) { //on login build data model.
-      console.log("Loggin detected, setting up dashboards.", s.apiKey);
+      console.log("Loggin detected, setting up dashboards.");
       this.getSavedDashBoards()
       .then(loginDataAndDashboards => {
         // console.log("UPDATE DASH DATA", loginDataAndDashboards, loginDataAndDashboards.currentDashBoard)
