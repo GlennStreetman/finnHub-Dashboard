@@ -107,7 +107,9 @@ describe('Get login cookie:', ()=>{
                     email: 'accountDataTest@test.com',
                     apikey: '',
                     webhook: '',
-                    ratelimit: 30
+                    ratelimit: 30,
+                    apialias: null,
+                    widgetsetup: null, 
                 }
             })
             .expect(200)

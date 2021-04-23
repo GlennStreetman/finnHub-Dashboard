@@ -95,9 +95,11 @@ describe('Get login cookie:', ()=>{
             .expect({
                 login: 1,
                 apiKey: '',
+                apiAlias: null,
                 exchangelist: 'US',
                 defaultexchange: 'US',
                 ratelimit: 30,
+                widgetsetup: null, 
             })
             .expect(200)
             .end(done)

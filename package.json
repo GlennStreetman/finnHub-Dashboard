@@ -63,7 +63,8 @@
     "build": "react-scripts build && npx tsc -p src/server/tsconfig.json",
     "heroku-postbuild": "react-scripts build && npm run tsc",
     "eject": "react-scripts eject",
-    "test": "jest --env node"
+    "test": "jest",
+    "test-f": "jest --reporters=jest-silent-reporter "
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -87,6 +88,7 @@
     "eslint-plugin-jsx-a11y": "^6.4.1",
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.0.0",
+    "jest-silent-reporter": "^0.5.0",
     "redux-devtools": "^3.7.0",
     "supertest": "^6.1.3"
   },

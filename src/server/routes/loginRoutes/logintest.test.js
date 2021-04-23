@@ -37,12 +37,15 @@ beforeAll((done) => {
     INSERT INTO users (
         loginname, email, password,	secretquestion,	
         secretanswer, apikey, webhook, emailconfirmed, 
-        passwordconfirmed, exchangelist, defaultexchange, ratelimit
+        passwordconfirmed, exchangelist, defaultexchange, ratelimit,
+        widgetsetup, apialias
     )
     VALUES (	
         'loginTest',	'loginTest@test.com',	'735a2320bac0f32172023078b2d3ae56',	'hello',	
         '69faab6268350295550de7d587bc323d',	'',	'',	'1',	
-        '1',	'US',	'US',	30	
+        '1',	'US',	'US',	30,
+        '{"PriceSplits":false}',
+        'testalias'	
     )
     ON CONFLICT
     DO NOTHING
@@ -51,12 +54,15 @@ beforeAll((done) => {
     INSERT INTO users (
         loginname, email, password,	secretquestion,	
         secretanswer, apikey, webhook, emailconfirmed, 
-        passwordconfirmed, exchangelist, defaultexchange, ratelimit
+        passwordconfirmed, exchangelist, defaultexchange, ratelimit,
+        widgetsetup, apialias
     )
     VALUES (	
-        'loginTest_notVerified',	'loginTest_notVerified.com',	'735a2320bac0f32172023078b2d3ae56',	'hello',	
+        'loginTest_notVerified',	'loginTest_notVerified.com', '735a2320bac0f32172023078b2d3ae56',	'hello',	
         '69faab6268350295550de7d587bc323d',	'',	'',	'0',	
-        '1',	'US',	'US',	30	
+        '1',	'US',	'US',	30, 
+        '{"PriceSplits":false}',
+        'testAlias2'
     )
     ON CONFLICT
     DO NOTHING
@@ -94,6 +100,8 @@ test("Good login get/login", (done) => {
             response: 'success',
             exchangelist: 'US',
             defaultexchange: 'US',
+            widgetsetup: '{"PriceSplits":false}',
+            apiAlias: 'testalias'
         })
         .expect(200, done);
 });
