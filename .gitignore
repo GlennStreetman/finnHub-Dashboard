@@ -18,3 +18,5 @@ db.sqlite
 /ssl
 cert
 *.env
+/uploads/*
+/uploads/*/*
