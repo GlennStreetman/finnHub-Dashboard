@@ -2,7 +2,7 @@
 // import eg from 'express-graphql'
 import g from 'graphql'
 import format from 'pg-format';
-import _ from 'lodash'
+// import _ from 'lodash'
 
 import { getDB } from '../../db/mongoLocal.js'
 import { filterDict } from './GQLFilters.js'

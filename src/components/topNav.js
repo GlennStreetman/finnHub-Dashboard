@@ -121,6 +121,11 @@ class TopNav extends React.Component {
                     </a>
                 </li>
                 <li id='ddi' className="navItem">
+                    <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('templates')}}> 
+                    Templates
+                    </a>
+                </li>
+                <li id='ddi' className="navItem">
                     <a href="#home" onClick={() => {this.props.toggleBackGroundMenu('endPoint')}}> 
                     Endpoints
                     </a>

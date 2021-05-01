@@ -12,6 +12,7 @@ import dbLive from './db/databaseLive.js';
 import devDB from "./db/databaseLocalPG.js"
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
+import fileUpload from 'express-fileupload';
 
 import { connectMongo } from "./db/mongoLocal.js"
 
@@ -30,6 +31,10 @@ import forgot from './routes/accounts/forgot.js'
 import newPW from './routes/accounts/newPW.js'
 import reset from './routes/accounts/reset.js'
 
+import uploadTemplate from './routes/excelTemplates/uploadTemplate.js'
+import runTemplate from './routes/excelTemplates/runTemplate.js'
+import deleteTemplate from './routes/excelTemplates/deleteTemplate.js'
+
 // import endPoint  from './routes/endPoint.js'
 import logUIError from './routes/logUiError.js'
 //routes below re-quire login
@@ -46,6 +51,11 @@ import graphQLRedirect from './routes/graphQL.js'
 import {schema} from './routes/graphQL/graphQL.js'
 
 const app = express();
+
+app.use(fileUpload({
+  createParentPath: true,
+  safeFileNames: true
+}));
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
@@ -136,12 +146,19 @@ app.use('/', finnHubData)
 app.use('/', findMongoData)
 app.use('/', deleteFinnDashData)
 app.use('/', updateGQLFilters)
+app.use('/', runTemplate)
 app.use('/', graphQLRedirect)
 app.use('/graphql', eg.graphqlHTTP({
   schema: schema,
   graphiql: true,
   pretty: true,
 }))
+app.use('/qGraphql', eg.graphqlHTTP({
+  schema: schema,
+  pretty: true,
+}))
+app.use('/', uploadTemplate)
+app.use('/', deleteTemplate)
 app.use('/', def)
 
 

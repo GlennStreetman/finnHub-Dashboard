@@ -40,19 +40,19 @@ export default class EndPointNode extends React.PureComponent {
         baseURL = baseURL.indexOf('localhost') >= 0 ? 
             baseURL.replace('http:/localhost:3000', 'localhost:5000') : //makes redirect work in dev mode.
             baseURL.replace('https:/', '')
-        if (p.searchList?.length === 3 && el === 'data' && p.searchList[0] === 'widget') {
+        if (p?.searchList?.length === 3 && el === 'data' && p?.searchList[0] === 'widget') {
             const apiToggle = !(p.apiAlias in [undefined, '']) ? p.apiAlias : p.apiKey 
             const queryProps = `(key: "${apiToggle}" dashboard: "${p.searchList[1]}" widget: "${p.searchList[2]}")`
             const returnValues = `dashboard, widgetType, widgetName, security, data`
             const thisQuery = `{${p.searchList[0]}${queryProps} {${returnValues}}}`
             return(<a href={`//${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
-        } else if (p.searchList?.length === 2 && p.searchList[0] === 'security'){
+        } else if (p?.searchList?.length === 2 && p.searchList[0] === 'security'){
             const apiToggle = !(p.apiAlias in [undefined, '']) ? p.apiAlias : p.apiKey 
             const queryProps = `(key: "${apiToggle}" dashboard: "${p.searchList[1]}" security: "${el}")`
             const returnValues = `dashboard, widgetType, widgetName`
             const thisQuery = `{${p.searchList[0]}${queryProps} {${returnValues}}}`
             return(<a href={`//${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
-        } else if (p.searchList?.length === 4 && el === 'data' && p.searchList[0] === 'security'){
+        } else if (p?.searchList?.length === 4 && el === 'data' && p.searchList[0] === 'security'){
             const apiToggle = !(p.apiAlias in [undefined, '']) ? p.apiAlias : p.apiKey 
             const queryProps = `(key: "${apiToggle}" dashboard: "${p.searchList[1]}" security: "${p.searchList[2]}" widgetName: "${p.searchList[3]}")`
             const returnValues = `dashboard, widgetType, widgetName, data`

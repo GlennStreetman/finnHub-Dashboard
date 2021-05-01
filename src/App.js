@@ -23,6 +23,7 @@ import AccountMenu, { accountMenuProps } from "./components/accountMenu";
 import WidgetMenu, { widgetMenuProps } from "./components/widgetMenu";
 import EndPointMenu, { endPointProps } from "./components/endPointMenu";
 import ExchangeMenu, { exchangeMenuProps } from "./components/exchangeMenu";
+import TemplateMenu, {templateMenuProps} from "./components/templateMenu";
 import { WidgetController, MenuWidgetToggle } from "./components/widgetController";
 
 //redux imports
@@ -48,7 +49,7 @@ class App extends React.Component {
       backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
       currentDashBoard: "", //dashboard being displayed
       DashBoardMenu: 0, //1 = show, 0 = hide
-      dashBoardData: [], //list of all saved dashboards.
+      dashBoardData: {}, //All saved dashboards
       defaultExchange: "US",
       exchangeList: ["US"], //list of all exchanges activated under account management.
       globalStockList: defaultGlobalStockList, //default stocks for new widgets.
@@ -117,17 +118,22 @@ class App extends React.Component {
     const p = this.props;
     
     if (s.login === 1 && prevState.login === 0) { //on login build data model.
-      console.log("Loggin detected, setting up dashboards.");
+      // console.log("Loggin detected, setting up dashboards.");
       this.getSavedDashBoards()
-      .then(loginDataAndDashboards => {
-        // console.log("UPDATE DASH DATA", loginDataAndDashboards, loginDataAndDashboards.currentDashBoard)
-        this.setState(loginDataAndDashboards) //{dashboardData: {}, menuList: {}}
-        p.rSetTargetDashboard({targetDashboard: loginDataAndDashboards.currentDashBoard})
-        p.rBuildDataModel({...loginDataAndDashboards, apiKey: s.apiKey})
+      .then(data => {
+        // console.log("UPDATE DASH DATA", data, data.currentDashBoard)
+        if ((!data.currentDashBoard && Object.keys(data.dashBoardData)) || 
+        (data.dashBoardData[data.currentDashBoard] === undefined && Object.keys(data.dashBoardData))) {
+          console.log('defaulting dashboard')
+          data.currentDashBoard = Object.keys(data.dashBoardData)[0]
+        }
+        this.setState(data) //{dashboardData: {}, menuList: {}}
+        p.rSetTargetDashboard({targetDashboard: data.currentDashBoard})
+        p.rBuildDataModel({...data, apiKey: s.apiKey})
       })
       .catch((error) => {
           console.error("Failed to recover dashboards", error);
-          });
+      });
       ;
     }
     
@@ -171,7 +177,7 @@ class App extends React.Component {
       setupData(this)
     }
     
-    if (
+    if ( //if apikey not setup show about menu
         (s.apiKey === '' && s.apiFlag === 0) || 
         (s.apiKey === null && s.apiFlag === 0)
     ) {
@@ -185,21 +191,29 @@ class App extends React.Component {
     }
 
     if ((s.globalStockList !== prevState.globalStockList) ){
-    // || (prevState.throttle === undefined && p.throttle !== undefined && s.globalStockList !== undefined)) {
       LoadStockData(this, s, GetStockPrice, p.throttle);
       LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
     }
 
-    if (s.login === 1 && s.loadStartingDashBoard === 0 && s.currentDashBoard !== "") {
-      // console.log("loading dashboards", s.dashBoardData)
-      this.setState({ loadStartingDashBoard: 1 });
+    if (s.login === 1 && s.loadStartingDashBoard === 0) {
       try {
         if (s.dashBoardData && Object.keys(s.dashBoardData).length > 0) {
-          let loadWidget = s.dashBoardData[s.currentDashBoard]["widgetlist"];
-          let loadGlobal = s.dashBoardData[s.currentDashBoard]["globalstocklist"];
-          // console.log(loadWidget, loadGlobal)
-          this.loadDashBoard(loadGlobal, loadWidget);
-          this.setState({ DashBoardMenu: 1 });
+          if (s.dashBoardData[s.currentDashBoard] !== undefined) {
+            let loadWidget = s.dashBoardData[s.currentDashBoard]["widgetlist"];
+            let loadGlobal = s.dashBoardData[s.currentDashBoard]["globalstocklist"];
+            this.loadDashBoard(loadGlobal, loadWidget);
+            this.setState({ DashBoardMenu: 1, loadStartingDashBoard: 1 });
+          } else if ( Object.keys(s.dashBoardData).length > 0) {
+            const defaultDashboard = Object.keys(s.dashBoardData)[0]
+            let loadWidget = s.dashBoardData[defaultDashboard]["widgetlist"];
+            let loadGlobal = s.dashBoardData[defaultDashboard]["globalstocklist"];
+            this.loadDashBoard(loadGlobal, loadWidget);
+            this.setState({ 
+              DashBoardMenu: 1, 
+              currentDashBoard: defaultDashboard,
+              loadStartingDashBoard: 1
+            });
+          }
         }
       } catch (err) {
         console.log("failed to load dashboards", err);
@@ -436,6 +450,7 @@ class App extends React.Component {
       widgetMenu: React.createElement(WidgetMenu, widgetMenuProps(this)),
       about: React.createElement(AboutMenu, { apiFlag: this.state.apiFlag }),
       exchangeMenu: React.createElement(ExchangeMenu, exchangeMenuProps(this)),
+      templates: React.createElement(TemplateMenu, templateMenuProps(this)),
     };
 
     const backGroundMenu = () => {

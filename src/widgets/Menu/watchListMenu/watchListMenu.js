@@ -95,7 +95,7 @@ export default class WatchListMenu extends React.PureComponent {
 
   }
 
-  fileUploadAction() { //what does this do?
+  fileUploadAction() {
     this.inputReference.current.click();
     console.log("upload action")
   }
