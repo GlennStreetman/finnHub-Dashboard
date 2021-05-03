@@ -62,7 +62,8 @@ router.get('/runTemplate', async (req, res) => {
     const user = userRows?.rows?.[0]?.id
     const workBookPath = `${appRootPath}/uploads/${user}/${req.query.template}`
     const tempPath = `${appRootPath}/uploads/${user}/temp/`
-    const tempFile = `${appRootPath}/uploads/${user}/temp/${req.query.template}${Date.now()}.xlsx`
+    const trimFileName = req.query.template.slice(0, req.query.template.indexOf('.xls'))
+    const tempFile = `${appRootPath}/uploads/${user}/temp/${trimFileName}${Date.now()}.xlsx`
     
     //read query worksheet and retrieve data from graphQL
     const queryObj = {}
@@ -95,6 +96,7 @@ router.get('/runTemplate', async (req, res) => {
                     dataObj[res[w].n][s.security] =  s.data
                 }
             }
+            dataObj.keys = [...dataObj.keys] //avoids and possible duplicate in keys
             promiseData = dataObj
             
         })
@@ -110,8 +112,8 @@ router.get('/runTemplate', async (req, res) => {
         }
         // console.log(promiseData)
         //read template, create data object, create temp file to be written to.
-        const templateData = {} //to be
-        fs.copyFileSync(workBookPath, tempFile)
+        const templateData = {} 
+        // fs.copyFileSync(workBookPath, tempFile)
         let wb = new Excel.Workbook()
         await wb.xlsx.readFile(workBookPath)
         wb.eachSheet((worksheet, sheetid)=>{
@@ -121,6 +123,7 @@ router.get('/runTemplate', async (req, res) => {
                     const thisRow = {
                         data: {},
                         writeColumns: 0, //if zero skip in later steps. Used for inserting new rows if greater than 1.
+                        keyColumns: {}, //list of columns where key needs to be updated.
                     }
                     for (const x in row.values) {
                         if (row.values[x].slice(0,2) === '&=') {
@@ -128,26 +131,54 @@ router.get('/runTemplate', async (req, res) => {
                             const searchString = searchStringRaw.slice(2, searchStringRaw.length)
                             if (searchString !== 'keys.keys') {
                                 const dataObj = getDataSlice(promiseData, searchString)
-                                console.log(Object.keys(dataObj).length)
                                 if (Object.keys(dataObj).length > thisRow.writeColumns) {thisRow.writeColumns = Object.keys(dataObj).length}
                                 thisRow.data[x] = dataObj
+                            } else {
+                                thisRow.data[x] = {...promiseData.keys}
+                                thisRow.keyColumns[x] = x
+                                // console.log('Key Column ', thisRow.keyColumns)
                             }
-                            // thisRow.data[x] = JSON.stringify(row.values[x]).slice(3, JSON.stringify(row.values).length)
                         }
                     }
-                    console.log('Row ' + rowNumber + ' : ', thisRow );
+                    // console.log('Row ' + rowNumber + ' : ', thisRow );
                     templateData[worksheet.name][rowNumber] = thisRow
-                    // console.log(templateData[worksheet.name][rowNumber])
+                    // console.log(templateData[worksheet.name][rowNumber]) 
                 })
             }
         })
-        console.log(templateData)
+        // console.log(templateData)
 
-        // workbook = xlsx.readFile(workBookPath);
-        // let sheetNames = workbook.SheetNames
-        // sheetNames.splice(sheetNames.indexOf('Query'), 1)
-        // workbook.SheetNames = sheetNames
-        // console.log(workbook.SheetNames, workbook)
+        const w = new Excel.Workbook()
+        w.xlsx.readFile(workBookPath)
+        .then(()=>{ //write templatedata to temporary worksheet copied from source template.
+            let rowIterator = 0 //add 1 for each line written so that writer doesnt fall out of sync with file.
+            for (const s in templateData) { //for each worksheet
+                const ws = w.getWorksheet(s) //for target worksheet
+                if (s !== 'keys') {
+                    const templateWorksheet = templateData[s]
+                    for (const row in templateWorksheet) { // for each row in worksheet
+                        const data = templateWorksheet[row].data //list of rows to be updated. 
+                        const writeColumns =  templateWorksheet[row].writeColumns //used to create range we need to work through.
+                        const keyColumns =  templateWorksheet[row].keyColumns //key columns
+                        let currentKey = '' //the current key
+                        // console.log('row:', row, data, writeColumns, keyColumns)
+                        for (let step = 1; step <= writeColumns; step++) {
+                            for (const updateCell in data) {
+                                if (keyColumns[updateCell]) currentKey = data[updateCell][step-1]
+                                console.log('currentKey', row,step, currentKey)
+                                ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value =  data[updateCell][currentKey]
+                            }
+                            ws.getRow(row + rowIterator).commit()
+                            ws.addRow().commit()
+                            rowIterator = rowIterator + 1
+                        }
+                    }
+
+                }
+            }
+            w.xlsx.writeFile(tempFile)
+        })
+
     }
 })
 

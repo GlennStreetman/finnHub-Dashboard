@@ -60,7 +60,7 @@
   "scripts": {
     "tsc": "npx tsc -p src/server/tsconfig.json",
     "tscd": "npx tsc -w -p src/server/tsconfig.json",
-    "server": "nodemon --watch './build/server/**/*' --ignore sessions/ --trace-warnings --loader ts-node ./build/server/server.js",
+    "server": "nodemon --watch './src/server/**/*' --ignore sessions/ --trace-warnings --loader ts-node ./build/server/server.js",
     "client": "SET PORT=3000 && react-scripts start",
     "start": "node ./build/server/server.js",
     "build": "react-scripts build && npx tsc -p src/server/tsconfig.json",
