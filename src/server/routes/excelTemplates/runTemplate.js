@@ -126,7 +126,8 @@ router.get('/runTemplate', async (req, res) => {
                         keyColumns: {}, //list of columns where key needs to be updated.
                     }
                     for (const x in row.values) {
-                        if (row.values[x].slice(0,2) === '&=') {
+                        // console.log(typeof row?.values?.[x])
+                        if (typeof row?.values?.[x] === 'string' && row?.values?.[x]?.slice(0,2) === '&=') {
                             const searchStringRaw = row.values[x]
                             const searchString = searchStringRaw.slice(2, searchStringRaw.length)
                             if (searchString !== 'keys.keys') {
@@ -135,6 +136,8 @@ router.get('/runTemplate', async (req, res) => {
                                 thisRow.data[x] = dataObj
                             } else {
                                 thisRow.data[x] = {...promiseData.keys}
+                                // thisRow.data[x] = {}
+                                // promiseData.keys.forEach((i)=>{thisRow.data[x][i] = i})
                                 thisRow.keyColumns[x] = x
                                 // console.log('Key Column ', thisRow.keyColumns)
                             }
@@ -153,29 +156,69 @@ router.get('/runTemplate', async (req, res) => {
         .then(()=>{ //write templatedata to temporary worksheet copied from source template.
             let rowIterator = 0 //add 1 for each line written so that writer doesnt fall out of sync with file.
             for (const s in templateData) { //for each worksheet
-                const ws = w.getWorksheet(s) //for target worksheet
-                if (s !== 'keys') {
+                const ws = w.getWorksheet(s) 
+                const addedRows = []
+                if (s !== 'keys') { 
                     const templateWorksheet = templateData[s]
                     for (const row in templateWorksheet) { // for each row in worksheet
                         const data = templateWorksheet[row].data //list of rows to be updated. 
                         const writeColumns =  templateWorksheet[row].writeColumns //used to create range we need to work through.
                         const keyColumns =  templateWorksheet[row].keyColumns //key columns
-                        let currentKey = '' //the current key
+                        let currentKey = '' //the current security key
                         // console.log('row:', row, data, writeColumns, keyColumns)
                         for (let step = 1; step <= writeColumns; step++) {
                             for (const updateCell in data) {
-                                if (keyColumns[updateCell]) currentKey = data[updateCell][step-1]
-                                console.log('currentKey', row,step, currentKey)
-                                ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value =  data[updateCell][currentKey]
+                                if (keyColumns[updateCell]) { 
+                                    currentKey = data[updateCell][step-1]
+                                    ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = data[updateCell][step-1]
+                                } else {
+                                    ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = data[updateCell][currentKey]
+                                }
                             }
                             ws.getRow(row + rowIterator).commit()
-                            ws.addRow().commit()
+                            if (step !== writeColumns) {
+                                let newRow = parseInt(row) + rowIterator + 1
+                                ws.insertRow(newRow).commit()
+                                addedRows.push(newRow)
+                            }
                             rowIterator = rowIterator + 1
                         }
                     }
-
                 }
+                console.log(addedRows) //next update all formula cells. Offset their row references be number of rows added before or inside of formula range.
+                ws.eachRow({includeEmpty: false},(row, rowNumber)=>{
+                    row.eachCell({ includeEmpty: false },(cell, colNumber)=>{
+                        if (typeof cell.value === 'object') {
+                            let updateString = cell.value.formula
+                            let updateList = []
+                            console.log('1:', updateString, typeof updateString)
+                            let re = new RegExp(/(?:^|[^0-9])([A-Z](?:100|[0-9][0-9]?))(?=$|[^0-9A-Z])/g)
+                            let allMatches = [...cell.value.formula.matchAll(re)]
+                            for (const m in allMatches) {
+                                let matchRow = parseInt(allMatches[m][1].replace(new RegExp(/\D/g), ''))
+                                let matchColumn = allMatches[m][1].replace(new RegExp(/[0-9]/g), '')
+                                for (const r in addedRows) {
+                                    if (matchRow >= parseInt(addedRows[r])) matchRow = matchRow + 1
+                                }
+                                const updateRef = matchColumn + matchRow
+                                console.log('2:', allMatches[m][1], updateRef)
+                                updateList.unshift([allMatches[m][1], updateRef]) //update row values in reverse order so you dont double update starting row.
+                            }
+                            for (const u in updateList) {
+                                console.log('3:',updateString.indexOf(updateList[u][0]), updateList[u][1])
+                                updateString = updateString.replace(updateList[u][0], updateList[u][1])
+                            }
+                            console.log('4:', updateString)
+                            const newValue = cell.value
+                            newValue.formula = updateString
+                            ws.getRow(rowNumber).getCell(colNumber).value = newValue
+                        }
+                    })
+                    ws.getRow(row).commit()
+                })
             }
+            
+
             w.xlsx.writeFile(tempFile)
         })
 
@@ -184,3 +227,14 @@ router.get('/runTemplate', async (req, res) => {
 
 
 export default router
+
+
+// A34A1
+// 5A1
+// 2.344A1
+// A1001
+// A1
+// A10
+// A100
+// SUM(A1:A2)
+// SUM(A1:A2, 5A1, A3)
