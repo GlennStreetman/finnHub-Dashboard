@@ -262,6 +262,10 @@ router.get('/runTemplate', async (req, res) => {
                 })
             }
             w.xlsx.writeFile(tempFile)
+            .then(()=>{
+                console.log('sending: ', tempFile)
+                res.sendFile(tempFile)
+            })
         })
 
     }

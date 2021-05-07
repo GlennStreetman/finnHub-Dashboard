@@ -26,9 +26,11 @@ router.get('/uploadTemplate', (req: uploadTemplatePost, res: any) => {
 
         const templateList: string[][] = []
         filenames.forEach((file) => {
-            console.log("File:", file);
-            const newListItem = [file, `${file}`]
-            templateList.push(newListItem)
+            if (file.indexOf('.') > 0) {
+                console.log("File:", file);
+                const newListItem = [file, `${file}`]
+                templateList.push(newListItem)
+            }
         });
         res.status(200).send({
             data: JSON.stringify(templateList)

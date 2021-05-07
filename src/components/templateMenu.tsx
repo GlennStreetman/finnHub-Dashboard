@@ -5,7 +5,7 @@ import { useState, useEffect, useRef } from "react";
 export default function TemplateMenu(p: { [key: string]: any }, ref: any) {
 
     const [templateFlag, setTemplateFlag] = useState(true) //if true, retrieve template list.
-    const [templateList, setTemplateList] = useState([['test1', 'testlink1'], ['test2', 'testlink2'], ['test3', 'testlink3looooooooooooooooooooooooooooooooong']]) //list of templates that have previously been uploaded
+    const [templateList, setTemplateList] = useState([]) //list of templates that have previously been uploaded
     const [serverMessage, setServerMessage] = useState('') //if true, retrieve template list. 
     const inputReference = useRef<HTMLInputElement>(null);
     //get template list if flag is true
@@ -49,6 +49,11 @@ export default function TemplateMenu(p: { [key: string]: any }, ref: any) {
 
     function runTemplate(e, apiKey, templateName) {
         fetch(`/runTemplate?key=${apiKey}&template=${templateName}`)
+            .then(response => response.blob())
+            .then(blob => {
+                var file = window.URL.createObjectURL(blob);
+                window.location.assign(file);
+            })
         e.preventDefault()
     }
 
@@ -57,7 +62,7 @@ export default function TemplateMenu(p: { [key: string]: any }, ref: any) {
         return tempList.map((el) => (
             <tr key={el[0] + 'tr'}>
                 <td key={el[0] + 'td1'}>{el[0]}</td>
-                <td key={el[0] + 'td2'}><a href='#' onClick={(e) => { runTemplate(e, apiKey, el[1]) }}>{`/runTemplate?key=${apiKey}&template=${el[1]}`}</a></td>
+                <td key={el[0] + 'td2'}><a href='#template' onClick={(e) => { runTemplate(e, apiKey, el[1]) }}>{`/runTemplate?key=${apiKey}&template=${el[1]}`}</a></td>
                 <td key={el[0] + 'td3'}><button onClick={() => deleteFile(el[0])}><i className="fa fa-times" aria-hidden="true"></i></button></td>
             </tr>
         ))
