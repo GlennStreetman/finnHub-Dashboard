@@ -28,7 +28,7 @@ export default class EndPointMenu extends React.Component {
             // console.log("draftstate", p.dashBoardData, p.dashBoardData[el],draftState)
             for (const w in draftState){
                 const widgetName = draftState[w].widgetHeader
-                const widgetNameDistinct = draftState[w].widgetHeader + w
+                const widgetNameDistinct = draftState[w].widgetHeader + w //creates a distinct name in case of duplicates
                 const widgetDetails = draftState[w]
                 // const id = widgetDetails.widgetID
                 delete widgetDetails.column
@@ -41,7 +41,7 @@ export default class EndPointMenu extends React.Component {
                 if (Object.keys(widgetDetails.config).length === 0) delete widgetDetails.config
                 if (Object.keys(widgetDetails.filters).length === 0) delete widgetDetails.filters
                 
-                const keys = Object.keys(widgetDetails.trackedStocks)
+                const keys = Object.keys(widgetDetails.trackedStocks).length ? Object.keys(widgetDetails.trackedStocks) : ['market']
                 widgetDetails.data = {}
                 for (const stock of keys) {
                     widgetDetails.data[stock] = stock
