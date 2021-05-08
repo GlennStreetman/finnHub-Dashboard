@@ -64,13 +64,9 @@ export default class EndPointNode extends React.PureComponent {
     }
 
     renderNodeData() {
-        
         //for each item in object, if object return button logic, else return string
         const p = this.props
-        
-        // console.log("nodeData", p.nodeData)
         const objectKeyZeroToList = Object.keys(p.nodeData).map((el, ind) => {
-            // console.log('el',ind, Object.keys(p.nodeData))
             if (el === 'data' && this.state[el] !== true) { //data Object closed                  
                 return (
                     <li className='liNode'  key={ind + 'dataObj1'}>

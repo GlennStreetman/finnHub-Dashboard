@@ -49,7 +49,6 @@ export default class endPointData extends React.Component<any, any> {
             searchList: [`${p.widgetID}-${stock}`],
             dashboard: p.dashboard
         }
-        console.log("searching for: ", stock, optionBody)
 
         const options = {
             method: "POST",
@@ -58,8 +57,6 @@ export default class endPointData extends React.Component<any, any> {
         };
         const getData = await fetch('/findMongoData', options)
         const resData: resObj[] = await getData.json()
-        console.log('resdata', resData, options)
-        console.log('HERE', resData, optionBody)
         const setData = await produce(s.endPointData, (draftState) => {
             if (resData !== undefined && resData.length) draftState[stock]['data'] = resData[0].data
         })
@@ -74,7 +71,6 @@ export default class endPointData extends React.Component<any, any> {
     isLink(el) {
         const p = this.props
         if (p.searchList?.[0] === 'widget') {
-            console.log('isWidget')
             const url = window.location
             let baseURL = url.protocol + "/" + url.host + "/" + url.pathname.split('/')[1] + 'graphQL';
             baseURL = baseURL.indexOf('localhost') >= 0 ?
@@ -96,7 +92,6 @@ export default class endPointData extends React.Component<any, any> {
         // const p = this.props
         const s = this.state
         const objectKeyZeroToList = Object.keys(s.endPointData).map((el, ind) => {
-            // console.log("1")
             if (typeof s.endPointData[el] === 'object' && s.endPointData[el] !== null && this.state[el] !== true) {
                 return (
                     <li className='liNode' key={ind + 'li'}>
@@ -128,7 +123,6 @@ export default class endPointData extends React.Component<any, any> {
                 )
             } else {
                 let thisString = s.endPointData[el]
-                // console.log("3")
                 return (
                     <li className='liNode' key={ind + 'li'}>
                         <div key={ind}>{el} - {thisString} </div>
