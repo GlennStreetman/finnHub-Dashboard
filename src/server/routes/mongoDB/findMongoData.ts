@@ -54,6 +54,7 @@ router.post('/findMongoData', async (req: findMongoDataPost, res: any) => {
             const dataSet = database.collection('dataSet');
             const findList = [{ key: 'plug' }]
             for (const key in searchList) {
+
                 const thisKey = dashboard + '-' + searchList[key]
                 findList.push({
                     key: thisKey
@@ -64,13 +65,11 @@ router.post('/findMongoData', async (req: findMongoDataPost, res: any) => {
                 $or: findList
             }
             const findDataSet = await dataSet.find(options)
-            // console.log(findDataSet)
             const resList: resObj[] = []
             await findDataSet.forEach((data: resObj) => {
                 resList.push(data)
             })
 
-            // console.log('3Got data', resList)
             res.status(200).json(resList) //returns list of objects.
 
         }
