@@ -111,7 +111,7 @@ class login extends React.Component {
         const p = this.props
         if (data.login) {
             this.setState({message: ""})
-            console.log('login data: ', data)
+            // console.log('login data: ', data)
             p.processLogin(data["key"], data["login"], data['ratelimit'], data['apiAlias'], data['widgetsetup']);
             p.updateExchangeList(data.exchangelist)
             p.updateDefaultExchange(data.defaultexchange)
@@ -167,7 +167,7 @@ class login extends React.Component {
             // console.log("3")
             this.secretQuestion(s.text0, s.userName)
             .then((data) => {
-                console.log(data)
+                // console.log(data)
                 if (data.question) {
                     this.setState({
                         message: "username: " + data["users"],
