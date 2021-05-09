@@ -148,7 +148,7 @@ async function buildTemplateData(promiseData, workBookPath){
 
 function printTemplateWorksheets(w, worksheetName, worksheetKeys, sourceTemplate){
     //create template copys for each security key if query string multi=true
-    console.log('print', w.workSheetName)
+    // console.log('print', worksheetName)
     for (const s of worksheetKeys) {
         let copySheet = w.addWorksheet(`temp`)
         copySheet.model = sourceTemplate.model
@@ -156,6 +156,195 @@ function printTemplateWorksheets(w, worksheetName, worksheetKeys, sourceTemplate
     }
 
 }
+
+function checkTimeSeriesStatus(ws, promiseData){
+    let returnFlag = 0
+    ws.eachRow({includeEmpty: false},(row)=>{
+    //update all formula cells. Offset their row references by number of rows added before or inside of formula range.
+        row.eachCell({ includeEmpty: false },(cell, colNumber)=>{
+            if (returnFlag === 0 && typeof cell.value === 'string' && cell.value.slice(0,2) === '&=') { //if template formula detected.
+                const searchStringRaw = cell.value
+                const searchString = searchStringRaw.slice(2, searchStringRaw.length)
+                if (searchString !== 'keys.keys') { //if data column
+                    const dataObj = getDataSlice(promiseData, searchString) //could {key: string} pairs OR {key: OBJECT} pairs
+                    // console.log(dataObj)
+                    if (typeof dataObj[Object.keys(dataObj)[0]] === 'object') {
+                        console.log('returning 1', dataObj)
+                        returnFlag = 1
+                    }
+                }
+            }
+        })
+    })
+    return returnFlag
+}
+
+function writeTimeSeriesSheetSingle(w, ws, s, templateData){
+    let rowIterator = 0 //if multiSheet = 'false: add 1 for each line written so that writer doesnt fall out of sync with file.
+    const templateWorksheet = templateData[s]
+    const addedRows = [] //if multiSheet = 'false: list of rows added to template. Used to adjust any excel formulas as they dont auto update when adding rows.
+    for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will add rows = time series count X number of securities.
+        const dataRow = templateWorksheet[row].data //list of rows to be updated from template file. 
+        const writeRows =  templateWorksheet[row].writeRows //used to create range of rows we need to  update.
+        const keyColumns =  templateWorksheet[row].keyColumns //list of key columns for each row. {...integers: integer}
+        let currentKey = '' //the current security key
+        let currKeyColumn = 0 //ref to the source of current security key
+        for (let step = 1; step <= writeRows; step++) { //iterate over new rows that data will populate into
+            let timeSeriesFlag = 1
+            let startRow = 0 //saves the start line for time series data
+            let dataRowCount = 0 //number of rows to enter data for time series
+            for (const updateCell in dataRow) { //{...rowInteger: {...security || key Integer: value || timeSeries{}}}
+                if (keyColumns[updateCell]) {  //update if key column integer. If security this test will fail as security ref is string.
+                    currentKey = dataRow?.[updateCell]?.[step-1]
+                    currKeyColumn = updateCell //Whenever a key value is in a cell update keyColumn. That way multiple keys can exist in the same row.
+                    if (dataRow[updateCell][step-1] && typeof dataRow[updateCell][step-1] === 'string') {
+                        ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][step-1]
+                    }
+                } else if (typeof dataRow[updateCell][currentKey] !== 'object') { 
+                    // if (typeof dataRow[updateCell][currentKey] !== undefined) console.log('111', typeof dataRow[updateCell][currentKey])
+                    if (ws !== undefined) ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][currentKey]
+                } else { 
+                    const dataGroup = dataRow[updateCell][currentKey]
+                    if (timeSeriesFlag === 1) { //only run once.
+                        timeSeriesFlag = 2;
+                        startRow = rowIterator
+                        dataRowCount = Object.keys(dataGroup).length
+                        for (let i = 1; i <= dataRowCount; i++) {
+                            let newRow = parseInt(row) + rowIterator + i 
+                            ws.insertRow(newRow).commit()
+                            addedRows.push(newRow)
+                        }
+                        rowIterator = rowIterator + dataRowCount 
+                        console.log('rowIterator', rowIterator)
+                    }
+                    for (let d = 0; d < dataRowCount;  d++){ //enter data for column
+                        const key = Object.keys(dataGroup)[d]
+                        ws.getRow(parseInt(startRow) + d + 2).getCell(parseInt(updateCell)).value = dataGroup[key]
+                        ws.getRow(parseInt(startRow) + d + 2).getCell(parseInt(currKeyColumn)).value = currentKey
+                        ws.getRow(parseInt(startRow) + d + 2).commit()
+                    }
+                }
+            }
+        }
+    }
+    
+    ws.eachRow({includeEmpty: false},(row, rowNumber)=>{
+        //update all formula cells. Offset their row references by number of rows added before or inside of formula range.
+        row.eachCell({ includeEmpty: false },(cell, colNumber)=>{
+            if (typeof cell.value === 'object') { //if excel formula
+                let updateString = cell.value.formula
+                let updateList = []
+                let re = new RegExp(/(?:^|[^0-9])([A-Z](?:100|[0-9][0-9]?))(?=$|[^0-9A-Z])/g)
+                let allMatches = cell.value.formula.matchAll(re) ? [...cell.value.formula.matchAll(re)] : []
+                for (const m in allMatches) {
+                    let matchRow = parseInt(allMatches[m][1].replace(new RegExp(/\D/g), ''))
+                    let matchColumn = allMatches[m][1].replace(new RegExp(/[0-9]/g), '')
+                    for (const r in addedRows) {
+                        if (matchRow >= parseInt(addedRows[r])) matchRow = matchRow + 1
+                    }
+                    const updateRef = matchColumn + matchRow
+                    updateList.unshift([allMatches[m][1], updateRef]) //update row values in reverse order so you dont double update starting row.
+                }
+                for (const u in updateList) {
+                    updateString = updateString.replace(updateList[u][0], updateList[u][1])
+                }
+                const newValue = cell.value
+                newValue.formula = updateString
+                ws.getRow(rowNumber).getCell(colNumber).value = newValue
+            }
+        })
+        ws.getRow(row).commit()
+    })
+}
+
+
+function dataPointSheetSingle(w, ws, s, templateData){
+    let rowIterator = 0 //if multiSheet = 'false: add 1 for each line written so that writer doesnt fall out of sync with file.
+    const templateWorksheet = templateData[s]
+    const addedRows = [] //if multiSheet = 'false: list of rows added to template. Used to adjust any excel formulas as they dont auto update when adding rows.
+    for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will almost always add rows to return file.
+        const dataRow = templateWorksheet[row].data //list of rows to be updated from template file. 
+        const writeRows =  templateWorksheet[row].writeRows //used to create range of rows we need to  update.
+        const keyColumns =  templateWorksheet[row].keyColumns //list of key columns for each row. {...integers: integer}
+        let currentKey = '' //the current security key
+        for (let step = 1; step <= writeRows; step++) { //iterate over new rows that data will populate into
+            for (const updateCell in dataRow) { //{...rowInteger: {...security || key Integer: value || timeSeries{}}}
+                if (keyColumns[updateCell]) {  //update if key column integer. If security this test will fail as security ref is string.
+                    currentKey = dataRow?.[updateCell]?.[step-1]
+                    if (dataRow[updateCell][step-1] && typeof dataRow[updateCell][step-1] === 'string') {
+                        ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][step-1]
+                    }
+                } else if (typeof dataRow[updateCell][currentKey] !== 'object') { //update if data point
+                    if (ws !== undefined) ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][currentKey]
+                } 
+            }
+                ws.getRow(row + rowIterator).commit()
+                if (step !== writeRows) { 
+                    let newRow = parseInt(row) + rowIterator + 1
+                    ws.insertRow(newRow).commit()
+                    addedRows.push(newRow)
+                    rowIterator = rowIterator + 1
+                }
+        }
+    }
+    
+    ws.eachRow({includeEmpty: false},(row, rowNumber)=>{
+        //update all formula cells. Offset their row references by number of rows added before or inside of formula range.
+        row.eachCell({ includeEmpty: false },(cell, colNumber)=>{
+            if (typeof cell.value === 'object') { //if excel formula
+                let updateString = cell.value.formula
+                let updateList = []
+                let re = new RegExp(/(?:^|[^0-9])([A-Z](?:100|[0-9][0-9]?))(?=$|[^0-9A-Z])/g)
+                let allMatches = cell.value.formula.matchAll(re) ? [...cell.value.formula.matchAll(re)] : []
+                for (const m in allMatches) {
+                    let matchRow = parseInt(allMatches[m][1].replace(new RegExp(/\D/g), ''))
+                    let matchColumn = allMatches[m][1].replace(new RegExp(/[0-9]/g), '')
+                    for (const r in addedRows) {
+                        if (matchRow >= parseInt(addedRows[r])) matchRow = matchRow + 1
+                    }
+                    const updateRef = matchColumn + matchRow
+                    updateList.unshift([allMatches[m][1], updateRef]) //update row values in reverse order so you dont double update starting row.
+                }
+                for (const u in updateList) {
+                    updateString = updateString.replace(updateList[u][0], updateList[u][1])
+                }
+                const newValue = cell.value
+                newValue.formula = updateString
+                ws.getRow(rowNumber).getCell(colNumber).value = newValue
+            }
+        })
+        ws.getRow(row).commit()
+    })
+
+}
+
+function dataPointSheetMulti(w, ws, s, templateData){
+    let rowIterator = 0 //if multiSheet = 'false: add 1 for each line written so that writer doesnt fall out of sync with file.
+    printTemplateWorksheets(w, s, templateData[s].sheetKeys, ws) //create new worksheets for each security
+    const templateWorksheet = templateData[s]
+    for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will almost always add rows to return file.
+        const dataRow = templateWorksheet[row].data //list of rows to be updated from template file. 
+        const writeRows =  templateWorksheet[row].writeRows //used to create range of rows we need to  update.
+        const keyColumns =  templateWorksheet[row].keyColumns //list of key columns for each row. {...integers: integer}
+        let currentKey = '' //the current security key
+        for (let step = 1; step <= writeRows; step++) { //iterate over new rows that data will populate into
+            for (const updateCell in dataRow) { //{...rowInteger: {...security || key Integer: value || timeSeries{}}}
+                if (keyColumns[updateCell]) {  //update if key column integer. If security this test will fail as security ref is string.
+                    currentKey = dataRow?.[updateCell]?.[step-1]
+                    if (dataRow[updateCell][step-1] && typeof dataRow[updateCell][step-1] === 'string') {
+                        ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][step-1]
+                    }
+                } else { //update data point cells.
+                    const tws = w.getWorksheet(`${s}-${currentKey}`)
+                    if (tws !== undefined) tws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][currentKey]
+                }
+            }
+            ws.getRow(row + rowIterator).commit()
+        }
+    }
+    w.removeWorksheet(ws.id)
+}
+
 
 router.get('/runTemplate', async (req, res) => {
     //route accessable via APIKEY or Alias.
@@ -183,108 +372,22 @@ router.get('/runTemplate', async (req, res) => {
             .then((res) => {
                 return processPromiseData(res)
         })
-        // console.log(promiseData.keys)
         const templateData = await buildTemplateData(promiseData, workBookPath) //{...sheetName {...row:{data:{}, writeRows: number, keyColumns: {}}}} from Template File
-        // console.log(templateData['Sheet2'])
         const w = new Excel.Workbook()
         w.xlsx.readFile(workBookPath)
         .then(()=>{ 
-            //write templatedata to temporary worksheet copied from source template.
-            let rowIterator = 0 //if multiSheet = 'false: add 1 for each line written so that writer doesnt fall out of sync with file.
             for (const s in templateData) { //for each worksheet
                 const ws = w.getWorksheet(s)
-                if (multiSheet === `true`) printTemplateWorksheets(w, s, templateData[s].sheetKeys, ws) 
-                const templateWorksheet = templateData[s]
-                const addedRows = [] //if multiSheet = 'false: list of rows added to template. Used to adjust any excel formulas as they dont auto update when adding rows.
-                for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will almost always add rows to return file.
-                    const dataRow = templateWorksheet[row].data //list of rows to be updated from template file. 
-                    const writeRows =  templateWorksheet[row].writeRows //used to create range of rows we need to  update.
-                    const keyColumns =  templateWorksheet[row].keyColumns //list of key columns for each row. {...integers: integer}
-                    let currentKey = '' //the current security key
-                    let currKeyColumn = 0 //ref to the source of current security key
-                    for (let step = 1; step <= writeRows; step++) { //iterate over new rows that data will populate into
-                        let timeSeries = 0 //switch to 1 if time series data found
-                        let startRow = 0 //saves the start line for time series data
-                        let dataRowCount = 0 //number of rows to enter data for time series
-                        for (const updateCell in dataRow) { //{...rowInteger: {...security || key Integer: value || timeSeries{}}}
-                            if (keyColumns[updateCell]) {  //update if key column integer. If security this test will fail as security ref is string.
-                                currentKey = dataRow?.[updateCell]?.[step-1]
-                                currKeyColumn = updateCell //Whenever a key value is in a cell update keyColumn. That way multiple keys can exist in the same row.
-                                if (dataRow[updateCell][step-1] && typeof dataRow[updateCell][step-1] === 'string') {
-                                    ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][step-1]
-                                }
-                            } else if (typeof dataRow[updateCell][currentKey] !== 'object') { //update if data point
-                                if (multiSheet !== `true`) {
-                                    ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][currentKey]
-                                } else {
-                                    const tws = w.getWorksheet(`${s}-${currentKey}`)
-                                    tws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][currentKey]
-                                }
-                            } else { //update if time series
-                                const dataGroup = dataRow[updateCell][currentKey]
-                                if (timeSeries === 0) { //only run once.
-                                    timeSeries = 1;
-                                    startRow = rowIterator
-                                    dataRowCount = Object.keys(dataGroup).length
-                                    for (let i = 1; i <= dataRowCount; i++) {
-                                        let newRow = parseInt(row) + rowIterator + i 
-                                        ws.insertRow(newRow).commit()
-                                        addedRows.push(newRow)
-                                        
-                                    }
-                                    rowIterator = rowIterator + dataRowCount 
-                                }
-                                for (let d = 0; d < dataRowCount;  d++){ //enter data for column
-                                    const key = Object.keys(dataGroup)[d]
-                                    ws.getRow(parseInt(startRow) + d + 2).getCell(parseInt(updateCell)).value = dataGroup[key]
-                                    ws.getRow(parseInt(startRow) + d + 2).getCell(parseInt(currKeyColumn)).value = currentKey
-                                    ws.getRow(parseInt(startRow) + d + 2).commit()
-                                }
-                            }
-                        }
-                        if (timeSeries === 0) { //if not time series
-                            ws.getRow(row + rowIterator).commit()
-                            if (step !== writeRows && multiSheet !== 'true') { //if multisheet is false
-                                let newRow = parseInt(row) + rowIterator + 1
-                                ws.insertRow(newRow).commit()
-                                addedRows.push(newRow)
-                                rowIterator = rowIterator + 1
-                            }
-                            
-                        }
-                    }
-                }
-                
-                if (multiSheet !== `true`) {
-                    ws.eachRow({includeEmpty: false},(row, rowNumber)=>{
-                        //update all formula cells. Offset their row references by number of rows added before or inside of formula range.
-                        row.eachCell({ includeEmpty: false },(cell, colNumber)=>{
-                            if (typeof cell.value === 'object') { //if excel formula
-                                let updateString = cell.value.formula
-                                let updateList = []
-                                let re = new RegExp(/(?:^|[^0-9])([A-Z](?:100|[0-9][0-9]?))(?=$|[^0-9A-Z])/g)
-                                let allMatches = cell.value.formula.matchAll(re) ? [...cell.value.formula.matchAll(re)] : []
-                                for (const m in allMatches) {
-                                    let matchRow = parseInt(allMatches[m][1].replace(new RegExp(/\D/g), ''))
-                                    let matchColumn = allMatches[m][1].replace(new RegExp(/[0-9]/g), '')
-                                    for (const r in addedRows) {
-                                        if (matchRow >= parseInt(addedRows[r])) matchRow = matchRow + 1
-                                    }
-                                    const updateRef = matchColumn + matchRow
-                                    updateList.unshift([allMatches[m][1], updateRef]) //update row values in reverse order so you dont double update starting row.
-                                }
-                                for (const u in updateList) {
-                                    updateString = updateString.replace(updateList[u][0], updateList[u][1])
-                                }
-                                const newValue = cell.value
-                                newValue.formula = updateString
-                                ws.getRow(rowNumber).getCell(colNumber).value = newValue
-                            }
-                        })
-                        ws.getRow(row).commit()
-                    })
-                } else { //if multiSheet === 'true'
-                    w.removeWorksheet(ws.id)
+                let timeSeries = checkTimeSeriesStatus(ws, promiseData)  //set to 1 if worksheet contains time series data.
+                if (timeSeries === 1) {
+                    console.log('creating time series worksheet')
+                    writeTimeSeriesSheetSingle(w, ws, s, templateData)
+                } else if (multiSheet !== 'true') {
+                    console.log('creating data point single')
+                    dataPointSheetSingle(w, ws, s, templateData)
+                } else {
+                    console.log('creating data point multi')
+                    dataPointSheetMulti(w, ws, s, templateData)
                 }
             }
             const deleteSheet = w.getWorksheet('Query')
