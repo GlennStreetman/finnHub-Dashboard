@@ -440,6 +440,7 @@ class App extends React.Component {
           queryData={quaryData}
           updateExchangeList={this.updateExchangeList}
           updateDefaultExchange={this.updateDefaultExchange}
+          rUpdateRateLimit={this.props.rUpdateRateLimit}
         />
       ) : (
         <></>
