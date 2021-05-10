@@ -34,6 +34,7 @@ import { rUpdateExchangeList } from "./slices/sliceExchangeList";
 import { rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus } from "./slices/sliceDataModel";
 import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
+import {rUpdateRateLimit} from "./slices/sliceFinnHubQueue";
 
 
 class App extends React.Component {
@@ -537,12 +538,13 @@ const mapStateToProps = (state) => ({
 });
 
 export default connect(mapStateToProps, { 
-  tGetSymbolList, 
-  rUpdateExchangeList, 
-  rBuildDataModel,
+  tGetSymbolList,
   tGetFinnhubData,
-  tGetMongoDB,
+  tGetMongoDB, 
+  rBuildDataModel,
   rResetUpdateFlag,
   rSetTargetDashboard,
   rSetUpdateStatus,
+  rUpdateExchangeList,
+  rUpdateRateLimit, 
 })(App);

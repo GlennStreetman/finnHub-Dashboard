@@ -13,9 +13,10 @@ interface queue {
     enqueue: Function,
     setSuspend: Function,
     resetQueue: Function,
+    updateInterval: Function,
 }
 
-export const createFunctionQueueObject = function (maxRequestPerInterval, interval, evenlySpaced) {
+export const createFunctionQueueObject = function (maxRequestPerInterval, interval, evenlySpaced) { //interval = 1000 equals 1 second interval. 
     let que: queue = {
         maxRequestPerInterval: maxRequestPerInterval,
         interval: interval,
@@ -76,12 +77,26 @@ export const createFunctionQueueObject = function (maxRequestPerInterval, interv
         resetQueue: function () {
             console.log("Finnhub.io requests queue reset.")
             this.queue = []
+        },
+        updateInterval: function (perSecond) {
+            if (evenlySpaced) {
+                console.log(this.interval, perSecond)
+                this.interval = 1000 / perSecond;
+                this.maxRequestPerInterval = 1;
+            } else {
+                this.maxRequestPerInterval = perSecond;
+                this.interval = 1000
+            }
         }
+
     }
 
     if (evenlySpaced) {
         que.interval = (que.interval) / que.maxRequestPerInterval;
         que.maxRequestPerInterval = 1;
+    } else {
+        que.maxRequestPerInterval = maxRequestPerInterval;
+        que.interval = interval
     }
 
     return que
@@ -121,9 +136,13 @@ export const finnHub = (throttle, reqObj: throttleApiReqObj) => {
             fetch(reqObj.apiString, { 'Access-Control-Allow-Origin': '*' })
                 .then((response) => {
                     if (response.status === 429) {
-                        console.log('--429--')
+                        console.log('--429 rate limit--')
                         throttle.setSuspend(61000)
                         return { 429: 429 }
+                        // } else if (response.status === 403) {
+                        //     console.log('--403 Cors--')
+                        //     // throttle.setSuspend(61000)
+                        //     return { 403: 403 }
                     } else if (response.status === 200) {
                         // console.log("200", response.status)
                         // response.status = 200
@@ -139,7 +158,6 @@ export const finnHub = (throttle, reqObj: throttleApiReqObj) => {
                 .then((data) => {
                     // console.log('data!!!', data)
                     if (data[429] !== undefined) {
-                        console.log('------------>429')
                         const resObj: throttleResObj = {
                             security: reqObj.security,
                             widget: reqObj.widget,
@@ -154,6 +172,21 @@ export const finnHub = (throttle, reqObj: throttleApiReqObj) => {
                         }
                         throttle.openRequests = throttle.openRequests -= 1
                         resolve(resObj)
+                        // } else if (data[403] !== undefined) {
+                        //     const resObj: throttleResObj = {
+                        //         security: reqObj.security,
+                        //         widget: reqObj.widget,
+                        //         apiString: reqObj.apiString,
+                        //         data: reqObj,
+                        //         dashboard: reqObj.dashboard,
+                        //         widgetName: reqObj.widgetName,
+                        //         widgetType: reqObj.widgetType,
+                        //         status: 403,
+                        //         updated: Date.now(),
+                        //         config: reqObj.config,
+                        //     }
+                        //     throttle.openRequests = throttle.openRequests -= 1
+                        //     resolve(resObj)
                     } else if (data[400] !== undefined) {
                         const resObj: throttleResObj = {
                             security: reqObj.security,

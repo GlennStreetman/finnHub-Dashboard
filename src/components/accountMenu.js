@@ -41,7 +41,6 @@ class AccountMenu extends React.Component {
     .then((data) => {
       if (baseState.mounted === true) {
         const dataSet = data["userData"];
-        console.log('dataset', dataSet)
         const rateLimit = dataSet.ratelimit !== null ? dataSet.ratelimit : 25
         const widgetSetup = JSON.parse(dataSet['widgetsetup'])
         this.setState({ 
@@ -79,7 +78,7 @@ class AccountMenu extends React.Component {
       this.props.updateAPIKey(newValue)
     }
     if (changeField === 'ratelimit') {
-      this.props.throttle.updateInterval(newValue)
+      this.props.rUpdateRateLimit(newValue)
     }
     fetch("/accountData", options)
       .then((response) => response.json())
@@ -219,7 +218,7 @@ class AccountMenu extends React.Component {
 
 export function accountMenuProps(that, key = "AccountMenu") {
   let propList = {
-    throttle: that.state.throttle,
+    rUpdateRateLimit: that.props.rUpdateRateLimit,
     apiKey: that.state.apiKey,
     widgetKey: key,
     updateAPIKey: that.updateAPIKey,

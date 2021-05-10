@@ -116,10 +116,8 @@ const dataModel = createSlice({
             const ap: resObj = action.payload
             for (const x in ap) {
                 const db = ap[x].dashboard
-                // state.status[db] = 'Ready'
                 const widget = ap[x].widget
                 const sec = ap[x].security
-                // if (state.dataSet[db] && state.dataSet[db][widget] && state.dataSet[db][widget][sec]) {
                 if (state.dataSet?.[db]?.[widget]?.[sec]) {
                     state.dataSet[db][widget][sec]['apiString'] = ap[x].apiString
                     state.dataSet[db][widget][sec]['updated'] = ap[x].updated
