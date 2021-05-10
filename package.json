@@ -29,6 +29,7 @@
     "express-session": "^1.17.1",
     "graphql": "^15.5.0",
     "graphql-type-json": "^0.3.2",
+    "helmet": "^4.6.0",
     "idb": "^6.0.0",
     "immer": "^8.0.1",
     "mailgun-js": "^0.6.7",
