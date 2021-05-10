@@ -11,7 +11,7 @@ import { marketNewsFilters } from './../widgets/Fundamentals/marketNews/marketNe
 export let estimateOptions = [
     ["EstimatesEarningsCalendar" ,"Earnings Calendar", "stockWidget", "Earnings Calendar", EarningsCalendarFilters,'Free'],  
     ["EstimatesEPSSurprises" ,"EPS Surprises", "stockWidget", "EPS Surprises",,'Free'], 
-    ["EstimatesPriceTarget" ,"Price Target", "stockWidget", "Price Target",,'Free'], 
+    ["EstimatesPriceTarget" ,"Price Target", "stockWidget", "Price Target",,'Premium'], 
     ["EstimatesRecommendationTrends" ,"Recommendation Trends", "stockWidget", "Recommendation Trends",,'Free'], 
 ]
 
