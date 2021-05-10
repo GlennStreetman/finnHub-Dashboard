@@ -137,7 +137,6 @@ app.use('/', forgot)
 app.use('/', newPW)
 app.use('/', reset)
 
-// app.use('/', endPoint)
 app.use('/', logUIError)
 //loggin
 app.use('/', accountData)

@@ -90,7 +90,7 @@ export const createFunctionQueueObject = function (maxRequestPerInterval, interv
 //add all API calls to throttleQue object using function below.
 //throttle =  que object returned by function above.
 
-export interface resObj {
+export interface throttleResObj {
     security: string,
     widget: string,
     apiString: string,
@@ -103,7 +103,17 @@ export interface resObj {
     config: Object,
 }
 
-export const finnHub = (throttle, reqObj) => {
+export interface throttleApiReqObj {
+    apiString: string,
+    widgetName: string,
+    dashboard: string,
+    widgetType: string,
+    config: Object,
+    widget: string,
+    security: string,
+}
+
+export const finnHub = (throttle, reqObj: throttleApiReqObj) => {
     // console.log("creating promise: ", throttle, reqObj)
     return new Promise((resolve) => {
         throttle.enqueue(function () {
@@ -130,7 +140,7 @@ export const finnHub = (throttle, reqObj) => {
                     // console.log('data!!!', data)
                     if (data[429] !== undefined) {
                         console.log('------------>429')
-                        const resObj: resObj = {
+                        const resObj: throttleResObj = {
                             security: reqObj.security,
                             widget: reqObj.widget,
                             apiString: reqObj.apiString,
@@ -145,7 +155,7 @@ export const finnHub = (throttle, reqObj) => {
                         throttle.openRequests = throttle.openRequests -= 1
                         resolve(resObj)
                     } else if (data[400] !== undefined) {
-                        const resObj: resObj = {
+                        const resObj: throttleResObj = {
                             security: reqObj.security,
                             widget: reqObj.widget,
                             apiString: reqObj.apiString,
@@ -160,7 +170,7 @@ export const finnHub = (throttle, reqObj) => {
                         throttle.openRequests = throttle.openRequests -= 1
                         resolve(resObj)
                     } else {
-                        const resObj: resObj = {
+                        const resObj: throttleResObj = {
                             security: reqObj.security,
                             widget: reqObj.widget,
                             apiString: reqObj.apiString,
@@ -179,7 +189,7 @@ export const finnHub = (throttle, reqObj) => {
                 .catch(error => {
                     console.log("finnHub error:", error.message, reqObj)
                     throttle.openRequests = throttle.openRequests -= 1
-                    const thisError: resObj = {
+                    const thisError: throttleResObj = {
                         security: reqObj.security,
                         widget: reqObj.widget,
                         apiString: reqObj.apiString,

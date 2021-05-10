@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { finnHub, resObj as queResObj } from "../appFunctions/throttleQueueAPI";
+import { finnHub, throttleResObj as queResObj } from "../appFunctions/throttleQueueAPI";
 
 //Receives list of widgets and checks stale dates in slice/datamodel to see if updates are needed.
 //If data is not fresh dispatch finnHub api request to throttleQueue.

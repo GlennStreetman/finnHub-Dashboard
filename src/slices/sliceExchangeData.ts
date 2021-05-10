@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { finnHub } from "../appFunctions/throttleQueue";
+// import { finnHub } from "../appFunctions/throttleQueue";
+import { finnHub, throttleApiReqObj } from "../appFunctions/throttleQueueAPI";
 
 export interface reqObj {
     exchange: string,
@@ -32,9 +33,18 @@ export const tGetSymbolList = createAsyncThunk(
     (reqObj: reqObj, thunkAPI: any) => { //{exchange, apiKey}
         const finnQueue = thunkAPI.getState().finnHubQueue.throttle
         const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${reqObj.exchange}&token=${reqObj.apiKey}`
+        const thisReq: throttleApiReqObj = {
+            apiString: apiString,
+            widgetName: 'pass',
+            dashboard: 'pass',
+            widgetType: 'pass',
+            config: {},
+            widget: 'pass',
+            security: 'pass',
+        }
         // console.log('GETTING exchange data', reqObj.exchange, reqObj.apiKey, apiString)
-        return finnHub(finnQueue, apiString) //replace with usestate.
-            .then((data) => {
+        return finnHub(finnQueue, thisReq) //replace with usestate.
+            .then((data: any) => {
                 if (data.error === 429) { //add back into queue if 429
                     tGetSymbolList(reqObj)
                     const resObj: resObj = {
