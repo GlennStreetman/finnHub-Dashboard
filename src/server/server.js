@@ -122,8 +122,6 @@ if (process.env.live === '1') {
   connectMongo((err) => { console.log("Connected", err) })
 }
 
-
-
 app.use('/', login)
 app.use('/', checkLogin)
 //accountRegistration
