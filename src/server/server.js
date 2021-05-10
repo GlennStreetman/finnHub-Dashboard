@@ -1,4 +1,5 @@
 import express from "express";
+import helmet from 'helmet'
 
 import eg from 'express-graphql'
 import dotenv from 'dotenv';
@@ -51,6 +52,7 @@ import graphQLRedirect from './routes/graphQL.js'
 import {schema} from './routes/graphQL/graphQL.js'
 
 const app = express();
+app.use(helmet())
 
 app.use(fileUpload({
   createParentPath: true,
