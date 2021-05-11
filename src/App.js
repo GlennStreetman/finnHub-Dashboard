@@ -270,7 +270,6 @@ class App extends React.Component {
           return this.key;
         }
       };
-      // GetStockPrice(this, stock, s.apiKey, s.throttle);
     } else {
       delete currentStockObj[stockRef];
     }
@@ -444,7 +443,7 @@ class App extends React.Component {
           queryData={quaryData}
           updateExchangeList={this.updateExchangeList}
           updateDefaultExchange={this.updateDefaultExchange}
-          throttle={this.props.throttle}
+          finnHubQueue={this.state.finnHubQueue}
         />
       ) : (
         <></>
@@ -541,7 +540,6 @@ class App extends React.Component {
 const mapStateToProps = (state) => ({
   rExchangeList: state.exchangeList.exchangeList,
   dataModel: state.dataModel,
-  // throttle: state.finnHubQueue.throttle 
 });
 
 export default connect(mapStateToProps, { 

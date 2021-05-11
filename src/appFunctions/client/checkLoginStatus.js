@@ -1,4 +1,4 @@
-export const checkLoginStatus = function checkLoginStatus(processLogin, updateExchangeList, updateDefaultExchange, throttle){
+export const checkLoginStatus = function checkLoginStatus(processLogin, updateExchangeList, updateDefaultExchange, finnHubQueue){
     fetch("/checkLogin")
     .then((response) => response.json())
     .then((data) => {
@@ -7,7 +7,7 @@ export const checkLoginStatus = function checkLoginStatus(processLogin, updateEx
             processLogin(data.apiKey, 1, data.ratelimit, data.apiAlias, data.widgetsetup)
             updateExchangeList(data.exchangelist)
             updateDefaultExchange(data.defaultexchange)
-            // throttle.updateInterval(data.ratelimit)
+            finnHubQueue.updateInterval(data.ratelimit)
         }
     })
 }
