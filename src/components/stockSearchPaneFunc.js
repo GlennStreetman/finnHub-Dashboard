@@ -19,7 +19,7 @@ class StockSearchPane extends React.Component {
     const p = this.props
     if (p.defaultExchange !== p.currentExchange){
       console.log("updating exchange data")
-      p.tGetSymbolList({exchange: p.defaultExchange, apiKey: p.apiKey})
+      p.tGetSymbolList({exchange: p.defaultExchange, apiKey: p.apiKey, finnHubQueue: p.finnHubQueue})
     }
   }
 
@@ -121,6 +121,7 @@ export function searchPaneProps(p) {
     searchText: p.searchText,
     changeSearchText: p.changeSearchText,
     apiKey: p.apiKey,
+    finnHubQueue: p.finnHubQueue,
   };
   return propList;
 }

@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { finnHub, throttleApiReqObj } from "../appFunctions/throttleQueueAPI";
+import { finnHub, throttleApiReqObj, finnHubQueue } from "../appFunctions/throttleQueueAPI";
 
 export interface reqObj {
     exchange: string,
     apiKey: string,
+    finnHubQueue: finnHubQueue,
 }
 
 interface resObj {
@@ -30,7 +31,7 @@ interface stockNode {
 export const tGetSymbolList = createAsyncThunk(
     'newSymbolList',
     (reqObj: reqObj, thunkAPI: any) => { //{exchange, apiKey}
-        const finnQueue = thunkAPI.getState().finnHubQueue.throttle
+        const finnQueue = reqObj.finnHubQueue
         const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${reqObj.exchange}&token=${reqObj.apiKey}`
         const thisReq: throttleApiReqObj = {
             apiString: apiString,

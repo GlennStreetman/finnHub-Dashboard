@@ -93,7 +93,7 @@ function changeExchange(ex){
             const newPayload = {
                 'exchange': newExchangeList[stock],
                 'apiKey': p.apiKey,
-                'throttle': p.throttle,
+                'finnHubQueue': p.finnHubQueue,
             }
             dispatch(tGetSymbolList(newPayload))
         }
@@ -157,9 +157,10 @@ function changeExchange(ex){
 export function exchangeMenuProps(that) {
     let propList = {
         apiKey: that.state.apiKey,
-        throttle: that.state.throttle,
+        finnHubQueue: that.state.finnHubQueue,
         updateExchangeList: that.updateExchangeList,
+
     };
     return propList;
-  }
+}
 

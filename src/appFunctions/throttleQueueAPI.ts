@@ -1,6 +1,6 @@
 import fetch from 'node-fetch';
 //returns queue object. Open new apiCalls by running finnHub function bellow.
-interface queue {
+export interface finnHubQueue {
     maxRequestPerInterval: number,
     interval: number,
     evenlySpaced: boolean,
@@ -17,7 +17,7 @@ interface queue {
 }
 
 export const createFunctionQueueObject = function (maxRequestPerInterval, interval, evenlySpaced) { //interval = 1000 equals 1 second interval. 
-    let que: queue = {
+    let que: finnHubQueue = {
         maxRequestPerInterval: maxRequestPerInterval,
         interval: interval,
         evenlySpaced: evenlySpaced, //true to run evenly over interval period.

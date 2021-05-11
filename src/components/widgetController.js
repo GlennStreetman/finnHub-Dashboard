@@ -54,6 +54,7 @@ class WidgetController extends React.Component {
                 loadSavedDashboard: p.loadSavedDashboard,
                 setSecurityFocus: p.setSecurityFocus,
                 targetSecurity: p.targetSecurity,
+                finnHubQueue: p.finnHubQueue,
             }
             if (el.widgetConfig === 'menuWidget') {
                 thisWidgetProps['menuWidgetToggle'] = this.props.menuWidgetToggle

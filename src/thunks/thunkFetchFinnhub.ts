@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { finnHub, throttleResObj as queResObj } from "../appFunctions/throttleQueueAPI";
+import { finnHub, throttleResObj as queResObj, finnHubQueue } from "../appFunctions/throttleQueueAPI";
 
 //Receives list of widgets and checks stale dates in slice/datamodel to see if updates are needed.
 //If data is not fresh dispatch finnHub api request to throttleQueue.
@@ -7,17 +7,20 @@ import { finnHub, throttleResObj as queResObj } from "../appFunctions/throttleQu
 export interface reqObj {
     targetDashBoard: string,
     widgetList: string[],
+    finnHubQueue: finnHubQueue,
 }
 
 export interface resObj {
     [key: string]: queResObj
 }
 
+//finnHubQueue: s.finnHubQueue,
 
 export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
     'GetFinnhubData',
     (req: reqObj, thunkAPI: any) => { //{dashboard: string, widgetList: []} //receives list of widgets from a dashboard to update.
-        const finnQueue = thunkAPI.getState().finnHubQueue.throttle
+        // const finnQueue = thunkAPI.getState().finnHubQueue.throttle
+        const finnQueue = req.finnHubQueue
         const dataModel = thunkAPI.getState().dataModel.dataSet[req.targetDashBoard] //finnHubData
         // const thisDashboard = dataModel.dataSet[req.targetDashBoard]
         const getWidgets = req.widgetList

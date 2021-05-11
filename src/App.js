@@ -3,6 +3,7 @@ import "./App.css";
 import queryString from "query-string";
 import produce from "immer"
 //app functions
+import { createFunctionQueueObject } from "./appFunctions/throttleQueueAPI";
 import { GetStockPrice, LoadStockData } from "./appFunctions/getStockPrices";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
 import { Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
@@ -52,6 +53,7 @@ class App extends React.Component {
       dashBoardData: {}, //All saved dashboards
       defaultExchange: "US",
       exchangeList: ["US"], //list of all exchanges activated under account management.
+      finnHubQueue: createFunctionQueueObject(30, 1000, true),
       globalStockList: defaultGlobalStockList, //default stocks for new widgets.
       login: 0, //login state. 0 logged out, 1 logged in.
       loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
@@ -152,6 +154,7 @@ class App extends React.Component {
           await that.props.tGetFinnhubData({ //get data for default dashboard.
             targetDashBoard: s.currentDashBoard, 
             widgetList: [targetDash[widget]],
+            finnHubQueue: s.finnHubQueue,
             // widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist)
           })
         }
@@ -167,6 +170,7 @@ class App extends React.Component {
            await that.props.tGetFinnhubData({ //run in background, do not await.
               targetDashBoard: dash, 
               widgetList: Object.keys(s.dashBoardData[dash].widgetlist),
+              finnHubQueue: s.finnHubQueue,
             })
             p.rSetUpdateStatus({
               [dash]: 'Ready'
@@ -191,7 +195,7 @@ class App extends React.Component {
     }
 
     if ((s.globalStockList !== prevState.globalStockList) ){
-      LoadStockData(this, s, GetStockPrice, p.throttle);
+      LoadStockData(this, s, GetStockPrice, s.finnHubQueue);
       LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
     }
 
@@ -231,6 +235,7 @@ class App extends React.Component {
           await that.props.tGetFinnhubData({
             currentDashboard: s.currentDashBoard, 
             widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetList),
+            finnHubQueue: s.finnHubQueue,
           })
           p.rSetUpdateStatus({
             [s.currentDashBoard]: 'Ready'
@@ -355,10 +360,11 @@ class App extends React.Component {
 
   updateDefaultExchange(ex) {
     //needs to check local storage and send stock data as part of payload.
+    const s = this.state
     if (ex.target) {
       //runs on dropdown update.
       this.setState({ defaultExchange: ex.target.value });
-      this.props.tGetSymbolList(ex.target.value, this.state.apiKey)
+      this.props.tGetSymbolList(ex.target.value, this.state.apiKey, s.finnHubQueue)
     } else {
       //runs on login
       this.setState({ defaultExchange: ex });
@@ -391,6 +397,7 @@ class App extends React.Component {
       await that.props.tGetFinnhubData({ //get data for default dashboard.
         targetDashBoard: s.currentDashBoard, 
         widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist),
+        finnHubQueue: s.finnHubQueue,
       })
       p.rSetUpdateStatus({
         [s.currentDashBoard]: 'Ready'
@@ -479,6 +486,7 @@ class App extends React.Component {
           WatchListMenu={this.state.WatchListMenu}
           widgetLockDown={this.state.widgetLockDown}
           widgetSetup={this.state.widgetSetup}
+          finnHubQueue={this.state.finnHubQueue}
         />
         <WidgetController
           login={this.state.login}
@@ -521,6 +529,7 @@ class App extends React.Component {
           loadSavedDashboard={this.loadSavedDashboard}
           setSecurityFocus={this.setSecurityFocus}
           targetSecurity={this.state.targetSecurity}
+          finnHubQueue={this.state.finnHubQueue}
         />
         {loginScreen}
         {backGroundMenu()}
@@ -532,7 +541,7 @@ class App extends React.Component {
 const mapStateToProps = (state) => ({
   rExchangeList: state.exchangeList.exchangeList,
   dataModel: state.dataModel,
-  throttle: state.finnHubQueue.throttle 
+  // throttle: state.finnHubQueue.throttle 
 });
 
 export default connect(mapStateToProps, { 

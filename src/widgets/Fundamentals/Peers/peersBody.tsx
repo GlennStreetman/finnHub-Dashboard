@@ -85,7 +85,7 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
         } else if (updateExchange === 0) {
             console.log('updating exchange')
             setUpdateExchange(1)
-            dispatch(tGetSymbolList({ exchange: p.defaultExchange, apiKey: p.apiKey }))
+            dispatch(tGetSymbolList({ exchange: p.defaultExchange, apiKey: p.apiKey, finnHubQueue: p.finnHubQueue }))
         }
     })
 
@@ -235,6 +235,7 @@ export function peersProps(that, key = "newWidgetNameProps") {
         updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
+        finnHubQueue: that.props.finnHubQueue
     };
     return propList;
 }
