@@ -34,10 +34,12 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                     (reqObj.updated === undefined) ||
                     (Date.now() - reqObj.updated >= 1 * 1000 * 60 * 60 * 3) //more than 3 hours old.
                 ) {
+                    // console.log('reqObj', reqObj)
                     requestList.push(finnHub(finnQueue, reqObj))
                 }
             }
         }
+
         return Promise.all(requestList)
             .then((res) => {
                 const resObj: resObj = {}
@@ -51,8 +53,8 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                     body: JSON.stringify(resObj),
                 };
                 fetch("/finnDashData", options)
-                    .then((response) => { return response.json() })
-                    .then(() => {
+                    .then((response) => {
+                        return response.json()
                     })
                 return (resObj)
             })

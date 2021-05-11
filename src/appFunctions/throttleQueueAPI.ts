@@ -28,7 +28,6 @@ export const createFunctionQueueObject = function (maxRequestPerInterval, interv
         running: 0, //0 not yet started, 1 running
         dequeue: function () {
             this.running = 1
-            // console.log('running deque:', this.running)
             let threshold = this.lastCalled + this.interval;
             let now = Date.now();
 
@@ -37,18 +36,15 @@ export const createFunctionQueueObject = function (maxRequestPerInterval, interv
                 setTimeout(() => this.dequeue(), threshold - now);
                 return;
             } else if (now < this.suspend) {
-                // console.log("Finnhub API calls suspended", that.openRequests, maxRequestPerInterval, that.suspend-now)
                 setTimeout(() => this.dequeue(), this.suspend - now);
                 return;
             } else if (this.openRequests >= this.maxRequestPerInterval) {
-                // console.log("Open finnhub.io request limit exceeded, temp pause requests.")
                 setTimeout(() => this.dequeue(), 100);
                 return;
             } else {
                 //max requests should default to 1 if evenly spaced. 
                 let callbacks = this.queue.splice(0, this.maxRequestPerInterval);
                 for (let x = 0; x < callbacks.length; x++) {
-                    // console.log("Enque: " + callbacks.length, "outstanding: "+ this.queue.length,"Open: " + this.openRequests, new Date())
                     callbacks[x]();
                     this.openRequests = this.openRequests += 1
                 }
@@ -62,13 +58,10 @@ export const createFunctionQueueObject = function (maxRequestPerInterval, interv
             }
         },
         enqueue: function (callback) {
-            // console.log("Enqueing")
             this.queue.push(callback);
             if (this.running === 0) {
-                // console.log("starting queue:", this.interval)
                 this.dequeue()
             }
-            // else {console.log('queue running')}
         },
         setSuspend: function (milliseconds) {
             this.suspend = Date.now() + milliseconds
@@ -79,10 +72,12 @@ export const createFunctionQueueObject = function (maxRequestPerInterval, interv
             this.queue = []
         },
         updateInterval: function (perSecond) {
+            console.log('updating interval: ', perSecond)
             if (evenlySpaced) {
                 console.log(this.interval, perSecond)
                 this.interval = 1000 / perSecond;
                 this.maxRequestPerInterval = 1;
+                console.log('new interval', this.interval)
             } else {
                 this.maxRequestPerInterval = perSecond;
                 this.interval = 1000
@@ -129,35 +124,28 @@ export interface throttleApiReqObj {
 }
 
 export const finnHub = (throttle, reqObj: throttleApiReqObj) => {
-    // console.log("creating promise: ", throttle, reqObj)
     return new Promise((resolve) => {
         throttle.enqueue(function () {
-            // console.log("------------fetch throttleQueAPI--------", reqObj, reqObj.apiString)
-            fetch(reqObj.apiString, { 'Access-Control-Allow-Origin': '*' })
+            console.log(`running: ${new Date()} ${reqObj.apiString}`)
+            fetch(reqObj.apiString) //, { 'Access-Control-Allow-Origin': '*' }
                 .then((response) => {
                     if (response.status === 429) {
                         console.log('--429 rate limit--')
                         throttle.setSuspend(61000)
-                        return { 429: 429 }
-                        // } else if (response.status === 403) {
-                        //     console.log('--403 Cors--')
-                        //     // throttle.setSuspend(61000)
-                        //     return { 403: 403 }
+                        return { status: 429 }
                     } else if (response.status === 200) {
-                        // console.log("200", response.status)
                         // response.status = 200
                         return response.json()
                     } else {
                         console.log("Response other than 429/200", response)
                         return {
-                            400: 400,
+                            status: 400,
                             response: response
                         }
                     }
                 })
                 .then((data) => {
-                    // console.log('data!!!', data)
-                    if (data[429] !== undefined) {
+                    if (data.status === 429) {
                         const resObj: throttleResObj = {
                             security: reqObj.security,
                             widget: reqObj.widget,
@@ -172,22 +160,7 @@ export const finnHub = (throttle, reqObj: throttleApiReqObj) => {
                         }
                         throttle.openRequests = throttle.openRequests -= 1
                         resolve(resObj)
-                        // } else if (data[403] !== undefined) {
-                        //     const resObj: throttleResObj = {
-                        //         security: reqObj.security,
-                        //         widget: reqObj.widget,
-                        //         apiString: reqObj.apiString,
-                        //         data: reqObj,
-                        //         dashboard: reqObj.dashboard,
-                        //         widgetName: reqObj.widgetName,
-                        //         widgetType: reqObj.widgetType,
-                        //         status: 403,
-                        //         updated: Date.now(),
-                        //         config: reqObj.config,
-                        //     }
-                        //     throttle.openRequests = throttle.openRequests -= 1
-                        //     resolve(resObj)
-                    } else if (data[400] !== undefined) {
+                    } else if (data.status === 400) {
                         const resObj: throttleResObj = {
                             security: reqObj.security,
                             widget: reqObj.widget,

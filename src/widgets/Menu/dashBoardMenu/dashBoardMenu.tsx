@@ -54,6 +54,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
         if (saveDashboardAs !== '' && saveDashboardAs !== undefined) {
             let savedDash = await p.saveCurrentDashboard(saveDashboardAs)
             if (savedDash === true) {
+                console.log('dashboard Saved')
                 let returnedDash = await p.getSavedDashBoards()
                 p.updateDashBoards(returnedDash)
             }
@@ -130,7 +131,6 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                                     // value="submit"
                                     onClick={() => {
                                         saveUpdateDashboard(inputText)
-                                        // this.props.saveCurrentDashboard(this.state.inputText);
                                         showCheckMark();
                                     }}
                                 />
@@ -160,8 +160,8 @@ export default forwardRef(DashBoardMenu);
 export function dashBoardMenuProps(that, key = "DashBoardMenu") {
     const helpText = <>
         Save and manage your widget setups with this menu<br />
-  Each saved dashboard becomes its own Finndash API endpoint.<br />
-  Click Endpoints on the top navigation bar to preview your endpoint data.
+        Each saved dashboard becomes its own Finndash API endpoint.<br />
+        Click Endpoints on the top navigation bar to preview your endpoint data.
     </>
 
     let propList = {

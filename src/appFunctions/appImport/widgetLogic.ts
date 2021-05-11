@@ -56,7 +56,6 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
         dashBoardData: newDashBoardData,
     }, () => {
         this.saveCurrentDashboard(s.currentDashBoard)
-        // console.log('---------NEW DASHBOARD DATA------', s.dashBoardData)
         this.props.rBuildDataModel({
             apiKey: this.state.apiKey,
             dashBoardData: newDashBoardData

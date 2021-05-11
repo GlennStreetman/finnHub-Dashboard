@@ -6,7 +6,6 @@ function GetStockPrice(context, stockDescription, apiKey, throttle) {
     const stockSymbol = stockDescription.symbol
     let stockPriceData = {};
     let that = context
-    console.log('getting stock prices')
     const queryString = `https://finnhub.io/api/v1/quote?symbol=${stockSymbol}&token=${apiKey}`
     const reqObj: throttleApiReqObj = {
       apiString: queryString,
@@ -26,7 +25,6 @@ function GetStockPrice(context, stockDescription, apiKey, throttle) {
             currentPrice: data?.data?.c,
           };
           that.setState((prevState) => {
-            // console.log("setting streamingPriceData")
             let newstreamingPriceData = Object.assign({}, prevState.streamingPriceData);
             newstreamingPriceData[`US-${stockSymbol}`] = stockPriceData;
             return { streamingPriceData: newstreamingPriceData };
@@ -36,16 +34,12 @@ function GetStockPrice(context, stockDescription, apiKey, throttle) {
       })
       .catch(error => {
         console.log(error.message)
-        console.log(throttle)
       });
   }
 }
 
 function LoadStockData(context, s, getStockPrice, throttle) {
-  // console.log("------loadStockPrice-------")
   if (Object.keys(s.globalStockList).length !== 0) {
-    // console.log(s.globalStockList)
-    // context.setState({ refreshStockData: 0 })
     for (const stock in s.globalStockList) {
       getStockPrice(context, s.globalStockList[stock], s.apiKey, throttle)
     }

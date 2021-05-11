@@ -114,15 +114,12 @@ router.post("/dashboard", (req, res, next) => {
         DO UPDATE SET globalstocklist = EXCLUDED.globalstocklist
         RETURNING ID
         `;
-        // console.log("SAVE DASHBOARD SETUP:", saveDashBoardSetupQuery)
         db.query(saveDashBoardSetupQuery, (err, rows) => {
             if (err) {
             reject("Failed to save dashboard", err);
             console.log("Failed to save dashboard");
             } else {
-            // console.log("dashboard data updated.", rows.rows[0].id);
             const widgetList = req.body.widgetList
-            // console.log('---------------WIDGETLIST-----------: ', widgetList)
             let querList = `DELETE FROM widgets WHERE dashboardkey = ${rows.rows[0].id};` //upsert for each widget in widgetlist
             for (const widget in widgetList){
                 const w = widgetList[widget]

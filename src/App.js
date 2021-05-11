@@ -34,7 +34,6 @@ import { rUpdateExchangeList } from "./slices/sliceExchangeList";
 import { rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus } from "./slices/sliceDataModel";
 import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
-import {rUpdateRateLimit} from "./slices/sliceFinnHubQueue";
 
 
 class App extends React.Component {
@@ -288,7 +287,6 @@ class App extends React.Component {
       this.setState({ widgetList: updatedWidgetList }, async ()=>{
         let savedDash = await this.saveCurrentDashboard(this.state.currentDashBoard)
         if (savedDash === true) {
-          console.log("dashboards saved")
           let returnedDash = await this.getSavedDashBoards()
           console.log(returnedDash)
           this.updateDashBoards(returnedDash)
@@ -440,7 +438,7 @@ class App extends React.Component {
           queryData={quaryData}
           updateExchangeList={this.updateExchangeList}
           updateDefaultExchange={this.updateDefaultExchange}
-          rUpdateRateLimit={this.props.rUpdateRateLimit}
+          throttle={this.props.throttle}
         />
       ) : (
         <></>
@@ -547,5 +545,4 @@ export default connect(mapStateToProps, {
   rSetTargetDashboard,
   rSetUpdateStatus,
   rUpdateExchangeList,
-  rUpdateRateLimit, 
 })(App);

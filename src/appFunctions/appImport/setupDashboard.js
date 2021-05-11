@@ -88,14 +88,31 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
 }
 
 export const SaveCurrentDashboard = async function saveCurrentDashboard(dashboardName) {
+    //saves current dashboard by name. Assigns new widget ids if using new name.
+    const s = this.state
+    console.log(Object.keys(s.dashBoardData), dashboardName, Object.keys(s.dashBoardData).indexOf(dashboardName))
+    const saveWidgetList = await produce(s.widgetList, (draftState)=>{
+        if (Object.keys(s.dashBoardData).indexOf(dashboardName) === -1) {
+            const stamp = new Date().getTime()
+            const keys = Object.keys(s.widgetList)
+            for (const k in keys) {
+                draftState[stamp + k] = draftState[keys[k]]
+                draftState[stamp + k]['widgetID'] = stamp + k
+                delete draftState[keys[k]]
+            }
+            return draftState
+        }
+    })
+
     return new Promise ((res) => {
         const data = {
             dashBoardName: dashboardName,
-            globalStockList: this.state.globalStockList,
-            widgetList: this.state.widgetList,
-            menuList: this.state.menuList,
+            globalStockList: s.globalStockList,
+            widgetList: saveWidgetList,
+            menuList: s.menuList,
         };
-        console.log("saving current dashboard");
+
+        console.log(saveWidgetList)
 
         const options = {
             method: "POST",
@@ -104,11 +121,10 @@ export const SaveCurrentDashboard = async function saveCurrentDashboard(dashboar
         };
 
         fetch("/dashBoard", options)
-            .then((data) => console.log('dashboard data retrieved'))
-            .then(() => {
-                console.log("loading saved dashboards");
+            .then(res => res.json())
+            .then((data)=>{
+                console.log("loading saved dashboards", data.message);
                 res(true)
-                // this.getSavedDashBoards()
             })
             .catch((err)=>{
                 console.log("Problem returning saved dashboards", err)

@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-// import { finnHub } from "../appFunctions/throttleQueue";
 import { finnHub, throttleApiReqObj } from "../appFunctions/throttleQueueAPI";
 
 export interface reqObj {
@@ -40,9 +39,8 @@ export const tGetSymbolList = createAsyncThunk(
             widgetType: 'pass',
             config: {},
             widget: 'pass',
-            security: 'pass',
+            security: reqObj.exchange,
         }
-        // console.log('GETTING exchange data', reqObj.exchange, reqObj.apiKey, apiString)
         return finnHub(finnQueue, thisReq) //replace with usestate.
             .then((data: any) => {
                 if (data.error === 429) { //add back into queue if 429
@@ -54,11 +52,11 @@ export const tGetSymbolList = createAsyncThunk(
                     return (resObj)
                 } else {
                     let updateStockList = {}
-                    // console.log('data', data)
-                    for (const stockObj in data) {
-                        data[stockObj]['exchange'] = reqObj.exchange
-                        let addStockKey = reqObj.exchange + "-" + data[stockObj]['symbol']
-                        updateStockList[addStockKey] = data[stockObj]
+                    const stockData = data.data
+                    for (const stockObj in stockData) {
+                        stockData[stockObj]['exchange'] = reqObj.exchange
+                        let addStockKey = reqObj.exchange + "-" + stockData[stockObj]['symbol']
+                        updateStockList[addStockKey] = stockData[stockObj]
                         updateStockList[addStockKey]['key'] = addStockKey
                     }
                     const resObj: resObj = {
@@ -92,7 +90,7 @@ const exchangeData = createSlice({
     reducers: {
         rUpdateExchangeData: (state, action) => {
             const ap = action.payload
-            // console.log("UPDATING EXCHANGE LIST", ap)
+
             state.exchangeData = ap
         },
     },
@@ -100,7 +98,6 @@ const exchangeData = createSlice({
     extraReducers: {
         // @ts-ignore: Unreachable code error
         [tGetSymbolList.pending]: (state) => {
-            // console.log('1 getting stock data')
             return state
         },
         // @ts-ignore: Unreachable code error
@@ -117,9 +114,7 @@ const exchangeData = createSlice({
                     data: data.data,
                     updated: Date.now(),
                 }
-                // console.log('updateObj', updateObj, data)
                 if (updateObj.ex !== undefined) {
-                    // console.log("UPDATING", updateObj)
                     state.e = updateObj
                 }
             } catch {

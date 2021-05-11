@@ -11,16 +11,13 @@ const finnHubQueue = createSlice({
             //receives object {a = throttle.action b= params}
             const s = state
             const ap = action.payload
-            s.throttle.updateInterval(ap)
-            return state
-        },
-
-        rEnqueue (state, action) {
-            const s = state
-            const ap = action.payload
-            s.throttle[ap.a] = ap.b
-
-            return state
+                if (s.throttle.evenlySpaced) {
+                    s.throttle.interval = 1000 / ap;
+                    s.throttle.maxRequestPerInterval = 1;
+                } else {
+                    s.throttle.interval = 1000
+                    s.throttle.maxRequestPerInterval = ap;
+                }
         },
 
     },
