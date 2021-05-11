@@ -97,7 +97,7 @@ const mapStateToProps = (state, ownProps) => {
 
   const p = ownProps
   // console.log('EXD', state.exchangeData.exchangeData?.data)
-  const thisExchange = state.exchangeData.exchangeData?.data
+  const thisExchange = state.exchangeData.e?.data
   const inputSymbol = p.searchText.slice(0, p.searchText.indexOf(":"))
   const updateStock = thisExchange !== undefined ? thisExchange[inputSymbol] : {}
   const currentExchange = state.exchangeData.e.ex
