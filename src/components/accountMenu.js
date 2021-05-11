@@ -78,7 +78,7 @@ class AccountMenu extends React.Component {
       this.props.updateAPIKey(newValue)
     }
     if (changeField === 'ratelimit') {
-      this.props.throttle.updateInterval(newValue)
+      this.props.finnHubQueue.updateInterval(newValue)
     }
     fetch("/accountData", options)
       .then((response) => response.json())
@@ -218,7 +218,7 @@ class AccountMenu extends React.Component {
 
 export function accountMenuProps(that, key = "AccountMenu") {
   let propList = {
-    throttle: that.props.throttle,
+    finnHubQueue: that.state.finnHubQueue,
     apiKey: that.state.apiKey,
     widgetKey: key,
     updateAPIKey: that.updateAPIKey,

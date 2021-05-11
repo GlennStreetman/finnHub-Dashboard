@@ -12,7 +12,7 @@ export const ProcessLogin = function processLogin(setKey, setLogin, ratelimit, a
         login: setLogin, 
         apiKey: setKey,
         apiAlias: apiAlias,
-        apiRateLimit: ratelimit,
+        // apiRateLimit: ratelimit,
         widgetSetup: JSON.parse(widgetSetup),
     });
 }

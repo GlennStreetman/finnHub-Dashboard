@@ -74,10 +74,8 @@ export const createFunctionQueueObject = function (maxRequestPerInterval, interv
         updateInterval: function (perSecond) {
             console.log('updating interval: ', perSecond)
             if (evenlySpaced) {
-                console.log(this.interval, perSecond)
                 this.interval = 1000 / perSecond;
                 this.maxRequestPerInterval = 1;
-                console.log('new interval', this.interval)
             } else {
                 this.maxRequestPerInterval = perSecond;
                 this.interval = 1000
