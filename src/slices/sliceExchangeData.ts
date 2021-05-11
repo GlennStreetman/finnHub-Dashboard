@@ -1,5 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import { finnHub, throttleApiReqObj, finnHubQueue } from "../appFunctions/throttleQueueAPI";
+import { finnHub, throttleApiReqObj, finnHubQueue } from "../appFunctions/appImport/throttleQueueAPI";
 
 export interface reqObj {
     exchange: string,

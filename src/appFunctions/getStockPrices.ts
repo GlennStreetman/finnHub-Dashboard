@@ -1,4 +1,4 @@
-import { finnHub, throttleApiReqObj } from "./throttleQueueAPI";
+import { finnHub, throttleApiReqObj } from "./appImport/throttleQueueAPI";
 
 function GetStockPrice(context, stockDescription, apiKey, throttle) {
   //US ONLY

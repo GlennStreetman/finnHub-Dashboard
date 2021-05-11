@@ -160,6 +160,7 @@ class WidgetContainer extends React.Component {
       widgetProps['widgetType'] = this.props.widgetList["widgetType"]
       widgetProps['config'] = this.props.widgetList.config
       widgetProps['updateDashBoards'] = this.props.updateDashBoards
+      widgetProps['finnHubQueue'] = this.props.finnHubQueue
     } 
     // widgetProps.ref = this.widgetRef
     if (this.props.widgetCopy) {
