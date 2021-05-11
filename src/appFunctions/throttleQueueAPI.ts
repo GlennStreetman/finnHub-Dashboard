@@ -126,7 +126,7 @@ export interface throttleApiReqObj {
 export const finnHub = (throttle, reqObj: throttleApiReqObj) => {
     return new Promise((resolve) => {
         throttle.enqueue(function () {
-            console.log(`running: ${new Date()} ${reqObj.apiString}`)
+            // console.log(`running: ${new Date()} ${reqObj.apiString}`)
             fetch(reqObj.apiString) //, { 'Access-Control-Allow-Origin': '*' }
                 .then((response) => {
                     if (response.status === 429) {
@@ -134,7 +134,6 @@ export const finnHub = (throttle, reqObj: throttleApiReqObj) => {
                         throttle.setSuspend(61000)
                         return { status: 429 }
                     } else if (response.status === 200) {
-                        // response.status = 200
                         return response.json()
                     } else {
                         console.log("Response other than 429/200", response)

@@ -115,7 +115,7 @@ class login extends React.Component {
             p.processLogin(data["key"], data["login"], data['ratelimit'], data['apiAlias'], data['widgetsetup']);
             p.updateExchangeList(data.exchangelist)
             p.updateDefaultExchange(data.defaultexchange)
-            p.throttle.updateInterval( data['ratelimit'])
+            // p.throttle.updateInterval( data['ratelimit'])
         }
     }
 

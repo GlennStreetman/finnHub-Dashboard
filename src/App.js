@@ -249,8 +249,7 @@ class App extends React.Component {
 
 
   updateGlobalStockList(event, stockRef, stockObj = {}) {
-    console.log("updating global stock list")
-    console.log()
+    console.log("updating global stock list", stockRef, stockObj)
     //pass stockRef to delete, pass in stockObj to update.
     // console.log("update global: ", stockRef, stockObj)
     const s = this.state;
