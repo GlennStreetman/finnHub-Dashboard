@@ -60,7 +60,7 @@ class WidgetController extends React.Component {
                 thisWidgetProps['menuWidgetToggle'] = this.props.menuWidgetToggle
                 thisWidgetProps['showMenu'] = p[el.widgetID]    
             }
-            if (p.widgetCopy.widgetID === el.widgetID){
+            if (p.widgetCopy?.widgetID === el.widgetID){
                 thisWidgetProps.widgetCopy = p.widgetCopy
             }
                 return (

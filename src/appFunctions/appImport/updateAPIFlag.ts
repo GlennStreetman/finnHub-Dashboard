@@ -1,6 +1,6 @@
 import { AppState } from './../../App'
 
-export const updateAPIFlag = function (val: number) {
+export const updateAPIFlag = function (this, val: number) {
     if (val > 0) {
         this.setState(() => {
             const update: Partial<AppState> = {

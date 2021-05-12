@@ -1,7 +1,7 @@
 import { AppState, AppProps } from './../../App'
 import { rBuildDataModelPayload } from './../../slices/sliceDataModel'
 
-export const updateDashBoards = function (data) {
+export const updateDashBoards = function (this, data) {
     const p: AppProps = this.props
     const s: AppState = this.state
     //{dashboardData, currentDashBoard, menuList}

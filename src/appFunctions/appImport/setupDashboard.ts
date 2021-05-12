@@ -2,7 +2,7 @@ import produce from "immer"
 
 import { AppState, globalStockList, widgetList, menuList } from './../../App'
 
-export const LoadDashBoard = async function loadDashBoard(newGlobalList: globalStockList, newWidgetList: widgetList) {
+export const LoadDashBoard = async function loadDashBoard(this, newGlobalList: globalStockList, newWidgetList: widgetList) {
     //setup global stock list.
     // console.log("HERE",newGlobalList, newWidgetList)
     let updateGlobalList: globalStockList = await produce(newGlobalList, (draftState: globalStockList) => {
@@ -45,7 +45,7 @@ export const LoadDashBoard = async function loadDashBoard(newGlobalList: globalS
     });
 }
 
-export const NewDashboard = function newDashboard() {
+export const NewDashboard = function newDashboard(this) {
     //Does not save dashboard, just clears everything.
     const s: AppState = this.state
     s.finnHubQueue.resetQueue()
@@ -104,7 +104,7 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
     }
 }
 
-export const SaveCurrentDashboard = async function saveCurrentDashboard(dashboardName: string) {
+export const SaveCurrentDashboard = async function saveCurrentDashboard(this, dashboardName: string) {
     //saves current dashboard by name. Assigns new widget ids if using new name.
     const s: AppState = this.state
     const saveWidgetList: widgetList = await produce(s.widgetList, (draftState: widgetList) => {

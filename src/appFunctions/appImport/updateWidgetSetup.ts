@@ -1,7 +1,10 @@
-export const updateWidgetSetup = function(el){ //widget ref, true/false
-    const s = this.state
-    const newWidgetSetup = {...s.widgetSetup, ...el}
-    this.setState({widgetSetup: newWidgetSetup})
+import { AppState, widgetSetup } from './../../App'
+
+export const updateWidgetSetup = function (this, el: widgetSetup) { //widget ref, true/false
+    const s: AppState = this.state
+    const newWidgetSetup: widgetSetup = { ...s.widgetSetup, ...el }
+    const payload: Partial<AppState> = { widgetSetup: newWidgetSetup }
+    this.setState(payload)
 
     const data = {
         field: "widgetsetup",

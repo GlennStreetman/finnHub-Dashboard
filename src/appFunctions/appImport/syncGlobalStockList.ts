@@ -1,7 +1,7 @@
 import produce from "immer"
 import { AppState, widgetList, dashBoardData } from './../../App'
 
-export const syncGlobalStockList = async function () {
+export const syncGlobalStockList = async function (this) {
     const s: AppState = this.state;
     // let completeUpade = async function(){
     const updatedWidgetList: widgetList = produce(s.widgetList, (draftState: widgetList) => {

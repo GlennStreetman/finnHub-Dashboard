@@ -44,7 +44,7 @@ import { rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus, dataModelDef } fro
 import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 
-export interface stockList {
+export interface stock {
     currency: string,
     dStock: Function,
     description: string,
@@ -57,8 +57,13 @@ export interface stockList {
     type: string,
 }
 
+export interface stockList {
+    [key: string]: stock
+}
+
+
 export interface globalStockList {
-    [key: string]: stockList
+    [key: string]: stock
 }
 
 export interface widget {
@@ -69,7 +74,7 @@ export interface widget {
     trackedStocks: stockList,
     widgetConfig: string,
     widgetHeader: string,
-    widgetID: string,
+    widgetID: string | number,
     widgetType: string,
     xAxis: string,
     yAxis: string,
@@ -150,6 +155,7 @@ export interface AppState {
     dashBoardMenu: number, //1 = show, 0 = hide
     dashBoardData: dashBoardData, //All saved dashboards
     defaultExchange: string,
+    enableDrag: boolean,
     exchangeList: string[], //list of all exchanges activated under account management.
     finnHubQueue: finnHubQueue,
     globalStockList: defaultGlobalStockList, //default stocks for new widgets.
@@ -157,13 +163,12 @@ export interface AppState {
     loadStartingDashBoard: number, //flag switches to 1 after attemping to load default dashboard.
     menuList: menuList, //lists of all menu widgets.
     rebuildDataSet: number, //Set to 1 to trigger finnHub Dataset rebuild. 
-    enableDrag: false,
     socket: any, //socket connection for streaming stock data.
     showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
     streamingPriceData: streamingPriceData, //data shared between some widgets and watchlist menu. Updated by socket data.
     targetSecurity: '', //target security for widgets. Update changes widget focus.
     watchListMenu: number, //1 = show, 0 = hide
-    widgetCopy: { widgetID: null }, //copy of state of widget being dragged.
+    widgetCopy: widget | null, //copy of state of widget being dragged.
     widgetLockDown: number, //1 removes buttons from all widgets.
     widgetList: widgetList, //lists of all widgets.
     widgetSetup: widgetSetup,
@@ -201,7 +206,7 @@ class App extends React.Component<AppProps, AppState> {
             streamingPriceData: {}, //data shared between some widgets and watchlist menu. Updated by socket data.
             targetSecurity: '', //target security for widgets. Update changes widget focus.
             watchListMenu: 1, //1 = show, 0 = hide
-            widgetCopy: { widgetID: null }, //copy of state of widget being dragged.
+            widgetCopy: null, //copy of state of widget being dragged.
             widgetLockDown: 0, //1 removes buttons from all widgets.
             widgetList: {}, //lists of all widgets.
             widgetSetup: {},

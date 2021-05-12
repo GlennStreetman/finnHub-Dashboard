@@ -31,6 +31,7 @@ interface stockNode {
 export const tGetSymbolList = createAsyncThunk(
     'newSymbolList',
     (reqObj: reqObj, thunkAPI: any) => { //{exchange, apiKey}
+        console.log(reqObj)
         const finnQueue = reqObj.finnHubQueue
         const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${reqObj.exchange}&token=${reqObj.apiKey}`
         const thisReq: throttleApiReqObj = {
@@ -42,8 +43,10 @@ export const tGetSymbolList = createAsyncThunk(
             widget: 'pass',
             security: reqObj.exchange,
         }
+
         return finnHub(finnQueue, thisReq) //replace with usestate.
             .then((data: any) => {
+                console.log('BROKEN')
                 if (data.error === 429) { //add back into queue if 429
                     tGetSymbolList(reqObj)
                     const resObj: resObj = {
@@ -52,6 +55,7 @@ export const tGetSymbolList = createAsyncThunk(
                     }
                     return (resObj)
                 } else {
+                    console.log('working')
                     let updateStockList = {}
                     const stockData = data.data
                     for (const stockObj in stockData) {

@@ -1,10 +1,13 @@
 import produce from "immer"
 import { reqBody } from '../../server/routes/mongoDB/setMongoFilters'
+import { AppState, AppProps, menuList, widget, dashBoardData, widgetList } from './../../App'
+import { rBuildDataModelPayload } from '../../slices/sliceDataModel'
 
-export const NewMenuContainer = function newMenuContainer(widgetDescription, widgetHeader, widgetConfig) {
+export const NewMenuContainer = function newMenuContainer(this, widgetDescription: string, widgetHeader: string, widgetConfig: string) {
+    const s: AppState = this.state
     const widgetName = widgetDescription;
-    // this.updateZIndex(widgetName)
-    let newMenuList = produce(this.state.menuList, (draftState) => {
+    const menuList: menuList = s.menuList
+    let newMenuList = produce(menuList, (draftState: menuList) => {
         draftState[widgetName] = {
             column: 0,
             columnOrder: -1,
@@ -16,17 +19,18 @@ export const NewMenuContainer = function newMenuContainer(widgetDescription, wid
             widgetConfig: widgetConfig,
         };
     });
-    this.setState({ menuList: newMenuList });
+    const payload: Partial<AppState> = { menuList: newMenuList }
+    this.setState(payload);
 }
 
-export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescription, widgetHeader, widgetConfig, defaultFilters = {}) {
+export const AddNewWidgetContainer = function AddNewWidgetContainer(this, widgetDescription: string, widgetHeader: string, widgetConfig: string, defaultFilters: Object = {}) {
     //receives info for new widget. Returns updated widgetlist & dashboard data
     // console.log("NEW WIDGET:", widgetDescription, widgetHeader, widgetConfig, defaultFilters)
-    const s = this.state
+    const s: AppState = this.state
 
     const widgetName = new Date().getTime();
-    const widgetStockList = widgetConfig === 'stockWidget' ? s.globalStockList : {}
-    const newWidget = {
+    const widgetStockList = s.globalStockList
+    const newWidget: widget = {
         column: 0,
         columnOrder: -1,
         config: {}, //used to save user setup for the widget that does not require new api request.
@@ -40,73 +44,71 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
         filters: defaultFilters //used to save user setup that requires new api request.
     };
 
-    const newWidgetList = produce(s.widgetList, (draftState) => {
+    const newWidgetList: widgetList = produce(s.widgetList, (draftState: Partial<AppState>) => {
         draftState[widgetName] = newWidget
     })
 
-    const currentDashBoard = s.currentDashBoard
-    const newDashBoardData = produce(s.dashBoardData, (draftState) => {
-        // console.log(s.dashBoardData[currentDashBoard])
+    const currentDashBoard: string = s.currentDashBoard
+    const newDashBoardData: dashBoardData = produce(s.dashBoardData, (draftState) => {
         draftState[currentDashBoard].widgetlist[widgetName] = newWidget
     })
 
-    //Move to side effects functions?
-    this.setState({
+    const payload: Partial<AppState> = {
         widgetList: newWidgetList,
         dashBoardData: newDashBoardData,
-    }, () => {
+    }
+    this.setState(payload, () => {
         this.saveCurrentDashboard(s.currentDashBoard)
-        this.props.rBuildDataModel({
-            apiKey: this.state.apiKey,
+
+        const payload: rBuildDataModelPayload = {
+            apiKey: s.apiKey,
             dashBoardData: newDashBoardData
-        })
+        }
+        this.props.rBuildDataModel(payload)
     });
 
 }
 
-export const ChangeWidgetName = function changeWidgetName(stateRef, widgetID, newName) {
-    console.log('Change widget name: ', stateRef, widgetID, newName)
-    const s = this.state
-    const newWidgetList = produce(s[stateRef], (draftState) => {
+export const ChangeWidgetName = function changeWidgetName(this, stateRef: string, widgetID: string | number, newName: string) {
+    //state ref should be 'widgetList' or 'menuList'
+    const s: AppState = this.state
+    const widgetGroup: widgetList | menuList = s[stateRef]
+    const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
         draftState[widgetID].widgetHeader = newName
     })
-    this.setState({
+    const payload: Partial<AppState> = {
         [stateRef]: newWidgetList,
-    });
+    }
+    this.setState(payload);
 }
 
-export const RemoveWidget = function removeWidget(stateRef, widgetID) {
-    console.log("REMOVE WIDGET", stateRef, widgetID)
-    const s = this.state
-    const newWidgetList = produce(s[stateRef], (draftState) => {
+export const RemoveWidget = function removeWidget(this, stateRef: string, widgetID: string | number) {
+    //state ref should be 'widgetList' or 'menuList'
+    const s: AppState = this.state
+    const widgetGroup: widgetList | menuList = s[stateRef]
+    const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
         delete draftState[widgetID]
     })
-
-    // let newWidgetList = Object.assign(this.state[stateRef]);
-    // delete newWidgetList[widgetID];
-    this.setState({
+    const payload: Partial<AppState> = {
         [stateRef]: newWidgetList,
-    });
+    }
+    this.setState(payload);
 }
 
-export const LockWidgets = function lockWidgets(toggle) {
-    console.log("toggle widget lock")
-    this.setState({ widgetLockDown: toggle })
+export const LockWidgets = function lockWidgets(this, toggle) {
+    const payload: Partial<AppState> = { widgetLockDown: toggle }
+    this.setState(payload)
 }
 
-export const UpdateWidgetFilters = function updateWidgetFilters(widgetID, dataKey, data) {
-    // console.log("updating widget filters.", widgetID, dataKey, data)
+export const UpdateWidgetFilters = function updateWidgetFilters(this, widgetID, dataKey, data) {
     try {
         const s = this.state
-        // console.log("UPDATEWIDGETFILTERS", dataKey, data)
         const newWidgetList = produce(s.widgetList, (draftState) => {
             draftState[widgetID].filters[dataKey] = data
         })
-
         const newDashBoardData = produce(s.dashBoardData, draftState => {
             draftState[s.currentDashBoard].widgetlist[widgetID].filters[dataKey] = data
         })
-
         this.setState({
             widgetList: newWidgetList,
             dashBoardData: newDashBoardData,
@@ -126,7 +128,7 @@ export const UpdateWidgetFilters = function updateWidgetFilters(widgetID, dataKe
     } catch { console.log("Problem updating widget filters.") }
 }
 
-export const UpdateWidgetStockList = function updateWidgetStockList(widgetId, symbol, stockObj = {}) {
+export const UpdateWidgetStockList = function updateWidgetStockList(this, widgetId, symbol, stockObj = {}) {
     //adds if not present, else removes stock from widget specific stock list.
     // console.log(widgetId, symbol, stockObj, 'updating stock list')
     const s = this.state
@@ -177,7 +179,7 @@ export const UpdateWidgetStockList = function updateWidgetStockList(widgetId, sy
     }
 }
 
-export const updateWidgetConfig = function (widgetID: number, updateObj: Object) {
+export const updateWidgetConfig = function (this, widgetID: number, updateObj: Object) {
     //receives key and value to update in widget config object.
     // console.log("UPDATING CONFIG", widgetID, updateObj)
     // const s = this.state
@@ -208,7 +210,7 @@ export const updateWidgetConfig = function (widgetID: number, updateObj: Object)
     })
 }
 
-export const ToggleWidgetVisability = function toggleWidgetVisability() {
+export const ToggleWidgetVisability = function toggleWidgetVisability(this) {
     const s = this.state
     this.setState({ showStockWidgets: s.showStockWidgets === 0 ? 1 : 0 })
 }
