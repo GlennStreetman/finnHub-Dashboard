@@ -2,7 +2,7 @@ import React from "react";
 import "./App.css";
 import queryString from "query-string";
 //app functions
-import { createFunctionQueueObject } from "./appFunctions/appImport/throttleQueueAPI";
+import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
 import { GetStockPrice, LoadStockData } from "./appFunctions/getStockPrices";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
 import { Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
@@ -40,19 +40,11 @@ import { connect } from "react-redux";
 import { tGetSymbolList } from "./slices/sliceExchangeData";
 import { rSetTargetDashboard } from "./slices/sliceShowData";
 import { rUpdateExchangeList } from "./slices/sliceExchangeList";
-import { rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus } from "./slices/sliceDataModel";
+import { rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus, dataModelDef } from "./slices/sliceDataModel";
 import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 
-interface App {
-    [key: string]: any
-}
-
-interface Props {
-    [key: string]: any
-}
-
-interface stockList {
+export interface stockList {
     currency: string,
     dStock: Function,
     description: string,
@@ -65,11 +57,11 @@ interface stockList {
     type: string,
 }
 
-interface globalStockList {
+export interface globalStockList {
     [key: string]: stockList
 }
 
-interface widget {
+export interface widget {
     column: number,
     columnOrder: number,
     config: Object,
@@ -83,30 +75,26 @@ interface widget {
     yAxis: string,
 }
 
-interface widgetList {
+export interface widgetList {
     [key: string]: widget
 }
 
-interface dashboard {
+export interface dashboard {
     dashboardname: string,
     globalstocklist: globalStockList,
     id: number,
     widgetlist: widgetList
 }
 
-interface dashBoardData {
+export interface dashBoardData {
     [key: string]: dashboard
 }
 
-interface functionQueueObject {
+export interface defaultGlobalStockList {
     [key: string]: any
 }
 
-interface defaultGlobalStockList {
-    [key: string]: any
-}
-
-interface menu {
+export interface menu {
     column: number,
     columnOrder: number,
     widgetConfig: string,
@@ -117,24 +105,40 @@ interface menu {
     yAxis: string,
 }
 
-interface menuList {
+export interface menuList {
     [key: string]: menu
 }
 
-interface priceObj {
+export interface priceObj {
     currentPrice: number
 }
 
-interface streamingPriceData {
+export interface streamingPriceData {
     [key: string]: priceObj
 }
 
-interface widgetSetup {
+export interface widgetSetup {
     [key: string]: boolean
 }
 
+interface App {
+    [key: string]: any
+}
 
-interface State {
+export interface AppProps {
+    rExchangeList: string[],
+    dataModel: dataModelDef,
+    tGetSymbolList: Function,
+    tGetFinnhubData: Function,
+    tGetMongoDB: Function,
+    rBuildDataModel: Function,
+    rResetUpdateFlag: Function,
+    rSetTargetDashboard: Function,
+    rSetUpdateStatus: Function,
+    rUpdateExchangeList: Function,
+}
+
+export interface AppState {
     accountMenu: number,
     availableStocks: any,
     aboutMenu: number,
@@ -147,7 +151,7 @@ interface State {
     dashBoardData: dashBoardData, //All saved dashboards
     defaultExchange: string,
     exchangeList: string[], //list of all exchanges activated under account management.
-    finnHubQueue: functionQueueObject,
+    finnHubQueue: finnHubQueue,
     globalStockList: defaultGlobalStockList, //default stocks for new widgets.
     login: number, //login state. 0 logged out, 1 logged in.
     loadStartingDashBoard: number, //flag switches to 1 after attemping to load default dashboard.
@@ -166,7 +170,7 @@ interface State {
     zIndex: string[], //list widgets. Index location sets zIndex
 }
 
-class App extends React.Component<Props, State> {
+class App extends React.Component<AppProps, AppState> {
     constructor(props) {
         super(props);
 

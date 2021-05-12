@@ -15,24 +15,25 @@ interface DataSet {
     targetDashboard: string,
 }
 
+export interface rSetTargetDashboardPayload {
+    targetDashboard: string
+}
+
+interface rSetTargetDashboardArgs {
+    payload: rSetTargetDashboardPayload
+}
 
 const initialState: DataSet = {
     dataSet: {},
     targetDashboard: '',
 }
 
+
+
 const showData = createSlice({
     name: 'showData',
     initialState,
     reducers: {
-        // rSetVisableData: (state, action) => {
-        //     //payload = {key: "string", data: {}}
-        //     //if key exists set data
-        //     const ap: any = action.payload
-        //     const key: string = ap.key
-        //     const data: DataNode = ap.data
-        //     if (state.dataSet[key]) { state.dataSet[key] = data }
-        // },
         rBuildVisableData: (state, action) => {
             //adds new key that is populated by data later.
             //payload {key: string, {...widget-ex-stck: {empty obj}}}
@@ -45,11 +46,7 @@ const showData = createSlice({
                 state.dataSet[key][thisSecurity] = {}
             }
         },
-        // rResetVisableData: (state, action) => {
-        //     //resets state after loading new dataset.
-        //     state.dataSet = {}
-        // },
-        rSetTargetDashboard: (state, action) => { //{targetDashboard}
+        rSetTargetDashboard: (state, action: rSetTargetDashboardArgs) => { //{targetDashboard}
             const target = action.payload.targetDashboard
             // console.log('target', target, action.payload)
             state.targetDashboard = target

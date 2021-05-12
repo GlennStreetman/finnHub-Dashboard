@@ -1,11 +1,13 @@
 import produce from "immer"
 
-export const LoadDashBoard = async function loadDashBoard(newGlobalList, newWidgetList) {
+import { AppState, globalStockList, widgetList, menuList } from './../../App'
+
+export const LoadDashBoard = async function loadDashBoard(newGlobalList: globalStockList, newWidgetList: widgetList) {
     //setup global stock list.
     // console.log("HERE",newGlobalList, newWidgetList)
-    let updateGlobalList = await produce(newGlobalList, (draftState) => {
-        for (const stock in draftState) {      
-            draftState[stock]['dStock'] = function(ex){
+    let updateGlobalList: globalStockList = await produce(newGlobalList, (draftState: globalStockList) => {
+        for (const stock in draftState) {
+            draftState[stock]['dStock'] = function (ex) {
                 if (ex.length === 1) {
                     return (this.symbol)
                 } else {
@@ -16,48 +18,63 @@ export const LoadDashBoard = async function loadDashBoard(newGlobalList, newWidg
     })
 
     //setup widgets, and their individual stock lists.
-    let updateWidgetList = await produce(newWidgetList, (draftState)=>{
-        for (const widget in draftState){
+    let updateWidgetList: widgetList = await produce(newWidgetList, (draftState: widgetList) => {
+        for (const widget in draftState) {
             // console.log("1")
             const widgetStockObj = draftState[widget]
             const trackedStockObj = widgetStockObj.trackedStocks
             for (const stock in trackedStockObj) {
-                trackedStockObj[stock]['dStock'] = function(ex){
-                if (ex.length === 1) {
-                    return (this.symbol)
-                } else {
-                    return (this.key)
-                }
+                trackedStockObj[stock]['dStock'] = function (ex) {
+                    if (ex.length === 1) {
+                        return (this.symbol)
+                    } else {
+                        return (this.key)
+                    }
                 }
             }
         }
         delete draftState.null
     })
 
-    this.setState({ 
-        globalStockList: updateGlobalList,
-        widgetList: updateWidgetList, 
+    this.setState(() => {
+        const update: Partial<AppState> = {
+            globalStockList: updateGlobalList,
+            widgetList: updateWidgetList,
+        }
+        return update
     });
 }
 
-export const NewDashboard = function newDashboard(){
+export const NewDashboard = function newDashboard() {
     //Does not save dashboard, just clears everything.
-    this.state.throttle.resetQueue()
-    this.setState({
-        currentDashBoard: "",
-        globalStockList: [],
-        widgetList: {},
-        zIndex: [],
+    const s: AppState = this.state
+    s.finnHubQueue.resetQueue()
+    this.setState(() => {
+        const update: Partial<AppState> = {
+            currentDashBoard: "",
+            globalStockList: [],
+            widgetList: {},
+            zIndex: [],
+        }
+        return update
     })
+}
+
+interface serverData { //replace after route is conerted to typescript
+    savedDashBoards: any,
+    menuSetup: any,
+    default: any,
+    message: string,
 }
 
 export const GetSavedDashBoards = async function getSavedDashBoards() {
     let res = await fetch("/dashBoard")
-    let data = await res.json()
-    
+    let data: serverData = await res.json()
+
     if (res.status === 200) {
         const parseDashBoard = data.savedDashBoards
         for (const dash in parseDashBoard) {
+            console.log(typeof parseDashBoard[dash].globalstocklist)
             parseDashBoard[dash].globalstocklist = JSON.parse(parseDashBoard[dash].globalstocklist)
             const thisDash = parseDashBoard[dash].widgetlist
             for (const widget in thisDash) {
@@ -66,11 +83,11 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
                 thisDash[widget].config = JSON.parse(thisDash[widget].config)
             }
         }
-        const loadDash = {
+        const loadDash: Partial<AppState> = {
             dashBoardData: parseDashBoard,
             currentDashBoard: data.default,
         }
-        const menuList = {}
+        const menuList: menuList = {}
         for (const menu in data.menuSetup) {
             menuList[menu] = data.menuSetup[menu]
         }
@@ -80,18 +97,17 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
 
     } else if (res.status === 401) {
         console.log(401)
-        return ({dashBoardData: {message: data.message}})
+        return ({ dashBoardData: { message: data.message } })
     } else {
         console.log("error", res)
-        return [{dashBoardData: {message: data.message}}]
+        return [{ dashBoardData: { message: data.message } }]
     }
 }
 
-export const SaveCurrentDashboard = async function saveCurrentDashboard(dashboardName) {
+export const SaveCurrentDashboard = async function saveCurrentDashboard(dashboardName: string) {
     //saves current dashboard by name. Assigns new widget ids if using new name.
-    const s = this.state
-    console.log(Object.keys(s.dashBoardData), dashboardName, Object.keys(s.dashBoardData).indexOf(dashboardName))
-    const saveWidgetList = await produce(s.widgetList, (draftState)=>{
+    const s: AppState = this.state
+    const saveWidgetList: widgetList = await produce(s.widgetList, (draftState: widgetList) => {
         if (Object.keys(s.dashBoardData).indexOf(dashboardName) === -1) {
             const stamp = new Date().getTime()
             const keys = Object.keys(s.widgetList)
@@ -104,7 +120,7 @@ export const SaveCurrentDashboard = async function saveCurrentDashboard(dashboar
         }
     })
 
-    return new Promise ((res) => {
+    return new Promise((res) => { //update type after route converted to typescript
         const data = {
             dashBoardName: dashboardName,
             globalStockList: s.globalStockList,
@@ -122,11 +138,11 @@ export const SaveCurrentDashboard = async function saveCurrentDashboard(dashboar
 
         fetch("/dashBoard", options)
             .then(res => res.json())
-            .then((data)=>{
+            .then((data) => {
                 console.log("loading saved dashboards", data.message);
                 res(true)
             })
-            .catch((err)=>{
+            .catch((err) => {
                 console.log("Problem returning saved dashboards", err)
                 res(false)
             })

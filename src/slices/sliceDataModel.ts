@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { widgetDict } from '../registers/endPointsReg'
 import { tGetFinnhubData, resObj } from '../thunks/thunkFetchFinnhub'
 import { tGetMongoDB } from '../thunks/thunkGetMongoDB'
+import { dashBoardData } from './../App'
 
 
 interface DataNode {
@@ -14,13 +15,13 @@ interface DataNode {
     // config?: Object,
 }
 
-interface dataModelDef {
+export interface dataModelDef {
     dataSet: { [key: string]: DataNode, },
     status: { [key: string]: string, } //Updating, Ready
     created: string
 }
 
-interface setUpdateStatus { //reference to dataset : status
+export interface setUpdateStatus { //reference to dataset : status
     [key: string]: string
 }
 
@@ -30,6 +31,11 @@ export interface EndPointObj {
 
 interface EndPointAPIList {
     [key: string]: EndPointObj
+}
+
+export interface rBuildDataModelPayload {
+    apiKey: string,
+    dashBoardData: dashBoardData
 }
 
 const initialState: dataModelDef = {
@@ -44,8 +50,8 @@ const dataModel = createSlice({
     reducers: {
         rBuildDataModel: (state, action) => { //{apiKey, dashboardData}
             //receivies dashboard object and builds dataset from scratch.
-            const ap: any = action.payload
-            const apD: any = ap.dashBoardData
+            const ap: rBuildDataModelPayload = action.payload
+            const apD: dashBoardData = ap.dashBoardData
             const endPointAPIList: EndPointAPIList = {} //list of lists. Each list []
             for (const d in apD) { //for each dashboard
                 const dashboardName: string = d
