@@ -1,10 +1,11 @@
 import produce from "immer"
 import { AppState, widget, menu, menuList, widgetList } from './../../App'
 
-export const SetDrag = function setDrag(this, stateRef: string, widgetId: string, widgetCopy: widget) {
-
-    const ref: string = stateRef === "menuWidget" ? "menuList" : "widgetList";
-    const updatedWidgetLocation = produce(this.state[ref], (draftState: Partial<AppState>) => {
+export const SetDrag = function setDrag(stateRef: 'menuWidget' | 'widgetList', widgetId: string | number, widgetCopy: widget) {
+    const s: AppState = this.state
+    const ref = stateRef === "menuWidget" ? "menuList" : "widgetList";
+    const thisList: menuList | widgetList = s[ref]
+    const updatedWidgetLocation = produce(thisList, (draftState: menuList | widgetList) => {
         draftState[widgetId]['column'] = 'drag'
     })
     return new Promise((resolve) => {
@@ -19,21 +20,26 @@ export const SetDrag = function setDrag(this, stateRef: string, widgetId: string
     })
 }
 
-export const MoveWidget = function moveWidget(this, stateRef: string, widgetId: string, xxAxis: number, yyAxis: number, thisCallBack = () => { }) {
-    const widgetListRef: string = stateRef === "menuWidget" ? "menuList" : "widgetList"
-    const updateWidgetLocation = produce(this.state[widgetListRef], (draftState: Partial<AppState>) => {
+export const MoveWidget = function moveWidget(stateRef: 'menuWidget' | 'widgetList', widgetId: string | number, xxAxis: number, yyAxis: number, thisCallBack = () => { }) {
+    const s: AppState = this.state
+    const ref = stateRef === "menuWidget" ? "menuList" : "widgetList"
+    const thisList: menuList | widgetList = s[ref]
+    const updateWidgetLocation = produce(thisList, (draftState: menuList | widgetList) => {
         draftState[widgetId]["xAxis"] = xxAxis;
         draftState[widgetId]["yAxis"] = yyAxis;
     })
-    const payload: Partial<AppState> = { [widgetListRef]: updateWidgetLocation }
-    this.setState((state) => {
+    const payload: Partial<AppState> = { [ref]: updateWidgetLocation }
+    this.setState((state: AppState) => {
         if (state.enableDrag === true) {
             return (payload)
+        } else {
+            console.log('drag not enabled')
+            return false
         }
     }, thisCallBack());
 }
 
-export const SnapOrder = function snapOrder(this, widget: string, column: number, yyAxis: number, wType: string) {
+export const SnapOrder = function snapOrder(widget: string, column: number, yyAxis: number, wType: string) {
     const s: AppState = this.state
     const draft: Partial<AppState> = {
         menuList: s.menuList,
@@ -101,11 +107,12 @@ export const SnapOrder = function snapOrder(this, widget: string, column: number
     this.setState(payload)
 }
 
-export const SnapWidget = function snapWidget(this, stateRef: string, widgetId: string, xxAxis: number, yyAxis: number) {
+export const SnapWidget = function snapWidget(stateRef: string, widgetId: string, xxAxis: number, yyAxis: number) {
     //adjust column based upon status of hidden menu columns.
     const s: AppState = this.state
-    const addColumn = {}
-    addColumn[s.menuList.DashBoardMenu.column] = []
+    const addColumn: { [key: string]: any } = {}
+    const thisColumn = s.menuList.DashBoardMenu.column
+    addColumn[thisColumn] = []
     addColumn[s.menuList.WatchListMenu.column] = []
     addColumn[s.menuList.DashBoardMenu.column].push(s.dashBoardMenu)
     addColumn[s.menuList.WatchListMenu.column].push(s.watchListMenu)
@@ -114,9 +121,9 @@ export const SnapWidget = function snapWidget(this, stateRef: string, widgetId: 
             addColumn[s.widgetList[w].column].push(1)
         }
     }
-    let column = Math.floor(xxAxis / 400)
+    let column: number = Math.floor(xxAxis / 400)
     for (const x in addColumn) {
-        if (addColumn[x].reduce((a, b) => a + b, 0) === 0) {
+        if (addColumn[x].reduce((a: number, b: number) => a + b, 0) === 0) {
             column = column + 1
         }
     }

@@ -28,10 +28,24 @@ interface stockNode {
     type: string,
 }
 
+interface DataNode {
+    ex?: string,
+    data?: stockObj,
+    updated?: number,
+}
+
+export interface sliceExchangeData {
+    e: DataNode,
+    exchangeData?: Object
+}
+
+const initialState: sliceExchangeData = {
+    e: {},
+}
+
 export const tGetSymbolList = createAsyncThunk(
     'newSymbolList',
-    (reqObj: reqObj, thunkAPI: any) => { //{exchange, apiKey}
-        console.log(reqObj)
+    (reqObj: reqObj, thunkAPI: any) => {
         const finnQueue = reqObj.finnHubQueue
         const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${reqObj.exchange}&token=${reqObj.apiKey}`
         const thisReq: throttleApiReqObj = {
@@ -56,7 +70,7 @@ export const tGetSymbolList = createAsyncThunk(
                     return (resObj)
                 } else {
                     console.log('working')
-                    let updateStockList = {}
+                    let updateStockList: stockObj = {}
                     const stockData = data.data
                     for (const stockObj in stockData) {
                         stockData[stockObj]['exchange'] = reqObj.exchange
@@ -74,44 +88,25 @@ export const tGetSymbolList = createAsyncThunk(
     }
 )
 
-interface DataNode {
-    ex?: string,
-    data?: stockObj,
-    updated?: number,
-}
-
-interface DataSet {
-    e: DataNode,
-    exchangeData?: Object
-}
-
-const initialState: DataSet = {
-    e: {},
-}
-
 const exchangeData = createSlice({
     name: 'exchangedata',
     initialState,
     reducers: {
         rUpdateExchangeData: (state, action) => {
             const ap = action.payload
-
             state.exchangeData = ap
         },
     },
 
     extraReducers: {
-        // @ts-ignore: Unreachable code error
-        [tGetSymbolList.pending]: (state) => {
+        [tGetSymbolList.pending.toString()]: (state) => {
             return state
         },
-        // @ts-ignore: Unreachable code error
-        [tGetSymbolList.rejected]: (state, action) => {
+        [tGetSymbolList.rejected.toString()]: (state, action) => {
             console.log('failed to retrieve stock data for: ', action)
             return state
         },
-        // @ts-ignore: Unreachable code error
-        [tGetSymbolList.fulfilled]: (state, action) => {
+        [tGetSymbolList.fulfilled.toString()]: (state, action) => {
             try {
                 let data = action.payload
                 const updateObj: DataNode = {

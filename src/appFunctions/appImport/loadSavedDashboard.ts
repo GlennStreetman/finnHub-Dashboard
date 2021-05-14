@@ -3,12 +3,12 @@ import { rSetTargetDashboardPayload } from './../../slices/sliceShowData'
 import { setUpdateStatus } from './../../slices/sliceDataModel'
 import { reqObj } from './../../thunks/thunkFetchFinnhub'
 
-export const loadSavedDashboard = function (this, target, globalStockList: globalStockList, widgetList: widgetList) {
+export const loadSavedDashboard = function (target: string, globalStockList: globalStockList, widgetList: widgetList) {
     const p: AppProps = this.props
     const payload: rSetTargetDashboardPayload = { targetDashboard: target }
     this.props.rSetTargetDashboard(payload)
     this.loadDashBoard(globalStockList, widgetList);
-    const updateVisable = async function (that) {
+    const updateVisable = async function (that: any) {
         const s: AppState = that.state
         await that.props.tGetMongoDB()
         //set updating

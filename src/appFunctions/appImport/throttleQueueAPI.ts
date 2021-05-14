@@ -16,7 +16,7 @@ export interface finnHubQueue {
     updateInterval: Function,
 }
 
-export const createFunctionQueueObject = function (maxRequestPerInterval, interval, evenlySpaced) { //interval = 1000 equals 1 second interval. 
+export const createFunctionQueueObject = function (maxRequestPerInterval: number, interval: number, evenlySpaced: boolean) { //interval = 1000 equals 1 second interval. 
     let que: finnHubQueue = {
         maxRequestPerInterval: maxRequestPerInterval,
         interval: interval,
@@ -57,13 +57,13 @@ export const createFunctionQueueObject = function (maxRequestPerInterval, interv
                 return
             }
         },
-        enqueue: function (callback) {
+        enqueue: function (callback: Function) {
             this.queue.push(callback);
             if (this.running === 0) {
                 this.dequeue()
             }
         },
-        setSuspend: function (milliseconds) {
+        setSuspend: function (milliseconds: number) {
             this.suspend = Date.now() + milliseconds
             return
         },
@@ -71,7 +71,7 @@ export const createFunctionQueueObject = function (maxRequestPerInterval, interv
             console.log("Finnhub.io requests queue reset.")
             this.queue = []
         },
-        updateInterval: function (perSecond) {
+        updateInterval: function (perSecond: number) {
             console.log('updating interval: ', perSecond)
             if (evenlySpaced) {
                 this.interval = 1000 / perSecond;
@@ -121,12 +121,12 @@ export interface throttleApiReqObj {
     security: string,
 }
 
-export const finnHub = (throttle, reqObj: throttleApiReqObj) => {
+export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
     return new Promise((resolve) => {
         throttle.enqueue(function () {
             // console.log(`running: ${new Date()} ${reqObj.apiString}`)
             fetch(reqObj.apiString) //, { 'Access-Control-Allow-Origin': '*' }
-                .then((response) => {
+                .then((response: any) => {
                     if (response.status === 429) {
                         console.log('--429 rate limit--')
                         throttle.setSuspend(61000)
@@ -141,7 +141,7 @@ export const finnHub = (throttle, reqObj: throttleApiReqObj) => {
                         }
                     }
                 })
-                .then((data) => {
+                .then((data: any) => {
                     if (data.status === 429) {
                         const resObj: throttleResObj = {
                             security: reqObj.security,
@@ -189,7 +189,7 @@ export const finnHub = (throttle, reqObj: throttleApiReqObj) => {
                         resolve(resObj)
                     }
                 })
-                .catch(error => {
+                .catch((error: any) => {
                     console.log("finnHub error:", error.message, reqObj)
                     throttle.openRequests = throttle.openRequests -= 1
                     const thisError: throttleResObj = {

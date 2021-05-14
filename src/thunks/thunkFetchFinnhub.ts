@@ -14,15 +14,11 @@ export interface resObj {
     [key: string]: queResObj
 }
 
-//finnHubQueue: s.finnHubQueue,
-
 export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
     'GetFinnhubData',
     (req: reqObj, thunkAPI: any) => { //{dashboard: string, widgetList: []} //receives list of widgets from a dashboard to update.
-        // const finnQueue = thunkAPI.getState().finnHubQueue.throttle
         const finnQueue = req.finnHubQueue
         const dataModel = thunkAPI.getState().dataModel.dataSet[req.targetDashBoard] //finnHubData
-        // const thisDashboard = dataModel.dataSet[req.targetDashBoard]
         const getWidgets = req.widgetList
         let requestList: Promise<any>[] = []
         for (const w of getWidgets) { //for each widget ID

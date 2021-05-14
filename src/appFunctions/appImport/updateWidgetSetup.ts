@@ -1,6 +1,6 @@
 import { AppState, widgetSetup } from './../../App'
 
-export const updateWidgetSetup = function (this, el: widgetSetup) { //widget ref, true/false
+export const updateWidgetSetup = function (el: widgetSetup) { //widget ref, true/false
     const s: AppState = this.state
     const newWidgetSetup: widgetSetup = { ...s.widgetSetup, ...el }
     const payload: Partial<AppState> = { widgetSetup: newWidgetSetup }

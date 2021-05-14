@@ -1,14 +1,14 @@
 import { AppState } from './../../App'
 import { reqObj } from './../../slices/sliceExchangeData'
 
-export const updateDefaultExchange = function (this, ex) {
+export const updateDefaultExchange = function (ex: string, getSymbol: boolean = false) {
     const s: AppState = this.state
-    if (ex.target) {
-        const payload: Partial<AppState> = { defaultExchange: ex.target.value }
+    if (getSymbol === true) {
+        const payload: Partial<AppState> = { defaultExchange: ex }
         this.setState(payload);
         const tGetSymbolObj: reqObj = {
-            exchange: ex.target.value,
-            apiKey: this.state.apiKey,
+            exchange: ex,
+            apiKey: s.apiKey,
             finnHubQueue: s.finnHubQueue,
         }
         this.props.tGetSymbolList(tGetSymbolObj)

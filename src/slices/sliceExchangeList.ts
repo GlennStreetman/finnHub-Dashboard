@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-interface exchangeListState {
+export interface sliceExchangeList {
     exchangeList: string[]
 }
 
-const startingState: exchangeListState = {
+const startingState: sliceExchangeList = {
     exchangeList: [], //list of active exchanges
 }
 
@@ -16,7 +16,7 @@ const exchangeList = createSlice({
     name: 'exchangeList',
     initialState: startingState,
     reducers: { //reducers can reference eachother with slice.caseReducers.reducer(state)
-        rUpdateExchangeList: (state: exchangeListState, action) => {
+        rUpdateExchangeList: (state: sliceExchangeList, action) => {
             const ap: rUpdateExchangeListPayload = action.payload
             const s = state
             return { ...s, exchangeList: ap.exchangeList }

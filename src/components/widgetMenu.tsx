@@ -1,5 +1,5 @@
 /* eslint-disable no-sparse-arrays */
-import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg.js'
+import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg'
 
 // interface widgetSetup {
 //     [key: string]: boolean

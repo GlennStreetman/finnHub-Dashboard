@@ -1,7 +1,7 @@
 import { AppState, AppProps } from './../../App'
 import { rUpdateExchangeListPayload } from './../../slices/sliceExchangeList'
 
-export const updateExchangeList = function (this, ex: string) {
+export const updateExchangeList = function (ex: string) {
 
     const p: AppProps = this.props;
 

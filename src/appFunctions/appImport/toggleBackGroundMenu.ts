@@ -1,6 +1,6 @@
 import { AppState } from './../../App'
 
-export const toggleBackGroundMenu = function (this, menu: string) {
+export const toggleBackGroundMenu = function (menu: string) {
     if (menu === "") {
         this.setState(() => {
             const update: Partial<AppState> = {

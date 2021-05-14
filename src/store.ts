@@ -1,8 +1,15 @@
 import { configureStore, getDefaultMiddleware } from '@reduxjs/toolkit';
-import exchangeData from './slices/sliceExchangeData'
-import exchangeList from './slices/sliceExchangeList'
-import dataModel from './slices/sliceDataModel'
-import showData from './slices/sliceShowData'
+import exchangeData, { sliceExchangeData } from './slices/sliceExchangeData'
+import exchangeList, { sliceExchangeList } from './slices/sliceExchangeList'
+import dataModel, { sliceDataModel } from './slices/sliceDataModel'
+import showData, { sliceShowData } from './slices/sliceShowData'
+
+export interface storeState {
+  exchangeData: sliceExchangeData,
+  exchangeList: sliceExchangeList,
+  dataModel: sliceDataModel,
+  showData: sliceShowData,
+}
 
 export const store = configureStore({
   reducer: {

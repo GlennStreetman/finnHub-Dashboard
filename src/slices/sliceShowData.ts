@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { tGetMongoDB } from '../thunks/thunkGetMongoDB.js'
+import { tGetMongoDB } from '../thunks/thunkGetMongoDB'
 import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB'
 import { tGetFinnhubData, resObj } from '../thunks/thunkFetchFinnhub'
 
@@ -10,7 +10,7 @@ interface DataNode {
     [key: string]: Object,
 }
 
-interface DataSet {
+export interface sliceShowData {
     dataSet: { [key: string]: DataNode },
     targetDashboard: string,
 }
@@ -23,7 +23,7 @@ interface rSetTargetDashboardArgs {
     payload: rSetTargetDashboardPayload
 }
 
-const initialState: DataSet = {
+const initialState: sliceShowData = {
     dataSet: {},
     targetDashboard: '',
 }

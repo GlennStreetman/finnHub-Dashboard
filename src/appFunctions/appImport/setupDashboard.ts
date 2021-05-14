@@ -1,13 +1,13 @@
 import produce from "immer"
 
-import { AppState, globalStockList, widgetList, menuList } from './../../App'
+import { AppState, globalStockList, widgetList, menuList, dashBoardData } from './../../App'
 
-export const LoadDashBoard = async function loadDashBoard(this, newGlobalList: globalStockList, newWidgetList: widgetList) {
+export const LoadDashBoard = async function loadDashBoard(newGlobalList: globalStockList, newWidgetList: widgetList) {
     //setup global stock list.
     // console.log("HERE",newGlobalList, newWidgetList)
     let updateGlobalList: globalStockList = await produce(newGlobalList, (draftState: globalStockList) => {
         for (const stock in draftState) {
-            draftState[stock]['dStock'] = function (ex) {
+            draftState[stock]['dStock'] = function (ex: string) {
                 if (ex.length === 1) {
                     return (this.symbol)
                 } else {
@@ -24,7 +24,7 @@ export const LoadDashBoard = async function loadDashBoard(this, newGlobalList: g
             const widgetStockObj = draftState[widget]
             const trackedStockObj = widgetStockObj.trackedStocks
             for (const stock in trackedStockObj) {
-                trackedStockObj[stock]['dStock'] = function (ex) {
+                trackedStockObj[stock]['dStock'] = function (ex: string) {
                     if (ex.length === 1) {
                         return (this.symbol)
                     } else {
@@ -45,7 +45,7 @@ export const LoadDashBoard = async function loadDashBoard(this, newGlobalList: g
     });
 }
 
-export const NewDashboard = function newDashboard(this) {
+export const NewDashboard = function newDashboard() {
     //Does not save dashboard, just clears everything.
     const s: AppState = this.state
     s.finnHubQueue.resetQueue()
@@ -67,14 +67,20 @@ interface serverData { //replace after route is conerted to typescript
     message: string,
 }
 
+export interface GetSavedDashBoardsRes {
+    dashBoardData: dashBoardData
+    currentDashBoard: string
+    menuList: menuList
+    message?: string
+}
+
 export const GetSavedDashBoards = async function getSavedDashBoards() {
     let res = await fetch("/dashBoard")
     let data: serverData = await res.json()
 
     if (res.status === 200) {
         const parseDashBoard = data.savedDashBoards
-        for (const dash in parseDashBoard) {
-            console.log(typeof parseDashBoard[dash].globalstocklist)
+        for (const dash in parseDashBoard) { //parse fields that are returned as strings.
             parseDashBoard[dash].globalstocklist = JSON.parse(parseDashBoard[dash].globalstocklist)
             const thisDash = parseDashBoard[dash].widgetlist
             for (const widget in thisDash) {
@@ -83,28 +89,40 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
                 thisDash[widget].config = JSON.parse(thisDash[widget].config)
             }
         }
-        const loadDash: Partial<AppState> = {
-            dashBoardData: parseDashBoard,
-            currentDashBoard: data.default,
-        }
         const menuList: menuList = {}
         for (const menu in data.menuSetup) {
             menuList[menu] = data.menuSetup[menu]
         }
-        loadDash['menuList'] = menuList
-        // console.log("DONE")
-        return (loadDash)
+
+        const GetSavedDashboardsRes: GetSavedDashBoardsRes = {
+            dashBoardData: parseDashBoard,
+            currentDashBoard: data.default,
+            menuList: menuList,
+            message: 'ok'
+        }
+        return (GetSavedDashboardsRes)
 
     } else if (res.status === 401) {
         console.log(401)
-        return ({ dashBoardData: { message: data.message } })
+        const GetSavedDashboardsRes: GetSavedDashBoardsRes = {
+            dashBoardData: {},
+            currentDashBoard: '',
+            menuList: {},
+            message: 'Problem retrieving saved dashboards'
+        }
+        return (GetSavedDashboardsRes)
     } else {
-        console.log("error", res)
-        return [{ dashBoardData: { message: data.message } }]
+        const GetSavedDashboardsRes: GetSavedDashBoardsRes = {
+            dashBoardData: {},
+            currentDashBoard: '',
+            menuList: {},
+            message: 'Problem retrieving saved dashboards'
+        }
+        return (GetSavedDashboardsRes)
     }
 }
 
-export const SaveCurrentDashboard = async function saveCurrentDashboard(this, dashboardName: string) {
+export const SaveCurrentDashboard = async function saveCurrentDashboard(dashboardName: string) {
     //saves current dashboard by name. Assigns new widget ids if using new name.
     const s: AppState = this.state
     const saveWidgetList: widgetList = await produce(s.widgetList, (draftState: widgetList) => {

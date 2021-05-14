@@ -1,9 +1,10 @@
 import produce from "immer"
 import { reqBody } from '../../server/routes/mongoDB/setMongoFilters'
-import { AppState, AppProps, menuList, widget, dashBoardData, widgetList } from './../../App'
+import { AppState, AppProps, menuList, widget, dashBoardData, widgetList, stockList, stock, filters, config } from './../../App'
 import { rBuildDataModelPayload } from '../../slices/sliceDataModel'
 
-export const NewMenuContainer = function newMenuContainer(this, widgetDescription: string, widgetHeader: string, widgetConfig: string) {
+
+export const NewMenuContainer = function newMenuContainer(widgetDescription: string, widgetHeader: string, widgetConfig: string) {
     const s: AppState = this.state
     const widgetName = widgetDescription;
     const menuList: menuList = s.menuList
@@ -23,12 +24,12 @@ export const NewMenuContainer = function newMenuContainer(this, widgetDescriptio
     this.setState(payload);
 }
 
-export const AddNewWidgetContainer = function AddNewWidgetContainer(this, widgetDescription: string, widgetHeader: string, widgetConfig: string, defaultFilters: Object = {}) {
+export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescription: string, widgetHeader: string, widgetConfig: string, defaultFilters: Object = {}) {
     //receives info for new widget. Returns updated widgetlist & dashboard data
     // console.log("NEW WIDGET:", widgetDescription, widgetHeader, widgetConfig, defaultFilters)
     const s: AppState = this.state
 
-    const widgetName = new Date().getTime();
+    const widgetName: number = new Date().getTime();
     const widgetStockList = s.globalStockList
     const newWidget: widget = {
         column: 0,
@@ -37,14 +38,14 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(this, widget
         widgetID: widgetName,
         widgetType: widgetDescription,
         widgetHeader: widgetHeader,
-        xAxis: "5rem",
-        yAxis: "5rem",
+        xAxis: 20, //prev 5 rem
+        yAxis: 20, //prev 5 rem
         trackedStocks: widgetStockList,
         widgetConfig: widgetConfig, //reference to widget type. Menu or data widget.
         filters: defaultFilters //used to save user setup that requires new api request.
     };
 
-    const newWidgetList: widgetList = produce(s.widgetList, (draftState: Partial<AppState>) => {
+    const newWidgetList: widgetList = produce(s.widgetList, (draftState: widgetList) => {
         draftState[widgetName] = newWidget
     })
 
@@ -69,8 +70,7 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(this, widget
 
 }
 
-export const ChangeWidgetName = function changeWidgetName(this, stateRef: string, widgetID: string | number, newName: string) {
-    //state ref should be 'widgetList' or 'menuList'
+export const ChangeWidgetName = function changeWidgetName(stateRef: 'widgetList' | 'menuList', widgetID: string | number, newName: string) {
     const s: AppState = this.state
     const widgetGroup: widgetList | menuList = s[stateRef]
     const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
@@ -82,8 +82,7 @@ export const ChangeWidgetName = function changeWidgetName(this, stateRef: string
     this.setState(payload);
 }
 
-export const RemoveWidget = function removeWidget(this, stateRef: string, widgetID: string | number) {
-    //state ref should be 'widgetList' or 'menuList'
+export const RemoveWidget = function removeWidget(stateRef: 'widgetList' | 'menuList', widgetID: string | number) {
     const s: AppState = this.state
     const widgetGroup: widgetList | menuList = s[stateRef]
     const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
@@ -95,101 +94,97 @@ export const RemoveWidget = function removeWidget(this, stateRef: string, widget
     this.setState(payload);
 }
 
-export const LockWidgets = function lockWidgets(this, toggle) {
+export const LockWidgets = function lockWidgets(toggle: number) {
     const payload: Partial<AppState> = { widgetLockDown: toggle }
     this.setState(payload)
 }
 
-export const UpdateWidgetFilters = function updateWidgetFilters(this, widgetID, dataKey, data) {
+export const UpdateWidgetFilters = function updateWidgetFilters(widgetID: string, dataKey: string, data: filters) {
     try {
-        const s = this.state
-        const newWidgetList = produce(s.widgetList, (draftState) => {
+        const s: AppState = this.state
+        const p: AppProps = this.state
+        const newWidgetList: widgetList = produce(s.widgetList, (draftState: widgetList) => {
             draftState[widgetID].filters[dataKey] = data
         })
-        const newDashBoardData = produce(s.dashBoardData, draftState => {
+        const newDashBoardData: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
             draftState[s.currentDashBoard].widgetlist[widgetID].filters[dataKey] = data
         })
-        this.setState({
+        const payload: Partial<AppState> = {
             widgetList: newWidgetList,
             dashBoardData: newDashBoardData,
-        }, async () => {
+        }
+        this.setState(payload, async () => {
             //delete records from mongoDB then rebuild dataset.
             let res = await fetch(`/deleteFinnDashData?widgetID=${widgetID}`)
-            let data = await res.json()
-            console.log("DATA", data)
             if (res.status === 200) {
-                this.props.rBuildDataModel({
-                    apiKey: this.state.apiKey,
-                    dashBoardData: this.state.dashBoardData
-                })
+                const payload: rBuildDataModelPayload = {
+                    apiKey: s.apiKey,
+                    dashBoardData: s.dashBoardData
+                }
+                p.rBuildDataModel(payload)
             } else { console.log("Problem updating widget filters.") }
 
         })
     } catch { console.log("Problem updating widget filters.") }
 }
 
-export const UpdateWidgetStockList = function updateWidgetStockList(this, widgetId, symbol, stockObj = {}) {
+export const UpdateWidgetStockList = function updateWidgetStockList(widgetId: number, symbol: string, stockObj: stock | Object = {}) {
     //adds if not present, else removes stock from widget specific stock list.
-    // console.log(widgetId, symbol, stockObj, 'updating stock list')
-    const s = this.state
-    // const saveCurrent = ()=>{this.saveCurrentDashboard(this.state.currentDashBoard)}
+    const s: AppState = this.state
     if (isNaN(widgetId) === false) {
 
-        const newWidgetList = produce(s.widgetList, (draftState) => {
-            const trackingSymbolList = draftState[widgetId]["trackedStocks"]; //copy target widgets stock object
+        const newWidgetList = produce(s.widgetList, (draftState: widgetList) => {
+            const trackingSymbolList: stockList = draftState[widgetId]["trackedStocks"]; //copy target widgets stock object
 
             if (Object.keys(trackingSymbolList).indexOf(symbol) === -1) {
                 //add
-                trackingSymbolList[symbol] = { ...stockObj }
-                trackingSymbolList[symbol]['dStock'] = function (ex) {
+                let newStock: stock = { ...stockObj } as stock
+                newStock['dStock'] = function (ex: string) {
                     if (ex.length === 1) {
                         return (this.symbol)
                     } else {
                         return (this.key)
                     }
                 }
+                trackingSymbolList[symbol] = newStock
                 draftState[widgetId]["trackedStocks"] = trackingSymbolList;
-
-
             } else {
-                //remove
+                //remove stock from list
                 console.log("removing stock", symbol)
                 delete trackingSymbolList[symbol]
                 draftState[widgetId]["trackedStocks"] = trackingSymbolList
             }
-
-            // draftState.dashBoardData[s.currentDashBoard].widgetlist = updateWidgetStockList 
         })
 
-        const updatedDashBoard = produce(s.dashBoardData, draftState => {
+        const updatedDashBoard: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
             draftState[s.currentDashBoard].widgetlist = newWidgetList
         })
-
-        this.setState({
+        const payload: Partial<AppState> = {
             widgetList: newWidgetList,
             dashBoardData: updatedDashBoard,
-            // rebuildDataSet: 1,
-        }, () => {
+        }
+        this.setState(payload, () => {
+
             this.saveCurrentDashboard(this.state.currentDashBoard)
-            this.props.rBuildDataModel({
+
+            const payload: rBuildDataModelPayload = {
                 apiKey: this.state.apiKey,
                 dashBoardData: this.state.dashBoardData
-            })
+            }
+            this.props.rBuildDataModel(payload)
         });
     }
 }
 
-export const updateWidgetConfig = function (this, widgetID: number, updateObj: Object) {
-    //receives key and value to update in widget config object.
-    // console.log("UPDATING CONFIG", widgetID, updateObj)
-    // const s = this.state
-    const updatedDashboardData = produce(this.state.widgetList, (draftState) => {
+export const updateWidgetConfig = function (widgetID: number, updateObj: config) {
+    const s: AppState = this.state
+    const updatedDashboardData: widgetList = produce(s.widgetList, (draftState: widgetList) => {
         for (const x in updateObj) {
             draftState[widgetID].config[x] = updateObj[x]
         }
     })
-    // console.log('updatedDashboardData', updatedDashboardData)
-    this.setState({ widgetList: updatedDashboardData }, () => {
+    const payload: Partial<AppState> = { widgetList: updatedDashboardData }
+    this.setState(payload, () => {
         this.saveCurrentDashboard(this.state.currentDashBoard)
         const updatedWidgetFilters = updatedDashboardData[widgetID].config
         const postBody: reqBody = {
@@ -210,7 +205,8 @@ export const updateWidgetConfig = function (this, widgetID: number, updateObj: O
     })
 }
 
-export const ToggleWidgetVisability = function toggleWidgetVisability(this) {
-    const s = this.state
-    this.setState({ showStockWidgets: s.showStockWidgets === 0 ? 1 : 0 })
+export const ToggleWidgetVisability = function toggleWidgetVisability() {
+    const s: AppState = this.state
+    const payload: Partial<AppState> = { showStockWidgets: s.showStockWidgets === 0 ? 1 : 0 }
+    this.setState(payload)
 }

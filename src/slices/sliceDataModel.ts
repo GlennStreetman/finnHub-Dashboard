@@ -1,27 +1,42 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { widgetDict } from '../registers/endPointsReg'
 import { tGetFinnhubData, resObj } from '../thunks/thunkFetchFinnhub'
-import { tGetMongoDB } from '../thunks/thunkGetMongoDB'
+import { tGetMongoDB, getMongoRes } from '../thunks/thunkGetMongoDB'
 import { dashBoardData } from './../App'
 
+interface dataStatus {
+    [key: string]: string, //dashboard data setup status: setup in progress, updating, ready
+}
 
 interface DataNode {
     apiString?: string,
-    updated?: number,
+    updated?: number | string,
     widgetName?: string,
     widgetType?: string,
     dashboard?: string,
     stale?: number,
-    // config?: Object,
 }
 
-export interface dataModelDef {
-    dataSet: { [key: string]: DataNode, },
-    status: { [key: string]: string, } //Updating, Ready
-    created: string
+interface securityList {
+    [key: string]: DataNode
 }
 
-export interface setUpdateStatus { //reference to dataset : status
+interface widgetList {
+    [key: string]: securityList
+}
+
+interface dashboardList {
+    [key: string]: widgetList
+}
+
+
+export interface sliceDataModel {
+    dataSet: dashboardList,
+    status: dataStatus,
+    created: string,
+}
+
+export interface setUpdateStatus {
     [key: string]: string
 }
 
@@ -38,7 +53,7 @@ export interface rBuildDataModelPayload {
     dashBoardData: dashBoardData
 }
 
-const initialState: dataModelDef = {
+const initialState: sliceDataModel = {
     dataSet: {},
     status: {},
     created: 'false',
@@ -48,7 +63,7 @@ const dataModel = createSlice({
     name: 'finnHubData',
     initialState,
     reducers: {
-        rBuildDataModel: (state, action) => { //{apiKey, dashboardData}
+        rBuildDataModel: (state: sliceDataModel, action) => { //{apiKey, dashboardData}
             //receivies dashboard object and builds dataset from scratch.
             const ap: rBuildDataModelPayload = action.payload
             const apD: dashBoardData = ap.dashBoardData
@@ -66,7 +81,6 @@ const dataModel = createSlice({
                         const widgetDescription: string = widgetList[w].widgetHeader
                         const widgetType: string = widgetList[w].widgetType
                         const config: Object = widgetList[w].config
-                        // @ts-ignore: Unreachable code error
                         const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
                         const trackedStocks = widgetList[w].trackedStocks
                         const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, ap.apiKey)
@@ -84,20 +98,16 @@ const dataModel = createSlice({
                     }
                 }
             }
-
-            //check for stale date and retain info?????
             state.dataSet = endPointAPIList
             const flag: boolean | string = state.created === 'false' ? 'true' : 'updated'
-            // console.log("UPDATING FLAG", flag)
             state.created = flag
 
         },
-        rResetUpdateFlag: (state) => {
-            // console.log("reseting update flag")
+        rResetUpdateFlag: (state: sliceDataModel) => {
             state.created = 'true'
 
         },
-        rSetUpdateStatus: (state, action) => {
+        rSetUpdateStatus: (state: sliceDataModel, action) => {
             //set the status of dashboard updates.
             const ap: setUpdateStatus = action.payload
             for (const dataSet in ap) {
@@ -106,19 +116,12 @@ const dataModel = createSlice({
         },
     },
     extraReducers: {
-        // @ts-ignore: Unreachable code error
-        [tGetFinnhubData.pending]: (state, action) => {
-            // console.log('1. Getting stock data!')
-            // return {...state}
+        [tGetFinnhubData.pending.toString()]: (state, action) => {
         },
-        // @ts-ignore: Unreachable code error
-        [tGetFinnhubData.rejected]: (state, action) => {
+        [tGetFinnhubData.rejected.toString()]: (state, action) => {
             console.log('2. failed to retrieve stock data for: ', action)
-            // return {...state}
         },
-        // @ts-ignore: Unreachable code error
-        [tGetFinnhubData.fulfilled]: (state, action) => {
-            // console.log("3 UPDATA DATA STORE:", action.payload)
+        [tGetFinnhubData.fulfilled.toString()]: (state: sliceDataModel, action) => {
             const ap: resObj = action.payload
             for (const x in ap) {
                 const db = ap[x].dashboard
@@ -130,21 +133,15 @@ const dataModel = createSlice({
                 }
             }
         },
-        // @ts-ignore: Unreachable code error
-        [tGetMongoDB.pending]: (state, action) => {
-            // console.log('1. Getting stock data!')
-            // const dashboard: string = action.meta.arg.targetDashBoard
-            // state.status[dashboard] = 'Updating'
+        [tGetMongoDB.pending.toString()]: (state, action) => {
         },
-        // @ts-ignore: Unreachable code error
-        [tGetMongoDB.rejected]: (state, action) => {
+        [tGetMongoDB.rejected.toString()]: (state, action) => {
             console.log('2. failed showData from Mongo: ', action)
-            // return {...state}
         },
-        // @ts-ignore: Unreachable code error
-        [tGetMongoDB.fulfilled]: (state, action) => {
-            // console.log("3Merge update fields into dataSet from mongoDB", action)
-            const ap = action.payload
+
+        [tGetMongoDB.fulfilled.toString()]: (state: sliceDataModel, action) => {
+            //set updated and stale flags.
+            const ap: getMongoRes = action.payload
             for (const x in ap) {
                 const dashboard = ap[x].dashboard
                 const widget = ap[x].widget
@@ -158,7 +155,6 @@ const dataModel = createSlice({
             }
         },
     }
-
 })
 
 export const {

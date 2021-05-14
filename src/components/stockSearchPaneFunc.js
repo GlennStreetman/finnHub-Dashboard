@@ -29,7 +29,8 @@ class StockSearchPane extends React.Component {
   }
 
   changeDefault(event){
-    this.props.updateDefaultExchange(event)
+    this.props.updateDefaultExchange(event.target.value, true)
+    event.preventDefault()
   }
   
   render() { // inputText

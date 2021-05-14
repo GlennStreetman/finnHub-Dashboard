@@ -11,7 +11,7 @@ import {
     ToggleWidgetVisability, ChangeWidgetName, RemoveWidget,
     UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig
 } from "./appFunctions/appImport/widgetLogic";
-import { LoadDashBoard, NewDashboard, GetSavedDashBoards, SaveCurrentDashboard }
+import { LoadDashBoard, NewDashboard, GetSavedDashBoards, GetSavedDashBoardsRes, SaveCurrentDashboard }
     from "./appFunctions/appImport/setupDashboard";
 import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
 import { updateGlobalStockList } from "./appFunctions/appImport/updateGlobalStockList"
@@ -37,10 +37,11 @@ import { WidgetController, MenuWidgetToggle } from "./components/widgetControlle
 
 //redux imports
 import { connect } from "react-redux";
+import { storeState } from './store'
 import { tGetSymbolList } from "./slices/sliceExchangeData";
 import { rSetTargetDashboard } from "./slices/sliceShowData";
 import { rUpdateExchangeList } from "./slices/sliceExchangeList";
-import { rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus, dataModelDef } from "./slices/sliceDataModel";
+import { rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus, sliceDataModel } from "./slices/sliceDataModel";
 import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 
@@ -66,18 +67,26 @@ export interface globalStockList {
     [key: string]: stock
 }
 
+export interface filters { //unique to each widget, not required
+    [key: string]: any
+}
+
+export interface config { //unique to each widget, not required
+    [key: string]: any
+}
+
 export interface widget {
-    column: number,
+    column: string | number, //can be set to drag.
     columnOrder: number,
-    config: Object,
-    filters: Object,
+    config: config,
+    filters: filters,
     trackedStocks: stockList,
     widgetConfig: string,
     widgetHeader: string,
     widgetID: string | number,
     widgetType: string,
-    xAxis: string,
-    yAxis: string,
+    xAxis: number,
+    yAxis: number,
 }
 
 export interface widgetList {
@@ -92,7 +101,7 @@ export interface dashboard {
 }
 
 export interface dashBoardData {
-    [key: string]: dashboard
+    [key: string]: dashboard,
 }
 
 export interface defaultGlobalStockList {
@@ -132,7 +141,7 @@ interface App {
 
 export interface AppProps {
     rExchangeList: string[],
-    dataModel: dataModelDef,
+    dataModel: sliceDataModel,
     tGetSymbolList: Function,
     tGetFinnhubData: Function,
     tGetMongoDB: Function,
@@ -176,7 +185,7 @@ export interface AppState {
 }
 
 class App extends React.Component<AppProps, AppState> {
-    constructor(props) {
+    constructor(props: AppProps) {
         super(props);
 
         const defaultGlobalStockList = {};
@@ -256,24 +265,25 @@ class App extends React.Component<AppProps, AppState> {
         this.updateWidgetSetup = updateWidgetSetup.bind(this)
     }
 
-    componentDidUpdate(prevProps, prevState) {
-        const s = this.state;
-        const p = this.props;
+    componentDidUpdate(prevProps: AppProps, prevState: AppState) {
+        const s: AppState = this.state;
+        const p: AppProps = this.props;
 
         if (s.login === 1 && prevState.login === 0) { //on login build data model.
-            // console.log("Loggin detected, setting up dashboards.");
             this.getSavedDashBoards()
-                .then(data => {
-                    // console.log("UPDATE DASH DATA", data, data.currentDashBoard)
-                    if ((!data.currentDashBoard && Object.keys(data.dashBoardData)) ||
-                        (data.dashBoardData[data.currentDashBoard] === undefined && Object.keys(data.dashBoardData))) {
+                .then((data: GetSavedDashBoardsRes) => {
+                    if ((data.dashBoardData[data.currentDashBoard] === undefined && Object.keys(data.dashBoardData))) { //if invalid current dashboard returned
                         data.currentDashBoard = Object.keys(data.dashBoardData)[0]
                     }
-                    this.setState(data) //{dashboardData: {}, menuList: {}}
+                    this.setState({
+                        dashBoardData: data.dashBoardData,
+                        currentDashBoard: data.currentDashBoard,
+                        menuList: data.menuList!,
+                    })
                     p.rSetTargetDashboard({ targetDashboard: data.currentDashBoard })
                     p.rBuildDataModel({ ...data, apiKey: s.apiKey })
                 })
-                .catch((error) => {
+                .catch((error: any) => {
                     console.error("Failed to recover dashboards", error);
                 });
             ;
@@ -508,7 +518,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 }
 
-const mapStateToProps = (state) => ({
+const mapStateToProps = (state: storeState) => ({
     rExchangeList: state.exchangeList.exchangeList,
     dataModel: state.dataModel,
 });

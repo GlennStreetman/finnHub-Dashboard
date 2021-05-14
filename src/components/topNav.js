@@ -1,5 +1,5 @@
 import React from "react";
-import {estimateOptions, fundamentalsOptions, priceOptions} from '../registers/topNavReg.js'
+import {estimateOptions, fundamentalsOptions, priceOptions} from '../registers/topNavReg'
 
 class TopNav extends React.Component {
     constructor(props) {
