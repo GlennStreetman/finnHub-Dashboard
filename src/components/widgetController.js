@@ -10,8 +10,6 @@ function MenuWidgetToggle(context) {
             that.newMenuContainer(menuName, dashName, "menuWidget");
             that.setState({ [menuName]: 1 });
         } else {
-            console.log('toggling', menuName, dashName )
-            console.log(that.state, that.state[menuName])
             that.state[menuName] === 1 ? that.setState({ [menuName]: 0 }) : that.setState({ [menuName]: 1 });
         }
     }

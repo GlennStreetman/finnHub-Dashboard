@@ -50,6 +50,10 @@ const showData = createSlice({
             const target = action.payload.targetDashboard
             // console.log('target', target, action.payload)
             state.targetDashboard = target
+        },
+        rTargetDashboardLogout: (state) => {
+            state.dataSet = {}
+            state.targetDashboard = ''
         }
 
     },
@@ -135,12 +139,11 @@ const showData = createSlice({
         },
     }
 })
-// })
+
 
 export const {
-    // rSetVisableData,
+    rTargetDashboardLogout,
     rBuildVisableData,
-    // rResetVisableData,
     rSetTargetDashboard,
 } = showData.actions
 export default showData.reducer

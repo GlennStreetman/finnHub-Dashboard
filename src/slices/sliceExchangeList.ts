@@ -21,10 +21,14 @@ const exchangeList = createSlice({
             const s = state
             return { ...s, exchangeList: ap.exchangeList }
         },
+        rExchangeListLogout: (state) => {
+            state.exchangeList = []
+        }
     },
 })
 
 export const {
     rUpdateExchangeList,
+    rExchangeListLogout,
 } = exchangeList.actions
 export default exchangeList.reducer

@@ -96,6 +96,9 @@ const exchangeData = createSlice({
             const ap = action.payload
             state.exchangeData = ap
         },
+        rExchangeDataLogout: (state) => {
+            state.e = {}
+        }
     },
 
     extraReducers: {
@@ -127,5 +130,6 @@ const exchangeData = createSlice({
 
 export const {
     rUpdateExchangeData,
+    rExchangeDataLogout
 } = exchangeData.actions
 export default exchangeData.reducer

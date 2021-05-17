@@ -49,7 +49,6 @@ class TopNav extends React.Component<topNavProps, topNavState> {
             showFundamentals: 0,
             showCost: 0,
         };
-        // this.showPane = this.showPane.bind(this);
         this.dropDownList = this.dropDownList.bind(this);
         this.isChecked = this.isChecked.bind(this);
     }
@@ -61,15 +60,6 @@ class TopNav extends React.Component<topNavProps, topNavState> {
             this.setState({ AboutAPIKeyReminder: 1 })
         }
     }
-
-    // showPane(stateRef: string, fixState = 0) {
-    //     const s: topNavState = this.state
-    //     //toggles view of specified menu. 1 = open 0 = closed
-    //     let showMenu = s[stateRef] === 0 ? 1 : 0;
-    //     if (fixState === 1) showMenu = 1;
-    //     const payload: any = { [stateRef]: showMenu }
-    //     this.setState(payload);
-    // }
 
     isChecked(el: [string, string, string, string, filters | undefined, string]) {
         const p: topNavProps = this.props

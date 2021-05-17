@@ -1,9 +1,15 @@
-import { AppState, widgetSetup } from './../../App'
+import { AppState, widgetSetup, AppProps } from './../../App'
 
 export const Logout = function logOut() {
+    const p: AppProps = this.props
     fetch("/logOut")
-        .then((data) => console.log('logging out', data))
-        .then(() => {
+        .then((res) => res.json())
+        .then((data) => {
+            console.log(data.message)
+            p.rDataModelLogout();
+            p.rExchangeDataLogout();
+            p.rExchangeListLogout();
+            p.rTargetDashboardLogout();
             setTimeout(() => this.setState(this.baseState), 100)
         });
 }

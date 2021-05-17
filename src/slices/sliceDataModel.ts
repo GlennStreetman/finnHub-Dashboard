@@ -114,6 +114,12 @@ const dataModel = createSlice({
                 state.status[dataSet] = ap[dataSet]
             }
         },
+        rDataModelLogout(state) {
+            console.log('reseting state')
+            state.dataSet = {}
+            state.status = {}
+            state.created = 'false'
+        }
     },
     extraReducers: {
         [tGetFinnhubData.pending.toString()]: (state, action) => {
@@ -161,5 +167,6 @@ export const {
     rBuildDataModel,
     rResetUpdateFlag,
     rSetUpdateStatus,
+    rDataModelLogout,
 } = dataModel.actions
 export default dataModel.reducer

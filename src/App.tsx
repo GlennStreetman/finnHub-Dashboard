@@ -38,12 +38,14 @@ import { WidgetController, MenuWidgetToggle } from "./components/widgetControlle
 //redux imports
 import { connect } from "react-redux";
 import { storeState } from './store'
-import { tGetSymbolList } from "./slices/sliceExchangeData";
-import { rSetTargetDashboard } from "./slices/sliceShowData";
-import { rUpdateExchangeList } from "./slices/sliceExchangeList";
-import { rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus, sliceDataModel } from "./slices/sliceDataModel";
+import { tGetSymbolList, rExchangeDataLogout } from "./slices/sliceExchangeData";
+import { rSetTargetDashboard, rTargetDashboardLogout } from "./slices/sliceShowData";
+import { rUpdateExchangeList, rExchangeListLogout } from "./slices/sliceExchangeList";
+import { rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus, sliceDataModel, rDataModelLogout } from "./slices/sliceDataModel";
 import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
+
+
 
 export interface stock {
     currency: string,
@@ -150,6 +152,10 @@ export interface AppProps {
     rSetTargetDashboard: Function,
     rSetUpdateStatus: Function,
     rUpdateExchangeList: Function,
+    rDataModelLogout: Function,
+    rExchangeDataLogout: Function,
+    rExchangeListLogout: Function,
+    rTargetDashboardLogout: Function,
 }
 
 export interface AppState {
@@ -289,7 +295,7 @@ class App extends React.Component<AppProps, AppState> {
             ;
         }
 
-        if ((prevProps.dataModel.created === 'false' && p.dataModel.created === 'true') || (p.dataModel.created === 'updated')) {
+        if ((prevProps.dataModel.created === 'false' && p.dataModel.created === 'true' && s.login === 1) || (p.dataModel.created === 'updated' && s.login === 1)) {
             //on login or data model update update dataset with finnHub data.
             console.log("RUNNING DATA BUILD")
             let setupData = async function () {
@@ -329,8 +335,8 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if ( //if apikey not setup show about menu
-            (s.apiKey === '' && s.apiFlag === 0) ||
-            (s.apiKey === null && s.apiFlag === 0)
+            (s.apiKey === '' && s.apiFlag === 0 && s.login === 1) ||
+            (s.apiKey === null && s.apiFlag === 0 && s.login === 1)
         ) {
             console.log("API key not returned")
             this.setState({
@@ -341,7 +347,7 @@ class App extends React.Component<AppProps, AppState> {
             }, () => { this.toggleBackGroundMenu('about') })
         }
 
-        if ((s.globalStockList !== prevState.globalStockList)) {
+        if ((s.globalStockList !== prevState.globalStockList && s.login === 1)) {
             LoadStockData(this, s, GetStockPrice, s.finnHubQueue);
             LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
         }
@@ -371,7 +377,7 @@ class App extends React.Component<AppProps, AppState> {
             }
         }
 
-        if (s.rebuildDataSet === 1) {
+        if (s.rebuildDataSet === 1 && s.login === 1) {
             console.log("Rebuilding dataset.")
             this.setState({ rebuildDataSet: 0 }, () => {
                 let setupData = async function () {
@@ -443,6 +449,7 @@ class App extends React.Component<AppProps, AppState> {
 
         return (
             <>
+
                 <TopNav
                     AccountMenu={this.state.accountMenu}
                     AddNewWidgetContainer={this.AddNewWidgetContainer}
@@ -530,4 +537,8 @@ export default connect(mapStateToProps, {
     rSetTargetDashboard,
     rSetUpdateStatus,
     rUpdateExchangeList,
+    rDataModelLogout,
+    rExchangeDataLogout,
+    rExchangeListLogout,
+    rTargetDashboardLogout,
 })(App);
