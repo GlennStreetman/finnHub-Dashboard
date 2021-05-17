@@ -2,7 +2,7 @@ import * as React from "react"
 import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
 import { useAppSelector } from '../../../hooks';
 
-// class DashBoardMenu extends React.PureComponent {
+
 function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
 
@@ -167,7 +167,6 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
     let propList = {
         getSavedDashBoards: that.props.getSavedDashBoards,
         dashBoardData: that.props.dashBoardData,
-        // loadDashBoard: that.props.loadDashBoard,
         currentDashBoard: that.props.currentDashBoard,
         saveCurrentDashboard: that.props.saveCurrentDashboard,
         newDashBoard: that.props.newDashboard,

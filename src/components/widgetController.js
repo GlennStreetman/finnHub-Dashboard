@@ -5,11 +5,13 @@ import {returnBodyProps} from "../registers/widgetControllerReg.js"
 function MenuWidgetToggle(context) {
     //Create dashboard menu if first time looking at, else toggle visability
     return function toggleFunction(menuName, dashName = "pass", that = context ){
-        if (that.state.menuList[menuName] === undefined) {
-
+        const menuNameRef = menuName.charAt(0).toUpperCase() + menuName.slice(1)
+        if (that.state.menuList[menuNameRef] === undefined) {
             that.newMenuContainer(menuName, dashName, "menuWidget");
             that.setState({ [menuName]: 1 });
         } else {
+            console.log('toggling', menuName, dashName )
+            console.log(that.state, that.state[menuName])
             that.state[menuName] === 1 ? that.setState({ [menuName]: 0 }) : that.setState({ [menuName]: 1 });
         }
     }
@@ -25,11 +27,8 @@ class WidgetController extends React.Component {
     }
 
     renderWidgetGroup(widgetObjList) {
-        // const p = this.props
         if (widgetObjList !== undefined && widgetObjList[0]['pass'] === undefined) {
-            // console.log("Presort:", widgetObjList)
             widgetObjList.sort((a,b) => (a.columnOrder > b.columnOrder) ? 1 : -1)
-            // console.log("Post Sort:", widgetObjList)
             const p = this.props
             const widgetGroup = widgetObjList.map((el) => {
             const thisWidgetProps = {
@@ -93,7 +92,6 @@ class WidgetController extends React.Component {
         const widgetGroups = Array.from({length: 32},  (i, x) => {return [{'pass':x}]})
         for (const w in allWidgets) {
             const thisColumn = allWidgets[w].column
-            // console.log(thisColumn)
             if (thisColumn === 'drag') {
                 widgetGroups[32] = []
                 widgetGroups[32].push(allWidgets[w])
@@ -102,9 +100,7 @@ class WidgetController extends React.Component {
             }
             widgetGroups[thisColumn].push(allWidgets[w])
             }
-            // widgetGroups[thisColumn] = [allWidgets[w]]
         }
-    // console.log("WIDGETGROUPS:", widgetGroups)
 
         const renderWidgetColumns = Object.keys(widgetGroups).map((el) => {
             return <div key={el+"divkey"} style={{padding: "1px",}}>

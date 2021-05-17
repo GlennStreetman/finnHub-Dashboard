@@ -33,7 +33,7 @@ export const MoveWidget = function moveWidget(stateRef: 'menuWidget' | 'widgetLi
         if (state.enableDrag === true) {
             return (payload)
         } else {
-            console.log('drag not enabled')
+            // console.log('drag not enabled')
             return false
         }
     }, thisCallBack());

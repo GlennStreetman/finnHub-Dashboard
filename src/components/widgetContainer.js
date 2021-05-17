@@ -111,7 +111,6 @@ class WidgetContainer extends React.Component {
 
     function closeDragElement(e) {
       // stop moving when mouse button is released:
-      // if (this.props.widgetList.column !== "drag") { 
       xAxis = e.clientX + window.scrollX;
       yAxis = e.clientY + window.scrollY;
       let newX = xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5
@@ -140,17 +139,17 @@ class WidgetContainer extends React.Component {
   render() {
     const that = this;
     //Add widgets to the list below that should not have access to the stock search pane
-    const hideStockSearchMenu = ["DashBoardMenu"]
+    const hideStockSearchMenu = ["dashBoardMenu"] //consider moving this to its own register.
     const compStyle = {
       display: this.state.show
     };
+
     if (that.props.widgetList.column === 'drag'){ 
       compStyle['position'] = 'absolute'
       compStyle['top'] = this.props.widgetList["yAxis"]
       compStyle['left'] = this.props.widgetList["xAxis"] 
     } 
-
-    let widgetProps = that.props.widgetBodyProps();
+    let widgetProps = that.props.widgetBodyProps ? that.props.widgetBodyProps() : {}
     if (this.props.widgetKey !== "dashBoardMenu") {
       widgetProps["showEditPane"] = that.state.showEditPane;
       widgetProps["showPane"] = that.showPane;
@@ -162,15 +161,10 @@ class WidgetContainer extends React.Component {
       widgetProps['updateDashBoards'] = this.props.updateDashBoards
       widgetProps['finnHubQueue'] = this.props.finnHubQueue
     } 
-    // widgetProps.ref = this.widgetRef
     if (this.props.widgetCopy) {
       widgetProps['widgetCopy'] = this.props.widgetCopy
     }
-    
     const myRef = this.widgetRef
-
-    // const thisWidget = widgetLookUp[this.props.widgetList["widgetType"]](widgetProps, myRef)
-    // console.log("myRef", myRef)
     
     return (
       <div 
