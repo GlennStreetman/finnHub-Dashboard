@@ -1,11 +1,11 @@
 import React from "react";
-import "./App.css";
+// import "./App.css";
 import queryString from "query-string";
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
 import { GetStockPrice, LoadStockData } from "./appFunctions/getStockPrices";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
-import { Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
+import { logoutServer, Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
 import {
     NewMenuContainer, AddNewWidgetContainer, LockWidgets,
     ToggleWidgetVisability, ChangeWidgetName, RemoveWidget,
@@ -137,9 +137,7 @@ export interface widgetSetup {
     [key: string]: boolean
 }
 
-interface App { //plug
-    [key: string]: any
-}
+interface App { [key: string]: any }
 
 export interface AppProps {
     rExchangeList: string[],
@@ -231,6 +229,7 @@ class App extends React.Component<AppProps, AppState> {
         this.baseState = this.state; //used to reset state upon logout.
         //login state logic.
         this.logOut = Logout.bind(this);
+        this.logoutServer = logoutServer.bind(this)
         this.processLogin = ProcessLogin.bind(this);
 
         //app logic for creating/removing, modifying, populating widgets.
@@ -274,7 +273,6 @@ class App extends React.Component<AppProps, AppState> {
     componentDidUpdate(prevProps: AppProps, prevState: AppState) {
         const s: AppState = this.state;
         const p: AppProps = this.props;
-
         if (s.login === 1 && prevState.login === 0) { //on login build data model.
             this.getSavedDashBoards()
                 .then((data: GetSavedDashBoardsRes) => {
@@ -290,9 +288,8 @@ class App extends React.Component<AppProps, AppState> {
                     p.rBuildDataModel({ ...data, apiKey: s.apiKey })
                 })
                 .catch((error: any) => {
-                    console.error("Failed to recover dashboards", error);
+                    console.error("Failed to recover dashboards");
                 });
-            ;
         }
 
         if ((prevProps.dataModel.created === 'false' && p.dataModel.created === 'true' && s.login === 1) || (p.dataModel.created === 'updated' && s.login === 1)) {
@@ -449,7 +446,6 @@ class App extends React.Component<AppProps, AppState> {
 
         return (
             <>
-
                 <TopNav
                     AccountMenu={this.state.accountMenu}
                     AddNewWidgetContainer={this.AddNewWidgetContainer}
@@ -461,6 +457,7 @@ class App extends React.Component<AppProps, AppState> {
                     lockWidgets={this.lockWidgets}
                     login={this.state.login}
                     logOut={this.logOut}
+                    logoutServer={this.logoutServer}
                     menuList={this.state.menuList}
                     menuWidgetToggle={menuWidgetToggle}
                     newMenuContainer={this.newMenuContainer}
@@ -542,3 +539,4 @@ export default connect(mapStateToProps, {
     rExchangeListLogout,
     rTargetDashboardLogout,
 })(App);
+

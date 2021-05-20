@@ -145,9 +145,6 @@ export const SaveCurrentDashboard = async function saveCurrentDashboard(dashboar
             widgetList: saveWidgetList,
             menuList: s.menuList,
         };
-
-        console.log(saveWidgetList)
-
         const options = {
             method: "POST",
             headers: { "Content-Type": "application/json" },

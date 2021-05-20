@@ -4,7 +4,7 @@ import { connect } from "react-redux";
 class CsvUpload extends PureComponent {
     
     componentDidMount(){
-        console.log("UPLOAD LIST RUNNING")
+
         const p = this.props
         p.uploadGlobalStockList(p.rUpdateObj)
         p.resetUploadList()       

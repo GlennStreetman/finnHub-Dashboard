@@ -6,6 +6,7 @@ import {secretQuestion} from "../appFunctions/client/secretQuestion";
 import {newPW} from "../appFunctions/client/newPW";
 import {checkLoginStatus} from "../appFunctions/client/checkLoginStatus";
 import {registerAccount} from "../appFunctions/client/registerAccount";
+import {completeLogin} from "./componentFunctions/completeLogin"
 // import e from "express";
 
 class login extends React.Component {
@@ -32,7 +33,7 @@ class login extends React.Component {
         this.clearText = this.clearText.bind(this);
         this.handleEnterKeyPress = this.handleEnterKeyPress.bind(this)
         this.emailIsValid = this.emailIsValid.bind(this);
-        this.completeLogin = this.completeLogin.bind(this);
+
         //import functions
         this.checkPassword = checkPassword.bind(this);
         this.checkLoginStatus = checkLoginStatus.bind(this)  
@@ -40,6 +41,7 @@ class login extends React.Component {
         this.newPW = newPW.bind(this); 
         this.secretQuestion = secretQuestion.bind(this); 
         this.registerAccount = registerAccount.bind(this);
+        this.completeLogin = completeLogin.bind(this);
     }
 
     componentDidMount(){
@@ -98,39 +100,23 @@ class login extends React.Component {
             warn6: "",
             showMenu: showMenuRef,
         });
+        return true
     }
 
     handleEnterKeyPress(e, keyFunction) {
         if (e.key === "Enter") {
-        // console.log('enter detected')
         keyFunction()
-        }
-    }
-
-    completeLogin(data){
-        const p = this.props
-        if (data.login) {
-            this.setState({message: ""})
-            console.log('login data: ', data)
-            p.processLogin(data["key"], data["login"], data['ratelimit'], data['apiAlias'], data['widgetsetup']);
-            p.updateExchangeList(data.exchangelist)
-            p.updateDefaultExchange(data.defaultexchange)
-            p.finnHubQueue.updateInterval( data['ratelimit'])
         }
     }
 
     render() {
         const s = this.state
-        //0 = login, 1 = recover, 2 = register
         const submitFunctionLookup = {
         0: () => {
-            // console.log("0")
             this.checkPassword(s.text0, s.text1)
             .then((data) => {
-                console.log("attempting login")
                 if (data.status === 200) {
-                    console.log('loggin in')
-                    this.completeLogin(data)
+                    this.completeLogin(this, data)
                 } else {
                     console.log("Failed to login", data)
                     this.setState({message: data.message})
@@ -140,7 +126,6 @@ class login extends React.Component {
                 this.setState({message: "No response from server. Check network connection."})
             })},
         1: () => {
-            // console.log("1")
             this.forgotLogin(s.text0)
             .then((data) => {
                 this.setState({ message: data.message })
@@ -149,26 +134,22 @@ class login extends React.Component {
                 this.setState({message: "No response from server. Check network connection."})
             })},
         2: () => {
-            // console.log("2")
             this.registerAccount(s.text0 , s.text1 , s.text2 , s.text3 , s.text4 , s.text5 , this.emailIsValid)
             .then((data) => {
                 if (data.message === 'Please review warnings') {
-                    this.setState({...data})
+                    this.setState({message: data.message}) //sp
                 } else if (data.status === 200) {
-                    this.setState({...data}, ()=>this.clearText(0))
+                    this.setState({message: data.message}, ()=>this.clearText(0))
                 } else {
-                    this.setState({...data})
+                    this.setState({message: data.message})
                 }
-                // this.setState({ message: data.message })
             })
             .catch(() => {
                 this.setState({message: "No response from server. Check network connection."})
             })},
         3: () => {
-            // console.log("3")
             this.secretQuestion(s.text0, s.userName)
             .then((data) => {
-                // console.log(data)
                 if (data.question) {
                     this.setState({
                         message: "username: " + data["users"],
@@ -183,7 +164,6 @@ class login extends React.Component {
             })
         },
         4: () => {
-            // console.log("4")
             this.newPW(s.text0, s.text1)
             .then((data)=>{
                 if (data.message === 'true') {
@@ -197,7 +177,6 @@ class login extends React.Component {
             })
         },
         };
-        //[titleText, [inputList], [link names], [link functions]]]
         const formSetup = {
             0: {
                 title: "Login to FinnDash", 
@@ -264,12 +243,12 @@ class login extends React.Component {
                     {/* render hyperlinks */}
                     <div className="div-inline-login">
                         <div className="login-div-options">
-                            <a href="#login" onClick={thisForm.linkFunctions[0]}>
+                            <a id="loginLink1" href="#login" onClick={thisForm.linkFunctions[0]}>
                             <b>{thisForm.linkNames[0]}</b>
                             </a>
                         </div>
                         <div className="login-div-options">
-                            <a href="#login" onClick={thisForm.linkFunctions[1]}>
+                            <a id="loginLink2" href="#login" onClick={thisForm.linkFunctions[1]}>
                             <b>{thisForm.linkNames[1]}</b>
                             </a>
                         </div>

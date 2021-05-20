@@ -1,7 +1,4 @@
-export const registerAccount = async function registerAccount(
-    loginText, pwText, reEnter ,emailText, secretQuestion, secretAnswer, emailIsValid
-) {
-    
+export const registerAccount = async function registerAccount(loginText, pwText, reEnter ,emailText, secretQuestion, secretAnswer, emailIsValid) {
     if (
         loginText.length >= 6 &&
         pwText.length >= 8 &&
@@ -31,16 +28,13 @@ export const registerAccount = async function registerAccount(
         }
         const data = await res.json()
         data.status = res.status
-        console.log("Register Data:", data)
         if (data.message === "new user created") {
-            // this.clearText(0);
             return({ message: "Thank you for registering, please check your email and follow the confirmation link." });
         } else {
             return(data);
         }
         
     } else {
-        console.log(loginText, pwText, reEnter ,emailText, secretQuestion, secretAnswer, emailIsValid)
         const updateObj = {message: 'Please review warnings'}
         loginText.length < 6 ? updateObj.warn0 = "User name must be at least 6 characters" : updateObj.warn0 = ""
         pwText.length < 8 ? updateObj.warn1 = "Password must be at least 8 characters" : updateObj.warn1 = ""

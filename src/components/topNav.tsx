@@ -13,6 +13,7 @@ interface topNavProps {
     login: number,
     logOut: Function,
     lockWidgets: Function,
+    logoutServer: Function,
     menuList: menuList,
     menuWidgetToggle: Function,
     newMenuContainer: Function,
@@ -91,13 +92,13 @@ class TopNav extends React.Component<topNavProps, topNavState> {
 
         let widgetDropDown = <>
             <ul id='ddu' className='sub-Menu'>
-                <li id='ddi' className='menu-item-has-children'><a href='#1'>Estimate</a>
+                <li id='ddi1' className='menu-item-has-children'><a href='#1'>Estimate</a>
                     {this.dropDownList(estimateOptions)}
                 </li>
-                <li id='ddi' className='menu-item-has-children'><a href='#2'>Fundamentals</a>
+                <li id='ddi2' className='menu-item-has-children'><a href='#2'>Fundamentals</a>
                     {this.dropDownList(fundamentalsOptions)}
                 </li>
-                <li id='ddi' className='menu-item-has-children'><a href='#3'>Price</a>
+                <li id='ddi3' className='menu-item-has-children'><a href='#3'>Price</a>
                     {this.dropDownList(priceOptions)}
                 </li>
             </ul>
@@ -107,24 +108,24 @@ class TopNav extends React.Component<topNavProps, topNavState> {
             if (this.props.showStockWidgets === 1) {
                 return (<>
 
-                    <li id='ddi' className='navItem'>
+                    <li id='wi1' className='navItem'>
                         <a href="#contact" onClick={() => this.props.menuWidgetToggle("dashBoardMenu", "Saved Dashboards")}>
                             {this.props.dashBoardMenu === 0 ? "Show Dashboard Menu" : "Hide Dashboard Menu"}
                         </a>
                     </li>
 
-                    <li id='ddi' className='navItem'>
+                    <li id='wi2' className='navItem'>
                         <a href="#contact" onClick={() => this.props.menuWidgetToggle("watchListMenu", "WatchList")}>
                             {this.props.WatchListMenu === 0 ? "Show Watchlist Menu" : "Hide Watchlist Menu"}
                         </a>
                     </li>
 
-                    <li id='ddi' className='navItem'>
+                    <li id='wi3' className='navItem'>
                         <a href="#contact" onClick={() => (this.props.widgetLockDown === 0 ? this.props.lockWidgets(1) : this.props.lockWidgets(0))}>
                             {this.props.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}
                         </a>
                     </li>
-                    <li id='ddi' className="menu-item-has-children"><a href="#contact">Widgets</a>
+                    <li id='wi4' className="menu-item-has-children"><a href="#contact">Widgets</a>
                         {widgetDropDown}
                     </li>
 
@@ -144,33 +145,37 @@ class TopNav extends React.Component<topNavProps, topNavState> {
 
                 <div className="navItemEnd">
                     <ul id='ddu' className="sub-menu">
-                        <li id='ddi' className="navItem">
+                        <li id='toggleBackGroundMenuButton' className="navItem">
                             <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('') }}>
                                 {this.props.backGroundMenu === '' ? " " : "Back to Dashboards"}
                             </a>
                         </li>
-                        <li id='ddi' className="navItem">
+                        <li id='templatesButton' className="navItem">
                             <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('templates') }}>
                                 Templates
                     </a>
                         </li>
-                        <li id='ddi' className="navItem">
+                        <li id='endPointButton' className="navItem">
                             <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('endPoint') }}>
                                 Endpoints
                     </a>
                         </li>
-                        <li id='ddi' className="navItem">
+                        <li id='manageAccountButton' className="navItem">
                             <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('manageAccount') }}>
                                 Manage Account
                     </a>
                         </li>
-                        <li id='ddi' className='navItem'>
+                        <li id='aboutButton' className='navItem'>
                             <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('about') }}>
                                 About
                     </a>
                         </li>
-                        <li id='ddi' className='navItem'>
-                            <a href="#home" onClick={() => this.props.logOut()}>
+                        <li id='LogButton' className='navItem'>
+                            <a id='LogButtonLink' href="#home" onClick={async () => {
+                                console.log('CLICK')
+                                await this.props.logoutServer()
+                                this.props.logOut()
+                            }}>
                                 {p.login === 0 ? "Login" : "Logout"}
                             </a>
                         </li>
@@ -182,7 +187,7 @@ class TopNav extends React.Component<topNavProps, topNavState> {
             <>
                 <div className="topnav">
                     <div className='navItemEnd'>
-                        <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('about') }}>
+                        <a id='aboutButton' href="#home" onClick={() => { this.props.toggleBackGroundMenu('about') }}>
                             {this.props.backGroundMenu === 'about' ? "Login" : "About"}
                         </a>
                     </div>

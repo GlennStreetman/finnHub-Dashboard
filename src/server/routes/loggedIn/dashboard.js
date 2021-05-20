@@ -20,12 +20,11 @@ router.get("/dashboard", (req, res, next) => {
             FROM menuSetup AS m
             LEFT JOIN menus AS s ON m.id = s.menukey
             WHERE userID =${req.session.uID}`;
-        // console.log(getMenuSetup)
-        // console.log("QUERIES:", getSavedDashBoards, getMenuSetup)
         const r = { //resultset
             savedDashBoards: {},
             menuSetup: {},
             default: '',
+            message: '',
         };
         db.query(getSavedDashBoards, (err, rows, next) => {
             if (err) {
@@ -56,7 +55,6 @@ router.get("/dashboard", (req, res, next) => {
                     yAxis: result[row].yaxis,
                     xAxis: result[row].xaxis,
                     }
-                    // console.log("KEYS:", r.savedDashBoards, "---",resultKey, newObject)
                     r.savedDashBoards[resultKey].widgetlist[newObject.widgetID] = newObject
                     
             }
