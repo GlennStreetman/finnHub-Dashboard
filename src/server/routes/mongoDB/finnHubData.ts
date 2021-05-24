@@ -34,8 +34,6 @@ router.get('/finnDashData', async (req: thisSession, res: any) => {
             await findDataSet.forEach((data: any) => {
                 resList.push(data)
             })
-            // client.close()
-            // console.log('3Got data', resList)
             res.status(200).json({ resList })
 
         }

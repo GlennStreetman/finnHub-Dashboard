@@ -67,6 +67,7 @@
     "client": "SET PORT=3000 && react-scripts start",
     "start": "node ./build/server/server.js",
     "build": "react-scripts build && npx tsc -p src/server/tsconfig.json",
+    "build:css": "tailwind build src/style.css -o dist/style.css",
     "heroku-postbuild": "react-scripts build && npm run tsc",
     "eject": "react-scripts eject",
     "test": "jest",

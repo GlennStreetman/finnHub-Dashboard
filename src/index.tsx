@@ -1,10 +1,10 @@
 import React from "react";
 import ReactDOM from "react-dom";
 
+import "./css/index.css";
 import "./css/bodyContent.css";
 import "./css/container.css";
 import "./css/dropDown.css";
-import "./css/index.css";
 import "./css/login.css";
 import "./css/topNav.css";
 import "./css/widgetBody.css";

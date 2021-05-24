@@ -92,13 +92,13 @@ class TopNav extends React.Component<topNavProps, topNavState> {
 
         let widgetDropDown = <>
             <ul id='ddu' className='sub-Menu'>
-                <li id='ddi1' className='menu-item-has-children'><a href='#1'>Estimate</a>
+                <li id='ddi' className='menu-item-has-children'><a href='#1'>Estimate</a>
                     {this.dropDownList(estimateOptions)}
                 </li>
-                <li id='ddi2' className='menu-item-has-children'><a href='#2'>Fundamentals</a>
+                <li id='ddi' className='menu-item-has-children'><a href='#2'>Fundamentals</a>
                     {this.dropDownList(fundamentalsOptions)}
                 </li>
-                <li id='ddi3' className='menu-item-has-children'><a href='#3'>Price</a>
+                <li id='ddi' className='menu-item-has-children'><a href='#3'>Price</a>
                     {this.dropDownList(priceOptions)}
                 </li>
             </ul>
@@ -108,24 +108,24 @@ class TopNav extends React.Component<topNavProps, topNavState> {
             if (this.props.showStockWidgets === 1) {
                 return (<>
 
-                    <li id='wi1' className='navItem'>
+                    <li id='ddi' className='navItem'>
                         <a href="#contact" onClick={() => this.props.menuWidgetToggle("dashBoardMenu", "Saved Dashboards")}>
                             {this.props.dashBoardMenu === 0 ? "Show Dashboard Menu" : "Hide Dashboard Menu"}
                         </a>
                     </li>
 
-                    <li id='wi2' className='navItem'>
+                    <li id='ddi' className='navItem'>
                         <a href="#contact" onClick={() => this.props.menuWidgetToggle("watchListMenu", "WatchList")}>
                             {this.props.WatchListMenu === 0 ? "Show Watchlist Menu" : "Hide Watchlist Menu"}
                         </a>
                     </li>
 
-                    <li id='wi3' className='navItem'>
+                    <li id='ddi' className='navItem'>
                         <a href="#contact" onClick={() => (this.props.widgetLockDown === 0 ? this.props.lockWidgets(1) : this.props.lockWidgets(0))}>
                             {this.props.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}
                         </a>
                     </li>
-                    <li id='wi4' className="menu-item-has-children"><a href="#contact">Widgets</a>
+                    <li id='ddi' className="menu-item-has-children"><a href="#contact">Widgets</a>
                         {widgetDropDown}
                     </li>
 

@@ -13,11 +13,13 @@ import { store } from '../store'
 import { getLogin_succeed } from '../server/routes/loginRoutes/login.mock'
 import { getCheckLogin_fail } from '../server/routes/loginRoutes/checkLogin.mock'
 import { getDashboard_success_noWidgets } from '../server/routes/loggedIn/dashboard.mock'
+import { getFinnDashData_noData } from '../server/routes/mongoDB/finnHubData.Mock'
+import { getNoMock } from '../server/server.mock'
 
 import { logoutServerMock } from './../appFunctions/appImport/appLogin.mock'
 import { getSavedDashBoardsMock } from '../appFunctions/appImport/setupDashboard.mock';
 
-const server = setupServer(getLogin_succeed, getCheckLogin_fail, getDashboard_success_noWidgets)
+const server = setupServer(getLogin_succeed, getCheckLogin_fail, getDashboard_success_noWidgets, getFinnDashData_noData, getNoMock)
 
 beforeAll(() => { server.listen() })
 afterAll(() => { server.close() })

@@ -295,12 +295,15 @@ class App extends React.Component<AppProps, AppState> {
         if ((prevProps.dataModel.created === 'false' && p.dataModel.created === 'true' && s.login === 1) || (p.dataModel.created === 'updated' && s.login === 1)) {
             //on login or data model update update dataset with finnHub data.
             console.log("RUNNING DATA BUILD")
+            p.rResetUpdateFlag()
             let setupData = async function () {
+                // console.log('0')
                 await p.tGetMongoDB()
                 const targetDash: string[] = s.dashBoardData?.[s.currentDashBoard]?.widgetlist ? Object.keys(s.dashBoardData?.[s.currentDashBoard]?.widgetlist) : []
                 p.rSetUpdateStatus({
                     [s.currentDashBoard]: 'Updating'
                 })
+                // console.log('1')
                 for (const widget in targetDash) {
                     await p.tGetFinnhubData({ //get data for default dashboard.
                         targetDashBoard: s.currentDashBoard,
@@ -308,23 +311,28 @@ class App extends React.Component<AppProps, AppState> {
                         finnHubQueue: s.finnHubQueue,
                     })
                 }
+                // console.log('2')
                 p.rSetUpdateStatus({
                     [s.currentDashBoard]: 'Ready'
                 })
+                // console.log('3')
                 const dashBoards: string[] = Object.keys(s.dashBoardData) //get data for dashboards not being shown
                 for (const dash of dashBoards) {
                     if (dash !== s.currentDashBoard) {
                         p.rSetUpdateStatus({
                             [dash]: 'Updating'
                         })
+                        // console.log('4')
                         await p.tGetFinnhubData({ //run in background, do not await.
                             targetDashBoard: dash,
                             widgetList: Object.keys(s.dashBoardData[dash].widgetlist),
                             finnHubQueue: s.finnHubQueue,
                         })
+                        // console.log('5')
                         p.rSetUpdateStatus({
                             [dash]: 'Ready'
                         })
+                        // console.log('6')
                     }
                 }
             }
@@ -345,11 +353,13 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if ((s.globalStockList !== prevState.globalStockList && s.login === 1)) {
+            console.log('loading global stock data')
             LoadStockData(this, s, GetStockPrice, s.finnHubQueue);
             LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
         }
 
         if (s.login === 1 && s.loadStartingDashBoard === 0) {
+            console.log('loading starting dashboard')
             try {
                 if (s.dashBoardData && Object.keys(s.dashBoardData).length > 0) {
                     if (s.dashBoardData[s.currentDashBoard] !== undefined) {

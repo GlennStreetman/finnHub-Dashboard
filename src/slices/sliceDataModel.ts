@@ -104,8 +104,8 @@ const dataModel = createSlice({
 
         },
         rResetUpdateFlag: (state: sliceDataModel) => {
+            console.log('CREATED EQUALS TRUE')
             state.created = 'true'
-
         },
         rSetUpdateStatus: (state: sliceDataModel, action) => {
             //set the status of dashboard updates.

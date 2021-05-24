@@ -18,7 +18,7 @@ export interface getMongoRes {
 
 export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
     'tgetMongoDb',
-    async () => { //l{ist of securities} 
+    async () => { //{list of securities} 
         try {
             console.log("Getting cached finnhub data")
             const getData = await fetch('/finnDashData')
