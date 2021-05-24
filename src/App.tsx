@@ -359,9 +359,10 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if (s.login === 1 && s.loadStartingDashBoard === 0) {
-            console.log('loading starting dashboard')
+
             try {
                 if (s.dashBoardData && Object.keys(s.dashBoardData).length > 0) {
+                    console.log('loading starting dashboard')
                     if (s.dashBoardData[s.currentDashBoard] !== undefined) {
                         let loadWidget = s.dashBoardData[s.currentDashBoard]["widgetlist"];
                         let loadGlobal = s.dashBoardData[s.currentDashBoard]["globalstocklist"];
