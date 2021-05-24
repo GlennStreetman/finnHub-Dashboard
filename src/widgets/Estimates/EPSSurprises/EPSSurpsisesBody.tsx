@@ -28,7 +28,7 @@ interface dataListObject {
 }
 
 function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
-    console.log(arg)
+
     if (arg !== undefined && Object.keys(arg).length > 0 && arg[0].actual !== undefined) {
         // console.log("returning true", arg)
         return true
@@ -121,10 +121,10 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
 
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
         if (isFinnHubData(rShowData) === true) {
-            console.log('passes typeguard')
+            // console.log('passes typeguard')
             setStockData(rShowData)
         } else {
-            console.log('does not pass typeguard')
+            // console.log('does not pass typeguard')
             setStockData([])
         }
     }, [rShowData])
