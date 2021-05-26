@@ -223,7 +223,7 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
             <tr key={el + "container"}>
                 <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
                 <td key={el + "buttonC"}>
-                    <button
+                    <button data-testid={`remove-${el}`}
                         key={el + "button"}
                         onClick={() => {
                             p.updateWidgetStockList(p.widgetKey, el);
@@ -237,7 +237,7 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
 
         let stockTable = (
             <table>
-                <tbody>{stockListRows}</tbody>
+                <tbody data-testid='recTrendEditPane'>{stockListRows}</tbody>
             </table>
         );
         return stockTable
@@ -259,17 +259,17 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
         ));
 
         let chartBody = (
-            <>
+            <div data-testid='recTrendBody'>
                 <div className="div-inline">
                     {"  Selection:  "}
-                    <select className="btn" value={targetStock} onChange={changeStockSelection}>
+                    <select data-testid='recTrendDropdown' className="btn" value={targetStock} onChange={changeStockSelection}>
                         {newSymbolList}
                     </select>
                 </div>
                 <div className="graphDiv">
                     <RecTrendChart chartOptions={chartOptions} />
                 </div>
-            </>
+            </div>
         );
         return chartBody;
     }

@@ -4,6 +4,7 @@ import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "re
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { rBuildVisableData } from '../../../slices/sliceShowData'
 import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
+import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
 
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 
@@ -140,7 +141,7 @@ function PriceTargetBody(p: { [key: string]: any }, ref: any) {
             <tr key={el + "container"}>
                 <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
                 <td key={el + "buttonC"}>
-                    <button
+                    <button data-testid={`remove-${el}`}
                         key={el + "button"}
                         onClick={() => {
                             p.updateWidgetStockList(p.widgetKey, el);
@@ -153,7 +154,7 @@ function PriceTargetBody(p: { [key: string]: any }, ref: any) {
         )
 
         let stockTable = (
-            <table>
+            <table data-testid='priceTargetSearchPane'>
                 <tbody>{stockListRows}</tbody>
             </table>
         );
@@ -161,11 +162,12 @@ function PriceTargetBody(p: { [key: string]: any }, ref: any) {
     }
 
     function renderStockData() {
-        // console.log("rendering stock data")
+        const parseList = ['targetHigh', 'targetLow', 'targetMean', 'targetMedian']
+
         const stockDataRows = Object.keys(stockData).map((el) =>
             <tr key={el + "row"}>
-                <td key={el + "symbol"}>{el}</td>
-                <td key={el + "name"}>{stockData[el]}</td>
+                <td key={el + "symbol"}>{convertCamelToProper(el)}</td>
+                <td key={el + "name"}>{parseList.includes(el) ? parseInt(stockData[el]).toFixed(2) : stockData[el]}</td>
             </tr>
         )
         const newSymbolList = Object.keys(p.trackedStocks).map((el) => (
@@ -174,11 +176,11 @@ function PriceTargetBody(p: { [key: string]: any }, ref: any) {
             </option>
         ))
         return <>
-            <select className="btn" value={targetStock} onChange={changeStockSelection}>
+            <select data-testid='ptSelectStock' className="btn" value={targetStock} onChange={changeStockSelection}>
                 {newSymbolList}
             </select>
             <table>
-                <tbody>
+                <tbody data-testid='ptRow'>
                     {stockDataRows}
                 </tbody>
             </table>
@@ -186,7 +188,7 @@ function PriceTargetBody(p: { [key: string]: any }, ref: any) {
     }
 
     return (
-        <>
+        <div data-testid='priceTargetBody' >
             {p.showEditPane === 1 && (
                 <>
                     {React.createElement(StockSearchPane, searchPaneProps(p))}
@@ -198,7 +200,7 @@ function PriceTargetBody(p: { [key: string]: any }, ref: any) {
                     {renderStockData()}
                 </>
             )}
-        </>
+        </div>
     )
 }
 //RENAME

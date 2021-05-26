@@ -46,7 +46,7 @@ function isFinnHubData(arg: any): arg is finnHubDataObj { //typeguard
         return false
     }
 }
-//RENAME FUNCTION
+
 function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
 
     const isInitialMount = useRef(true); //update to false after first render.
@@ -79,10 +79,28 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
         }
     }
 
+    const startingStartDate = () => {
+        const now = Date.now()
+        const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000 * 52
+        const startUnix = now + startUnixOffset
+        const startDate = new Date(startUnix).toISOString().slice(0, 10);
+        return startDate
+    }
+
+    const startingEndDate = () => {
+        const now = Date.now()
+        const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
+        const endUnix = now + endUnixOffset
+        const endDate = new Date(endUnix).toISOString().slice(0, 10);
+        return endDate
+    }
+
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [stockData, setStockData] = useState(startingstockData());
     const [targetStock, setTargetStock] = useState(startingTargetStock());
     const [display, setDisplay] = useState('EPS') //EPS or Revenue
+    const [start, setStart] = useState(startingStartDate())
+    const [end, setEnd] = useState(startingEndDate())
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
@@ -154,12 +172,22 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
         }
     }, [p.targetSecurity, p.widgetKey, dispatch])
 
+    function updateStartDate(e) {
+        setStart(e.target.value)
+    }
+
+    function updateEndDate(e) {
+        setEnd(e.target.value)
+    }
+
     function updateFilter(e) {
+        console.log('UPDATE FILTER', start, end)
         if (isNaN(new Date(e.target.value).getTime()) === false) {
             const now = Date.now()
             const target = new Date(e.target.value).getTime();
             const offset = target - now
             const name = e.target.name;
+            console.log(name, e.target.value)
             p.updateWidgetFilters(p.widgetKey, name, offset)
         }
     }
@@ -171,7 +199,7 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
             <tr key={el + "container"}>
                 <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
                 <td key={el + "buttonC"}>
-                    <button
+                    <button data-testid={`remove-${el}`}
                         key={el + "button"}
                         onClick={() => {
                             p.updateWidgetStockList(p.widgetKey, el);
@@ -182,23 +210,16 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
                 </td>
             </tr>
         )
-        const now = Date.now()
-        const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000 * 52
-        const startUnix = now + startUnixOffset
-        const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
-        const endUnix = now + endUnixOffset
-        const startDate = new Date(startUnix).toISOString().slice(0, 10);
-        const endDate = new Date(endUnix).toISOString().slice(0, 10);
 
-        let searchForm = (
+        let searchForm = ( // onBlur={updateFilter}
             <>
                 <div className="stockSearch">
                     <form className="form-stack">
                         <label htmlFor="start">Start date:</label>
-                        <input className="btn" id="start" type="date" name="startDate" onChange={updateFilter} value={startDate}></input>
+                        <input className="btn" id="start" type="date" name="startDate" onChange={updateStartDate} onBlur={updateFilter} value={start}></input>
                         <br />
                         <label htmlFor="end">End date:</label>
-                        <input className="btn" id="end" type="date" name="endDate" onChange={updateFilter} value={endDate}></input>
+                        <input className="btn" id="end" type="date" name="endDate" onChange={updateEndDate} onBlur={updateFilter} value={end}></input>
                     </form>
                 </div>
                 <table>
@@ -265,12 +286,12 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
                 <>
                     <div id='earningsCalendarBody' className="div-inline">
                         {"  Stock:  "}
-                        <select className="btn" value={targetStock} onChange={changeStockSelection}>
+                        <select data-testid="ECstockSelector" className="btn" value={targetStock} onChange={changeStockSelection}>
                             {newStockList}
                         </select>
 
                         {"  Display:  "}
-                        <select className="btn" value={display} onChange={changeValueSelection}>
+                        <select data-testid="ECDisplaySelector" className="btn" value={display} onChange={changeValueSelection}>
                             {newSymbolList}
                         </select>
 
@@ -294,7 +315,7 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
     }
 
     return (
-        <>
+        <div data-testid="earningsCalendarBody">
             {p.showEditPane === 1 && (
                 <>
                     {React.createElement(StockSearchPane, searchPaneProps(p))}
@@ -306,7 +327,7 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
                     {renderStockData()}
                 </>
             )}
-        </>
+        </div>
     )
 }
 
@@ -332,7 +353,7 @@ export function EarningsCalendarProps(that, key = "newWidgetNameProps") {
 
 export const EarningsCalendarFilters: filters = { //IF widget uses filters remember to define default filters here and add to topNavReg as 5th paramater.
     startDate: -604800 * 1000 * 52, //1 year backward. Limited to 1 year on free version.
-    endDate: 0,  //today.
+    endDate: 604800 * 1000 * 52,  //1 year forward. Limited to 1 year on free version.
     description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.',
 }
 

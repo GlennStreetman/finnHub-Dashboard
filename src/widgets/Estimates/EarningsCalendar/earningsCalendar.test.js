@@ -17,19 +17,19 @@ import { store } from '../../../store'
 import { Provider } from 'react-redux'
 
 //mock routes
+import {mockFinnHubData, getDashboard_success} from './earnigsCalendar.mock'
 import { getCheckLogin_success } from '../../../server/routes/loginRoutes/checkLogin.mock'
 import { getFinnDashData_noData, postFinnDashData_noSave }  from '../../../server/routes/mongoDB/finnHubData.mock'
-import {mockFinnHubDataEarnings, getDashboard_success_EPSWidget} from './EPSSuprises.mock'
-import {postDashboard_success_noWidgets} from '../../../server/routes/loggedIn/dashboard.mock'
-import {mockFinnHubDataQuote} from '../../../appFunctions/getStockPrices.mock'
-import {mockFinnhubDataStockSymbol} from '../../../slices/sliceExchangeData.mock'
-import {logUiErrorIntercept} from '../../../server/routes/logUiError.mock'
+import { postDashboard_success_noWidgets } from '../../../server/routes/loggedIn/dashboard.mock'
+import { mockFinnHubDataQuote } from '../../../appFunctions/getStockPrices.mock'
+import { mockFinnhubDataStockSymbol } from '../../../slices/sliceExchangeData.mock'
+import { logUiErrorIntercept } from '../../../server/routes/logUiError.mock'
 
 //mock service worker for all http requests
 const mockHTTPServer = setupServer(
     getCheckLogin_success,  //auto login, mock user data
-    getDashboard_success_EPSWidget, //default dashboard setup
-    mockFinnHubDataEarnings, //mock finnhub earnings endpoint 
+    getDashboard_success, //default dashboard setup
+    mockFinnHubData, //mock finnhub earnings endpoint 
     getFinnDashData_noData, //mock mongo cached data empty.
     postFinnDashData_noSave, //mock post finndashdata save. 
     postDashboard_success_noWidgets,  //mock save dashboard after loading widget.
@@ -63,23 +63,25 @@ it('Test Single Widget dashboard : EarningsCalendar ', async (done) => {
     await waitFor(() => {
         expect(screen.getByTestId('Earnings Calendar')).toBeInTheDocument() //copy submenu text
     })
-    expect(getByTestId('EPS Surprises')).toBeInTheDocument() 
-    fireEvent.click(screen.getByTestId('EPS Surprises')) //copy submenu text
+    expect(getByTestId('Earnings Calendar')).toBeInTheDocument() 
+    fireEvent.click(screen.getByTestId('Earnings Calendar')) //copy submenu text
     //check widget is mounted
     await waitFor(() => {
-        expect(screen.getByTestId('EPSSuprisesBody')).toBeInTheDocument()
-        expect(screen.getByText('Selection:')).toBeInTheDocument()
-        expect(screen.getByTestId('SelectionLabel')).toBeInTheDocument()
-        expect(screen.getByTestId('EPSChart')).toBeInTheDocument()
-        expect(screen.getByTestId('canvasChart')).toBeInTheDocument()
+        expect(screen.getByTestId('earningsCalendarBody')).toBeInTheDocument()
+        // screen.debug(screen.getByTestId('earningsCalendarBody'))
+        expect(screen.getByTestId('ECstockSelector')).toBeInTheDocument()
+        expect(screen.getByTestId('ECDisplaySelector')).toBeInTheDocument()
+        expect(screen.getByText('Quarter')).toBeInTheDocument()
+        expect(screen.getByText('4.99')).toBeInTheDocument()
     })
-    //check that edit pane for widget renders and all buttons work
-    expect(screen.getByTestId('editPaneButton-EstimatesEPSSurprises')).toBeInTheDocument() 
-    fireEvent.click(getByTestId('editPaneButton-EstimatesEPSSurprises'))
+    // check that edit pane for widget renders and all buttons work
+    expect(screen.getByTestId('editPaneButton-EstimatesEarningsCalendar')).toBeInTheDocument() 
+    fireEvent.click(getByTestId('editPaneButton-EstimatesEarningsCalendar'))
     await waitFor(() => {
         expect(screen.getByText('Symbol:')).toBeInTheDocument()
         expect(screen.getByTestId('remove-US-WMT')).toBeInTheDocument()
         expect(screen.getByTestId('remove-US-COST')).toBeInTheDocument()
+        expect(screen.getByText('Start date:')).toBeInTheDocument()
     })
     //remove target stock
     fireEvent.click(screen.getByTestId('remove-US-WMT'))
@@ -88,10 +90,10 @@ it('Test Single Widget dashboard : EarningsCalendar ', async (done) => {
         expect(screen.getByTestId('remove-US-COST')).toBeInTheDocument()
     })
     //unmount widget
-    expect(screen.getByTestId('removeWidget-EstimatesEPSSurprises')).toBeInTheDocument() 
-    fireEvent.click(screen.getByTestId('removeWidget-EstimatesEPSSurprises'))
+    expect(screen.getByTestId('removeWidget-EstimatesEarningsCalendar')).toBeInTheDocument() 
+    fireEvent.click(screen.getByTestId('removeWidget-EstimatesEarningsCalendar'))
     await waitFor(() => {
-        expect(screen.queryByTestId('EPSSuprisesBody')).toBe(null)
+        expect(screen.queryByTestId('earningsCalendarBody')).toBe(null)
     })
     done()
 })
