@@ -81,7 +81,7 @@ router.get("/dashboard", (req, res, next) => {
                             yAxis: thisRow.yaxis,
                             }
                         }
-                        // console.log("dashboard DATA: ", r)
+                        // console.log("dashboard DATA: ", '-------------------------------------->',r.savedDashBoards.TEST.widgetlist)
                         // console.log("WIDGETS", r.savedDashBoards["TEST"].widgetlist)
                         res.status(200).json(r);
                     } else {

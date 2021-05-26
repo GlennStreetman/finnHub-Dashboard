@@ -32,7 +32,10 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
 
     // useEffect(() => {}, [])
     useEffect(() => {
-        if (isInitialMount.current === true && p.currentDashBoard) setInputText(p.currentDashBoard)
+        if (isInitialMount.current === true && p.currentDashBoard) {
+            console.log('dashboard Menu Mounted')
+            setInputText(p.currentDashBoard)
+        }
     }, [p.currentDashBoard])
 
     useEffect(() => {
@@ -92,7 +95,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     ));
 
     return (
-        <div className="dashBoardMenu">
+        <div className="dashBoardMenu" data-testid="dashboardMenu" >
             <div>
                 <table>
                     <thead>

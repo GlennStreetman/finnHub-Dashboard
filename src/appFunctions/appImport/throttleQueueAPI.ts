@@ -133,7 +133,7 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                     } else if (response.status === 200) {
                         return response.json()
                     } else {
-                        console.log("Response other than 429/200", response)
+                        console.log("Response other than 429/200", response.status, response)
                         return {
                             status: 400,
                             response: response

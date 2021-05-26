@@ -1,4 +1,4 @@
-import { GetSavedDashBoards } from './setupDashboard'
+import { GetSavedDashBoards } from './getSavedDashboards'
 
 export const getSavedDashBoardsMock = jest.fn(() => {
     console.log('RUNNING SAVED DASHBOARD MOCK')

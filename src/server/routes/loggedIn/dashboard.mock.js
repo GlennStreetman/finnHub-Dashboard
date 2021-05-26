@@ -37,3 +37,12 @@ rest.get("/dashboard", (req, res, ctx) =>{
         ctx.json(resObj)
     )
 })
+
+export const postDashboard_success_noWidgets =     //auto login check rejected.
+rest.post("/dashboard", (req, res, ctx) =>{
+    console.log('postDashboard saved true')
+    return res(
+        ctx.status(200),
+        ctx.json({message: 'MOCKED EMPTY RESPONSE'})
+    )
+})

@@ -263,7 +263,7 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
         if (stockData !== undefined) {
             let symbolSelectorDropDown = (
                 <>
-                    <div className="div-inline">
+                    <div id='earningsCalendarBody' className="div-inline">
                         {"  Stock:  "}
                         <select className="btn" value={targetStock} onChange={changeStockSelection}>
                             {newStockList}

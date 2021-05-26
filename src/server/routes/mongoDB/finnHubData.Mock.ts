@@ -10,3 +10,12 @@ export const getFinnDashData_noData =     //auto login check rejected.
             ctx.json({ resList })
         )
     })
+
+export const postFinnDashData_noSave =     //auto login check rejected.
+    rest.post("/finnDashData", (req, res, ctx) => {
+        console.log('post finnDashData no data saved')
+        return res(
+            ctx.status(200),
+            ctx.json({ message: `Updates Complete` })
+        )
+    })

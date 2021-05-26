@@ -78,7 +78,7 @@ class TopNav extends React.Component<topNavProps, topNavState> {
             let [a, b, c, d, e] = el
             if (this.isChecked(el) === true) {
                 return (<li key={a + 'li'} id='ddi'>
-                    <a key={a} href="#r" onClick={() => { this.props.AddNewWidgetContainer(a, b, c, e); }}>
+                    <a key={a} data-testid={d} href="#r" onClick={() => { this.props.AddNewWidgetContainer(a, b, c, e); }}>
                         {d}
                     </a>
                 </li>)
@@ -92,13 +92,13 @@ class TopNav extends React.Component<topNavProps, topNavState> {
 
         let widgetDropDown = <>
             <ul id='ddu' className='sub-Menu'>
-                <li id='ddi' className='menu-item-has-children'><a href='#1'>Estimate</a>
+                <li id='ddi' className='menu-item-has-children'><a data-testid="estimatesDropdown" href='#1'>Estimate</a>
                     {this.dropDownList(estimateOptions)}
                 </li>
-                <li id='ddi' className='menu-item-has-children'><a href='#2'>Fundamentals</a>
+                <li id='ddi' className='menu-item-has-children'><a data-testid="fundamentalsDropDown" href='#2'>Fundamentals</a>
                     {this.dropDownList(fundamentalsOptions)}
                 </li>
-                <li id='ddi' className='menu-item-has-children'><a href='#3'>Price</a>
+                <li id='ddi' className='menu-item-has-children'><a data-testid="priceDropDown" href='#3'>Price</a>
                     {this.dropDownList(priceOptions)}
                 </li>
             </ul>
@@ -125,7 +125,7 @@ class TopNav extends React.Component<topNavProps, topNavState> {
                             {this.props.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}
                         </a>
                     </li>
-                    <li id='ddi' className="menu-item-has-children"><a href="#contact">Widgets</a>
+                    <li id='ddi' className="menu-item-has-children"><a data-testid="widgetsDropdown" href="#contact">Widgets</a>
                         {widgetDropDown}
                     </li>
 

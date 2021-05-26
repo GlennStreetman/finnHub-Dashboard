@@ -28,12 +28,9 @@ interface dataListObject {
 }
 
 function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
-
-    if (arg !== undefined && Object.keys(arg).length > 0 && arg[0].actual !== undefined) {
-        // console.log("returning true", arg)
+    if (arg !== undefined && Object.keys(arg).length > 0 && arg[0] && arg[0].actual !== undefined) {
         return true
     } else {
-        // console.log("returning false", arg)
         return false
     }
 }
@@ -211,7 +208,7 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
                 <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
 
                 <td key={el + "buttonC"}>
-                    <button
+                    <button data-testid={`remove-${el}`}
                         key={el + "button"}
                         onClick={() => {
                             p.updateWidgetStockList(p.widgetKey, el);
@@ -232,6 +229,7 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
     }
 
     function renderStockData() {
+        console.log('Rendering EPS surprises')
         let newSymbolList = Object.keys(p.trackedStocks).map((el) => (
             <option key={el + "ddl"} value={el}>
                 {p.trackedStocks[el].dStock(p.exchangeList)}
@@ -240,13 +238,13 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
 
         let chartBody = (
             <>
-                <div className="div-inline">
+                <div data-testid="SelectionLabel" className="div-inline" >
                     {"  Selection:  "}
                     <select className="btn" value={targetStock} onChange={changeStockSelection}>
                         {newSymbolList}
                     </select>
                 </div>
-                <div className="graphDiv">
+                <div className="graphDiv" data-testid={`EPSChart`}>
                     <ReactChart chartOptions={chartOptions} />
                 </div>
             </>
@@ -255,7 +253,7 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
     }
 
     return (
-        <>
+        <div data-testid="EPSSuprisesBody">
             {p.showEditPane === 1 && (
                 <>
                     {React.createElement(StockSearchPane, searchPaneProps(p))}
@@ -267,7 +265,7 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
                     {renderStockData()}
                 </>
             )}
-        </>
+        </div>
     )
 }
 //RENAME

@@ -195,7 +195,7 @@ class WidgetContainer extends React.Component {
             </button>
 
             {hideStockSearchMenu.indexOf(this.props.widgetKey) < 0 && (
-              <button className="headerButtons" onClick={() => this.showPane("showEditPane", -1)}>
+              <button data-testid={`editPaneButton-${this.props.widgetList["widgetType"]}`} className="headerButtons" onClick={() => {console.log('CLICK EDIT PANE');this.showPane("showEditPane", -1)}}>
                 <i className="fa fa-pencil-square-o" aria-hidden="true"></i>
               </button>
             )}
@@ -217,7 +217,7 @@ class WidgetContainer extends React.Component {
                 }
               }}
             >
-              <i className="fa fa-times" aria-hidden="true"></i>
+              <i className="fa fa-times" aria-hidden="true" data-testid={`removeWidget-${this.props.widgetList["widgetType"]}`}></i>
             </button>
           ) : (
             <></>

@@ -1,4 +1,5 @@
 export const checkLoginStatus = function checkLoginStatus(processLogin, updateExchangeList, updateDefaultExchange, finnHubQueue){
+    console.log('CHECKING LOGGIN STATUS')
     fetch("/checkLogin")
     .then((response) => response.json())
     .then((data) => {
@@ -7,6 +8,6 @@ export const checkLoginStatus = function checkLoginStatus(processLogin, updateEx
             updateExchangeList(data.exchangelist)
             updateDefaultExchange(data.defaultexchange)
             finnHubQueue.updateInterval(data.ratelimit)
-        }
+        } else {console.log('FAILED LOGIN', data)}
     })
 }

@@ -9,7 +9,7 @@ export default function TemplateMenu(p: { [key: string]: any }, ref: any) {
 
     const [templateFlag, setTemplateFlag] = useState(true) //if true, retrieve template list.
     const [templateList, setTemplateList] = useState([]) //list of templates that have previously been uploaded
-    const [serverMessage, setServerMessage] = useState('') //if true, retrieve template list. 
+    const [serverMessage] = useState('') //if true, retrieve template list. 
     const [checkMulti, setCheckMulti] = useState<checkObject>({})
     const inputReference = useRef<HTMLInputElement>(null);
     //get template list if flag is true

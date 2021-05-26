@@ -60,7 +60,6 @@ export const tGetSymbolList = createAsyncThunk(
 
         return finnHub(finnQueue, thisReq) //replace with usestate.
             .then((data: any) => {
-                console.log('BROKEN')
                 if (data.error === 429) { //add back into queue if 429
                     tGetSymbolList(reqObj)
                     const resObj: resObj = {
@@ -69,7 +68,6 @@ export const tGetSymbolList = createAsyncThunk(
                     }
                     return (resObj)
                 } else {
-                    console.log('working')
                     let updateStockList: stockObj = {}
                     const stockData = data.data
                     for (const stockObj in stockData) {

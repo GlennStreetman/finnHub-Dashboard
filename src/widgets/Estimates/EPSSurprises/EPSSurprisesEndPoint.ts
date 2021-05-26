@@ -11,7 +11,7 @@ export default function EPSSuprisesEndPoint(stockList: StockObj[], filters, apiK
         if (types.reStock.test(stockSymbol) === true && types.finnHubAPI.test(queryString) === true) {
             queryStringObj[key] = (queryString)
         } else {
-            console.log("Failed earnings calendar endpoint Typeguard: ", queryString)
+            console.log("Failed EPS Suprises endpoint Typeguard: ", queryString)
         }
     }
     return queryStringObj

@@ -11,8 +11,9 @@ import {
     ToggleWidgetVisability, ChangeWidgetName, RemoveWidget,
     UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig
 } from "./appFunctions/appImport/widgetLogic";
-import { LoadDashBoard, NewDashboard, GetSavedDashBoards, GetSavedDashBoardsRes, SaveCurrentDashboard }
+import { LoadDashBoard, NewDashboard, SaveCurrentDashboard }
     from "./appFunctions/appImport/setupDashboard";
+import { GetSavedDashBoards, GetSavedDashBoardsRes } from "./appFunctions/appImport/getSavedDashboards";
 import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
 import { updateGlobalStockList } from "./appFunctions/appImport/updateGlobalStockList"
 import { syncGlobalStockList } from "./appFunctions/appImport/syncGlobalStockList"
