@@ -15,7 +15,6 @@ class StockSearchPane extends React.PureComponent {
   }
 
   componentDidMount(){
-    console.log('Mounted')
     const p = this.props
     if (p.defaultExchange !== p.currentExchange){
       console.log("updating exchange data")

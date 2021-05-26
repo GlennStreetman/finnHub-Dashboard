@@ -64,6 +64,7 @@ const dataModel = createSlice({
     initialState,
     reducers: {
         rBuildDataModel: (state: sliceDataModel, action) => { //{apiKey, dashboardData}
+            console.log('building data model')
             //receivies dashboard object and builds dataset from scratch.
             const ap: rBuildDataModelPayload = action.payload
             const apD: dashBoardData = ap.dashBoardData
@@ -100,6 +101,7 @@ const dataModel = createSlice({
             }
             state.dataSet = endPointAPIList
             const flag: boolean | string = state.created === 'false' ? 'true' : 'updated'
+            console.log('new flag', flag)
             state.created = flag
 
         },
