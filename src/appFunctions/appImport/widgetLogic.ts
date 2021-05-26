@@ -100,9 +100,10 @@ export const LockWidgets = function lockWidgets(toggle: number) {
 }
 
 export const UpdateWidgetFilters = function updateWidgetFilters(widgetID: string, dataKey: string, data: filters) {
+    console.log('new filters', dataKey, data)
     try {
         const s: AppState = this.state
-        const p: AppProps = this.state
+        const p: AppProps = this.props
         const newWidgetList: widgetList = produce(s.widgetList, (draftState: widgetList) => {
             draftState[widgetID].filters[dataKey] = data
         })
@@ -113,13 +114,15 @@ export const UpdateWidgetFilters = function updateWidgetFilters(widgetID: string
             widgetList: newWidgetList,
             dashBoardData: newDashBoardData,
         }
+        console.log('update widget filter payload:', payload)
         this.setState(payload, async () => {
             //delete records from mongoDB then rebuild dataset.
             let res = await fetch(`/deleteFinnDashData?widgetID=${widgetID}`)
             if (res.status === 200) {
+                console.log('DELETE RECORDS', res)
                 const payload: rBuildDataModelPayload = {
                     apiKey: s.apiKey,
-                    dashBoardData: s.dashBoardData
+                    dashBoardData: newDashBoardData
                 }
                 p.rBuildDataModel(payload)
             } else { console.log("Problem updating widget filters.") }
