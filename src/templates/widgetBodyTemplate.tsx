@@ -214,7 +214,7 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
     }
 
     return (
-        <>
+        <div data-testid='---widgetName----'>
             {p.showEditPane === 1 && (
                 <>
                     {React.createElement(StockSearchPane, searchPaneProps(p))}
@@ -226,7 +226,7 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
                     {renderStockData()}
                 </>
             )}
-        </>
+        </div>
     )
 }
 //RENAME
