@@ -6,6 +6,7 @@ import { rBuildVisableData } from '../../../slices/sliceShowData'
 import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
 
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -171,7 +172,7 @@ function FundamentalsCompanyProfile2(p: { [key: string]: any }, ref: any) {
     function mapStockData() {
         const rows = Object.keys(stockData).map((key) =>
             <tr key={stockData[key + 'tr'] + key}>
-                <td key={stockData[key + 'td']}>{`${key}: `}</td>
+                <td key={stockData[key + 'td']}>{`${convertCamelToProper(key)}: `}</td>
                 <td key={stockData[key + 'td2'] + key}>
                     {key === 'logo' ? <img key={stockData[key + 'pic'] + key} width='25%' src={stockData[key]} alt={stockData[key]}></img> : stockData[key]}
                 </td>

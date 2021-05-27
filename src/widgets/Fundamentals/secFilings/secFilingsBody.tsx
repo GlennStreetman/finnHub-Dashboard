@@ -4,6 +4,7 @@ import StockSearchPane, { searchPaneProps } from "../../../components/stockSearc
 import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { rBuildVisableData } from '../../../slices/sliceShowData'
+import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -158,7 +159,7 @@ function FundamentalsSECFilings(p: { [key: string]: any }, ref: any) {
         if (data !== undefined) {
             let tableData = Object.keys(data).map((el) =>
                 <tr key={"row" + el}>
-                    <td key={"heading" + el}>{el}</td>
+                    <td key={"heading" + el}>{convertCamelToProper(el)}</td>
                     <td key={"value" + el}>{formatURLS(data[el])}</td>
                 </tr>
             )

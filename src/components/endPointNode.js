@@ -1,5 +1,6 @@
 import React from "react";
 import EndPointData from './endPointData'
+import { convertCamelToProper } from './../appFunctions/stringFunctions'
 
 export default class EndPointNode extends React.PureComponent {
 
@@ -59,7 +60,7 @@ export default class EndPointNode extends React.PureComponent {
             const thisQuery = `{${p.searchList[0]}${queryProps} {${returnValues}}}`
             return(<a href={`//${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
         } else {
-            return el
+            return convertCamelToProper(el)
         }
     }
 
@@ -136,7 +137,7 @@ export default class EndPointNode extends React.PureComponent {
                 let thisString = this.props.nodeData[el]
                 return(
                     <li className='liNode'  key={ind + 'listring'}>
-                        <div key={ind + 'listringdiv1'}>{el} - {thisString} </div>
+                        <div key={ind + 'listringdiv1'}>{convertCamelToProper(el)} - {thisString} </div>
                     </li>
                 )
             }
