@@ -3,9 +3,10 @@ import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "re
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { rBuildVisableData } from '../../../slices/sliceShowData'
-// import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
+import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
 
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import CreateTimeSeriesChart, { createOptions } from './createTimeSeriesChart'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -30,6 +31,15 @@ function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
 
 function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
+
+    const startingTargetStock = () => {
+        if (isInitialMount.current === true) {
+            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+                const targetStock = p.widgetCopy.targetStock
+                return (targetStock)
+            } else { return ('') }
+        }
+    }
 
     const startingstockData = () => {
         if (isInitialMount.current === true) {
@@ -63,12 +73,20 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         }
     }
 
+    const startToggleMode = () => {
+        return 'metrics'
+    }
+
     const [widgetCopy] = useState(startingWidgetCoptyRef())
-    const [stockData, setStockData] = useState(startingstockData()); //data for each stock.
+    const [stockData, setStockData] = useState(startingstockData()); //metric & series data for each stock.
+    const [toggleMode, setToggleMode] = useState(startToggleMode()); //'metric' OR 'series'.
     const [metricList, setMetricList] = useState(startMetricList()); //metricList target stocks available metrics
+    const [seriesList, setSeriesList] = useState(startMetricList()); //metricList target stocks available metrics
     const [metricIncrementor, setMetricIncrementor] = useState(1);
     const [orderView, setOrderView] = useState(0);
     const [symbolView, setSymbolView] = useState(0);
+    const [targetStock, setTargetStock] = useState(startingTargetStock());
+    const [targetSeries, setTargetSeries] = useState('')
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
@@ -94,6 +112,19 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         }
     ))
 
+    useEffect(() => { //set default stock
+        if (Object.keys(p.trackedStocks).length > 0 && targetStock === '') {
+            const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
+            setTargetStock(setDefault)
+        }
+    }, [p.trackedStocks, targetStock])
+
+    useEffect(() => { //set default series 
+        if (seriesList.length > 0 && targetSeries === '') {
+            setTargetSeries(seriesList[0])
+        }
+    }, [seriesList, targetSeries])
+
     useEffect(() => {
         //On mount, use widget copy, else build visable data.
         //On update, if change in target stock, rebuild visable data.
@@ -115,7 +146,8 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
             updateWidgetConfig(key, {
                 metricSource: newSource,
-                metricSelection: []
+                metricSelection: [],
+                seriesSelection: [],
             })
         }
     }, [p.updateWidgetConfig, p.widgetKey, p.trackedStocks, p.apiKey, p.config.metricSource])
@@ -124,42 +156,46 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         if (isFinnHubData(rShowData) === true) {
             const newData: FinnHubAPIDataArray = {}
             for (const node in rShowData) {
-                newData[node] = rShowData[node]['metric']
+                newData[node] = {
+                    metrics: {},
+                    series: {},
+                }
+                newData[node].metrics = rShowData[node]['metric']
+                newData[node].series = rShowData[node]['series']['annual']
             }
             setStockData(newData)
-        } else { setStockData({}) }
+        } else {
+            setStockData({})
+        }
     }, [rShowData])
 
     useEffect(() => {
         if (stockData[p.config.metricSource] !== undefined) {
-            const newList = Object.keys(stockData[p.config.metricSource]) ?? []
-            // p.updateWidgetconfig(p.apiKey, 'metricList', newList)
-            setMetricList(newList)
+            const newMetricList = Object.keys(stockData[p.config.metricSource].metrics) ?? []
+            const newSeriesList = Object.keys(stockData[p.config.metricSource].series) ?? []
+            setMetricList(newMetricList)
+            setSeriesList(newSeriesList)
         }
     }, [stockData, p.config.metricSource])
 
     function changeSource(el) {
         p.updateWidgetConfig(p.widgetKey, {
-            metricList: [],
             metricSource: el,
         })
     }
 
-    function changeOrder(indexRef, change) {
+    function changeOrder(indexRef, change, update) {
         //changes order that metric selections are displayed in.
-        console.log(indexRef + ":" + change)
-        let moveFrom = p.config.metricSelection[indexRef]
-        let moveTo = p.config.metricSelection[indexRef + change]
-        let orderMetricSelection = p.config.metricSelection.slice()
+        let moveFrom = p.config[update][indexRef]
+        let moveTo = p.config[update][indexRef + change]
+        let orderMetricSelection = p.config[update].slice()
         orderMetricSelection[indexRef] = moveTo
         orderMetricSelection[indexRef + change] = moveFrom
-        console.log(orderMetricSelection, moveFrom, moveTo, p.config.metricSelection.length)
-        if (indexRef + change >= 0 && indexRef + change < p.config.metricSelection.length) {
+        if (indexRef + change >= 0 && indexRef + change < p.config[update].length) {
             console.log('updating')
             p.updateWidgetConfig(p.widgetKey, {
-                metricSelection: orderMetricSelection
+                [update]: orderMetricSelection
             })
-            // setMetricSelection(orderMetricSelection)
         }
     }
 
@@ -174,18 +210,44 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             let newSelection = p.config.metricSelection.slice()
             newSelection.push(metric)
             p.updateWidgetConfig(p.widgetKey, { metricSelection: newSelection })
-            // setMetricSelection(newSelection)
         } else {
             let newSelection = p.config.metricSelection.slice()
             newSelection.splice(newSelection.indexOf(metric), 1)
             p.updateWidgetConfig(p.widgetKey, { metricSelection: newSelection })
-            // setMetricSelection(newSelection)
+        }
+    }
+
+    function selectSeries(series) {
+        if (p.config.seriesSelection.indexOf(series) < 0) {
+            let newSelection = p.config.seriesSelection.slice()
+            newSelection.push(series)
+            p.updateWidgetConfig(p.widgetKey, { seriesSelection: newSelection })
+        } else {
+            let newSelection = p.config.seriesSelection.slice()
+            newSelection.splice(newSelection.indexOf(series), 1)
+            p.updateWidgetConfig(p.widgetKey, { seriesSelection: newSelection })
         }
     }
 
     function getMetrics() {
         let metricSelector = (
             <>
+                <div>
+                    <table>
+                        <thead>
+                            <tr>
+                                <td>Metrics</td>
+                                <td>Series</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><input type='radio' name='widgetToggle' checked={toggleMode === 'metrics'} onChange={() => setToggleMode('metrics')} /></td>
+                                <td><input type='radio' name='widgetToggle' checked={toggleMode === 'series'} onChange={() => setToggleMode('series')} /></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
                 <div>
                     <button onClick={() => changeIncrememnt(-1)}>
                         <i className="fa fa-backward" aria-hidden="true"></i>
@@ -209,10 +271,18 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
     function checkStatus(check) {
         //sets status of check boxes when selecting or deselecting checkboxes.
-        if (p.config.metricSelection.indexOf(check) > -1) {
-            return true
+        if (toggleMode === 'metric') {
+            if (p.config.metricSelection.indexOf(check) > -1) {
+                return true
+            } else {
+                return false
+            }
         } else {
-            return false
+            if (p.config.seriesSelection.indexOf(check) > -1) {
+                return true
+            } else {
+                return false
+            }
         }
     }
 
@@ -222,26 +292,49 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             let start = increment - 10;
             let end = increment;
             let metricSlice = metricList.slice(start, end);
-            let selectionSlice = p.config.metricSelection.slice(start, end);
+            let seriesSlice = seriesList.slice(start, end);
+            let metricSelectionSlice = p.config.metricSelection.slice(start, end);
+            let seriesSelectionSlice = p.config.seriesSelection.slice(start, end);
             let stockSelectionSlice = Object.keys(p.trackedStocks).slice(start, end);
             // console.log(selectionSlice)
             let mapMetrics = metricSlice.map((el, index) => (
                 <tr key={el + "metricRow" + index}>
-                    <td key={el + "metricdesc"}>{el}</td>
+                    <td key={el + "metricdesc"}>{convertCamelToProper(el)}</td>
                     <td key={el + "metricSelect"}>
                         <input type="checkbox" key={el + "checkbox"} onChange={() => selectMetrics(el)} checked={checkStatus(el)} />
                     </td>
                 </tr>
             ));
 
-            let mapMetricSelection = selectionSlice.map((el, index) => (
+            let mapSeries = seriesSlice.map((el, index) => (
                 <tr key={el + "metricRow" + index}>
-                    <td key={el + "metricdesc"}>{el}</td>
+                    <td key={el + "metricdesc"}>{convertCamelToProper(el)}</td>
+                    <td key={el + "metricSelect"}>
+                        <input type="checkbox" key={el + "checkbox"} onChange={() => selectSeries(el)} checked={checkStatus(el)} />
+                    </td>
+                </tr>
+            ));
+
+            let mapMetricSelection = metricSelectionSlice.map((el, index) => (
+                <tr key={el + "metricRow" + index}>
+                    <td key={el + "metricdesc"}>{convertCamelToProper(el)}</td>
                     <td key={el + "up"}>
-                        <button onClick={() => changeOrder(index, -1)}><i className="fa fa-sort-asc" aria-hidden="true"></i></button>
+                        <button onClick={() => changeOrder(index, -1, 'metricSelection')}><i className="fa fa-sort-asc" aria-hidden="true"></i></button>
                     </td>
                     <td key={el + "down"}>
-                        <button onClick={() => changeOrder(index, 1)}><i className="fa fa-sort-desc" aria-hidden="true"></i></button>
+                        <button onClick={() => changeOrder(index, 1, 'metricSelection')}><i className="fa fa-sort-desc" aria-hidden="true"></i></button>
+                    </td>
+                </tr>
+            ));
+
+            let mapSeriesSelection = seriesSelectionSlice.map((el, index) => (
+                <tr key={el + "metricRow" + index}>
+                    <td key={el + "metricdesc"}>{convertCamelToProper(el)}</td>
+                    <td key={el + "up"}>
+                        <button onClick={() => changeOrder(index, -1, 'seriesSelection')}><i className="fa fa-sort-asc" aria-hidden="true"></i></button>
+                    </td>
+                    <td key={el + "down"}>
+                        <button onClick={() => changeOrder(index, 1, 'seriesSelection')}><i className="fa fa-sort-desc" aria-hidden="true"></i></button>
                     </td>
                 </tr>
             ));
@@ -267,12 +360,21 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                         </>
                     )
                 } else if (orderView === 0) {
-                    return (
-                        <>
-                            <td>Metric</td>
-                            <td>Select</td>
-                        </>
-                    )
+                    if (toggleMode === 'metrics') {
+                        return (
+                            <>
+                                <td>Metric</td>
+                                <td>Select</td>
+                            </>
+                        )
+                    } else {
+                        return (
+                            <>
+                                <td>Time Series</td>
+                                <td>Select</td>
+                            </>
+                        )
+                    }
                 } else {
                     return (
                         <>
@@ -291,9 +393,12 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                                 {metricSelectTableheading()}
                             </tr>
                         </thead>
+
                         <tbody>
-                            {orderView === 0 && symbolView === 0 && mapMetrics}
-                            {orderView === 1 && symbolView === 0 && mapMetricSelection}
+                            {orderView === 0 && symbolView === 0 && toggleMode === 'metrics' && mapMetrics}
+                            {orderView === 1 && symbolView === 0 && toggleMode === 'metrics' && mapMetricSelection}
+                            {orderView === 0 && symbolView === 0 && toggleMode === 'series' && mapSeries}
+                            {orderView === 1 && symbolView === 0 && toggleMode === 'series' && mapSeriesSelection}
                             {symbolView === 1 && mapStockSelection}
                         </tbody>
                     </table>
@@ -304,7 +409,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     }
 
     function updateWidgetList(stock) {
-        // console.log("updating");
         if (stock.indexOf(":") > 0) {
             const stockSymbole = stock.slice(0, stock.indexOf(":"));
             p.updateWidgetStockList(p.widgetKey, stockSymbole);
@@ -316,63 +420,126 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     function mapStockData(symbol) {
         let symbolData = stockData[symbol]
         let findMetrics = p.config.metricSelection
-        // console.log(findMetrics)
         let returnMetrics: string[] = []
         for (const x in findMetrics) {
             try {
-                let metric: string | number = symbolData[findMetrics[x]]
+                let metric: string | number = symbolData[toggleMode][findMetrics[x]]
                 returnMetrics.push(metric.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                 }))
             } catch (err) {
-                // console.log('mapStockData err', symbol)
+                // console.log('error rendering stock data', err)
             }
         }
-        // console.log(returnMetrics)
         let thisKey = p.widgetKey
         let thisMetricList = returnMetrics.map((el, ind) => <td className="rightTE" key={thisKey + el + ind + "dat"}>{el}</td>)
         return thisMetricList
     }
 
-    function renderStockData() {
-        let selectionList: string[] = []
-        let thisKey = p.widgetKey
-        if (p.config.metricSelection !== undefined) { selectionList = p.config.metricSelection.slice() }
-        let headerRows = selectionList.map((el) => {
-            let title = el.replace(/([A-Z])/g, ' $1').trim().split(" ").join("\n")
-            if (title.search(/\d\s[A-Z]/g) !== -1) {
-                title = title.slice(0, title.search(/\d\s[A-Z]/g) + 1) + '-' + title.slice(title.search(/\d\s[A-Z]/g) + 2)
-            }
-            // console.log(title)
-            title = title.replace(/T\sT\sM/g, 'TTM')
-            // console.log(title)
-            return (<td className='tdHead' key={thisKey + el + "title"}>{title}</td>)
-        }
-        )
-        let bodyRows = Object.keys(p.trackedStocks).map((el) => {
-            return (
-                <tr key={thisKey + el + "tr1"}>
-                    <td key={thisKey + el + "td1"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
-                    {mapStockData(el)}
-                </tr>
-            )
-        })
-        let buildTable = <div className="widgetTableDiv">
-            <table className='widgetBodyTable'>
-                <thead>
-                    <tr>
-                        <td className='centerBottomTE'>Symbole:</td>
-                        {headerRows}
-                    </tr>
-                </thead>
-                <tbody>
-                    {bodyRows}
-                </tbody>
-            </table>
-        </div>
+    function changeBodySelection(e) {
+        const target = e.target.value;
+        setToggleMode(target)
+    }
 
-        return buildTable;
+    function bodySelector() {
+        return (
+            <select className="btn" value={toggleMode} onChange={changeBodySelection}>
+                <option key={'metricsSelection1'} value={'metrics'}>
+                    metrics
+                </option>
+                <option key={'metricsSelection2'} value={'series'}>
+                    series
+                </option>
+            </select>
+        )
+    }
+
+    function changeStockSelection(e) {
+        const target = e.target.value;
+        setTargetStock(target)
+    }
+
+    function changeSeriesSelection(e) {
+        const target = e.target.value;
+        setTargetSeries(target)
+    }
+
+    let stockSymbolList = Object.keys(p.trackedStocks).map((el) => (
+        <option key={el + "option"} value={el}>
+            {p.trackedStocks[el].dStock(p.exchangeList)}
+        </option>
+    ));
+
+    let seriesListOptions = p.config.seriesSelection.map((el) => (
+        <option key={el + "option"} value={el}>
+            {convertCamelToProper(el)}
+        </option>
+    ));
+
+    function renderStockData() {
+
+        if (toggleMode === 'metrics') { //build metrics table.
+            let selectionList: string[] = []
+            let thisKey = p.widgetKey
+            if (p.config.metricSelection !== undefined) { selectionList = p.config.metricSelection.slice() }
+            let headerRows = selectionList.map((el) => {
+                let title = el.replace(/([A-Z])/g, ' $1').trim().split(" ").join("\n")
+                if (title.search(/\d\s[A-Z]/g) !== -1) {
+                    title = title.slice(0, title.search(/\d\s[A-Z]/g) + 1) + '-' + title.slice(title.search(/\d\s[A-Z]/g) + 2)
+                }
+                title = title.replace(/T\sT\sM/g, 'TTM')
+                return (<td className='tdHead' key={thisKey + el + "title"}>{title}</td>)
+            }
+            )
+            let bodyRows = Object.keys(p.trackedStocks).map((el) => {
+                return (
+                    <tr key={thisKey + el + "tr1"}>
+                        <td key={thisKey + el + "td1"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
+                        {mapStockData(el)}
+                    </tr>
+                )
+            })
+            let buildTableMetrics = (
+                <div className="widgetTableDiv">
+                    Show: {bodySelector()}
+
+                    <table className='widgetBodyTable'>
+                        <thead>
+                            <tr>
+                                <td className='centerBottomTE'>Symbole:</td>
+                                {headerRows}
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {bodyRows}
+                        </tbody>
+                    </table>
+                </div>
+            )
+            return buildTableMetrics
+        } else { //build time series chart
+            // console.log(stockData[targetStock]['series'][targetSeries], targetSeries)
+            let stockDataObj = stockData?.[targetStock]?.['series']?.[targetSeries] ? stockData[targetStock]['series'][targetSeries] : []
+            const options = createOptions(convertCamelToProper(targetSeries), stockDataObj)
+            let buildChartSelection = (
+                <div className="widgetTableDiv">
+                    Show: {bodySelector()} <br />
+                    Stock: {
+                        <select className="btn" value={targetStock} onChange={changeStockSelection}>
+                            {stockSymbolList}
+                        </select>
+                    } <br />
+                    Series: {
+                        <select className="btn" value={targetSeries} onChange={changeSeriesSelection}>
+                            {seriesListOptions}
+                        </select>
+                    }
+                    <CreateTimeSeriesChart candleData={options} />
+                </div>
+            )
+            return buildChartSelection;
+        }
     }
 
     return (
