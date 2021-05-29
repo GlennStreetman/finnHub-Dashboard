@@ -9,7 +9,7 @@ import { companyNewsFilters } from '../widgets/Fundamentals/companyNews/companyN
 import { IPOCalendarFilters } from '../widgets/Fundamentals/IPOCalendar/IPOCalendarBody';
 import { marketNewsFilters } from '../widgets/Fundamentals/marketNews/marketNewsBody';
 
-//widget Type, Widget Name, widget class, widget Name?, filters(optional), api tier[free,hybird,premium]
+//1.widget Type, 2.Widget Name, 3.widget class, 4.widget Name?, 5.filters(optional), 6.api tier[free,hybird,premium]
 export let estimateOptions: [string, string, string, string, filters | undefined, string][] = [
     ["EstimatesEarningsCalendar", "Earnings Calendar", "stockWidget", "Earnings Calendar", EarningsCalendarFilters, 'Free'],
     ["EstimatesEPSSurprises", "EPS Surprises", "stockWidget", "EPS Surprises", , 'Free'],

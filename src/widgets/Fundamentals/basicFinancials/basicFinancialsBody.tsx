@@ -3,6 +3,7 @@ import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "re
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { rBuildVisableData } from '../../../slices/sliceShowData'
+import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
 import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
 
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
@@ -21,8 +22,7 @@ export interface FinnHubAPIDataArray {
 
 //add any additional type guard functions here used for live code.
 function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
-    // console.log('!arg', arg)
-    if (arg !== undefined && Object.keys(arg).length > 0 && arg[Object.keys(arg)[0]].symbol) {
+    if (arg !== undefined && Object.keys(arg).length > 0 && arg[Object.keys(arg)[0]].filters) {
         return true
     } else {
         return false
@@ -79,7 +79,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [stockData, setStockData] = useState(startingstockData()); //metric & series data for each stock.
-    const [toggleMode, setToggleMode] = useState(startToggleMode()); //'metric' OR 'series'.
+    const [toggleMode, setToggleMode] = useState(startToggleMode()); //'metrics' OR 'series'.
     const [metricList, setMetricList] = useState(startMetricList()); //metricList target stocks available metrics
     const [seriesList, setSeriesList] = useState(startMetricList()); //metricList target stocks available metrics
     const [metricIncrementor, setMetricIncrementor] = useState(1);
@@ -93,8 +93,8 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData = state.showData.dataSet[p.widgetKey]
-            return (showData)
+            const returnData = state.showData.dataSet[p.widgetKey]
+            return (returnData)
         }
     })
 
@@ -113,7 +113,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     ))
 
     useEffect(() => { //set default stock
-        if (Object.keys(p.trackedStocks).length > 0 && targetStock === '') {
+        if (Object.keys(p.trackedStocks).length > 0 && !targetStock) {
             const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
             setTargetStock(setDefault)
         }
@@ -132,13 +132,43 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             isInitialMount.current = false;
         } else {
             if (isInitialMount.current === true) { isInitialMount.current = false }
+            let stockList = Object.keys(p.trackedStocks)
+            let securityList: string[] = []
+            let filterObj = {}
+
+            if (toggleMode === 'metrics') {
+                securityList = stockList
+                for (const s of stockList) {
+                    filterObj[s] = {
+                        filterPaths: ['metric', 'series.annual'],
+                        showsData: []
+                    }
+                    if (p.config.metricSelection) {
+                        for (const f of p.config.metricSelection) {
+                            filterObj[s].showsData.push(`metric.${f}`)
+                        }
+                    }
+                }
+            } else { //if Time Series
+                securityList.push(targetStock)
+                filterObj[targetStock] = {}
+                filterObj[targetStock] = {
+                    filterPaths: ['metric', 'series.annual'],
+                    showsData: []
+                }
+                for (const f of p.config.seriesSelection) {
+                    filterObj[targetStock].showsData.push(`series.annual.${f}`)
+                }
+            }
+
             const payload: object = {
                 key: p.widgetKey,
-                securityList: Object.keys(p.trackedStocks)
+                securityList: securityList,
+                dataFilters: filterObj
             }
             dispatch(rBuildVisableData(payload))
         }
-    }, [p.widgetKey, widgetCopy, dispatch, p.trackedStocks])
+    }, [p.widgetKey, widgetCopy, dispatch, p.trackedStocks, p.config.metricSelection, p.config.seriesSelection, targetStock, toggleMode])
 
     useEffect((key: number = p.widgetKey, trackedStock = p.trackedStocks, keyList: string[] = Object.keys(p.trackedStocks), updateWidgetConfig: Function = p.updateWidgetConfig) => {
         //Setup default metric source if none selected.
@@ -160,11 +190,12 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                     metrics: {},
                     series: {},
                 }
-                newData[node].metrics = rShowData[node]['metric']
-                newData[node].series = rShowData[node]['series']['annual']
+                if (rShowData?.[node]?.['metric']) { newData[node].metrics = rShowData[node]['metric'] }
+                if (rShowData?.[node]?.['series']?.['annual']) newData[node].series = rShowData[node]['series']['annual']
             }
             setStockData(newData)
         } else {
+            console.log('does not pass guard')
             setStockData({})
         }
     }, [rShowData])
@@ -175,8 +206,14 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             const newSeriesList = Object.keys(stockData[p.config.metricSource].series) ?? []
             setMetricList(newMetricList)
             setSeriesList(newSeriesList)
+
         }
     }, [stockData, p.config.metricSource])
+
+    useEffect(() => {
+        let searchList = Object.keys(p.trackedStocks).map((el) => `${p.widgetKey}-${el}`)
+        dispatch(tSearchMongoDB(searchList))
+    }, [toggleMode, targetStock, p.config.metricSelection, p.config.seriesSelection, dispatch, p.trackedStocks, p.widgetKey])
 
     function changeSource(el) {
         p.updateWidgetConfig(p.widgetKey, {
@@ -185,7 +222,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     }
 
     function changeOrder(indexRef, change, update) {
-        //changes order that metric selections are displayed in.
         let moveFrom = p.config[update][indexRef]
         let moveTo = p.config[update][indexRef + change]
         let orderMetricSelection = p.config[update].slice()
@@ -271,7 +307,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
     function checkStatus(check) {
         //sets status of check boxes when selecting or deselecting checkboxes.
-        if (toggleMode === 'metric') {
+        if (toggleMode === 'metrics') {
             if (p.config.metricSelection.indexOf(check) > -1) {
                 return true
             } else {
@@ -296,7 +332,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             let metricSelectionSlice = p.config.metricSelection.slice(start, end);
             let seriesSelectionSlice = p.config.seriesSelection.slice(start, end);
             let stockSelectionSlice = Object.keys(p.trackedStocks).slice(start, end);
-            // console.log(selectionSlice)
             let mapMetrics = metricSlice.map((el, index) => (
                 <tr key={el + "metricRow" + index}>
                     <td key={el + "metricdesc"}>{convertCamelToProper(el)}</td>
@@ -471,18 +506,19 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         </option>
     ));
 
-    let seriesListOptions = p.config.seriesSelection.map((el) => (
+    let seriesListOptions = p.config.seriesSelection ? p.config.seriesSelection.map((el) => (
         <option key={el + "option"} value={el}>
             {convertCamelToProper(el)}
         </option>
-    ));
+    )) : <></>;
 
     function renderStockData() {
 
         if (toggleMode === 'metrics') { //build metrics table.
             let selectionList: string[] = []
             let thisKey = p.widgetKey
-            if (p.config.metricSelection !== undefined) { selectionList = p.config.metricSelection.slice() }
+            selectionList = []
+            if (p.config.metricSelection) { selectionList = p.config.metricSelection.slice() }
             let headerRows = selectionList.map((el) => {
                 let title = el.replace(/([A-Z])/g, ' $1').trim().split(" ").join("\n")
                 if (title.search(/\d\s[A-Z]/g) !== -1) {

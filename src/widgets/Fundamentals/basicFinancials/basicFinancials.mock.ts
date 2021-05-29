@@ -96,7 +96,7 @@ const resData = {
 const resObj = resData
 
 export const mockFinnHubData = //MOCK API REQUEST FOR THIS WIDGET. Remember to update api string on next line.
-    rest.get("https://finnhub.io/api/v1/---UPDATE-----*", (req, res, ctx) => {
+    rest.get("https://finnhub.io/api/v1/stock/metric*", (req, res, ctx) => {
         console.log('return mocked finnhub data /earnings')
         return res(
             ctx.status(200),
@@ -114,7 +114,7 @@ export const getCheckLogin_success =     //auto login check rejected.
                 login: 1,
                 ratelimit: 25,
                 apiAlias: 'alias',
-                widgetsetup: '{"EstimatesEarningsCalendar":true}', //UPDATE NEEDED IF premium feature. First item from topNavReg tuple.
+                widgetsetup: '{"FundamentalsBasicFinancials":true}', //UPDATE NEEDED IF premium feature. First item from topNavReg tuple.
                 exchangelist: ['US'],
                 defaultexchange: ['US',]
             })

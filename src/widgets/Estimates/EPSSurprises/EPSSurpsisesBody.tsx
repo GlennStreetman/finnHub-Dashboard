@@ -229,7 +229,6 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
     }
 
     function renderStockData() {
-        console.log('Rendering EPS surprises')
         let newSymbolList = Object.keys(p.trackedStocks).map((el) => (
             <option key={el + "ddl"} value={el}>
                 {p.trackedStocks[el].dStock(p.exchangeList)}
@@ -268,9 +267,9 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
         </div>
     )
 }
-//RENAME
+
 export default forwardRef(EstimatesEPSSurprises)
-//RENAME
+
 export function EPSSurprisesProps(that, key = "newWidgetNameProps") {
     let propList = {
         apiKey: that.props.apiKey,
