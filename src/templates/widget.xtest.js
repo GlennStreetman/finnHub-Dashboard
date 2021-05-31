@@ -20,7 +20,7 @@ import { store } from '../../../store'
 import { Provider } from 'react-redux'
 
 //mock routes
-import {mockFinnHubData, getDashboard_success, getCheckLogin_success} from './widget.mock'
+import {mockFinnHubData, getDashboard_success, getCheckLogin_success, postFindMongoData_success_noData, postUpdateGQLFilters} from './widget.mock'
 import { getFinnDashData_noData, postFinnDashData_noSave }  from '../../../server/routes/mongoDB/finnHubData.mock'
 import { postDashboard_success_noWidgets } from '../../../server/routes/loggedIn/dashboard.mock'
 import { mockFinnHubDataQuote } from '../../../appFunctions/getStockPrices.mock'
@@ -37,7 +37,9 @@ const mockHTTPServer = setupServer(
     postDashboard_success_noWidgets,  //mock save dashboard after loading widget.
     mockFinnHubDataQuote, //mock finnhub quote data for wathclist menu widget.
     mockFinnhubDataStockSymbol, //mock stock data for exchange
-    logUiErrorIntercept //mock and warn about any user interface errors. SHould this force fail?
+    logUiErrorIntercept, //mock and warn about any user interface errors. SHould this force fail?
+    postFindMongoData_success_noData, 
+    postUpdateGQLFilters,
     ) 
 
 
@@ -59,7 +61,7 @@ it('Test Single Widget dashboard : EarningsCalendar ', async (done) => {
     //add target widget from dropdown
     fireEvent.mouseOver(getByTestId('widgetsDropdown'));
     await waitFor(() => {
-        expect(screen.getByTestId('estimatesDropdown')).toBeInTheDocument() //estimatesDropDown, fundamentalsDropdown, priceDropDown
+        expect(screen.getByTestId('estimatesDropdown')).toBeInTheDocument() //estimatesDropDown, fundamentalsDropDown, priceDropDown
     })
     fireEvent.mouseOver(screen.getByText('Estimate')); //UPDATE WITH Estimate, Fundamental, Price
     await waitFor(() => {
