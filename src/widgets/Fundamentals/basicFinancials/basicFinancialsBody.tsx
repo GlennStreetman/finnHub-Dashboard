@@ -308,7 +308,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                             {orderView === 0 ? 'Order' : 'Selection'}
                         </button>
                     )}
-                    <button onClick={() => { symbolView === 1 ? setSymbolView(0) : setSymbolView(1) }}>
+                    <button data-testid='symbolViewSelector' onClick={() => { console.log('HERE'); symbolView === 1 ? setSymbolView(0) : setSymbolView(1) }}>
                         {symbolView === 0 ? 'Stocks' : 'Metrics'}
                     </button>
                 </div>
@@ -391,7 +391,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                     <td key={el + "metricdesc"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
                     <td><input type='radio' name='sourceStock' checked={p.config.metricSource === el} onChange={() => changeSource(el)} /></td>
                     <td key={el + "remove"}>
-                        <button onClick={() => { updateWidgetList(el); }}><i className="fa fa-times" aria-hidden="true" /></button>
+                        <button data-testid={`remove-${el}`} onClick={() => { updateWidgetList(el); }}><i className="fa fa-times" aria-hidden="true" /></button>
                     </td>
 
                 </tr>
@@ -410,14 +410,14 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                     if (toggleMode === 'metrics') {
                         return (
                             <>
-                                <td>Metric</td>
+                                <td data-testid='metricSelector'>Metric</td>
                                 <td>Select</td>
                             </>
                         )
                     } else {
                         return (
                             <>
-                                <td>Time Series</td>
+                                <td data-testid='timeSeriesSelector'>Time Series</td>
                                 <td>Select</td>
                             </>
                         )
@@ -491,11 +491,11 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
     function bodySelector() {
         return (
-            <select className="btn" value={toggleMode} onChange={changeBodySelection}>
-                <option key={'metricsSelection1'} value={'metrics'}>
+            <select data-testid='modeSelector' className="btn" value={toggleMode} onChange={changeBodySelection}>
+                <option data-testid='selectMetrics' key={'metricsSelection1'} value={'metrics'}>
                     metrics
                 </option>
-                <option key={'metricsSelection2'} value={'series'}>
+                <option data-testid='selectSeries' key={'metricsSelection2'} value={'series'}>
                     series
                 </option>
             </select>
@@ -513,7 +513,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     }
 
     let stockSymbolList = Object.keys(p.trackedStocks).map((el) => (
-        <option key={el + "option"} value={el}>
+        <option data-testid={`select-${el}`} key={el + "option"} value={el}>
             {p.trackedStocks[el].dStock(p.exchangeList)}
         </option>
     ));
@@ -525,8 +525,10 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     )) : <></>;
 
     function renderStockData() {
+        console.log('RENDERING')
 
         if (toggleMode === 'metrics') { //build metrics table.
+            console.log('building metrics')
             let selectionList: string[] = []
             let thisKey = p.widgetKey
             selectionList = []
@@ -549,13 +551,13 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 )
             })
             let buildTableMetrics = (
-                <div className="widgetTableDiv">
+                <div data-testid='metricsSelectors' className="widgetTableDiv">
                     Show: {bodySelector()}
 
                     <table className='widgetBodyTable'>
                         <thead>
                             <tr>
-                                <td className='centerBottomTE'>Symbole:</td>
+                                <td data-testid='symbolLabel' className='centerBottomTE'>Symbol:</td>
                                 {headerRows}
                             </tr>
                         </thead>
@@ -567,14 +569,15 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             )
             return buildTableMetrics
         } else { //build time series chart
+            console.log('BUILDING CHART SELECTION')
             // console.log(stockData[targetStock]['series'][targetSeries], targetSeries)
             let stockDataObj = stockData?.[targetStock]?.['series']?.[targetSeries] ? stockData[targetStock]['series'][targetSeries] : []
             const options = createOptions(convertCamelToProper(targetSeries), stockDataObj)
             let buildChartSelection = (
-                <div className="widgetTableDiv">
+                <div data-testid='seriesSelectors' className="widgetTableDiv">
                     Show: {bodySelector()} <br />
                     Stock: {
-                        <select className="btn" value={targetStock} onChange={changeStockSelection}>
+                        <select data-testid='selectStock' className="btn" value={targetStock} onChange={changeStockSelection}>
                             {stockSymbolList}
                         </select>
                     } <br />
@@ -591,7 +594,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     }
 
     return (
-        <>
+        <div data-testid='basicFinancialsBody'>
             {p.showEditPane === 1 && (
                 <>
                     {React.createElement(StockSearchPane, searchPaneProps(p))}
@@ -599,7 +602,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 </>
             )}
             {Object.keys(p.trackedStocks).length > 0 && p.showEditPane === 0 ? renderStockData() : <></>}
-        </>
+        </div>
     );
 }
 //RENAME

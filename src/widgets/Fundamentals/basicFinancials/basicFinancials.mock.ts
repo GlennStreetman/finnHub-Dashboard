@@ -120,3 +120,22 @@ export const getCheckLogin_success =     //auto login check rejected.
             })
         )
     })
+
+export const postFindMongoData_success_noData =
+    rest.post("/findMongoData", (req, res, ctx) => {
+        console.log('post/CheckLogin success, no data')
+        return res(
+            ctx.status(200),
+            ctx.json({})
+        )
+    })
+
+export const postUpdateGQLFilters =
+    rest.post("/updateGQLFilters", (req, res, ctx) => {
+        console.log('post/CheckLogin success, no data')
+        return res(
+            ctx.status(200),
+            ctx.json({ message: `Update filters Complete` })
+        )
+    })
+
