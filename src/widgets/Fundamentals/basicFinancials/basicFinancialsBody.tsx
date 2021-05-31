@@ -194,7 +194,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             }
             setStockData(newData)
         } else {
-            console.log('does not pass guard')
+            // console.log('does not pass guard')
             setStockData({})
         }
     }, [rShowData])
@@ -525,10 +525,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     )) : <></>;
 
     function renderStockData() {
-        console.log('RENDERING')
-
         if (toggleMode === 'metrics') { //build metrics table.
-            console.log('building metrics')
             let selectionList: string[] = []
             let thisKey = p.widgetKey
             selectionList = []
@@ -569,8 +566,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             )
             return buildTableMetrics
         } else { //build time series chart
-            console.log('BUILDING CHART SELECTION')
-            // console.log(stockData[targetStock]['series'][targetSeries], targetSeries)
             let stockDataObj = stockData?.[targetStock]?.['series']?.[targetSeries] ? stockData[targetStock]['series'][targetSeries] : []
             const options = createOptions(convertCamelToProper(targetSeries), stockDataObj)
             let buildChartSelection = (

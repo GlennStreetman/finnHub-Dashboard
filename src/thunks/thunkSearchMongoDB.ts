@@ -6,7 +6,6 @@ export const tSearchMongoDB = createAsyncThunk( //{dashboard, [securityList]}
     'tSearch',
     async (req: string[], thunkAPI: any) => { //{list of securities}
         //if stale pop from list 
-
         const dashboard = thunkAPI.getState().showData.targetDashboard
         const reqData: reqObj = {
             searchList: req,

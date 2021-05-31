@@ -44,7 +44,6 @@ const showData = createSlice({
             //adds new key that is populated by data later.
             //payload {key: string, {...widget-ex-stck: {empty obj}}}
             const ap: rBuildVisableDataPayload = action.payload
-            console.log('ap:', ap)
             const key: string = ap.key
             state.dataSet[key] = {}
             for (const security in ap.securityList) {
@@ -52,7 +51,7 @@ const showData = createSlice({
                 state.dataSet[key][thisSecurity] = {}
             }
             if (ap.dataFilters) {
-                console.log('dataFilters', ap.dataFilters)
+
                 for (const [sec, values] of Object.entries(ap.dataFilters)) {
                     state.dataSet[key][sec]['filters'] = values
                 }
@@ -77,7 +76,6 @@ const showData = createSlice({
             // return {...state}
         },
         [tGetFinnhubData.fulfilled.toString()]: (state, action) => {
-            console.log('tGetFinnhubData')
             const ap: resObj = action.payload
             for (const key in ap) {
                 if (ap[key].dashboard === state.targetDashboard) {
@@ -128,7 +126,6 @@ const showData = createSlice({
             // return {...state}
         },
         [tSearchMongoDB.fulfilled.toString()]: (state, action) => {
-            console.log('tSearchMongoDB')
             const ap: any = action.payload
             for (const x in ap) {
                 const widgetRef: string = ap[x].widget
