@@ -136,12 +136,17 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             let securityList: string[] = []
             let filterObj = {}
 
+            // filterPaths: [],
+            // showData: [],
+            // widgetType: 'FundamentalsBasicFinancials'
+
             if (toggleMode === 'metrics') {
                 securityList = stockList
                 for (const s of stockList) {
                     filterObj[s] = {
                         filterPaths: ['metric', 'series.annual'],
-                        showsData: []
+                        showsData: [],
+                        widgetType: 'FundamentalsBasicFinancials'
                     }
                     if (p.config.metricSelection) {
                         for (const f of p.config.metricSelection) {
@@ -154,7 +159,8 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 filterObj[targetStock] = {}
                 filterObj[targetStock] = {
                     filterPaths: ['metric', 'series.annual'],
-                    showsData: []
+                    showsData: [],
+                    widgetType: 'FundamentalsBasicFinancials'
                 }
                 for (const f of p.config.seriesSelection) {
                     filterObj[targetStock].showsData.push(`series.annual.${f}`)
@@ -201,14 +207,11 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     }, [rShowData])
 
     useEffect(() => {
-        if (stockData[p.config.metricSource] !== undefined) {
-            const newMetricList = Object.keys(stockData[p.config.metricSource].metrics) ?? []
-            const newSeriesList = Object.keys(stockData[p.config.metricSource].series) ?? []
-            setMetricList(newMetricList)
-            setSeriesList(newSeriesList)
-
+        if (stockData[p.config.metricSource] && rShowData && targetStock && rShowData[targetStock]) {
+            if (rShowData[targetStock]['metricKeys']) setMetricList(rShowData[targetStock]['metricKeys'])
+            if (rShowData[targetStock]['seriesKeys']) setSeriesList(rShowData[targetStock]['seriesKeys'])
         }
-    }, [stockData, p.config.metricSource])
+    }, [stockData, p.config.metricSource, rShowData, targetStock])
 
     useEffect(() => {
         let searchList = Object.keys(p.trackedStocks).map((el) => `${p.widgetKey}-${el}`)

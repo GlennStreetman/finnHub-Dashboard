@@ -2,7 +2,8 @@ import { createSlice } from '@reduxjs/toolkit';
 import { tGetMongoDB } from '../thunks/thunkGetMongoDB'
 import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB'
 import { tGetFinnhubData, resObj } from '../thunks/thunkFetchFinnhub'
-import { findByString, mergeByString } from './../appFunctions/stringFunctions'
+// import { findByString, mergeByString } from './../appFunctions/stringFunctions'
+import { widgetReducers } from '../registers/dataReducerReg'
 
 //data = {keys : data objects}
 //key should be widget reference.
@@ -43,6 +44,7 @@ const showData = createSlice({
             //adds new key that is populated by data later.
             //payload {key: string, {...widget-ex-stck: {empty obj}}}
             const ap: rBuildVisableDataPayload = action.payload
+            console.log('ap:', ap)
             const key: string = ap.key
             state.dataSet[key] = {}
             for (const security in ap.securityList) {
@@ -50,6 +52,7 @@ const showData = createSlice({
                 state.dataSet[key][thisSecurity] = {}
             }
             if (ap.dataFilters) {
+                console.log('dataFilters', ap.dataFilters)
                 for (const [sec, values] of Object.entries(ap.dataFilters)) {
                     state.dataSet[key][sec]['filters'] = values
                 }
@@ -63,7 +66,6 @@ const showData = createSlice({
             state.dataSet = {}
             state.targetDashboard = ''
         }
-
     },
     extraReducers: {
         [tGetFinnhubData.pending.toString()]: (state, action) => {
@@ -105,16 +107,11 @@ const showData = createSlice({
                     if (state.dataSet?.[widgetRef]?.[security] !== undefined) { //for target security from payload that is in target daashboard
                         const secObj: DataNode = state.dataSet[widgetRef][security]
                         if (secObj.filters) { //IF FILTERS NEED TO BE APPLYIED TO OVER QUERIED DATA.
-                            const filterObj = secObj.filters
-                            for (const f in filterObj['filterPaths']) { //zero out all filter paths
-                                let filterPathItems = findByString(data, filterObj['filterPaths'][f].split('.'))
-                                for (let x in filterPathItems) filterPathItems[x] = ''
-                                mergeByString(secObj, filterObj['filterPaths'][f].split('.'), filterPathItems)
-                            }
-                            for (const f in filterObj['showsData']) {
-                                let filterPathItems = findByString(data, filterObj['showsData'][f].split('.'))
-                                mergeByString(secObj, filterObj['showsData'][f].split('.'), filterPathItems)
-                            }
+                            let widgetType = secObj.filters['widgetType']
+                            let filteredDataFunc = widgetReducers[widgetType]
+                            let filteredData = filteredDataFunc(data, secObj.filters)
+                            filteredData.filters = secObj.filters
+                            state.dataSet[widgetRef][security] = filteredData
                         } else { //no filters
                             state.dataSet[widgetRef][security] = ap[x].data
                         }
@@ -140,16 +137,11 @@ const showData = createSlice({
                 if (state.dataSet?.[widgetRef]?.[security] !== undefined) { //for target security from payload that is in target daashboard
                     const secObj: DataNode = state.dataSet[widgetRef][security]
                     if (secObj.filters) { //IF FILTERS NEED TO BE APPLYIED TO OVER QUERIED DATA.
-                        const filterObj = secObj.filters
-                        for (const f in filterObj['filterPaths']) { //zero out all filter paths
-                            let filterPathItems = findByString(data, filterObj['filterPaths'][f].split('.'))
-                            for (let x in filterPathItems) filterPathItems[x] = ''
-                            mergeByString(secObj, filterObj['filterPaths'][f].split('.'), filterPathItems)
-                        }
-                        for (const f in filterObj['showsData']) {
-                            let filterPathItems = findByString(data, filterObj['showsData'][f].split('.'))
-                            mergeByString(secObj, filterObj['showsData'][f].split('.'), filterPathItems)
-                        }
+                        let widgetType = secObj.filters['widgetType']
+                        let filteredDataFunc = widgetReducers[widgetType]
+                        let filteredData = filteredDataFunc(data, secObj.filters)
+                        filteredData.filters = secObj.filters
+                        state.dataSet[widgetRef][security] = filteredData
                     } else { //no filters
                         state.dataSet[widgetRef][security] = ap[x].data
                     }
