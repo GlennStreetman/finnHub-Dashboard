@@ -112,13 +112,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         }
     ))
 
-    useEffect(() => { //set default stock
-        if (Object.keys(p.trackedStocks).length > 0 && !targetStock) {
-            const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
-            setTargetStock(setDefault)
-        }
-    }, [p.trackedStocks, targetStock])
-
     useEffect(() => { //set default series 
         if (seriesList.length > 0 && targetSeries === '') {
             setTargetSeries(seriesList[0])
@@ -205,6 +198,22 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             setStockData({})
         }
     }, [rShowData])
+
+    useEffect(() => {
+        //if stock not selected default to first stock.
+        if (Object.keys(p.trackedStocks).length > 0 && targetStock === '') {
+            const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
+            setTargetStock(setDefault)
+        }
+    }, [p.trackedStocks, targetStock])
+
+    useEffect(() => { //on change to targetSecurity update widget focus
+        if (p.targetSecurity !== '') {
+            const target = `${p.widgetKey}-${p.targetSecurity}`
+            setTargetStock(p.targetSecurity)
+            dispatch(tSearchMongoDB([target]))
+        }
+    }, [p.targetSecurity, p.widgetKey, dispatch])
 
     useEffect(() => {
         if (stockData[p.config.metricSource] && rShowData && targetStock && rShowData[targetStock]) {
@@ -603,6 +612,7 @@ export function metricsProps(that, key = "newWidgetNameProps") {
         exchangeList: that.props.exchangeList,
         filters: that.props.widgetList[key]["filters"],
         showPane: that.showPane,
+        targetSecurity: that.props.targetSecurity,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         updateWidgetConfig: that.props.updateWidgetConfig,
         updateDefaultExchange: that.props.updateDefaultExchange,
