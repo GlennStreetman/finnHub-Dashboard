@@ -76,13 +76,24 @@ const showData = createSlice({
             // return {...state}
         },
         [tGetFinnhubData.fulfilled.toString()]: (state, action) => {
+            console.log('tGetFinnhubData')
             const ap: resObj = action.payload
-            for (const key in ap) {
-                if (ap[key].dashboard === state.targetDashboard) {
-                    const widgetRef: string = ap[key].widget
-                    const security: string = ap[key].security
+            for (const x in ap) {
+                if (ap[x].dashboard === state.targetDashboard) {
+                    const widgetRef: string = ap[x].widget
+                    const security: string = ap[x].security
+                    const data: object = ap[x].data
                     if (state?.dataSet?.[widgetRef]?.[security] !== undefined) {
-                        state.dataSet[widgetRef][security] = ap[key].data
+                        const secObj: DataNode = state.dataSet[widgetRef][security]
+                        if (secObj.filters) { //IF FILTERS NEED TO BE APPLYIED TO REFORMAT DATA.
+                            let widgetType = secObj.filters['widgetType']
+                            let filteredDataFunc = widgetReducers[widgetType]
+                            let filteredData = filteredDataFunc(data, secObj.filters)
+                            filteredData.filters = secObj.filters
+                            state.dataSet[widgetRef][security] = filteredData
+                        } else { //no filters
+                            state.dataSet[widgetRef][security] = ap[x].data
+                        }
                     }
                 }
             }
@@ -96,6 +107,7 @@ const showData = createSlice({
             // return {...state}
         },
         [tGetMongoDB.fulfilled.toString()]: (state, action) => {
+            console.log('tGetMongoDB')
             const ap: any = action.payload
             for (const x in ap) { //FOR 'DB-WIdget-security' key
                 if (ap[x].dashboard === state.targetDashboard) { //if returned data should be visable
@@ -104,7 +116,7 @@ const showData = createSlice({
                     const data: object = ap[x].data
                     if (state.dataSet?.[widgetRef]?.[security] !== undefined) { //for target security from payload that is in target daashboard
                         const secObj: DataNode = state.dataSet[widgetRef][security]
-                        if (secObj.filters) { //IF FILTERS NEED TO BE APPLYIED TO OVER QUERIED DATA.
+                        if (secObj.filters) { //IF FILTERS NEED TO BE APPLYIED TO REFORMAT DATA.
                             let widgetType = secObj.filters['widgetType']
                             let filteredDataFunc = widgetReducers[widgetType]
                             let filteredData = filteredDataFunc(data, secObj.filters)
@@ -126,6 +138,7 @@ const showData = createSlice({
             // return {...state}
         },
         [tSearchMongoDB.fulfilled.toString()]: (state, action) => {
+            console.log('tSearchMongoDB')
             const ap: any = action.payload
             for (const x in ap) {
                 const widgetRef: string = ap[x].widget
@@ -133,7 +146,7 @@ const showData = createSlice({
                 const data: object = ap[x].data
                 if (state.dataSet?.[widgetRef]?.[security] !== undefined) { //for target security from payload that is in target daashboard
                     const secObj: DataNode = state.dataSet[widgetRef][security]
-                    if (secObj.filters) { //IF FILTERS NEED TO BE APPLYIED TO OVER QUERIED DATA.
+                    if (secObj.filters) { //IF FILTERS NEED TO BE APPLYIED TO REFORMAT DATA.
                         let widgetType = secObj.filters['widgetType']
                         let filteredDataFunc = widgetReducers[widgetType]
                         let filteredData = filteredDataFunc(data, secObj.filters)
