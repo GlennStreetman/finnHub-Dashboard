@@ -83,7 +83,7 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
             }
             return (lookupNames)
         } else if (updateExchange === 0) {
-            console.log('updating exchange')
+            // console.log('updating exchange')
             setUpdateExchange(1)
             dispatch(tGetSymbolList({ exchange: p.defaultExchange, apiKey: p.apiKey, finnHubQueue: p.finnHubQueue }))
         }
@@ -112,7 +112,7 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
                 key: p.widgetKey,
                 securityList: [[`${targetStock}`]]
             }
-            console.log(payload)
+            // console.log(payload)
             dispatch(rBuildVisableData(payload))
         }
     }, [targetStock, p.widgetKey, widgetCopy, dispatch])
@@ -150,6 +150,7 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
                 <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
                 <td key={el + "buttonC"}>
                     <button
+                        data-testid={`remove-${el}`}
                         key={el + "button"}
                         onClick={() => {
                             p.updateWidgetStockList(p.widgetKey, el);
@@ -204,7 +205,7 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
 
 
     return (
-        <>
+        <div data-testid='peersBody'>
             {p.showEditPane === 1 && (
                 <>
                     {React.createElement(StockSearchPane, searchPaneProps(p))}
@@ -216,7 +217,7 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
                     {renderStockData()}
                 </>
             )}
-        </>
+        </div>
     )
 }
 

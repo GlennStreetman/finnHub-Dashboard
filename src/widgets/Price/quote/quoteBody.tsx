@@ -143,6 +143,7 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
                 <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
                 <td key={el + "buttonC"}>
                     <button
+                        data-testid={`remove-${el}`}
                         key={el + "button"}
                         onClick={() => {
                             p.updateWidgetStockList(p.widgetKey, el);
@@ -267,19 +268,19 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
         //     )}
         //     {Object.keys(p.streamingPriceData).length > 0 ? renderStockData() : <></>}
         // </>
-        <>
+        <div data-testid='quoteBody'>
             {p.showEditPane === 1 && (
-                <>
+                <div >
                     {React.createElement(StockSearchPane, searchPaneProps(p))}
                     {renderSearchPane()}
-                </>
+                </div>
             )}
             {p.showEditPane === 0 && (
                 <>
                     {renderStockData()}
                 </>
             )}
-        </>
+        </div>
     );
 }
 

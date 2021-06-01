@@ -98,7 +98,7 @@ class TopNav extends React.Component<topNavProps, topNavState> {
                 <li id='ddi' className='menu-item-has-children'><a data-testid="fundamentalsDropDown" href='#2'>Fundamentals</a>
                     {this.dropDownList(fundamentalsOptions)}
                 </li>
-                <li id='ddi' className='menu-item-has-children'><a data-testid="priceDropDown" href='#3'>Price</a>
+                <li id='ddi' className='menu-item-has-children'><a data-testid="priceDropDown" href='#3'>Price Data</a>
                     {this.dropDownList(priceOptions)}
                 </li>
             </ul>

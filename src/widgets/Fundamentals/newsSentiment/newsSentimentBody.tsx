@@ -142,6 +142,7 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
                     <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
                     <td key={el + "buttonC"}>
                         <button
+                            data-testid={`remove-${el}`}
                             key={el + "button"}
                             onClick={() => {
                                 updateWidgetList(el);
@@ -190,7 +191,7 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
     }
 
     return (
-        <>
+        <div data-testid='newsSentimentBody'>
             {p.showEditPane === 1 && (
                 <>
                     {React.createElement(StockSearchPane, searchPaneProps(p))}
@@ -202,7 +203,7 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
                     {renderStockData()}
                 </>
             )}
-        </>
+        </div>
     )
 }
 

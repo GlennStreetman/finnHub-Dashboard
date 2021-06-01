@@ -186,6 +186,7 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
                 <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
                 <td key={el + "buttonC"}>
                     <button
+                        data-testid={`remove-${el}`}
                         key={el + "button"}
                         onClick={() => {
                             p.updateWidgetStockList(p.widgetKey, el);
@@ -274,7 +275,7 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
     }
 
     return (
-        <>
+        <div data-testid='splitsBody'>
             {p.showEditPane === 1 && (
                 <>
                     {React.createElement(StockSearchPane, searchPaneProps(p))}
@@ -286,7 +287,7 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
                     {renderStockData()}
                 </>
             )}
-        </>
+        </div>
     )
 }
 

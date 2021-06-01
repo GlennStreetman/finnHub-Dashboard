@@ -222,7 +222,7 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
     }
 
     return (
-        <>
+        <div data-testid='marketNewsBody'>
             {p.showEditPane === 1 && (
                 <>
                     {renderSearchPane()}
@@ -233,7 +233,7 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
                     {renderStockData()}
                 </>
             )}
-        </>
+        </div>
     )
 }
 

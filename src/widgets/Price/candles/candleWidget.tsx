@@ -247,20 +247,6 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         }
     }
 
-    // function updateFilter(e) {
-    //     // const target = e.target;
-    //     // const name = target.name;
-    //     if (isNaN(new Date(e.target.value).getTime()) === false) {
-    //         const now = Date.now()
-    //         const target = new Date(e.target.value).getTime();
-    //         const offset = now - target
-    //         const name = e.target.name;
-    //         p.updateWidgetFilters(p.widgetKey, name, offset);
-    //     } else {
-    //         p.updateWidgetFilters(p.widgetKey, e.target.name, e.target.value)
-    //     }
-    // }
-
     function changeStockSelection(e) {
         const target = e.target.value;
         const key = `${p.widgetKey}-${target}`
@@ -277,6 +263,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                     <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
                     <td key={el + "buttonC"}>
                         <button
+                            data-testid={`remove-${el}`}
                             key={el + "button"}
                             onClick={() => {
                                 updateWidgetList(el);
@@ -348,7 +335,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     ));
 
     return (
-        <>
+        <div data-testid='candleBody'>
             {p.showEditPane === 1 && (
                 <>
                     <div className="searchPane">
@@ -376,7 +363,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
             {p.showEditPane === 0 && (
                 Object.keys(p.trackedStocks).length > 0 ? displayCandleGraph() : <></>
             )}
-        </>
+        </div>
     );
 }
 

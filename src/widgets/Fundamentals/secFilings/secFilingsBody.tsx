@@ -178,6 +178,7 @@ function FundamentalsSECFilings(p: { [key: string]: any }, ref: any) {
                     <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
                     <td key={el + "buttonC"}>
                         <button
+                            data-testid={`remove-${el}`}
                             key={el + "button"}
                             onClick={() => {
                                 p.updateWidgetStockList(p.widgetKey, el);
@@ -241,7 +242,7 @@ function FundamentalsSECFilings(p: { [key: string]: any }, ref: any) {
     }
 
     return (
-        <>
+        <div data-testid='secFilingsBody'>
             {p.showEditPane === 1 && (
                 <>
                     {React.createElement(StockSearchPane, searchPaneProps(p))}
@@ -253,7 +254,7 @@ function FundamentalsSECFilings(p: { [key: string]: any }, ref: any) {
                     {renderStockData()}
                 </>
             )}
-        </>
+        </div>
     )
 }
 
