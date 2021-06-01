@@ -48,7 +48,7 @@ beforeAll(() => {mockHTTPServer.listen({
 })})
 afterAll(() => { mockHTTPServer.close() })
 
-it('Test Single Widget dashboard : EarningsCalendar ', async (done) => {
+it('Test Single Widget dashboard : Candle ', async (done) => {
     //login to dashboard with no widgets.
     const { debug, getByTestId } = render(
         <Provider store={store}>
