@@ -201,7 +201,8 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
     useEffect(() => {
         //if stock not selected default to first stock.
-        if (Object.keys(p.trackedStocks).length > 0 && targetStock === '') {
+        if (Object.keys(p.trackedStocks).length > 0 && !targetStock) {
+            console.log('SETTING TARGET STOCK')
             const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
             setTargetStock(setDefault)
         }
