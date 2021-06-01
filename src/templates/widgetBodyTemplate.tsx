@@ -68,9 +68,27 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
         }
     }
 
+    const startingStartDate = () => { //REMOVE IF FILTERS NOT NEEDED
+        const now = Date.now()
+        const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000 * 52
+        const startUnix = now + startUnixOffset
+        const startDate = new Date(startUnix).toISOString().slice(0, 10);
+        return startDate
+    }
+
+    const startingEndDate = () => { //REMOVE IF FILTERS NOT NEEDED
+        const now = Date.now()
+        const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
+        const endUnix = now + endUnixOffset
+        const endDate = new Date(endUnix).toISOString().slice(0, 10);
+        return endDate
+    }
+
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [stockData, setStockData] = useState(startingstockData());
     const [targetStock, setTargetStock] = useState(startingTargetStock());
+    const [start, setStart] = useState(startingStartDate()) //REMOVE IF FILTERS NOT NEEDED
+    const [end, setEnd] = useState(startingEndDate()) //REMOVE IF FILTERS NOT NEEDED
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
@@ -111,18 +129,15 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
     }, [targetStock, p.widgetKey, widgetCopy, dispatch])
 
     useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
-        //DELETE IF NO FILTERS
-        //Setup filters if not yet done.
-        //example update commented out below. 
-        if (filters['startDate'] === undefined) {
-            // const startDateOffset = -604800 * 1000 * 52 * 20 //20 year backward. Limited to 1 year on free version.
-            // const endDateOffset = 0 //today.
-            // update(key, 'startDate', startDateOffset)
-            // update(key, 'endDate', endDateOffset)
-            // update(key, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
-
+        if (filters['startDate'] === undefined) { //REMOVE IF FILTERS NOT NEEDED
+            const filterUpdate = {
+                startDate: start,
+                endDate: end,
+                Description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
+            }
+            update(key, filterUpdate)
         }
-    }, [p.filters, p.updateWidgetFilters, p.widgetKey])
+    }, [p.filters, p.updateWidgetFilters, p.widgetKey, start, end])
 
     useEffect(() => {
         //DELETE IF NO TARGET STOCK
@@ -145,13 +160,25 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
         }
     }, [p.targetSecurity, p.widgetKey, dispatch])
 
-    function updateFilter(e) {
+
+
+    function updateStartDate(e) { //remove if filters not needed
+        setStart(e.target.value)
+    }
+
+    function updateEndDate(e) {//remove if filters not needed
+        setEnd(e.target.value)
+    }
+
+    function updateFilter(e) { //remove if filters not needed
+        console.log('UPDATE FILTER', start, end)
         if (isNaN(new Date(e.target.value).getTime()) === false) {
             const now = Date.now()
             const target = new Date(e.target.value).getTime();
             const offset = target - now
             const name = e.target.name;
-            p.updateWidgetFilters(p.widgetKey, name, offset)
+            console.log(name, e.target.value)
+            p.updateWidgetFilters(p.widgetKey, { [name]: offset })
         }
     }
 
@@ -164,6 +191,7 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
                 <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
                 <td key={el + "buttonC"}>
                     <button
+                        data-testid={`remove-${el}`}
                         key={el + "button"}
                         onClick={() => {
                             p.updateWidgetStockList(p.widgetKey, el);
@@ -186,11 +214,12 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
         let searchForm = (
             <>
                 <div className="stockSearch">
-                    <form className="form-inline">
+                    <form className="form-stack">
                         <label htmlFor="start">Start date:</label>
-                        <input className="btn" id="start" type="date" name="startDate" onChange={updateFilter} value={startDate}></input>
+                        <input className="btn" id="start" type="date" name="startDate" onChange={updateStartDate} onBlur={updateFilter} value={start}></input>
+                        <br />
                         <label htmlFor="end">End date:</label>
-                        <input className="btn" id="end" type="date" name="endDate" onChange={updateFilter} value={endDate}></input>
+                        <input className="btn" id="end" type="date" name="endDate" onChange={updateEndDate} onBlur={updateFilter} value={end}></input>
                     </form>
                 </div>
                 <table>
