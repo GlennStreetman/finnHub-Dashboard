@@ -46,12 +46,25 @@ export const getDashboard_success =     //auto login check rejected.
     })
 
 //default data to be returned for test purposes for all stocks.
-const resData = {}
+const resData = {
+    "country": "US",
+    "currency": "USD",
+    "exchange": "NASDAQ/NMS (GLOBAL MARKET)",
+    "ipo": "1980-12-12",
+    "marketCapitalization": 1415993,
+    "name": "Apple Inc",
+    "phone": "14089961010",
+    "shareOutstanding": 4375.47998046875,
+    "ticker": "AAPL",
+    "weburl": "https://www.apple.com/",
+    "logo": "https://static.finnhub.io/logo/87cb30d8-80df-11ea-8951-00000000092a.png",
+    "finnhubIndustry": "Technology"
+}
 
 const resObj = resData
 
 export const mockFinnHubData = //MOCK API REQUEST FOR THIS WIDGET. Remember to update api string on next line.
-    rest.get("https://finnhub.io/api/v1/financials-reported*", (req, res, ctx) => {
+    rest.get("https://finnhub.io/api/v1/stock/profile2*", (req, res, ctx) => {
         console.log('return mocked finnhub data /earnings')
         return res(
             ctx.status(200),
@@ -69,7 +82,7 @@ export const getCheckLogin_success =     //auto login check rejected.
                 login: 1,
                 ratelimit: 25,
                 apiAlias: 'alias',
-                widgetsetup: '{"FundamentalsFinancialsAsReported":true}', //UPDATE NEEDED IF premium feature. First item from topNavReg tuple.
+                widgetsetup: '{"FundamentalsCompanyProfile2":true}', //UPDATE NEEDED IF premium feature. First item from topNavReg tuple.
                 exchangelist: ['US'],
                 defaultexchange: ['US',]
             })

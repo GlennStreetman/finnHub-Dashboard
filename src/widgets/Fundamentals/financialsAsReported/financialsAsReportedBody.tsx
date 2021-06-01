@@ -154,6 +154,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                     <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
                     <td key={el + "buttonC"}>
                         <button
+                            data-testid={`remove-${el}`}
                             key={el + "button"}
                             onClick={() => {
                                 updateWidgetList(el);
@@ -193,7 +194,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         const thisNodeData = { ...stockData, ...thisKey }
         const stockTable =
             <>
-                <select className="btn" value={targetStock} onChange={changeStockSelection}>
+                <select data-testid='financialsAsReportedStock' className="btn" value={targetStock} onChange={changeStockSelection}>
                     {newSymbolList}
                 </select>
                 <br />
@@ -208,7 +209,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
 
 
     return (
-        <>
+        <div data-testid='financialsAsReportedBody'>
             {p.showEditPane === 1 && (
                 <>
                     {React.createElement(StockSearchPane, searchPaneProps(p))}
@@ -220,7 +221,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                     {renderStockData()}
                 </>
             )}
-        </>
+        </div>
     )
 }
 //RENAME

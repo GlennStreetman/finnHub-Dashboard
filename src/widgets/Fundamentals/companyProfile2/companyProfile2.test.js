@@ -20,7 +20,7 @@ import { store } from '../../../store'
 import { Provider } from 'react-redux'
 
 //mock routes
-import {mockFinnHubData, getDashboard_success, getCheckLogin_success, postFindMongoData_success_noData, postUpdateGQLFilters} from './widget.mock'
+import {mockFinnHubData, getDashboard_success, getCheckLogin_success, postFindMongoData_success_noData, postUpdateGQLFilters} from './companyProfile2.mock'
 import { getFinnDashData_noData, postFinnDashData_noSave }  from '../../../server/routes/mongoDB/finnHubData.mock'
 import { postDashboard_success_noWidgets } from '../../../server/routes/loggedIn/dashboard.mock'
 import { mockFinnHubDataQuote } from '../../../appFunctions/getStockPrices.mock'
@@ -61,22 +61,22 @@ it('Test Single Widget dashboard : EarningsCalendar ', async (done) => {
     //add target widget from dropdown
     fireEvent.mouseOver(getByTestId('widgetsDropdown'));
     await waitFor(() => {
-        expect(screen.getByTestId('estimatesDropdown')).toBeInTheDocument() //estimatesDropDown, fundamentalsDropDown, priceDropDown
+        expect(screen.getByTestId('fundamentalsDropDown')).toBeInTheDocument() //estimatesDropDown, fundamentalsDropDown, priceDropDown
     })
-    fireEvent.mouseOver(screen.getByText('Estimate')); //UPDATE WITH Estimate, Fundamentals, Price
+    fireEvent.mouseOver(screen.getByText('Fundamentals')); //UPDATE WITH Estimate, Fundamentals, Price
     await waitFor(() => {
-        expect(screen.getByTestId('Earnings Calendar')).toBeInTheDocument() //copy submenu text
+        expect(screen.getByTestId('Company Profile 2')).toBeInTheDocument() //copy submenu text
     })
-    expect(getByTestId('Earnings Calendar')).toBeInTheDocument() //copy submenu text
-    fireEvent.click(screen.getByTestId('Earnings Calendar')) //copy submenu text
+    expect(getByTestId('Company Profile 2')).toBeInTheDocument() //copy submenu text
+    fireEvent.click(screen.getByTestId('Company Profile 2')) //copy submenu text
     //check widget is mounted
     await waitFor(() => {
-        expect(screen.getByTestId('earningsCalendarBody')).toBeInTheDocument() //testID for widgets outer most div
-        //additional tests for widget body render.
+        expect(screen.getByTestId('companyProfile2Body')).toBeInTheDocument() //testID for widgets outer most div
+        expect(screen.getByTestId('profile2DropDown')).toBeInTheDocument()
     })
     // check that edit pane for widget renders and all buttons work
-    expect(screen.getByTestId('editPaneButton-EstimatesEarningsCalendar')).toBeInTheDocument() //update with widgetID
-    fireEvent.click(getByTestId('editPaneButton-EstimatesEarningsCalendar')) //update with widgetID
+    expect(screen.getByTestId('editPaneButton-FundamentalsCompanyProfile2')).toBeInTheDocument() //update with widgetID
+    fireEvent.click(getByTestId('editPaneButton-FundamentalsCompanyProfile2')) //update with widgetID
     await waitFor(() => {
         //additional tests for widget setup menu render.
     })
@@ -88,10 +88,10 @@ it('Test Single Widget dashboard : EarningsCalendar ', async (done) => {
         expect(screen.getByTestId('remove-US-COST')).toBeInTheDocument()
     })
     //unmount widget
-    expect(screen.getByTestId('removeWidget-EstimatesEarningsCalendar')).toBeInTheDocument()  //update with widgetID
-    fireEvent.click(screen.getByTestId('removeWidget-EstimatesEarningsCalendar')) //update with widgetID
+    expect(screen.getByTestId('removeWidget-FundamentalsCompanyProfile2')).toBeInTheDocument()  //update with widgetID
+    fireEvent.click(screen.getByTestId('removeWidget-FundamentalsCompanyProfile2')) //update with widgetID
     await waitFor(() => {
-        expect(screen.queryByTestId('earningsCalendarBody')).toBe(null) //update widget body tag.
+        expect(screen.queryByTestId('companyProfile2Body')).toBe(null) //update widget body tag.
     })
     done()
 })

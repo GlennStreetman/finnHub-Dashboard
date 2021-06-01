@@ -82,10 +82,28 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
         } else { return (1) }
     }
 
+    const startingStartDate = () => {
+        const now = Date.now()
+        const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000
+        const startUnix = now - startUnixOffset
+        const startDate = new Date(startUnix).toISOString().slice(0, 10);
+        return startDate
+    }
+
+    const startingEndDate = () => {
+        const now = Date.now()
+        const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
+        const endUnix = now + endUnixOffset
+        const endDate = new Date(endUnix).toISOString().slice(0, 10);
+        return endDate
+    }
+
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [stockData, setStockData] = useState(startingstockData());
     const [targetStock, setTargetStock] = useState(startingTargetStock());
     const [newsIncrementor, setNewsIncrementor] = useState(startingNewIncrementor())
+    const [start, setStart] = useState(startingStartDate())
+    const [end, setEnd] = useState(startingEndDate())
 
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
@@ -128,7 +146,7 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
 
     useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
         if (filters['startDate'] === undefined) {
-            const startDateOffset = 604800 * 1000 //1 week
+            const startDateOffset = -604800 * 1000 //1 week
             const endDateOffset = 0 //today.
             update(key, 'startDate', startDateOffset)
             update(key, 'endDate', endDateOffset)
@@ -210,6 +228,7 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
                     <td key={el + "name"}>{(p.trackedStocks[el].dStock(p.exchangeList))}</td>
                     <td key={el + "buttonC"}>
                         <button
+                            data-testid={`remove-${el}`}
                             key={el + "button"}
                             onClick={() => {
                                 updateWidgetList(el);
@@ -257,7 +276,7 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
                             <td>Headline</td>
                         </tr>
                     </thead>
-                    <tbody>{mapNews}</tbody>
+                    <tbody data-testid='newBodyTable'>{mapNews}</tbody>
                 </table>
             </div>
         );
@@ -290,24 +309,32 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
         return symbolSelectorDropDown;
     }
 
+    function updateStartDate(e) {
+        setStart(e.target.value)
+    }
+
+    function updateEndDate(e) {
+        setEnd(e.target.value)
+    }
+
     function renderSearchPane() {
-        const now = Date.now()
-        const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800 * 1000
-        const startUnix = now - startUnixOffset
-        const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
-        const endUnix = now - endUnixOffset
-        const startDate = new Date(startUnix).toISOString().slice(0, 10);
-        const endDate = new Date(endUnix).toISOString().slice(0, 10);
+        // const now = Date.now()
+        // const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800 * 1000
+        // const startUnix = now - startUnixOffset
+        // const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
+        // const endUnix = now - endUnixOffset
+        // const startDate = new Date(startUnix).toISOString().slice(0, 10);
+        // const endDate = new Date(endUnix).toISOString().slice(0, 10);
 
         return (
             <>
                 <div className="stockSearch">
                     <form className="form-stack">
                         <label htmlFor="start">Start date:</label>
-                        <input className="btn" id="start" type="date" name="startDate" onChange={updateFilter} value={startDate}></input>
+                        <input className="btn" id="start" type="date" name="startDate" onChange={updateStartDate} onBlur={updateFilter} value={start}></input>
                         <br />
                         <label htmlFor="end">End date:</label>
-                        <input className="btn" id="end" type="date" name="endDate" onChange={updateFilter} value={endDate}></input>
+                        <input className="btn" id="end" type="date" name="endDate" onChange={updateEndDate} onBlur={updateFilter} value={end}></input>
                     </form>
                 </div>
 
@@ -335,7 +362,7 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
     }
 
     return (
-        <>
+        <div data-testid='companyNewsBody'>
             {p.showEditPane === 1 && (
                 <>
                     {React.createElement(StockSearchPane, searchPaneProps(p))}
@@ -347,7 +374,7 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
                     {renderStockData()}
                 </>
             )}
-        </>
+        </div>
     )
 }
 //RENAME

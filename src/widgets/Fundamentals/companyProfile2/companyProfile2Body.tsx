@@ -148,6 +148,7 @@ function FundamentalsCompanyProfile2(p: { [key: string]: any }, ref: any) {
                     <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
                     <td key={el + "buttonC"}>
                         <button
+                            data-testid={`remove-${el}`}
                             key={el + "button"}
                             onClick={() => {
                                 editWidgetStockList(el);
@@ -204,7 +205,7 @@ function FundamentalsCompanyProfile2(p: { [key: string]: any }, ref: any) {
 
         const stockTable =
             <>
-                <select className="btn" value={targetStock} onChange={changeStockSelection}>
+                <select data-testid='profile2DropDown' className="btn" value={targetStock} onChange={changeStockSelection}>
                     {newSymbolList}
                 </select>
                 <br />
@@ -224,7 +225,7 @@ function FundamentalsCompanyProfile2(p: { [key: string]: any }, ref: any) {
     }
 
     return (
-        <>
+        <div data-testid='companyProfile2Body'>
             {p.showEditPane === 1 && (
                 <>
                     {React.createElement(StockSearchPane, searchPaneProps(p))}
@@ -236,7 +237,7 @@ function FundamentalsCompanyProfile2(p: { [key: string]: any }, ref: any) {
                     {renderStockData()}
                 </>
             )}
-        </>
+        </div>
     )
 }
 

@@ -46,12 +46,45 @@ export const getDashboard_success =     //auto login check rejected.
     })
 
 //default data to be returned for test purposes for all stocks.
-const resData = {}
+const resData = {
+    "cik": "320193",
+    "data": [
+        {
+            "accessNumber": "0000320193-19-000119",
+            "symbol": "AAPL",
+            "cik": "320193",
+            "year": 2019,
+            "quarter": 0,
+            "form": "10-K",
+            "startDate": "2018-09-30 00:00:00",
+            "endDate": "2019-09-28 00:00:00",
+            "filedDate": "2019-10-31 00:00:00",
+            "acceptedDate": "2019-10-30 18:12:36",
+            "report": {
+                "bs": {
+                    "Assets": 338516000000,
+                    "Liabilities": 248028000000,
+                    "InventoryNet": 4106000000,
+                },
+                "cf": {
+                    "NetIncomeLoss": 55256000000,
+                    "InterestPaidNet": 3423000000,
+                },
+                "ic": {
+                    "GrossProfit": 98392000000,
+                    "NetIncomeLoss": 55256000000,
+                    "OperatingExpenses": 34462000000,
+                }
+            }
+        }
+    ],
+    "symbol": "AAPL"
+}
 
 const resObj = resData
 
 export const mockFinnHubData = //MOCK API REQUEST FOR THIS WIDGET. Remember to update api string on next line.
-    rest.get("https://finnhub.io/api/v1/financials-reported*", (req, res, ctx) => {
+    rest.get("https://finnhub.io/api/v1/stock/financials-reported*", (req, res, ctx) => {
         console.log('return mocked finnhub data /earnings')
         return res(
             ctx.status(200),
@@ -69,7 +102,7 @@ export const getCheckLogin_success =     //auto login check rejected.
                 login: 1,
                 ratelimit: 25,
                 apiAlias: 'alias',
-                widgetsetup: '{"FundamentalsFinancialsAsReported":true}', //UPDATE NEEDED IF premium feature. First item from topNavReg tuple.
+                widgetsetup: '{"EstimatesEarningsCalendar":true}', //UPDATE NEEDED IF premium feature. First item from topNavReg tuple.
                 exchangelist: ['US'],
                 defaultexchange: ['US',]
             })
