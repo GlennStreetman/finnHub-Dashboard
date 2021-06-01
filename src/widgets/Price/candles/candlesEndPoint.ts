@@ -12,9 +12,9 @@ export default function candleWidgetEndPoint(stockList: StockObj[], filters: fil
     // console.log('NEW FILTERS!!!', Object.keys(filters))
     const now: number = Date.now()
     const startUnixOffset: number = filters.startDate !== undefined ? filters.startDate : 604800
-    const startUnix: number = Math.floor((now - startUnixOffset) / 1000)
+    const startUnix: number = Math.floor((now + startUnixOffset) / 1000)
     const endUnixOffset: number = filters.startDate !== undefined ? filters.endDate : 0
-    const endUnix: number = Math.floor((now - endUnixOffset) / 1000)
+    const endUnix: number = Math.floor((now + endUnixOffset) / 1000)
     const resolution: string = filters.resolution
     let queryStringObj: EndPointObj = {}
 

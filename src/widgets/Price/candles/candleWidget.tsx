@@ -72,10 +72,29 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         }
     }
 
+    const startingStartDate = () => { //save dates as offsets from now
+        const now = Date.now()
+        const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000 * 52
+        const startUnix = now + startUnixOffset
+        const startDate = new Date(startUnix).toISOString().slice(0, 10);
+        return startDate
+    }
+
+    const startingEndDate = () => { //save dates as offsets from now
+        const now = Date.now()
+        const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
+        const endUnix = now + endUnixOffset
+        const endDate = new Date(endUnix).toISOString().slice(0, 10);
+        return endDate
+    }
+
+
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [targetStock, setTargetStock] = useState(startingTargetStock());
     const [chartData, setChartData] = useState(startingCandleData())
     const [options, setOptions] = useState(startingOptions())
+    const [start, setStart] = useState(startingStartDate())
+    const [end, setEnd] = useState(startingEndDate())
     const dispatch = useDispatch()
 
     //finnhub data stored in redux
@@ -119,19 +138,18 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: string = p.widgetKey) => {
         //Setup filters if not yet done.
         if (filters['startDate'] !== undefined && types.reWID.test(key) === true && isInitialMount.current !== false) {
-            console.log("Setting up candles filters")
-            const startDateSetBack: number = 31536000 * 1000 //1 week
-            const endDateSetBack: number = 0
-            update(key, 'resolution', 'W')
-            update(key, 'startDate', startDateSetBack)
-            update(key, 'endDate', endDateSetBack)
-            update(key, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
-
+            const filterUpdate = {
+                resolution: 'W',
+                startDate: start,
+                endDate: end,
+                Description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
+            }
+            update(key, filterUpdate)
         } else {
             if (isInitialMount.current !== false) console.log("Problem setting up candle filters: ", types.reWID.test(key), filters['startDate'])
         }
         // }
-    }, [p.filters, p.updateWidgetFilters, p.widgetKey])
+    }, [p.filters, p.updateWidgetFilters, p.widgetKey, start, end])
 
     useEffect(() => {
         //if stock not selected default to first stock.
@@ -179,13 +197,13 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                     setChartData(chartData)
                 }
                 //SET CHART OPTIONS
-                const now = Date.now()
-                const startUnixOffset: number = p.filters.startDate !== undefined ? p.filters.startDate : 604800 * 1000
-                const startUnix: number = now - startUnixOffset
-                const endUnixOffset: number = p.filters.startDate !== undefined ? p.filters.endDate : 0
-                const endUnix: number = now - endUnixOffset
-                const startDate: string = new Date(startUnix).toISOString().slice(0, 10);
-                const endDate: string = new Date(endUnix).toISOString().slice(0, 10);
+                // const now = Date.now()
+                // const startUnixOffset: number = p.filters.startDate !== undefined ? p.filters.startDate : 604800 * 1000
+                // const startUnix: number = now - startUnixOffset
+                // const endUnixOffset: number = p.filters.startDate !== undefined ? p.filters.endDate : 0
+                // const endUnix: number = now - endUnixOffset
+                // const startDate: string = new Date(startUnix).toISOString().slice(0, 10);
+                // const endDate: string = new Date(endUnix).toISOString().slice(0, 10);
 
                 const options: Object = {
                     width: 400,
@@ -194,7 +212,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                     animationEnabled: true,
                     exportEnabled: true,
                     title: {
-                        text: targetStock + ": " + startDate + " - " + endDate,
+                        text: targetStock + ": " + start + " - " + end,
                     },
                     axisX: {
                         valueFormatString: "YYYY-MM-DD",
@@ -218,7 +236,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                 // }
             } else { console.log("Failed candle data type guard:", data) }
         }
-    }, [targetStock, rShowData, p.filters.endDate, p.filters.startDate])
+    }, [targetStock, rShowData, p.filters.endDate, p.filters.startDate, start, end])
 
     function updateWidgetList(stock) {
         if (stock.indexOf(":") > 0) {
@@ -229,19 +247,19 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         }
     }
 
-    function updateFilter(e) {
-        // const target = e.target;
-        // const name = target.name;
-        if (isNaN(new Date(e.target.value).getTime()) === false) {
-            const now = Date.now()
-            const target = new Date(e.target.value).getTime();
-            const offset = now - target
-            const name = e.target.name;
-            p.updateWidgetFilters(p.widgetKey, name, offset);
-        } else {
-            p.updateWidgetFilters(p.widgetKey, e.target.name, e.target.value)
-        }
-    }
+    // function updateFilter(e) {
+    //     // const target = e.target;
+    //     // const name = target.name;
+    //     if (isNaN(new Date(e.target.value).getTime()) === false) {
+    //         const now = Date.now()
+    //         const target = new Date(e.target.value).getTime();
+    //         const offset = now - target
+    //         const name = e.target.name;
+    //         p.updateWidgetFilters(p.widgetKey, name, offset);
+    //     } else {
+    //         p.updateWidgetFilters(p.widgetKey, e.target.name, e.target.value)
+    //     }
+    // }
 
     function changeStockSelection(e) {
         const target = e.target.value;
@@ -280,6 +298,26 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         return stockCandleTable;
     }
 
+    function updateStartDate(e) {
+        setStart(e.target.value)
+    }
+
+    function updateEndDate(e) {
+        setEnd(e.target.value)
+    }
+
+    function updateFilter(e) {
+        console.log('UPDATE FILTER', start, end)
+        if (isNaN(new Date(e.target.value).getTime()) === false) {
+            const now = Date.now()
+            const target = new Date(e.target.value).getTime();
+            const offset = target - now
+            const name = e.target.name;
+            console.log(name, e.target.value)
+            p.updateWidgetFilters(p.widgetKey, { [name]: offset })
+        }
+    }
+
     function displayCandleGraph() {
         let newSymbolList = Object.keys(p.trackedStocks).map((el) => (
             <option key={el + "ddl"} value={el}>
@@ -309,14 +347,6 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         </option>
     ));
 
-    const now = Date.now()
-    const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800 * 1000
-    const startUnix = now - startUnixOffset
-    const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
-    const endUnix = now - endUnixOffset
-    const startDate = new Date(startUnix).toISOString().slice(0, 10);
-    const endDate = new Date(endUnix).toISOString().slice(0, 10);
-
     return (
         <>
             {p.showEditPane === 1 && (
@@ -326,13 +356,17 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                         <div className="stockSearch">
                             <form className="form-inline">
                                 <label htmlFor="start">Start date:</label>
-                                <input className="btn" id="start" type="date" name="startDate" onChange={updateFilter} value={startDate}></input>
-                                <label htmlFor="end">End date:</label>
-                                <input className="btn" id="end" type="date" name="endDate" onChange={updateFilter} value={endDate}></input>
-                                <label htmlFor="resBtn">Resolution:</label>
-                                <select id="resBtn" className="btn" name='resolution' value={p.filters.resolution} onChange={updateFilter}>
-                                    {resolutionList}
-                                </select>
+                                <input className="btn" id="start" type="date" name="startDate" onChange={updateStartDate} onBlur={updateFilter} value={start}></input>
+                                <p>
+                                    <label htmlFor="end">End date:</label>
+                                    <input className="btn" id="end" type="date" name="endDate" onChange={updateEndDate} onBlur={updateFilter} value={end}></input>
+                                </p>
+                                <p>
+                                    <label htmlFor="resBtn">Resolution:</label>
+                                    <select id="resBtn" className="btn" name='resolution' value={p.filters.resolution} onChange={updateFilter}>
+                                        {resolutionList}
+                                    </select>
+                                </p>
                             </form>
                         </div>
                     </div>
@@ -350,6 +384,7 @@ export default forwardRef(PriceCandles)
 
 export function candleWidgetProps(that, key = "Candles") {
     let propList = {
+        apiKey: that.props.apiKey,
         defaultExchange: that.props.defaultExchange,
         exchangeList: that.props.exchangeList,
         filters: that.props.widgetList[key]["filters"],
@@ -367,7 +402,7 @@ export function candleWidgetProps(that, key = "Candles") {
 
 export const candleWidgetFilters: object = {
     resolution: 'W',
-    startDate: 31536000000,
+    startDate: -31536000000,
     "endDate": 0,
     "Description": 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
 }

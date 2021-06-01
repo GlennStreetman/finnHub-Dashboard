@@ -82,15 +82,15 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
         } else { return (1) }
     }
 
-    const startingStartDate = () => {
+    const startingStartDate = () => { //save dates as offsets from now
         const now = Date.now()
-        const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000
-        const startUnix = now - startUnixOffset
+        const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000 * 52
+        const startUnix = now + startUnixOffset
         const startDate = new Date(startUnix).toISOString().slice(0, 10);
         return startDate
     }
 
-    const startingEndDate = () => {
+    const startingEndDate = () => { //save dates as offsets from now
         const now = Date.now()
         const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
         const endUnix = now + endUnixOffset
@@ -145,15 +145,15 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
     }, [targetStock, p.widgetKey, widgetCopy, dispatch])
 
     useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
-        if (filters['startDate'] === undefined) {
-            const startDateOffset = -604800 * 1000 //1 week
-            const endDateOffset = 0 //today.
-            update(key, 'startDate', startDateOffset)
-            update(key, 'endDate', endDateOffset)
-            update(key, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
-
+        if (filters['startDate'] === undefined) { //if filters not saved to props
+            const filterUpdate = {
+                startDate: start,
+                endDate: end,
+                Description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
+            }
+            update(key, filterUpdate)
         }
-    }, [p.filters, p.updateWidgetFilters, p.widgetKey])
+    }, [p.filters, p.updateWidgetFilters, p.widgetKey, start, end])
 
     useEffect(() => {
         //if stock not selected default to first stock.
@@ -178,12 +178,14 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
 
 
     function updateFilter(e) {
+        console.log('UPDATE FILTER', start, end)
         if (isNaN(new Date(e.target.value).getTime()) === false) {
             const now = Date.now()
             const target = new Date(e.target.value).getTime();
             const offset = target - now
             const name = e.target.name;
-            p.updateWidgetFilters(p.widgetKey, name, offset)
+            console.log(name, e.target.value)
+            p.updateWidgetFilters(p.widgetKey, { [name]: offset })
         }
     }
 

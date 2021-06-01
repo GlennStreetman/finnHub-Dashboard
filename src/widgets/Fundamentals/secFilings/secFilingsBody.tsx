@@ -268,7 +268,6 @@ export function secFilingsProps(that, key = "newWidgetNameProps") {
         showPane: that.showPane,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         updateDefaultExchange: that.props.updateDefaultExchange,
-        updateWidgetFilters: that.props.updateWidgetFilters,
         updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,

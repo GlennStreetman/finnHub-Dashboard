@@ -79,7 +79,7 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
         }
     }
 
-    const startingStartDate = () => {
+    const startingStartDate = () => { //save dates as offsets from now
         const now = Date.now()
         const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000 * 52
         const startUnix = now + startUnixOffset
@@ -87,7 +87,7 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
         return startDate
     }
 
-    const startingEndDate = () => {
+    const startingEndDate = () => { //save dates as offsets from now
         const now = Date.now()
         const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
         const endUnix = now + endUnixOffset
@@ -141,15 +141,15 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
     }, [targetStock, p.widgetKey, widgetCopy, dispatch])
 
     useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
-        if (filters['startDate'] === undefined) {
-            const startDate = -604800 * 1000 * 52 //1 year backward. Limited to 1 year on free version.
-            const endDate = 0 //today.
-            update(key, 'startDate', startDate)
-            update(key, 'endDate', endDate)
-            update(key, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
-
+        if (filters['startDate'] === undefined) { //if filters not saved to props
+            const filterUpdate = {
+                startDate: start,
+                endDate: end,
+                Description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
+            }
+            update(key, filterUpdate)
         }
-    }, [p.filters, p.updateWidgetFilters, p.widgetKey])
+    }, [p.filters, p.updateWidgetFilters, p.widgetKey, start, end])
 
     useEffect(() => {
         //DELETE IF NO TARGET STOCK
@@ -188,7 +188,7 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
             const offset = target - now
             const name = e.target.name;
             console.log(name, e.target.value)
-            p.updateWidgetFilters(p.widgetKey, name, offset)
+            p.updateWidgetFilters(p.widgetKey, { [name]: offset })
         }
     }
 

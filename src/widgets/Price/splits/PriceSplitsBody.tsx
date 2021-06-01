@@ -28,7 +28,7 @@ interface filters {
 }
 
 function isFinnHubSplitList(arg: any): arg is finnHubSplitArray { //typeguard
-    if (arg !== undefined && Object.keys(arg).length > 0 && arg[0].date) {
+    if (arg !== undefined && Object.keys(arg).length > 0 && arg[0] && arg[0].date) {
         // console.log("returning true", arg)
         return true
     } else {
@@ -68,9 +68,27 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
         }
     }
 
+    const startingStartDate = () => { //save dates as offsets from now
+        const now = Date.now()
+        const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000 * 52
+        const startUnix = now + startUnixOffset
+        const startDate = new Date(startUnix).toISOString().slice(0, 10);
+        return startDate
+    }
+
+    const startingEndDate = () => { //save dates as offsets from now
+        const now = Date.now()
+        const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
+        const endUnix = now + endUnixOffset
+        const endDate = new Date(endUnix).toISOString().slice(0, 10);
+        return endDate
+    }
+
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [stockData, setStockData] = useState(startingstockData());
     const [targetStock, setTargetStock] = useState(startingTargetStock());
+    const [start, setStart] = useState(startingStartDate())
+    const [end, setEnd] = useState(startingEndDate())
     const dispatch = useDispatch();
 
     const rShowData = useSelector((state) => {
@@ -103,22 +121,21 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
                 key: p.widgetKey,
                 securityList: [[`${targetStock}`]]
             }
-            console.log(payload)
+            // console.log(payload)
             dispatch(rBuildVisableData(payload))
         }
     }, [targetStock, p.widgetKey, widgetCopy, dispatch])
 
     useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
-        //Setup filters if not yet done.
-        if (filters['startDate'] === undefined) {
-            const startDateOffset = -604800 * 1000 * 52 * 20 //20 year backward. Limited to 1 year on free version.
-            const endDateOffset = 0 //today.
-            update(key, 'startDate', startDateOffset)
-            update(key, 'endDate', endDateOffset)
-            update(key, 'Description', 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.')
-
+        if (filters['startDate'] === undefined) { //if filters not saved to props
+            const filterUpdate = {
+                startDate: start,
+                endDate: end,
+                Description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
+            }
+            update(key, filterUpdate)
         }
-    }, [p.filters, p.updateWidgetFilters, p.widgetKey])
+    }, [p.filters, p.updateWidgetFilters, p.widgetKey, start, end])
 
     useEffect(() => {
         //if stock not selected default to first stock.
@@ -140,13 +157,23 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
         }
     }, [p.targetSecurity, p.widgetKey, dispatch])
 
+    function updateStartDate(e) {
+        setStart(e.target.value)
+    }
+
+    function updateEndDate(e) {
+        setEnd(e.target.value)
+    }
+
     function updateFilter(e) {
+        console.log('UPDATE FILTER', start, end)
         if (isNaN(new Date(e.target.value).getTime()) === false) {
             const now = Date.now()
             const target = new Date(e.target.value).getTime();
             const offset = target - now
             const name = e.target.name;
-            p.updateWidgetFilters(p.widgetKey, name, offset)
+            console.log(name, e.target.value)
+            p.updateWidgetFilters(p.widgetKey, { [name]: offset })
         }
     }
 
@@ -170,22 +197,14 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
             </tr>
         )
 
-        const now = Date.now()
-        const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000 * 52
-        const startUnix = now + startUnixOffset
-        const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
-        const endUnix = now + endUnixOffset
-        const startDate = new Date(startUnix).toISOString().slice(0, 10);
-        const endDate = new Date(endUnix).toISOString().slice(0, 10);
-
         let searchForm = (
             <>
                 <div className="stockSearch">
                     <form className="form-inline">
                         <label htmlFor="start">Start date:</label>
-                        <input className="btn" id="start" type="date" name="startDate" onChange={updateFilter} value={startDate}></input>
+                        <input className="btn" id="start" type="date" name="startDate" onChange={updateStartDate} onBlur={updateFilter} value={start}></input>
                         <label htmlFor="end">End date:</label>
-                        <input className="btn" id="end" type="date" name="endDate" onChange={updateFilter} value={endDate}></input>
+                        <input className="btn" id="end" type="date" name="endDate" onChange={updateEndDate} onBlur={updateFilter} value={end}></input>
                     </form>
                 </div>
                 <table>

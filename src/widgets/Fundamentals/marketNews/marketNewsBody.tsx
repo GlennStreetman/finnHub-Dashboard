@@ -105,9 +105,9 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
 
     useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
 
-        if (filters['startDate'] === undefined) {
+        if (filters['categorySelection'] === undefined) {
             const categorySelection = 'general' //['general', 'forex', 'crypto', 'merger']
-            update(key, 'categorySelection', categorySelection)
+            update(key, { categorySelection: categorySelection })
 
         }
     }, [p.filters, p.updateWidgetFilters, p.widgetKey])
@@ -118,7 +118,7 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
     }, [rShowData])
 
     function updateFilter(e) {
-        p.updateWidgetFilters(p.widgetKey, "categorySelection", e)
+        p.updateWidgetFilters(p.widgetKey, { categorySelection: e })
     }
 
     function formatSourceName(source) {
@@ -187,46 +187,9 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
     }
 
     function renderSearchPane() {
-        //add search pane rendering logic here. Additional filters need to be added below.
-
-        const stockList = Object.keys(p.trackedStocks);
-        const stockListRows = stockList.map((el) =>
-            <tr key={el + "container"}>
-                <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
-                <td key={el + "buttonC"}>
-                    <button
-                        key={el + "button"}
-                        onClick={() => {
-                            p.updateWidgetStockList(p.widgetKey, el);
-                        }}
-                    >
-                        <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
-                    </button>
-                </td>
-            </tr>
-        )
-
-        const now = Date.now()
-        const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000 * 52
-        const startUnix = now + startUnixOffset
-        const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
-        const endUnix = now + endUnixOffset
-        const startDate = new Date(startUnix).toISOString().slice(0, 10);
-        const endDate = new Date(endUnix).toISOString().slice(0, 10);
-
+        //no filters or searches needed.
         let searchForm = (
             <>
-                <div className="stockSearch">
-                    <form className="form-inline">
-                        <label htmlFor="start">Start date:</label>
-                        <input className="btn" id="start" type="date" name="startDate" onChange={updateFilter} value={startDate}></input>
-                        <label htmlFor="end">End date:</label>
-                        <input className="btn" id="end" type="date" name="endDate" onChange={updateFilter} value={endDate}></input>
-                    </form>
-                </div>
-                <table>
-                    <tbody>{stockListRows}</tbody>
-                </table>
             </>
         );
         return searchForm
@@ -279,21 +242,14 @@ export default forwardRef(FundamentalsMarketNews)
 export function marketNewsProps(that, key = "newWidgetNameProps") {
     let propList = {
         apiKey: that.props.apiKey,
-        // defaultExchange: that.props.defaultExchange,
-        // exchangeList: that.props.exchangeList,
         filters: that.props.widgetList[key]["filters"],
         showPane: that.showPane,
-        // trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        // updateDefaultExchange: that.props.updateDefaultExchange,
         updateWidgetFilters: that.props.updateWidgetFilters,
-        // updateGlobalStockList: that.props.updateGlobalStockList,
-        // updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
     };
     return propList;
 }
 
-//rename
 export const marketNewsFilters: object = {
     categorySelection: 'general'  //['general', 'forex', 'crypto', 'merger']
 }

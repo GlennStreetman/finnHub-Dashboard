@@ -46,12 +46,35 @@ export const getDashboard_success =     //auto login check rejected.
     })
 
 //default data to be returned for test purposes for all stocks.
-const resData = {}
+const resData = {
+    "ipoCalendar": [
+        {
+            "date": "2020-04-03",
+            "exchange": "NASDAQ Global",
+            "name": "ZENTALIS PHARMACEUTICALS, LLC",
+            "numberOfShares": 7650000,
+            "price": "16.00-18.00",
+            "status": "expected",
+            "symbol": "ZNTL",
+            "totalSharesValue": 158355000
+        },
+        {
+            "date": "2020-04-01",
+            "exchange": "NASDAQ Global",
+            "name": "WIMI HOLOGRAM CLOUD INC.",
+            "numberOfShares": 5000000,
+            "price": "5.50-7.50",
+            "status": "expected",
+            "symbol": "WIMI",
+            "totalSharesValue": 43125000
+        },
+    ]
+}
 
 const resObj = resData
 
 export const mockFinnHubData = //MOCK API REQUEST FOR THIS WIDGET. Remember to update api string on next line.
-    rest.get("https://finnhub.io/api/v1/-----replace-----*", (req, res, ctx) => {
+    rest.get("https://finnhub.io/api/v1/calendar/ipo*", (req, res, ctx) => {
         console.log('return mocked finnhub data /earnings')
         return res(
             ctx.status(200),

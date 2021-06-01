@@ -99,16 +99,19 @@ export const LockWidgets = function lockWidgets(toggle: number) {
     this.setState(payload)
 }
 
-export const UpdateWidgetFilters = function updateWidgetFilters(widgetID: string, dataKey: string, data: filters) {
-    console.log('new filters', dataKey, data)
+export const UpdateWidgetFilters = function updateWidgetFilters(widgetID: string, data: filters) {
+    console.log('new filters', data)
     try {
         const s: AppState = this.state
         const p: AppProps = this.props
         const newWidgetList: widgetList = produce(s.widgetList, (draftState: widgetList) => {
-            draftState[widgetID].filters[dataKey] = data
+            draftState[widgetID].filters = { ...draftState[widgetID].filters, ...data }
         })
         const newDashBoardData: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
-            draftState[s.currentDashBoard].widgetlist[widgetID].filters[dataKey] = data
+            draftState[s.currentDashBoard].widgetlist[widgetID].filters = {
+                ...draftState[s.currentDashBoard].widgetlist[widgetID].filters,
+                ...data
+            }
         })
         const payload: Partial<AppState> = {
             widgetList: newWidgetList,
