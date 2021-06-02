@@ -20,7 +20,7 @@ function isFinnHubData(arg: FinnHubAPIData): arg is string[] { //typeguard
         // console.log("returning true", arg)
         return true
     } else {
-        console.log("returning false", arg)
+        // console.log("returning false", arg)
         return false
     }
 }
@@ -126,6 +126,14 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
         }
     }, [p.trackedStocks, targetStock])
 
+    useEffect(() => { //on change to targetSecurity update widget focus
+        if (p.targetSecurity !== '') {
+            const target = `${p.widgetKey}-${p.targetSecurity}`
+            setTargetStock(p.targetSecurity)
+            dispatch(tSearchMongoDB([target]))
+        }
+    }, [p.targetSecurity, p.widgetKey, dispatch])
+
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
         if (isFinnHubData(rShowData) === true) {
             setStockData(rShowData)
@@ -178,13 +186,14 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
     }
 
     function renderStockData() {
-        const stockDataRows = stockData.map((el) =>
+
+        const stockDataRows = Array.isArray(stockData) ? stockData.map((el) =>
             <tr key={el + "row"}>
                 <td key={el + "symbol"}>{el}</td>
                 {/* <td key={el + "name"}>{el}</td> */}
                 <td key={el + "name"}>{getStockName(`${p.defaultExchange}-${el}`)}</td>
             </tr>
-        )
+        ) : []
         const newSymbolList = Object.keys(p.trackedStocks).map((el) => (
             <option key={el + "ddl"} value={el}>
                 {p.trackedStocks[el].dStock(p.exchangeList)}
@@ -230,6 +239,7 @@ export function peersProps(that, key = "newWidgetNameProps") {
         exchangeList: that.props.exchangeList,
         filters: that.props.widgetList[key]["filters"],
         showPane: that.showPane,
+        targetSecurity: that.props.targetSecurity,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         updateDefaultExchange: that.props.updateDefaultExchange,
         updateGlobalStockList: that.props.updateGlobalStockList,
