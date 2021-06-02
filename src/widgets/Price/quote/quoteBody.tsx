@@ -110,7 +110,7 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
                         prevClosePrice: data.pc,
                     }
                 } else {
-                    if (Object.keys(data).length > 0) console.log("Problem with Quote data", rShowData, key)
+                    // if (Object.keys(data).length > 0) console.log("Problem with Quote data", rShowData, key)
                 }
                 // console.log('key', Object.keys(rShowData), key, data)
             }

@@ -30,10 +30,10 @@ interface filters { //Any paramas not related to stock used by finnHub endpoint.
 
 function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
     if (arg !== undefined && Object.keys(arg).length > 0 && arg.ipoCalendar && arg.ipoCalendar[0].date) {
-        console.log("returning true", arg)
+        // console.log("returning true", arg)
         return true
     } else {
-        console.log("returning false", arg)
+        // console.log("returning false", arg)
         return false
     }
 }

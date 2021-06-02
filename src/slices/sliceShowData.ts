@@ -76,7 +76,7 @@ const showData = createSlice({
             // return {...state}
         },
         [tGetFinnhubData.fulfilled.toString()]: (state, action) => {
-            console.log('tGetFinnhubData')
+            // console.log('tGetFinnhubData')
             const ap: resObj = action.payload
             for (const x in ap) {
                 if (ap[x].dashboard === state.targetDashboard) {
@@ -107,7 +107,7 @@ const showData = createSlice({
             // return {...state}
         },
         [tGetMongoDB.fulfilled.toString()]: (state, action) => {
-            console.log('tGetMongoDB')
+            // console.log('tGetMongoDB')
             const ap: any = action.payload
             for (const x in ap) { //FOR 'DB-WIdget-security' key
                 if (ap[x].dashboard === state.targetDashboard) { //if returned data should be visable
@@ -138,7 +138,7 @@ const showData = createSlice({
             // return {...state}
         },
         [tSearchMongoDB.fulfilled.toString()]: (state, action) => {
-            console.log('tSearchMongoDB')
+            // console.log('tSearchMongoDB')
             const ap: any = action.payload
             for (const x in ap) {
                 const widgetRef: string = ap[x].widget
