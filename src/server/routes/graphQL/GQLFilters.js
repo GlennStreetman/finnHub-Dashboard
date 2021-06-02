@@ -27,3 +27,5 @@ export const filterDict = { //Remember to convert time series data into an objec
     EstimatesEPSSurprises: EPSSuprisesGQLFilter,
     EstimatesEarningsCalendar: EarningsCalendarGQLFilter,
 }
+
+

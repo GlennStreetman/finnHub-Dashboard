@@ -17,10 +17,11 @@ const db = process.env.live === "1" ? dbLive : devDB;
 
 const router = express.Router();
 
-const getMongoData = (reqObj) => {
+const getGraphQLData = (reqObj) => {
     //queries mongo database and attached returned data to request obj, then returns.
     return new Promise((resolve, reject) => {
         const getAPIData = `http://localhost:5000/qGraphQL?query=${reqObj.q}`
+        console.log('GETTING', getAPIData)
         fetch(getAPIData)
         .then((r)=>r.json())
         .then(data=>{
@@ -44,7 +45,7 @@ const buildQueryList = (path) => {
     for (const q in queryList) { //for each query in special query sheet.
         if (queryList[q][0] && queryList[q][0] !== '') {
             // console.log('pushing', queryList[q][0] )
-            returnList.push(getMongoData({
+            returnList.push(getGraphQLData({
                 n: queryList[q][0],
                 q: queryList[q][1],
             }))
@@ -54,7 +55,7 @@ const buildQueryList = (path) => {
 }
 
 const processPromiseData = (res) => {
-    //build dataObj containing results of mongoDB requests
+    //build dataObj containing results of mongoDB ALL requests
     const dataObj = {keys: new Set()}
     for (const w in res){ //for each widget
         dataObj[res[w].n] =  {}
@@ -69,26 +70,54 @@ const processPromiseData = (res) => {
     return dataObj
 }
 
+function findByString(searchObj, thisSearch){ //find value in nested object
+    let searchList = [...thisSearch]
+    if (searchList.length === 1) {
+        let ret = searchObj[searchList]
+        if (Array.isArray(ret)) {return ([...ret])}
+        else if (typeof ret === 'object') {return {...ret}}
+        else {return ret}
+    } else {
+        let searchTerm = searchList.shift()
+        if (searchObj[searchTerm]) {
+            let foundObj = searchObj[searchTerm]
+            return findByString(foundObj, searchList)
+        } else {
+            // console.log('FILTER NOT FOUND:', searchList)
+            return({})
+        }
+    }
+}
+
+// x = ['cat', 'dog', 'test']
+// y = [x[0], 'inersert', ...x.slice(1,x.length)]
+// console.log(x,y)
+
 function getDataSlice(dataObj, queryString){
     //iterates through all dataObj keys to finds all matching slices 
     //return object {security(s): value(s)}    
     const returnObj = {}
-    const queryStringList = queryString.split('.')
+
     const keys = dataObj.keys
     for (const s of keys){
-        if (typeof dataObj?.[queryStringList[0]]?.[s]?.[queryStringList[1]] !== 'undefined') { 
-            //data point data
-            const val = dataObj?.[queryStringList[0]]?.[s]?.[queryStringList[1]]
-            returnObj[s] = val
-        } else {
-            //time series data
-            const timeSeriesSlice = dataObj?.[queryStringList[0]]?.[s]
-            const val = {}
-            for (const t in timeSeriesSlice) {
-                val[t] = timeSeriesSlice[t][queryStringList[1]]
-            }
-            returnObj[s] = val
-        }
+        const qList = queryString.split('.')
+        const queryStringWithStock = [qList[0], s, ...qList.slice(1, qList.length)]
+        let findData = findByString(dataObj, queryStringWithStock)
+        returnObj[s] = findData
+        console.log('HERE------------>', queryStringWithStock, findData)
+        // if (typeof dataObj?.[queryStringList[0]]?.[s]?.[queryStringList[1]] !== 'undefined') { 
+        //     //data point data
+        //     const val = dataObj?.[queryStringList[0]]?.[s]?.[queryStringList[1]]
+        //     returnObj[s] = val
+        // } else {
+        //     //time series data
+        //     const timeSeriesSlice = dataObj?.[queryStringList[0]]?.[s]
+        //     const val = {}
+        //     for (const t in timeSeriesSlice) {
+        //         val[t] = timeSeriesSlice[t][queryStringList[1]]
+        //     }
+        //     returnObj[s] = val
+        // }
     }
     return returnObj
 }
@@ -149,6 +178,7 @@ async function buildTemplateData(promiseData, workBookPath){
 function printTemplateWorksheets(w, worksheetName, worksheetKeys, sourceTemplate){
     //create template copys for each security key if query string multi=true
     // console.log('print', worksheetName)
+    console.log('CREATING SHEETS')
     for (const s of worksheetKeys) {
         let copySheet = w.addWorksheet(`temp`)
         copySheet.model = sourceTemplate.model
@@ -157,25 +187,28 @@ function printTemplateWorksheets(w, worksheetName, worksheetKeys, sourceTemplate
 
 }
 
-function checkTimeSeriesStatus(ws, promiseData){
+function checkTimeSeriesStatus(ws, promiseData){ //Checks promise data to determine if its time series or data point.
+    //data point = key: string
+    //time series = key: object
     let returnFlag = 0
-    ws.eachRow({includeEmpty: false},(row)=>{
-    //update all formula cells. Offset their row references by number of rows added before or inside of formula range.
-        row.eachCell({ includeEmpty: false },(cell, colNumber)=>{
-            if (returnFlag === 0 && typeof cell.value === 'string' && cell.value.slice(0,2) === '&=') { //if template formula detected.
+    ws.eachRow({includeEmpty: false},(row)=>{ //for each row
+        row.eachCell({ includeEmpty: false },(cell)=>{ //for each cell
+            if (returnFlag === 0 && typeof cell.value === 'string' && cell.value.slice(0,2) === '&=') { //if template formula detected
                 const searchStringRaw = cell.value
-                const searchString = searchStringRaw.slice(2, searchStringRaw.length)
+                const searchString = searchStringRaw.slice(2, searchStringRaw.length) //remove &=
                 if (searchString !== 'keys.keys') { //if data column
                     const dataObj = getDataSlice(promiseData, searchString) //could {key: string} pairs OR {key: OBJECT} pairs
-                    // console.log(dataObj)
+                    
                     if (typeof dataObj[Object.keys(dataObj)[0]] === 'object') {
                         console.log('returning 1', dataObj)
                         returnFlag = 1
                     }
+                    console.log('----dataObjFlag----:', returnFlag, dataObj)
                 }
             }
         })
     })
+
     return returnFlag
 }
 
@@ -319,6 +352,7 @@ function dataPointSheetSingle(w, ws, s, templateData){
 }
 
 function dataPointSheetMulti(w, ws, s, templateData){
+    console.log('---PROCESSING MULTI---')
     let rowIterator = 0 //if multiSheet = 'false: add 1 for each line written so that writer doesnt fall out of sync with file.
     printTemplateWorksheets(w, s, templateData[s].sheetKeys, ws) //create new worksheets for each security
     const templateWorksheet = templateData[s]
@@ -378,8 +412,8 @@ router.get('/runTemplate', async (req, res) => {
         .then(()=>{ 
             for (const s in templateData) { //for each worksheet
                 const ws = w.getWorksheet(s)
-                let timeSeries = checkTimeSeriesStatus(ws, promiseData)  //set to 1 if worksheet contains time series data.
-                if (timeSeries === 1) {
+                let timeSeriesFlag = checkTimeSeriesStatus(ws, promiseData)  //set to 1 if worksheet contains time series data.
+                if (timeSeriesFlag === 1) {
                     console.log('creating time series worksheet')
                     writeTimeSeriesSheetSingle(w, ws, s, templateData)
                 } else if (multiSheet !== 'true') {
