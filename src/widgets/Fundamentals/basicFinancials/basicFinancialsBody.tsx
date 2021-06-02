@@ -12,8 +12,16 @@ import CreateTimeSeriesChart, { createOptions } from './createTimeSeriesChart'
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
+export interface Annual {
+    annual: object
+}
+
 export interface FinnHubAPIData { //rename
-    [index: string]: number | string
+    filters: object,
+    metric: object,
+    metricKeys: string[],
+    series: Annual,
+    seriesKeys: string[],
 }
 
 export interface FinnHubAPIDataArray {

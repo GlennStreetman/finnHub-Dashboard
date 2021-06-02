@@ -44,8 +44,9 @@ export function basicFinancialsReducer(data: basicFinancialsData, filters: filte
         metricKeys: [],
         seriesKeys: [],
     }
-    resObj.metricKeys = Object.keys(data.metric)
-    resObj.seriesKeys = Object.keys(data.series.annual)
+    console.log('data', data)
+    resObj.metricKeys = data?.metric ? Object.keys(data.metric) : []
+    resObj.seriesKeys = data?.series?.annual ? Object.keys(data.series.annual) : []
     for (const f in filters['showsData']) {
         let filterPathItems = findByString(data, filters['showsData'][f].split('.'))
         mergeByString(resObj, filters['showsData'][f].split('.'), filterPathItems)

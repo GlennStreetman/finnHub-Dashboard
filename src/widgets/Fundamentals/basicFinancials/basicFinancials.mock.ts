@@ -138,4 +138,3 @@ export const postUpdateGQLFilters =
             ctx.json({ message: `Update filters Complete` })
         )
     })
-

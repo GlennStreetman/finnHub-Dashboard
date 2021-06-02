@@ -400,9 +400,9 @@ export function newsWidgetProps(that, key = "newWidgetNameProps") {
     return propList;
 }
 
-//rename
+
 export const companyNewsFilters: object = {
-    startDate: 604800 * 1000, //1 week
+    startDate: -604800 * 1000 * 52,
     endDate: 0,
     Description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
 }
