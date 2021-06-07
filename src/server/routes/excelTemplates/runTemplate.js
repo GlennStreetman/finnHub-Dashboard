@@ -72,7 +72,7 @@ const processPromiseData = (res) => {
 
 function findByString(searchObj, thisSearch){ //find value in nested object
     let searchList = [...thisSearch]
-    if (searchList.length === 1) {
+    if (searchList.length === 1) { //base case of recursive search.
         let ret = searchObj[searchList]
         if (Array.isArray(ret)) {return ([...ret])}
         else if (typeof ret === 'object') {return {...ret}}
@@ -89,9 +89,6 @@ function findByString(searchObj, thisSearch){ //find value in nested object
     }
 }
 
-// x = ['cat', 'dog', 'test']
-// y = [x[0], 'inersert', ...x.slice(1,x.length)]
-// console.log(x,y)
 
 function getDataSlice(dataObj, queryString){
     //iterates through all dataObj keys to finds all matching slices 
@@ -100,24 +97,23 @@ function getDataSlice(dataObj, queryString){
 
     const keys = dataObj.keys
     for (const s of keys){
-        const qList = queryString.split('.')
-        const queryStringWithStock = [qList[0], s, ...qList.slice(1, qList.length)]
-        let findData = findByString(dataObj, queryStringWithStock)
-        returnObj[s] = findData
-        console.log('HERE------------>', queryStringWithStock, findData)
-        // if (typeof dataObj?.[queryStringList[0]]?.[s]?.[queryStringList[1]] !== 'undefined') { 
-        //     //data point data
-        //     const val = dataObj?.[queryStringList[0]]?.[s]?.[queryStringList[1]]
-        //     returnObj[s] = val
-        // } else {
-        //     //time series data
-        //     const timeSeriesSlice = dataObj?.[queryStringList[0]]?.[s]
-        //     const val = {}
-        //     for (const t in timeSeriesSlice) {
-        //         val[t] = timeSeriesSlice[t][queryStringList[1]]
-        //     }
-        //     returnObj[s] = val
+        const queryList = queryString.split('.') 
+        if (typeof dataObj?.[queryList[0]]?.[s]?.[queryList[1]] !== 'undefined') { //dataPoint
+            const queryStringWithStock = [queryList[0], s, ...queryList.slice(1, queryList.length)] //creates tuple [searchKey, security, datapoint]
+            let findData = findByString(dataObj, queryStringWithStock)
+            returnObj[s] = findData
+            console.log('HERE------------>', queryStringWithStock, findData)
+        } else { //Time series
+            console.log(queryList)
+            //time series data
+            const timeSeriesSlice = dataObj?.[queryList[0]]?.[s]
+            const val = {}
+            for (const t in timeSeriesSlice) {
+                val[t] = timeSeriesSlice[t][queryList[1]]
+            }
+            returnObj[s] = val
         // }
+        }
     }
     return returnObj
 }
