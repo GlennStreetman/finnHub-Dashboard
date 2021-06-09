@@ -148,7 +148,6 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
 
     function changeCategory(e) { //needs to update category selection.
         const target = e.target.value;
-        // this.setState({ categorySelection: target });
         updateFilter(target)
         setNewsIncrementor(1);
     }

@@ -9,7 +9,8 @@ import { logoutServer, Logout, ProcessLogin } from "./appFunctions/appImport/app
 import {
     NewMenuContainer, AddNewWidgetContainer, LockWidgets,
     ToggleWidgetVisability, ChangeWidgetName, RemoveWidget,
-    UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig
+    UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig,
+    toggleWidgetBody
 } from "./appFunctions/appImport/widgetLogic";
 import { LoadDashBoard, NewDashboard, SaveCurrentDashboard }
     from "./appFunctions/appImport/setupDashboard";
@@ -83,6 +84,7 @@ export interface widget {
     columnOrder: number,
     config: config,
     filters: filters,
+    showBody: boolean,
     trackedStocks: stockList,
     widgetConfig: string,
     widgetHeader: string,
@@ -243,6 +245,7 @@ class App extends React.Component<AppProps, AppState> {
         this.updateWidgetStockList = UpdateWidgetStockList.bind(this);
         this.toggleWidgetVisability = ToggleWidgetVisability.bind(this);
         this.updateWidgetConfig = updateWidgetConfig.bind(this);
+        this.toggleWidgetBody = toggleWidgetBody.bind(this)
 
         //App logic for setting up dashboards.
         this.loadDashBoard = LoadDashBoard.bind(this);
@@ -510,6 +513,7 @@ class App extends React.Component<AppProps, AppState> {
                     streamingPriceData={this.state.streamingPriceData}
                     syncGlobalStockList={this.syncGlobalStockList}
                     targetSecurity={this.state.targetSecurity}
+                    toggleWidgetBody={this.toggleWidgetBody}
                     updateAPIFlag={this.updateAPIFlag}
                     updateAPIKey={this.updateAPIKey}
                     updateDashBoards={this.updateDashBoards}

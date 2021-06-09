@@ -30,28 +30,29 @@ class WidgetController extends React.Component {
             const p = this.props
             const widgetGroup = widgetObjList.map((el) => {
             const thisWidgetProps = {
-                key: el.widgetId,
-                moveWidget: p.moveWidget,
-                removeWidget: p.removeWidget,
-                stateRef: el.widgetConfig, //used by app.js to move and remove widgets.
-                widgetBodyProps: returnBodyProps(this, el.widgetType, el.widgetID),
-                widgetKey: el.widgetID,
-                widgetLockDown: p.widgetLockDown,
                 changeWidgetName: p.changeWidgetName,
-                zIndex: p.zIndex,
-                showStockWidgets: p.showStockWidgets,
-                snapWidget: p.snapWidget,
-                setDrag: p.setDrag,
-                widgetList: el,
-                updateAPIFlag: p.updateAPIFlag,
                 currentDashBoard: p.currentDashBoard,
                 enableDrag: p.enableDrag,
-                updateWidgetConfig: p.updateWidgetConfig,
-                updateDashBoards: p.updateDashBoards,
-                loadSavedDashboard: p.loadSavedDashboard,
-                setSecurityFocus: p.setSecurityFocus,
-                targetSecurity: p.targetSecurity,
                 finnHubQueue: p.finnHubQueue,
+                key: el.widgetId,
+                loadSavedDashboard: p.loadSavedDashboard,
+                moveWidget: p.moveWidget,
+                removeWidget: p.removeWidget,
+                setDrag: p.setDrag,
+                setSecurityFocus: p.setSecurityFocus,
+                showStockWidgets: p.showStockWidgets,
+                snapWidget: p.snapWidget,
+                stateRef: el.widgetConfig, //used by app.js to move and remove widgets.
+                targetSecurity: p.targetSecurity,
+                toggleWidgetBody: p.toggleWidgetBody,
+                updateAPIFlag: p.updateAPIFlag,
+                updateDashBoards: p.updateDashBoards,
+                updateWidgetConfig: p.updateWidgetConfig,
+                widgetBodyProps: returnBodyProps(this, el.widgetType, el.widgetID),
+                widgetKey: el.widgetID,
+                widgetList: el,
+                widgetLockDown: p.widgetLockDown,
+                zIndex: p.zIndex,
             }
             if (el.widgetConfig === 'menuWidget') {
                 thisWidgetProps['menuWidgetToggle'] = this.props.menuWidgetToggle

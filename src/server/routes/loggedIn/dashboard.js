@@ -7,8 +7,7 @@ const router = express.Router();
 
 const db = process.env.live === "1" ? dbLive : devDB;
 
-router.get("/dashboard", (req, res, next) => {
-    // console.log("------------------GETTING DASHBOARD-------------")
+router.get("/dashboard", (req, res, next) => { //returns requested dashboard to user.
     if (req.session.login === true) { 
         const getSavedDashBoards = `
             SELECT *
@@ -32,7 +31,7 @@ router.get("/dashboard", (req, res, next) => {
                 res.json({message: "Failed to retrieve dashboards"});
             } else {
                 const result = rows.rows;
-                for (const row in result) {
+                for (const row in result) { //For each widget in dashboard
                     if (r.savedDashBoards[result[row].dashboardname] === undefined){
                         r.savedDashBoards[result[row].dashboardname] = {
                             dashboardname: result[row].dashboardname,
@@ -54,6 +53,7 @@ router.get("/dashboard", (req, res, next) => {
                     widgetType: result[row].widgettype,
                     yAxis: result[row].yaxis,
                     xAxis: result[row].xaxis,
+                    showBody: result[row].showbody,
                     }
                     r.savedDashBoards[resultKey].widgetlist[newObject.widgetID] = newObject
                     
@@ -95,13 +95,10 @@ router.get("/dashboard", (req, res, next) => {
     }
 });
 
-router.post("/dashboard", (req, res, next) => {
-    
+router.post("/dashboard", (req, res, next) => { //saves users dashboard
     if (req.session.login === true) {  
-    // console.log("--------post dashboard-------------", req.body)
     let dashBoardName = format("%L", req.body.dashBoardName);
     let globalStockList = format("%L", JSON.stringify(req.body.globalStockList));
-
     const saveDashBoardSetup = (userID) => {
         return new Promise((resolve, reject) => {
         const saveDashBoardSetupQuery = `
@@ -125,7 +122,7 @@ router.post("/dashboard", (req, res, next) => {
                 const trackedStocks = JSON.stringify(w.trackedStocks)
                 const saveWidget = `
                 INSERT INTO widgets
-                (dashboardkey, columnid, columnorder, config, filters, trackedstocks, widgetconfig, widgetheader, widgetid, widgettype, xaxis, yaxis)
+                (dashboardkey, columnid, columnorder, config, filters, trackedstocks, widgetconfig, widgetheader, widgetid, widgettype, xaxis, yaxis, showBody)
                 VALUES(
                 ${format("%L", rows.rows[0].id)}, 
                 ${format("%L", w.column)}, 
@@ -138,12 +135,15 @@ router.post("/dashboard", (req, res, next) => {
                 ${format("%L", w.widgetID)}, 
                 ${format("%L", w.widgetType)}, 
                 ${format("%L", w.xAxis)}, 
-                ${format("%L", w.yAxis)}
+                ${format("%L", w.yAxis)},
+                ${format("%L", w.showBody)}
                 )
                 ON CONFLICT (dashboardkey, widgetid)
                 DO UPDATE SET columnid = EXCLUDED.columnid , columnorder = EXCLUDED.columnorder, filters = EXCLUDED.filters,
                 trackedStocks = EXCLUDED.trackedStocks, widgetconfig = EXCLUDED.widgetconfig, 
-                widgetheader = EXCLUDED.widgetheader,xaxis = EXCLUDED.xaxis, yaxis = EXCLUDED.yAxis;
+                widgetheader = EXCLUDED.widgetheader,xaxis = EXCLUDED.xaxis, yaxis = EXCLUDED.yAxis,
+                showBody = EXCLUDED.showBody
+                ;
                 `
                 querList = querList + saveWidget
             }

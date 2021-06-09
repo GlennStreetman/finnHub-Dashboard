@@ -73,4 +73,7 @@ ADD Column apialias text UNIQUE
 alter table users
 ADD column widgetsetup text
 
+-- NOT YET IMPLEMENTED ON LIVE
 
+Alter table widgets
+ADD Column showBody Boolean DEFAULT true
