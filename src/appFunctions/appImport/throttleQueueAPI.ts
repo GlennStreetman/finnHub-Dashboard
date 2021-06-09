@@ -46,7 +46,8 @@ export const createFunctionQueueObject = function (maxRequestPerInterval: number
                 let callbacks = this.queue.splice(0, this.maxRequestPerInterval);
                 for (let x = 0; x < callbacks.length; x++) {
                     callbacks[x]();
-                    this.openRequests = this.openRequests += 1
+                    this.openRequests = this.openRequests + 1
+                    // console.log(`Time: ${new Date().toString().slice(15, 25)}, this:${this.openRequests} `)
                 }
                 this.lastCalled = Date.now();
                 if (this.queue.length) {
@@ -154,6 +155,7 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                             updated: Date.now(),
                             config: reqObj.config,
                         }
+                        // console.log('request complete')
                         throttle.openRequests = throttle.openRequests -= 1
                         resolve(resObj)
                     } else if (data.status === 400) {
@@ -169,6 +171,7 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                             updated: Date.now(),
                             config: reqObj.config,
                         }
+                        // console.log('request complete')
                         throttle.openRequests = throttle.openRequests -= 1
                         resolve(resObj)
                     } else {
@@ -184,12 +187,14 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                             updated: Date.now(),
                             config: reqObj.config,
                         }
+                        // console.log('request complete')
                         throttle.openRequests = throttle.openRequests -= 1
                         resolve(resObj)
                     }
                 })
                 .catch((error: any) => {
                     console.log("finnHub error:", error.message, reqObj)
+                    // console.log('request complete')
                     throttle.openRequests = throttle.openRequests -= 1
                     const thisError: throttleResObj = {
                         security: reqObj.security,
