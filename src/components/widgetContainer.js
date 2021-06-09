@@ -148,6 +148,11 @@ render() {
     height: '10px',
     }
 
+    const visStatus = this.props.widgetList.showBody || this.props.stateRef === 'menuWidget' ? 'block' : 'none'
+    const bodyVisable = {
+        display: visStatus,
+    }
+
     if (that.props.widgetList.column === 'drag'){ 
     compStyle['position'] = 'absolute'
     compStyle['top'] = this.props.widgetList["yAxis"]
@@ -199,13 +204,13 @@ render() {
             </button>
             {hideStockSearchMenu.indexOf(this.props.widgetKey) < 0 && (
             <>
-
+                {this.props.stateRef !== 'menuWidget' ?
                 <button data-testid={`editPaneButton-${this.props.widgetList["widgetType"]}`} 
                     className="headerButtons" 
                     onClick={() => {this.props.toggleWidgetBody(this.props.widgetKey)}
                 }>
                 {this.props.widgetList.showBody !== false ? <i className="fa fa-caret-square-o-right" aria-hidden="true" /> : <i className="fa fa-caret-square-o-down" aria-hidden="true" />}
-                </button>
+                </button> : <></>}
 
                 <button data-testid={`editPaneButton-${this.props.widgetList["widgetType"]}`} className="headerButtons" onClick={() => {this.showPane("showEditPane", -1)}}>
                 <i className="fa fa-pencil-square-o" aria-hidden="true" />
@@ -216,12 +221,14 @@ render() {
         ) : (
         <div className="widgetHeader">{this.state.renderHeader}</div>
         )}
-        {this.props.widgetList.showBody !== false ?
+        <div className='widgetBody' style={bodyVisable} key={this.props.showBody}>
+        {/* {this.props.widgetList.showBody !== false ? */}
         <ErrorBoundary widgetType={this.props.widgetList["widgetType"]}>
         {React.createElement(widgetLookUp[this.props.widgetList["widgetType"]], {ref: myRef, ...widgetProps })}
-        </ErrorBoundary> : 
-        <></>
-        }
+        </ErrorBoundary> 
+        </div>
+        {/* : <div ref={myRef}></div> */}
+        {/* } */}
         <div className="widgetFooter">
         {this.props.widgetList.showBody !== false ?
         this.state.showEditPane === 1 ? (
