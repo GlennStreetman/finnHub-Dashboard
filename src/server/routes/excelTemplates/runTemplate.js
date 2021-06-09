@@ -105,14 +105,12 @@ function getDataSlice(dataObj, queryString){
             console.log('HERE------------>', queryStringWithStock, findData)
         } else { //Time series
             console.log(queryList)
-            //time series data
             const timeSeriesSlice = dataObj?.[queryList[0]]?.[s]
             const val = {}
             for (const t in timeSeriesSlice) {
                 val[t] = timeSeriesSlice[t][queryList[1]]
             }
             returnObj[s] = val
-        // }
         }
     }
     return returnObj
