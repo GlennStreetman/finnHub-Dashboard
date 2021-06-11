@@ -210,7 +210,7 @@ class App extends React.Component<AppProps, AppState> {
             dashBoardData: {}, //All saved dashboards
             defaultExchange: "US",
             exchangeList: ["US"], //list of all exchanges activated under account management.
-            finnHubQueue: createFunctionQueueObject(30, 1000, true),
+            finnHubQueue: createFunctionQueueObject(1, 1000, true),
             globalStockList: defaultGlobalStockList, //default stocks for new widgets.
             login: 0, //login state. 0 logged out, 1 logged in.
             loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.

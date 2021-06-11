@@ -52,7 +52,7 @@ router.post("/register", (req, res) => {
         '0',
         'US',
         'US',
-        30,
+        1,
         '',
         '')
         RETURNING *`;
