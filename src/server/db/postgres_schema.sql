@@ -78,7 +78,7 @@ CREATE TABLE users
     defaultexchange text,
     ratelimit int,
     apialias text UNIQUE,
-    widgetsetup text,
+    widgetsetup text DEFAULT '{}',
     CONSTRAINT users_pkey PRIMARY KEY (id),
     CONSTRAINT users_login_key UNIQUE (loginname),
     CONSTRAINT users_email_key UNIQUE (email)

@@ -71,7 +71,7 @@ alter table users
 ADD Column apialias text UNIQUE
 
 alter table users
-ADD column widgetsetup text
+ADD column widgetsetup text default '{}'
 
 -- NOT YET IMPLEMENTED ON LIVE
 
