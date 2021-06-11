@@ -1,4 +1,4 @@
-A web deployable applicaiton that allows you to quickly design and visualize your [Finnhub Stock API data](https://finnhub.io/) in a [dashboard format](https://github.com/GlennStreetman/finnHub-Dashboard/blob/master/public/Example_small.jpg). Each dashboard then becomes its own API endpoint that can be used to bulk pull data.
+Aweb deployable applicaiton that allows you to quickly design and visualize your [Finnhub Stock API data](https://finnhub.io/) in a [dashboard format](https://github.com/GlennStreetman/finnHub-Dashboard/blob/master/public/Example_small.jpg). Each dashboard then becomes its own API endpoint that you can query using graphQL. After you are done designing your dashboards you can push your data to Excel.
 
 [Working Example](https://finn-dash.herokuapp.com/) requires going through registration process and working Finnhub.io API Key.
 

@@ -12,7 +12,7 @@ const URL = process.env.live === '1' ? `https://finn-dash.herokuapp.com` : `http
 
 const API_KEY = process.env.API_KEY || 1;
 const DOMAIN = process.env.DOMAIN_KEY || 1;
-const mailgun = mGun({ apiKey: API_KEY, domain: DOMAIN });
+const mailgun = new mGun({ apiKey: API_KEY, domain: DOMAIN });
 
 function emailIsValid(email) {
     return /\S+@\S+\.\S+/.test(email);

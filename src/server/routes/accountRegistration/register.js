@@ -14,7 +14,7 @@ const router = express.Router();
 const API_KEY = process.env.API_KEY || 1;
 const DOMAIN = process.env.DOMAIN_KEY || 1;
 
-mailgun({ apiKey: API_KEY, domain: DOMAIN })
+const mg = new mailgun({ apiKey: API_KEY, domain: DOMAIN })
 
 router.post("/register", (req, res) => {
   // console.log(req.body)
@@ -123,7 +123,7 @@ router.post("/register", (req, res) => {
           };
           // console.log(data)
           if (req.body.emailText.indexOf("@test.com") === -1) {
-            mailgun.messages().send(data, (error) => {
+            mg.messages().send(data, (error) => {
               if (error) {
                 console.log("register error", error);
               } else {
