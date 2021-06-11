@@ -1,6 +1,10 @@
 import React from "react";
 
-class AboutMenu extends React.PureComponent {
+interface aboutMenuProps2 {
+  apiFlag: number,
+}
+
+class AboutMenu extends React.PureComponent<aboutMenuProps2> {
   constructor(props) {
     super(props);
     this.state = {};
@@ -19,13 +23,13 @@ class AboutMenu extends React.PureComponent {
       <div style={divOutline}>
         <div className="bodyTxt">
           <p>
-            <b>FinnDash:</b> An App that allows you to visualize your FinnHub.IO API data by arranging and configuring financial widgets.
+            <b>FinnDash:</b> An App, for your FinnHub.io API data, that allows you to specify data sets using a dashboard creator, adds a graphQL wrapper to each dashboard, and allows your to push your data into excel templates.
             <br />
             <br />
             <b>Getting Started: </b> <br />
             {this.props.apiFlag > 0 ? (
               <mark>
-                1. Register for your free Finnhub.io API key --`&gt;`?{" "}
+                1. Register for your free Finnhub.io API key:
                 <a href="https://finnhub.io/register" target="_blank" rel="noopener noreferrer">
                   FinnHub Register
                 </a>
@@ -35,7 +39,7 @@ class AboutMenu extends React.PureComponent {
               </mark>
             ) : (
               <>
-                1. Register for your free Finnhub.io API key --`&gt;`?{" "}
+                1. Register for your free Finnhub.io API key:{" "}
                 <a href="https://finnhub.io/register" target="_blank" rel="noopener noreferrer">
                   FinnHub Register
                 </a>

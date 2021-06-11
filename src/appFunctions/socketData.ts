@@ -58,7 +58,6 @@ function LoadTickerSocket(context: { state: AppState, setState: Function }, prev
     const that = context
     //    /console.log('SOCKET', apiKey)
     if (globalStockList !== prevState.globalStockList && apiKey !== "" && apiKey) {
-        // console.log('SETTING UP SOCKET')
         if (socket === '' && apiKey !== undefined && apiKey !== '' && apiKey.indexOf('sandbox') === -1) {
             socket = new WebSocket(`wss://ws.finnhub.io?token=${apiKey}`)
         }
