@@ -49,7 +49,7 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
             dashBoardData: {},
             currentDashBoard: '',
             menuList: {},
-            message: 'Problem retrieving saved dashboards'
+            message: 'No Saved dashboards returned'
         }
         return (GetSavedDashboardsRes)
     } else {
@@ -57,7 +57,7 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
             dashBoardData: {},
             currentDashBoard: '',
             menuList: {},
-            message: 'Problem retrieving saved dashboards'
+            message: 'Problem retrieving saved dashboards2'
         }
         return (GetSavedDashboardsRes)
     }

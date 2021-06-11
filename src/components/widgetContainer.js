@@ -174,7 +174,6 @@ render() {
     widgetProps['widgetCopy'] = this.props.widgetCopy
     }
     const myRef = this.widgetRef
-    
     return (
     <div 
         key={this.props.widgetKey + "container" + that.props.widgetList.column} 
@@ -205,7 +204,7 @@ render() {
             {hideStockSearchMenu.indexOf(this.props.widgetKey) < 0 && (
             <>
                 {this.props.stateRef !== 'menuWidget' ?
-                <button data-testid={`editPaneButton-${this.props.widgetList["widgetType"]}`} 
+                <button  
                     className="headerButtons" 
                     onClick={() => {this.props.toggleWidgetBody(this.props.widgetKey)}
                 }>

@@ -45,7 +45,7 @@ beforeAll((done) => {
     VALUES (	
         'loginCheck',	'loginCheck@test.com',	'735a2320bac0f32172023078b2d3ae56',	'hello',	
         '69faab6268350295550de7d587bc323d',	'',	'',	'1',	
-        '1',	'US',	'US',	30	
+        '1',	'US',	'US',	1	
     )
     ON CONFLICT
     DO NOTHING
@@ -98,8 +98,8 @@ describe('Get login cookie:', ()=>{
                 apiAlias: null,
                 exchangelist: 'US',
                 defaultexchange: 'US',
-                ratelimit: 30,
-                widgetsetup: null, 
+                ratelimit: 1,
+                widgetsetup: '{}', 
             })
             .expect(200)
             .end(done)

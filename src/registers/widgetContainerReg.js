@@ -38,7 +38,7 @@ export let widgetLookUp = {
     PriceQuote: PriceQuote,
     PriceCandles: PriceCandles,
     PriceSplits:PriceSplits,
-    DashBoardMenu: DashBoardMenu,
-    WatchListMenu: WatchListMenu,
+    dashBoardMenu: DashBoardMenu,
+    watchListMenu: WatchListMenu,
 }; 
 

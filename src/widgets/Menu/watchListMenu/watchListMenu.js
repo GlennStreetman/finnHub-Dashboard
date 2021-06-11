@@ -33,7 +33,7 @@ export default class WatchListMenu extends React.PureComponent {
       
     const p = this.props
     const g = p.globalStockList;
-    if (Object.keys(g) !== undefined) {
+    if (g && Object.keys(g) !== undefined) {
     // console.log(g, '-------------')
     const stockListKey = Object.keys(g).map((el) => ( 
     <tr key={el + "row"}>

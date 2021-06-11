@@ -111,11 +111,11 @@ export const SnapWidget = function snapWidget(stateRef: string, widgetId: string
     //adjust column based upon status of hidden menu columns.
     const s: AppState = this.state
     const addColumn: { [key: string]: any } = {}
-    const thisColumn = s.menuList.DashBoardMenu.column
+    const thisColumn = s.menuList.dashBoardMenu.column
     addColumn[thisColumn] = []
-    addColumn[s.menuList.WatchListMenu.column] = []
-    addColumn[s.menuList.DashBoardMenu.column].push(s.dashBoardMenu)
-    addColumn[s.menuList.WatchListMenu.column].push(s.watchListMenu)
+    addColumn[s.menuList.watchListMenu.column] = []
+    addColumn[s.menuList.dashBoardMenu.column].push(s.dashBoardMenu)
+    addColumn[s.menuList.watchListMenu.column].push(s.watchListMenu)
     for (const w in s.widgetList) {
         if (addColumn[s.widgetList[w].column] !== undefined) {
             addColumn[s.widgetList[w].column].push(1)

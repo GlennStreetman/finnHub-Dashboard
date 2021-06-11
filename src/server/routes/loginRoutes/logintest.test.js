@@ -96,7 +96,7 @@ test("Good login get/login", (done) => {
         .expect({
             key: "", 
             login: 1,
-            ratelimit: 30,
+            ratelimit: 1,
             response: 'success',
             exchangelist: 'US',
             defaultexchange: 'US',

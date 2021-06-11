@@ -280,6 +280,7 @@ class App extends React.Component<AppProps, AppState> {
         if (s.login === 1 && prevState.login === 0) { //on login build data model.
             this.getSavedDashBoards()
                 .then((data: GetSavedDashBoardsRes) => {
+                    console.log('saved dashboard:', data)
                     if ((data.dashBoardData[data.currentDashBoard] === undefined && Object.keys(data.dashBoardData))) { //if invalid current dashboard returned
                         data.currentDashBoard = Object.keys(data.dashBoardData)[0]
                     }
@@ -481,7 +482,7 @@ class App extends React.Component<AppProps, AppState> {
                     toggleBackGroundMenu={this.toggleBackGroundMenu}
                     toggleWidgetVisability={this.toggleWidgetVisability}
                     updateAPIFlag={this.updateAPIFlag}
-                    WatchListMenu={this.state.watchListMenu}
+                    watchListMenu={this.state.watchListMenu}
                     widgetLockDown={this.state.widgetLockDown}
                     widgetSetup={this.state.widgetSetup}
                 />
@@ -491,7 +492,7 @@ class App extends React.Component<AppProps, AppState> {
                     changeWidgetName={this.changeWidgetName}
                     currentDashBoard={this.state.currentDashBoard}
                     dashBoardData={this.state.dashBoardData}
-                    DashBoardMenu={this.state.dashBoardMenu}
+                    dashBoardMenu={this.state.dashBoardMenu}
                     defaultExchange={this.state.defaultExchange}
                     exchangeList={this.state.exchangeList}
                     finnHubQueue={this.state.finnHubQueue}
@@ -523,7 +524,7 @@ class App extends React.Component<AppProps, AppState> {
                     updateWidgetFilters={this.updateWidgetFilters}
                     updateWidgetStockList={this.updateWidgetStockList}
                     uploadGlobalStockList={this.uploadGlobalStockList}
-                    WatchListMenu={this.state.watchListMenu}
+                    watchListMenu={this.state.watchListMenu}
                     widgetCopy={this.state.widgetCopy}
                     widgetList={this.state.widgetList}
                     widgetLockDown={this.state.widgetLockDown}

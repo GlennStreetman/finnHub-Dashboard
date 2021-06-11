@@ -22,7 +22,7 @@ interface topNavProps {
     toggleBackGroundMenu: Function,
     toggleWidgetVisability: Function,
     updateAPIFlag: Function,
-    WatchListMenu: number,
+    watchListMenu: number,
     widgetLockDown: number,
     widgetSetup: widgetSetup,
     finnHubQueue: finnHubQueue,
@@ -116,7 +116,7 @@ class TopNav extends React.Component<topNavProps, topNavState> {
 
                     <li id='ddi' className='navItem'>
                         <a href="#contact" onClick={() => this.props.menuWidgetToggle("watchListMenu", "WatchList")}>
-                            {this.props.WatchListMenu === 0 ? "Show Watchlist Menu" : "Hide Watchlist Menu"}
+                            {this.props.watchListMenu === 0 ? "Show Watchlist Menu" : "Hide Watchlist Menu"}
                         </a>
                     </li>
 
@@ -153,22 +153,22 @@ class TopNav extends React.Component<topNavProps, topNavState> {
                         <li id='templatesButton' className="navItem">
                             <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('templates') }}>
                                 Templates
-                    </a>
+                            </a>
                         </li>
                         <li id='endPointButton' className="navItem">
                             <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('endPoint') }}>
                                 Endpoints
-                    </a>
+                            </a>
                         </li>
                         <li id='manageAccountButton' className="navItem">
                             <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('manageAccount') }}>
                                 Manage Account
-                    </a>
+                            </a>
                         </li>
                         <li id='aboutButton' className='navItem'>
                             <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('about') }}>
                                 About
-                    </a>
+                            </a>
                         </li>
                         <li id='LogButton' className='navItem'>
                             <a id='LogButtonLink' href="#home" onClick={async () => {

@@ -1,23 +1,23 @@
 import { rest } from 'msw'
 
 const menuList = {
-    WatchListMenu: {
+    watchListMenu: {
         column: 0,
         columnOrder: 0,
         widgetConfig: 'menuWidget',
         widgetHeader: 'WatchList',
-        widgetID: 'WatchListMenu',
-        widgetType: 'WatchListMenu',
+        widgetID: 'watchListMenu',
+        widgetType: 'watchListMenu',
         xAxis: '5',
         yAxis: '75'
     },
-    DashBoardMenu: {
+    dashBoardMenu: {
         column: 0,
         columnOrder: 1,
         widgetConfig: 'menuWidget',
         widgetHeader: 'Saved Dashboards',
-        widgetID: 'DashBoardMenu',
-        widgetType: 'DashBoardMenu',
+        widgetID: 'dashBoardMenu',
+        widgetType: 'dashBoardMenu',
         xAxis: '46',
         yAxis: '149'
     }

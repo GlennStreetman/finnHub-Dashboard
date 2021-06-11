@@ -5,11 +5,14 @@ import {returnBodyProps} from "../registers/widgetControllerReg.js"
 function MenuWidgetToggle(context) {
     //Create dashboard menu if first time looking at, else toggle visability
     return function toggleFunction(menuName, dashName = "pass", that = context ){
-        const menuNameRef = menuName.charAt(0).toUpperCase() + menuName.slice(1)
-        if (that.state.menuList[menuNameRef] === undefined) {
+        console.log(menuName, dashName, that)
+        // const menuNameRef = menuName.charAt(0).toUpperCase() + menuName.slice(1)
+        if (that.state.menuList[menuName] === undefined) {
+            console.log('here', menuName)
             that.newMenuContainer(menuName, dashName, "menuWidget");
             that.setState({ [menuName]: 1 });
         } else {
+            console.log('there:', menuName)
             that.state[menuName] === 1 ? that.setState({ [menuName]: 0 }) : that.setState({ [menuName]: 1 });
         }
     }
@@ -26,6 +29,7 @@ class WidgetController extends React.Component {
 
     renderWidgetGroup(widgetObjList) {
         if (widgetObjList !== undefined && widgetObjList[0]['pass'] === undefined) {
+            // console.log('Rendering Widgets:', widgetObjList)
             widgetObjList.sort((a,b) => (a.columnOrder > b.columnOrder) ? 1 : -1)
             const p = this.props
             const widgetGroup = widgetObjList.map((el) => {
@@ -61,6 +65,7 @@ class WidgetController extends React.Component {
             if (p.widgetCopy?.widgetID === el.widgetID){
                 thisWidgetProps.widgetCopy = p.widgetCopy
             }
+            // console.log('thisWidgetProps', thisWidgetProps)
                 return (
                 <div key={el.widgetID+'thisKey'} style={{padding: "1px"}}>
                     {React.createElement(WidgetContainer, thisWidgetProps)}
