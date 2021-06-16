@@ -5,6 +5,8 @@ import { epsSuprisesExcel } from "../widgets/Estimates/EPSSurprises/epsSurprises
 import { priceTargetExcel } from "../widgets/Estimates/PriceTarget/priceTargetExcelFunction";
 import { recTrendExcel } from "../widgets/Estimates/RecommendationTrends/recTrendExcelFunction";
 
+import { basicFinancialsExcel } from "../widgets/Fundamentals/basicFinancials/basicFinancialsExcelFunction";
+
 import { candleExcel } from "../widgets/Price/candles/candleExcelFunction";
 
 interface widgetDictInt {
@@ -16,6 +18,7 @@ export const excelRegister: widgetDictInt = {
     EstimatesEPSSurprises: epsSuprisesExcel,
     EstimatesPriceTarget: priceTargetExcel,
     EstimatesRecommendationTrends: recTrendExcel,
+    FundamentalsBasicFinancials: basicFinancialsExcel,
 
     PriceCandles: candleExcel,
 }

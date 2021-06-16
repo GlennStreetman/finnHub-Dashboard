@@ -81,20 +81,15 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         }
     }
 
-    const startToggleMode = () => {
-        return 'metrics'
-    }
-
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [stockData, setStockData] = useState(startingstockData()); //metric & series data for each stock.
-    const [toggleMode, setToggleMode] = useState(startToggleMode()); //'metrics' OR 'series'.
     const [metricList, setMetricList] = useState(startMetricList()); //metricList target stocks available metrics
     const [seriesList, setSeriesList] = useState(startMetricList()); //metricList target stocks available metrics
     const [metricIncrementor, setMetricIncrementor] = useState(1);
     const [orderView, setOrderView] = useState(0);
     const [symbolView, setSymbolView] = useState(0);
     const [targetStock, setTargetStock] = useState(startingTargetStock());
-    const [targetSeries, setTargetSeries] = useState('')
+    // const [targetSeries, setTargetSeries] = useState('')
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
@@ -116,15 +111,16 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 metricIncrementor: metricIncrementor,
                 orderView: orderView,
                 symbolView: symbolView,
+                targetSeries: '',
             },
         }
     ))
 
     useEffect(() => { //set default series 
-        if (seriesList.length > 0 && targetSeries === '') {
+        if (seriesList.length > 0 && p.config.targetSeries === '') {
             setTargetSeries(seriesList[0])
         }
-    }, [seriesList, targetSeries])
+    }, [seriesList, p.config.targetSeries, setTargetSeries])
 
     useEffect(() => {
         //On mount, use widget copy, else build visable data.
@@ -137,11 +133,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             let securityList: string[] = []
             let filterObj = {}
 
-            // filterPaths: [],
-            // showData: [],
-            // widgetType: 'FundamentalsBasicFinancials'
-
-            if (toggleMode === 'metrics') {
+            if (p.config.toggleMode === 'metrics') {
                 securityList = stockList
                 for (const s of stockList) {
                     filterObj[s] = {
@@ -163,8 +155,10 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                     showsData: [],
                     widgetType: 'FundamentalsBasicFinancials'
                 }
-                for (const f of p.config.seriesSelection) {
-                    filterObj[targetStock].showsData.push(`series.annual.${f}`)
+                if (p?.config?.seriesSelection) {
+                    for (const f of p?.config?.seriesSelection) {
+                        filterObj[targetStock].showsData.push(`series.annual.${f}`)
+                    }
                 }
             }
 
@@ -175,7 +169,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             }
             dispatch(rBuildVisableData(payload))
         }
-    }, [p.widgetKey, widgetCopy, dispatch, p.trackedStocks, p.config.metricSelection, p.config.seriesSelection, targetStock, toggleMode])
+    }, [p.widgetKey, widgetCopy, dispatch, p.trackedStocks, p.config.metricSelection, p.config.seriesSelection, targetStock, p.config.toggleMode])
 
     useEffect((key: number = p.widgetKey, trackedStock = p.trackedStocks, keyList: string[] = Object.keys(p.trackedStocks), updateWidgetConfig: Function = p.updateWidgetConfig) => {
         //Setup default metric source if none selected.
@@ -185,6 +179,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 metricSource: newSource,
                 metricSelection: [],
                 seriesSelection: [],
+                toggleMode: 'metrics',
             })
         }
     }, [p.updateWidgetConfig, p.widgetKey, p.trackedStocks, p.apiKey, p.config.metricSource])
@@ -234,7 +229,19 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     useEffect(() => {
         let searchList = Object.keys(p.trackedStocks).map((el) => `${p.widgetKey}-${el}`)
         dispatch(tSearchMongoDB(searchList))
-    }, [toggleMode, targetStock, p.config.metricSelection, p.config.seriesSelection, dispatch, p.trackedStocks, p.widgetKey])
+    }, [p.config.toggleMode, targetStock, p.config.metricSelection, p.config.seriesSelection, dispatch, p.trackedStocks, p.widgetKey])
+
+    function setToggleMode(el) {
+        p.updateWidgetConfig(p.widgetKey, {
+            toggleMode: el,
+        })
+    }
+
+    function setTargetSeries(el) {
+        p.updateWidgetConfig(p.widgetKey, {
+            targetSeries: el,
+        })
+    }
 
     function changeSource(el) {
         p.updateWidgetConfig(p.widgetKey, {
@@ -299,8 +306,8 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                         </thead>
                         <tbody>
                             <tr>
-                                <td><input type='radio' name='widgetToggle' checked={toggleMode === 'metrics'} onChange={() => setToggleMode('metrics')} /></td>
-                                <td><input type='radio' name='widgetToggle' checked={toggleMode === 'series'} onChange={() => setToggleMode('series')} /></td>
+                                <td><input type='radio' name='widgetToggle' checked={p.config.toggleMode === 'metrics'} onChange={() => setToggleMode('metrics')} /></td>
+                                <td><input type='radio' name='widgetToggle' checked={p.config.toggleMode === 'series'} onChange={() => setToggleMode('series')} /></td>
                             </tr>
                         </tbody>
                     </table>
@@ -328,7 +335,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
     function checkStatus(check) {
         //sets status of check boxes when selecting or deselecting checkboxes.
-        if (toggleMode === 'metrics') {
+        if (p.config.toggleMode === 'metrics') {
             if (p.config.metricSelection.indexOf(check) > -1) {
                 return true
             } else {
@@ -416,7 +423,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                         </>
                     )
                 } else if (orderView === 0) {
-                    if (toggleMode === 'metrics') {
+                    if (p.config.toggleMode === 'metrics') {
                         return (
                             <>
                                 <td data-testid='metricSelector'>Metric</td>
@@ -451,10 +458,10 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                         </thead>
 
                         <tbody>
-                            {orderView === 0 && symbolView === 0 && toggleMode === 'metrics' && mapMetrics}
-                            {orderView === 1 && symbolView === 0 && toggleMode === 'metrics' && mapMetricSelection}
-                            {orderView === 0 && symbolView === 0 && toggleMode === 'series' && mapSeries}
-                            {orderView === 1 && symbolView === 0 && toggleMode === 'series' && mapSeriesSelection}
+                            {orderView === 0 && symbolView === 0 && p.config.toggleMode === 'metrics' && mapMetrics}
+                            {orderView === 1 && symbolView === 0 && p.config.toggleMode === 'metrics' && mapMetricSelection}
+                            {orderView === 0 && symbolView === 0 && p.config.toggleMode === 'series' && mapSeries}
+                            {orderView === 1 && symbolView === 0 && p.config.toggleMode === 'series' && mapSeriesSelection}
                             {symbolView === 1 && mapStockSelection}
                         </tbody>
                     </table>
@@ -479,7 +486,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         let returnMetrics: string[] = []
         for (const x in findMetrics) {
             try {
-                let metric: string | number = symbolData[toggleMode][findMetrics[x]]
+                let metric: string | number = symbolData[p.config.toggleMode][findMetrics[x]]
                 returnMetrics.push(metric.toLocaleString(undefined, {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
@@ -500,7 +507,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
     function bodySelector() {
         return (
-            <select data-testid='modeSelector' className="btn" value={toggleMode} onChange={changeBodySelection}>
+            <select data-testid='modeSelector' className="btn" value={p.config.toggleMode} onChange={changeBodySelection}>
                 <option data-testid='selectMetrics' key={'metricsSelection1'} value={'metrics'}>
                     metrics
                 </option>
@@ -534,7 +541,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     )) : <></>;
 
     function renderStockData() {
-        if (toggleMode === 'metrics') { //build metrics table.
+        if (p.config.toggleMode === 'metrics') { //build metrics table.
             let selectionList: string[] = []
             let thisKey = p.widgetKey
             selectionList = []
@@ -575,8 +582,8 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             )
             return buildTableMetrics
         } else { //build time series chart
-            let stockDataObj = stockData?.[targetStock]?.['series']?.[targetSeries] ? stockData[targetStock]['series'][targetSeries] : []
-            const options = createOptions(convertCamelToProper(targetSeries), stockDataObj)
+            let stockDataObj = stockData?.[targetStock]?.['series']?.[p.config.targetSeries] ? stockData[targetStock]['series'][p.config.targetSeries] : []
+            const options = createOptions(convertCamelToProper(p.config.targetSeries), stockDataObj)
             let buildChartSelection = (
                 <div data-testid='seriesSelectors' className="widgetTableDiv">
                     Show: {bodySelector()} <br />
@@ -586,7 +593,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                         </select>
                     } <br />
                     Series: {
-                        <select className="btn" value={targetSeries} onChange={changeSeriesSelection}>
+                        <select className="btn" value={p.config.targetSeries} onChange={changeSeriesSelection}>
                             {seriesListOptions}
                         </select>
                     }

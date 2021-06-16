@@ -246,7 +246,7 @@ render() {
 
         {this.props.widgetList.showBody !== false && this.state.showEditPane !== 1 && (
             excelRegister[this.props.widgetList.widgetType] && (
-                <button onClick={()=>excelFunction(this.props.apiKey, this.props.currentDashBoard, this.props.widgetList.widgetHeader)}>
+                <button onClick={()=>excelFunction(this.props.apiKey, this.props.currentDashBoard, this.props.widgetList.widgetHeader, this.props.widgetList.config)}>
                     <i className="fa fa-file-excel-o" aria-hidden="true" data-testid={`excelButton-${this.props.widgetList["widgetType"]}`}></i>
                 </button>
             )

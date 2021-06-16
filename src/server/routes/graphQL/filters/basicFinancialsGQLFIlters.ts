@@ -2,23 +2,32 @@ import { FinnHubAPIData } from '../../../../widgets/Fundamentals/basicFinancials
 
 export default function basicFinancialsGQLFilter(data: FinnHubAPIData, config: any = {}) {
     //convert time series list to Object: Keys = period, values = object
-    console.log('config', config)
-    const resObj = {
-        metrics: {},
-        series: {},
+    if (config.toggleMode === 'metrics') {
+        const resObj = {
+            metrics: {},
+        }
+        const filterListMetrics = config['metricSelection']
+        const metrics = data.metric
+        for (const d in filterListMetrics) { //filter metrics
+            resObj.metrics[filterListMetrics[d]] = metrics?.[filterListMetrics[d]]
+        }
+        return resObj
     }
 
-    const filterListMetrics = config['metricSelection']
-    const metrics = data.metric
-    for (const d in filterListMetrics) { //filter metrics
-        resObj.metrics[filterListMetrics[d]] = metrics[filterListMetrics[d]]
+    if (config.toggleMode === 'series') {
+        let resObj = {
+            period: [],
+            v: [],
+        }
+        const targetSeries = config.targetSeries
+        const timeSeriesData: [] = data?.series?.annual?.[targetSeries]
+        if (timeSeriesData) {
+            for (const d in timeSeriesData) {
+                resObj.period.push(timeSeriesData[d]['period'])
+                resObj.v.push(timeSeriesData[d]['v'])
+            }
+        }
+        console.log('resObj', resObj)
+        return resObj
     }
-
-    const filtersTimeSeries = config['seriesSelection']
-    const timeSeries = data.series.annual
-    for (const d in filtersTimeSeries) { //filter metrics
-        resObj.series[filtersTimeSeries[d]] = timeSeries[filtersTimeSeries[d]]
-    }
-    console.log('resObj:', resObj)
-    return resObj
 }

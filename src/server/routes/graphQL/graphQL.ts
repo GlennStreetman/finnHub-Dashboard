@@ -187,7 +187,7 @@ const RootQueryType = new g.GraphQLObjectType({
                     const security = args.security ? securityList() : false
                     const filters = args.security ? args.filters : false
                     const query = `
-                    SELECT w.widgetID, u.id, w.widgettype
+                    SELECT w.widgetID, u.id, w.widgettype, w.config
                     FROM widgets w
 					LEFT JOIN USERS U ON U.apiKey = ${apiKey} OR apialias = ${apiKey}
                     WHERE dashboardkey = (
@@ -199,10 +199,12 @@ const RootQueryType = new g.GraphQLObjectType({
                             WHERE (apiKey = ${apiKey} OR apialias = ${apiKey})) AND dashboardname = ${dashboardName})
 					AND widgetHeader = ${widget}
                     `
-                    // console.log('get widget: ', query)
+                    console.log('get widget: ', query)
                     try {
                         const returnData = await db.query(query)
-                        // console.log('This Data: ', returnData.rows[0])
+                        console.log('returnData', returnData)
+                        let dataConfig = JSON.parse(returnData.rows[0].config)
+                        if (!dataConfig) dataConfig = {}
                         const findData = {
                             userID: returnData.rows[0].id,
                             dashboard: args.dashboard,
@@ -218,22 +220,19 @@ const RootQueryType = new g.GraphQLObjectType({
                         const resList: Object[] = []
                         await findDataSet.forEach((data: finnHubData) => {
                             if (filterDict[data.widgetType]) {//if finnHub API data needs to be filtered or reformated
-                                console.log('dataFilter:', data)
-                                data.data = filterDict[data.widgetType](data.data, data.config)
+                                data.data = filterDict[data.widgetType](data.data, dataConfig)
                             }
                             if (filters) {
-                                console.log('FILTERING: ', filters)
+                                // console.log('FILTERING: ', filters)
                                 let newFilter
                                 if (filters.indexOf('*') > -1) {
                                     newFilter = filters.replace(/\./g, String.fromCharCode(92) + `.`)
-                                    console.log(newFilter)
+                                    // console.log(newFilter)
                                     newFilter = new RegExp(newFilter.replace(/[*]/g, '.*?'))
                                 } else {
                                     newFilter = filters
                                 }
-                                console.log('newFilter', newFilter)
-
-
+                                // console.log('newFilter', newFilter)
                                 const queryFilteredData = {}
                                 function objRecursive(obj, newObj, path) {
                                     for (const key in obj) {
@@ -245,25 +244,14 @@ const RootQueryType = new g.GraphQLObjectType({
                                             if (newFilter instanceof RegExp) {
                                                 if (newFilter.test(`${path}${key}`) === true) { newObj[key] = obj[key] }
                                             } else {
-                                                console.log(newFilter, `${path}${key}`, newFilter === `${path}${key}`)
+                                                // console.log(newFilter, `${path}${key}`, newFilter === `${path}${key}`)
                                                 if (newFilter === `${path}${key}`) { newObj[key] = obj[key] }
                                             }
                                         }
                                     }
                                 }
                                 objRecursive(data.data, queryFilteredData, '')
-
-                                // console.log('queryFilteredData', queryFilteredData)
                                 data.data = queryFilteredData
-                                // const filterList = filters.split(',')
-                                // console.log(typeof data.data, typeof filterList)
-                                // for (const dataPoint in data.data) {
-                                //     if (filterList.indexOf(dataPoint) === -1) {
-                                //         console.log(filterList, filterList.indexOf(dataPoint), filterList[dataPoint])
-                                //         delete data.data[dataPoint]
-                                //     }
-                                // }
-                                //                     /.*?\.buy/
                             }
                             data.widgetType = widgetType
                             resList.push(data)
@@ -312,7 +300,7 @@ const RootQueryType = new g.GraphQLObjectType({
                     const widgetType = args.widgetType ? ` AND w.widgettype IN (${widgetTypeList()})  ` : `  `
 
                     const query = `
-                    SELECT w.widgetID, u.id
+                    SELECT w.widgetID, u.id, w.config
                     FROM widgets w
 					LEFT JOIN USERS U ON U.apiKey = ${apiKey} OR apialias = ${apiKey}
                     WHERE dashboardkey = (

@@ -13,7 +13,7 @@ export const recTrendExcel = function (apiKey, currentDashBoard, widgetHeader) {
             { Symbol: 'symbol' },
         ] 
     };
-    console.log('data', data)
+    console.log('basic rec trend data', data)
     const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },

@@ -83,7 +83,7 @@ function findByString(searchObj, thisSearch){ //find value in nested object
             let foundObj = searchObj[searchTerm]
             return findByString(foundObj, searchList)
         } else {
-            // console.log('FILTER NOT FOUND:', searchList)
+            console.log('FILTER NOT FOUND:', searchList)
             return({})
         }
     }
@@ -210,27 +210,33 @@ function writeTimeSeriesSheetSingle(w, ws, s, templateData){
     let rowIterator = 0 //if multiSheet = 'false: add 1 for each line written so that writer doesnt fall out of sync with file.
     const templateWorksheet = templateData[s]
     const addedRows = [] //if multiSheet = 'false: list of rows added to template. Used to adjust any excel formulas as they dont auto update when adding rows.
+    console.log('starting write time series')
     for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will add rows = time series count X number of securities.
         const dataRow = templateWorksheet[row].data //list of rows to be updated from template file. 
         const writeRows =  templateWorksheet[row].writeRows //used to create range of rows we need to  update.
         const keyColumns =  templateWorksheet[row].keyColumns //list of key columns for each row. {...integers: integer}
         let currentKey = '' //the current security key
         let currKeyColumn = 0 //ref to the source of current security key
+        console.log('starting write time series2')
         for (let step = 1; step <= writeRows; step++) { //iterate over new rows that data will populate into
             let timeSeriesFlag = 1
             let startRow = 0 //saves the start line for time series data
             let dataRowCount = 0 //number of rows to enter data for time series
+            console.log('starting write time series3')
             for (const updateCell in dataRow) { //{...rowInteger: {...security || key Integer: value || timeSeries{}}}
                 if (keyColumns[updateCell]) {  //update if key column integer. If security this test will fail as security ref is string.
+                    console.log('starting write time series4.1')
                     currentKey = dataRow?.[updateCell]?.[step-1]
                     currKeyColumn = updateCell //Whenever a key value is in a cell update keyColumn. That way multiple keys can exist in the same row.
                     if (dataRow[updateCell][step-1] && typeof dataRow[updateCell][step-1] === 'string') {
+                        console.log('starting write time series4.2')
                         ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][step-1]
                     }
-                } else if (typeof dataRow[updateCell][currentKey] !== 'object') { 
-                    // if (typeof dataRow[updateCell][currentKey] !== undefined) console.log('111', typeof dataRow[updateCell][currentKey])
+                } else if (typeof dataRow[updateCell][currentKey] !== 'object') {
+                    console.log('starting write time series4.3') 
                     if (ws !== undefined) ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][currentKey]
                 } else { 
+                    console.log('starting write time series4.4')
                     const dataGroup = dataRow[updateCell][currentKey]
                     if (timeSeriesFlag === 1) { //only run once.
                         timeSeriesFlag = 2;
@@ -262,7 +268,7 @@ function writeTimeSeriesSheetSingle(w, ws, s, templateData){
                 let updateString = cell.value.formula
                 let updateList = []
                 let re = new RegExp(/(?:^|[^0-9])([A-Z](?:100|[0-9][0-9]?))(?=$|[^0-9A-Z])/g)
-                let allMatches = cell.value.formula.matchAll(re) ? [...cell.value.formula.matchAll(re)] : []
+                let allMatches = cell?.value?.formula?.matchAll(re) ? [...cell.value.formula.matchAll(re)] : []
                 for (const m in allMatches) {
                     let matchRow = parseInt(allMatches[m][1].replace(new RegExp(/\D/g), ''))
                     let matchColumn = allMatches[m][1].replace(new RegExp(/[0-9]/g), '')
@@ -286,6 +292,7 @@ function writeTimeSeriesSheetSingle(w, ws, s, templateData){
 
 
 function dataPointSheetSingle(w, ws, s, templateData){
+    console.log('data point sheet single')
     let rowIterator = 0 //if multiSheet = 'false: add 1 for each line written so that writer doesnt fall out of sync with file.
     const templateWorksheet = templateData[s]
     const addedRows = [] //if multiSheet = 'false: list of rows added to template. Used to adjust any excel formulas as they dont auto update when adding rows.
@@ -408,7 +415,7 @@ router.get('/runTemplate', async (req, res) => {
                 const ws = w.getWorksheet(s)
                 let timeSeriesFlag = checkTimeSeriesStatus(ws, promiseData)  //set to 1 if worksheet contains time series data.
                 if (timeSeriesFlag === 1) {
-                    console.log('creating time series worksheet')
+                    console.log('creating time series worksheet1')
                     writeTimeSeriesSheetSingle(w, ws, s, templateData)
                 } else if (multiSheet !== 'true') {
                     console.log('creating data point single')
@@ -464,7 +471,7 @@ router.post('/runTemplate', async (req, res) => {
                 const ws = w.getWorksheet(s)
                 let timeSeriesFlag = checkTimeSeriesStatus(ws, promiseData)  //set to 1 if worksheet contains time series data.
                 if (timeSeriesFlag === 1) {
-                    console.log('creating time series worksheet')
+                    console.log('creating time series worksheet2')
                     writeTimeSeriesSheetSingle(w, ws, s, templateData)
                 } else if (multiSheet !== 'true') {
                     console.log('creating data point single')
@@ -576,7 +583,7 @@ router.post('/generateTemplate', async (req, res) => {
                 const ws = w.getWorksheet(s)
                 let timeSeriesFlag = checkTimeSeriesStatus(ws, promiseData)  //set to 1 if worksheet contains time series data.
                 if (timeSeriesFlag === 1) {
-                    console.log('creating time series worksheet')
+                    console.log('creating time series worksheet3')
                     writeTimeSeriesSheetSingle(w, ws, s, templateData)
                 } else if (multiSheet !== 'true') {
                     console.log('creating data point single:')
