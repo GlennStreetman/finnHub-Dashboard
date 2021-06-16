@@ -1,7 +1,7 @@
 
 import { finnHubDataObj } from '../../../../widgets/Estimates/EarningsCalendar/EarningsCalendarBody'
 
-export default function recommendationTrendsGQLFilter(data: finnHubDataObj, filters: Object = {}) {
+export default function recommendationTrendsGQLFilter(data: finnHubDataObj, config: Object = {}) {
     //convert time series list to Object: Keys = period, values = object
     const resObj = {}
     const earningsCalendar = data.earningsCalendar

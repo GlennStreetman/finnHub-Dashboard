@@ -7,6 +7,6 @@ interface widgetDictInt {
     [key: string]: Function
 }
 
-export const widgetReducers: widgetDictInt = {
+export const widgetReducers: widgetDictInt = { //if api data needs to be modified for use in widget. Useful if data is over queried.
     FundamentalsBasicFinancials: basicFinancialsReducer,
 }

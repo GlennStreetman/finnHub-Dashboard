@@ -1,7 +1,7 @@
 
 import { FinnHubAPIDataArray } from '../../../../widgets/Fundamentals/secFilings/secFilingsBody'
 
-export default function secFilingsGQLFilter(data: FinnHubAPIDataArray, filters: Object = {}) {
+export default function secFilingsGQLFilter(data: FinnHubAPIDataArray, config: Object = {}) {
     //convert time series list to Object: Keys = period, values = object
     const resObj = {}
 

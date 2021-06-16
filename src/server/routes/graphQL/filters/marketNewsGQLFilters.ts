@@ -1,7 +1,7 @@
 
 import { FinnHubAPIDataArray } from '../../../../widgets/Fundamentals/marketNews/marketNewsBody'
 
-export default function recommendationTrendsGQLFilter(data: FinnHubAPIDataArray, filters: Object = {}) {
+export default function recommendationTrendsGQLFilter(data: FinnHubAPIDataArray, config: Object = {}) {
     //convert time series list to Object: Keys = period, values = object
     const resObj = {}
 

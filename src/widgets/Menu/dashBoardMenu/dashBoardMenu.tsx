@@ -4,7 +4,7 @@ import { useAppSelector } from '../../../hooks';
 
 
 function DashBoardMenu(p: { [key: string]: any }, ref: any) {
-    console.log('rendering dashboardmenu')
+    // console.log('rendering dashboardmenu')
     const isInitialMount = useRef(true); //update to false after first render.
 
     const [inputText, setInputText] = useState('Enter Name')

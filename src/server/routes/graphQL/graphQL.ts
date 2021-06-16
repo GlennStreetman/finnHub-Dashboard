@@ -218,6 +218,7 @@ const RootQueryType = new g.GraphQLObjectType({
                         const resList: Object[] = []
                         await findDataSet.forEach((data: finnHubData) => {
                             if (filterDict[data.widgetType]) {//if finnHub API data needs to be filtered or reformated
+                                console.log('dataFilter:', data)
                                 data.data = filterDict[data.widgetType](data.data, data.config)
                             }
                             if (filters) {

@@ -20,11 +20,13 @@ export default function TemplateMenu(p: { [key: string]: any }, ref: any) {
             fetch('/uploadTemplate')
                 .then((res) => res.json())
                 .then((data) => {
-                    const d = JSON.parse(data.data)
-                    const update = {}
-                    for (const x in d) { update[d[x]] = false }
-                    setCheckMulti(update)
-                    setTemplateList(d)
+                    if (data.data) {
+                        const d = JSON.parse(data.data)
+                        const update = {}
+                        for (const x in d) { update[d[x]] = false }
+                        setCheckMulti(update)
+                        setTemplateList(d)
+                    }
                 })
             //setTemplateList('[newlist])
         }

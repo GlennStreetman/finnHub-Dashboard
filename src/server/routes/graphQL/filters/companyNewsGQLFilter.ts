@@ -1,6 +1,6 @@
 import { FinnHubAPIDataArray } from '../../../../widgets/Fundamentals/companyNews/companyNewsBody'
 
-export default function companyNewsGQLFilter(data: FinnHubAPIDataArray, filters: Object = {}) {
+export default function companyNewsGQLFilter(data: FinnHubAPIDataArray, config: Object = {}) {
     //convert time series list to Object: Keys = period, values = object
     const resObj = {}
 

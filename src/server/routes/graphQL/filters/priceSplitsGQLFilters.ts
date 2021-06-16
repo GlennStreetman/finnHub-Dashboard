@@ -1,7 +1,7 @@
 
 import { finnHubSplitArray } from '../../../../widgets/Price/splits/PriceSplitsBody'
 
-export default function priceSplitsGQLFilter(data: finnHubSplitArray, filters: Object = {}) {
+export default function priceSplitsGQLFilter(data: finnHubSplitArray, config: Object = {}) {
     //convert time series list to Object: Keys = period, values = object
     const resObj = {}
 

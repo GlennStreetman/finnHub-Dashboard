@@ -430,4 +430,174 @@ router.get('/runTemplate', async (req, res) => {
     }
 })
 
+router.post('/runTemplate', async (req, res) => {
+    //route accessable via APIKEY or Alias.
+    //get user ID
+    // console.log(req.query)
+    const apiKey = format('%L', req.query['key'])
+    const multiSheet = req.query['multi']
+    const findUser = `
+        SELECT id
+        FROM users
+        WHERE apiKey = ${apiKey} OR apiAlias = ${apiKey}
+    `
+    //copy target template into temp folder
+    const userRows = await db.query(findUser)
+    const user = userRows?.rows?.[0]?.id
+    const workBookPath = `${appRootPath}/uploads/${user}/${req.query.template}`
+    const tempPath = `${appRootPath}/uploads/${user}/temp/`
+    const trimFileName = req.query.template.slice(0, req.query.template.indexOf('.xls'))
+    const tempFile = `${appRootPath}/uploads/${user}/temp/${trimFileName}${Date.now()}.xlsx`
+
+    if (fs.existsSync(workBookPath)) { //if template name provided by get requests exists
+        makeTempDir(tempPath) //make temp directory for user if it doesnt already exist.        
+        const promiseList = await buildQueryList(workBookPath) //List of promises built from excel templates query sheet
+        const promiseData = await Promise.all(promiseList)  //after promises run process promise data {keys: [], data: {}} FROM mongoDB
+            .then((res) => {
+                return processPromiseData(res)
+        })
+        const templateData = await buildTemplateData(promiseData, workBookPath) //{...sheetName {...row:{data:{}, writeRows: number, keyColumns: {}}}} from Template File
+        const w = new Excel.Workbook()
+        w.xlsx.readFile(workBookPath)
+        .then(()=>{ 
+            for (const s in templateData) { //for each worksheet
+                const ws = w.getWorksheet(s)
+                let timeSeriesFlag = checkTimeSeriesStatus(ws, promiseData)  //set to 1 if worksheet contains time series data.
+                if (timeSeriesFlag === 1) {
+                    console.log('creating time series worksheet')
+                    writeTimeSeriesSheetSingle(w, ws, s, templateData)
+                } else if (multiSheet !== 'true') {
+                    console.log('creating data point single')
+                    dataPointSheetSingle(w, ws, s, templateData)
+                } else {
+                    console.log('creating data point multi')
+                    dataPointSheetMulti(w, ws, s, templateData)
+                }
+            }
+            const deleteSheet = w.getWorksheet('Query')
+            w.removeWorksheet(deleteSheet.id)
+            w.xlsx.writeFile(tempFile)
+            .then(()=>{
+                console.log('sending: ', tempFile)
+                res.status(200).sendFile(tempFile)
+            })
+        })
+
+    }
+})
+
+router.post('/generateTemplate', async (req, res) => {
+    // Post: apiKey, dashboard, widget, columnKeys <--Make this alias if available or key
+    const reqData = req.body
+    console.log('reqData', reqData)
+    const apiKey = format('%L', reqData.apiKey)
+    const multiSheet = 'false'
+    const findUser = `
+        SELECT id
+        FROM users
+        WHERE apiKey = ${apiKey} OR apiAlias = ${apiKey}
+    `
+    //copy target template into temp folder
+    const userRows = await db.query(findUser)
+    const user = userRows?.rows?.[0]?.id
+
+    const workBookPath = `${appRootPath}/uploads/${user}/temp/excelTemplate${Date.now()}`
+    const workBookName = workBookPath + '.xlsx'
+    const tempPath = `${appRootPath}/uploads/${user}/temp/`
+    makeTempDir(tempPath) //make temp directory for user if it doesnt already exist.
+    const trimFileName = 'excelTemplateReturnFile'
+    const tempFile = `${appRootPath}/uploads/${user}/temp/${trimFileName}${Date.now()}.xlsx`
+
+    const wn = new Excel.Workbook()
+    //Query sheet templating
+    const querySheet = wn.addWorksheet('Query') //build query worksheet
+    
+    let queryRow = querySheet.getRow(1)
+    queryRow.getCell(1).value = 'dataName'
+    queryRow.getCell(2).value = `{widget(key: "${reqData.apiKey}" dashboard: "${reqData.dashboard}" widget: "${reqData.widget}") {security, data}}`
+    queryRow.getCell(3).value = '***ADD Columns A and B to the "Query" worksheet when designing custom excel templates***'
+    queryRow.getCell(3).font = {bold: true}
+    queryRow.commit()
+
+    queryRow = querySheet.getRow(3)
+    queryRow.getCell(3).value = '***ADD THE BELOW template tags TO ANY Excel sheet, not named query, in order to populate data into an excel template. ***'
+    queryRow.getCell(3).font = {bold: true}
+    queryRow.commit()
+
+    //data markup tag templating
+    let dataColumns = reqData.columnKeys
+    queryRow = querySheet.getRow(4)
+    queryRow.getCell(3).value = 'Security'
+    for (const d in dataColumns){
+        queryRow.getCell(parseInt(d) + 4).value = Object.keys(dataColumns[d])[0]
+    }
+    queryRow.commit()
+    //template data row
+    queryRow = querySheet.getRow(5)
+    queryRow.getCell(3).value = '&=keys.keys'
+    for (let d in dataColumns){
+        queryRow.getCell(parseInt(d) + 4).value = `&=dataName.${ Object.values(dataColumns[d])[0]}`
+    }
+    queryRow.commit()
+
+    //build data worksheet
+    const dataSheet = wn.addWorksheet('Data') 
+    // let dataColumns = reqData.columnKeys
+    //title row
+    let dataRow = dataSheet.getRow(1)
+    dataRow.getCell(1).value = 'Security'
+    for (const d in dataColumns){
+        dataRow.getCell(parseInt(d) + 2).value = Object.keys(dataColumns[d])[0]
+    }
+    dataRow.commit()
+    //template data row
+    dataRow = dataSheet.getRow(2)
+    dataRow.getCell(1).value = '&=keys.keys'
+    for (let d in dataColumns){
+        dataRow.getCell(parseInt(d) + 2).value = `&=dataName.${ Object.values(dataColumns[d])[0]}`
+    }
+    dataRow.commit()
+    //  write/overwrite user dataTemplate
+    await wn.xlsx.writeFile(workBookName)
+    console.log('file created')
+    // if (fs.existsSync(workBookPath)) { //if template name provided by get requests exists        
+        const promiseList = await buildQueryList(workBookName) //List of promises built from excel templates query sheet
+        const promiseData = await Promise.all(promiseList)  //after promises run process promise data {keys: [], data: {}} FROM mongoDB
+            .then((res) => {
+                return processPromiseData(res)
+        })
+        console.log('promises complete!')
+        const templateData = await buildTemplateData(promiseData, workBookName) //{...sheetName {...row:{data:{}, writeRows: number, keyColumns: {}}}} from Template File
+        const w = new Excel.Workbook()
+        w.xlsx.readFile(workBookName)
+        .then(()=>{ 
+            console.log('parsing file')
+            for (const s in templateData) { //for each worksheet
+                const ws = w.getWorksheet(s)
+                let timeSeriesFlag = checkTimeSeriesStatus(ws, promiseData)  //set to 1 if worksheet contains time series data.
+                if (timeSeriesFlag === 1) {
+                    console.log('creating time series worksheet')
+                    writeTimeSeriesSheetSingle(w, ws, s, templateData)
+                } else if (multiSheet !== 'true') {
+                    console.log('creating data point single:')
+                    dataPointSheetSingle(w, ws, s, templateData)
+                } else {
+                    console.log('creating data point multi')
+                    dataPointSheetMulti(w, ws, s, templateData)
+                }
+            }
+            console.log('data Point Complete')
+            // const deleteSheet = w.getWorksheet('Query')
+            // w.removeWorksheet(deleteSheet.id)
+            console.log('writing return file')
+            w.xlsx.writeFile(tempFile)
+            .then(()=>{
+                console.log('sending: ', tempFile)
+                res.status(200).sendFile(tempFile)
+            })
+        })
+
+    // }
+})
+
 export default router

@@ -34,6 +34,7 @@ class WidgetController extends React.Component {
             const p = this.props
             const widgetGroup = widgetObjList.map((el) => {
             const thisWidgetProps = {
+                apiKey: p.apiKey,
                 changeWidgetName: p.changeWidgetName,
                 currentDashBoard: p.currentDashBoard,
                 enableDrag: p.enableDrag,

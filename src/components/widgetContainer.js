@@ -1,5 +1,6 @@
 import React from "react";
 import {widgetLookUp} from '../registers/widgetContainerReg.js'
+import {excelRegister} from '../registers/excelButtonRegister'
 import ToolTip from './../components/toolTip.js'
 import ErrorBoundary from './widgetErrorBoundary';
 
@@ -135,7 +136,6 @@ showWidget(){
     }
 }
 
-
 render() {
     const that = this;
     //Add widgets to the list below that should not have access to the stock search pane
@@ -152,6 +152,7 @@ render() {
     const bodyVisable = {
         display: visStatus,
     }
+    const excelFunction = excelRegister[this.props.widgetList.widgetType]
 
     if (that.props.widgetList.column === 'drag'){ 
     compStyle['position'] = 'absolute'
@@ -229,24 +230,27 @@ render() {
         {/* : <div ref={myRef}></div> */}
         {/* } */}
         <div className="widgetFooter">
-        {this.props.widgetList.showBody !== false ?
-        this.state.showEditPane === 1 ? (
-            <button
-            onClick={() => {
-                if (this.props.stateRef === "stockWidget" || this.props.stateRef === 'marketWidget') {
-                this.props.removeWidget("widgetList", this.props.widgetKey);
-                } else {
-                this.props.menuWidgetToggle(this.props.widgetKey);
-                }
-            }}
-            >
-            <i className="fa fa-times" aria-hidden="true" data-testid={`removeWidget-${this.props.widgetList["widgetType"]}`}></i>
-            </button>
-        ) : (
-            <div style={emptyStyle}></div>
-        )
-        : 
-        <></>}
+        {this.props.widgetList.showBody !== false && this.state.showEditPane === 1 && (
+                <button
+                onClick={() => {
+                    if (this.props.stateRef === "stockWidget" || this.props.stateRef === 'marketWidget') {
+                    this.props.removeWidget("widgetList", this.props.widgetKey);
+                    } else {
+                    this.props.menuWidgetToggle(this.props.widgetKey);
+                    }
+                }}
+                >
+                <i className="fa fa-times" aria-hidden="true" data-testid={`removeWidget-${this.props.widgetList["widgetType"]}`}></i>
+                </button>
+        )}
+
+        {this.props.widgetList.showBody !== false && this.state.showEditPane !== 1 && (
+            excelRegister[this.props.widgetList.widgetType] && (
+                <button onClick={()=>excelFunction(this.props.apiKey, this.props.currentDashBoard, this.props.widgetList.widgetHeader)}>
+                    <i className="fa fa-file-excel-o" aria-hidden="true" data-testid={`excelButton-${this.props.widgetList["widgetType"]}`}></i>
+                </button>
+            )
+        )}
         </div>
     </div>
     );
