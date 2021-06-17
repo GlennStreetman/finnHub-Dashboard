@@ -21,7 +21,7 @@ const getGraphQLData = (reqObj) => {
     //queries mongo database and attached returned data to request obj, then returns.
     return new Promise((resolve, reject) => {
         const getAPIData = `http://localhost:5000/qGraphQL?query=${reqObj.q}`
-        console.log('GETTING', getAPIData)
+        // console.log('GETTING', getAPIData)
         fetch(getAPIData)
         .then((r)=>r.json())
         .then(data=>{
@@ -102,9 +102,9 @@ function getDataSlice(dataObj, queryString){
             const queryStringWithStock = [queryList[0], s, ...queryList.slice(1, queryList.length)] //creates tuple [searchKey, security, datapoint]
             let findData = findByString(dataObj, queryStringWithStock)
             returnObj[s] = findData
-            console.log('HERE------------>', queryStringWithStock, findData)
+            // console.log('HERE------------>', queryStringWithStock, findData)
         } else { //Time series
-            console.log(queryList)
+            // console.log(queryList)
             const timeSeriesSlice = dataObj?.[queryList[0]]?.[s]
             const val = {}
             for (const t in timeSeriesSlice) {
@@ -172,7 +172,7 @@ async function buildTemplateData(promiseData, workBookPath){
 function printTemplateWorksheets(w, worksheetName, worksheetKeys, sourceTemplate){
     //create template copys for each security key if query string multi=true
     // console.log('print', worksheetName)
-    console.log('CREATING SHEETS')
+    // console.log('CREATING SHEETS')
     for (const s of worksheetKeys) {
         let copySheet = w.addWorksheet(`temp`)
         copySheet.model = sourceTemplate.model
@@ -194,10 +194,10 @@ function checkTimeSeriesStatus(ws, promiseData){ //Checks promise data to determ
                     const dataObj = getDataSlice(promiseData, searchString) //could {key: string} pairs OR {key: OBJECT} pairs
                     
                     if (typeof dataObj[Object.keys(dataObj)[0]] === 'object') {
-                        console.log('returning 1', dataObj)
+                        // console.log('returning 1', dataObj)
                         returnFlag = 1
                     }
-                    console.log('----dataObjFlag----:', returnFlag, dataObj)
+                    // console.log('----dataObjFlag----:', returnFlag, dataObj)
                 }
             }
         })
@@ -210,33 +210,33 @@ function writeTimeSeriesSheetSingle(w, ws, s, templateData){
     let rowIterator = 0 //if multiSheet = 'false: add 1 for each line written so that writer doesnt fall out of sync with file.
     const templateWorksheet = templateData[s]
     const addedRows = [] //if multiSheet = 'false: list of rows added to template. Used to adjust any excel formulas as they dont auto update when adding rows.
-    console.log('starting write time series')
+    // console.log('starting write time series')
     for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will add rows = time series count X number of securities.
         const dataRow = templateWorksheet[row].data //list of rows to be updated from template file. 
         const writeRows =  templateWorksheet[row].writeRows //used to create range of rows we need to  update.
         const keyColumns =  templateWorksheet[row].keyColumns //list of key columns for each row. {...integers: integer}
         let currentKey = '' //the current security key
         let currKeyColumn = 0 //ref to the source of current security key
-        console.log('starting write time series2')
+        // console.log('starting write time series2')
         for (let step = 1; step <= writeRows; step++) { //iterate over new rows that data will populate into
             let timeSeriesFlag = 1
             let startRow = 0 //saves the start line for time series data
             let dataRowCount = 0 //number of rows to enter data for time series
-            console.log('starting write time series3')
+            // console.log('starting write time series3')
             for (const updateCell in dataRow) { //{...rowInteger: {...security || key Integer: value || timeSeries{}}}
                 if (keyColumns[updateCell]) {  //update if key column integer. If security this test will fail as security ref is string.
-                    console.log('starting write time series4.1')
+                    // console.log('starting write time series4.1')
                     currentKey = dataRow?.[updateCell]?.[step-1]
                     currKeyColumn = updateCell //Whenever a key value is in a cell update keyColumn. That way multiple keys can exist in the same row.
                     if (dataRow[updateCell][step-1] && typeof dataRow[updateCell][step-1] === 'string') {
-                        console.log('starting write time series4.2')
+                        // console.log('starting write time series4.2')
                         ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][step-1]
                     }
                 } else if (typeof dataRow[updateCell][currentKey] !== 'object') {
-                    console.log('starting write time series4.3') 
+                    // console.log('starting write time series4.3') 
                     if (ws !== undefined) ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][currentKey]
                 } else { 
-                    console.log('starting write time series4.4')
+                    // console.log('starting write time series4.4')
                     const dataGroup = dataRow[updateCell][currentKey]
                     if (timeSeriesFlag === 1) { //only run once.
                         timeSeriesFlag = 2;
@@ -248,7 +248,7 @@ function writeTimeSeriesSheetSingle(w, ws, s, templateData){
                             addedRows.push(newRow)
                         }
                         rowIterator = rowIterator + dataRowCount 
-                        console.log('rowIterator', rowIterator)
+                        // console.log('rowIterator', rowIterator)
                     }
                     for (let d = 0; d < dataRowCount;  d++){ //enter data for column
                         const key = Object.keys(dataGroup)[d]
@@ -415,7 +415,7 @@ router.get('/runTemplate', async (req, res) => {
                 const ws = w.getWorksheet(s)
                 let timeSeriesFlag = checkTimeSeriesStatus(ws, promiseData)  //set to 1 if worksheet contains time series data.
                 if (timeSeriesFlag === 1) {
-                    console.log('creating time series worksheet1')
+                    // console.log('creating time series worksheet1')
                     writeTimeSeriesSheetSingle(w, ws, s, templateData)
                 } else if (multiSheet !== 'true') {
                     console.log('creating data point single')
@@ -471,13 +471,13 @@ router.post('/runTemplate', async (req, res) => {
                 const ws = w.getWorksheet(s)
                 let timeSeriesFlag = checkTimeSeriesStatus(ws, promiseData)  //set to 1 if worksheet contains time series data.
                 if (timeSeriesFlag === 1) {
-                    console.log('creating time series worksheet2')
+                    // console.log('creating time series worksheet2')
                     writeTimeSeriesSheetSingle(w, ws, s, templateData)
                 } else if (multiSheet !== 'true') {
-                    console.log('creating data point single')
+                    // console.log('creating data point single')
                     dataPointSheetSingle(w, ws, s, templateData)
                 } else {
-                    console.log('creating data point multi')
+                    // console.log('creating data point multi')
                     dataPointSheetMulti(w, ws, s, templateData)
                 }
             }
@@ -485,7 +485,7 @@ router.post('/runTemplate', async (req, res) => {
             w.removeWorksheet(deleteSheet.id)
             w.xlsx.writeFile(tempFile)
             .then(()=>{
-                console.log('sending: ', tempFile)
+                // console.log('sending: ', tempFile)
                 res.status(200).sendFile(tempFile)
             })
         })
@@ -496,7 +496,7 @@ router.post('/runTemplate', async (req, res) => {
 router.post('/generateTemplate', async (req, res) => {
     // Post: apiKey, dashboard, widget, columnKeys <--Make this alias if available or key
     const reqData = req.body
-    console.log('reqData', reqData)
+    // console.log('reqData', reqData)
     const apiKey = format('%L', reqData.apiKey)
     const multiSheet = 'false'
     const findUser = `
@@ -566,40 +566,36 @@ router.post('/generateTemplate', async (req, res) => {
     dataRow.commit()
     //  write/overwrite user dataTemplate
     await wn.xlsx.writeFile(workBookName)
-    console.log('file created')
+    // console.log('file created')
     // if (fs.existsSync(workBookPath)) { //if template name provided by get requests exists        
         const promiseList = await buildQueryList(workBookName) //List of promises built from excel templates query sheet
         const promiseData = await Promise.all(promiseList)  //after promises run process promise data {keys: [], data: {}} FROM mongoDB
             .then((res) => {
                 return processPromiseData(res)
         })
-        console.log('promises complete!')
+        // console.log('promises complete!')
         const templateData = await buildTemplateData(promiseData, workBookName) //{...sheetName {...row:{data:{}, writeRows: number, keyColumns: {}}}} from Template File
         const w = new Excel.Workbook()
         w.xlsx.readFile(workBookName)
         .then(()=>{ 
-            console.log('parsing file')
+            // console.log('parsing file')
             for (const s in templateData) { //for each worksheet
                 const ws = w.getWorksheet(s)
                 let timeSeriesFlag = checkTimeSeriesStatus(ws, promiseData)  //set to 1 if worksheet contains time series data.
                 if (timeSeriesFlag === 1) {
-                    console.log('creating time series worksheet3')
+                    // console.log('creating time series worksheet3')
                     writeTimeSeriesSheetSingle(w, ws, s, templateData)
                 } else if (multiSheet !== 'true') {
-                    console.log('creating data point single:')
+                    // console.log('creating data point single:')
                     dataPointSheetSingle(w, ws, s, templateData)
                 } else {
                     console.log('creating data point multi')
                     dataPointSheetMulti(w, ws, s, templateData)
                 }
             }
-            console.log('data Point Complete')
-            // const deleteSheet = w.getWorksheet('Query')
-            // w.removeWorksheet(deleteSheet.id)
-            console.log('writing return file')
             w.xlsx.writeFile(tempFile)
             .then(()=>{
-                console.log('sending: ', tempFile)
+                // console.log('sending: ', tempFile)
                 res.status(200).sendFile(tempFile)
             })
         })

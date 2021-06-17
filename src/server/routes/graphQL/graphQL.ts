@@ -199,10 +199,10 @@ const RootQueryType = new g.GraphQLObjectType({
                             WHERE (apiKey = ${apiKey} OR apialias = ${apiKey})) AND dashboardname = ${dashboardName})
 					AND widgetHeader = ${widget}
                     `
-                    console.log('get widget: ', query)
+                    // console.log('get widget: ', query)
                     try {
                         const returnData = await db.query(query)
-                        console.log('returnData', returnData)
+                        // console.log('returnData', returnData)
                         let dataConfig = JSON.parse(returnData.rows[0].config)
                         if (!dataConfig) dataConfig = {}
                         const findData = {
