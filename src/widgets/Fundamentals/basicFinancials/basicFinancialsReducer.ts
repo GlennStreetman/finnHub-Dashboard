@@ -50,5 +50,6 @@ export function basicFinancialsReducer(data: basicFinancialsData, filters: filte
         let filterPathItems = findByString(data, filters['showsData'][f].split('.'))
         mergeByString(resObj, filters['showsData'][f].split('.'), filterPathItems)
     }
+    console.log('--------------returning basic financials reducer-------------------')
     return resObj
 }

@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
+import { useState, useCallback, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { rBuildVisableData } from '../../../slices/sliceShowData'
@@ -115,6 +115,12 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             },
         }
     ))
+
+    const setTargetSeries = useCallback((el) => {
+        const widgetKey = p.widgetKey
+        const updateFunction = p.updateWidgetConfig
+        updateFunction(widgetKey, { targetSeries: el, })
+    }, [p.widgetKey, p.updateWidgetConfig])
 
     useEffect(() => { //set default series 
         if (seriesList.length > 0 && p.config.targetSeries === '') {
@@ -234,12 +240,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     function setToggleMode(el) {
         p.updateWidgetConfig(p.widgetKey, {
             toggleMode: el,
-        })
-    }
-
-    function setTargetSeries(el) {
-        p.updateWidgetConfig(p.widgetKey, {
-            targetSeries: el,
         })
     }
 
