@@ -11,7 +11,7 @@ export default function basicFinancialsEndPoint(stockList: StockObj[], filters, 
         if (types.reStock.test(stockSymbol) === true && types.finnHubAPI.test(queryString) === true) {
             queryStringObj[key] = (queryString)
         } else {
-            console.log("Failed recommendation trends endpoint Typeguard: ", queryString)
+            console.log("Failed basic financials endpoint Typeguard: ", queryString)
         }
     }
     return queryStringObj

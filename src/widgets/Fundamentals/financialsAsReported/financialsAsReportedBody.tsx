@@ -1,6 +1,7 @@
 import * as React from "react"
 import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
 import { convertCamelToProper } from './../../../appFunctions/stringFunctions'
+import { excelRegister } from '../../../registers/excelButtonRegister'
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { rBuildVisableData } from '../../../slices/sliceShowData'
@@ -25,7 +26,7 @@ interface finnHubFilingObj {
     report: Object,
 }
 
-interface FinnHubAPIData { //rename
+export interface FinnHubAPIData { //rename
     filters: object,
     symbol: string,
     cik: string,
@@ -74,16 +75,10 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         }
     }
 
-    const startingPagination = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
-        if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            return (p.widgetCopy.newsIncrementor)
-        } else { return (0) }
-    }
-
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [stockData, setStockData] = useState(startingstockData());
     const [targetStock, setTargetStock] = useState(startingTargetStock());
-    const [pagination, setPagination] = useState(startingPagination());
+    // const [pagination, setPagination] = useState(startingPagination());
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
@@ -112,7 +107,8 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
             const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
             updateWidgetConfig(key, {
                 metricSource: newSource,
-                targetReport: 'bs'
+                targetReport: 'bs',
+                pagination: 0,
             })
         }
     }, [p.updateWidgetConfig, p.widgetKey, p.trackedStocks, p.apiKey, p.config.metricSource])
@@ -223,8 +219,10 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
 
     function changeIncrememnt(e) {
         console.log('click', e)
-        const newPagination = pagination + e;
-        if (newPagination > -1 && rShowData && newPagination <= Object.keys(rShowData).length - 1) setPagination(newPagination)
+        const newPagination = p.config.pagination + e;
+        if (newPagination > -1 && rShowData && newPagination <= Object.keys(rShowData).length - 1) p.updateWidgetConfig(p.widgetKey, {
+            pagination: newPagination,
+        })
     }
 
     function renderStockData() {
@@ -241,15 +239,21 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                 <option key='cf' value='cf' > Cash Flow </option>
             </>
 
-        const stockDataNode = rShowData ? rShowData[pagination] : []
-
+        const stockDataNode = rShowData ? rShowData[p.config.pagination] : []
+        const excelFunction = excelRegister['FundamentalsFinancialsAsReported']
         const mapstockDataNode = stockDataNode ? Object.entries(stockDataNode).map((el) => {
             const val: any = typeof el[1] !== 'object' ? el[1] :
-                <button onClick={() => console.log('click')}>
+                <button onClick={() => {
+                    excelFunction(
+                        this.props.apiKey,
+                        this.props.currentDashBoard,
+                        this.props.widgetList.widgetHeader,
+                        { ...this.props.widgetList.config, ...{ single: true } })
+                }}>
                     <i className="fa fa-file-excel-o" aria-hidden="true"></i>
                 </button>
             return (
-                <tr key={el + pagination}>
+                <tr key={el + p.config.pagination}>
                     <td>{convertCamelToProper(el[0])}</td>
                     <td>{val}</td>
                 </tr>

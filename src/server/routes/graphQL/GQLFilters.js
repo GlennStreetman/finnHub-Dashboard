@@ -8,6 +8,7 @@ import marketNewsGQLFilter  from "./filters/marketNewsGQLFilters.js";
 import peersGQLFilter  from "./filters/peersGQLFilter.js";
 import secFilingsGQLFilter  from "./filters/secFilingsGQLFilters.js";
 import priceSplitsGQLFilter  from "./filters/priceSplitsGQLFilters.js";
+import financialsAsReportedGQLFilter from './filters/financialsAsReportedGQLFilters.js'
 
 export const filterDict = { //Remember to convert time series data into an object list, time value should be key.
     // PriceCandles: candleWidgetGQLFilter,
@@ -19,7 +20,7 @@ export const filterDict = { //Remember to convert time series data into an objec
     FundamentalsMarketNews: marketNewsGQLFilter,
     // FundamentalsNewsSentiment: newsSentimentGQLFilter,
     FundamentalsPeers: peersGQLFilter,
-    // FundamentalsFinancialsAsReported: financialsAsReportedGQLFilter,
+    FundamentalsFinancialsAsReported: financialsAsReportedGQLFilter,
     FundamentalsSECFilings: secFilingsGQLFilter,
     // FundamentalsIPOCalendar: IPOCalendarGQLFilter,
     EstimatesRecommendationTrends: recommendationTrendsGQLFilter,

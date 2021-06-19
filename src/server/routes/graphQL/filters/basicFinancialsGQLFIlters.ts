@@ -2,7 +2,7 @@ import { FinnHubAPIData } from '../../../../widgets/Fundamentals/basicFinancials
 
 export default function basicFinancialsGQLFilter(data: FinnHubAPIData, config: any = {}) {
     //convert time series list to Object: Keys = period, values = object
-    if (config.toggleMode === 'metrics') {
+    if (config.toggleMode === 'metrics') { //widget Show: dropdown set to metrics
         const resObj = {
             metrics: {},
         }
@@ -14,7 +14,7 @@ export default function basicFinancialsGQLFilter(data: FinnHubAPIData, config: a
         return resObj
     }
 
-    if (config.toggleMode === 'series') {
+    if (config.toggleMode === 'series') { //widget Show: dropdown set to series.
         let resObj = {
             period: [],
             v: [],

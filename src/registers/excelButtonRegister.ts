@@ -8,6 +8,8 @@ import { recTrendExcel } from "../widgets/Estimates/RecommendationTrends/recTren
 import { basicFinancialsExcel } from "../widgets/Fundamentals/basicFinancials/basicFinancialsExcelFunction";
 import { companyNewsExcel } from "../widgets/Fundamentals/companyNews/companyNewsExcelFunction";
 import { companyProfileExcel } from "../widgets/Fundamentals/companyProfile2/companyProfileExcelFunction";
+import { financialsAsReportedSingle } from "../widgets/Fundamentals/financialsAsReported/financialsAsReportedExcelFunction";
+
 
 import { candleExcel } from "../widgets/Price/candles/candleExcelFunction";
 
@@ -23,6 +25,7 @@ export const excelRegister: widgetDictInt = {
     FundamentalsBasicFinancials: basicFinancialsExcel,
     FundamentalsCompanyNews: companyNewsExcel,
     FundamentalsCompanyProfile2: companyProfileExcel,
+    FundamentalsFinancialsAsReported: financialsAsReportedSingle,
 
     PriceCandles: candleExcel,
 }

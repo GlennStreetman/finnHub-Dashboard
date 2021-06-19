@@ -199,10 +199,8 @@ const RootQueryType = new g.GraphQLObjectType({
                             WHERE (apiKey = ${apiKey} OR apialias = ${apiKey})) AND dashboardname = ${dashboardName})
 					AND widgetHeader = ${widget}
                     `
-                    // console.log('get widget: ', query)
                     try {
                         const returnData = await db.query(query)
-                        // console.log('returnData', returnData)
                         let dataConfig = JSON.parse(returnData.rows[0].config)
                         if (!dataConfig) dataConfig = {}
                         const findData = {
@@ -223,7 +221,6 @@ const RootQueryType = new g.GraphQLObjectType({
                                 data.data = filterDict[data.widgetType](data.data, dataConfig)
                             }
                             if (filters) {
-                                // console.log('FILTERING: ', filters)
                                 let newFilter
                                 if (filters.indexOf('*') > -1) {
                                     newFilter = filters.replace(/\./g, String.fromCharCode(92) + `.`)
@@ -232,7 +229,6 @@ const RootQueryType = new g.GraphQLObjectType({
                                 } else {
                                     newFilter = filters
                                 }
-                                // console.log('newFilter', newFilter)
                                 const queryFilteredData = {}
                                 function objRecursive(obj, newObj, path) {
                                     for (const key in obj) {
