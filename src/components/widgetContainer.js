@@ -1,6 +1,6 @@
 import React from "react";
 import {widgetLookUp} from '../registers/widgetContainerReg.js'
-import {excelRegister} from '../registers/excelButtonRegister'
+import {excelRegister, excelRegister_singleSecurity} from '../registers/excelButtonRegister'
 import ToolTip from './../components/toolTip.js'
 import ErrorBoundary from './widgetErrorBoundary';
 
@@ -245,9 +245,19 @@ render() {
         )}
 
         {this.props.widgetList.showBody !== false && this.state.showEditPane !== 1 && (
-            excelRegister[this.props.widgetList.widgetType] && (
-                <button onClick={()=>excelFunction(this.props.apiKey, this.props.currentDashBoard, this.props.widgetList.widgetHeader, this.props.widgetList.config)}>
+
+            excelRegister_singleSecurity[this.props.widgetList.widgetType] && ( //button returns data for target securities associated with widget.
+                <button onClick={()=>excelFunction(this.props.apiKey, this.props.currentDashBoard, this.props.widgetList.widgetHeader, this.props.widgetList.config.targetSecurity)}>
                     <i className="fa fa-file-excel-o" aria-hidden="true" data-testid={`excelButton-${this.props.widgetList["widgetType"]}`}></i>
+                </button>
+            )
+        )}
+
+        {this.props.widgetList.showBody !== false && this.state.showEditPane !== 1 && (
+
+            excelRegister[this.props.widgetList.widgetType] && ( //button returns data for all securities associated with widget.
+                <button onClick={()=>excelFunction(this.props.apiKey, this.props.currentDashBoard, this.props.widgetList.widgetHeader)}>
+                    <i className="fa fa-list" aria-hidden="true" data-testid={`excelButton-${this.props.widgetList["widgetType"]}`}></i>
                 </button>
             )
         )}
@@ -258,3 +268,5 @@ render() {
 }
 
 export default WidgetContainer;
+
+

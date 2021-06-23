@@ -63,7 +63,11 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
             if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
                 const targetStock = p.widgetCopy.targetStock
                 return (targetStock)
-            } else { return ('') }
+            } else if (p?.config?.targetSecurity) {
+                return (p?.config?.targetSecurity)
+            } else {
+                return ('')
+            }
         }
     }
 
@@ -103,15 +107,16 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
 
     useEffect((key: number = p.widgetKey, trackedStock = p.trackedStocks, keyList: string[] = Object.keys(p.trackedStocks), updateWidgetConfig: Function = p.updateWidgetConfig) => {
         //Setup default metric source if none selected.
-        if (p.config.metricSource === undefined) {
+        if (p.config.targetSecurity === undefined) {
             const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
             updateWidgetConfig(key, {
-                metricSource: newSource,
+                targetSecurity: newSource,
                 targetReport: 'bs',
                 pagination: 0,
+                year: rShowData ? rShowData[0]['year'] : ''
             })
         }
-    }, [p.updateWidgetConfig, p.widgetKey, p.trackedStocks, p.apiKey, p.config.metricSource])
+    }, [p.updateWidgetConfig, rShowData, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
 
     useEffect(() => {
         //On mount, use widget copy, else build visable data.
@@ -122,7 +127,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
             if (isInitialMount.current === true) { isInitialMount.current = false }
             let filterObj = {}
             filterObj[targetStock] = {
-                metricSource: targetStock,
+                targetSecurity: targetStock,
                 targetReport: p.config.targetReport ? p.config.targetReport : 'bs',
                 widgetType: 'FundamentalsFinancialsAsReported'
             }
@@ -134,7 +139,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
             }
             dispatch(rBuildVisableData(payload))
         }
-    }, [targetStock, p.widgetKey, widgetCopy, dispatch, p.config.metricSource, p.config.targetReport])
+    }, [targetStock, p.widgetKey, widgetCopy, dispatch, p.config.targetSecurity, p.config.targetReport])
 
     useEffect(() => {
         //DELETE IF NO TARGET STOCK
@@ -146,8 +151,24 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     }, [p.trackedStocks, targetStock])
 
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) } else { setStockData([]) }
+        if (isFinnHubData(rShowData) === true) {
+            setStockData(rShowData)
+        } else {
+            setStockData([])
+        }
     }, [rShowData])
+
+    useEffect(() => { //set default year if blank.
+        const pagVal = p.config.pagination
+        if (p.config.year === '' && rShowData?.[pagVal]['year']) {
+            const key = p.widgetKey
+            let updateConfig = p.updateWidgetConfig
+            updateConfig(key, {
+                year: rShowData?.[pagVal]['year']
+            })
+        }
+
+    }, [rShowData, p.key, p.config.year, p.config.pagination, p.updateWidgetConfig, p.widgetKey])
 
     useEffect(() => { //on change to targetSecurity update widget focus
         if (p.targetSecurity !== '') {
@@ -203,7 +224,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         const key = `${p.widgetKey}-${target}`
         setTargetStock(target)
         p.updateWidgetConfig(p.widgetKey, {
-            metricSource: target,
+            targetSecurity: target,
         })
         dispatch(tSearchMongoDB([key]))
     }
@@ -218,11 +239,13 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     }
 
     function changeIncrememnt(e) {
-        console.log('click', e)
         const newPagination = p.config.pagination + e;
-        if (newPagination > -1 && rShowData && newPagination <= Object.keys(rShowData).length - 1) p.updateWidgetConfig(p.widgetKey, {
-            pagination: newPagination,
-        })
+        if (newPagination > -1 && rShowData && newPagination <= Object.keys(rShowData).length - 1) {
+            p.updateWidgetConfig(p.widgetKey, {
+                pagination: newPagination,
+                year: rShowData[newPagination]['year']
+            })
+        }
     }
 
     function renderStockData() {
@@ -242,22 +265,25 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         const stockDataNode = rShowData ? rShowData[p.config.pagination] : []
         const excelFunction = excelRegister['FundamentalsFinancialsAsReported']
         const mapstockDataNode = stockDataNode ? Object.entries(stockDataNode).map((el) => {
-            const val: any = typeof el[1] !== 'object' ? el[1] :
-                <button onClick={() => {
-                    excelFunction(
-                        this.props.apiKey,
-                        this.props.currentDashBoard,
-                        this.props.widgetList.widgetHeader,
-                        { ...this.props.widgetList.config, ...{ single: true } })
-                }}>
-                    <i className="fa fa-file-excel-o" aria-hidden="true"></i>
-                </button>
-            return (
-                <tr key={el + p.config.pagination}>
-                    <td>{convertCamelToProper(el[0])}</td>
-                    <td>{val}</td>
-                </tr>
-            )
+            if (el[0] !== 'report') {
+                const val: any = typeof el[1] !== 'object' ? el[1] : <></>
+                // <button onClick={() => {
+                //     excelFunction(
+                //         p.apiKey,
+                //         p.currentDashBoard,
+                //         p.widgetHeader,
+                //         p.config.targetSecurity
+                //     )
+                // }}>
+                //     <i className="fa fa-file-excel-o" aria-hidden="true"></i>
+                // </button>
+                return (
+                    <tr key={el + p.config.pagination}>
+                        <td>{convertCamelToProper(el[0])}</td>
+                        <td>{val}</td>
+                    </tr>
+                )
+            }
         }) : <></>
         const stockTable =
             <>
@@ -311,17 +337,19 @@ export default forwardRef(FundamentalsFinancialsAsReported)
 export function financialsAsReportedProps(that, key = "newWidgetNameProps") {
     let propList = {
         apiKey: that.props.apiKey,
+        currentDashBoard: that.props.currentDashBoard,
         defaultExchange: that.props.defaultExchange,
         exchangeList: that.props.exchangeList,
         filters: that.props.widgetList[key]["filters"],
         showPane: that.showPane,
+        targetSecurity: that.props.targetSecurity,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         updateDefaultExchange: that.props.updateDefaultExchange,
         updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         updateWidgetConfig: that.props.updateWidgetConfig,
         widgetKey: key,
-        targetSecurity: that.props.targetSecurity,
+        widgetHeader: that.props.widgetList[key].widgetHeader
     };
     return propList;
 }

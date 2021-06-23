@@ -45,8 +45,10 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
             if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
                 const stockData = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
                 return (stockData)
+            } else if (p?.config?.targetSecurity) {
+                return (p?.config?.targetSecurity)
             } else {
-                return ([])
+                return ('')
             }
         }
     }
@@ -234,6 +236,9 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
         const target = e.target.value;
         const key = `${p.widgetKey}-${target}`
         setTargetStock(target)
+        p.updateWidgetConfig(p.widgetKey, {
+            targetSecurity: target,
+        })
         dispatch(tSearchMongoDB([key]))
     }
 

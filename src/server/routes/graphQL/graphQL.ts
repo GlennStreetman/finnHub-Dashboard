@@ -161,16 +161,14 @@ const RootQueryType = new g.GraphQLObjectType({
                     Do not add extra spaces between commas.
                     Example: "US-AAPL,US-MSFT,US-TSLA".
                 ` },
-                filters: {
-                    type: g.GraphQLString, description: `
-                    Optional: Reduce data returned from 
-                    data return field down to headings included 
-                    in provided list.
-                    `
-                },
+                // visable: {
+                //     type: g.GraphQLString, description: `
+                //     Optional: Filter results to only show visable data from widget.
+                // ` },
             },
             type: g.GraphQLList(widget),
             resolve: (parrent, args) => {
+                console.log('args:', args)
                 return new Promise(async (res, rej) => {
                     const apiKey = format('%L', args.key)
                     const dashboardName = format('%L', args.dashboard).toUpperCase()
@@ -185,7 +183,7 @@ const RootQueryType = new g.GraphQLObjectType({
                         return returnList
                     }
                     const security = args.security ? securityList() : false
-                    const filters = args.security ? args.filters : false
+                    // const filters = args.security ? args.filters : false
                     const query = `
                     SELECT w.widgetID, u.id, w.widgettype, w.config
                     FROM widgets w
@@ -199,8 +197,10 @@ const RootQueryType = new g.GraphQLObjectType({
                             WHERE (apiKey = ${apiKey} OR apialias = ${apiKey})) AND dashboardname = ${dashboardName})
 					AND widgetHeader = ${widget}
                     `
+                    // console.log(query)
                     try {
                         const returnData = await db.query(query)
+                        // console.log('returnData:', returnData)
                         let dataConfig = JSON.parse(returnData.rows[0].config)
                         if (!dataConfig) dataConfig = {}
                         const findData = {
@@ -218,36 +218,7 @@ const RootQueryType = new g.GraphQLObjectType({
                         const resList: Object[] = []
                         await findDataSet.forEach((data: finnHubData) => {
                             if (filterDict[data.widgetType]) {//if finnHub API data needs to be filtered or reformated
-                                data.data = filterDict[data.widgetType](data.data, dataConfig)
-                            }
-                            if (filters) {
-                                let newFilter
-                                if (filters.indexOf('*') > -1) {
-                                    newFilter = filters.replace(/\./g, String.fromCharCode(92) + `.`)
-                                    // console.log(newFilter)
-                                    newFilter = new RegExp(newFilter.replace(/[*]/g, '.*?'))
-                                } else {
-                                    newFilter = filters
-                                }
-                                const queryFilteredData = {}
-                                function objRecursive(obj, newObj, path) {
-                                    for (const key in obj) {
-                                        if (typeof obj[key] === "object" && obj[key] !== null) {
-                                            const newObj = {}
-                                            queryFilteredData[key] = newObj
-                                            objRecursive(obj[key], newObj, `${path}${key}.`)
-                                        } else {
-                                            if (newFilter instanceof RegExp) {
-                                                if (newFilter.test(`${path}${key}`) === true) { newObj[key] = obj[key] }
-                                            } else {
-                                                // console.log(newFilter, `${path}${key}`, newFilter === `${path}${key}`)
-                                                if (newFilter === `${path}${key}`) { newObj[key] = obj[key] }
-                                            }
-                                        }
-                                    }
-                                }
-                                objRecursive(data.data, queryFilteredData, '')
-                                data.data = queryFilteredData
+                                data.data = filterDict[data.widgetType](data?.data, dataConfig)
                             }
                             data.widgetType = widgetType
                             resList.push(data)

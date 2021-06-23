@@ -1,4 +1,4 @@
-export const nameExcel = function (apiKey, currentDashBoard, widgetHeader) {
+export const nameExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
     const data = { 
         apiKey: apiKey,
         dashboard: currentDashBoard,
@@ -10,7 +10,8 @@ export const nameExcel = function (apiKey, currentDashBoard, widgetHeader) {
             { Low: 'l' }, 
             { Close: 'c' }] 
     };
-    console.log('data', data)
+    
+    if (security) data.security = security
     const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },

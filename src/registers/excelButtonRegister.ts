@@ -8,7 +8,7 @@ import { recTrendExcel } from "../widgets/Estimates/RecommendationTrends/recTren
 import { basicFinancialsExcel } from "../widgets/Fundamentals/basicFinancials/basicFinancialsExcelFunction";
 import { companyNewsExcel } from "../widgets/Fundamentals/companyNews/companyNewsExcelFunction";
 import { companyProfileExcel } from "../widgets/Fundamentals/companyProfile2/companyProfileExcelFunction";
-import { financialsAsReportedSingle } from "../widgets/Fundamentals/financialsAsReported/financialsAsReportedExcelFunction";
+import { financialsAsReportedExcel } from "../widgets/Fundamentals/financialsAsReported/financialsAsReportedExcelFunction";
 
 
 import { candleExcel } from "../widgets/Price/candles/candleExcelFunction";
@@ -25,7 +25,19 @@ export const excelRegister: widgetDictInt = {
     FundamentalsBasicFinancials: basicFinancialsExcel,
     FundamentalsCompanyNews: companyNewsExcel,
     FundamentalsCompanyProfile2: companyProfileExcel,
-    FundamentalsFinancialsAsReported: financialsAsReportedSingle,
+    FundamentalsFinancialsAsReported: financialsAsReportedExcel,
+
+    PriceCandles: candleExcel,
+}
+
+export const excelRegister_singleSecurity: widgetDictInt = {
+    EstimatesEarningsCalendar: EarningsCalendarExcelFunction,
+    EstimatesEPSSurprises: epsSuprisesExcel,
+    EstimatesPriceTarget: priceTargetExcel,
+    EstimatesRecommendationTrends: recTrendExcel,
+    FundamentalsCompanyNews: companyNewsExcel,
+    FundamentalsCompanyProfile2: companyProfileExcel,
+    FundamentalsFinancialsAsReported: financialsAsReportedExcel,
 
     PriceCandles: candleExcel,
 }

@@ -1,4 +1,4 @@
-export const EarningsCalendarExcelFunction = function (apiKey, currentDashBoard, widgetHeader) {
+export const EarningsCalendarExcelFunction = function (apiKey, currentDashBoard, widgetHeader, security) {
     const data = { 
         apiKey: apiKey,
         dashboard: currentDashBoard,
@@ -15,12 +15,15 @@ export const EarningsCalendarExcelFunction = function (apiKey, currentDashBoard,
             { Year: 'year' },
         ]
     };
-    console.log('data', data)
+
+    if (security) data.security = security
+
     const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
     };
+    
 
     fetch("/generateTemplate", options)
         .then(response => response.blob())

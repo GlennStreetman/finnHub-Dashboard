@@ -20,8 +20,9 @@ const router = express.Router();
 const getGraphQLData = (reqObj) => {
     //queries mongo database and attached returned data to request obj, then returns.
     return new Promise((resolve, reject) => {
-        const getAPIData = `http://localhost:5000/qGraphQL?query=${reqObj.q}`
-        // console.log('GETTING', getAPIData)
+        let queryParams = reqObj.q
+        const getAPIData = `http://localhost:5000/qGraphQL?query=${queryParams}`
+        console.log('getAPIData', getAPIData)
         fetch(getAPIData)
         .then((r)=>r.json())
         .then(data=>{
@@ -46,8 +47,8 @@ const buildQueryList = (path) => {
         if (queryList[q][0] && queryList[q][0] !== '') {
             // console.log('pushing', queryList[q][0] )
             returnList.push(getGraphQLData({
-                n: queryList[q][0],
-                q: queryList[q][1],
+                n: queryList[q][0], //data name
+                q: queryList[q][1], //query string
             }))
         }
     }
@@ -518,10 +519,14 @@ router.post('/generateTemplate', async (req, res) => {
     const wn = new Excel.Workbook()
     //Query sheet templating
     const querySheet = wn.addWorksheet('Query') //build query worksheet
-    
+    console.log('reqData', reqData)
+    let security =  reqData.security ? `security: "${reqData.security}"` : ''
+    let visable =  reqData.visable ? `visable: "${reqData.visable}"` : ''
+    console.log('reducers', `{widget(key: "${reqData.apiKey}" dashboard: "${reqData.dashboard}" widget: "${reqData.widget}" ${security} ${visable} ) {security, data}}`)
+
     let queryRow = querySheet.getRow(1)
     queryRow.getCell(1).value = 'dataName'
-    queryRow.getCell(2).value = `{widget(key: "${reqData.apiKey}" dashboard: "${reqData.dashboard}" widget: "${reqData.widget}") {security, data}}`
+    queryRow.getCell(2).value = `{widget(key: "${reqData.apiKey}" dashboard: "${reqData.dashboard}" widget: "${reqData.widget}" ${security} ${visable} ) {security, data}}`
     queryRow.getCell(3).value = '***ADD Columns A and B to the "Query" worksheet when designing custom excel templates***'
     queryRow.getCell(3).font = {bold: true}
     queryRow.commit()
@@ -567,12 +572,13 @@ router.post('/generateTemplate', async (req, res) => {
     //  write/overwrite user dataTemplate
     await wn.xlsx.writeFile(workBookName)
     // console.log('file created')
-    // if (fs.existsSync(workBookPath)) { //if template name provided by get requests exists        
-        const promiseList = await buildQueryList(workBookName) //List of promises built from excel templates query sheet
+    // if (fs.existsSync(workBookPath)) { //if template name provided by get requests exists       
+        const promiseList = await buildQueryList(workBookName, reqData.reducers) //List of promises built from excel templates query sheet
         const promiseData = await Promise.all(promiseList)  //after promises run process promise data {keys: [], data: {}} FROM mongoDB
             .then((res) => {
                 return processPromiseData(res)
         })
+        
         // console.log('promises complete!')
         const templateData = await buildTemplateData(promiseData, workBookName) //{...sheetName {...row:{data:{}, writeRows: number, keyColumns: {}}}} from Template File
         const w = new Excel.Workbook()
@@ -583,13 +589,10 @@ router.post('/generateTemplate', async (req, res) => {
                 const ws = w.getWorksheet(s)
                 let timeSeriesFlag = checkTimeSeriesStatus(ws, promiseData)  //set to 1 if worksheet contains time series data.
                 if (timeSeriesFlag === 1) {
-                    // console.log('creating time series worksheet3')
                     writeTimeSeriesSheetSingle(w, ws, s, templateData)
                 } else if (multiSheet !== 'true') {
-                    // console.log('creating data point single:')
                     dataPointSheetSingle(w, ws, s, templateData)
                 } else {
-                    console.log('creating data point multi')
                     dataPointSheetMulti(w, ws, s, templateData)
                 }
             }
