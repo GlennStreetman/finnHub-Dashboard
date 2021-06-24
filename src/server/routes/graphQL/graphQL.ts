@@ -168,7 +168,6 @@ const RootQueryType = new g.GraphQLObjectType({
             },
             type: g.GraphQLList(widget),
             resolve: (parrent, args) => {
-                console.log('args:', args)
                 return new Promise(async (res, rej) => {
                     const apiKey = format('%L', args.key)
                     const dashboardName = format('%L', args.dashboard).toUpperCase()
