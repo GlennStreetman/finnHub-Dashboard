@@ -1,6 +1,7 @@
 import express from 'express';
 import appRootPath from 'app-root-path'
 import fs from 'fs';
+import { makeTempDir } from './runTemplate'
 
 const router = express.Router();
 
@@ -14,9 +15,6 @@ interface uploadTemplatePost extends Request {
     files: any
 }
 
-// interface resObj {
-//     message: Text,
-// }
 
 router.get('/uploadTemplate', (req: uploadTemplatePost, res: any) => {
     if (req.session.login === true) {
@@ -38,9 +36,15 @@ router.get('/uploadTemplate', (req: uploadTemplatePost, res: any) => {
     }
 })
 
-router.post("/uploadTemplate", (req: uploadTemplatePost, res: any) => {
+router.post("/uploadTemplate", async (req: uploadTemplatePost, res: any) => {
     if (req.session.login === true) {
-        const subFolder = req.session.uID
+        const userID = req.session.uID
+
+        const uploadsFolder = `${appRootPath}/uploads/`
+        const tempFolder = `${appRootPath}/uploads/${userID}/`
+        await makeTempDir(uploadsFolder)
+        await makeTempDir(tempFolder)
+
         try {
             if (!req.files) {
                 res.status(500).send({
@@ -48,13 +52,10 @@ router.post("/uploadTemplate", (req: uploadTemplatePost, res: any) => {
                     message: 'No file uploaded'
                 });
             } else {
-                console.log('1', req.files)
                 let uploadFile = req.files.file;
-                console.log('2', uploadFile.name)
                 const uploadName = uploadFile.name.replace('xlsx', '.xlsx').replace('xlsm', '.xlsm')
-                console.log('3', uploadName)
                 if (uploadName.includes('.xlsx') || uploadName.includes('.xlsm')) {
-                    uploadFile.mv(`./uploads/${subFolder}/${uploadFile.name.replace('xlsx', '.xlsx').replace('xlsm', '.xlsm')}`);
+                    uploadFile.mv(`./uploads/${userID}/${uploadFile.name.replace('xlsx', '.xlsx').replace('xlsm', '.xlsm')}`);
                 }
                 res.status(200).send({
                     message: 'File is uploaded',

@@ -115,7 +115,7 @@ function getDataSlice(dataObj, queryString){
     return returnObj
 }
 
-function makeTempDir(tempPath){
+export function makeTempDir(tempPath){
     console.log('make path:', tempPath)
     if (!fs.existsSync(tempPath)) {
         fs.mkdir(tempPath, (err) => {
@@ -394,11 +394,13 @@ router.get('/runTemplate', async (req, res) => { //run user configured excel tem
     const userRows = await db.query(findUser)
     const user = userRows?.rows?.[0]?.id
     const workBookPath = `${appRootPath}/uploads/${user}/${req.query.template}`
+    const uploadsFolder = `${appRootPath}/uploads/`
     const tempFolder = `${appRootPath}/uploads/${user}/`
     const tempPath = `${appRootPath}/uploads/${user}/temp/`
     const trimFileName = req.query.template.slice(0, req.query.template.indexOf('.xls'))
     const tempFile = `${appRootPath}/uploads/${user}/temp/${trimFileName}${Date.now()}.xlsx`
 
+    await makeTempDir(uploadsFolder)
     await makeTempDir(tempFolder)
     await makeTempDir(tempPath)    
 
@@ -449,8 +451,10 @@ router.post('/generateTemplate', async (req, res) => { //create and process widg
 
     const workBookPath = `${appRootPath}/uploads/${user}/temp/excelTemplate${Date.now()}`
     const workBookName = workBookPath + '.xlsx'
+    const uploadsFolder = `${appRootPath}/uploads/`
     const tempFolder = `${appRootPath}/uploads/${user}/`
     const tempPath = `${appRootPath}/uploads/${user}/temp/`
+    await makeTempDir(uploadsFolder)
     await makeTempDir(tempFolder)
     await makeTempDir(tempPath) 
     const trimFileName = 'excelTemplateReturnFile'
