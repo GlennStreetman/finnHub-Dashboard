@@ -12,7 +12,7 @@ import fetch from 'node-fetch';
 import dbLive from "../../db/databaseLive.js"
 import devDB from "../../db/databaseLocalPG.js"
 
-
+const rootURL = process.env.live === '1' ? `https://finn-dash.herokuapp.com` : `http://localhost:5000`
 const db = process.env.live === "1" ? dbLive : devDB;
 
 const router = express.Router();
@@ -21,7 +21,7 @@ const getGraphQLData = (reqObj) => {
     //queries mongo database and attached returned data to request obj, then returns.
     return new Promise((resolve, reject) => {
         let queryParams = reqObj.q
-        const getAPIData = `http://localhost:5000/qGraphQL?query=${queryParams}`
+        const getAPIData = `${rootURL}/qGraphQL?query=${queryParams}`
         console.log('getAPIData', getAPIData)
         fetch(getAPIData)
         .then((r)=>r.json())
