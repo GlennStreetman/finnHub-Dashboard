@@ -123,6 +123,7 @@ function makeTempDir(tempPath){
             }
         })
     }
+    return true
 }
 
 async function buildTemplateData(promiseData, workBookPath){
@@ -392,12 +393,15 @@ router.get('/runTemplate', async (req, res) => { //run user configured excel tem
     const userRows = await db.query(findUser)
     const user = userRows?.rows?.[0]?.id
     const workBookPath = `${appRootPath}/uploads/${user}/${req.query.template}`
+    const tempFolder = `${appRootPath}/uploads/${user}/`
     const tempPath = `${appRootPath}/uploads/${user}/temp/`
     const trimFileName = req.query.template.slice(0, req.query.template.indexOf('.xls'))
     const tempFile = `${appRootPath}/uploads/${user}/temp/${trimFileName}${Date.now()}.xlsx`
 
+    await makeTempDir(tempFolder)
+    await makeTempDir(tempPath)    
+
     if (fs.existsSync(workBookPath)) { //if template name provided by get requests exists
-        makeTempDir(tempPath) //make temp directory for user if it doesnt already exist.        
         const promiseList = await buildQueryList(workBookPath) //List of promises built from excel templates query sheet
         const promiseData = await Promise.all(promiseList)  //after promises run process promise data {keys: [], data: {}} FROM mongoDB
             .then((res) => {
@@ -429,6 +433,7 @@ router.get('/runTemplate', async (req, res) => { //run user configured excel tem
 
 router.post('/generateTemplate', async (req, res) => { //create and process widget derived template.
     // Post: apiKey, dashboard, widget, columnKeys <--Make this alias if available or key
+    console.log('/generateTemplate')
     const reqData = req.body
     const apiKey = format('%L', reqData.apiKey)
     const multiSheet = 'false'
@@ -443,8 +448,10 @@ router.post('/generateTemplate', async (req, res) => { //create and process widg
 
     const workBookPath = `${appRootPath}/uploads/${user}/temp/excelTemplate${Date.now()}`
     const workBookName = workBookPath + '.xlsx'
+    const tempFolder = `${appRootPath}/uploads/${user}/`
     const tempPath = `${appRootPath}/uploads/${user}/temp/`
-    makeTempDir(tempPath) //make temp directory for user if it doesnt already exist.
+    await makeTempDir(tempFolder)
+    await makeTempDir(tempPath) 
     const trimFileName = 'excelTemplateReturnFile'
     const tempFile = `${appRootPath}/uploads/${user}/temp/${trimFileName}${Date.now()}.xlsx`
 
@@ -453,7 +460,7 @@ router.post('/generateTemplate', async (req, res) => { //create and process widg
     const querySheet = wn.addWorksheet('Query') //build query worksheet
     let security =  reqData.security ? `security: "${reqData.security}"` : ''
     let visable =  reqData.visable ? `visable: "${reqData.visable}"` : ''
-    console.log('reducers', `{widget(key: "${reqData.apiKey}" dashboard: "${reqData.dashboard}" widget: "${reqData.widget}" ${security} ${visable} ) {security, data}}`)
+    // console.log('reducers', `{widget(key: "${reqData.apiKey}" dashboard: "${reqData.dashboard}" widget: "${reqData.widget}" ${security} ${visable} ) {security, data}}`)
 
     let queryRow = querySheet.getRow(1)
     queryRow.getCell(1).value = 'dataName'
