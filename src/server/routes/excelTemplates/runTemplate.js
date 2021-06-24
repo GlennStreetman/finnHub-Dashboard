@@ -12,7 +12,7 @@ import fetch from 'node-fetch';
 import dbLive from "../../db/databaseLive.js"
 import devDB from "../../db/databaseLocalPG.js"
 
-const rootURL = process.env.live === '1' ? `https://finn-dash.herokuapp.com` : `http://localhost:5000`
+const rootURL = process.env.live === '1' ? process.env.deployURL : process.env.testURL
 const db = process.env.live === "1" ? dbLive : devDB;
 
 const router = express.Router();

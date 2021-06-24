@@ -8,7 +8,7 @@ import mGun from 'mailgun-js'
 
 const router = express.Router();
 const db = process.env.live === "1" ? dbLive : devDB;
-const URL = process.env.live === '1' ? `https://finn-dash.herokuapp.com` : `http://localhost:5000`
+const URL = process.env.live === '1' ? process.env.deployURL : process.env.testURL
 
 const API_KEY = process.env.API_KEY || 1;
 const DOMAIN = process.env.DOMAIN_KEY || 1;

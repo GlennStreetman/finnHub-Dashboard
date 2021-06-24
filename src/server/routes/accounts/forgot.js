@@ -10,7 +10,7 @@ const db = process.env.live === "1" ? dbLive : devDB;
 const API_KEY = process.env.API_KEY || 1;
 const DOMAIN = process.env.DOMAIN_KEY || 1;
 const mailgun = new mGun({ apiKey: API_KEY, domain: DOMAIN });
-const URL = process.env.live === '1' ? `https://finn-dash.herokuapp.com` : `http://localhost:5000`
+const URL = process.env.live === '1' ? process.env.deployURL : process.env.testURL
 
 router.get("/forgot", (req, res, next) => {
     console.log("reseting password")

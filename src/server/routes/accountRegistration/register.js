@@ -6,7 +6,7 @@ import dbLive from '../../db/databaseLive.js';
 import devDB from "../../db/databaseLocalPG.js";
 import mailgun from "mailgun-js";
 
-const URL = process.env.live === "1" ? `https://finn-dash.herokuapp.com` : `http://localhost:5000`;
+const URL = process.env.live === "1" ? process.env.deployURL : process.env.testURL;
 const db = process.env.live === "1" ? dbLive : devDB;
 
 const router = express.Router();
