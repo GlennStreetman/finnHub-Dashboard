@@ -1,7 +1,7 @@
 import express from 'express';
 import appRootPath from 'app-root-path'
 import fs from 'fs';
-import { makeTempDir } from './runTemplate'
+import { makeTempDir } from './runTemplate.js'
 
 const router = express.Router();
 
