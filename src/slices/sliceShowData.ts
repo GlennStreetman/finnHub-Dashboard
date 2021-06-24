@@ -30,6 +30,7 @@ const initialState: sliceShowData = {
     targetDashboard: '',
 }
 
+
 export interface rBuildVisableDataPayload {
     key: string, //widget Key
     securityList: string[], //list of securities
@@ -75,7 +76,7 @@ const showData = createSlice({
             // return {...state}
         },
         [tGetFinnhubData.fulfilled.toString()]: (state, action) => {
-            // console.log('tGetFinnhubData')
+            // console.log('tGetFinnhubData', action.payload)
             const ap: resObj = action.payload
             for (const x in ap) {
                 if (ap[x].dashboard === state.targetDashboard) {
@@ -87,6 +88,7 @@ const showData = createSlice({
                         if (secObj.filters) { //IF FILTERS NEED TO BE APPLYIED TO REFORMAT DATA.
                             let widgetType = secObj.filters['widgetType']
                             let filteredDataFunc = widgetReducers[widgetType]
+                            // console.log('filteredDataFunc', filteredDataFunc)
                             let filteredData = filteredDataFunc(data, secObj.filters)
                             filteredData.filters = secObj.filters
                             state.dataSet[widgetRef][security] = filteredData
@@ -106,7 +108,7 @@ const showData = createSlice({
             // return {...state}
         },
         [tGetMongoDB.fulfilled.toString()]: (state, action) => {
-            // console.log('tGetMongoDB')
+            // console.log('tGetMongoDB', action.payload)
             const ap: any = action.payload
             for (const x in ap) { //FOR 'DB-WIdget-security' key
                 if (ap[x].dashboard === state.targetDashboard) { //if returned data should be visable
@@ -118,6 +120,7 @@ const showData = createSlice({
                         if (secObj.filters) { //IF FILTERS NEED TO BE APPLYIED TO REFORMAT DATA.
                             let widgetType = secObj.filters['widgetType']
                             let filteredDataFunc = widgetReducers[widgetType]
+                            //console.log('filteredDataFunc', widgetType, filteredDataFunc)
                             let filteredData = filteredDataFunc(data, secObj.filters)
                             filteredData.filters = secObj.filters
                             state.dataSet[widgetRef][security] = filteredData
@@ -137,7 +140,7 @@ const showData = createSlice({
             // return {...state}
         },
         [tSearchMongoDB.fulfilled.toString()]: (state, action) => {
-            // console.log('tSearchMongoDB')
+            // console.log('tSearchMongoDB', action.payload)
             const ap: any = action.payload
             for (const x in ap) {
                 const widgetRef: string = ap[x].widget
@@ -148,6 +151,7 @@ const showData = createSlice({
                     if (secObj.filters) { //IF FILTERS NEED TO BE APPLYIED TO REFORMAT DATA.
                         let widgetType = secObj.filters['widgetType']
                         let filteredDataFunc = widgetReducers[widgetType]
+                        //console.log('filteredDataFunc', widgetType, filteredDataFunc)
                         let filteredData = filteredDataFunc(data, secObj.filters)
                         filteredData.filters = secObj.filters
                         state.dataSet[widgetRef][security] = filteredData

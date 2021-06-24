@@ -1,13 +1,18 @@
-export const epsSuprisesExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
+export const marketNewsExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
     const data = { 
         apiKey: apiKey,
         dashboard: currentDashBoard,
         widget: widgetHeader,
         columnKeys: [ //<-- DEFINE Column headers and finnHub data keys.
-            { Actual: 'actual' }, 
-            { Estimate: 'estimate' }, 
-            { Period: 'period' }, 
-            { Symbol: 'symbol' }, ] 
+            { Category: 'category' }, 
+            { 'Date Time': 'datetime' }, 
+            { ID: 'id' }, 
+            { Image: 'image' }, 
+            { Related: 'related' },
+            { Source: 'source' },
+            { Summary: 'summary' },
+            { URL: 'url' },
+        ] 
     };
     
     if (security) data.security = security

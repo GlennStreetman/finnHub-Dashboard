@@ -65,7 +65,11 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
             if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
                 const targetStock = p.widgetCopy.targetStock
                 return (targetStock)
-            } else { return ('') }
+            } else if (p?.config?.targetSecurity) {
+                return (p?.config?.targetSecurity)
+            } else {
+                return ('')
+            }
         }
     }
 
@@ -105,6 +109,16 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
             },
         }
     ))
+
+    useEffect((key: number = p.widgetKey, trackedStock = p.trackedStocks, keyList: string[] = Object.keys(p.trackedStocks), updateWidgetConfig: Function = p.updateWidgetConfig) => {
+        //Setup default metric source if none selected.
+        if (p.config.targetSecurity === undefined) {
+            const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
+            updateWidgetConfig(key, {
+                targetSecurity: newSource,
+            })
+        }
+    }, [p.updateWidgetConfig, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
 
     useEffect(() => {
         //On mount, use widget copy, else build visable data.
@@ -247,6 +261,9 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
         const target = e.target.value;
         const key = `${p.widgetKey}-${target}`
         setTargetStock(target)
+        p.updateWidgetConfig(p.widgetKey, {
+            targetSecurity: target,
+        })
         dispatch(tSearchMongoDB([key]))
     }
 
@@ -304,6 +321,7 @@ export function recommendationTrendsProps(that, key = "newWidgetNameProps") {
         updateDefaultExchange: that.props.updateDefaultExchange,
         updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
+        updateWidgetConfig: that.props.updateWidgetConfig,
         widgetKey: key,
         targetSecurity: that.props.targetSecurity,
     };

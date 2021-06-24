@@ -8,7 +8,8 @@ import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
-interface FinnHubAPIData {
+export interface FinnHubAPIData {
+    date: string,
     exchange: string,
     name: string,
     numberOfShares: number,
@@ -181,7 +182,6 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
 
     function changeIncrement(e) {
         const newIncrement = paginationInt + e;
-        console.log("new pagination", newIncrement)
         if (newIncrement > -1 && newIncrement < stockData.ipoCalendar.length) setPaginationInt(newIncrement)
     }
 

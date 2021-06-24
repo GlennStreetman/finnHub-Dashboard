@@ -280,7 +280,6 @@ class App extends React.Component<AppProps, AppState> {
         if (s.login === 1 && prevState.login === 0) { //on login build data model.
             this.getSavedDashBoards()
                 .then((data: GetSavedDashBoardsRes) => {
-                    console.log('saved dashboard:', data)
                     if ((data.dashBoardData[data.currentDashBoard] === undefined && Object.keys(data.dashBoardData))) { //if invalid current dashboard returned
                         data.currentDashBoard = Object.keys(data.dashBoardData)[0]
                     }

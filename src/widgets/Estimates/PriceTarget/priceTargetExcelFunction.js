@@ -1,4 +1,4 @@
-export const priceTargetExcel = function (apiKey, currentDashBoard, widgetHeader) {
+export const priceTargetExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
     const data = { 
         apiKey: apiKey,
         dashboard: currentDashBoard,
@@ -12,7 +12,9 @@ export const priceTargetExcel = function (apiKey, currentDashBoard, widgetHeader
             { 'Target Median': 'targetMedian' },       
         ] 
     };
-    console.log('data', data)
+    
+    if (security) data.security = security
+
     const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },

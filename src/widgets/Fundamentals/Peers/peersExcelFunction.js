@@ -1,17 +1,15 @@
-export const epsSuprisesExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
+export const peersExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
     const data = { 
         apiKey: apiKey,
         dashboard: currentDashBoard,
         widget: widgetHeader,
         columnKeys: [ //<-- DEFINE Column headers and finnHub data keys.
-            { Actual: 'actual' }, 
-            { Estimate: 'estimate' }, 
-            { Period: 'period' }, 
-            { Symbol: 'symbol' }, ] 
+            { Peers: 'peers' }, 
+        ] 
     };
     
     if (security) data.security = security
-
+    
     const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },

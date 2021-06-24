@@ -1,11 +1,19 @@
-export const candleExcel = function (apiKey, currentDashBoard, widgetHeader) {
+export const candleExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
+    
     const data = {
         apiKey: apiKey,
         dashboard: currentDashBoard,
         widget: widgetHeader,
-        columnKeys: [{ Time: 't' }, { Open: 'c' }, { High: 'h' }, { Low: 'l' }, { Close: 'c' }]
+        columnKeys: [
+            { Time: 't' }, 
+            { Open: 'c' }, 
+            { High: 'h' }, 
+            { Low: 'l' }, 
+            { Close: 'c' }]
     };
-    console.log('data', data)
+
+    if (security) data.security = security
+
     const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },

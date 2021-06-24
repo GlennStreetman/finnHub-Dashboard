@@ -1,13 +1,19 @@
-export const epsSuprisesExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
+export const ipoCalendarExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
     const data = { 
         apiKey: apiKey,
         dashboard: currentDashBoard,
         widget: widgetHeader,
         columnKeys: [ //<-- DEFINE Column headers and finnHub data keys.
-            { Actual: 'actual' }, 
-            { Estimate: 'estimate' }, 
-            { Period: 'period' }, 
-            { Symbol: 'symbol' }, ] 
+            { Date: 'date' }, 
+            { Exchange: 'exchange' }, 
+            { Name: 'name' }, 
+            { NumberOfShares: 'numberOfShares' }, 
+            { Price: 'price' },
+            { Status: 'status' },
+            { Symbol: 'symbol' },
+            { TotalSharesValue: 'totalSharesValue' },
+        
+        ] 
     };
     
     if (security) data.security = security

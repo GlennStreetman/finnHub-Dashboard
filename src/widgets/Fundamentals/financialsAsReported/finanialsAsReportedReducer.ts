@@ -50,7 +50,6 @@ export function financialsAsReportedReducer(data: finAsReportedData, filters: fi
         const targetReport = filters.targetReport
         let filteredNode = { [targetReport]: seriesData[n].report[targetReport] }
         newNode.report = filteredNode
-        // console.log(newNode)
         resObj.data.push(newNode)
     }
     return resObj

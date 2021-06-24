@@ -1,10 +1,10 @@
 import * as React from "react"
 import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
-import EndPointNode from "../../../components/endPointNode";
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { rBuildVisableData } from '../../../slices/sliceShowData'
+import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -58,7 +58,11 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
         if (isInitialMount.current === true) {
             if (p.widgetCopy !== undefined && p.widgetCopy.widgetID !== null) {
                 return p.widgetCopy.widgetID
-            } else { return -1 }
+            } else if (p?.config?.targetSecurity) {
+                return (p?.config?.targetSecurity)
+            } else {
+                return ('')
+            }
         }
     }
 
@@ -87,6 +91,16 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
         }
     ))
 
+    useEffect((key: number = p.widgetKey, trackedStock = p.trackedStocks, keyList: string[] = Object.keys(p.trackedStocks), updateWidgetConfig: Function = p.updateWidgetConfig) => {
+        //Setup default metric source if none selected.
+        if (p.config.targetSecurity === undefined) {
+            const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
+            updateWidgetConfig(key, {
+                targetSecurity: newSource,
+            })
+        }
+    }, [p.updateWidgetConfig, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
+
     useEffect(() => {
         //On mount, use widget copy, else build visable data.
         //On update, if change in target stock, rebuild visable data.
@@ -94,9 +108,11 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
             isInitialMount.current = false;
         } else {
             if (isInitialMount.current === true) { isInitialMount.current = false }
+            const filterObj = { [targetStock]: { widgetType: 'FundamentalsNewsSentiment' } }
             const payload: object = {
                 key: p.widgetKey,
-                securityList: [[`${targetStock}`]]
+                securityList: [`${targetStock}`],
+                dataFilters: filterObj,
             }
             // console.log(payload)
             dispatch(rBuildVisableData(payload))
@@ -168,6 +184,9 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
         const target = e.target.value;
         const key = `${p.widgetKey}-${target}`
         setTargetStock(target)
+        p.updateWidgetConfig(p.widgetKey, {
+            targetSecurity: target,
+        })
         dispatch(tSearchMongoDB([key]))
     }
 
@@ -178,6 +197,15 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
             </option>
         ))
 
+        const dataRows = typeof rShowData === 'object' ? Object.entries(rShowData).map((el) => {
+            if (typeof el[1] !== 'object') return (
+                <tr key={`${el[0]}-${el[1]}`}>
+                    <td>{convertCamelToProper(el[0])}: </td>
+                    <td>{el[1]}</td>
+                </tr>
+            )
+        }) : <></>
+        // const dataRows = <></>
 
         const stockTable =
             <>
@@ -185,7 +213,10 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
                     {newSymbolList}
                 </select>
                 <br />
-                <EndPointNode nodeData={stockData} />
+                <table>
+                    <thead><tr><td>Metric</td><td>Value</td></tr></thead>
+                    <tbody>{dataRows}</tbody>
+                </table>
             </>
         return stockTable
     }
@@ -219,6 +250,7 @@ export function newsSentimentsProps(that, key = "newWidgetNameProps") {
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         updateDefaultExchange: that.props.updateDefaultExchange,
         updateGlobalStockList: that.props.updateGlobalStockList,
+        updateWidgetConfig: that.props.updateWidgetConfig,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
         targetSecurity: that.props.targetSecurity,

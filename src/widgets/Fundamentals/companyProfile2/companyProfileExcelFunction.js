@@ -1,4 +1,4 @@
-export const companyProfileExcel = function (apiKey, currentDashBoard, widgetHeader) {
+export const companyProfileExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
     const data = { 
         apiKey: apiKey,
         dashboard: currentDashBoard,
@@ -18,7 +18,9 @@ export const companyProfileExcel = function (apiKey, currentDashBoard, widgetHea
             { FinnhubIndustry: 'finnhubIndustry' },
         ] 
     };
-    console.log('data', data)
+
+    if (security) data.security = security
+
     const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },

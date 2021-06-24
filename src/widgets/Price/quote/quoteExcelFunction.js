@@ -1,17 +1,19 @@
-export const epsSuprisesExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
+export const quoteExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
     const data = { 
         apiKey: apiKey,
         dashboard: currentDashBoard,
         widget: widgetHeader,
         columnKeys: [ //<-- DEFINE Column headers and finnHub data keys.
-            { Actual: 'actual' }, 
-            { Estimate: 'estimate' }, 
-            { Period: 'period' }, 
-            { Symbol: 'symbol' }, ] 
+            { Current: 'c' }, 
+            { High: 'h' }, 
+            { Low: 'l' }, 
+            { Open: 'o' }, 
+            { 'Previous Close': 'pc' },
+            { Time: 't' },
+        ] 
     };
     
     if (security) data.security = security
-
     const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },

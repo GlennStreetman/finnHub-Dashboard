@@ -1,6 +1,6 @@
 import {convertCamelToProper} from './../../../appFunctions/stringFunctions'
 
-export const basicFinancialsExcel = function (apiKey, currentDashBoard, widgetHeader, config) {
+export const basicFinancialsExcel = function (apiKey, currentDashBoard, widgetHeader, security, config) {
 
     const columnKeys = function(){
         if (config.toggleMode === 'metrics'){
@@ -30,7 +30,7 @@ export const basicFinancialsExcel = function (apiKey, currentDashBoard, widgetHe
         columnKeys: columnKeys()
     };
 
-    console.log('basic fin data', data)
+    if (security) data.security = security
 
     const options = {
         method: "POST",

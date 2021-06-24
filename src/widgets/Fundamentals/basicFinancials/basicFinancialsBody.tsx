@@ -45,7 +45,11 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
                 const targetStock = p.widgetCopy.targetStock
                 return (targetStock)
-            } else { return ('') }
+            } else if (p?.config?.targetSecurity) {
+                return (p?.config?.targetSecurity)
+            } else {
+                return ('')
+            }
         }
     }
 
@@ -179,16 +183,16 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
     useEffect((key: number = p.widgetKey, trackedStock = p.trackedStocks, keyList: string[] = Object.keys(p.trackedStocks), updateWidgetConfig: Function = p.updateWidgetConfig) => {
         //Setup default metric source if none selected.
-        if (p.config.metricSource === undefined) {
+        if (p.config.targetSecurity === undefined) {
             const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
             updateWidgetConfig(key, {
-                metricSource: newSource,
+                targetSecurity: newSource,
                 metricSelection: [],
                 seriesSelection: [],
                 toggleMode: 'metrics',
             })
         }
-    }, [p.updateWidgetConfig, p.widgetKey, p.trackedStocks, p.apiKey, p.config.metricSource])
+    }, [p.updateWidgetConfig, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
 
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
         if (isFinnHubData(rShowData) === true) {
@@ -226,13 +230,13 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     }, [p.targetSecurity, p.widgetKey, dispatch])
 
     useEffect(() => {
-        if (stockData[p.config.metricSource] && rShowData && targetStock && rShowData[targetStock]) {
+        if (stockData[p.config.targetSecurity] && rShowData && targetStock && rShowData[targetStock]) {
             if (rShowData[targetStock]['metricKeys']) setMetricList(rShowData[targetStock]['metricKeys'])
             if (rShowData[targetStock]['seriesKeys']) setSeriesList(rShowData[targetStock]['seriesKeys'])
         }
-    }, [stockData, p.config.metricSource, rShowData, targetStock])
+    }, [stockData, p.config.targetSecurity, rShowData, targetStock])
 
-    useEffect(() => {
+    useEffect(() => {//refresh data on change to filters.
         let searchList = Object.keys(p.trackedStocks).map((el) => `${p.widgetKey}-${el}`)
         dispatch(tSearchMongoDB(searchList))
     }, [p.config.toggleMode, targetStock, p.config.metricSelection, p.config.seriesSelection, dispatch, p.trackedStocks, p.widgetKey])
@@ -245,7 +249,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
     function changeSource(el) {
         p.updateWidgetConfig(p.widgetKey, {
-            metricSource: el,
+            targetSecurity: el,
         })
     }
 
@@ -405,7 +409,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             let mapStockSelection = stockSelectionSlice.map((el, index) => (
                 <tr key={el + "metricRow" + index}>
                     <td key={el + "metricdesc"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
-                    <td><input type='radio' name='sourceStock' checked={p.config.metricSource === el} onChange={() => changeSource(el)} /></td>
+                    <td><input type='radio' name='sourceStock' checked={p.config.targetSecurity === el} onChange={() => changeSource(el)} /></td>
                     <td key={el + "remove"}>
                         <button data-testid={`remove-${el}`} onClick={() => { updateWidgetList(el); }}><i className="fa fa-times" aria-hidden="true" /></button>
                     </td>
@@ -521,6 +525,9 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     function changeStockSelection(e) {
         const target = e.target.value;
         setTargetStock(target)
+        p.updateWidgetConfig(p.widgetKey, {
+            targetSecurity: target,
+        })
     }
 
     function changeSeriesSelection(e) {

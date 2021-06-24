@@ -1,4 +1,4 @@
-export const recTrendExcel = function (apiKey, currentDashBoard, widgetHeader) {
+export const recTrendExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
     const data = { 
         apiKey: apiKey,
         dashboard: currentDashBoard,
@@ -13,7 +13,9 @@ export const recTrendExcel = function (apiKey, currentDashBoard, widgetHeader) {
             { Symbol: 'symbol' },
         ] 
     };
-    console.log('basic rec trend data', data)
+    
+    if (security) data.security = security
+
     const options = {
         method: "POST",
         headers: { "Content-Type": "application/json" },

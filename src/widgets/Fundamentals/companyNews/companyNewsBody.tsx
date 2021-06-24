@@ -53,8 +53,10 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
             if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
                 const stockData = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
                 return (stockData)
+            } else if (p?.config?.targetSecurity) {
+                return (p?.config?.targetSecurity)
             } else {
-                return ([])
+                return ('')
             }
         }
     }
@@ -128,6 +130,16 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
         }
     ))
 
+    useEffect((key: number = p.widgetKey, trackedStock = p.trackedStocks, keyList: string[] = Object.keys(p.trackedStocks), updateWidgetConfig: Function = p.updateWidgetConfig) => {
+        //Setup default metric source if none selected.
+        if (p.config.targetSecurity === undefined) {
+            const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
+            updateWidgetConfig(key, {
+                targetSecurity: newSource,
+            })
+        }
+    }, [p.updateWidgetConfig, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
+
     useEffect(() => {
         //On mount, use widget copy, else build visable data.
         //On update, if change in target stock, rebuild visable data.
@@ -189,8 +201,7 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
         }
     }
 
-    function formatSourceName(source) {
-        //clean up source names for news articles.
+    function formatSourceName(source) {//clean up source names for news articles.
         let formattedSource = source;
         formattedSource = formattedSource.replace(".com", "");
         formattedSource = formattedSource.replace("http:", "");
@@ -256,9 +267,8 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
         let increment = 10 * newsIncrementor;
         let newStart = increment - 10;
         let newsEnd = increment;
-        // console.log('stockData', stockData)
         let newsSlice = stockData.slice(newStart, newsEnd);
-        let mapNews = newsSlice.map((el, index) => (
+        let mapNews = Array.isArray(newsSlice) ? newsSlice.map((el, index) => (
             <tr key={el + "newsRow" + index}>
                 <td key={el + "newsSource"}>{formatSourceName(el["source"])}</td>
                 <td key={el + "newsHeadline"}>
@@ -267,7 +277,7 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
                     </a>
                 </td>
             </tr>
-        ));
+        )) : <></>;
 
         let thisnewsTable = (
             <div className="newsBody">
@@ -320,13 +330,6 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
     }
 
     function renderSearchPane() {
-        // const now = Date.now()
-        // const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : 604800 * 1000
-        // const startUnix = now - startUnixOffset
-        // const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
-        // const endUnix = now - endUnixOffset
-        // const startDate = new Date(startUnix).toISOString().slice(0, 10);
-        // const endDate = new Date(endUnix).toISOString().slice(0, 10);
 
         return (
             <>
@@ -351,6 +354,9 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
         const key = `${p.widgetKey}-${target}`
         // console.log("HERE", target, key)
         setTargetStock(target)
+        p.updateWidgetConfig(p.widgetKey, {
+            targetSecurity: target,
+        })
         dispatch(tSearchMongoDB([key]))
         setNewsIncrementor(1)
     }
@@ -390,6 +396,7 @@ export function newsWidgetProps(that, key = "newWidgetNameProps") {
         filters: that.props.widgetList[key]["filters"],
         showPane: that.showPane,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
+        updateWidgetConfig: that.props.updateWidgetConfig,
         updateDefaultExchange: that.props.updateDefaultExchange,
         updateWidgetFilters: that.props.updateWidgetFilters,
         updateGlobalStockList: that.props.updateGlobalStockList,

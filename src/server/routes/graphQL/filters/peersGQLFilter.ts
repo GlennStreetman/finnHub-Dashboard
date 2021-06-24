@@ -1,13 +1,16 @@
 import { FinnHubAPIData } from '../../../../widgets/Fundamentals/Peers/peersBody'
 
+interface resObjSetup { //rename
+    peers: string[]
+}
+
 export default function recommendationTrendsGQLFilter(data: FinnHubAPIData, config: Object = {}) {
     //convert time series list to Object: Keys = period, values = object
-    const resObj = {}
+    const resObj: resObjSetup = { peers: [] }
 
     for (const d in data) {
-        const key = d
-        const val = data[d]
-        resObj[key] = val
+        let peersList = resObj['peers']
+        peersList.push(data[d])
     }
     return resObj
 }

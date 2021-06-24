@@ -247,7 +247,7 @@ render() {
         {this.props.widgetList.showBody !== false && this.state.showEditPane !== 1 && (
 
             excelRegister_singleSecurity[this.props.widgetList.widgetType] && ( //button returns data for target securities associated with widget.
-                <button onClick={()=>excelFunction(this.props.apiKey, this.props.currentDashBoard, this.props.widgetList.widgetHeader, this.props.widgetList.config.targetSecurity)}>
+                <button onClick={()=>excelFunction(this.props.apiKey, this.props.currentDashBoard, this.props.widgetList.widgetHeader, this.props.widgetList.config.targetSecurity, this.props.widgetList.config)}>
                     <i className="fa fa-file-excel-o" aria-hidden="true" data-testid={`excelButton-${this.props.widgetList["widgetType"]}`}></i>
                 </button>
             )
@@ -256,7 +256,7 @@ render() {
         {this.props.widgetList.showBody !== false && this.state.showEditPane !== 1 && (
 
             excelRegister[this.props.widgetList.widgetType] && ( //button returns data for all securities associated with widget.
-                <button onClick={()=>excelFunction(this.props.apiKey, this.props.currentDashBoard, this.props.widgetList.widgetHeader)}>
+                <button onClick={()=>excelFunction(this.props.apiKey, this.props.currentDashBoard, this.props.widgetList.widgetHeader,false,this.props.widgetList.config)}>
                     <i className="fa fa-list" aria-hidden="true" data-testid={`excelButton-${this.props.widgetList["widgetType"]}`}></i>
                 </button>
             )

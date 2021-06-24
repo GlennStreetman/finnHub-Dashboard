@@ -43,8 +43,10 @@ function PriceTargetBody(p: { [key: string]: any }, ref: any) {
             if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
                 const stockData = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
                 return (stockData)
+            } else if (p?.config?.targetSecurity) {
+                return (p?.config?.targetSecurity)
             } else {
-                return ([])
+                return ('')
             }
         }
     }
@@ -91,6 +93,16 @@ function PriceTargetBody(p: { [key: string]: any }, ref: any) {
         }
     ))
 
+    useEffect((key: number = p.widgetKey, trackedStock = p.trackedStocks, keyList: string[] = Object.keys(p.trackedStocks), updateWidgetConfig: Function = p.updateWidgetConfig) => {
+        //Setup default metric source if none selected.
+        if (p.config.targetSecurity === undefined) {
+            const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
+            updateWidgetConfig(key, {
+                targetSecurity: newSource,
+            })
+        }
+    }, [p.updateWidgetConfig, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
+
     useEffect(() => {
         //On mount, use widget copy, else build visable data.
         //On update, if change in target stock, rebuild visable data.
@@ -131,6 +143,9 @@ function PriceTargetBody(p: { [key: string]: any }, ref: any) {
         const target = e.target.value;
         const key = `${p.widgetKey}-${target}`
         setTargetStock(target)
+        p.updateWidgetConfig(p.widgetKey, {
+            targetSecurity: target,
+        })
         dispatch(tSearchMongoDB([key]))
     }
 
@@ -217,6 +232,7 @@ export function priceTargetProps(that, key = "newWidgetNameProps") {
         updateDefaultExchange: that.props.updateDefaultExchange,
         updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
+        updateWidgetConfig: that.props.updateWidgetConfig,
         widgetKey: key,
         targetSecurity: that.props.targetSecurity,
     };
