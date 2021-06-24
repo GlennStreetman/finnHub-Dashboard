@@ -116,6 +116,7 @@ function getDataSlice(dataObj, queryString){
 }
 
 function makeTempDir(tempPath){
+    console.log('make path:', tempPath)
     if (!fs.existsSync(tempPath)) {
         fs.mkdir(tempPath, (err) => {
             if (err) {
