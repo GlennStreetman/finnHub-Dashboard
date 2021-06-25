@@ -76,7 +76,7 @@ export const SaveCurrentDashboard = async function saveCurrentDashboard(dashboar
         }
     })
 
-    return new Promise((res) => { //update type after route converted to typescript
+    let status = await new Promise((res) => { //update type after route converted to typescript
         const data = {
             dashBoardName: dashboardName,
             globalStockList: s.globalStockList,
@@ -100,4 +100,6 @@ export const SaveCurrentDashboard = async function saveCurrentDashboard(dashboar
                 res(false)
             })
     })
+    return status
+
 }
