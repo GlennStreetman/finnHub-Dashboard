@@ -88,7 +88,6 @@ export const SaveCurrentDashboard = async function saveCurrentDashboard(dashboar
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
         };
-
         fetch("/dashBoard", options)
             .then(res => res.json())
             .then((data) => {
