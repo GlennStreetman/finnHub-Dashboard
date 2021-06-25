@@ -93,7 +93,7 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
         }
     })
 
-    const updateFilterMemo = useMemo(() => {
+    const updateFilterMemo = useMemo(() => { //used inst useStartingFilters Hook.
         return {
             startDate: start,
             endDate: end,

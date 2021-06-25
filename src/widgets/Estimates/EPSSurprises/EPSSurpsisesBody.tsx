@@ -1,10 +1,15 @@
 import * as React from "react"
-import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
+import { useState, useEffect, forwardRef, useRef } from "react";
 import ReactChart from "./reactChart";
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
-import { rBuildVisableData } from '../../../slices/sliceShowData'
 import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
+
+import { useDragCopy } from '../../widgetHooks/useDragCopy'
+import { useTargetSecurity } from '../../widgetHooks/useTargetSecurity'
+import { useSearchMongoDb } from '../../widgetHooks/useSearchMongoDB'
+import { useBuildVisableData } from '../../widgetHooks/useBuildVisableData'
+import { useUpdateFocus } from '../../widgetHooks/useUpdateFocus'
 
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 
@@ -51,15 +56,6 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
         }
     }
 
-    const startingTargetStock = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
-        if (isInitialMount.current === true) {
-            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-                const targetStock = p.widgetCopy.targetStock
-                return (targetStock)
-            } else { return ('') }
-        }
-    }
-
     const startingWidgetCoptyRef = () => {
         if (isInitialMount.current === true) {
             if (p.widgetCopy !== undefined && p.widgetCopy.widgetID !== null) {
@@ -69,7 +65,6 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
     }
 
     const [stockData, setStockData] = useState(startingstockData());
-    const [targetStock, setTargetStock] = useState(startingTargetStock());
     const [chartOptions, setChartOptions] = useState({})
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const dispatch = useDispatch(); //allows widget to run redux actions.
@@ -78,55 +73,16 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData: object = state.showData.dataSet[p.widgetKey][targetStock]
+            const showData: object = state.showData.dataSet[p.widgetKey][p.config.targetSecurity]
             return (showData)
         }
     })
 
-    useImperativeHandle(ref, () => (
-        //used to copy widgets when being dragged. example: if widget body renders time series data into chart, copy chart data.
-        //add additional slices of state to list if they help reduce re-render time.
-        {
-            state: {
-                stockData: stockData,
-                targetStock: targetStock,
-                chartOptions: chartOptions,
-            },
-        }
-    ))
-
-    useEffect((key: number = p.widgetKey, trackedStock = p.trackedStocks, keyList: string[] = Object.keys(p.trackedStocks), updateWidgetConfig: Function = p.updateWidgetConfig) => {
-        //Setup default metric source if none selected.
-        if (p.config.targetSecurity === undefined) {
-            const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
-            updateWidgetConfig(key, {
-                targetSecurity: newSource,
-            })
-        }
-    }, [p.updateWidgetConfig, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
-
-    useEffect(() => {
-        //On mount, use widget copy, else build visable data.
-        //On update, if change in target stock, rebuild visable data.
-        if (isInitialMount.current === true && widgetCopy === p.widgetKey) {
-            isInitialMount.current = false;
-        } else {
-            if (isInitialMount.current === true) { isInitialMount.current = false }
-            const payload: object = {
-                key: p.widgetKey,
-                securityList: [[`${targetStock}`]]
-            }
-            dispatch(rBuildVisableData(payload))
-        }
-    }, [targetStock, p.widgetKey, widgetCopy, dispatch])
-
-    useEffect(() => {
-        //if stock not selected default to first stock.
-        if (Object.keys(p.trackedStocks).length > 0 && targetStock === '') {
-            const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
-            setTargetStock(setDefault)
-        }
-    }, [p.trackedStocks, targetStock])
+    useDragCopy(ref, { chartOptions: chartOptions, stockData: stockData, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
+    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
+    useBuildVisableData(p?.config?.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
+    useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey) //on update to security focus, from watchlist menu, update target security.
 
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
         if (isFinnHubData(rShowData) === true) {
@@ -138,7 +94,7 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
         }
     }, [rShowData])
 
-    useEffect(() => {
+    useEffect(() => { //create data chart
         // console.log('stock data updated, created chart objects.')
         const actualList: dataListObject[] = []
         const estimateList: dataListObject[] = []
@@ -162,7 +118,7 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
             animationEnabled: true,
             exportEnabled: true,
             title: {
-                text: `${targetStock}: EPS Surprises'`
+                text: `${p.config.targetSecurity}: EPS Surprises'`
             },
             axisX: {
                 title: ""
@@ -194,21 +150,11 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
         }
         setChartOptions(options);
 
-    }, [stockData, targetStock])
-
-    useEffect(() => { //on change to targetSecurity update widget focus
-        if (p.targetSecurity !== '') {
-            const target = `${p.widgetKey}-${p.targetSecurity}`
-            setTargetStock(p.targetSecurity)
-            dispatch(tSearchMongoDB([target]))
-        }
-    }, [p.targetSecurity, p.widgetKey, dispatch])
-
+    }, [stockData, p.config.targetSecurity])
 
     function changeStockSelection(e) { //DELETE IF no target stock
         const target = e.target.value;
         const key = `${p.widgetKey}-${target}`
-        setTargetStock(target)
         p.updateWidgetConfig(p.widgetKey, {
             targetSecurity: target,
         })
@@ -253,8 +199,7 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
         let chartBody = (
             <>
                 <div data-testid="SelectionLabel" className="div-inline" >
-                    {"  Selection:  "}
-                    <select className="btn" value={targetStock} onChange={changeStockSelection}>
+                    <select className="btn" value={p.config.targetSecurity} onChange={changeStockSelection}>
                         {newSymbolList}
                     </select>
                 </div>

@@ -144,9 +144,9 @@ render() {
     display: this.state.show
     };
 
-    const emptyStyle = {
-    height: '10px',
-    }
+    // const emptyStyle = {
+    // height: '10px',
+    // }
 
     const visStatus = this.props.widgetList.showBody || this.props.stateRef === 'menuWidget' ? 'block' : 'none'
     const bodyVisable = {
