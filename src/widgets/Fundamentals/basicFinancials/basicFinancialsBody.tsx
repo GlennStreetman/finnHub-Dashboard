@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useState, useCallback, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
+import { useState, useEffect, forwardRef, useRef } from "react";
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { rBuildVisableData } from '../../../slices/sliceShowData'
@@ -8,6 +8,12 @@ import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
 
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 import CreateTimeSeriesChart, { createOptions } from './createTimeSeriesChart'
+
+import { useDragCopy } from '../../widgetHooks/useDragCopy'
+import { useTargetSecurity } from '../../widgetHooks/useTargetSecurity'
+import { useSearchMongoDb } from '../../widgetHooks/useSearchMongoDB'
+import { useUpdateFocus } from '../../widgetHooks/useUpdateFocus'
+
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -39,19 +45,6 @@ function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
 
 function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
-
-    const startingTargetStock = () => {
-        if (isInitialMount.current === true) {
-            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-                const targetStock = p.widgetCopy.targetStock
-                return (targetStock)
-            } else if (p?.config?.targetSecurity) {
-                return (p?.config?.targetSecurity)
-            } else {
-                return ('')
-            }
-        }
-    }
 
     const startingstockData = () => {
         if (isInitialMount.current === true) {
@@ -92,8 +85,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     const [metricIncrementor, setMetricIncrementor] = useState(1);
     const [orderView, setOrderView] = useState(0);
     const [symbolView, setSymbolView] = useState(0);
-    const [targetStock, setTargetStock] = useState(startingTargetStock());
-    // const [targetSeries, setTargetSeries] = useState('')
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
@@ -105,81 +96,70 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         }
     })
 
-    useImperativeHandle(ref, () => (
-        //used to copy widgets when being dragged. example: if widget body renders time series data into chart, copy chart data.
-        //add additional slices of state to list if they help reduce re-render time.
-        {
-            state: {
-                stockData: stockData,
-                metricList: metricList,
-                metricIncrementor: metricIncrementor,
-                orderView: orderView,
-                symbolView: symbolView,
-                targetSeries: '',
-            },
-        }
-    ))
-
-    const setTargetSeries = useCallback((el) => {
-        const widgetKey = p.widgetKey
-        const updateFunction = p.updateWidgetConfig
-        updateFunction(widgetKey, { targetSeries: el, })
-    }, [p.widgetKey, p.updateWidgetConfig])
+    useDragCopy(ref, {
+        stockData: stockData,
+        metricList: metricList,
+        metricIncrementor: metricIncrementor,
+        orderView: orderView,
+        symbolView: symbolView,
+        targetSeries: '',
+    })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
+    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
+    useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey) //on update to security focus, from watchlist menu, update target security.
 
     useEffect(() => { //set default series 
-        if (seriesList.length > 0 && p.config.targetSeries === '') {
-            setTargetSeries(seriesList[0])
+        if (seriesList.length > 0 && !p.config.targetSeries) {
+            const updateWidgetConf = p.updateWidgetConfig
+            updateWidgetConf(p.widgetKey, { targetSeries: seriesList[0], })
         }
-    }, [seriesList, p.config.targetSeries, setTargetSeries])
+    }, [seriesList, p.updateWidgetConfig, p.config.targetSeries, p.widgetKey])
 
-    useEffect(() => {
-        //On mount, use widget copy, else build visable data.
-        //On update, if change in target stock, rebuild visable data.
-        if (isInitialMount.current === true && widgetCopy === p.widgetKey) {
-            isInitialMount.current = false;
-        } else {
-            if (isInitialMount.current === true) { isInitialMount.current = false }
-            let stockList = Object.keys(p.trackedStocks)
-            let securityList: string[] = []
-            let filterObj = {}
+    useEffect(() => { //build config setup
+        console.log('BUILDING VISABLE DATA')
+        let stockList = Object.keys(p.trackedStocks)
+        let securityList: string[] = []
+        let filterObj = {}
 
-            if (p.config.toggleMode === 'metrics') {
-                securityList = stockList
-                for (const s of stockList) {
-                    filterObj[s] = {
-                        filterPaths: ['metric', 'series.annual'],
-                        showsData: [],
-                        widgetType: 'FundamentalsBasicFinancials'
-                    }
-                    if (p.config.metricSelection) {
-                        for (const f of p.config.metricSelection) {
-                            filterObj[s].showsData.push(`metric.${f}`)
-                        }
-                    }
-                }
-            } else { //if Time Series
-                securityList.push(targetStock)
-                filterObj[targetStock] = {}
-                filterObj[targetStock] = {
+        if (p.config.toggleMode === 'metrics') {
+            securityList = stockList
+            for (const s of stockList) {
+                filterObj[s] = {
                     filterPaths: ['metric', 'series.annual'],
                     showsData: [],
                     widgetType: 'FundamentalsBasicFinancials'
                 }
-                if (p?.config?.seriesSelection) {
-                    for (const f of p?.config?.seriesSelection) {
-                        filterObj[targetStock].showsData.push(`series.annual.${f}`)
+                if (p.config.metricSelection) {
+                    for (const f of p.config.metricSelection) {
+                        filterObj[s].showsData.push(`metric.${f}`)
                     }
                 }
             }
-
-            const payload: object = {
-                key: p.widgetKey,
-                securityList: securityList,
-                dataFilters: filterObj
+        } else { //if Time Series
+            securityList.push(p.config.targetSecurity)
+            filterObj[p.config.targetSecurity] = {}
+            filterObj[p.config.targetSecurity] = {
+                filterPaths: ['metric', 'series.annual'],
+                showsData: [],
+                widgetType: 'FundamentalsBasicFinancials'
             }
-            dispatch(rBuildVisableData(payload))
+            if (p?.config?.seriesSelection) {
+                for (const f of p?.config?.seriesSelection) {
+                    filterObj?.[p.config.targetSecurity]?.showsData.push(`series.annual.${f}`)
+                }
+            }
         }
-    }, [p.widgetKey, widgetCopy, dispatch, p.trackedStocks, p.config.metricSelection, p.config.seriesSelection, targetStock, p.config.toggleMode])
+
+        const payload: object = {
+            key: p.widgetKey,
+            securityList: securityList,
+            dataFilters: filterObj
+        }
+        console.log('payload paramas', p.widgetKey, securityList, filterObj)
+        console.log('visable payload', payload)
+        dispatch(rBuildVisableData(payload))
+
+    }, [p.widgetKey, widgetCopy, dispatch, p.trackedStocks, p.config.metricSelection, p.config.seriesSelection, p.config.targetSecurity, p.config.toggleMode])
 
     useEffect((key: number = p.widgetKey, trackedStock = p.trackedStocks, keyList: string[] = Object.keys(p.trackedStocks), updateWidgetConfig: Function = p.updateWidgetConfig) => {
         //Setup default metric source if none selected.
@@ -212,34 +192,22 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         }
     }, [rShowData])
 
-    useEffect(() => {
-        //if stock not selected default to first stock.
-        if (Object.keys(p.trackedStocks).length > 0 && !targetStock) {
-            console.log('SETTING TARGET STOCK')
-            const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
-            setTargetStock(setDefault)
+    useEffect(() => { //sets up lists used in widget configuration menu.
+        if (stockData[p?.config?.targetSecurity] && rShowData && p?.config?.targetSecurity && rShowData[p?.config?.targetSecurity]) {
+            if (rShowData?.[p.config.targetSecurity]?.['metricKeys']) setMetricList(rShowData?.[p.config.targetSecurity]?.['metricKeys'])
+            if (rShowData?.[p.config.targetSecurity]?.['seriesKeys']) setSeriesList(rShowData?.[p.config.targetSecurity]?.['seriesKeys'])
         }
-    }, [p.trackedStocks, targetStock])
-
-    useEffect(() => { //on change to targetSecurity update widget focus
-        if (p.targetSecurity !== '') {
-            const target = `${p.widgetKey}-${p.targetSecurity}`
-            setTargetStock(p.targetSecurity)
-            dispatch(tSearchMongoDB([target]))
-        }
-    }, [p.targetSecurity, p.widgetKey, dispatch])
-
-    useEffect(() => {
-        if (stockData[p.config.targetSecurity] && rShowData && targetStock && rShowData[targetStock]) {
-            if (rShowData[targetStock]['metricKeys']) setMetricList(rShowData[targetStock]['metricKeys'])
-            if (rShowData[targetStock]['seriesKeys']) setSeriesList(rShowData[targetStock]['seriesKeys'])
-        }
-    }, [stockData, p.config.targetSecurity, rShowData, targetStock])
+    }, [stockData, p.config.targetSecurity, rShowData])
 
     useEffect(() => {//refresh data on change to filters.
         let searchList = Object.keys(p.trackedStocks).map((el) => `${p.widgetKey}-${el}`)
         dispatch(tSearchMongoDB(searchList))
-    }, [p.config.toggleMode, targetStock, p.config.metricSelection, p.config.seriesSelection, dispatch, p.trackedStocks, p.widgetKey])
+    }, [p.config.toggleMode, p.config.targetSecurity, p.config.metricSelection, p.config.seriesSelection, dispatch, p.trackedStocks, p.widgetKey])
+
+    function setTargetSeries(el) {
+        p.updateWidgetConfig(p.widgetKey, { targetSeries: el, })
+    }
+
 
     function setToggleMode(el) {
         p.updateWidgetConfig(p.widgetKey, {
@@ -522,9 +490,8 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         )
     }
 
-    function changeStockSelection(e) {
+    function changeStockSelection(e) { //DELETE IF no target stock
         const target = e.target.value;
-        setTargetStock(target)
         p.updateWidgetConfig(p.widgetKey, {
             targetSecurity: target,
         })
@@ -572,7 +539,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             })
             let buildTableMetrics = (
                 <div data-testid='metricsSelectors' className="widgetTableDiv">
-                    Show: {bodySelector()}
+                    {bodySelector()}
 
                     <table className='widgetBodyTable'>
                         <thead>
@@ -589,13 +556,13 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             )
             return buildTableMetrics
         } else { //build time series chart
-            let stockDataObj = stockData?.[targetStock]?.['series']?.[p.config.targetSeries] ? stockData[targetStock]['series'][p.config.targetSeries] : []
+            let stockDataObj = stockData?.[p.config.targetSecurity]?.['series']?.[p.config.targetSeries] ? stockData[p.config.targetSecurity]['series'][p.config.targetSeries] : []
             const options = createOptions(convertCamelToProper(p.config.targetSeries), stockDataObj)
             let buildChartSelection = (
                 <div data-testid='seriesSelectors' className="widgetTableDiv">
                     Show: {bodySelector()} <br />
                     Stock: {
-                        <select data-testid='selectStock' className="btn" value={targetStock} onChange={changeStockSelection}>
+                        <select data-testid='selectStock' className="btn" value={p.config.targetSecurity} onChange={changeStockSelection}>
                             {stockSymbolList}
                         </select>
                     } <br />
@@ -623,9 +590,9 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         </div>
     );
 }
-//RENAME
+
 export default forwardRef(FundamentalsBasicFinancials)
-//RENAME
+
 export function metricsProps(that, key = "newWidgetNameProps") {
     let propList = {
         apiKey: that.props.apiKey,
