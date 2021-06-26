@@ -1,13 +1,17 @@
 import * as React from "react"
-import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
+import { useState, useEffect, forwardRef, useRef } from "react";
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
-import { rBuildVisableData } from '../../../slices/sliceShowData'
+
+import { useDragCopy } from './../../widgetHooks/useDragCopy'
+import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
+import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
+
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
-interface FinnHubAPIData { //rename
+interface FinnHubAPIData {
     category: string,
     datetime: number,
     headline: string,
@@ -28,28 +32,8 @@ interface filters { //Any paramas not related to stock used by finnHub endpoint.
     categorySelection: string,
 }
 
-//add any additional type guard functions here used for live code.
-function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
-    if (arg !== undefined && Object.keys(arg).length > 0 && arg[0].category) {
-        return true
-    } else {
-        return false
-    }
-}
-//RENAME FUNCTION
 function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
-
-    const startingstockData = () => {
-        if (isInitialMount.current === true) {
-            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-                const stockData = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
-                return (stockData)
-            } else {
-                return ([])
-            }
-        }
-    }
 
     const startingNewsIncrementor = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
@@ -66,7 +50,7 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
     }
 
     const [widgetCopy] = useState(startingWidgetCoptyRef())
-    const [stockData, setStockData] = useState(startingstockData());
+    // const [stockData, setStockData] = useState(startingstockData());
     const [newsIncrementor, setNewsIncrementor] = useState(startingNewsIncrementor());
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
@@ -74,34 +58,14 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData: object = state.showData.dataSet[p.widgetKey]['market']
+            const showData: any = state.showData.dataSet[p.widgetKey]['market']
             return (showData)
         }
     })
 
-    useImperativeHandle(ref, () => (
-        {
-            state: {
-                stockData: stockData,
-                newsIncrementor: newsIncrementor,
-            },
-        }
-    ))
-
-    useEffect(() => {
-        //On mount, use widget copy, else build visable data.
-        //On update, if change in target stock, rebuild visable data.
-        if (isInitialMount.current === true && widgetCopy === p.widgetKey) {
-            isInitialMount.current = false;
-        } else {
-            if (isInitialMount.current === true) { isInitialMount.current = false }
-            const payload: object = {
-                key: p.widgetKey,
-                securityList: [[`market`]]
-            }
-            dispatch(rBuildVisableData(payload))
-        }
-    }, [p.widgetKey, widgetCopy, dispatch])
+    useDragCopy(ref, { newsIncrementor: newsIncrementor, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
+    useBuildVisableData('market', p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
     useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
 
@@ -112,17 +76,12 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
         }
     }, [p.filters, p.updateWidgetFilters, p.widgetKey])
 
-
-    useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) } else { setStockData([]) }
-    }, [rShowData])
-
     function updateFilter(e) {
         p.updateWidgetFilters(p.widgetKey, { categorySelection: e })
     }
 
-    function formatSourceName(source) {
-        //clean up source names for news articles.
+    function formatSourceName(source) {//clean up source names for news articles.
+
         let formattedSource = source;
         if (formattedSource !== undefined) {
             formattedSource = formattedSource.replace(".com", "");
@@ -157,7 +116,7 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
         let increment = 10 * newsIncrementor;
         let newStart = increment - 10;
         let newsEnd = increment;
-        let newsSlice = stockData.slice(newStart, newsEnd);
+        let newsSlice = Array.isArray(rShowData) === true ? rShowData.slice(newStart, newsEnd) : [];
         let mapNews = newsSlice.map((el, index) => (
             <tr key={el + "newsRow" + index}>
                 <td key={el + "newsSource"}>{formatSourceName(el["source"])}</td>
@@ -188,8 +147,7 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
     function renderSearchPane() {
         //no filters or searches needed.
         let searchForm = (
-            <>
-            </>
+            <></>
         );
         return searchForm
     }

@@ -1,11 +1,17 @@
 import * as React from "react"
-import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
+import { useState, useEffect, forwardRef, useRef } from "react";
 import { convertCamelToProper } from './../../../appFunctions/stringFunctions'
-import { excelRegister } from '../../../registers/excelButtonRegister'
+
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
-import { rBuildVisableData } from '../../../slices/sliceShowData'
 import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
+
+import { useDragCopy } from './../../widgetHooks/useDragCopy'
+import { useTargetSecurity } from './../../widgetHooks/useTargetSecurity'
+import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
+import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
+import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
+
 
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 
@@ -26,50 +32,16 @@ interface finnHubFilingObj {
     report: Object,
 }
 
-export interface FinnHubAPIData { //rename
+export interface FinnHubAPIData {
     filters: object,
     symbol: string,
     cik: string,
     data: finnHubFilingObj,
 }
 
-//add any additional type guard functions here used for live code.
-function isFinnHubData(arg: any): arg is FinnHubAPIData { //typeguard
-    if (arg !== undefined && Object.keys(arg).length > 0 && arg.symbol) {
-        // console.log("returning true", arg)
-        return true
-    } else {
-        // console.log("returning false", arg)
-        return false
-    }
-}
-//RENAME FUNCTION
+
 function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
-
-    const startingstockData = () => {
-        if (isInitialMount.current === true) {
-            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-                const stockData = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
-                return (stockData)
-            } else {
-                return ([])
-            }
-        }
-    }
-
-    const startingTargetStock = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
-        if (isInitialMount.current === true) {
-            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-                const targetStock = p.widgetCopy.targetStock
-                return (targetStock)
-            } else if (p?.config?.targetSecurity) {
-                return (p?.config?.targetSecurity)
-            } else {
-                return ('')
-            }
-        }
-    }
 
     const startingWidgetCoptyRef = () => {
         if (isInitialMount.current === true) {
@@ -80,30 +52,22 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     }
 
     const [widgetCopy] = useState(startingWidgetCoptyRef())
-    const [stockData, setStockData] = useState(startingstockData());
-    const [targetStock, setTargetStock] = useState(startingTargetStock());
-    // const [pagination, setPagination] = useState(startingPagination());
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
         if (state?.dataModel.created !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData: object = state?.showData?.dataSet?.[p.widgetKey]?.[targetStock]?.['data']
+            const showData: object = state?.showData?.dataSet?.[p.widgetKey]?.[p.config.targetSecurity]?.['data']
             return (showData)
         }
     })
 
-    useImperativeHandle(ref, () => (
-        //used to copy widgets when being dragged. example: if widget body renders time series data into chart, copy chart data.
-        //add additional slices of state to list if they help reduce re-render time.
-        {
-            state: {
-                stockData: stockData,
-                targetStock: targetStock, //REMOVE IF NO TARGET STOCK
-            },
-        }
-    ))
+    useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
+    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
+    useBuildVisableData(p?.config?.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
+    useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey) //on update to security focus, from watchlist menu, update target security.
 
     useEffect((key: number = p.widgetKey, trackedStock = p.trackedStocks, keyList: string[] = Object.keys(p.trackedStocks), updateWidgetConfig: Function = p.updateWidgetConfig) => {
         //Setup default metric source if none selected.
@@ -117,67 +81,6 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
             })
         }
     }, [p.updateWidgetConfig, rShowData, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
-
-    useEffect(() => {
-        //On mount, use widget copy, else build visable data.
-        //On update, if change in target stock, rebuild visable data.
-        if (isInitialMount.current === true && widgetCopy === p.widgetKey) {
-            isInitialMount.current = false;
-        } else {
-            if (isInitialMount.current === true) { isInitialMount.current = false }
-            let filterObj = {}
-            filterObj[targetStock] = {
-                targetSecurity: targetStock,
-                targetReport: p.config.targetReport ? p.config.targetReport : 'bs',
-                widgetType: 'FundamentalsFinancialsAsReported'
-            }
-
-            const payload: object = {
-                key: p.widgetKey,
-                securityList: [[`${targetStock}`]],
-                dataFilters: filterObj,
-            }
-            dispatch(rBuildVisableData(payload))
-        }
-    }, [targetStock, p.widgetKey, widgetCopy, dispatch, p.config.targetSecurity, p.config.targetReport])
-
-    useEffect(() => {
-        //DELETE IF NO TARGET STOCK
-        //if stock not selected default to first stock.
-        if (Object.keys(p.trackedStocks).length > 0 && targetStock === '') {
-            const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
-            setTargetStock(setDefault)
-        }
-    }, [p.trackedStocks, targetStock])
-
-    useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        if (isFinnHubData(rShowData) === true) {
-            setStockData(rShowData)
-        } else {
-            setStockData([])
-        }
-    }, [rShowData])
-
-    useEffect(() => { //set default year if blank.
-        const pagVal = p.config.pagination
-        if (p.config.year === '' && rShowData?.[pagVal]['year']) {
-            const key = p.widgetKey
-            let updateConfig = p.updateWidgetConfig
-            updateConfig(key, {
-                year: rShowData?.[pagVal]['year']
-            })
-        }
-
-    }, [rShowData, p.key, p.config.year, p.config.pagination, p.updateWidgetConfig, p.widgetKey])
-
-    useEffect(() => { //on change to targetSecurity update widget focus
-        if (p.targetSecurity !== '') {
-            const target = `${p.widgetKey}-${p.targetSecurity}`
-            setTargetStock(p.targetSecurity)
-            dispatch(tSearchMongoDB([target]))
-        }
-    }, [p.targetSecurity, p.widgetKey, dispatch])
-
 
     function updateWidgetList(stock) {
         if (stock.indexOf(":") > 0) {
@@ -221,17 +124,14 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
 
     function changeStockSelection(e) { //DELETE IF no target stock
         const target = e.target.value;
-        const key = `${p.widgetKey}-${target}`
-        setTargetStock(target)
         p.updateWidgetConfig(p.widgetKey, {
             targetSecurity: target,
         })
-        dispatch(tSearchMongoDB([key]))
     }
 
     function changeReportSelection(e) {
         const target = e.target.value;
-        const key = `${p.widgetKey}-${targetStock}`
+        const key = `${p.widgetKey}-${p?.config?.targetSecurity}`
         p.updateWidgetConfig(p.widgetKey, {
             targetReport: target,
         })
@@ -263,31 +163,21 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
             </>
 
         const stockDataNode = rShowData ? rShowData[p.config.pagination] : []
-        const excelFunction = excelRegister['FundamentalsFinancialsAsReported']
         const mapstockDataNode = stockDataNode ? Object.entries(stockDataNode).map((el) => {
             if (el[0] !== 'report') {
                 const val: any = typeof el[1] !== 'object' ? el[1] : <></>
-                // <button onClick={() => {
-                //     excelFunction(
-                //         p.apiKey,
-                //         p.currentDashBoard,
-                //         p.widgetHeader,
-                //         p.config.targetSecurity
-                //     )
-                // }}>
-                //     <i className="fa fa-file-excel-o" aria-hidden="true"></i>
-                // </button>
                 return (
-                    <tr key={el + p.config.pagination}>
+                    <tr key={el[0] + p.config.pagination}>
                         <td>{convertCamelToProper(el[0])}</td>
                         <td>{val}</td>
                     </tr>
                 )
-            }
+            } else { return <tr key={el[0]}></tr> }
         }) : <></>
+
         const stockTable =
             <>
-                <select data-testid='financialsAsReportedStock' className="btn" value={targetStock} onChange={changeStockSelection}>
+                <select data-testid='financialsAsReportedStock' className="btn" value={p.configtargetSecurity} onChange={changeStockSelection}>
                     {newSymbolList}
                 </select>
                 <select data-testid='financialsAsReportedSelection' className="btn" value={p.config.targetReport} onChange={changeReportSelection}>
@@ -331,9 +221,9 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         </div>
     )
 }
-//RENAME
+
 export default forwardRef(FundamentalsFinancialsAsReported)
-//RENAME
+
 export function financialsAsReportedProps(that, key = "newWidgetNameProps") {
     let propList = {
         apiKey: that.props.apiKey,
