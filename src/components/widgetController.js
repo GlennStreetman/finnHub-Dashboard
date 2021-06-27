@@ -29,7 +29,6 @@ class WidgetController extends React.Component {
 
     renderWidgetGroup(widgetObjList) {
         if (widgetObjList !== undefined && widgetObjList[0]['pass'] === undefined) {
-            // console.log('Rendering Widgets:', widgetObjList)
             widgetObjList.sort((a,b) => (a.columnOrder > b.columnOrder) ? 1 : -1)
             const p = this.props
             const widgetGroup = widgetObjList.map((el) => {
@@ -61,12 +60,12 @@ class WidgetController extends React.Component {
             }
             if (el.widgetConfig === 'menuWidget') {
                 thisWidgetProps['menuWidgetToggle'] = this.props.menuWidgetToggle
-                thisWidgetProps['showMenu'] = p[el.widgetID]    
+                thisWidgetProps['showMenu'] = p[el.widgetID]  
+                thisWidgetProps['setWidgetFocus'] = this.props.setWidgetFocus
             }
             if (p.widgetCopy?.widgetID === el.widgetID){
                 thisWidgetProps.widgetCopy = p.widgetCopy
             }
-            // console.log('thisWidgetProps', thisWidgetProps)
                 return (
                 <div key={el.widgetID+'thisKey'} style={{padding: "1px"}}>
                     {React.createElement(WidgetContainer, thisWidgetProps)}

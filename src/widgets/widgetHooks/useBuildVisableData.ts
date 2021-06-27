@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { rBuildVisableData } from '../../slices/sliceShowData'
 //updates widgets config.targetSecurity for any widget that uses a target security.
 export const useBuildVisableData = function (
-    targetSecurity, //p?.config?.targetSecurity
+    targetSecurityList, //list of securites that need to be available in slice.visableData.
     widgetKey, //p.widgetKey
     widgetCopy, // widgetCopy from drag function OR widgetKey 
     dispatch, // Dispatch()
@@ -15,9 +15,9 @@ export const useBuildVisableData = function (
             if (isInitialMount.current === true) { isInitialMount.current = false }
             const payload: object = {
                 key: widgetKey,
-                securityList: [[`${targetSecurity}`]]
+                securityList: targetSecurityList
             }
             dispatch(rBuildVisableData(payload))
         }
-    }, [targetSecurity, widgetKey, widgetCopy, dispatch, isInitialMount])
+    }, [targetSecurityList, widgetKey, widgetCopy, dispatch, isInitialMount])
 }

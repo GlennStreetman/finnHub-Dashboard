@@ -79,9 +79,13 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
         }
     }, [start, end])
 
+    const focusSecurityList = useMemo(() => { //remove if all securities should stay in focus.
+        return ['IPOS']
+    }, [])
+
     useDragCopy(ref, { paginationInt: paginationInt, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
-    useBuildVisableData('IPOS', p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
+    useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
 
     function updateFilter(e) {

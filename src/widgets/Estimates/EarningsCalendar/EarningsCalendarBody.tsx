@@ -10,7 +10,7 @@ import { useDragCopy } from './../../widgetHooks/useDragCopy'
 import { useTargetSecurity } from './../../widgetHooks/useTargetSecurity'
 import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
-import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
+
 import { useStartingFilters } from './../../widgetHooks/useStartingFilters'
 
 
@@ -82,13 +82,12 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
     const [end, setEnd] = useState(startingEndDate())
     const [pagination, setPagination] = useState(startingPagination())
     const dispatch = useDispatch(); //allows widget to run redux actions.
-    const targetStock = p?.config?.targetSecurity ? p.config.targetSecurity : p?.trackedStocks?.[0] ? p?.trackedStocks?.[0] : ''
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData: FinnHubAPIDataArray = state.showData.dataSet?.[p.widgetKey]?.[targetStock]?.['earningsCalendar']
+            const showData: FinnHubAPIDataArray = state.showData.dataSet?.[p.widgetKey]?.[p.config.targetSecurity]?.['earningsCalendar']
             return (showData)
         }
     })
@@ -101,11 +100,15 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
         }
     }, [start, end])
 
+    const focusSecurityList = useMemo(() => { //remove if all securities should stay in focus.
+        return [p?.config?.targetSecurity]
+    }, [p?.config?.targetSecurity])
+
+
     useDragCopy(ref, { pagination: pagination, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
-    useBuildVisableData(p?.config?.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey) //on update to security focus, from watchlist menu, update target security.
+    useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
 
     function updateStartDate(e) {
@@ -201,7 +204,7 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
         let symbolSelectorDropDown = (
             <>
                 <div id='earningsCalendarBody'>
-                    <select data-testid="ECstockSelector" className="btn" value={targetStock} onChange={changeStockSelection}>
+                    <select data-testid="ECstockSelector" className="btn" value={p.config.targetSecurity} onChange={changeStockSelection}>
                         {newStockList}
                     </select>
                     <button onClick={() => changePagination(-1)}>

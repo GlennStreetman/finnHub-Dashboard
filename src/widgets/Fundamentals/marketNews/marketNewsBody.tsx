@@ -1,5 +1,5 @@
 import * as React from "react"
-import { useState, useEffect, forwardRef, useRef } from "react";
+import { useState, useEffect, forwardRef, useRef, useMemo } from "react";
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 
@@ -63,9 +63,14 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
         }
     })
 
+    const focusSecurityList = useMemo(() => { //remove if all securities should stay in focus.
+        return ['market']
+    }, [])
+
+
     useDragCopy(ref, { newsIncrementor: newsIncrementor, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
-    useBuildVisableData('market', p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
+    useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
     useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
 

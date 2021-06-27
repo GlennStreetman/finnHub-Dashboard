@@ -1,9 +1,12 @@
 import React from "react";
-import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
+import { useState, useEffect, useMemo, forwardRef, useRef } from "react";
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
-import { rBuildVisableData } from '../../../slices/sliceShowData'
+
+import { useDragCopy } from './../../widgetHooks/useDragCopy'
+import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
+import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -55,51 +58,34 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
         }
     }
 
-    const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [stockData, setStockData] = useState(startingstockData())
+    const [widgetCopy] = useState(startingWidgetCoptyRef())
 
     const dispatch = useDispatch()
 
-    const rShowData = useSelector((state) => {
-        //redux connection
+    const rShowData = useSelector((state) => {//redux connection
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
             const showData = state.showData.dataSet[p.widgetKey]
-            // console.log("showdata", showData)
             return (showData)
         }
     })
 
-    useImperativeHandle(ref, () => (
-        //used to copy widgets when being dragged.
-        {
-            state: {
-                stockData: stockData,
-            },
-        }
-    ))
+    const focusSecurityList = useMemo(() => { //remove if all securities should stay in focus.
+        return Object.keys(p.trackedStocks)
+    }, [p.trackedStocks])
 
-    useEffect(() => {
-        if (isInitialMount.current === true && widgetCopy === p.widgetKey) {
-            isInitialMount.current = false;
-        } else {
-            // console.log("Loading Quote Widget")
-            const stockList: string[] = Object.keys(p.trackedStocks)
-            const payload: object = {
-                key: p.widgetKey,
-                securityList: stockList,
-            }
-            dispatch(rBuildVisableData(payload))
-        }
-    }, [p.widgetKey, p.trackedStocks, widgetCopy, dispatch])
+
+    useDragCopy(ref, { stockData: stockData, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
+    useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
     useEffect(() => { //CREATE STOCK DATA
 
         if (rShowData !== undefined && Object.keys(rShowData).length > 0) {
             const newData: FinnHubQuoteObj = {}
             for (const key in rShowData) {
-
                 const data: any = rShowData[key]
                 if (isQuoteData(data)) {
                     newData[key] = {
@@ -109,10 +95,7 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
                         dayOpenPrice: data.o,
                         prevClosePrice: data.pc,
                     }
-                } else {
-                    // if (Object.keys(data).length > 0) console.log("Problem with Quote data", rShowData, key)
                 }
-                // console.log('key', Object.keys(rShowData), key, data)
             }
             setStockData(newData)
         } else { setStockData({}) }
@@ -136,7 +119,6 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
     }
 
     function renderSearchPane() {
-        //add search pane rendering logic here. Additional filters need to be added below.
         const stockList = Object.keys(p.trackedStocks);
         const stockListRows = stockList.map((el) =>
             <tr key={el + "container"}>
@@ -167,10 +149,8 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
     }
 
     function renderStockData() {
-
         let pd = stockData;
         let widgetStockList = Object.keys(p.trackedStocks)
-        // console.log("WIDGETSTOCKLIST", widgetStockList, pd['US-TSLA'], widgetStockList[0])
         let stockDetailRow = widgetStockList.map((el) =>
             pd[el] ? (
                 <tr key={el + "st" + + pd[el]["currentPrice"]}>
@@ -201,8 +181,6 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
                     </td>
 
                     <td className='rightTEFade' key={el + "currentPrice" + returnKey(p.streamingPriceData[el])}>
-
-                        {/* {pd[el]["currentPrice"].toLocaleString(undefined, { */}
                         {findPrice(el).toLocaleString(undefined, {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
@@ -235,19 +213,19 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
                         <td key={p.widgetKey + "stock"}>Symbole:</td>
                         <td className="centerTE" key={p.widgetKey + "close"}>
                             Prev Close
-                </td>
+                        </td>
                         <td className="centerTE" key={p.widgetKey + "open"}>
                             Day Open
-                </td>
+                        </td>
                         <td className="centerTE" key={p.widgetKey + "low"}>
                             Day Low
-                </td>
+                        </td>
                         <td className="centerTE" key={p.widgetKey + "high"}>
                             Day High
-                </td>
+                        </td>
                         <td className="centerTE" key={p.widgetKey + "price"}>
                             Price
-                </td>
+                        </td>
 
                         {p.showEditPane === 1 ? <td key={p.widgetKey + "remove"}>Remove</td> : <></>}
                     </tr>
@@ -255,19 +233,11 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
                 <tbody key={p.widgetKey + "body"}>{stockDetailRow}</tbody>
             </table>
         );
-        // console.log('buildTable', buildTable)
         return buildTable;
     }
 
 
     return (
-        // <>
-        //     {p.showEditPane === 1 && (
-        //         React.createElement(StockSearchPane, searchPaneProps(p))
-
-        //     )}
-        //     {Object.keys(p.streamingPriceData).length > 0 ? renderStockData() : <></>}
-        // </>
         <div data-testid='quoteBody'>
             {p.showEditPane === 1 && (
                 <div >
@@ -285,7 +255,6 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
 }
 
 export default forwardRef(PriceQuote)
-
 
 export function quoteBodyProps(that, key = "Quote") {
     let propList = {

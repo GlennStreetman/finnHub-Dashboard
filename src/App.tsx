@@ -10,7 +10,7 @@ import {
     NewMenuContainer, AddNewWidgetContainer, LockWidgets,
     ToggleWidgetVisability, ChangeWidgetName, RemoveWidget,
     UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig,
-    toggleWidgetBody
+    toggleWidgetBody, setWidgetFocus
 } from "./appFunctions/appImport/widgetLogic";
 import { LoadDashBoard, NewDashboard, SaveCurrentDashboard }
     from "./appFunctions/appImport/setupDashboard";
@@ -246,6 +246,7 @@ class App extends React.Component<AppProps, AppState> {
         this.toggleWidgetVisability = ToggleWidgetVisability.bind(this);
         this.updateWidgetConfig = updateWidgetConfig.bind(this);
         this.toggleWidgetBody = toggleWidgetBody.bind(this)
+        this.setWidgetFocus = setWidgetFocus.bind(this)
 
         //App logic for setting up dashboards.
         this.loadDashBoard = LoadDashBoard.bind(this);
@@ -508,6 +509,7 @@ class App extends React.Component<AppProps, AppState> {
                     saveCurrentDashboard={this.saveCurrentDashboard}
                     setDrag={this.setDrag}
                     setSecurityFocus={this.setSecurityFocus}
+                    setWidgetFocus={this.setWidgetFocus}
                     showStockWidgets={this.state.showStockWidgets}
                     snapWidget={this.snapWidget}
                     streamingPriceData={this.state.streamingPriceData}
@@ -528,6 +530,7 @@ class App extends React.Component<AppProps, AppState> {
                     widgetList={this.state.widgetList}
                     widgetLockDown={this.state.widgetLockDown}
                     zIndex={this.state.zIndex}
+
                 />
                 {loginScreen}
                 {backGroundMenu()}

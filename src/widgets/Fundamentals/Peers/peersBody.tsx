@@ -1,54 +1,25 @@
 import * as React from "react"
-import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
+import { useState, forwardRef, useRef, useMemo } from "react";
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
-import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
 import { useAppDispatch, useAppSelector } from '../../../hooks';
-import { rBuildVisableData } from '../../../slices/sliceShowData'
 import { RootState } from '../../../store'
 import { tGetSymbolList } from "./../../../slices/sliceExchangeData";
+
+import { useDragCopy } from './../../widgetHooks/useDragCopy'
+import { useTargetSecurity } from './../../widgetHooks/useTargetSecurity'
+import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
+import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
+
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
-export interface FinnHubAPIData { //rename
+export interface FinnHubAPIData {
     [key: number]: string
-}
-
-//add any additional type guard functions here used for live code.
-function isFinnHubData(arg: FinnHubAPIData): arg is string[] { //typeguard
-    if (arg !== undefined && Object.keys(arg).length > 0) {
-        return true
-    } else {
-        return false
-    }
 }
 
 function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
-
-    const startingstockData = () => {
-        if (isInitialMount.current === true) {
-            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-                const stockData = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
-                return (stockData)
-            } else {
-                return ([])
-            }
-        }
-    }
-
-    const startingTargetStock = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
-        if (isInitialMount.current === true) {
-            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-                const targetStock = p.widgetCopy.targetStock
-                return (targetStock)
-            } else if (p?.config?.targetSecurity) {
-                return (p?.config?.targetSecurity)
-            } else {
-                return ('')
-            }
-        }
-    }
 
     const startingWidgetCoptyRef = () => {
         if (isInitialMount.current === true) {
@@ -59,8 +30,6 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
     }
 
     const [widgetCopy] = useState(startingWidgetCoptyRef())
-    const [stockData, setStockData] = useState(startingstockData());
-    const [targetStock, setTargetStock] = useState(startingTargetStock());
     const [updateExchange, setUpdateExchange] = useState(0)
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
@@ -68,7 +37,7 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData: any = state.showData.dataSet[p.widgetKey][targetStock]
+            const showData: any = state?.showData?.dataSet?.[p.widgetKey]?.[p.config.targetSecurity]
             return (showData)
         }
     })
@@ -76,7 +45,7 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
     const rExchange = useSelector((state: any) => {
         if (state.exchangeData.e.ex === p.defaultExchange) {
             const exchangeData: any = state.exchangeData.e.data
-            const widgetData = state.showData.dataSet[p.widgetKey] ? state.showData.dataSet[p.widgetKey][targetStock] : {}
+            const widgetData = state.showData.dataSet[p.widgetKey] ? state?.showData?.dataSet?.[p.widgetKey]?.[p.config.targetSecurity] : {}
             const lookupNames: Object = {}
             for (const s in widgetData) {
                 const stockKey = `${p.defaultExchange}-${widgetData[s]}`
@@ -91,79 +60,25 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
         }
     })
 
+    const focusSecurityList = useMemo(() => { //remove if all securities should stay in focus.
+        return [p?.config?.targetSecurity]
+    }, [p?.config?.targetSecurity])
 
-    useImperativeHandle(ref, () => (
-        //used to copy widgets when being dragged. example: if widget body renders time series data into chart, copy chart data.
-        //add additional slices of state to list if they help reduce re-render time.
-        {
-            state: {
-                stockData: stockData,
-                targetStock: targetStock, //REMOVE IF NO TARGET STOCK
-            },
-        }
-    ))
-
-    useEffect((key: number = p.widgetKey, trackedStock = p.trackedStocks, keyList: string[] = Object.keys(p.trackedStocks), updateWidgetConfig: Function = p.updateWidgetConfig) => {
-        //Setup default metric source if none selected.
-        if (p.config.targetSecurity === undefined) {
-            const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
-            updateWidgetConfig(key, {
-                targetSecurity: newSource,
-            })
-        }
-    }, [p.updateWidgetConfig, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
-
-    useEffect(() => {
-        //On mount, use widget copy, else build visable data.
-        //On update, if change in target stock, rebuild visable data.
-        if (isInitialMount.current === true && widgetCopy === p.widgetKey) {
-            isInitialMount.current = false;
-        } else {
-            if (isInitialMount.current === true) { isInitialMount.current = false }
-            const payload: object = {
-                key: p.widgetKey,
-                securityList: [[`${targetStock}`]]
-            }
-            // console.log(payload)
-            dispatch(rBuildVisableData(payload))
-        }
-    }, [targetStock, p.widgetKey, widgetCopy, dispatch])
-
-    useEffect(() => {
-        //DELETE IF NO TARGET STOCK
-        //if stock not selected default to first stock.
-        if (Object.keys(p.trackedStocks).length > 0 && targetStock === '') {
-            const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
-            setTargetStock(setDefault)
-        }
-    }, [p.trackedStocks, targetStock])
-
-    useEffect(() => { //on change to targetSecurity update widget focus
-        if (p.targetSecurity !== '') {
-            const target = `${p.widgetKey}-${p.targetSecurity}`
-            setTargetStock(p.targetSecurity)
-            dispatch(tSearchMongoDB([target]))
-        }
-    }, [p.targetSecurity, p.widgetKey, dispatch])
-
-    useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        if (isFinnHubData(rShowData) === true) {
-            setStockData(rShowData)
-        } else { setStockData([]) }
-    }, [rShowData])
+    useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
+    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
+    useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
     function getStockName(stock) {
         try {
             const stockName = rExchange !== undefined ? rExchange[stock] : ''
             return stockName
         } catch {
-            // console.log('cant find stock', stock)
             return " "
         }
     }
 
     function renderSearchPane() {
-        //add search pane rendering logic here. Additional filters need to be added below.
         const stockList = Object.keys(p.trackedStocks);
         const stockListRows = stockList.map((el) =>
             <tr key={el + "container"}>
@@ -190,22 +105,18 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
         return stockTable
     }
 
-    function changeStockSelection(e) { //DELETE IF no target stock
+    function changeStockSelection(e) {
         const target = e.target.value;
-        const key = `${p.widgetKey}-${target}`
-        setTargetStock(target)
         p.updateWidgetConfig(p.widgetKey, {
             targetSecurity: target,
         })
-        dispatch(tSearchMongoDB([key]))
     }
 
     function renderStockData() {
 
-        const stockDataRows = Array.isArray(stockData) ? stockData.map((el) =>
+        const stockDataRows = Array.isArray(rShowData) ? rShowData.map((el) =>
             <tr key={el + "row"}>
                 <td key={el + "symbol"}>{el}</td>
-                {/* <td key={el + "name"}>{el}</td> */}
                 <td key={el + "name"}>{getStockName(`${p.defaultExchange}-${el}`)}</td>
             </tr>
         ) : []
@@ -215,7 +126,7 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
             </option>
         ))
         return <>
-            <select className="btn" value={targetStock} onChange={changeStockSelection}>
+            <select className="btn" value={p.config.targetSecurity} onChange={changeStockSelection}>
                 {newSymbolList}
             </select>
             <table>
@@ -226,7 +137,6 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
             </table>
         </>
     }
-
 
     return (
         <div data-testid='peersBody'>

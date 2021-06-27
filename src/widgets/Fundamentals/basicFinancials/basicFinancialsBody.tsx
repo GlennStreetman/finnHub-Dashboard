@@ -12,7 +12,7 @@ import CreateTimeSeriesChart, { createOptions } from './createTimeSeriesChart'
 import { useDragCopy } from '../../widgetHooks/useDragCopy'
 import { useTargetSecurity } from '../../widgetHooks/useTargetSecurity'
 import { useSearchMongoDb } from '../../widgetHooks/useSearchMongoDB'
-import { useUpdateFocus } from '../../widgetHooks/useUpdateFocus'
+
 
 
 const useDispatch = useAppDispatch
@@ -106,7 +106,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
-    useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey) //on update to security focus, from watchlist menu, update target security.
 
     useEffect(() => { //set default series 
         if (seriesList.length > 0 && !p.config.targetSeries) {

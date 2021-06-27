@@ -1,13 +1,16 @@
 import * as React from "react"
-import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
+import { useState, useEffect, useMemo, forwardRef, useRef } from "react";
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
-import { rBuildVisableData } from '../../../slices/sliceShowData'
-import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
 
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 import CreateCandleStickChart from "./createCandleStickChart";
-import types from './../../../types'
+
+import { useDragCopy } from './../../widgetHooks/useDragCopy'
+import { useTargetSecurity } from './../../widgetHooks/useTargetSecurity'
+import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
+import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
+import { useStartingFilters } from './../../widgetHooks/useStartingFilters'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -22,29 +25,12 @@ interface FinnHubCandleData {
     v: number[],
 }
 
-interface filters {
-    description: string,
-    resolution: string,
-    startDate: number,
-    endDate: number,
-}
-
-
 function isCandleData(arg: any): arg is FinnHubCandleData { //defined shape of candle data. CHeck used before rendering.
     return arg.c !== undefined
 }
 
 function PriceCandles(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
-
-    const startingTargetStock = () => {
-        if (isInitialMount.current === true) {
-            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-                const targetStock = p.widgetCopy.targetStock
-                return (targetStock)
-            } else { return ('') }
-        }
-    }
 
     const startingCandleData = () => {
         if (isInitialMount.current === true) {
@@ -94,104 +80,46 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
 
 
     const [widgetCopy] = useState(startingWidgetCoptyRef())
-    const [targetStock, setTargetStock] = useState(startingTargetStock());
     const [chartData, setChartData] = useState(startingCandleData())
     const [options, setOptions] = useState(startingOptions())
     const [start, setStart] = useState(startingStartDate())
     const [end, setEnd] = useState(startingEndDate())
     const dispatch = useDispatch()
 
-    //finnhub data stored in redux
-    const rShowData = useSelector((state) => {
+    const rShowData = useSelector((state) => {     //finnhub data stored in redux
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData = state.showData.dataSet[p.widgetKey][targetStock]
-            // console.log('CandleData', CandleData)
+            const showData = state?.showData?.dataSet?.[p.widgetKey]?.[p.config.targetSecurity]
             return (showData)
         }
     })
 
-    useImperativeHandle(ref, () => (
-        //used to copy widgets when being dragged.
-        {
-            state: {
-                targetStock: targetStock,
-                chartData: chartData,
-                options: options,
-            },
+    const updateFilterMemo = useMemo(() => { //used inst useStartingFilters Hook.
+        return {
+            resolution: 'W',
+            startDate: start,
+            endDate: end,
+            Description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
         }
-    ))
+    }, [start, end,])
 
-    useEffect((key: number = p.widgetKey, trackedStock = p.trackedStocks, keyList: string[] = Object.keys(p.trackedStocks), updateWidgetConfig: Function = p.updateWidgetConfig) => {
-        //Setup default metric source if none selected.
-        if (p.config.targetSecurity === undefined) {
-            const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
-            updateWidgetConfig(key, {
-                targetSecurity: newSource,
-            })
-        }
-    }, [p.updateWidgetConfig, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
+    const focusSecurityList = useMemo(() => {
+        return [p?.config?.targetSecurity]
+    }, [p?.config?.targetSecurity])
 
-
-    useEffect(() => {
-        //On mount, use widget copy, else build visable data.
-        //On update, if change in target stock, rebuild visable data.
-        if (isInitialMount.current === true && widgetCopy === p.widgetKey) {
-            isInitialMount.current = false;
-        } else {
-            if (isInitialMount.current === true) { isInitialMount.current = false }
-            const payload: object = {
-                key: p.widgetKey,
-                securityList: [[`${targetStock}`]]
-            }
-            // console.log(payload)
-            dispatch(rBuildVisableData(payload))
-        }
-    }, [targetStock, p.widgetKey, widgetCopy, dispatch])
-
-    useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: string = p.widgetKey) => {
-        //Setup filters if not yet done.
-        if (filters['startDate'] !== undefined && types.reWID.test(key) === true && isInitialMount.current !== false) {
-            const filterUpdate = {
-                resolution: 'W',
-                startDate: start,
-                endDate: end,
-                Description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
-            }
-            update(key, filterUpdate)
-        } else {
-            if (isInitialMount.current !== false) console.log("Problem setting up candle filters: ", types.reWID.test(key), filters['startDate'])
-        }
-        // }
-    }, [p.filters, p.updateWidgetFilters, p.widgetKey, start, end])
-
-    useEffect(() => {
-        //if stock not selected default to first stock.
-        if (Object.keys(p.trackedStocks).length > 0 && targetStock === '') {
-            // console.log("setStock", Object.keys(p.trackedStocks).length, targetStock)
-            const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
-            setTargetStock(setDefault)
-        }
-    }, [p.trackedStocks, targetStock])
-
-    useEffect(() => { //on change to targetSecurity update widget focus. Delete if not targetSecurity.
-        if (p.targetSecurity !== '') {
-            const target = `${p.widgetKey}-${p.targetSecurity}`
-            setTargetStock(p.targetSecurity)
-            dispatch(tSearchMongoDB([target]))
-        }
-    }, [p.targetSecurity, p.widgetKey, dispatch])
-
+    useDragCopy(ref, { chartData: chartData, options: options, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
+    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
+    useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
+    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
 
     interface ChartNode {
         x: Date,
         y: number[],
     }
 
-    useEffect(() => {
-        //CREATE CANDLE DATA
-        // console.log("Calculating candle data")
+    useEffect(() => {//CREATE CANDLE DATA
         if (rShowData !== undefined && Object.keys(rShowData).length > 0) {
             const data: any = rShowData //returned from finnHub API
             if (isCandleData(data)) {
@@ -219,7 +147,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                     animationEnabled: true,
                     exportEnabled: true,
                     title: {
-                        text: targetStock + ": " + start + " - " + end,
+                        text: p.config.targetSecurity + ": " + start + " - " + end,
                     },
                     axisX: {
                         valueFormatString: "YYYY-MM-DD",
@@ -232,7 +160,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                         {
                             type: "candlestick",
                             showInLegend: true,
-                            name: targetStock,
+                            name: p.config.targetSecurity,
                             yValueFormatString: "$###0.00",
                             xValueFormatString: "YYYY-MM-DD",
                             dataPoints: chartData,
@@ -243,7 +171,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                 // }
             } else { console.log("Failed candle data type guard:", data) }
         }
-    }, [targetStock, rShowData, p.filters.endDate, p.filters.startDate, start, end])
+    }, [p.config.targetSecurity, rShowData, p.filters.endDate, p.filters.startDate, start, end])
 
     function updateWidgetList(stock) {
         if (stock.indexOf(":") > 0) {
@@ -256,12 +184,9 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
 
     function changeStockSelection(e) {
         const target = e.target.value;
-        const key = `${p.widgetKey}-${target}`
-        setTargetStock(target)
         p.updateWidgetConfig(p.widgetKey, {
             targetSecurity: target,
         })
-        dispatch(tSearchMongoDB([key]))
     }
 
     function editCandleListForm() {
@@ -302,8 +227,8 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         setEnd(e.target.value)
     }
 
-    function updateFilter(e) {
-        console.log('UPDATE FILTER', start, end)
+    function updateFilterDate(e) {
+        console.log('UPDATE FILTER', e.target.name, start, end)
         if (isNaN(new Date(e.target.value).getTime()) === false) {
             const now = Date.now()
             const target = new Date(e.target.value).getTime();
@@ -312,6 +237,10 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
             console.log(name, e.target.value)
             p.updateWidgetFilters(p.widgetKey, { [name]: offset })
         }
+    }
+
+    function updateFilterResolution(e) {
+        p.updateWidgetFilters(p.widgetKey, { [e.target.name]: e.target.value })
     }
 
     function displayCandleGraph() {
@@ -325,7 +254,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
             <>
                 <div className="div-inline">
                     {"  Selection:  "}
-                    <select className="btn" value={targetStock} onChange={changeStockSelection}>
+                    <select className="btn" value={p?.config?.targetSecurity} onChange={changeStockSelection}>
                         {newSymbolList}
                     </select>
                 </div>
@@ -352,14 +281,14 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                         <div className="stockSearch">
                             <form className="form-inline">
                                 <label htmlFor="start">Start date:</label>
-                                <input className="btn" id="start" type="date" name="startDate" onChange={updateStartDate} onBlur={updateFilter} value={start}></input>
+                                <input className="btn" id="start" type="date" name="startDate" onChange={updateStartDate} onBlur={updateFilterDate} value={start}></input>
                                 <p>
                                     <label htmlFor="end">End date:</label>
-                                    <input className="btn" id="end" type="date" name="endDate" onChange={updateEndDate} onBlur={updateFilter} value={end}></input>
+                                    <input className="btn" id="end" type="date" name="endDate" onChange={updateEndDate} onBlur={updateFilterDate} value={end}></input>
                                 </p>
                                 <p>
                                     <label htmlFor="resBtn">Resolution:</label>
-                                    <select id="resBtn" className="btn" name='resolution' value={p.filters.resolution} onChange={updateFilter}>
+                                    <select id="resBtn" className="btn" name='resolution' value={p.filters.resolution} onChange={updateFilterResolution}>
                                         {resolutionList}
                                     </select>
                                 </p>

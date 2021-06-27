@@ -61,7 +61,10 @@ export default class WatchListMenu extends React.PureComponent {
               type="radio" 
               key={el+'radio'} 
               checked={p.targetSecurity === g[el].key} 
-              onChange={() => p.setSecurityFocus(g[el].key)} /></td>
+              onChange={() => {
+                  p.setWidgetFocus(g[el].key)
+                  p.setSecurityFocus(g[el].key)
+                }} /></td>
           </>
         }
         {this.props.showEditPane === 1 && 
@@ -227,6 +230,7 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
     syncGlobalStockList: that.props.syncGlobalStockList,
     setSecurityFocus: that.props.setSecurityFocus,
     targetSecurity: that.props.targetSecurity,
+    setWidgetFocus: that.props.setWidgetFocus,
   };
   return propList;
 }

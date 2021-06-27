@@ -1,66 +1,38 @@
 import * as React from "react"
-import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
+import { useState, useMemo, forwardRef, useRef } from "react";
 
 import { useAppDispatch, useAppSelector } from '../hooks';
-import { rBuildVisableData } from '../slices/sliceShowData'
-import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB'
+
+import { useDragCopy } from './../widgets/widgetHooks/useDragCopy'
+import { useTargetSecurity } from './../widgets/widgetHooks/useTargetSecurity'
+import { useSearchMongoDb } from './../widgets/widgetHooks/useSearchMongoDB'
+import { useBuildVisableData } from './../widgets/widgetHooks/useBuildVisableData'
+import { useStartingFilters } from './../widgets/widgetHooks/useStartingFilters'
 
 import StockSearchPane, { searchPaneProps } from "../components/stockSearchPaneFunc";
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
-interface FinnHubAPIData { //rename
-    //defined shape of data returns by finnHub
-}
+// interface FinnHubAPIData { //rename
+//     //defined shape of data returns by finnHub
+// }
 
-interface FinnHubAPIDataArray {
-    [index: number]: FinnHubAPIData
-}
+// interface FinnHubAPIDataArray {
+//     [index: number]: FinnHubAPIData
+// }
 
-interface filters { //Any paramas not related to stock used by finnHub endpoint.
-    //remove if not needed, else define
-    description: string,
-    endDate: number,
-    startDate: number,
-    //additional filters...
-}
+// interface filters { //Any paramas not related to stock used by finnHub endpoint.
+//     //remove if not needed, else define
+//     description: string,
+//     endDate: number,
+//     startDate: number,
+//     //additional filters...
+// }
 
-//add any additional type guard functions here used for live code.
-function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
-    if (arg !== undefined && Object.keys(arg).length > 0 && arg[0].date) {
-        // console.log("returning true", arg)
-        return true
-    } else {
-        // console.log("returning false", arg)
-        return false
-    }
-}
 //RENAME FUNCTION
 function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
-
-    const startingstockData = () => {
-        if (isInitialMount.current === true) {
-            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-                const stockData = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
-                return (stockData)
-            } else if (p?.config?.targetSecurity) {
-                return (p?.config?.targetSecurity)
-            } else {
-                return ('')
-            }
-        }
-    }
-
-    const startingTargetStock = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
-        if (isInitialMount.current === true) {
-            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-                const targetStock = p.widgetCopy.targetStock
-                return (targetStock)
-            } else { return ('') }
-        }
-    }
 
     const startingWidgetCoptyRef = () => {
         if (isInitialMount.current === true) {
@@ -87,8 +59,6 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
     }
 
     const [widgetCopy] = useState(startingWidgetCoptyRef())
-    const [stockData, setStockData] = useState(startingstockData());
-    const [targetStock, setTargetStock] = useState(startingTargetStock());
     const [start, setStart] = useState(startingStartDate()) //REMOVE IF FILTERS NOT NEEDED
     const [end, setEnd] = useState(startingEndDate()) //REMOVE IF FILTERS NOT NEEDED
     const dispatch = useDispatch(); //allows widget to run redux actions.
@@ -97,72 +67,28 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData: object = state.showData.dataSet[p.widgetKey][targetStock]
+            const showData: object = state.showData.dataSet[p.widgetKey][p?.config?.targetSecurity]
             return (showData)
         }
     })
 
-    useImperativeHandle(ref, () => (
-        //used to copy widgets when being dragged. example: if widget body renders time series data into chart, copy chart data.
-        //add additional slices of state to list if they help reduce re-render time.
-        {
-            state: {
-                stockData: stockData,
-                targetStock: targetStock, //REMOVE IF NO TARGET STOCK
-            },
+    const updateFilterMemo = useMemo(() => { //remove if no filters
+        return {
+            startDate: start,
+            endDate: end,
+            Description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
         }
-    ))
+    }, [start, end])
 
-    useEffect(() => {
-        //On mount, use widget copy, else build visable data.
-        //On update, if change in target stock, rebuild visable data.
-        if (isInitialMount.current === true && widgetCopy === p.widgetKey) {
-            isInitialMount.current = false;
-        } else {
-            console.log('New Calc', widgetCopy)
-            if (isInitialMount.current === true) { isInitialMount.current = false }
-            const payload: object = {
-                key: p.widgetKey,
-                securityList: [[`${targetStock}`]]
-            }
-            console.log(payload)
-            dispatch(rBuildVisableData(payload))
-        }
-    }, [targetStock, p.widgetKey, widgetCopy, dispatch])
+    const focusSecurityList = useMemo(() => { //remove if all securities should stay in focus.
+        return [p?.config?.targetSecurity] //Object.keys(p.trackedStocks)
+    }, [p?.config?.targetSecurity]) //[p.trackedStocks])
 
-    useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
-        if (filters['startDate'] === undefined) { //REMOVE IF FILTERS NOT NEEDED
-            const filterUpdate = {
-                startDate: start,
-                endDate: end,
-                Description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
-            }
-            update(key, filterUpdate)
-        }
-    }, [p.filters, p.updateWidgetFilters, p.widgetKey, start, end])
-
-    useEffect(() => {
-        //DELETE IF NO TARGET STOCK
-        //if stock not selected default to first stock.
-        if (Object.keys(p.trackedStocks).length > 0 && targetStock === '') {
-            const setDefault = p.trackedStocks[Object.keys(p.trackedStocks)[0]].key
-            setTargetStock(setDefault)
-        }
-    }, [p.trackedStocks, targetStock])
-
-    useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        if (isFinnHubData(rShowData) === true) { setStockData(rShowData) } else { setStockData([]) } //<--update if default is object or other data type.
-    }, [rShowData])
-
-    useEffect(() => { //on change to targetSecurity update widget focus. Delete if not targetSecurity.
-        if (p.targetSecurity !== '') {
-            const target = `${p.widgetKey}-${p.targetSecurity}`
-            setTargetStock(p.targetSecurity)
-            dispatch(tSearchMongoDB([target]))
-        }
-    }, [p.targetSecurity, p.widgetKey, dispatch])
-
-
+    useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
+    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
+    useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
+    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
 
     function updateStartDate(e) { //remove if filters not needed
         setStart(e.target.value)
@@ -205,14 +131,6 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
             </tr>
         )
 
-        const now = Date.now()
-        const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000 * 52
-        const startUnix = now + startUnixOffset
-        const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
-        const endUnix = now + endUnixOffset
-        const startDate = new Date(startUnix).toISOString().slice(0, 10);
-        const endDate = new Date(endUnix).toISOString().slice(0, 10);
-
         let searchForm = (
             <>
                 <div className="stockSearch">
@@ -232,19 +150,17 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
         return searchForm
     }
 
-    function changeStockSelection(e) { //DELETE IF no target stock. target function of selector dropdown.
-        const target = e.target.value;
-        const key = `${p.widgetKey}-${target}`
-        setTargetStock(target)
-        p.updateWidgetConfig(p.widgetKey, {
-            targetSecurity: target,
-        })
-        dispatch(tSearchMongoDB([key]))
-    }
+    // function changeStockSelection(e) { //DELETE IF no target stock
+    //     const target = e.target.value;
+    //     p.updateWidgetConfig(p.widgetKey, {
+    //         targetSecurity: target,
+    //     })
+    //     //if any configs need to be reset add logic here. Pagination?
+    // }
 
 
     function renderStockData() {
-        //RENDER LOGIN HERE FOR STOCK DATA.
+        return rShowData ? Object.keys(rShowData).map((el => <tr>{el}</tr>)) : <></>
     }
 
     return (
