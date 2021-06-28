@@ -127,7 +127,6 @@ function WidgetContainer(p) {
     let widgetProps = p.widgetBodyProps ? p.widgetBodyProps() : {}
     if (p.widgetKey !== "dashBoardMenu") {
     widgetProps["showEditPane"] = showEditPane;
-    widgetProps["showPane"] = showPane;
     widgetProps['searchText'] = searchText
     widgetProps['changeSearchText'] = changeSearchText
     widgetProps['updateAPIFlag'] = p.updateAPIFlag

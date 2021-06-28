@@ -47,6 +47,19 @@ class StockSearchPane extends React.Component {
         Enter stock name or symbol to search for stocks. <br />
     </>
 
+    const syncText = <>
+    Set all widgets stocklists equal to global stock list.<br />
+    Useful after copying a dashboard and quickly updating all widgets to new stock list. <br />
+    </>
+
+    const watchListSync = 
+      <>
+        <button className="ui button" onClick={this.props.syncGlobalStockList}>
+              Sync
+        </button>
+        <ToolTip textFragment={syncText} hintName='sw' /> <br />
+      </>
+
     return (
       <div className="stockSearch">
         <form
@@ -56,7 +69,7 @@ class StockSearchPane extends React.Component {
               const thisStock = this.props.rUpdateStock
               const stockKey = thisStock.key
               this.props.updateGlobalStockList(e, stockKey, thisStock);
-              this.props.showSearchPane();
+              // this.props.showSearchPane();
               e.preventDefault();
             } else if (widgetKey / 1 !== undefined && this.props.rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
               const thisStock = this.props.rUpdateStock
@@ -77,9 +90,9 @@ class StockSearchPane extends React.Component {
             {exchangeOptions}
           </select></>
           } 
-          <br />
+
           <ToolTip textFragment={helpText2} hintName='sspe2' />
-          <label htmlFor="stockSearch">Symbol: </label>
+          <label htmlFor="stockSearch">Security: </label>
           <input size='18' autoComplete="off" className="btn" type="text" id="stockSearch" list="stockSearch1" value={this.state.inputText} onChange={this.handleChange} />
           <datalist id="stockSearch1">
             <StockDataList  
@@ -88,7 +101,9 @@ class StockSearchPane extends React.Component {
             />
           </datalist>
           <input className="btn" type="submit" value="Submit" />
+          {this.props.widgetKey === 'watchListMenu' && watchListSync}
         </form>
+
       </div>
     );
   }
@@ -97,7 +112,7 @@ class StockSearchPane extends React.Component {
 const mapStateToProps = (state, ownProps) => {
 
   const p = ownProps
-  // console.log('EXD', state.exchangeData.exchangeData?.data)
+
   const thisExchange = state.exchangeData.e?.data
   const inputSymbol = p.searchText.slice(0, p.searchText.indexOf(":"))
   const updateStock = thisExchange !== undefined ? thisExchange[inputSymbol] : {}
@@ -107,15 +122,11 @@ const mapStateToProps = (state, ownProps) => {
     currentExchange: currentExchange,
   }
 }
-
 export default connect(mapStateToProps, {tGetSymbolList})(StockSearchPane);
-// export default StockSearchPane;
-
 
 export function searchPaneProps(that) {
   const propList = {
     updateGlobalStockList: that.props.updateGlobalStockList,
-    showSearchPane: () => that.props.showPane("showEditPane", 1),
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: that.props.widgetKey,
     exchangeList: that.props.exchangeList,

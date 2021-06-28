@@ -34,7 +34,6 @@ export default class WatchListMenu extends React.PureComponent {
     const p = this.props
     const g = p.globalStockList;
     if (g && Object.keys(g) !== undefined) {
-    // console.log(g, '-------------')
     const stockListKey = Object.keys(g).map((el) => ( 
     <tr key={el + "row"}>
 
@@ -69,13 +68,7 @@ export default class WatchListMenu extends React.PureComponent {
         }
         {this.props.showEditPane === 1 && 
           <>
-            <td className="centerTE">{g[el]['exchange']}</td>
-            <td className="centerTE">{g[el]['symbol']}</td>
-            <td className="leftTe">{g[el]['description']}</td>
-            <td className="centerTE">{g[el]['currency']}</td>
-            <td className="leftTe">{g[el]['figi']}</td>
-            <td className="rightTE">{g[el]['mic']}</td>
-            <td className="centerTE" key={el + "rmv"}>
+          <td className="centerTE" key={el + "rmv"}>
               <button
                 key={el + "clck"}
                 onClick={(e) => {
@@ -85,6 +78,12 @@ export default class WatchListMenu extends React.PureComponent {
                 <i className="fa fa-times" aria-hidden="true"></i>
               </button>
             </td>
+            <td className="centerTE">{g[el]['exchange']}</td>
+            <td className="centerTE">{g[el]['symbol']}</td>
+            <td className="leftTe">{g[el]['description']}</td>
+            <td className="centerTE">{g[el]['currency']}</td>
+            <td className="leftTe">{g[el]['figi']}</td>
+            <td className="rightTE">{g[el]['mic']}</td>  
           </>
         }
       </tr>
@@ -114,7 +113,6 @@ export default class WatchListMenu extends React.PureComponent {
       complete: function(results) {
         const newStockList = []
         for (const stock in results.data) {
-          // console.log(results.data, stock, "<--------------")
           if (results.data[stock][1] !== undefined) {
             const thisStock = results.data[stock][0].toUpperCase() + '-' + results.data[stock][1].toUpperCase()
             newStockList.push(thisStock)
@@ -151,7 +149,7 @@ export default class WatchListMenu extends React.PureComponent {
       <>
         {this.props.showEditPane === 1 && (
           <>
-          {React.createElement(StockSearchPane, searchPaneProps(this))}
+          {/* {React.createElement(StockSearchPane, searchPaneProps(this))} */}
           <div>
             <input type="file" hidden ref={this.inputReference} onChange={this.fileUploadInputChange} />
             <button className="ui button" onClick={this.fileUploadAction}>
@@ -159,13 +157,21 @@ export default class WatchListMenu extends React.PureComponent {
             </button>
             <ToolTip textFragment={helpText} hintName='wl' /> <br />
             <button className="ui button" onClick={this.props.syncGlobalStockList}>
-                Sync Widgets
+                Sync
             </button>
             <ToolTip textFragment={syncText} hintName='sw' /> <br />
           </div>
 
           </>
         )}
+        <div >
+        {this.props.showEditPane !== 1 &&(<>{React.createElement(StockSearchPane, searchPaneProps(this))}</>)}
+        {/* <button className="ui button" onClick={this.props.syncGlobalStockList}>
+                Sync
+            </button>
+        <ToolTip textFragment={syncText} hintName='sw' /> <br /> */}
+        </div>
+
         <div className='.widgetTableDiv' style={{overflow: 'scroll'}}>
           <table className='widgetBodyTable'>
             <thead>
@@ -180,13 +186,14 @@ export default class WatchListMenu extends React.PureComponent {
                 }
                 {this.props.showEditPane === 1 &&  
                   <> 
+                    <td className="centerTE">Remove</td>
                     <td className="centerTE">Exchange</td>
                     <td className="centerTE">Symbol</td>
                     <td className="centerTE">Name</td>
                     <td className="centerTE">Currency</td>
                     <td className="centerTE">FIGI</td>
                     <td className="centerTE">MIC</td>
-                    <td className="centerTE">Remove</td>
+
                   </>
                 }
               </tr>
@@ -211,7 +218,6 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
   const helpText = <>
     All stocks added to Watchlist become default stocks for new widgets. <br />
     Each stock on watchlist also opens a socket connection for steaming data.<br />
-    Some widgets are updating by socket connections.
     </>
   
   let propList = {

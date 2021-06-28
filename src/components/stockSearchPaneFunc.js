@@ -17,7 +17,6 @@ class StockSearchPane extends React.PureComponent {
   componentDidMount(){
     const p = this.props
     if (p.defaultExchange !== p.currentExchange){
-      console.log("updating exchange data")
       p.tGetSymbolList({exchange: p.defaultExchange, apiKey: p.apiKey, finnHubQueue: p.finnHubQueue})
     }
   }
@@ -32,8 +31,7 @@ class StockSearchPane extends React.PureComponent {
     event.preventDefault()
   }
   
-  render() { // inputText
-
+  render() {
     const p = this.props
     let widgetKey = p.widgetKey;
     const exchangeOptions = this.props.exchangeList.map((el) => 
@@ -46,7 +44,6 @@ class StockSearchPane extends React.PureComponent {
       const helpText2 = <>
         Enter stock name or symbol to search for stocks. <br />
     </>
-    console.log('RENDERING STOCK SEARCH PANE')
     return (
       <div className="stockSearch" data-testid="stockSearchPane">
         <form
@@ -78,9 +75,9 @@ class StockSearchPane extends React.PureComponent {
             {exchangeOptions}
           </select></>
           } 
-          <br />
+
           <ToolTip textFragment={helpText2} hintName='sspe2' />
-          <label htmlFor="stockSearch">Symbol: </label>
+          <label htmlFor="stockSearch">Security: </label>
           <input size='18' autoComplete="off" className="btn" type="text" id="stockSearch" list="stockSearch1" value={this.state.inputText} onChange={this.handleChange} />
           <datalist id="stockSearch1">
             <StockDataList  
@@ -96,7 +93,7 @@ class StockSearchPane extends React.PureComponent {
 }
 
 const mapStateToProps = (state, ownProps) => {
-  // console.log("OWNPROPS:", ownProps)
+
   const p = ownProps
   const thisExchange = state.exchangeData.e?.data
   const inputSymbol = p.searchText.slice(0, p.searchText.indexOf(":"))
