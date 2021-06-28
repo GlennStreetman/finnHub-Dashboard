@@ -26,15 +26,6 @@ export function findByString(searchObj, searchList){ //find value in nested obje
     }
 }
 
-// var x = {
-//     cats: {
-//         cat1: 'cat1',
-//         cat2: 'cat2' 
-//     }
-// }
-
-// console.log('FINISH', findByString(x, 'cats.cat1'))
-
 export function mergeByString(searchObj, searchList, payload){ //recursively merge in obj.
     if (searchList.length === 1) {
         return searchObj[searchList[0]] = payload
@@ -50,9 +41,14 @@ export function mergeByString(searchObj, searchList, payload){ //recursively mer
     }
 }
 
-// var test = {}
-// var searchList = ['this', 'is', 'a', 'test']
-// var payload = {working: 'test'}
-// mergeByString(test, searchList, payload)
-
-// console.log(test)
+export function uniqueObjectnName(newName, reviewObject, iterator=0){
+    if (reviewObject[newName]) {
+        return uniqueObjectnName(newName, reviewObject, iterator+1)
+    } else {
+        if (iterator === 0){
+            return newName
+        } else {
+            return `${newName}${iterator}`
+        }
+    }
+}

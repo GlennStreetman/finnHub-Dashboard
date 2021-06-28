@@ -15,12 +15,25 @@ export interface GetSavedDashBoardsRes {
     message?: string
 }
 
+const blankDashboard = {
+    dashBoardData: {
+        NEW: {
+            dashboardname: 'NEW',
+            globalstocklist: {},
+            widgetlist: {},
+        }
+    },
+    currentDashBoard: 'NEW',
+    menuList: { "watchListMenu": { "column": 0, "columnOrder": -1, "widgetConfig": "menuWidget", "widgetHeader": "WatchList", "widgetID": "watchListMenu", "widgetType": "watchListMenu", "xAxis": "5rem", "yAxis": "5rem" }, "dashBoardMenu": { "column": 0, "columnOrder": -1, "widgetConfig": "menuWidget", "widgetHeader": "Saved Dashboards", "widgetID": "dashBoardMenu", "widgetType": "dashBoardMenu", "xAxis": "5rem", "yAxis": "5rem" } },
+    message: 'No saved dashboards'
+}
+
 export const GetSavedDashBoards = async function getSavedDashBoards() {
     let res = await fetch("/dashBoard")
     let data: serverData = await res.json()
 
     if (res.status === 200) {
-        const parseDashBoard = data.savedDashBoards
+        let parseDashBoard = data.savedDashBoards
         for (const dash in parseDashBoard) { //parse fields that are returned as strings.
             parseDashBoard[dash].globalstocklist = JSON.parse(parseDashBoard[dash].globalstocklist)
             const thisDash = parseDashBoard[dash].widgetlist
@@ -35,7 +48,9 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
             menuList[menu] = data.menuSetup[menu]
         }
 
-        const GetSavedDashboardsRes: GetSavedDashBoardsRes = {
+        const noDashboards = Object.keys(parseDashBoard).length === 0 ? true : false
+
+        const GetSavedDashboardsRes: GetSavedDashBoardsRes = noDashboards ? blankDashboard : {
             dashBoardData: parseDashBoard,
             currentDashBoard: data.default,
             menuList: menuList,
@@ -45,20 +60,8 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
 
     } else if (res.status === 401) {
         console.log(401)
-        const GetSavedDashboardsRes: GetSavedDashBoardsRes = {
-            dashBoardData: {},
-            currentDashBoard: '',
-            menuList: {},
-            message: 'No Saved dashboards returned'
-        }
-        return (GetSavedDashboardsRes)
+        return (blankDashboard)
     } else {
-        const GetSavedDashboardsRes: GetSavedDashBoardsRes = {
-            dashBoardData: {},
-            currentDashBoard: '',
-            menuList: {},
-            message: 'Problem retrieving saved dashboards2'
-        }
-        return (GetSavedDashboardsRes)
+        return (blankDashboard)
     }
 }
