@@ -8,11 +8,15 @@ import { useState, useEffect } from "react";
 //creates widget container. Used by all widgets.
 function WidgetContainer(p) {
 
-    const [renderHeader, setRenderHeader] = useState(p.widgetList["widgetHeader"])
+    const [renderHeader, setRenderHeader] = useState()
     const [showEditPane, setShowEditPane] = useState(0) //0: Hide, 1: Show
     const [show, setShow] = useState('block') //block = visable, none = hidden
     const [searchText, setSearchText] = useState('')
     const widgetRef = React.createRef()
+
+    useEffect(()=>{
+        setRenderHeader(p.widgetList["widgetHeader"])
+    },[p.widgetList])    
 
     useEffect(() => {
         const visable = ()=>{
@@ -44,7 +48,6 @@ function WidgetContainer(p) {
     }
 
     function updateHeader(e) {//changes widget name.
-        setRenderHeader(e.target.value);
         if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
             p.changeWidgetName('widgetList', p.widgetKey, e.target.value);
         } else{
@@ -105,7 +108,6 @@ function WidgetContainer(p) {
         }
     }
 
-    console.log('render-------------->', p.widgetList["widgetType"])
     const hideStockSearchMenu = ["dashBoardMenu"] //consider moving this to its own register.
     const compStyle = {
     display: show
@@ -153,7 +155,7 @@ function WidgetContainer(p) {
                 {renderHeader}
             </>
             ) : (
-            <input type="text" id={p.widgetKey + "HeaderValue"} value={p.renderHeader} onChange={updateHeader} />
+            <input type="text" id={p.widgetKey + "HeaderValue"} value={renderHeader} onChange={updateHeader} />
             )}
 
             <button

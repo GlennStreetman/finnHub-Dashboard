@@ -16,7 +16,6 @@ export const useTargetSecurity = function (
             const payload = {
                 targetSecurity: newTarget,
             }
-            console.log('new target', key, payload, updateWidgetConfig)
             updateWidgetConfig(key, payload)
         }
     }, [key, trackedStocks, updateWidgetConfig, targetSecurity])

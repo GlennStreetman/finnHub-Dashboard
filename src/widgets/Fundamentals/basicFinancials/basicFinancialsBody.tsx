@@ -13,8 +13,6 @@ import { useDragCopy } from '../../widgetHooks/useDragCopy'
 import { useTargetSecurity } from '../../widgetHooks/useTargetSecurity'
 import { useSearchMongoDb } from '../../widgetHooks/useSearchMongoDB'
 
-
-
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
@@ -115,7 +113,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     }, [seriesList, p.updateWidgetConfig, p.config.targetSeries, p.widgetKey])
 
     useEffect(() => { //build config setup
-        console.log('BUILDING VISABLE DATA')
         let stockList = Object.keys(p.trackedStocks)
         let securityList: string[] = []
         let filterObj = {}
@@ -154,8 +151,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             securityList: securityList,
             dataFilters: filterObj
         }
-        console.log('payload paramas', p.widgetKey, securityList, filterObj)
-        console.log('visable payload', payload)
         dispatch(rBuildVisableData(payload))
 
     }, [p.widgetKey, widgetCopy, dispatch, p.trackedStocks, p.config.metricSelection, p.config.seriesSelection, p.config.targetSecurity, p.config.toggleMode])
@@ -227,7 +222,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         orderMetricSelection[indexRef] = moveTo
         orderMetricSelection[indexRef + change] = moveFrom
         if (indexRef + change >= 0 && indexRef + change < p.config[update].length) {
-            console.log('updating')
             p.updateWidgetConfig(p.widgetKey, {
                 [update]: orderMetricSelection
             })
@@ -295,7 +289,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                             {orderView === 0 ? 'Order' : 'Selection'}
                         </button>
                     )}
-                    <button data-testid='symbolViewSelector' onClick={() => { console.log('HERE'); symbolView === 1 ? setSymbolView(0) : setSymbolView(1) }}>
+                    <button data-testid='symbolViewSelector' onClick={() => { symbolView === 1 ? setSymbolView(0) : setSymbolView(1) }}>
                         {symbolView === 0 ? 'Stocks' : 'Metrics'}
                     </button>
                 </div>
@@ -457,13 +451,15 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         let returnMetrics: string[] = []
         for (const x in findMetrics) {
             try {
-                let metric: string | number = symbolData[p.config.toggleMode][findMetrics[x]]
-                returnMetrics.push(metric.toLocaleString(undefined, {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                }))
+                if (symbolData?.[p.config.toggleMode]?.[findMetrics[x]]) {
+                    let metric: string | number = symbolData[p.config.toggleMode][findMetrics[x]]
+                    returnMetrics.push(metric.toLocaleString(undefined, {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                    }))
+                }
             } catch (err) {
-                // console.log('error rendering stock data', err)
+                console.log('error rendering stock data', err)
             }
         }
         let thisKey = p.widgetKey

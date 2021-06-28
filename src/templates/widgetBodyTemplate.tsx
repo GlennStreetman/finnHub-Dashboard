@@ -72,6 +72,10 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
         }
     })
 
+    const focusSecurityList = useMemo(() => { //remove if all securities should stay in focus.
+        return [p?.config?.targetSecurity]
+    }, [p?.config?.targetSecurity])
+
     const updateFilterMemo = useMemo(() => { //remove if no filters
         return {
             startDate: start,
@@ -79,10 +83,6 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
             Description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
         }
     }, [start, end])
-
-    const focusSecurityList = useMemo(() => { //remove if all securities should stay in focus.
-        return [p?.config?.targetSecurity] //Object.keys(p.trackedStocks)
-    }, [p?.config?.targetSecurity]) //[p.trackedStocks])
 
     useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
@@ -150,13 +150,13 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
         return searchForm
     }
 
-    // function changeStockSelection(e) { //DELETE IF no target stock
-    //     const target = e.target.value;
-    //     p.updateWidgetConfig(p.widgetKey, {
-    //         targetSecurity: target,
-    //     })
-    //     //if any configs need to be reset add logic here. Pagination?
-    // }
+    function changeStockSelection(e) { //DELETE IF no target stock
+        const target = e.target.value;
+        p.updateWidgetConfig(p.widgetKey, {
+            targetSecurity: target,
+        })
+        //if any configs need to be reset add logic here. Pagination?
+    }
 
 
     function renderStockData() {

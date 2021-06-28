@@ -133,13 +133,11 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
     }
 
     function updateFilter(e) {
-        console.log('UPDATE FILTER', start, end)
         if (isNaN(new Date(e.target.value).getTime()) === false) {
             const now = Date.now()
             const target = new Date(e.target.value).getTime();
             const offset = target - now
             const name = e.target.name;
-            console.log(name, e.target.value)
             p.updateWidgetFilters(p.widgetKey, { [name]: offset })
         }
     }
@@ -236,7 +234,6 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
         return symbolSelectorDropDown;
 
     }
-    console.log('RENDER ECB')
     return (
         <div data-testid="earningsCalendarBody">
             {p.showEditPane === 1 && (
@@ -281,6 +278,3 @@ export const EarningsCalendarFilters: filters = { //IF widget uses filters remem
     description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.',
 }
 
-fetch('https://finnhub.io/api/v1/calendar/earnings?from=2020-06-26&to=2022-06-24&symbol=AAPL&token=sandbox_bujhtnn48v6rigi03lsg')
-    .then((dat) => dat.json())
-    .then(((data) => { console.log(data) }))

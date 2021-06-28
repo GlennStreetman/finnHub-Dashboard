@@ -68,7 +68,7 @@ class WidgetController extends React.Component {
             }
 
             const subComponent = React.createElement(WidgetContainer, thisWidgetProps)
-            const memoizedComponent = React.memo(subComponent)
+            // const memoizedComponent = React.memo(subComponent)
                 return (
                 <div key={el.widgetID+'thisKey'} style={{padding: "1px"}}>
                     {subComponent}

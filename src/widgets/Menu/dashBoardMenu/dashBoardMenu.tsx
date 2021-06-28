@@ -31,7 +31,6 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
         }
     ))
 
-    // useEffect(() => {}, [])
     useEffect(() => {
         if (isInitialMount.current === true && p.currentDashBoard) {
             console.log('dashboard Menu Mounted')

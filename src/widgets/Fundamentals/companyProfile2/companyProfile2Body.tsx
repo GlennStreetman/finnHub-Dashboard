@@ -1,18 +1,12 @@
 import * as React from "react"
 import { useState, forwardRef, useRef, useMemo } from "react";
-
 import { useAppDispatch, useAppSelector } from '../../../hooks';
-
-
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
-
 import { useDragCopy } from './../../widgetHooks/useDragCopy'
 import { useTargetSecurity } from '../../widgetHooks/useTargetSecurity'
 import { useSearchMongoDb } from '../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from '../../widgetHooks/useBuildVisableData'
-
-
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector

@@ -1,11 +1,12 @@
 import * as React from "react"
-import { useState, useEffect, forwardRef, useRef, useMemo } from "react";
+import { useState, forwardRef, useRef, useMemo } from "react";
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 
 import { useDragCopy } from './../../widgetHooks/useDragCopy'
 import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
+import { useStartingFilters } from './../../widgetHooks/useStartingFilters'
 
 
 const useDispatch = useAppDispatch
@@ -28,10 +29,6 @@ export interface FinnHubAPIDataArray {
     [index: number]: FinnHubAPIData
 }
 
-interface filters { //Any paramas not related to stock used by finnHub endpoint.
-    categorySelection: string,
-}
-
 function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
 
@@ -50,8 +47,8 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
     }
 
     const [widgetCopy] = useState(startingWidgetCoptyRef())
-    // const [stockData, setStockData] = useState(startingstockData());
     const [newsIncrementor, setNewsIncrementor] = useState(startingNewsIncrementor());
+
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
@@ -67,26 +64,22 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
         return ['market']
     }, [])
 
+    const updateFilterMemo = useMemo(() => { //remove if no filters
+        return {
+            categorySelection: 'general'
+        }
+    }, [])
 
     useDragCopy(ref, { newsIncrementor: newsIncrementor, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-
-    useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
-
-        if (filters['categorySelection'] === undefined) {
-            const categorySelection = 'general' //['general', 'forex', 'crypto', 'merger']
-            update(key, { categorySelection: categorySelection })
-
-        }
-    }, [p.filters, p.updateWidgetFilters, p.widgetKey])
+    useStartingFilters(p.filters['categorySelection'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
 
     function updateFilter(e) {
         p.updateWidgetFilters(p.widgetKey, { categorySelection: e })
     }
 
     function formatSourceName(source) {//clean up source names for news articles.
-
         let formattedSource = source;
         if (formattedSource !== undefined) {
             formattedSource = formattedSource.replace(".com", "");

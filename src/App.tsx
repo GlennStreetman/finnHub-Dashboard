@@ -25,6 +25,7 @@ import { updateDefaultExchange } from "./appFunctions/appImport/updateDefaultExc
 import { updateDashBoards } from "./appFunctions/appImport/updateDashBoards"
 import { loadSavedDashboard } from "./appFunctions/appImport/loadSavedDashboard"
 import { updateWidgetSetup } from "./appFunctions/appImport/updateWidgetSetup"
+import { MenuWidgetToggle } from "./appFunctions/appImport/menuWidgetToggle"
 
 //component imports
 import TopNav from "./components/topNav";
@@ -35,7 +36,7 @@ import WidgetMenu, { widgetMenuProps } from "./components/widgetMenu";
 import EndPointMenu, { endPointProps } from "./components/endPointMenu";
 import ExchangeMenu, { exchangeMenuProps } from "./components/exchangeMenu";
 import TemplateMenu, { templateMenuProps } from "./components/templateMenu";
-import { WidgetController, MenuWidgetToggle } from "./components/widgetController";
+import { WidgetController } from "./components/widgetController";
 
 //redux imports
 import { connect } from "react-redux";
@@ -46,8 +47,6 @@ import { rUpdateExchangeList, rExchangeListLogout } from "./slices/sliceExchange
 import { rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus, sliceDataModel, rDataModelLogout } from "./slices/sliceDataModel";
 import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
-
-
 
 export interface stock {
     currency: string,
@@ -65,7 +64,6 @@ export interface stock {
 export interface stockList {
     [key: string]: stock
 }
-
 
 export interface globalStockList {
     [key: string]: stock
@@ -302,13 +300,11 @@ class App extends React.Component<AppProps, AppState> {
             console.log("RUNNING DATA BUILD")
             p.rResetUpdateFlag()
             let setupData = async function () {
-                // console.log('0')
                 await p.tGetMongoDB()
                 const targetDash: string[] = s.dashBoardData?.[s.currentDashBoard]?.widgetlist ? Object.keys(s.dashBoardData?.[s.currentDashBoard]?.widgetlist) : []
                 p.rSetUpdateStatus({
                     [s.currentDashBoard]: 'Updating'
                 })
-                // console.log('1')
                 for (const widget in targetDash) {
                     await p.tGetFinnhubData({ //get data for default dashboard.
                         targetDashBoard: s.currentDashBoard,
@@ -316,28 +312,23 @@ class App extends React.Component<AppProps, AppState> {
                         finnHubQueue: s.finnHubQueue,
                     })
                 }
-                // console.log('2')
                 p.rSetUpdateStatus({
                     [s.currentDashBoard]: 'Ready'
                 })
-                // console.log('3')
                 const dashBoards: string[] = Object.keys(s.dashBoardData) //get data for dashboards not being shown
                 for (const dash of dashBoards) {
                     if (dash !== s.currentDashBoard) {
                         p.rSetUpdateStatus({
                             [dash]: 'Updating'
                         })
-                        // console.log('4')
                         await p.tGetFinnhubData({ //run in background, do not await.
                             targetDashBoard: dash,
                             widgetList: Object.keys(s.dashBoardData[dash].widgetlist),
                             finnHubQueue: s.finnHubQueue,
                         })
-                        // console.log('5')
                         p.rSetUpdateStatus({
                             [dash]: 'Ready'
                         })
-                        // console.log('6')
                     }
                 }
             }

@@ -101,15 +101,6 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
-
-    // useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-    //     if (isFinnHubData(rShowData) === true) {
-    //         setStockData(rShowData)
-    //     } else {
-    //         setStockData([])
-    //     }
-    // }, [rShowData])
-
     useEffect(() => {//create chart data
         const sOptions = ['strongSell', 'sell', 'hold', 'buy', 'strongBuy']
         const chartData: DataChartObject = { strongSell: {}, sell: {}, hold: {}, buy: {}, strongBuy: {} }

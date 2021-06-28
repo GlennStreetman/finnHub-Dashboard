@@ -11,8 +11,6 @@ import { useTargetSecurity } from './../../widgetHooks/useTargetSecurity'
 import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
 
-
-
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 
 const useDispatch = useAppDispatch
@@ -38,7 +36,6 @@ export interface FinnHubAPIData {
     cik: string,
     data: finnHubFilingObj,
 }
-
 
 function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
@@ -180,7 +177,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
 
         const stockTable =
             <>
-                <select data-testid='financialsAsReportedStock' className="btn" value={p.configtargetSecurity} onChange={changeStockSelection}>
+                <select data-testid='financialsAsReportedStock' className="btn" value={p.config.targetSecurity} onChange={changeStockSelection}>
                     {newSymbolList}
                 </select>
                 <select data-testid='financialsAsReportedSelection' className="btn" value={p.config.targetReport} onChange={changeReportSelection}>

@@ -1,23 +1,6 @@
 import React from "react";
 import WidgetContainer from "./widgetContainer";
 import {returnBodyProps} from "../registers/widgetControllerReg.js"
-// import { useState } from "react";
-
-function MenuWidgetToggle(context) {
-    //Create dashboard menu if first time looking at, else toggle visability
-    return function toggleFunction(menuName, dashName = "pass", that = context ){
-        console.log(menuName, dashName, that)
-        // const menuNameRef = menuName.charAt(0).toUpperCase() + menuName.slice(1)
-        if (that.state.menuList[menuName] === undefined) {
-            console.log('here', menuName)
-            that.newMenuContainer(menuName, dashName, "menuWidget");
-            that.setState({ [menuName]: 1 });
-        } else {
-            console.log('there:', menuName)
-            that.state[menuName] === 1 ? that.setState({ [menuName]: 0 }) : that.setState({ [menuName]: 1 });
-        }
-    }
-}
 
 function WidgetController(p){
 
@@ -40,7 +23,7 @@ function WidgetController(p){
                 setSecurityFocus: p.setSecurityFocus,
                 showStockWidgets: p.showStockWidgets,
                 snapWidget: p.snapWidget,
-                stateRef: el.widgetConfig, //used by app.js to move and remove widgets.
+                stateRef: el.widgetConfig,
                 targetSecurity: p.targetSecurity,
                 toggleWidgetBody: p.toggleWidgetBody,
                 updateAPIFlag: p.updateAPIFlag,
@@ -127,4 +110,4 @@ function WidgetController(p){
     )
 }
 
-export {WidgetController, MenuWidgetToggle};
+export {WidgetController };
