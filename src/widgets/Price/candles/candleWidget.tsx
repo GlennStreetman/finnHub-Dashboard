@@ -252,8 +252,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
 
         let symbolSelectorDropDown = (
             <>
-                <div className="div-inline">
-                    {"  Selection:  "}
+                <div className="div-stack">
                     <select className="btn" value={p?.config?.targetSecurity} onChange={changeStockSelection}>
                         {newSymbolList}
                     </select>

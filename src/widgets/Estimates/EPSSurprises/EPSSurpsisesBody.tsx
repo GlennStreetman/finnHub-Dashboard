@@ -2,6 +2,9 @@ import * as React from "react"
 import { useState, useEffect, forwardRef, useRef, useMemo } from "react";
 import ReactChart from "./reactChart";
 
+import { createSelector } from 'reselect'
+import { storeState } from './../../../store'
+
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
 
@@ -32,29 +35,8 @@ interface dataListObject {
     y: string
 }
 
-function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
-    if (arg !== undefined && Object.keys(arg).length > 0 && arg[0] && arg[0].actual !== undefined) {
-        return true
-    } else {
-        return false
-    }
-}
-//RENAME FUNCTION
 function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
-
-    const startingstockData = () => {
-        if (isInitialMount.current === true) {
-            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-                const stockData = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
-                return (stockData)
-            } else if (p?.config?.targetSecurity) {
-                return (p?.config?.targetSecurity)
-            } else {
-                return ('')
-            }
-        }
-    }
 
     const startingWidgetCoptyRef = () => {
         if (isInitialMount.current === true) {
@@ -64,16 +46,20 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
         }
     }
 
-    const [stockData, setStockData] = useState(startingstockData());
     const [chartOptions, setChartOptions] = useState({})
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const dispatch = useDispatch(); //allows widget to run redux actions.
+
+    const showDataSelector = createSelector(
+        (state: storeState) => state.showData.dataSet[p.widgetKey][p.config.targetSecurity],
+        returnValue => returnValue
+    )
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData: object = state.showData.dataSet[p.widgetKey][p.config.targetSecurity]
+            const showData: object = showDataSelector(state)
             return (showData)
         }
     })
@@ -82,30 +68,19 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
         return [p?.config?.targetSecurity]
     }, [p?.config?.targetSecurity])
 
-    useDragCopy(ref, { chartOptions: chartOptions, stockData: stockData, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useDragCopy(ref, { chartOptions: chartOptions, }) //useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
-    useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        if (isFinnHubData(rShowData) === true) {
-            // console.log('passes typeguard')
-            setStockData(rShowData)
-        } else {
-            // console.log('does not pass typeguard')
-            setStockData([])
-        }
-    }, [rShowData])
-
     useEffect(() => { //create data chart
-        // console.log('stock data updated, created chart objects.')
         const actualList: dataListObject[] = []
         const estimateList: dataListObject[] = []
 
-        for (const i in stockData) {
-            const n = stockData
-            actualList.push({ 'x': new Date(n[i]['period']), 'y': n[i]['actual'] })
-            estimateList.push({ 'x': new Date(n[i]['period']), 'y': n[i]['estimate'] })
+        for (const i in rShowData) {
+            // const n = stockData
+            actualList.push({ 'x': new Date(rShowData[i]['period']), 'y': rShowData[i]['actual'] })
+            estimateList.push({ 'x': new Date(rShowData[i]['period']), 'y': rShowData[i]['estimate'] })
         }
 
         const chartData = {
@@ -153,7 +128,7 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
         }
         setChartOptions(options);
 
-    }, [stockData, p.config.targetSecurity])
+    }, [rShowData, p.config.targetSecurity])
 
     function changeStockSelection(e) { //DELETE IF no target stock
         const target = e.target.value;
@@ -201,7 +176,7 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
 
         let chartBody = (
             <>
-                <div data-testid="SelectionLabel" className="div-inline" >
+                <div data-testid="SelectionLabel" className="div-stack" >
                     <select className="btn" value={p.config.targetSecurity} onChange={changeStockSelection}>
                         {newSymbolList}
                     </select>
@@ -213,7 +188,7 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
         );
         return chartBody;
     }
-
+    console.log('Rendering EPS')
     return (
         <div data-testid="EPSSuprisesBody">
             {p.showEditPane === 1 && (

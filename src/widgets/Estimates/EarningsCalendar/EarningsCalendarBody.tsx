@@ -1,6 +1,9 @@
 import * as React from "react"
 import { useState, forwardRef, useRef, useMemo } from "react";
 
+import { createSelector } from 'reselect'
+import { storeState } from './../../../store'
+
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { convertCamelToProper } from './../../../appFunctions/stringFunctions'
 
@@ -83,11 +86,16 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
     const [pagination, setPagination] = useState(startingPagination())
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
+    const showDataSelector = createSelector(
+        (state: storeState) => state.showData.dataSet?.[p.widgetKey]?.[p.config.targetSecurity]?.['earningsCalendar'],
+        returnValue => returnValue
+    )
+
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData: FinnHubAPIDataArray = state.showData.dataSet?.[p.widgetKey]?.[p.config.targetSecurity]?.['earningsCalendar']
+            const showData: FinnHubAPIDataArray = showDataSelector(state)
             return (showData)
         }
     })
@@ -228,7 +236,7 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
         return symbolSelectorDropDown;
 
     }
-
+    console.log('RENDER ECB')
     return (
         <div data-testid="earningsCalendarBody">
             {p.showEditPane === 1 && (

@@ -2,6 +2,9 @@ import * as React from "react"
 import { useState, useEffect, forwardRef, useRef, useMemo } from "react";
 import RecTrendChart from "./recTrendChart";
 
+import { createSelector } from 'reselect'
+import { storeState } from './../../../store'
+
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
@@ -10,6 +13,8 @@ import { useDragCopy } from './../../widgetHooks/useDragCopy'
 import { useTargetSecurity } from './../../widgetHooks/useTargetSecurity'
 import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
+
+
 
 
 const useDispatch = useAppDispatch
@@ -38,27 +43,27 @@ interface DataChartObject {
 }
 
 //add any additional type guard functions here used for live code.
-function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
-    if (arg !== undefined && Object.keys(arg).length > 0 && arg[0].symbol) {
-        return true
-    } else {
-        return false
-    }
-}
+// function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
+//     if (arg !== undefined && Object.keys(arg).length > 0 && arg[0].symbol) {
+//         return true
+//     } else {
+//         return false
+//     }
+// }
 
 function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
 
-    const startingstockData = () => {
-        if (isInitialMount.current === true) {
-            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-                const stockData = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
-                return (stockData)
-            } else {
-                return ([])
-            }
-        }
-    }
+    // const startingstockData = () => {
+    //     if (isInitialMount.current === true) {
+    //         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
+    //             const stockData = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
+    //             return (stockData)
+    //         } else {
+    //             return ([])
+    //         }
+    //     }
+    // }
 
     const startingWidgetCoptyRef = () => {
         if (isInitialMount.current === true) {
@@ -68,16 +73,21 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
         }
     }
 
-    const [stockData, setStockData] = useState(startingstockData());
+    // const [stockData, setStockData] = useState(startingstockData());
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [chartOptions, setchartOptions] = useState({})
     const dispatch = useDispatch(); //allows widget to run redux actions.
+
+    const showDataSelector = createSelector(
+        (state: storeState) => state.showData.dataSet[p.widgetKey][p.config.targetSecurity],
+        returnValue => returnValue
+    )
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData: object = state.showData.dataSet[p.widgetKey][p.config.targetSecurity]
+            const showData: any = showDataSelector(state)
             return (showData)
         }
     })
@@ -86,19 +96,19 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
         return [p?.config?.targetSecurity]
     }, [p?.config?.targetSecurity])
 
-    useDragCopy(ref, { stockData: JSON.parse(JSON.stringify(stockData)), chartOptions: chartOptions })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useDragCopy(ref, { chartOptions: chartOptions })// stockData: JSON.parse(JSON.stringify(stockData)),   useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
 
-    useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        if (isFinnHubData(rShowData) === true) {
-            setStockData(rShowData)
-        } else {
-            setStockData([])
-        }
-    }, [rShowData])
+    // useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
+    //     if (isFinnHubData(rShowData) === true) {
+    //         setStockData(rShowData)
+    //     } else {
+    //         setStockData([])
+    //     }
+    // }, [rShowData])
 
     useEffect(() => {//create chart data
         const sOptions = ['strongSell', 'sell', 'hold', 'buy', 'strongBuy']
@@ -113,7 +123,7 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
                 dataPoints: [] //populated by loop below
             }
         }
-        const listSixData = stockData.slice(0, 12)
+        const listSixData = Array.isArray(rShowData) === true ? rShowData.slice(0, 12) : []
         const rawData = listSixData
         for (const i in rawData) {
             const node = rawData[i]
@@ -163,7 +173,7 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
 
         setchartOptions(options)
 
-    }, [stockData, p.config.targetSecurity])
+    }, [rShowData, p.config.targetSecurity])
 
     function renderSearchPane() {
 
@@ -209,8 +219,7 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
 
         let chartBody = (
             <div data-testid='recTrendBody'>
-                <div className="div-inline">
-                    {"  Selection:  "}
+                <div className="div-stack">
                     <select data-testid='recTrendDropdown' className="btn" value={p.config.targetSecurity} onChange={changeStockSelection}>
                         {newSymbolList}
                     </select>
@@ -222,7 +231,7 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
         );
         return chartBody;
     }
-
+    console.log('rendering RTB')
     return (
         <>
             {p.showEditPane === 1 && (
