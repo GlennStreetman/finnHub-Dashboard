@@ -136,6 +136,7 @@ export function searchPaneProps(that) {
     changeSearchText: that.props.changeSearchText,
     apiKey: that.props.apiKey,
     finnHubQueue: that.props.finnHubQueue,
+    syncGlobalStockList: that.props.syncGlobalStockList,
   };
   return propList;
 }
