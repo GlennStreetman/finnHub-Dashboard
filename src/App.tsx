@@ -206,7 +206,7 @@ class App extends React.Component<AppProps, AppState> {
             apiAlias: "",
             backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
             currentDashBoard: "", //dashboard being displayed
-            dashBoardMenu: 0, //1 = show, 0 = hide
+            dashBoardMenu: 1, //1 = show, 0 = hide
             dashBoardData: {}, //All saved dashboards
             defaultExchange: "US",
             exchangeList: ["US"], //list of all exchanges activated under account management.
