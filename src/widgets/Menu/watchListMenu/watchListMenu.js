@@ -39,6 +39,14 @@ export default class WatchListMenu extends React.PureComponent {
 
         {this.props.showEditPane === 0 &&
           <>
+            <td><input 
+              type="radio" 
+              key={el+'radio'} 
+              checked={p.targetSecurity === g[el].key} 
+              onChange={() => {
+                  p.setWidgetFocus(g[el].key)
+                  p.setSecurityFocus(g[el].key)
+                }} /></td>
             <td key={el + "symb"}>
               {g[el].dStock(p.exchangeList)}
             </td>
@@ -56,14 +64,7 @@ export default class WatchListMenu extends React.PureComponent {
                 <></>
               )}
             </td>
-            <td><input 
-              type="radio" 
-              key={el+'radio'} 
-              checked={p.targetSecurity === g[el].key} 
-              onChange={() => {
-                  p.setWidgetFocus(g[el].key)
-                  p.setSecurityFocus(g[el].key)
-                }} /></td>
+
           </>
         }
         {this.props.showEditPane === 1 && 
@@ -140,16 +141,14 @@ export default class WatchListMenu extends React.PureComponent {
     </>
 
     const syncText = <>
-    Set all widgets stocklists equal to global stock list.<br />
-    Useful after copying a dashboard and quickly updating all widgets to new stock list. <br />
-
+    Set all widgets security list equal to Watchlist Menu security list.<br />
+    Also useful after copying a dashboard and quickly updating all widgets with new security list. <br />
     </>
 
     return (
       <>
         {this.props.showEditPane === 1 && (
           <>
-          {/* {React.createElement(StockSearchPane, searchPaneProps(this))} */}
           <div>
             <input type="file" hidden ref={this.inputReference} onChange={this.fileUploadInputChange} />
             <button className="ui button" onClick={this.fileUploadAction}>
@@ -166,10 +165,6 @@ export default class WatchListMenu extends React.PureComponent {
         )}
         <div >
         {this.props.showEditPane !== 1 &&(<>{React.createElement(StockSearchPane, searchPaneProps(this))}</>)}
-        {/* <button className="ui button" onClick={this.props.syncGlobalStockList}>
-                Sync
-            </button>
-        <ToolTip textFragment={syncText} hintName='sw' /> <br /> */}
         </div>
 
         <div className='.widgetTableDiv' style={{overflow: 'scroll'}}>
@@ -178,10 +173,10 @@ export default class WatchListMenu extends React.PureComponent {
               <tr>
                 {this.props.showEditPane === 0 &&
                   <>
+                    <td className="centerTE">Focus</td>
                     <td className="centerTE">Symbol</td>
                     <td className="centerTE">Name</td>
                     <td className="centerTE">Price</td>
-                    <td className="centerTE">Focus</td>
                   </>
                 }
                 {this.props.showEditPane === 1 &&  

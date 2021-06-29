@@ -188,7 +188,6 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
         );
         return chartBody;
     }
-    console.log('Rendering EPS')
     return (
         <div data-testid="EPSSuprisesBody">
             {p.showEditPane === 1 && (

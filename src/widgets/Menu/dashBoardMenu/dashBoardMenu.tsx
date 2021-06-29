@@ -1,15 +1,13 @@
-import * as React from "react"
-import { useState, useEffect, useImperativeHandle, forwardRef, useRef } from "react";
+import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { useAppSelector } from '../../../hooks';
+import { uniqueObjectnName } from './../../../appFunctions/stringFunctions'
 
 
 function DashBoardMenu(p: { [key: string]: any }, ref: any) {
-    // console.log('rendering dashboardmenu')
-    const isInitialMount = useRef(true); //update to false after first render.
 
+    // const isInitialMount = useRef(true); //update to false after first render.
     const [inputText, setInputText] = useState('Enter Name')
-    const [checkMark, setCheckMark] = useState("faIcon");
-
+    const [newNames, setNewNames] = useState({})
     const useSelector = useAppSelector
 
     const dashboardStatus = useSelector((state) => { //REDUX Data associated with this widget.
@@ -26,71 +24,127 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
         {
             state: {
                 inputText: inputText,
-                checkMark: checkMark, //REMOVE IF NO TARGET STOCK
+                newNames: newNames,
             },
         }
     ))
 
     useEffect(() => {
-        if (isInitialMount.current === true && p.currentDashBoard) {
-            console.log('dashboard Menu Mounted')
-            setInputText(p.currentDashBoard)
-        }
-    }, [p.currentDashBoard])
+        let returnObj = {}
+        let keyList = Object.keys(p.dashBoardData)
+        for (const x in keyList) returnObj[keyList[x]] = keyList[x]
+        setNewNames(returnObj)
+    }, [p.dashBoardData])
 
-    useEffect(() => {
-        if (p.currentDashBoard) setInputText(p.currentDashBoard)
-    }, [p.currentDashBoard])
 
     function handleChange(e) {
         const newName = e.target.value
         setInputText(newName.trim().toUpperCase())
     }
 
-    function showCheckMark() {
-        setCheckMark("faIconFade")
-        setTimeout(() => setCheckMark("faIcon"), 3000);
+    function stageNameChange(e) { //newName, widgetName 
+        const dbName = dashBoardData[e.target.id].dashboardname
+        let updateNewNames = { ...newNames }
+        updateNewNames[dashBoardData[dbName].dashboardname] = e.target.value
+        setNewNames(updateNewNames)
     }
 
-    async function saveUpdateDashboard(dashboardName) {
-        const saveDashboardAs = dashboardName.trim()
+    async function postNameChange(e) {
+        if (!p.dashBoardData[e.target.value]) {
+            const data: any = {
+                dbID: dashBoardData[e.target.id].id,
+                newName: e.target.value
+            }
+            const options = {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            };
+            await fetch('/renameDashboard', options)
+            p.rebuildDashboardState()
+        }
+    }
+
+    async function copyDashboard(dashboardName) {
+        const saveDashboardAs = uniqueObjectnName(dashboardName.trim(), p.dashBoardData)
         if (saveDashboardAs !== '' && saveDashboardAs !== undefined) {
             let savedDash = await p.saveCurrentDashboard(saveDashboardAs)
             if (savedDash === true) {
-                console.log('dashboard Saved')
-                let returnedDash = await p.getSavedDashBoards()
-                p.updateDashBoards(returnedDash)
+                p.rebuildDashboardState()
             }
         } else { setInputText('Enter Name') }
     }
 
-    async function deleteDashBoard(dashBoardId) {
+    async function deleteDashBoard(dashBoardId, dashboardName) {
         await fetch(`/deleteSavedDashboard?dashID=${dashBoardId}`)
-        const afterDelete = await p.getSavedDashBoards();
-        p.updateDashBoards(afterDelete)
+        if (dashboardName === p.currentDashBoard && Object.keys(dashBoardData).length > 1) { //if shown dashboard is deleted.
+            for (const x in Object.keys(dashBoardData)) {
+                const dashboard = p.dashBoardData[Object.keys(dashBoardData)[x]]
+                const testDashboardName = dashboard.dashboardname
+                if (testDashboardName !== dashboardName) { //load non-deleted dashboard
+                    p.loadSavedDashboard(testDashboardName, dashboard.globalstocklist, dashboard.widgetlist);
+                    break
+                }
+            }
+        } else if (dashboardName === p.currentDashBoard && Object.keys(dashBoardData).length === 1) {
+            p.newDashBoard('NEW', p.dashBoardData)
+        }
+        p.rebuildDashboardState()
     }
-
 
     let dashBoardData = p.dashBoardData;
     let savedDashBoards = Object.keys({ ...dashBoardData }).map((el) => (
         <tr key={dashBoardData[el].id + "tr"}>
-            <td className="centerTE">
-                <button onClick={() => deleteDashBoard(dashBoardData[el].id)}>
-                    <i className="fa fa-times" aria-hidden="true"></i>
-                </button>
-            </td>
-            <td key={dashBoardData[el].id + "te"}>{dashBoardData[el].dashboardname}</td>
+            {p.showEditPane === 1 ? //if showing edit pane
+                <>
+                    <td className="centerTE">
+                        <button onClick={() => deleteDashBoard(dashBoardData[el].id, dashBoardData[el].dashboardname)}>
+                            <i className="fa fa-times" aria-hidden="true"></i>
+                        </button>
+                    </td>
+                    <td>
+                        <input
+                            size={18}
+                            autoComplete="off"
+                            className="btn"
+                            type="text"
+                            id={el}
+                            list="stockSearch1"
+                            value={newNames[dashBoardData[el].dashboardname] ? newNames[dashBoardData[el].dashboardname] : ''}
+                            onChange={stageNameChange}
+                            onBlur={postNameChange}
+                        />
+                    </td>
+                </>
+                : //if not showing edit pane
+                <>
+                    <td className="centerTE">
+                        <input
+                            type='radio'
+                            key={el + 'radio'}
+                            checked={p.currentDashBoard === p.dashBoardData?.[el]?.dashboardname} //
+                            onChange={() => {
+                                p.loadSavedDashboard(p.dashBoardData?.[el]?.dashboardname, dashBoardData[el].globalstocklist, dashBoardData[el].widgetlist);
+                                setInputText(dashBoardData[el].dashboardname)
+                            }}
+                        />
+                    </td>
+                    <td key={dashBoardData[el].id + "te"}>{dashBoardData[el].dashboardname}</td>
+                </>
+            }
+
             <td>{dashboardStatus?.[dashBoardData[el].dashboardname]}</td>
-            <td className="centerTE">
-                <button
-                    onClick={() => {
-                        p.loadSavedDashboard(el, dashBoardData[el].globalstocklist, dashBoardData[el].widgetlist);
-                        setInputText(dashBoardData[el].dashboardname)
-                    }}
-                >
-                    <i className="fa fa-check-square-o" aria-hidden="true"></i>
-                </button>
-            </td>
+            {p.showEditPane === 1 &&
+                <td>
+                    <button
+                        className="fa fa-check-square-o"
+                        aria-hidden="true"
+                        type="submit"
+                        onClick={() => {
+                            copyDashboard(`${dashBoardData[el].dashboardname}`)
+                        }}
+                    />
+                </td>}
         </tr>
     ));
 
@@ -100,10 +154,20 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                 <table>
                     <thead>
                         <tr>
-                            <td className="centerTE">Remove</td>
-                            <td className="centerTE">Description</td>
-                            <td className="centerTE">Status</td>
-                            <td className="centerTE">Display</td>
+                            {p.showEditPane === 1 ?
+                                <>
+                                    <td className="centerTE">Remove</td>
+                                    <td className="centerTE">Description</td>
+                                    <td className="centerTE">Status</td>
+                                    <td className="centerTE">Copy</td>
+                                </> :
+                                <>
+                                    <td className="centerTE">Display</td>
+                                    <td className="centerTE">Description</td>
+                                    <td className="centerTE">Status</td>
+                                </>
+                            }
+
                         </tr>
                     </thead>
                     <tbody>
@@ -114,14 +178,11 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                                 <td></td>
                                 <td>"No previous saves"</td>
                                 <td></td>
-                                <td></td>
                             </tr>
                         )}
                         <tr>
                             <td className="centerTE">
-                                <p className={checkMark}>
-                                    <i className="fa fa-check-circle" aria-hidden="true"></i>
-                                </p>
+
                             </td>
                             <td>
                                 <input type="text" value={inputText} onChange={handleChange}></input>
@@ -130,35 +191,21 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                                 <input
                                     className="btn"
                                     type="submit"
-                                    value={p.currentDashBoard === inputText ? "Update" : " Save "}
-                                    // value="submit"
+                                    value="New"
                                     onClick={() => {
-                                        saveUpdateDashboard(inputText)
-                                        showCheckMark();
+                                        p.newDashBoard(inputText, p.dashBoardData);
                                     }}
                                 />
                             </td>
                         </tr>
-                        <tr><td></td><td></td><td>
-                            <input
-                                className="btn"
-                                type="submit"
-                                value="New"
-                                // value="submit"
-                                onClick={() => {
-                                    p.newDashBoard();
-                                }}
-                            />
-                        </td></tr>
                     </tbody>
                 </table>
             </div>
-        </div>
+        </div >
     );
 }
 
 export default forwardRef(DashBoardMenu);
-// export default StockSearchPane;
 
 export function dashBoardMenuProps(that, key = "DashBoardMenu") {
     const helpText = <>
@@ -176,6 +223,7 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
         helpText: [helpText, 'DBM'],
         loadSavedDashboard: that.props.loadSavedDashboard,
         updateDashBoards: that.props.updateDashBoards,
+        rebuildDashboardState: that.props.rebuildDashboardState,
     };
     return propList;
 }

@@ -83,16 +83,21 @@ export const ChangeWidgetName = function changeWidgetName(stateRef: 'widgetList'
     this.setState(payload);
 }
 
-export const RemoveWidget = function removeWidget(stateRef: 'widgetList' | 'menuList', widgetID: string | number) {
-    const s: AppState = this.state
-    const widgetGroup: widgetList | menuList = s[stateRef]
+export const RemoveWidget = async function removeWidget(stateRef: 'widgetList' | 'menuList', widgetID: string | number) {
+    // const s: AppState = this.state
+    const widgetGroup: widgetList | menuList = this.state[stateRef]
     const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
         delete draftState[widgetID]
     })
     const payload: Partial<AppState> = {
         [stateRef]: newWidgetList,
     }
-    this.setState(payload);
+    await this.setState(payload, () => {
+        return true
+    });
+    await this.saveCurrentDashboard(this.state.currentDashBoard)
+    this.rebuildDashboardState()
+
 }
 
 export const LockWidgets = function lockWidgets(toggle: number) {

@@ -7,7 +7,10 @@ export const loadSavedDashboard = function (target: string, globalStockList: glo
     const p: AppProps = this.props
     const payload: rSetTargetDashboardPayload = { targetDashboard: target }
     this.props.rSetTargetDashboard(payload)
-    this.loadDashBoard(globalStockList, widgetList);
+    this.loadDashBoard(target, globalStockList, widgetList);
+    this.setState({
+        currentDashBoard: target,
+    })
     const updateVisable = async function (that: any) {
         const s: AppState = that.state
         await that.props.tGetMongoDB()

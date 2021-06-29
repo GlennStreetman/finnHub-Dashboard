@@ -104,10 +104,10 @@ export const SnapOrder = function snapOrder(widget: string, column: number, yyAx
         menuList: newMenu,
         widgetList: newWidget,
     }
-    this.setState(payload)
+    this.setState(payload, () => { return true })
 }
 
-export const SnapWidget = function snapWidget(stateRef: string, widgetId: string, xxAxis: number, yyAxis: number) {
+export const SnapWidget = async function snapWidget(stateRef: string, widgetId: string, xxAxis: number, yyAxis: number) {
     //adjust column based upon status of hidden menu columns.
     const s: AppState = this.state
     const addColumn: { [key: string]: any } = {}
@@ -127,5 +127,7 @@ export const SnapWidget = function snapWidget(stateRef: string, widgetId: string
             column = column + 1
         }
     }
-    this.snapOrder(widgetId, column, yyAxis, stateRef)
+    await this.snapOrder(widgetId, column, yyAxis, stateRef)
+    await this.saveCurrentDashboard(this.state.currentDashBoard)
+    this.rebuildDashboardState()
 }

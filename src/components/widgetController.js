@@ -34,6 +34,8 @@ function WidgetController(p){
                 widgetList: el,
                 widgetLockDown: p.widgetLockDown,
                 zIndex: p.zIndex,
+                getSavedDashBoards: p.getSavedDashBoards,
+                rebuildDashboardState: p.rebuildDashboardState,
             }
             if (el.widgetConfig === 'menuWidget') {
                 thisWidgetProps['menuWidgetToggle'] = p.menuWidgetToggle

@@ -270,76 +270,30 @@ class App extends React.Component<AppProps, AppState> {
         this.updateDashBoards = updateDashBoards.bind(this) //when dashboard menu saves or deletes a dashboard, runs to upddate state.
         this.loadSavedDashboard = loadSavedDashboard.bind(this) // loads a dashboard
         this.setSecurityFocus = this.setSecurityFocus.bind(this) //Sets target security for all widgets that have security dropdown selector 
-        this.updateWidgetSetup = updateWidgetSetup.bind(this)
+        this.updateWidgetSetup = updateWidgetSetup.bind(this) //saves current dashboard to postgres.
+        this.rebuildDashboardState = this.rebuildDashboardState.bind(this) //sets s.dashboardData. Used to build dataModel in redux
+        this.refreshFinnhubAPIDataAll = this.refreshFinnhubAPIDataAll.bind(this) //For All Dashboards: gets data from mongo if available, else queues updates with finnhub.io
+        this.refreshFinnhubAPIDataVisable = this.refreshFinnhubAPIDataVisable.bind(this)
+        this.buildWidgetList = this.buildWidgetList.bind(this) //sets s.widgetList. Used to build widgets for dashboard. Mounted widgets create redux.showData
     }
 
     componentDidUpdate(prevProps: AppProps, prevState: AppState) {
         const s: AppState = this.state;
         const p: AppProps = this.props;
-        if (s.login === 1 && prevState.login === 0) { //on login build data model.
-            this.getSavedDashBoards()
-                .then((data: GetSavedDashBoardsRes) => {
-                    if ((data.dashBoardData[data.currentDashBoard] === undefined && Object.keys(data.dashBoardData))) { //if invalid current dashboard returned
-                        data.currentDashBoard = Object.keys(data.dashBoardData)[0]
-                    }
-                    this.setState({
-                        dashBoardData: data.dashBoardData,
-                        currentDashBoard: data.currentDashBoard,
-                        menuList: data.menuList!,
-                    })
-                    p.rSetTargetDashboard({ targetDashboard: data.currentDashBoard })
-                    p.rBuildDataModel({ ...data, apiKey: s.apiKey })
-                })
-                .catch((error: any) => {
-                    console.error("Failed to recover dashboards");
-                });
+        if (s.login === 1 && prevState.login === 0) { //on login build dashboard state, then use state to build redux dataModel.
+            this.rebuildDashboardState()
         }
 
-        if ((prevProps.dataModel.created === 'false' && p.dataModel.created === 'true' && s.login === 1) || (p.dataModel.created === 'updated' && s.login === 1)) {
-            //on login or data model update update dataset with finnHub data.
-            console.log("RUNNING DATA BUILD")
-            p.rResetUpdateFlag()
-            let setupData = async function () {
-                await p.tGetMongoDB()
-                const targetDash: string[] = s.dashBoardData?.[s.currentDashBoard]?.widgetlist ? Object.keys(s.dashBoardData?.[s.currentDashBoard]?.widgetlist) : []
-                p.rSetUpdateStatus({
-                    [s.currentDashBoard]: 'Updating'
-                })
-                for (const widget in targetDash) {
-                    await p.tGetFinnhubData({ //get data for default dashboard.
-                        targetDashBoard: s.currentDashBoard,
-                        widgetList: [targetDash[widget]],
-                        finnHubQueue: s.finnHubQueue,
-                    })
-                }
-                p.rSetUpdateStatus({
-                    [s.currentDashBoard]: 'Ready'
-                })
-                const dashBoards: string[] = Object.keys(s.dashBoardData) //get data for dashboards not being shown
-                for (const dash of dashBoards) {
-                    if (dash !== s.currentDashBoard) {
-                        p.rSetUpdateStatus({
-                            [dash]: 'Updating'
-                        })
-                        await p.tGetFinnhubData({ //run in background, do not await.
-                            targetDashBoard: dash,
-                            widgetList: Object.keys(s.dashBoardData[dash].widgetlist),
-                            finnHubQueue: s.finnHubQueue,
-                        })
-                        p.rSetUpdateStatus({
-                            [dash]: 'Ready'
-                        })
-                    }
-                }
-            }
-            setupData()
+        if ((prevProps.dataModel.created === 'false' && p.dataModel.created === 'true' && s.login === 1) ||
+            (p.dataModel.created === 'updated' && s.login === 1)) {//on login or data model update update dataset with finnHub data.
+            p.rResetUpdateFlag() //sets all dashboards status to updating in redux store.
+            this.refreshFinnhubAPIDataAll() //fetches finnhub api data, from mongo if avilable, else queues Finnhub.io api alls. When complete sets dashboard status ready.
         }
 
         if ( //if apikey not setup show about menu
             (s.apiKey === '' && s.apiFlag === 0 && s.login === 1) ||
             (s.apiKey === null && s.apiFlag === 0 && s.login === 1)
         ) {
-            console.log("API key not returned")
             this.setState({
                 apiFlag: 1,
                 watchListMenu: 0,
@@ -348,57 +302,18 @@ class App extends React.Component<AppProps, AppState> {
             }, () => { this.toggleBackGroundMenu('about') })
         }
 
-        if ((s.globalStockList !== prevState.globalStockList && s.login === 1)) {
-            console.log('loading global stock data')
-            LoadStockData(this, s, GetStockPrice, s.finnHubQueue);
+        if ((s.globalStockList !== prevState.globalStockList && s.login === 1)) { //price data for watchlist, including socket data.
+            LoadStockData(this, s, GetStockPrice, s.finnHubQueue); //sets default day price for watchlist, usefull if socket data not available.
             LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
         }
 
         if (s.login === 1 && s.loadStartingDashBoard === 0) {
-
-            try {
-                if (s.dashBoardData && Object.keys(s.dashBoardData).length > 0) {
-                    console.log('loading starting dashboard')
-                    if (s.dashBoardData[s.currentDashBoard] !== undefined) {
-                        let loadWidget = s.dashBoardData[s.currentDashBoard]["widgetlist"];
-                        let loadGlobal = s.dashBoardData[s.currentDashBoard]["globalstocklist"];
-                        this.loadDashBoard(loadGlobal, loadWidget);
-                        this.setState({ dashBoardMenu: 1, loadStartingDashBoard: 1 });
-                    } else if (Object.keys(s.dashBoardData).length > 0) {
-                        const defaultDashboard = Object.keys(s.dashBoardData)[0]
-                        let loadWidget = s.dashBoardData[defaultDashboard]["widgetlist"];
-                        let loadGlobal = s.dashBoardData[defaultDashboard]["globalstocklist"];
-                        this.loadDashBoard(loadGlobal, loadWidget);
-                        this.setState({
-                            dashBoardMenu: 1,
-                            currentDashBoard: defaultDashboard,
-                            loadStartingDashBoard: 1
-                        });
-                    }
-                }
-            } catch (err) {
-                console.log("failed to load dashboards", err);
-            }
+            this.buildWidgetList()
         }
 
-        if (s.rebuildDataSet === 1 && s.login === 1) {
-            console.log("Rebuilding dataset.")
+        if (s.rebuildDataSet === 1 && s.login === 1) { //refresh current dashboards api data.
             this.setState({ rebuildDataSet: 0 }, () => {
-                let setupData = async function () {
-                    await p.tGetMongoDB()
-                    p.rSetUpdateStatus({
-                        [s.currentDashBoard]: 'Updating'
-                    })
-                    await p.tGetFinnhubData({
-                        currentDashboard: s.currentDashBoard,
-                        widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist),
-                        finnHubQueue: s.finnHubQueue,
-                    })
-                    p.rSetUpdateStatus({
-                        [s.currentDashBoard]: 'Ready'
-                    })
-                }
-                setupData()
+                this.refreshFinnhubAPIDataVisable()
             })
         }
     }
@@ -408,6 +323,107 @@ class App extends React.Component<AppProps, AppState> {
             this.state.socket.close();
         }
     }
+
+    async refreshFinnhubAPIDataVisable() {
+        const s: AppState = this.state;
+        const p: AppProps = this.props;
+        await p.tGetMongoDB()
+        p.rSetUpdateStatus({
+            [s.currentDashBoard]: 'Updating'
+        })
+        await p.tGetFinnhubData({
+            currentDashboard: s.currentDashBoard,
+            widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist),
+            finnHubQueue: s.finnHubQueue,
+        })
+        p.rSetUpdateStatus({
+            [s.currentDashBoard]: 'Ready'
+        })
+    }
+
+    async refreshFinnhubAPIDataAll() {
+        const s: AppState = this.state;
+        const p: AppProps = this.props;
+        await p.tGetMongoDB()
+        const targetDash: string[] = s.dashBoardData?.[s.currentDashBoard]?.widgetlist ? Object.keys(s.dashBoardData?.[s.currentDashBoard]?.widgetlist) : []
+        p.rSetUpdateStatus({
+            [s.currentDashBoard]: 'Updating'
+        })
+        for (const widget in targetDash) {
+            await p.tGetFinnhubData({ //get data for default dashboard.
+                targetDashBoard: s.currentDashBoard,
+                widgetList: [targetDash[widget]],
+                finnHubQueue: s.finnHubQueue,
+            })
+        }
+        p.rSetUpdateStatus({
+            [s.currentDashBoard]: 'Ready'
+        })
+        const dashBoards: string[] = Object.keys(s.dashBoardData) //get data for dashboards not being shown
+        for (const dash of dashBoards) {
+            if (dash !== s.currentDashBoard) {
+                p.rSetUpdateStatus({
+                    [dash]: 'Updating'
+                })
+                await p.tGetFinnhubData({ //run in background, do not await.
+                    targetDashBoard: dash,
+                    widgetList: Object.keys(s.dashBoardData[dash].widgetlist),
+                    finnHubQueue: s.finnHubQueue,
+                })
+                p.rSetUpdateStatus({
+                    [dash]: 'Ready'
+                })
+            }
+        }
+    }
+
+    async rebuildDashboardState() { //fetches dashboard data, then updates s.dashBoarDData, then builds redux model
+
+        try {
+            const data: GetSavedDashBoardsRes = await this.getSavedDashBoards()
+            if ((data.dashBoardData[data.currentDashBoard] === undefined && Object.keys(data.dashBoardData))) { //if invalid current dashboard returned
+                data.currentDashBoard = Object.keys(data.dashBoardData)[0]
+            }
+            this.setState({
+                dashBoardData: data.dashBoardData,
+                currentDashBoard: data.currentDashBoard,
+                menuList: data.menuList!,
+                // widgetList: data.dashBoardData?.[data.currentDashBoard]?.['widgetlist']
+            })
+            this.props.rSetTargetDashboard({ targetDashboard: data.currentDashBoard })
+            this.props.rBuildDataModel({ ...data, apiKey: this.state.apiKey })
+        } catch (error: any) {
+            console.error("Failed to recover dashboards");
+        }
+    }
+
+    async buildWidgetList() {
+        const s: AppState = this.state;
+        try {
+            if (s.dashBoardData && Object.keys(s.dashBoardData).length > 0) {
+                console.log('loading starting dashboard')
+                if (s.dashBoardData[s.currentDashBoard] !== undefined) {
+                    let loadWidget = s.dashBoardData[s.currentDashBoard]["widgetlist"];
+                    let loadGlobal = s.dashBoardData[s.currentDashBoard]["globalstocklist"];
+                    this.loadDashBoard('NEW', loadGlobal, loadWidget);
+                    this.setState({ dashBoardMenu: 1, loadStartingDashBoard: 1 });
+                } else if (Object.keys(s.dashBoardData).length > 0) {
+                    const defaultDashboard = Object.keys(s.dashBoardData)[0]
+                    let loadWidget = s.dashBoardData[defaultDashboard]["widgetlist"];
+                    let loadGlobal = s.dashBoardData[defaultDashboard]["globalstocklist"];
+                    this.loadDashBoard(defaultDashboard, loadGlobal, loadWidget);
+                    this.setState({
+                        dashBoardMenu: 1,
+                        currentDashBoard: defaultDashboard,
+                        loadStartingDashBoard: 1
+                    });
+                }
+            }
+        } catch (err) {
+            console.log("failed to load dashboards", err);
+        }
+    }
+
 
     uploadGlobalStockList(newStockObj: stockList) {
         this.setState({ globalStockList: newStockObj });
@@ -438,7 +454,7 @@ class App extends React.Component<AppProps, AppState> {
                 <></>
             );
 
-        const backGroundSelection: { [key: string]: React.ReactElement } = {
+        const backGroundSelection: { [key: string]: React.ReactElement } = { //topnav menus.
             endPoint: React.createElement(EndPointMenu, endPointProps(this)),
             manageAccount: React.createElement(AccountMenu, accountMenuProps(this)),
             widgetMenu: React.createElement(WidgetMenu, widgetMenuProps(this)),
@@ -497,6 +513,7 @@ class App extends React.Component<AppProps, AppState> {
                     newDashboard={this.newDashboard}
                     processLogin={this.processLogin}
                     removeWidget={this.removeWidget}
+                    rebuildDashboardState={this.rebuildDashboardState}
                     saveCurrentDashboard={this.saveCurrentDashboard}
                     setDrag={this.setDrag}
                     setSecurityFocus={this.setSecurityFocus}
@@ -521,7 +538,6 @@ class App extends React.Component<AppProps, AppState> {
                     widgetList={this.state.widgetList}
                     widgetLockDown={this.state.widgetLockDown}
                     zIndex={this.state.zIndex}
-
                 />
                 {loginScreen}
                 {backGroundMenu()}

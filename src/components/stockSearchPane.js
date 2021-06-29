@@ -48,8 +48,8 @@ class StockSearchPane extends React.Component {
     </>
 
     const syncText = <>
-    Set all widgets stocklists equal to global stock list.<br />
-    Useful after copying a dashboard and quickly updating all widgets to new stock list. <br />
+    Set all widgets security list equal to Watchlist Menu security list.<br />
+    Also useful after copying a dashboard and quickly updating all widgets with new security list. <br />
     </>
 
     const watchListSync = 

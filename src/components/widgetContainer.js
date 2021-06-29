@@ -108,7 +108,6 @@ function WidgetContainer(p) {
         }
     }
 
-    const hideStockSearchMenu = ["dashBoardMenu"] //consider moving this to its own register.
     const compStyle = {
     display: show
     };
@@ -125,15 +124,15 @@ function WidgetContainer(p) {
     compStyle['left'] = p.widgetList["xAxis"] 
     } 
     let widgetProps = p.widgetBodyProps ? p.widgetBodyProps() : {}
-    if (p.widgetKey !== "dashBoardMenu") {
     widgetProps["showEditPane"] = showEditPane;
-    widgetProps['searchText'] = searchText
-    widgetProps['changeSearchText'] = changeSearchText
-    widgetProps['updateAPIFlag'] = p.updateAPIFlag
-    widgetProps['widgetType'] = p.widgetList["widgetType"]
-    widgetProps['config'] = p.widgetList.config
-    widgetProps['updateDashBoards'] = p.updateDashBoards
-    widgetProps['finnHubQueue'] = p.finnHubQueue
+    if (p.widgetKey !== "dashBoardMenu") {
+        widgetProps['searchText'] = searchText
+        widgetProps['changeSearchText'] = changeSearchText
+        widgetProps['updateAPIFlag'] = p.updateAPIFlag
+        widgetProps['widgetType'] = p.widgetList["widgetType"]
+        widgetProps['config'] = p.widgetList.config
+        widgetProps['updateDashBoards'] = p.updateDashBoards
+        widgetProps['finnHubQueue'] = p.finnHubQueue
     } 
     if (p.widgetCopy) {
     widgetProps['widgetCopy'] = p.widgetCopy
@@ -166,7 +165,6 @@ function WidgetContainer(p) {
             >
             <i className="fa fa-arrows" aria-hidden="true"></i>
             </button>
-            {hideStockSearchMenu.indexOf(p.widgetKey) < 0 && (
             <>
                 {p.stateRef !== 'menuWidget' ?
                 <button  
@@ -180,7 +178,6 @@ function WidgetContainer(p) {
                 <i className="fa fa-pencil-square-o" aria-hidden="true" />
                 </button>
             </>
-            )}
         </div>
         ) : (
         <div className="widgetHeader">{renderHeader}</div>
@@ -195,11 +192,11 @@ function WidgetContainer(p) {
         <div className="widgetFooter">
         {p.widgetList.showBody !== false && showEditPane === 1 && (
                 <button
-                onClick={() => {
+                onClick={async () => {
                     if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
-                    p.removeWidget("widgetList", p.widgetKey);
+                        p.removeWidget("widgetList", p.widgetKey);
                     } else {
-                    p.menuWidgetToggle(p.widgetKey);
+                        p.menuWidgetToggle(p.widgetKey);
                     }
                 }}
                 >

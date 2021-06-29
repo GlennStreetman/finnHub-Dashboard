@@ -41,9 +41,11 @@ export function mergeByString(searchObj, searchList, payload){ //recursively mer
     }
 }
 
-export function uniqueObjectnName(newName, reviewObject, iterator=0){
+export function uniqueObjectnName(newName, reviewObject){
+    let iterator = 0
     if (reviewObject[newName]) {
-        return uniqueObjectnName(newName, reviewObject, iterator+1)
+        console.log('newname taken: ', newName)
+        return uniqueObjectnName(newName+'*', reviewObject, iterator+1)
     } else {
         if (iterator === 0){
             return newName

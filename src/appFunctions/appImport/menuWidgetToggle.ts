@@ -1,7 +1,6 @@
 export function MenuWidgetToggle(context) {
     //Create dashboard menu if first time looking at, else toggle visability
     return function toggleFunction(menuName, dashName = "pass", that = context) {
-        console.log(menuName, dashName, that)
         if (that.state.menuList[menuName] === undefined) {
             that.newMenuContainer(menuName, dashName, "menuWidget");
             that.setState({ [menuName]: 1 });

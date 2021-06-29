@@ -234,4 +234,25 @@ router.post("/dashboard", (req, res, next) => { //saves users dashboard
     }
 });
 
+
+router.post("/renameDashboard", (req, res, next) => { //{newName: string, dbID: number}
+    if (req.session.login === true) { 
+        let newName = format("%L", req.body.newName);
+        let dbID = format("%L", req.body.dbID);
+        const getSavedDashBoards = `
+            UPDATE dashboard
+            SET dashboardname = ${newName}
+            WHERE userid = ${req.session.uID} AND id = ${dbID}`;
+        console.log('renameDashboard', getSavedDashBoards)
+        db.query(getSavedDashBoards, (err, rows) => {
+            if (err) {
+                res.status(401).json({message: "Dashboard name update failed."})
+                console.log('Dashboard name update failed:', err)
+            } else {
+                res.status(200).json({message: 'name update success.'})
+            }
+        })
+    }
+})
+
 export default router

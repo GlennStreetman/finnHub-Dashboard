@@ -1,6 +1,7 @@
 import { AppState, widgetSetup } from './../../App'
 
 export const updateWidgetSetup = function (el: widgetSetup) { //widget ref, true/false
+    //saved widet setup in postgres
     const s: AppState = this.state
     const newWidgetSetup: widgetSetup = { ...s.widgetSetup, ...el }
     const payload: Partial<AppState> = { widgetSetup: newWidgetSetup }

@@ -22,7 +22,6 @@ class StockDataList extends React.Component {
   }
 
   render() {
-    // console.log("rendering");
     return <>{this.createDataList()}</>;
   }
 }
@@ -30,11 +29,9 @@ class StockDataList extends React.Component {
 const mapStateToProps = (state, ownProps) => {
   const p = ownProps
   const thisExchange = state.exchangeData.e?.data
-  // console.log('!!!thisExchange', thisExchange)
   const newFilteredList = []
   if (thisExchange !== undefined) {
     const availableStockCount = Object.keys(thisExchange).length;
-    // console.log(availableStockCount)
     const exchangeKeys = Object.keys(thisExchange) //list
     for (let resultCount = 0, filteredCount = 0; 
     resultCount < 20 && filteredCount < availableStockCount; 
@@ -46,12 +43,10 @@ const mapStateToProps = (state, ownProps) => {
         newFilteredList.push(thisSearchPhrase);
       }
     }
-    // console.log('newFilteredList', newFilteredList)
     return {
       rFilteredStocks: newFilteredList,
     }
   } else {
-    // console.log("------------no exchange data loaded------")
     return {
       rFilteredStocks: undefined,
     }

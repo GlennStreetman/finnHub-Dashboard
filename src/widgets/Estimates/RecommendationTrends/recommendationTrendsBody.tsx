@@ -222,7 +222,6 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
         );
         return chartBody;
     }
-    console.log('rendering RTB')
     return (
         <>
             {p.showEditPane === 1 && (
