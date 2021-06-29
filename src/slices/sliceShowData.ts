@@ -37,6 +37,10 @@ export interface rBuildVisableDataPayload {
     dataFilters?: string[] //used to filter data if finnHubData over queries.Each string should start with reference to a security.
 }
 
+export interface rUnmountWidgetPayload {
+    widgetKey: string
+}
+
 const showData = createSlice({
     name: 'showData',
     initialState,
@@ -64,6 +68,10 @@ const showData = createSlice({
         rTargetDashboardLogout: (state) => {
             state.dataSet = {}
             state.targetDashboard = ''
+        },
+        rUnmountWidget: (state, action) => {
+            const ap: rUnmountWidgetPayload = action.payload
+            delete state?.dataSet?.[ap.widgetKey]
         }
     },
     extraReducers: {
@@ -169,6 +177,7 @@ export const {
     rTargetDashboardLogout,
     rBuildVisableData,
     rSetTargetDashboard,
+    rUnmountWidget,
 } = showData.actions
 export default showData.reducer
 

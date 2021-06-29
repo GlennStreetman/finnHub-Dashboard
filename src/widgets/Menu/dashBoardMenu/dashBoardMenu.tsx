@@ -2,8 +2,14 @@ import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { useAppSelector } from '../../../hooks';
 import { uniqueObjectnName } from './../../../appFunctions/stringFunctions'
 
+import { useAppDispatch } from './../../../hooks';
+import { rUnmountWidget } from './../../../slices/sliceShowData'
+import { rRemoveDashboardDataModel } from './../../../slices/sliceDataModel'
 
 function DashBoardMenu(p: { [key: string]: any }, ref: any) {
+
+    const useDispatch = useAppDispatch
+    const dispatch = useDispatch(); //allows widget to run redux actions.
 
     // const isInitialMount = useRef(true); //update to false after first render.
     const [inputText, setInputText] = useState('Enter Name')
@@ -53,14 +59,18 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
         if (!p.dashBoardData[e.target.value]) {
             const data: any = {
                 dbID: dashBoardData[e.target.id].id,
+                oldName: dashBoardData[e.target.id].dashboardname,
                 newName: e.target.value
             }
+
             const options = {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
             };
             await fetch('/renameDashboard', options)
+            await fetch('/renameDashboardMongo', options)
+
             p.rebuildDashboardState()
         }
     }
@@ -75,9 +85,32 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
         } else { setInputText('Enter Name') }
     }
 
+    function unMountWidgets() {
+        const widdgetKeys = Object.keys(p.dashBoardData?.[p.currentDashBoard]?.widgetlist)
+        for (const x in widdgetKeys) {
+            const widgetKey = widdgetKeys[x]
+            const payload = {
+                widgetKey: widgetKey,
+            }
+            dispatch(rUnmountWidget(payload))
+        }
+    }
+
+    function unMountDashboard(removeName) {
+        const payload = {
+            dashboardName: removeName,
+        }
+        dispatch(rRemoveDashboardDataModel(payload))
+    }
+
     async function deleteDashBoard(dashBoardId, dashboardName) {
-        await fetch(`/deleteSavedDashboard?dashID=${dashBoardId}`)
+        await fetch(`/deleteSavedDashboard?dashID=${dashBoardId}`) //delete from postgres
+
+        const deleteKeyList = Object.keys(p.dashBoardData[dashboardName]['widgetlist'])
+        for (const x in deleteKeyList) fetch(`/deleteFinnDashData?widgetID=${deleteKeyList[x]}`) //drop data from mongo.
+
         if (dashboardName === p.currentDashBoard && Object.keys(dashBoardData).length > 1) { //if shown dashboard is deleted.
+            unMountWidgets()
             for (const x in Object.keys(dashBoardData)) {
                 const dashboard = p.dashBoardData[Object.keys(dashBoardData)[x]]
                 const testDashboardName = dashboard.dashboardname
@@ -87,9 +120,11 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                 }
             }
         } else if (dashboardName === p.currentDashBoard && Object.keys(dashBoardData).length === 1) {
+            unMountWidgets()
             p.newDashBoard('NEW', p.dashBoardData)
         }
-        p.rebuildDashboardState()
+        unMountDashboard(dashboardName) //removes dashboard from redux
+        p.removeDashboardFromState(dashboardName) //removes dashboard from App.state
     }
 
     let dashBoardData = p.dashBoardData;
@@ -124,6 +159,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                             key={el + 'radio'}
                             checked={p.currentDashBoard === p.dashBoardData?.[el]?.dashboardname} //
                             onChange={() => {
+                                unMountWidgets()
                                 p.loadSavedDashboard(p.dashBoardData?.[el]?.dashboardname, dashBoardData[el].globalstocklist, dashBoardData[el].widgetlist);
                                 setInputText(dashBoardData[el].dashboardname)
                             }}
@@ -224,6 +260,7 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
         loadSavedDashboard: that.props.loadSavedDashboard,
         updateDashBoards: that.props.updateDashBoards,
         rebuildDashboardState: that.props.rebuildDashboardState,
+        removeDashboardFromState: that.props.removeDashboardFromState,
     };
     return propList;
 }

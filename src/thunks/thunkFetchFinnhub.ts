@@ -25,7 +25,6 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
             const thisWidget = dataModel[w]
             for (const s in thisWidget) { //for each security
                 const reqObj = { ...thisWidget[s] }
-                // console.log('reqObj', reqObj)
                 reqObj.dashboard = req.targetDashBoard
                 reqObj.widget = w
                 reqObj.security = s
@@ -34,7 +33,6 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                     (reqObj.updated === undefined) ||
                     (Date.now() - reqObj.updated >= 1 * 1000 * 60 * 60 * 3) //more than 3 hours old.
                 ) {
-                    // console.log('reqObj', reqObj)
                     requestList.push(finnHub(finnQueue, reqObj))
                 }
             }
@@ -43,7 +41,6 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
         return Promise.all(requestList)
             .then((res) => {
                 const resObj: resObj = {}
-                // console.log(res)
                 for (const resStock of res) {
                     const key: string = `${resStock.dashboard}-${resStock.widget}-${resStock.security}`
                     resObj[key] = resStock
@@ -57,7 +54,6 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                     .then((response) => {
                         return response.json()
                     })
-                // console.log(resObj) resObj.widgetType
                 return (resObj) //thunk data returned to dataModel(update stale date) and showdata(retain in redux if marked as visable).
             })
     })

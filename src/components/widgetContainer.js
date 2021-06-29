@@ -4,9 +4,15 @@ import {excelRegister, excelRegister_singleSecurity} from '../registers/excelBut
 import ToolTip from './../components/toolTip.js'
 import ErrorBoundary from './widgetErrorBoundary';
 import { useState, useEffect } from "react";
+import { useAppDispatch } from './../hooks';
+import { rUnmountWidget } from './../slices/sliceShowData'
+
 
 //creates widget container. Used by all widgets.
 function WidgetContainer(p) {
+
+    const useDispatch = useAppDispatch
+    const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const [renderHeader, setRenderHeader] = useState()
     const [showEditPane, setShowEditPane] = useState(0) //0: Hide, 1: Show
@@ -195,6 +201,11 @@ function WidgetContainer(p) {
                 onClick={async () => {
                     if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
                         p.removeWidget("widgetList", p.widgetKey);
+                        fetch(`/deleteFinnDashData?widgetID=${p.widgetKey}`)
+                        const payload = {
+                            widgetKey: p.widgetKey,
+                        }
+                        dispatch(rUnmountWidget(payload))
                     } else {
                         p.menuWidgetToggle(p.widgetKey);
                     }

@@ -47,6 +47,7 @@ import finnHubData from './routes/mongoDB/finnHubData.js'
 import findMongoData from './routes/mongoDB/findMongoData.js'
 import deleteFinnDashData from './routes/mongoDB/deleteMongoRecords.js'
 import updateGQLFilters from './routes/mongoDB/setMongoFilters.js'
+import renameDashboardMongo from './routes/mongoDB/renameDashboardMongo.js'
 import graphQLRedirect from './routes/graphQL.js'
 //graphQL
 import {schema} from './routes/graphQL/graphQL.js'
@@ -148,6 +149,7 @@ app.use('/', findMongoData)
 app.use('/', deleteFinnDashData)
 app.use('/', updateGQLFilters)
 app.use('/', runTemplate)
+app.use('/', renameDashboardMongo)
 app.use('/', graphQLRedirect)
 app.use('/graphql', eg.graphqlHTTP({
   schema: schema,

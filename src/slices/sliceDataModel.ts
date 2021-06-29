@@ -53,6 +53,10 @@ export interface rBuildDataModelPayload {
     dashBoardData: dashBoardData
 }
 
+export interface rRemoveDashboardPayload {
+    dashboardName: string,
+}
+
 const initialState: sliceDataModel = {
     dataSet: {},
     status: {},
@@ -121,6 +125,11 @@ const dataModel = createSlice({
             state.dataSet = {}
             state.status = {}
             state.created = 'false'
+        },
+        rRemoveDashboardDataModel(state, action) {
+            const ap: rRemoveDashboardPayload = action.payload
+            const removeDashboard = ap.dashboardName
+            delete state.dataSet[removeDashboard]
         }
     },
     extraReducers: {
@@ -170,5 +179,6 @@ export const {
     rResetUpdateFlag,
     rSetUpdateStatus,
     rDataModelLogout,
+    rRemoveDashboardDataModel,
 } = dataModel.actions
 export default dataModel.reducer

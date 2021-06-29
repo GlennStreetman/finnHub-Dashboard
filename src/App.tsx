@@ -8,9 +8,9 @@ import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData
 import { logoutServer, Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
 import {
     NewMenuContainer, AddNewWidgetContainer, LockWidgets,
-    ToggleWidgetVisability, ChangeWidgetName, RemoveWidget,
+    ToggleWidgetVisability, ChangeWidgetName,
     UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig,
-    toggleWidgetBody, setWidgetFocus
+    toggleWidgetBody, setWidgetFocus, removeDashboardFromState
 } from "./appFunctions/appImport/widgetLogic";
 import { LoadDashBoard, NewDashboard, SaveCurrentDashboard }
     from "./appFunctions/appImport/setupDashboard";
@@ -238,7 +238,6 @@ class App extends React.Component<AppProps, AppState> {
         this.AddNewWidgetContainer = AddNewWidgetContainer.bind(this);
         this.changeWidgetName = ChangeWidgetName.bind(this);
         this.lockWidgets = LockWidgets.bind(this);
-        this.removeWidget = RemoveWidget.bind(this);
         this.updateWidgetFilters = UpdateWidgetFilters.bind(this);
         this.updateWidgetStockList = UpdateWidgetStockList.bind(this);
         this.toggleWidgetVisability = ToggleWidgetVisability.bind(this);
@@ -275,6 +274,7 @@ class App extends React.Component<AppProps, AppState> {
         this.refreshFinnhubAPIDataAll = this.refreshFinnhubAPIDataAll.bind(this) //For All Dashboards: gets data from mongo if available, else queues updates with finnhub.io
         this.refreshFinnhubAPIDataVisable = this.refreshFinnhubAPIDataVisable.bind(this)
         this.buildWidgetList = this.buildWidgetList.bind(this) //sets s.widgetList. Used to build widgets for dashboard. Mounted widgets create redux.showData
+        this.removeDashboardFromState = removeDashboardFromState.bind(this)
     }
 
     componentDidUpdate(prevProps: AppProps, prevState: AppState) {
@@ -377,7 +377,7 @@ class App extends React.Component<AppProps, AppState> {
         }
     }
 
-    async rebuildDashboardState() { //fetches dashboard data, then updates s.dashBoarDData, then builds redux model
+    async rebuildDashboardState() { //fetches dashboard data, then updates s.dashBoardData, then builds redux model.
 
         try {
             const data: GetSavedDashBoardsRes = await this.getSavedDashBoards()
@@ -388,7 +388,6 @@ class App extends React.Component<AppProps, AppState> {
                 dashBoardData: data.dashBoardData,
                 currentDashBoard: data.currentDashBoard,
                 menuList: data.menuList!,
-                // widgetList: data.dashBoardData?.[data.currentDashBoard]?.['widgetlist']
             })
             this.props.rSetTargetDashboard({ targetDashboard: data.currentDashBoard })
             this.props.rBuildDataModel({ ...data, apiKey: this.state.apiKey })
@@ -423,7 +422,6 @@ class App extends React.Component<AppProps, AppState> {
             console.log("failed to load dashboards", err);
         }
     }
-
 
     uploadGlobalStockList(newStockObj: stockList) {
         this.setState({ globalStockList: newStockObj });
@@ -513,6 +511,7 @@ class App extends React.Component<AppProps, AppState> {
                     newDashboard={this.newDashboard}
                     processLogin={this.processLogin}
                     removeWidget={this.removeWidget}
+                    removeDashboardFromState={this.removeDashboardFromState}
                     rebuildDashboardState={this.rebuildDashboardState}
                     saveCurrentDashboard={this.saveCurrentDashboard}
                     setDrag={this.setDrag}

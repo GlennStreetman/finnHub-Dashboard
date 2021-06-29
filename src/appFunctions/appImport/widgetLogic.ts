@@ -3,7 +3,6 @@ import { reqBody } from '../../server/routes/mongoDB/setMongoFilters'
 import { AppState, AppProps, menuList, widget, dashBoardData, widgetList, stockList, stock, filters, config } from './../../App'
 import { rBuildDataModelPayload } from '../../slices/sliceDataModel'
 
-
 export const NewMenuContainer = function newMenuContainer(widgetDescription: string, widgetHeader: string, widgetConfig: string) {
     const s: AppState = this.state
     const widgetName = widgetDescription;
@@ -71,7 +70,7 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
 
 }
 
-export const ChangeWidgetName = function changeWidgetName(stateRef: 'widgetList' | 'menuList', widgetID: string | number, newName: string) {
+export const ChangeWidgetName = function (stateRef: 'widgetList' | 'menuList', widgetID: string | number, newName: string) {
     const s: AppState = this.state
     const widgetGroup: widgetList | menuList = s[stateRef]
     const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
@@ -83,8 +82,8 @@ export const ChangeWidgetName = function changeWidgetName(stateRef: 'widgetList'
     this.setState(payload);
 }
 
-export const RemoveWidget = async function removeWidget(stateRef: 'widgetList' | 'menuList', widgetID: string | number) {
-    // const s: AppState = this.state
+export const RemoveWidget = async function (stateRef: 'widgetList' | 'menuList', widgetID: string | number) {
+
     const widgetGroup: widgetList | menuList = this.state[stateRef]
     const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
         delete draftState[widgetID]
@@ -100,7 +99,7 @@ export const RemoveWidget = async function removeWidget(stateRef: 'widgetList' |
 
 }
 
-export const LockWidgets = function lockWidgets(toggle: number) {
+export const LockWidgets = function (toggle: number) {
     const payload: Partial<AppState> = { widgetLockDown: toggle }
     this.setState(payload)
 }
@@ -154,7 +153,7 @@ export const UpdateWidgetStockList = function updateWidgetStockList(widgetId: nu
 }
 
 //widget filters change how data is queried from finnHub
-export const UpdateWidgetFilters = function updateWidgetFilters(widgetID: string, data: filters) {
+export const UpdateWidgetFilters = function (widgetID: string, data: filters) {
     console.log('new filters', data)
     try {
         const s: AppState = this.state
@@ -243,4 +242,13 @@ export const toggleWidgetBody = function (widgetID) {
         draftState[widgetID].showBody = !draftState[widgetID].showBody
     })
     this.setState({ widgetList: updatedWidget })
+}
+
+export const removeDashboardFromState = function (widgetName) {
+    const s: AppState = this.state
+    const updatedWidget: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
+        delete draftState[widgetName]
+    })
+    this.setState({ dashBoardData: updatedWidget })
+
 }
