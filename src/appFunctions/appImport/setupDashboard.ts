@@ -77,10 +77,10 @@ export const NewDashboard = function newDashboard(newName, dashboards) {
 }
 
 export const saveDashboard = async function (dashboardName: string) {
-    //saves current dashboard by name. Assigns new widget ids if using new name.
+    //saves current dashboard by name. Assigns new widget ids if using new name (copy function). Returns true on success.
     const widgList: widgetList = this.state.widgetList
     const saveWidgetList: widgetList = await produce(widgList, (draftState: widgetList) => {
-        if (Object.keys(this.state.dashBoardData).indexOf(dashboardName) === -1) {
+        if (Object.keys(this.state.dashBoardData).indexOf(dashboardName) === -1) { //if new name, copy current widgets.
             const stamp = new Date().getTime()
             const keys = Object.keys(this.state.widgetList)
             for (const k in keys) {
@@ -104,14 +104,14 @@ export const saveDashboard = async function (dashboardName: string) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
         };
-        fetch("/dashBoard", options)
+        fetch("/dashBoard", options) //posts that data to be saved.
             .then(res => res.json())
             .then((data) => {
-                console.log("loading saved dashboards", data.message);
+                // console.log("dashboard saved.", data.message);
                 res(true)
             })
             .catch((err) => {
-                console.log("Problem returning saved dashboards", err)
+                console.log("dashboard save error: ", err)
                 res(false)
             })
     })
