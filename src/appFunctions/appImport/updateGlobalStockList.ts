@@ -4,8 +4,8 @@ import produce from "immer"
 
 export const updateGlobalStockList = async function (event: Event, stockRef: string, stockObj: StockObj | Object = {}) {
     //if no stock object passed, remove from global stock list, else add.
-    const s: AppState = this.state;
-    const currentStockObj = { ...s.globalStockList };
+    // const s: AppState = this.state;
+    const currentStockObj = { ...this.state.globalStockList };
     if (currentStockObj[stockRef] === undefined) {
         currentStockObj[stockRef] = { ...stockObj };
         currentStockObj[stockRef]["dStock"] = function (ex: string) {
@@ -19,8 +19,10 @@ export const updateGlobalStockList = async function (event: Event, stockRef: str
         delete currentStockObj[stockRef];
     }
 
-    let updateCurrentDashboard: dashBoardData = await produce(s.dashBoardData, (draftState: dashBoardData) => {
-        draftState[s.currentDashBoard].globalstocklist = currentStockObj
+    const oldState: AppState = this.state;
+    const dbData = oldState.dashBoardData
+    let updateCurrentDashboard: dashBoardData = await produce(dbData, (draftState: dashBoardData) => {
+        draftState[this.state.currentDashBoard].globalstocklist = currentStockObj
     })
 
 
@@ -28,8 +30,9 @@ export const updateGlobalStockList = async function (event: Event, stockRef: str
         globalStockList: currentStockObj,
         dashBoardData: updateCurrentDashboard
     }
+    console.log('updateGlobalStockList Save', payload)
     this.setState(payload, () => {
-        this.saveDashboard(s.currentDashBoard)
+        this.saveDashboard(this.state.currentDashBoard)
     });
 
 

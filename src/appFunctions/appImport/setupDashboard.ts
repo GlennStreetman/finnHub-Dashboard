@@ -99,6 +99,7 @@ export const saveDashboard = async function (dashboardName: string) {
             widgetList: saveWidgetList,
             menuList: this.state.menuList,
         };
+        console.log('SAVE DATA', data)
         const options = {
             method: "POST",
             headers: { "Content-Type": "application/json" },

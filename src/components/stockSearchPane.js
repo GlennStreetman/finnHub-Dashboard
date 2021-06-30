@@ -14,6 +14,7 @@ class StockSearchPane extends React.Component {
 
     this.handleChange = this.handleChange.bind(this);
     this.changeDefault = this.changeDefault.bind(this);
+    this.submitSecurity = this.submitSecurity.bind(this)
   }
 
   componentDidMount(){
@@ -32,10 +33,31 @@ class StockSearchPane extends React.Component {
     this.props.updateDefaultExchange(event.target.value, true)
     event.preventDefault()
   }
+
+  submitSecurity(e){
+    let widgetKey = this.props.widgetKey;
+    if (this.props.rUpdateStock !== undefined && widgetKey === 'watchListMenu') {
+      const thisStock = this.props.rUpdateStock
+      const stockKey = thisStock.key
+      console.log('FIRING FROM SEARCHPANE')
+      this.props.updateGlobalStockList(e, stockKey, thisStock);
+      // this.props.showSearchPane();
+      e.preventDefault();
+    } else if (widgetKey / 1 !== undefined && this.props.rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
+      const thisStock = this.props.rUpdateStock
+      const stockKey = thisStock.key
+      this.props.updateWidgetStockList(widgetKey, stockKey, thisStock);
+      e.preventDefault();
+    
+    } else {
+      console.log("invalid stock selection");
+      e.preventDefault();
+    }
+  }
   
   render() { // inputText
-    const p = this.props
-    let widgetKey = p.widgetKey;
+    // const p = this.props
+    // let widgetKey = p.widgetKey;
     const exchangeOptions = this.props.exchangeList.map((el) => 
       <option key={el} value={el}>{el}</option>
     )
@@ -54,7 +76,7 @@ class StockSearchPane extends React.Component {
 
     const watchListSync = 
       <>
-        <button className="ui button" onClick={this.props.syncGlobalStockList}>
+        <button className="ui button" name='other' onClick={this.props.syncGlobalStockList}>
               Sync
         </button>
         <ToolTip textFragment={syncText} hintName='sw' /> <br />
@@ -65,22 +87,25 @@ class StockSearchPane extends React.Component {
         <form
           className="form-stack"
           onSubmit={(e) => { //submit stock to be added/removed from global & widget stocklist.
-            if (this.props.rUpdateStock !== undefined && widgetKey === 'watchListMenu') {
-              const thisStock = this.props.rUpdateStock
-              const stockKey = thisStock.key
-              this.props.updateGlobalStockList(e, stockKey, thisStock);
-              // this.props.showSearchPane();
-              e.preventDefault();
-            } else if (widgetKey / 1 !== undefined && this.props.rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
-              const thisStock = this.props.rUpdateStock
-              const stockKey = thisStock.key
-              this.props.updateWidgetStockList(widgetKey, stockKey, thisStock);
-              e.preventDefault();
+            console.log('e', e)
+            e.preventDefault()
+            // if (this.props.rUpdateStock !== undefined && widgetKey === 'watchListMenu') {
+            //   const thisStock = this.props.rUpdateStock
+            //   const stockKey = thisStock.key
+            //   console.log('FIRING FROM SEARCHPANE')
+            //   this.props.updateGlobalStockList(e, stockKey, thisStock);
+            //   // this.props.showSearchPane();
+            //   e.preventDefault();
+            // } else if (widgetKey / 1 !== undefined && this.props.rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
+            //   const thisStock = this.props.rUpdateStock
+            //   const stockKey = thisStock.key
+            //   this.props.updateWidgetStockList(widgetKey, stockKey, thisStock);
+            //   e.preventDefault();
             
-            } else {
-              console.log("invalid stock selection");
-              e.preventDefault();
-            }
+            // } else {
+            //   console.log("invalid stock selection");
+            //   e.preventDefault();
+            // }
           }}
         >
           {this.props.exchangeList.length > 1 && <>
@@ -100,7 +125,7 @@ class StockSearchPane extends React.Component {
               inputText={this.props.searchText}
             />
           </datalist>
-          <input className="btn" type="submit" value="Submit" />
+          <button className="btn" type="other" value="Submit" onClick={this.submitSecurity}>Submit</button>
           {this.props.widgetKey === 'watchListMenu' && watchListSync}
         </form>
 

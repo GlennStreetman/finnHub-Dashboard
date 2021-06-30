@@ -1,12 +1,13 @@
 import produce from "immer"
-import { AppState, widgetList, dashBoardData } from './../../App'
+import { AppState, widgetList } from './../../App'
 
 export const syncGlobalStockList = async function () {
-    const s: AppState = this.state;
-    const updatedWidgetList: widgetList = produce(s.widgetList, (draftState: widgetList) => {
+    const oldState: AppState = this.state;
+    const oldWidgetList = oldState.widgetList
+    const updatedWidgetList: widgetList = produce(oldWidgetList, (draftState: widgetList) => {
         for (const w in draftState) {
             if (draftState[w].widgetConfig === 'stockWidget') {
-                draftState[w]["trackedStocks"] = s.globalStockList;
+                draftState[w]["trackedStocks"] = this.state.globalStockList;
             }
         }
     })
@@ -14,11 +15,10 @@ export const syncGlobalStockList = async function () {
         const resObj: Partial<AppState> = { widgetList: updatedWidgetList }
         return resObj
     }, async () => {
-        let savedDash: boolean = await this.saveDashboard(s.currentDashBoard) //saves dashboard setup to server
+        console.log('HERE', this.state.dashBoardData[this.state.currentDashBoard])
+        let savedDash: boolean = await this.saveDashboard(this.state.currentDashBoard) //saves dashboard setup to server
         if (savedDash === true) {
-            let returnedDash: dashBoardData = await this.getSavedDashBoards()
-            this.updateDashBoards(returnedDash)
-            if (Object.keys(s.globalStockList)[0] !== undefined) this.setSecurityFocus(Object.keys(s.globalStockList)[0])
+            if (Object.keys(this.state.globalStockList)[0] !== undefined) this.setSecurityFocus(Object.keys(this.state.globalStockList)[0])
         }
     });
 }

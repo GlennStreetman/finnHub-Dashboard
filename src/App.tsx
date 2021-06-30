@@ -8,7 +8,7 @@ import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData
 import { logoutServer, Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
 import {
     NewMenuContainer, AddNewWidgetContainer, LockWidgets,
-    ToggleWidgetVisability, ChangeWidgetName,
+    ToggleWidgetVisability, ChangeWidgetName, RemoveWidget,
     UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig,
     toggleWidgetBody, setWidgetFocus, removeDashboardFromState
 } from "./appFunctions/appImport/widgetLogic";
@@ -275,6 +275,7 @@ class App extends React.Component<AppProps, AppState> {
         this.refreshFinnhubAPIDataVisable = this.refreshFinnhubAPIDataVisable.bind(this)
         this.buildWidgetList = this.buildWidgetList.bind(this) //sets s.widgetList. Used to build widgets for dashboard. Mounted widgets create redux.showData
         this.removeDashboardFromState = removeDashboardFromState.bind(this)
+        this.removeWidget = RemoveWidget.bind(this)
     }
 
     componentDidUpdate(prevProps: AppProps, prevState: AppState) {

@@ -140,7 +140,6 @@ export const UpdateWidgetStockList = function updateWidgetStockList(widgetId: nu
             dashBoardData: updatedDashBoard,
         }
         this.setState(payload, () => {
-
             this.saveDashboard(this.state.currentDashBoard)
 
             const payload: rBuildDataModelPayload = {
