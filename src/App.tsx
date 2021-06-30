@@ -325,7 +325,7 @@ class App extends React.Component<AppProps, AppState> {
         }
     }
 
-    async refreshFinnhubAPIDataVisable() {
+    async refreshFinnhubAPIDataVisable() { //queues all finnhub data to be refreshed for current dashboard.
         const s: AppState = this.state;
         const p: AppProps = this.props;
         await p.tGetMongoDB()
@@ -342,7 +342,7 @@ class App extends React.Component<AppProps, AppState> {
         })
     }
 
-    async refreshFinnhubAPIDataAll() {
+    async refreshFinnhubAPIDataAll() { //queues all finnhub data to be refreshes for all dashboards.
         const s: AppState = this.state;
         const p: AppProps = this.props;
         await p.tGetMongoDB()
@@ -379,7 +379,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     async rebuildDashboardState() { //fetches dashboard data, then updates s.dashBoardData, then builds redux model.
-
+        console.log('running rebuild')
         try {
             const data: GetSavedDashBoardsRes = await this.getSavedDashBoards()
             if ((data.dashBoardData[data.currentDashBoard] === undefined && Object.keys(data.dashBoardData))) { //if invalid current dashboard returned

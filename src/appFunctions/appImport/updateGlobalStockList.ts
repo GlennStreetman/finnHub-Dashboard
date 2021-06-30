@@ -30,7 +30,6 @@ export const updateGlobalStockList = async function (event: Event, stockRef: str
         globalStockList: currentStockObj,
         dashBoardData: updateCurrentDashboard
     }
-    console.log('updateGlobalStockList Save', payload)
     this.setState(payload, () => {
         this.saveDashboard(this.state.currentDashBoard)
     });

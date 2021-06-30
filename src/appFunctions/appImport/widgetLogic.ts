@@ -88,14 +88,22 @@ export const RemoveWidget = async function (stateRef: 'widgetList' | 'menuList',
     const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
         delete draftState[widgetID]
     })
+
+    let dashBoardData: dashBoardData = this.state.dashBoardData
+    const newDashboardData: dashBoardData = produce(dashBoardData, (draftState) => {
+        let thisWidgetList = draftState[this.state.currentDashBoard].widgetlist
+        delete thisWidgetList[widgetID]
+    })
+
     const payload: Partial<AppState> = {
         [stateRef]: newWidgetList,
+        dashBoardData: newDashboardData,
     }
-    await this.setState(payload, () => {
+    this.setState(payload, () => {
+        this.saveDashboard(this.state.currentDashBoard)
         return true
     });
-    await this.saveDashboard(this.state.currentDashBoard)
-    this.rebuildDashboardState()
+    // this.rebuildDashboardState()
 
 }
 
@@ -189,6 +197,7 @@ export const UpdateWidgetFilters = function (widgetID: string, data: filters) {
 
 //widget config changes how data is manipulated after being queried.
 export const updateWidgetConfig = function (widgetID: number, updateObj: config) {
+    console.log(this.state.enableDrag)
     const s: AppState = this.state
     const updatedDashboardData: widgetList = produce(s.widgetList, (draftState: widgetList) => {
         for (const x in updateObj) {
@@ -197,7 +206,7 @@ export const updateWidgetConfig = function (widgetID: number, updateObj: config)
     })
     const payload: Partial<AppState> = { widgetList: updatedDashboardData }
     this.setState(payload, () => {
-        this.saveDashboard(this.state.currentDashBoard)
+        if (this.state.enableDrag !== true) this.saveDashboard(this.state.currentDashBoard)
         const updatedWidgetFilters = updatedDashboardData[widgetID].config
         const postBody: reqBody = {
             widget: widgetID,

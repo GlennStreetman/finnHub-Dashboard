@@ -219,7 +219,7 @@ router.post("/dashboard", (req, res, next) => { //saves users dashboard
 
     saveDashBoardSetup(req.session.uID)
         .then((data) => {
-            // console.log(data);
+            // console.log('HERE', data);
             return updateMenuSetup(data);
         })
         .then(() => {

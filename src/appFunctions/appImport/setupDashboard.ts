@@ -77,6 +77,7 @@ export const NewDashboard = function newDashboard(newName, dashboards) {
 }
 
 export const saveDashboard = async function (dashboardName: string) {
+
     //saves current dashboard by name. Assigns new widget ids if using new name (copy function). Returns true on success.
     const widgList: widgetList = this.state.widgetList
     const saveWidgetList: widgetList = await produce(widgList, (draftState: widgetList) => {
@@ -99,7 +100,7 @@ export const saveDashboard = async function (dashboardName: string) {
             widgetList: saveWidgetList,
             menuList: this.state.menuList,
         };
-        console.log('SAVE DATA', data)
+
         const options = {
             method: "POST",
             headers: { "Content-Type": "application/json" },

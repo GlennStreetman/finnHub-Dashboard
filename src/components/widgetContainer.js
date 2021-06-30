@@ -73,6 +73,7 @@ function WidgetContainer(p) {
         let widgetWidth = 200
 
         function dragMouseDown(e) {
+            console.log('start drag')
         e = e || window.event;
         e.preventDefault();
 

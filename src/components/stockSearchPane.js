@@ -39,7 +39,6 @@ class StockSearchPane extends React.Component {
     if (this.props.rUpdateStock !== undefined && widgetKey === 'watchListMenu') {
       const thisStock = this.props.rUpdateStock
       const stockKey = thisStock.key
-      console.log('FIRING FROM SEARCHPANE')
       this.props.updateGlobalStockList(e, stockKey, thisStock);
       // this.props.showSearchPane();
       e.preventDefault();
@@ -86,7 +85,6 @@ class StockSearchPane extends React.Component {
         <form
           className="form-stack"
           onSubmit={(e) => { //submit stock to be added/removed from global & widget stocklist.
-            console.log('e', e)
             e.preventDefault()
             // if (this.props.rUpdateStock !== undefined && widgetKey === 'watchListMenu') {
             //   const thisStock = this.props.rUpdateStock

@@ -105,12 +105,10 @@ const dataModel = createSlice({
             }
             state.dataSet = endPointAPIList
             const flag: boolean | string = state.created === 'false' ? 'true' : 'updated'
-            console.log('new flag', flag)
             state.created = flag
 
         },
         rResetUpdateFlag: (state: sliceDataModel) => {
-            console.log('CREATED EQUALS TRUE')
             state.created = 'true'
         },
         rSetUpdateStatus: (state: sliceDataModel, action) => {
