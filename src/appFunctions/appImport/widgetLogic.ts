@@ -197,7 +197,6 @@ export const UpdateWidgetFilters = function (widgetID: string, data: filters) {
 
 //widget config changes how data is manipulated after being queried.
 export const updateWidgetConfig = function (widgetID: number, updateObj: config) {
-    console.log(this.state.enableDrag)
     const s: AppState = this.state
     const updatedDashboardData: widgetList = produce(s.widgetList, (draftState: widgetList) => {
         for (const x in updateObj) {

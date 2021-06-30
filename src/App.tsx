@@ -44,7 +44,7 @@ import { storeState } from './store'
 import { tGetSymbolList, rExchangeDataLogout } from "./slices/sliceExchangeData";
 import { rSetTargetDashboard, rTargetDashboardLogout } from "./slices/sliceShowData";
 import { rUpdateExchangeList, rExchangeListLogout } from "./slices/sliceExchangeList";
-import { rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus, sliceDataModel, rDataModelLogout } from "./slices/sliceDataModel";
+import { rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus, sliceDataModel, rDataModelLogout, rRebuildTargetDashboardModel } from "./slices/sliceDataModel";
 import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 
@@ -147,6 +147,7 @@ export interface AppProps {
     tGetFinnhubData: Function,
     tGetMongoDB: Function,
     rBuildDataModel: Function,
+    rRebuildTargetDashboardModel: Function,
     rResetUpdateFlag: Function,
     rSetTargetDashboard: Function,
     rSetUpdateStatus: Function,
@@ -276,6 +277,7 @@ class App extends React.Component<AppProps, AppState> {
         this.buildWidgetList = this.buildWidgetList.bind(this) //sets s.widgetList. Used to build widgets for dashboard. Mounted widgets create redux.showData
         this.removeDashboardFromState = removeDashboardFromState.bind(this)
         this.removeWidget = RemoveWidget.bind(this)
+        this.rebuildVisableDashboard = this.rebuildVisableDashboard.bind(this) //rebuilds dashboard in redux state.dataModel
     }
 
     componentDidUpdate(prevProps: AppProps, prevState: AppState) {
@@ -395,6 +397,15 @@ class App extends React.Component<AppProps, AppState> {
         } catch (error: any) {
             console.error("Failed to recover dashboards");
         }
+    }
+
+    rebuildVisableDashboard() {
+        const payload = {
+            apiKey: this.state.apiKey,
+            dashBoardData: this.state.dashBoardData,
+            targetDashboard: this.state.currentDashBoard,
+        }
+        this.props.rRebuildTargetDashboardModel(payload)
     }
 
     async buildWidgetList() {
@@ -564,5 +575,6 @@ export default connect(mapStateToProps, {
     rExchangeDataLogout,
     rExchangeListLogout,
     rTargetDashboardLogout,
+    rRebuildTargetDashboardModel,
 })(App);
 

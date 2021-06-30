@@ -5,7 +5,7 @@ import { uniqueObjectnName } from './../stringFunctions'
 
 
 
-export const setupDashboardObject = async function setupDashboardObject(target: string, newGlobalList: globalStockList, newWidgetList: widgetList) {
+export const setupDashboardObject = async function (target: string, newGlobalList: globalStockList, newWidgetList: widgetList) {
     //setup global security list and widgets.
     let updateGlobalList: globalStockList = await produce(newGlobalList, (draftState: globalStockList) => {
         for (const stock in draftState) {

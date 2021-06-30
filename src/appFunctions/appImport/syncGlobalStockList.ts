@@ -18,6 +18,7 @@ export const syncGlobalStockList = async function () {
         let savedDash: boolean = await this.saveDashboard(this.state.currentDashBoard) //saves dashboard setup to server
         if (savedDash === true) {
             if (Object.keys(this.state.globalStockList)[0] !== undefined) this.setSecurityFocus(Object.keys(this.state.globalStockList)[0])
+            this.rebuildVisableDashboard()
         }
     });
 }

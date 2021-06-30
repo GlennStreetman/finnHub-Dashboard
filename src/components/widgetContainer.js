@@ -6,6 +6,7 @@ import ErrorBoundary from './widgetErrorBoundary';
 import { useState, useEffect } from "react";
 import { useAppDispatch } from './../hooks';
 import { rUnmountWidget } from './../slices/sliceShowData'
+import { rRemoveWidgetDataModel } from './../slices/sliceDataModel'
 
 
 //creates widget container. Used by all widgets.
@@ -205,8 +206,10 @@ function WidgetContainer(p) {
                         fetch(`/deleteFinnDashData?widgetID=${p.widgetKey}`)
                         const payload = {
                             widgetKey: p.widgetKey,
+                            dashboardName: p.currentDashBoard,
                         }
                         dispatch(rUnmountWidget(payload))
+                        dispatch(rRemoveWidgetDataModel(payload))
                     } else {
                         p.menuWidgetToggle(p.widgetKey);
                     }

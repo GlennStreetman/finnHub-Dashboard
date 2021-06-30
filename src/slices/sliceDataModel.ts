@@ -53,8 +53,19 @@ export interface rBuildDataModelPayload {
     dashBoardData: dashBoardData
 }
 
+export interface rRebuildTargetDashboardPayload {
+    apiKey: string,
+    dashBoardData: dashBoardData,
+    targetDashboard: string,
+}
+
 export interface rRemoveDashboardPayload {
     dashboardName: string,
+}
+
+export interface rRemoveWidgetDataModelPayload {
+    dashboardName: string,
+    widgetKey: string,
 }
 
 const initialState: sliceDataModel = {
@@ -62,6 +73,8 @@ const initialState: sliceDataModel = {
     status: {},
     created: 'false',
 }
+
+
 
 const dataModel = createSlice({
     name: 'finnHubData',
@@ -71,12 +84,13 @@ const dataModel = createSlice({
             console.log('building data model')
             //receivies dashboard object and builds dataset from scratch.
             const ap: rBuildDataModelPayload = action.payload
+            console.log('ap', ap)
             const apD: dashBoardData = ap.dashBoardData
-            const endPointAPIList: EndPointAPIList = {} //list of lists. Each list []
+            const dataModel: EndPointAPIList = {} //list of lists. Each list []
             for (const d in apD) { //for each dashboard
                 const dashboardName: string = d
                 state.status[dashboardName] = 'Setup in Progress'
-                endPointAPIList[dashboardName] = {}
+                dataModel[dashboardName] = {}
                 const widgetList = apD[d].widgetlist
                 for (const w in widgetList) {  //for each widget
                     const widgetName: string = w
@@ -90,9 +104,9 @@ const dataModel = createSlice({
                         const trackedStocks = widgetList[w].trackedStocks
                         const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, ap.apiKey)
                         delete endPointData.undefined
-                        endPointAPIList[dashboardName][widgetName] = {}
+                        dataModel[dashboardName][widgetName] = {}
                         for (const stock in endPointData) {
-                            endPointAPIList[dashboardName][widgetName][`${stock}`] = {
+                            dataModel[dashboardName][widgetName][`${stock}`] = {
                                 apiString: endPointData[stock],
                                 widgetName: widgetDescription,
                                 dashboard: dashboardName,
@@ -103,9 +117,45 @@ const dataModel = createSlice({
                     }
                 }
             }
-            state.dataSet = endPointAPIList
+            state.dataSet = dataModel
             const flag: boolean | string = state.created === 'false' ? 'true' : 'updated'
             state.created = flag
+        },
+        rRebuildTargetDashboardModel: (state: sliceDataModel, action) => {
+            const ap: rRebuildTargetDashboardPayload = action.payload
+            const apD: dashBoardData = ap.dashBoardData
+            const dashboardName: string = ap.targetDashboard
+            const targetDashboard = apD?.[dashboardName]
+            console.log('payload', ap)
+
+            const newDashboardModel = {}
+            const widgetList = targetDashboard.widgetlist
+            for (const w in widgetList) {  //for each widget
+                const widgetName: string = w
+                if (w !== null && w !== 'null') {
+                    const endPoint: string = widgetList[w].widgetType
+                    const filters: Object = widgetList[w].filters
+                    const widgetDescription: string = widgetList[w].widgetHeader
+                    const widgetType: string = widgetList[w].widgetType
+                    const config: Object = widgetList[w].config
+                    const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
+                    const trackedStocks = widgetList[w].trackedStocks
+                    const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, ap.apiKey)
+                    delete endPointData.undefined
+                    newDashboardModel[widgetName] = {}
+                    for (const stock in endPointData) {
+                        newDashboardModel[widgetName][`${stock}`] = {
+                            apiString: endPointData[stock],
+                            widgetName: widgetDescription,
+                            dashboard: dashboardName,
+                            widgetType: widgetType,
+                            config: config,
+                        }
+                    }
+                }
+            }
+            state.dataSet[dashboardName] = newDashboardModel
+            state.status[dashboardName] = 'Updating'
 
         },
         rResetUpdateFlag: (state: sliceDataModel) => {
@@ -124,11 +174,17 @@ const dataModel = createSlice({
             state.status = {}
             state.created = 'false'
         },
-        rRemoveDashboardDataModel(state, action) {
+        rRemoveDashboardDataModel(state: sliceDataModel, action) {
             const ap: rRemoveDashboardPayload = action.payload
             const removeDashboard = ap.dashboardName
             delete state.dataSet[removeDashboard]
-        }
+        },
+        rRemoveWidgetDataModel(state: sliceDataModel, action) {
+            const ap: rRemoveWidgetDataModelPayload = action.payload
+            const targetDashboard = ap.dashboardName
+            const targetWidget = ap.widgetKey
+            delete state.dataSet?.[targetDashboard]?.[targetWidget]
+        },
     },
     extraReducers: {
         [tGetFinnhubData.pending.toString()]: (state, action) => {
@@ -178,5 +234,7 @@ export const {
     rSetUpdateStatus,
     rDataModelLogout,
     rRemoveDashboardDataModel,
+    rRemoveWidgetDataModel,
+    rRebuildTargetDashboardModel,
 } = dataModel.actions
 export default dataModel.reducer
