@@ -56,8 +56,7 @@ class StockSearchPane extends React.Component {
   }
   
   render() { // inputText
-    // const p = this.props
-    // let widgetKey = p.widgetKey;
+
     const exchangeOptions = this.props.exchangeList.map((el) => 
       <option key={el} value={el}>{el}</option>
     )
@@ -118,8 +117,8 @@ class StockSearchPane extends React.Component {
 
           <ToolTip textFragment={helpText2} hintName='sspe2' />
           <label htmlFor="stockSearch">Security: </label>
-          <input size='18' autoComplete="off" className="btn" type="text" id="stockSearch" list="stockSearch1" value={this.state.inputText} onChange={this.handleChange} />
-          <datalist id="stockSearch1">
+          <input size='18' autoComplete="off" className="btn" type="text" id="stockSearch" list={`${this.props.widgetKey}-dataList`} value={this.state.inputText} onChange={this.handleChange} />
+          <datalist id={`${this.props.widgetKey}-dataList`}>
             <StockDataList  
               defaultExchange={this.props.defaultExchange}
               inputText={this.props.searchText}
