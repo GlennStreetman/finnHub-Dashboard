@@ -8,6 +8,8 @@ import { useTargetSecurity } from '../../widgetHooks/useTargetSecurity'
 import { useSearchMongoDb } from '../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from '../../widgetHooks/useBuildVisableData'
 
+import { dStock } from './../../../appFunctions/formatStockSymbols'
+
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
@@ -58,7 +60,7 @@ function FundamentalsCompanyProfile2(p: { [key: string]: any }, ref: any) {
         let row = stockList.map((el) =>
             p.showEditPane === 1 ? (
                 <tr key={el + "container"}>
-                    <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
+                    <td key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
                     <td key={el + "buttonC"}>
                         <button
                             data-testid={`remove-${el}`}
@@ -111,7 +113,7 @@ function FundamentalsCompanyProfile2(p: { [key: string]: any }, ref: any) {
     function renderStockData() {
         const newSymbolList = Object.keys(p.trackedStocks).map((el) => (
             <option key={el + "ddl"} value={el}>
-                {p.trackedStocks[el].dStock(p.exchangeList)}
+                {dStock(p.trackedStocks[el], p.exchangeList)}
             </option>
         ))
 

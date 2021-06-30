@@ -24,19 +24,9 @@ const mapStateToProps =  (state, ownProps) => {
     for (const s in ul) { //stock in uploadlist
         const stock = ul[s]
         const exchange = stock.slice(0,stock.indexOf('-'))
-        // console.log(stock, exchange)
         const updateStock = state.exchangeData.e.ex === exchange ? {...state.exchangeData.e.data[stock]} : 'pass'
-        console.log('updateStock', stock,updateStock)
         if (updateStock !== 'pass') {
             updateObj[stock] = updateStock
-            updateObj[stock].dStock = function(ex){
-                //pass in exchange list
-                if (ex.length === 1) {
-                    return (this.symbol)
-                } else {
-                    return (this.key)
-                }
-            }
         }
     }
     return {rUpdateObj: updateObj}

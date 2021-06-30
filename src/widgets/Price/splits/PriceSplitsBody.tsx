@@ -11,6 +11,8 @@ import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
 import { useStartingFilters } from './../../widgetHooks/useStartingFilters'
 
+import { dStock } from './../../../appFunctions/formatStockSymbols'
+
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
@@ -127,7 +129,7 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
         const stockList = Object.keys(p.trackedStocks);
         const stockListRows = stockList.map((el) =>
             <tr key={el + "container"}>
-                <td key={el + "name"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
+                <td key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
                 <td key={el + "buttonC"}>
                     <button
                         data-testid={`remove-${el}`}
@@ -189,7 +191,7 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
     function renderStockData() {
         let newStockList = Object.keys(p.trackedStocks).map((el) => (
             <option key={el + "ddl"} value={el}>
-                {p.trackedStocks[el].dStock(p.exchangeList)}
+                {dStock(p.trackedStocks[el], p.exchangeList)}
             </option>
         ));
 

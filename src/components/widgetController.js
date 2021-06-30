@@ -76,14 +76,14 @@ function WidgetController(p){
     const widgetGroups = Array.from({length: 32},  (i, x) => {return [{'pass':x}]}) //creates 32 columns
     
     for (const w in allWidgets) { //puts widgets into columns
-        const thisColumn = allWidgets[w].column
+        const thisColumn = allWidgets[w]?.column
         if (thisColumn === 'drag') {
             widgetGroups[32] = []
             widgetGroups[32].push(allWidgets[w])
-        } else { if (widgetGroups[thisColumn][0]['pass'] !== undefined) {
+        } else { if (widgetGroups?.[thisColumn]?.[0]?.['pass'] !== undefined) {
             widgetGroups[thisColumn] = []
         }
-        widgetGroups[thisColumn].push(allWidgets[w])
+        if (widgetGroups?.[thisColumn]) widgetGroups?.[thisColumn].push(allWidgets[w])
         }
     }
 

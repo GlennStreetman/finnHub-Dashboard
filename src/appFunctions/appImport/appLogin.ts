@@ -23,6 +23,7 @@ export const ProcessLogin = function (apiKey: string, setLogin: number, apiAlias
         apiAlias: apiAlias,
         widgetSetup: parseSetup,
     }
+    console.log('login payload', payload)
     this.setState(payload, () => { return true });
 }
 

@@ -4,6 +4,8 @@ import StockSearchPane, {searchPaneProps} from "../../../components/stockSearchP
 import CsvUpload from './csvUpload.js'
 import ToolTip from '../../../components/toolTip.js'
 
+import { dStock } from './../../../appFunctions/formatStockSymbols'
+
 export default class WatchListMenu extends React.PureComponent {
   constructor(props) {
     super(props);
@@ -48,7 +50,7 @@ export default class WatchListMenu extends React.PureComponent {
                   p.setSecurityFocus(g[el].key)
                 }} /></td>
             <td key={el + "symb"}>
-              {g[el].dStock(p.exchangeList)}
+              {dStock(g[el],p.exchangeList)}
             </td>
             <td className="leftTE" key={el + 'desc'}>
               {g[el].description}

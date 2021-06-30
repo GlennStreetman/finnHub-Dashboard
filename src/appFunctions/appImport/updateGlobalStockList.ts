@@ -4,7 +4,7 @@ import produce from "immer"
 
 export const updateGlobalStockList = async function (event: Event, stockRef: string, stockObj: StockObj | Object = {}) {
     //if no stock object passed, remove from global stock list, else add.
-    // const s: AppState = this.state;
+    console.log('updating global')
     const currentStockObj = { ...this.state.globalStockList };
     if (currentStockObj[stockRef] === undefined) {
         currentStockObj[stockRef] = { ...stockObj };

@@ -1,4 +1,4 @@
-export const checkLoginStatus = function checkLoginStatus(processLogin, updateExchangeList, updateDefaultExchange, finnHubQueue){
+export const checkLoginStatus = function(processLogin, updateExchangeList, updateDefaultExchange, finnHubQueue){
     console.log('CHECKING LOGGIN STATUS')
     fetch("/checkLogin")
     .then((response) => response.json())

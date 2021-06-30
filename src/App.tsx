@@ -44,7 +44,11 @@ import { storeState } from './store'
 import { tGetSymbolList, rExchangeDataLogout } from "./slices/sliceExchangeData";
 import { rSetTargetDashboard, rTargetDashboardLogout } from "./slices/sliceShowData";
 import { rUpdateExchangeList, rExchangeListLogout } from "./slices/sliceExchangeList";
-import { rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus, sliceDataModel, rDataModelLogout, rRebuildTargetDashboardModel } from "./slices/sliceDataModel";
+import {
+    rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus,
+    sliceDataModel, rDataModelLogout, rRebuildTargetDashboardModel,
+    rRebuildTargetWidgetModel
+} from "./slices/sliceDataModel";
 import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 
@@ -156,6 +160,7 @@ export interface AppProps {
     rExchangeDataLogout: Function,
     rExchangeListLogout: Function,
     rTargetDashboardLogout: Function,
+    rRebuildTargetWidgetModel: Function,
 }
 
 export interface AppState {
@@ -185,7 +190,6 @@ export interface AppState {
     watchListMenu: number, //1 = show, 0 = hide
     widgetCopy: widget | null, //copy of state of widget being dragged.
     widgetLockDown: number, //1 removes buttons from all widgets.
-    widgetList: widgetList, //lists of all widgets.
     widgetSetup: widgetSetup,
     zIndex: string[], //list widgets. Index location sets zIndex
 }
@@ -223,7 +227,6 @@ class App extends React.Component<AppProps, AppState> {
             watchListMenu: 1, //1 = show, 0 = hide
             widgetCopy: null, //copy of state of widget being dragged.
             widgetLockDown: 0, //1 removes buttons from all widgets.
-            widgetList: {}, //lists of all widgets.
             widgetSetup: {},
             zIndex: [], //list widgets. Index location sets zIndex
         };
@@ -274,7 +277,6 @@ class App extends React.Component<AppProps, AppState> {
         this.rebuildDashboardState = this.rebuildDashboardState.bind(this) //sets s.dashboardData. Used to build dataModel in redux
         this.refreshFinnhubAPIDataAll = this.refreshFinnhubAPIDataAll.bind(this) //For All Dashboards: gets data from mongo if available, else queues updates with finnhub.io
         this.refreshFinnhubAPIDataVisable = this.refreshFinnhubAPIDataVisable.bind(this)
-        this.buildWidgetList = this.buildWidgetList.bind(this) //sets s.widgetList. Used to build widgets for dashboard. Mounted widgets create redux.showData
         this.removeDashboardFromState = removeDashboardFromState.bind(this)
         this.removeWidget = RemoveWidget.bind(this)
         this.rebuildVisableDashboard = this.rebuildVisableDashboard.bind(this) //rebuilds dashboard in redux state.dataModel
@@ -308,10 +310,6 @@ class App extends React.Component<AppProps, AppState> {
         if ((s.globalStockList !== prevState.globalStockList && s.login === 1)) { //price data for watchlist, including socket data.
             LoadStockData(this, s, GetStockPrice, s.finnHubQueue); //sets default day price for watchlist, usefull if socket data not available.
             LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
-        }
-
-        if (s.login === 1 && s.loadStartingDashBoard === 0) {
-            this.buildWidgetList()
         }
 
         if (s.rebuildDataSet === 1 && s.login === 1) { //refresh current dashboards api data.
@@ -387,11 +385,14 @@ class App extends React.Component<AppProps, AppState> {
             if ((data.dashBoardData[data.currentDashBoard] === undefined && Object.keys(data.dashBoardData))) { //if invalid current dashboard returned
                 data.currentDashBoard = Object.keys(data.dashBoardData)[0]
             }
-            this.setState({
+            const payload = {
                 dashBoardData: data.dashBoardData,
                 currentDashBoard: data.currentDashBoard,
+                globalStockList: data.dashBoardData[data.currentDashBoard].globalstocklist,
                 menuList: data.menuList!,
-            })
+            }
+            console.log('rebuild finished', payload)
+            this.setState(payload, () => { console.log(this.state.dashBoardData) })
             this.props.rSetTargetDashboard({ targetDashboard: data.currentDashBoard })
             this.props.rBuildDataModel({ ...data, apiKey: this.state.apiKey })
         } catch (error: any) {
@@ -406,33 +407,6 @@ class App extends React.Component<AppProps, AppState> {
             targetDashboard: this.state.currentDashBoard,
         }
         this.props.rRebuildTargetDashboardModel(payload)
-    }
-
-    async buildWidgetList() {
-        const s: AppState = this.state;
-        try {
-            if (s.dashBoardData && Object.keys(s.dashBoardData).length > 0) {
-                console.log('loading starting dashboard')
-                if (s.dashBoardData[s.currentDashBoard] !== undefined) {
-                    let loadWidget = s.dashBoardData[s.currentDashBoard]["widgetlist"];
-                    let loadGlobal = s.dashBoardData[s.currentDashBoard]["globalstocklist"];
-                    this.setupDashboardObject('NEW', loadGlobal, loadWidget);
-                    this.setState({ dashBoardMenu: 1, loadStartingDashBoard: 1 });
-                } else if (Object.keys(s.dashBoardData).length > 0) {
-                    const defaultDashboard = Object.keys(s.dashBoardData)[0]
-                    let loadWidget = s.dashBoardData[defaultDashboard]["widgetlist"];
-                    let loadGlobal = s.dashBoardData[defaultDashboard]["globalstocklist"];
-                    this.setupDashboardObject(defaultDashboard, loadGlobal, loadWidget);
-                    this.setState({
-                        dashBoardMenu: 1,
-                        currentDashBoard: defaultDashboard,
-                        loadStartingDashBoard: 1
-                    });
-                }
-            }
-        } catch (err) {
-            console.log("failed to load dashboards", err);
-        }
     }
 
     uploadGlobalStockList(newStockObj: stockList) {
@@ -476,6 +450,9 @@ class App extends React.Component<AppProps, AppState> {
         const backGroundMenu = () => {
             return <div className="backgroundMenu">{backGroundSelection[s.backGroundMenu]}</div>;
         };
+
+        const widgetList = this.state.dashBoardData?.[this.state.currentDashBoard]?.['widgetlist'] ?
+            this.state.dashBoardData?.[this.state.currentDashBoard]['widgetlist'] : {}
 
         return (
             <>
@@ -546,7 +523,7 @@ class App extends React.Component<AppProps, AppState> {
                     uploadGlobalStockList={this.uploadGlobalStockList}
                     watchListMenu={this.state.watchListMenu}
                     widgetCopy={this.state.widgetCopy}
-                    widgetList={this.state.widgetList}
+                    widgetList={widgetList}
                     widgetLockDown={this.state.widgetLockDown}
                     zIndex={this.state.zIndex}
                 />
@@ -576,5 +553,6 @@ export default connect(mapStateToProps, {
     rExchangeListLogout,
     rTargetDashboardLogout,
     rRebuildTargetDashboardModel,
+    rRebuildTargetWidgetModel,
 })(App);
 

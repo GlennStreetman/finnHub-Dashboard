@@ -12,6 +12,8 @@ import { useBuildVisableData } from '../../widgetHooks/useBuildVisableData'
 
 import { useStartingFilters } from '../../widgetHooks/useStartingFilters'
 
+import { dStock } from './../../../appFunctions/formatStockSymbols'
+
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
@@ -148,7 +150,7 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
         let stockNewsRow = newsList.map((el) =>
             p.showEditPane === 1 ? (
                 <tr key={el + "container"}>
-                    <td key={el + "name"}>{(p.trackedStocks[el].dStock(p.exchangeList))}</td>
+                    <td key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
                     <td key={el + "buttonC"}>
                         <button
                             data-testid={`remove-${el}`}
@@ -208,7 +210,7 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
     function displayNews() {
         let newSymbolList = Object.keys(p.trackedStocks).map((el) => (
             <option key={el + "ddl"} value={el}>
-                {p.trackedStocks[el].dStock(p.exchangeList)}
+                {dStock(p.trackedStocks[el], p.exchangeList)}
             </option>
         ));
 

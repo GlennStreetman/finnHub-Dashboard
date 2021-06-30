@@ -53,6 +53,13 @@ export interface rBuildDataModelPayload {
     dashBoardData: dashBoardData
 }
 
+export interface rebuildTargetWidgetPayload {
+    apiKey: string,
+    dashBoardData: dashBoardData,
+    targetDashboard: string,
+    targetWidget: string,
+}
+
 export interface rRebuildTargetDashboardPayload {
     apiKey: string,
     dashBoardData: dashBoardData,
@@ -156,6 +163,39 @@ const dataModel = createSlice({
             }
             state.dataSet[dashboardName] = newDashboardModel
             state.status[dashboardName] = 'Updating'
+        },
+        rRebuildTargetWidgetModel: (state: sliceDataModel, action) => {
+            const ap: rebuildTargetWidgetPayload = action.payload
+            const apD: dashBoardData = ap.dashBoardData
+            const dashboardName: string = ap.targetDashboard
+            const w: string = ap.targetWidget //widget name
+
+            const targetWidget = apD?.[dashboardName].widgetlist[w]
+            console.log(w, apD, targetWidget)
+            const stockUpdate = {}
+            if (w !== null && w !== 'null') {
+                const endPoint: string = targetWidget.widgetType
+                const filters: Object = targetWidget.filters
+                const widgetDescription: string = targetWidget.widgetHeader
+                const widgetType: string = targetWidget.widgetType
+                const config: Object = targetWidget.config
+                const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
+                const trackedStocks = targetWidget.trackedStocks
+                const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, ap.apiKey)
+                delete endPointData.undefined
+
+                for (const stock in endPointData) {
+                    stockUpdate[`${stock}`] = {
+                        apiString: endPointData[stock],
+                        widgetName: widgetDescription,
+                        dashboard: dashboardName,
+                        widgetType: widgetType,
+                        config: config,
+                    }
+                }
+            }
+            state.dataSet[dashboardName][w] = stockUpdate
+            state.status[dashboardName] = 'Updating'
 
         },
         rResetUpdateFlag: (state: sliceDataModel) => {
@@ -168,7 +208,7 @@ const dataModel = createSlice({
                 state.status[dataSet] = ap[dataSet]
             }
         },
-        rDataModelLogout(state) {
+        rDataModelLogout(state: sliceDataModel) {
             console.log('reseting state')
             state.dataSet = {}
             state.status = {}
@@ -236,5 +276,6 @@ export const {
     rRemoveDashboardDataModel,
     rRemoveWidgetDataModel,
     rRebuildTargetDashboardModel,
+    rRebuildTargetWidgetModel
 } = dataModel.actions
 export default dataModel.reducer

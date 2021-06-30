@@ -202,7 +202,7 @@ function WidgetContainer(p) {
                 <button
                 onClick={async () => {
                     if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
-                        p.removeWidget("widgetList", p.widgetKey);
+                        p.removeWidget("dashBoardData", p.widgetKey);
                         fetch(`/deleteFinnDashData?widgetID=${p.widgetKey}`)
                         const payload = {
                             widgetKey: p.widgetKey,

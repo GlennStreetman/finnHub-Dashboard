@@ -13,6 +13,8 @@ import { useDragCopy } from '../../widgetHooks/useDragCopy'
 import { useTargetSecurity } from '../../widgetHooks/useTargetSecurity'
 import { useSearchMongoDb } from '../../widgetHooks/useSearchMongoDB'
 
+import { dStock } from './../../../appFunctions/formatStockSymbols'
+
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
@@ -369,7 +371,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
             let mapStockSelection = stockSelectionSlice.map((el, index) => (
                 <tr key={el + "metricRow" + index}>
-                    <td key={el + "metricdesc"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
+                    <td key={el + "metricdesc"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
                     <td><input type='radio' name='sourceStock' checked={p.config.targetSecurity === el} onChange={() => changeSource(el)} /></td>
                     <td key={el + "remove"}>
                         <button data-testid={`remove-${el}`} onClick={() => { updateWidgetList(el); }}><i className="fa fa-times" aria-hidden="true" /></button>
@@ -499,7 +501,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
     let stockSymbolList = Object.keys(p.trackedStocks).map((el) => (
         <option data-testid={`select-${el}`} key={el + "option"} value={el}>
-            {p.trackedStocks[el].dStock(p.exchangeList)}
+            {dStock(p.trackedStocks[el], p.exchangeList)}
         </option>
     ));
 
@@ -527,7 +529,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             let bodyRows = Object.keys(p.trackedStocks).map((el) => {
                 return (
                     <tr key={thisKey + el + "tr1"}>
-                        <td key={thisKey + el + "td1"}>{p.trackedStocks[el].dStock(p.exchangeList)}</td>
+                        <td key={thisKey + el + "td1"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
                         {mapStockData(el)}
                     </tr>
                 )
