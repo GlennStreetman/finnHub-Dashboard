@@ -19,6 +19,7 @@ function WidgetController(p){
                 loadSavedDashboard: p.loadSavedDashboard,
                 moveWidget: p.moveWidget,
                 removeWidget: p.removeWidget,
+                removeDashboardFromState: p.removeDashboardFromState,
                 setDrag: p.setDrag,
                 setSecurityFocus: p.setSecurityFocus,
                 showStockWidgets: p.showStockWidgets,

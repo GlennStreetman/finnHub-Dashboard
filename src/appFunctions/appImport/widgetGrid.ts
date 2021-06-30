@@ -128,6 +128,6 @@ export const SnapWidget = async function snapWidget(stateRef: string, widgetId: 
         }
     }
     await this.snapOrder(widgetId, column, yyAxis, stateRef)
-    await this.saveCurrentDashboard(this.state.currentDashBoard)
+    await this.saveDashboard(this.state.currentDashBoard)
     this.rebuildDashboardState()
 }

@@ -5,7 +5,7 @@ import { uniqueObjectnName } from './../stringFunctions'
 
 
 
-export const LoadDashBoard = async function loadDashBoard(target: string, newGlobalList: globalStockList, newWidgetList: widgetList) {
+export const setupDashboardObject = async function setupDashboardObject(target: string, newGlobalList: globalStockList, newWidgetList: widgetList) {
     //setup global security list and widgets.
     let updateGlobalList: globalStockList = await produce(newGlobalList, (draftState: globalStockList) => {
         for (const stock in draftState) {
@@ -51,8 +51,6 @@ export const LoadDashBoard = async function loadDashBoard(target: string, newGlo
 export const NewDashboard = function newDashboard(newName, dashboards) {
     const testname = newName ? newName : 'DASHBOARD'
     const uniqueName = uniqueObjectnName(testname, dashboards)
-    const s: AppState = this.state
-    s.finnHubQueue.resetQueue()
     this.setState(() => {
         const update: Partial<AppState> = {
             currentDashBoard: uniqueName,
@@ -62,16 +60,23 @@ export const NewDashboard = function newDashboard(newName, dashboards) {
         }
         return update
     }, async () => {
-        let savedDash: boolean = await this.saveCurrentDashboard(uniqueName) //saves dashboard setup to server
+        let savedDash: boolean = await this.saveDashboard(uniqueName) //saves dashboard setup to server
         if (savedDash === true) {
-            let returnedDash: dashBoardData = await this.getSavedDashBoards()
-            this.updateDashBoards(returnedDash)
-            if (Object.keys(s.globalStockList)[0] !== undefined) this.setSecurityFocus(Object.keys(s.globalStockList)[0])
+            let returnedDash: dashBoardData = await this.getSavedDashBoards() //get saved dashboard data
+            const savedDashboard = returnedDash.dashBoardData[uniqueName]
+            //skip redux for now, not needed if no widgets and no stocks
+            const newDashboardObj = await produce(this.state.dashBoardData, (draftState: dashBoardData) => {
+                draftState[uniqueName] = savedDashboard
+                return draftState
+            })
+            this.setState({
+                dashBoardData: newDashboardObj
+            })
         }
     })
 }
 
-export const SaveCurrentDashboard = async function saveCurrentDashboard(dashboardName: string) {
+export const saveDashboard = async function (dashboardName: string) {
     //saves current dashboard by name. Assigns new widget ids if using new name.
     const widgList: widgetList = this.state.widgetList
     const saveWidgetList: widgetList = await produce(widgList, (draftState: widgetList) => {

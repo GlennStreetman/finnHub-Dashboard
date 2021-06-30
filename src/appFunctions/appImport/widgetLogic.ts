@@ -59,7 +59,7 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
         dashBoardData: newDashBoardData,
     }
     this.setState(payload, () => {
-        this.saveCurrentDashboard(s.currentDashBoard)
+        this.saveDashboard(s.currentDashBoard)
 
         const payload: rBuildDataModelPayload = {
             apiKey: s.apiKey,
@@ -94,7 +94,7 @@ export const RemoveWidget = async function (stateRef: 'widgetList' | 'menuList',
     await this.setState(payload, () => {
         return true
     });
-    await this.saveCurrentDashboard(this.state.currentDashBoard)
+    await this.saveDashboard(this.state.currentDashBoard)
     this.rebuildDashboardState()
 
 }
@@ -141,7 +141,7 @@ export const UpdateWidgetStockList = function updateWidgetStockList(widgetId: nu
         }
         this.setState(payload, () => {
 
-            this.saveCurrentDashboard(this.state.currentDashBoard)
+            this.saveDashboard(this.state.currentDashBoard)
 
             const payload: rBuildDataModelPayload = {
                 apiKey: this.state.apiKey,
@@ -198,7 +198,7 @@ export const updateWidgetConfig = function (widgetID: number, updateObj: config)
     })
     const payload: Partial<AppState> = { widgetList: updatedDashboardData }
     this.setState(payload, () => {
-        this.saveCurrentDashboard(this.state.currentDashBoard)
+        this.saveDashboard(this.state.currentDashBoard)
         const updatedWidgetFilters = updatedDashboardData[widgetID].config
         const postBody: reqBody = {
             widget: widgetID,

@@ -78,7 +78,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     async function copyDashboard(dashboardName) {
         const saveDashboardAs = uniqueObjectnName(dashboardName.trim(), p.dashBoardData)
         if (saveDashboardAs !== '' && saveDashboardAs !== undefined) {
-            let savedDash = await p.saveCurrentDashboard(saveDashboardAs)
+            let savedDash = await p.saveDashboard(saveDashboardAs)
             if (savedDash === true) {
                 p.rebuildDashboardState()
             }
@@ -120,10 +120,10 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                 }
             }
         } else if (dashboardName === p.currentDashBoard && Object.keys(dashBoardData).length === 1) {
-            unMountWidgets()
+            unMountWidgets() //removes widgets from redux visable data model.
             p.newDashBoard('NEW', p.dashBoardData)
         }
-        unMountDashboard(dashboardName) //removes dashboard from redux
+        unMountDashboard(dashboardName) //removes dashboard from redux datamodel.
         p.removeDashboardFromState(dashboardName) //removes dashboard from App.state
     }
 
@@ -254,7 +254,7 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
         getSavedDashBoards: that.props.getSavedDashBoards,
         dashBoardData: that.props.dashBoardData,
         currentDashBoard: that.props.currentDashBoard,
-        saveCurrentDashboard: that.props.saveCurrentDashboard,
+        saveDashboard: that.props.saveDashboard,
         newDashBoard: that.props.newDashboard,
         helpText: [helpText, 'DBM'],
         loadSavedDashboard: that.props.loadSavedDashboard,

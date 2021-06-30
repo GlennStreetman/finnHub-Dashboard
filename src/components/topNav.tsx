@@ -18,7 +18,7 @@ interface topNavProps {
     menuWidgetToggle: Function,
     newMenuContainer: Function,
     showStockWidgets: number,
-    saveCurrentDashboard: Function,
+    saveDashboard: Function,
     toggleBackGroundMenu: Function,
     toggleWidgetVisability: Function,
     updateAPIFlag: Function,

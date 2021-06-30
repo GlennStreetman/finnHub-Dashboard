@@ -12,7 +12,7 @@ import {
     UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig,
     toggleWidgetBody, setWidgetFocus, removeDashboardFromState
 } from "./appFunctions/appImport/widgetLogic";
-import { LoadDashBoard, NewDashboard, SaveCurrentDashboard }
+import { setupDashboardObject, NewDashboard, saveDashboard }
     from "./appFunctions/appImport/setupDashboard";
 import { GetSavedDashBoards, GetSavedDashBoardsRes } from "./appFunctions/appImport/getSavedDashboards";
 import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
@@ -246,10 +246,10 @@ class App extends React.Component<AppProps, AppState> {
         this.setWidgetFocus = setWidgetFocus.bind(this)
 
         //App logic for setting up dashboards.
-        this.loadDashBoard = LoadDashBoard.bind(this);
+        this.setupDashboardObject = setupDashboardObject.bind(this);
         this.newDashboard = NewDashboard.bind(this);
         this.getSavedDashBoards = GetSavedDashBoards.bind(this);
-        this.saveCurrentDashboard = SaveCurrentDashboard.bind(this);
+        this.saveDashboard = saveDashboard.bind(this);
 
         //app logic for MOVING widgets and snapping them into location.
         this.setDrag = SetDrag.bind(this);
@@ -404,13 +404,13 @@ class App extends React.Component<AppProps, AppState> {
                 if (s.dashBoardData[s.currentDashBoard] !== undefined) {
                     let loadWidget = s.dashBoardData[s.currentDashBoard]["widgetlist"];
                     let loadGlobal = s.dashBoardData[s.currentDashBoard]["globalstocklist"];
-                    this.loadDashBoard('NEW', loadGlobal, loadWidget);
+                    this.setupDashboardObject('NEW', loadGlobal, loadWidget);
                     this.setState({ dashBoardMenu: 1, loadStartingDashBoard: 1 });
                 } else if (Object.keys(s.dashBoardData).length > 0) {
                     const defaultDashboard = Object.keys(s.dashBoardData)[0]
                     let loadWidget = s.dashBoardData[defaultDashboard]["widgetlist"];
                     let loadGlobal = s.dashBoardData[defaultDashboard]["globalstocklist"];
-                    this.loadDashBoard(defaultDashboard, loadGlobal, loadWidget);
+                    this.setupDashboardObject(defaultDashboard, loadGlobal, loadWidget);
                     this.setState({
                         dashBoardMenu: 1,
                         currentDashBoard: defaultDashboard,
@@ -482,7 +482,7 @@ class App extends React.Component<AppProps, AppState> {
                     menuList={this.state.menuList}
                     menuWidgetToggle={menuWidgetToggle}
                     newMenuContainer={this.newMenuContainer}
-                    saveCurrentDashboard={this.saveCurrentDashboard} //saveCurrentDashboard
+                    saveDashboard={this.saveDashboard} //saveDashboard
                     showStockWidgets={this.state.showStockWidgets}
                     toggleBackGroundMenu={this.toggleBackGroundMenu}
                     toggleWidgetVisability={this.toggleWidgetVisability}
@@ -513,7 +513,7 @@ class App extends React.Component<AppProps, AppState> {
                     removeWidget={this.removeWidget}
                     removeDashboardFromState={this.removeDashboardFromState}
                     rebuildDashboardState={this.rebuildDashboardState}
-                    saveCurrentDashboard={this.saveCurrentDashboard}
+                    saveDashboard={this.saveDashboard}
                     setDrag={this.setDrag}
                     setSecurityFocus={this.setSecurityFocus}
                     setWidgetFocus={this.setWidgetFocus}

@@ -7,7 +7,7 @@ export const loadSavedDashboard = function (target: string, globalStockList: glo
     const p: AppProps = this.props
     const payload: rSetTargetDashboardPayload = { targetDashboard: target }
     this.props.rSetTargetDashboard(payload)
-    this.loadDashBoard(target, globalStockList, widgetList);
+    this.setupDashboardObject(target, globalStockList, widgetList);
     this.setState({
         currentDashBoard: target,
     })

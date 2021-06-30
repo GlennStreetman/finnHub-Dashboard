@@ -14,7 +14,7 @@ export const syncGlobalStockList = async function () {
         const resObj: Partial<AppState> = { widgetList: updatedWidgetList }
         return resObj
     }, async () => {
-        let savedDash: boolean = await this.saveCurrentDashboard(s.currentDashBoard) //saves dashboard setup to server
+        let savedDash: boolean = await this.saveDashboard(s.currentDashBoard) //saves dashboard setup to server
         if (savedDash === true) {
             let returnedDash: dashBoardData = await this.getSavedDashBoards()
             this.updateDashBoards(returnedDash)
