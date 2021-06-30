@@ -599,7 +599,7 @@ export function metricsProps(that, key = "newWidgetNameProps") {
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         updateWidgetConfig: that.props.updateWidgetConfig,
         updateDefaultExchange: that.props.updateDefaultExchange,
-        updateGlobalStockList: that.props.updateGlobalStockList,
+        // updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
 

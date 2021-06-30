@@ -305,7 +305,7 @@ export function newsWidgetProps(that, key = "newWidgetNameProps") {
         updateWidgetConfig: that.props.updateWidgetConfig,
         updateDefaultExchange: that.props.updateDefaultExchange,
         updateWidgetFilters: that.props.updateWidgetFilters,
-        updateGlobalStockList: that.props.updateGlobalStockList,
+        // updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
         targetSecurity: that.props.targetSecurity,

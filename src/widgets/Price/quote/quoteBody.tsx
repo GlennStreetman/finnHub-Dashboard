@@ -262,12 +262,12 @@ export function quoteBodyProps(that, key = "Quote") {
         showPane: that.showPane,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         streamingPriceData: that.props.streamingPriceData,
-        updateGlobalStockList: that.props.updateGlobalStockList,
+        // updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
         exchangeList: that.props.exchangeList,
         defaultExchange: that.props.defaultExchange,
-        updateDefaultExchange: that.props.updateDefaultExchange,
+        // updateDefaultExchange: that.props.updateDefaultExchange,
     };
     return propList;
 }

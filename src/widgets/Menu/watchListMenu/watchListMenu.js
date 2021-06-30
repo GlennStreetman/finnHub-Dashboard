@@ -155,7 +155,7 @@ export default class WatchListMenu extends React.PureComponent {
                 Upload CSV
             </button>
             <ToolTip textFragment={helpText} hintName='wl' /> <br />
-            <button className="ui button" onClick={this.props.syncGlobalStockList}>
+            <button className="ui button" onClick={()=> {console.log('FIRING FROM WATCHLIST'); this.props.syncGlobalStockList()}}>
                 Sync
             </button>
             <ToolTip textFragment={syncText} hintName='sw' /> <br />

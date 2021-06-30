@@ -166,9 +166,9 @@ export function peersProps(that, key = "newWidgetNameProps") {
         showPane: that.showPane,
         targetSecurity: that.props.targetSecurity,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        updateDefaultExchange: that.props.updateDefaultExchange,
+        // updateDefaultExchange: that.props.updateDefaultExchange,
         updateWidgetConfig: that.props.updateWidgetConfig,
-        updateGlobalStockList: that.props.updateGlobalStockList,
+        // updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
         finnHubQueue: that.props.finnHubQueue

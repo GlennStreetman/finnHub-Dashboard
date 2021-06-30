@@ -165,7 +165,7 @@ export function companyProfile2Props(that, key = "newWidgetNameProps") {
         showPane: that.showPane,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         updateDefaultExchange: that.props.updateDefaultExchange,
-        updateGlobalStockList: that.props.updateGlobalStockList,
+        // updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetConfig: that.props.updateWidgetConfig,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
