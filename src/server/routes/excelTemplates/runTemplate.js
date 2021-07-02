@@ -403,34 +403,38 @@ router.get('/runTemplate', async (req, res) => { //run user configured excel tem
     await makeTempDir(uploadsFolder)
     await makeTempDir(tempFolder)
     await makeTempDir(tempPath)    
-
-    if (fs.existsSync(workBookPath)) { //if template name provided by get requests exists
-        const promiseList = await buildQueryList(workBookPath) //List of promises built from excel templates query sheet
-        const promiseData = await Promise.all(promiseList)  //after promises run process promise data {keys: [], data: {}} FROM mongoDB
-            .then((res) => {
-                return processPromiseData(res)
-        })
-        const templateData = await buildTemplateData(promiseData, workBookPath) //{...sheetName {...row:{data:{}, writeRows: number, keyColumns: {}}}} from Template File
-        const w = new Excel.Workbook()
-        await w.xlsx.readFile(workBookPath)
-        for (const s in templateData) { //for each worksheet
-            const ws = w.getWorksheet(s)
-            let timeSeriesFlag = checkTimeSeriesStatus(ws, promiseData)  //set to 1 if worksheet contains time series data.
-            if (timeSeriesFlag === 1) {
-                writeTimeSeriesSheetSingle(w, ws, s, templateData)
-            } else if (multiSheet !== 'true') {
-                dataPointSheetSingle(w, ws, s, templateData)
-            } else {
-                dataPointSheetMulti(w, ws, s, templateData)
+    try {
+        if (fs.existsSync(workBookPath)) { //if template name provided by get requests exists
+            const promiseList = await buildQueryList(workBookPath) //List of promises built from excel templates query sheet
+            const promiseData = await Promise.all(promiseList)  //after promises run process promise data {keys: [], data: {}} FROM mongoDB
+                .then((res) => {
+                    return processPromiseData(res)
+            })
+            const templateData = await buildTemplateData(promiseData, workBookPath) //{...sheetName {...row:{data:{}, writeRows: number, keyColumns: {}}}} from Template File
+            const w = new Excel.Workbook()
+            await w.xlsx.readFile(workBookPath)
+            for (const s in templateData) { //for each worksheet
+                const ws = w.getWorksheet(s)
+                let timeSeriesFlag = checkTimeSeriesStatus(ws, promiseData)  //set to 1 if worksheet contains time series data.
+                if (timeSeriesFlag === 1) {
+                    writeTimeSeriesSheetSingle(w, ws, s, templateData)
+                } else if (multiSheet !== 'true') {
+                    dataPointSheetSingle(w, ws, s, templateData)
+                } else {
+                    dataPointSheetMulti(w, ws, s, templateData)
+                }
             }
-        }
-        const deleteSheet = w.getWorksheet('Query')
-        w.removeWorksheet(deleteSheet.id)
-        await w.xlsx.writeFile(tempFile)
-        res.status(200).sendFile(tempFile, ()=>{
-            fs.unlinkSync(tempFile)
-        })
+            const deleteSheet = w.getWorksheet('Query')
+            w.removeWorksheet(deleteSheet.id)
+            await w.xlsx.writeFile(tempFile)
+            res.status(200).sendFile(tempFile, ()=>{
+                fs.unlinkSync(tempFile)
+            })
 
+        }
+    }catch (error){
+        console.log('get/runTemplate error running excel template file', error)
+        res.status(400).json({ message: "Error running excel template"}, error)
     }
 })
 

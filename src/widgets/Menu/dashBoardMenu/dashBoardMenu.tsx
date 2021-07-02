@@ -60,7 +60,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
             const data: any = {
                 dbID: dashBoardData[e.target.id].id,
                 oldName: dashBoardData[e.target.id].dashboardname,
-                newName: e.target.value
+                newName: e.target.value.toUpperCase()
             }
 
             const options = {
