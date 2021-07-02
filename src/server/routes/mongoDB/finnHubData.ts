@@ -7,45 +7,51 @@ interface session {
     uID: number,
 }
 
-interface thisSession extends Request {
+
+
+interface finnDashDataReq extends Request {
     session: session,
     body: any
+    query: any
 }
 
 const router = express.Router();
 
 //gets user, none stale, finnhub data. This process deletes stale records.
-router.get('/finnDashData', async (req: thisSession, res: any) => {
-    if (req.session.login === true) {
-        try {
-            // console.log("1get FinndashData")
-            const client = getDB()
-            const database = client.db('finnDash');
-            const dataSet = database.collection('dataSet');
-            await dataSet.deleteMany({ //delete stale records for user
-                userID: req.session.uID,
-                stale: { $lte: Date.now() }
-            })
-            // console.log("2delete complete")
-            const findDataSet = dataSet.find({
-                userID: req.session.uID,
-            })
-            const resList: any[] = []
-            await findDataSet.forEach((data: any) => {
-                resList.push(data)
-            })
-            res.status(200).json({ resList })
+router.get('/finnDashData', async (req: finnDashDataReq, res: any) => {
+    try {
+        console.log("1get FinndashData", req)
+        const client = getDB()
+        const database = client.db('finnDash');
+        const dataSet = database.collection('dataSet');
+        await dataSet.deleteMany({ //delete stale records for user
+            userID: req.session.uID,
+            stale: { $lte: Date.now() } //delete records where stale date is saved as less than or equal to now.
+        })
 
+        const reqFilter = {
+            userID: req.session.uID,
         }
-        catch (err) {
-            console.log(err)
-            res.status(500).json({ message: `Problem finding user dataset.` });
-        }
+        if (req.query['dashboard']) reqFilter['dashboard'] = req.query['widget']
+        if (req.query['widget']) reqFilter['widget'] = req.query['widget']
+
+        const findDataSet = dataSet.find(reqFilter)
+        const resList: any[] = []
+        await findDataSet.forEach((data: any) => {
+            resList.push(data)
+        })
+        res.status(200).json({ resList })
+
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).json({ message: `Problem finding user dataset.` });
     }
 })
 
+
 //updates MongoDB finnDash.dataset with finnhub data.
-router.post("/finnDashData", async (req: thisSession, res: any) => {
+router.post("/finnDashData", async (req: finnDashDataReq, res: any) => {
     if (req.session.login === true) {
         try {
             const client = getDB()
@@ -68,7 +74,7 @@ router.post("/finnDashData", async (req: thisSession, res: any) => {
                         dashboard: u.dashboard,
                         widgetName: u.widgetName,
                         retrieved: u.updated,
-                        stale: u.updated + 1000 * 60 * 60 * 30,
+                        stale: u.updated + 1000 * 60 * 60 * 3, //stale after 3 hours, consider setting up user defined variable.
                         data: u.data,
                         apiString: u.apiString,
                         security: u.security,

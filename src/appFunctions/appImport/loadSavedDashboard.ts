@@ -13,7 +13,7 @@ export const loadSavedDashboard = function (target: string, globalStockList: glo
     })
     const updateVisable = async function (that: any) {
         const s: AppState = that.state
-        await that.props.tGetMongoDB()
+        await that.props.tGetMongoDB({ dashboard: this.state.currentDashBoard })
         //set updating
         const status: setUpdateStatus = {
             [s.currentDashBoard]: 'Updating'

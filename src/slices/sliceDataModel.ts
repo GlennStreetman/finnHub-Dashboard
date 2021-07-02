@@ -91,7 +91,6 @@ const dataModel = createSlice({
             console.log('building data model')
             //receivies dashboard object and builds dataset from scratch.
             const ap: rBuildDataModelPayload = action.payload
-            console.log('ap', ap)
             const apD: dashBoardData = ap.dashBoardData
             const dataModel: EndPointAPIList = {} //list of lists. Each list []
             for (const d in apD) { //for each dashboard
@@ -133,7 +132,6 @@ const dataModel = createSlice({
             const apD: dashBoardData = ap.dashBoardData
             const dashboardName: string = ap.targetDashboard
             const targetDashboard = apD?.[dashboardName]
-            console.log('payload', ap)
 
             const newDashboardModel = {}
             const widgetList = targetDashboard.widgetlist
@@ -171,7 +169,6 @@ const dataModel = createSlice({
             const w: string = ap.targetWidget //widget name
 
             const targetWidget = apD?.[dashboardName].widgetlist[w]
-            console.log(w, apD, targetWidget)
             const stockUpdate = {}
             if (w !== null && w !== 'null') {
                 const endPoint: string = targetWidget.widgetType

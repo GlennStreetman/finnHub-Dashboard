@@ -33,7 +33,6 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
     let data: serverData = await res.json()
     if (res.status === 200) {
         let parseDashBoard = data.savedDashBoards
-        console.log('parseDashBoard', parseDashBoard)
         for (const dash in parseDashBoard) { //parse fields that are returned as strings.
             parseDashBoard[dash].globalstocklist = JSON.parse(parseDashBoard[dash].globalstocklist)
             const thisDash = parseDashBoard[dash].widgetlist
@@ -51,14 +50,6 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
 
         const noDashboards = Object.keys(parseDashBoard).length === 0 ? true : false
         const defaultDash = parseDashBoard[data.default] ? data.default : parseDashBoard[Object.keys(parseDashBoard)[0]]
-
-        console.log('PARSED', {
-            dashBoardData: parseDashBoard,
-            currentDashBoard: defaultDash,
-            globalStockList: parseDashBoard[defaultDash].globalstocklist,
-            menuList: menuList,
-            message: 'ok'
-        })
 
         const GetSavedDashboardsRes: GetSavedDashBoardsRes = noDashboards ? blankDashboard : {
             dashBoardData: parseDashBoard,

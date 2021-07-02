@@ -13,7 +13,6 @@ export const SetDrag = function setDrag(stateRef: 'menuWidget' | 'widgetList', w
     } else {
 
         const thisList: menuList | dashBoardData = s[ref]
-        console.log(thisList, s.currentDashBoard)
         updatedWidgetLocation = produce(thisList, (draftState: menuList | dashBoardData) => {
             draftState[s.currentDashBoard]['widgetlist'][widgetId]['column'] = 'drag'
         })
@@ -24,7 +23,6 @@ export const SetDrag = function setDrag(stateRef: 'menuWidget' | 'widgetList', w
             [ref]: updatedWidgetLocation,
             widgetCopy: widgetCopy
         }
-        console.log('payload', payload)
         this.setState(payload, () => {
             resolve(true)
         })

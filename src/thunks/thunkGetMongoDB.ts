@@ -16,12 +16,24 @@ export interface getMongoRes {
     [key: string]: mongoObj
 }
 
+interface tgetMongoDBReq {
+    widget?: string,
+    dashboard?: string
+}
+
 export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
     'tgetMongoDb',
-    async () => { //{list of securities} 
+    async (reqObj: tgetMongoDBReq | false = false) => {
         try {
             console.log("Getting cached finnhub data")
-            const getData = await fetch('/finnDashData')
+            let fetchString = '/finnDashData'
+            if (reqObj) { //build request string with filters.
+                fetchString = fetchString + '?'
+                if (reqObj.dashboard) fetchString = `${fetchString}dashboard=${reqObj.dashboard}`
+                if (reqObj.widget) fetchString = `${fetchString}&widget=${reqObj.widget}`
+            }
+            console.log('--------------', fetchString)
+            const getData = await fetch(fetchString)
             const freshData = await getData.json()
             const resObj: getMongoRes = {}
             for (const x in freshData.resList) {

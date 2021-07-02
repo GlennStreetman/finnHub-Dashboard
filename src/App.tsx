@@ -182,7 +182,7 @@ export interface AppState {
     login: number, //login state. 0 logged out, 1 logged in.
     loadStartingDashBoard: number, //flag switches to 1 after attemping to load default dashboard.
     menuList: menuList, //lists of all menu widgets.
-    rebuildDataSet: number, //Set to 1 to trigger finnHub Dataset rebuild. 
+    // rebuildDataSet: number, //Set to 1 to trigger finnHub Dataset rebuild. 
     socket: any, //socket connection for streaming stock data.
     showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
     streamingPriceData: streamingPriceData, //data shared between some widgets and watchlist menu. Updated by socket data.
@@ -190,7 +190,7 @@ export interface AppState {
     watchListMenu: number, //1 = show, 0 = hide
     widgetCopy: widget | null, //copy of state of widget being dragged.
     widgetLockDown: number, //1 removes buttons from all widgets.
-    widgetSetup: widgetSetup,
+    widgetSetup: widgetSetup, //activates premium api routes.
     zIndex: string[], //list widgets. Index location sets zIndex
 }
 
@@ -218,7 +218,7 @@ class App extends React.Component<AppProps, AppState> {
             login: 0, //login state. 0 logged out, 1 logged in.
             loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
             menuList: {}, //lists of all menu widgets.
-            rebuildDataSet: 0, //Set to 1 to trigger finnHub Dataset rebuild. 
+            // rebuildDataSet: 0, //Set to 1 to trigger finnHub Dataset rebuild. 
             enableDrag: false,
             socket: "", //socket connection for streaming stock data.
             showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
@@ -227,7 +227,7 @@ class App extends React.Component<AppProps, AppState> {
             watchListMenu: 1, //1 = show, 0 = hide
             widgetCopy: null, //copy of state of widget being dragged.
             widgetLockDown: 0, //1 removes buttons from all widgets.
-            widgetSetup: {},
+            widgetSetup: {},//activates premium api routes.
             zIndex: [], //list widgets. Index location sets zIndex
         };
 
@@ -312,11 +312,11 @@ class App extends React.Component<AppProps, AppState> {
             LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
         }
 
-        if (s.rebuildDataSet === 1 && s.login === 1) { //refresh current dashboards api data.
-            this.setState({ rebuildDataSet: 0 }, () => {
-                this.refreshFinnhubAPIDataVisable()
-            })
-        }
+        // if (s.rebuildDataSet === 1 && s.login === 1) { //refresh current dashboards api data.
+        //     this.setState({ rebuildDataSet: 0 }, () => {
+        //         this.refreshFinnhubAPIDataVisable()
+        //     })
+        // }
     }
 
     componentWillUnmount() {
@@ -328,7 +328,7 @@ class App extends React.Component<AppProps, AppState> {
     async refreshFinnhubAPIDataVisable() { //queues all finnhub data to be refreshed for current dashboard.
         const s: AppState = this.state;
         const p: AppProps = this.props;
-        await p.tGetMongoDB()
+        await p.tGetMongoDB({ dashboard: this.state.currentDashBoard })
         p.rSetUpdateStatus({
             [s.currentDashBoard]: 'Updating'
         })
@@ -391,8 +391,7 @@ class App extends React.Component<AppProps, AppState> {
                 globalStockList: data.dashBoardData[data.currentDashBoard].globalstocklist,
                 menuList: data.menuList!,
             }
-            console.log('rebuild finished', payload)
-            this.setState(payload, () => { console.log(this.state.dashBoardData) })
+            this.setState(payload)
             this.props.rSetTargetDashboard({ targetDashboard: data.currentDashBoard })
             this.props.rBuildDataModel({ ...data, apiKey: this.state.apiKey })
         } catch (error: any) {

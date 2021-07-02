@@ -118,7 +118,7 @@ class login extends React.Component {
                 if (data.status === 200) {
                     this.completeLogin(this, data)
                 } else {
-                    console.log("Failed to login", data)
+                    // console.log("Failed to login", data)
                     this.setState({message: data.message})
                 }
             })

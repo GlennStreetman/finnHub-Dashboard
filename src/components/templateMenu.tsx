@@ -15,7 +15,6 @@ export default function TemplateMenu(p: { [key: string]: any }, ref: any) {
     //get template list if flag is true
     useEffect((flag: boolean = templateFlag) => {
         if (flag === true) {
-            console.log("updating template list")
             setTemplateFlag(false)
             fetch('/uploadTemplate')
                 .then((res) => res.json())
@@ -28,7 +27,6 @@ export default function TemplateMenu(p: { [key: string]: any }, ref: any) {
                         setTemplateList(d)
                     }
                 })
-            //setTemplateList('[newlist])
         }
     }, [templateFlag])
 
