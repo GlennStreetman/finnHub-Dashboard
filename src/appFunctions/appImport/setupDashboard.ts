@@ -54,7 +54,7 @@ export const NewDashboard = function newDashboard(newName, dashboards) {
     this.setState(() => {
         const update: Partial<AppState> = {
             currentDashBoard: uniqueName,
-            globalStockList: [],
+            globalStockList: {},
             // widgetList: {},
             zIndex: [],
         }
@@ -77,7 +77,6 @@ export const NewDashboard = function newDashboard(newName, dashboards) {
 }
 
 export const saveDashboard = async function (dashboardName: string) {
-
     //saves current dashboard by name. Assigns new widget ids if using new name (copy function). Returns true on success.
     const widgList: widgetList = this.state.dashBoardData[this.state.currentDashBoard] ? this.state.dashBoardData[this.state.currentDashBoard].widgetlist : {}
     const saveWidgetList: widgetList = await produce(widgList, (draftState: widgetList) => {
@@ -87,6 +86,7 @@ export const saveDashboard = async function (dashboardName: string) {
             for (const k in keys) {
                 draftState[stamp + k] = draftState[keys[k]]
                 draftState[stamp + k]['widgetID'] = stamp + k
+                draftState[stamp + k].trackedStocks = {}
                 delete draftState[keys[k]]
             }
             return draftState

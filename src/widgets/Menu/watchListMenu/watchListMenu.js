@@ -230,6 +230,7 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
     updateDefaultExchange: that.props.updateDefaultExchange,
     uploadGlobalStockList: that.props.uploadGlobalStockList,
     helpText: [helpText, 'WLM'],
+    refreshFinnhubAPIDataCurrentDashboard: that.props.refreshFinnhubAPIDataCurrentDashboard,
     syncGlobalStockList: that.props.syncGlobalStockList,
     setSecurityFocus: that.props.setSecurityFocus,
     targetSecurity: that.props.targetSecurity,

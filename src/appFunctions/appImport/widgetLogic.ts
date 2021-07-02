@@ -179,11 +179,11 @@ export const UpdateWidgetFilters = function (widgetID: string, data: filters) {
             //delete records from mongoDB then rebuild dataset.
             let res = await fetch(`/deleteFinnDashData?widgetID=${widgetID}`)
             if (res.status === 200) {
-                console.log('DELETE RECORDS', res)
-                const payload: rBuildDataModelPayload = {
-                    apiKey: s.apiKey,
-                    dashBoardData: newDashBoardData
-                }
+                // console.log('DELETE RECORDS', res)
+                // const payload: rBuildDataModelPayload = {
+                //     apiKey: s.apiKey,
+                //     dashBoardData: newDashBoardData
+                // }
                 p.rRebuildTargetWidgetModel({
                     apiKey: this.state.apiKey,
                     dashBoardData: this.state.dashBoardData,

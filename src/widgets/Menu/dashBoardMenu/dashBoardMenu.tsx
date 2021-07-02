@@ -76,16 +76,21 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     }
 
     async function copyDashboard(dashboardName) {
-        const saveDashboardAs = uniqueObjectnName(dashboardName.trim(), p.dashBoardData)
+        unMountWidgets()
+        const saveDashboardAs: string = uniqueObjectnName(dashboardName.trim(), p.dashBoardData)
         if (saveDashboardAs !== '' && saveDashboardAs !== undefined) {
             let savedDash = await p.saveDashboard(saveDashboardAs)
             if (savedDash === true) {
-                p.rebuildDashboardState()
+                await p.rebuildDashboardState()
+                // p.refreshFinnhubAPIDataCurrentDashboard()
             }
-        } else { setInputText('Enter Name') }
+
+        } else {
+            setInputText('Enter Name')
+        }
     }
 
-    function unMountWidgets() {
+    function unMountWidgets() { //removes visable data from redux for dashboard.
         const widdgetKeys = Object.keys(p.dashBoardData?.[p.currentDashBoard]?.widgetlist)
         for (const x in widdgetKeys) {
             const widgetKey = widdgetKeys[x]
@@ -260,6 +265,7 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
         loadSavedDashboard: that.props.loadSavedDashboard,
         updateDashBoards: that.props.updateDashBoards,
         rebuildDashboardState: that.props.rebuildDashboardState,
+        refreshFinnhubAPIDataCurrentDashboard: that.props.refreshFinnhubAPIDataCurrentDashboard,
         removeDashboardFromState: that.props.removeDashboardFromState,
     };
     return propList;

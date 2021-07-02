@@ -49,7 +49,7 @@ import {
     sliceDataModel, rDataModelLogout, rRebuildTargetDashboardModel,
     rRebuildTargetWidgetModel
 } from "./slices/sliceDataModel";
-import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
+import { tGetFinnhubData, tgetFinnHubDataReq } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 
 export interface stock {
@@ -276,7 +276,7 @@ class App extends React.Component<AppProps, AppState> {
         this.updateWidgetSetup = updateWidgetSetup.bind(this) //saves current dashboard to postgres.
         this.rebuildDashboardState = this.rebuildDashboardState.bind(this) //sets s.dashboardData. Used to build dataModel in redux
         this.refreshFinnhubAPIDataAll = this.refreshFinnhubAPIDataAll.bind(this) //For All Dashboards: gets data from mongo if available, else queues updates with finnhub.io
-        this.refreshFinnhubAPIDataVisable = this.refreshFinnhubAPIDataVisable.bind(this)
+        this.refreshFinnhubAPIDataCurrentDashboard = this.refreshFinnhubAPIDataCurrentDashboard.bind(this)
         this.removeDashboardFromState = removeDashboardFromState.bind(this)
         this.removeWidget = RemoveWidget.bind(this)
         this.rebuildVisableDashboard = this.rebuildVisableDashboard.bind(this) //rebuilds dashboard in redux state.dataModel
@@ -325,18 +325,20 @@ class App extends React.Component<AppProps, AppState> {
         }
     }
 
-    async refreshFinnhubAPIDataVisable() { //queues all finnhub data to be refreshed for current dashboard.
+    async refreshFinnhubAPIDataCurrentDashboard() { //queues all finnhub data to be refreshed for current dashboard.
+        console.log('refresh finnhub data for current dashboard', this.state.currentDashBoard)
         const s: AppState = this.state;
         const p: AppProps = this.props;
         await p.tGetMongoDB({ dashboard: this.state.currentDashBoard })
         p.rSetUpdateStatus({
             [s.currentDashBoard]: 'Updating'
         })
-        await p.tGetFinnhubData({
-            currentDashboard: s.currentDashBoard,
+        const payload: tgetFinnHubDataReq = {
+            targetDashBoard: s.currentDashBoard,
             widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist),
             finnHubQueue: s.finnHubQueue,
-        })
+        }
+        await p.tGetFinnhubData(payload)
         p.rSetUpdateStatus({
             [s.currentDashBoard]: 'Ready'
         })
@@ -391,9 +393,13 @@ class App extends React.Component<AppProps, AppState> {
                 globalStockList: data.dashBoardData[data.currentDashBoard].globalstocklist,
                 menuList: data.menuList!,
             }
-            this.setState(payload)
-            this.props.rSetTargetDashboard({ targetDashboard: data.currentDashBoard })
-            this.props.rBuildDataModel({ ...data, apiKey: this.state.apiKey })
+            this.setState(payload, () => {
+                this.props.rSetTargetDashboard({ targetDashboard: data.currentDashBoard }) //update target dashboard in redux dataModel
+                this.props.rBuildDataModel({ ...data, apiKey: this.state.apiKey })
+                return true
+            })
+
+
         } catch (error: any) {
             console.error("Failed to recover dashboards");
         }
@@ -417,7 +423,8 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     setSecurityFocus(target: string) {
-        this.setState({ targetSecurity: target })
+        console.log('setting security focus:', target)
+        this.setState({ targetSecurity: target }, () => { return true })
     }
 
     render() {
@@ -501,6 +508,7 @@ class App extends React.Component<AppProps, AppState> {
                     removeWidget={this.removeWidget}
                     removeDashboardFromState={this.removeDashboardFromState}
                     rebuildDashboardState={this.rebuildDashboardState}
+                    refreshFinnhubAPIDataCurrentDashboard={this.refreshFinnhubAPIDataCurrentDashboard}
                     saveDashboard={this.saveDashboard}
                     setDrag={this.setDrag}
                     setSecurityFocus={this.setSecurityFocus}

@@ -18,6 +18,7 @@ function WidgetController(p){
                 key: el.widgetId,
                 loadSavedDashboard: p.loadSavedDashboard,
                 moveWidget: p.moveWidget,
+                refreshFinnhubAPIDataCurrentDashboard: p.refreshFinnhubAPIDataCurrentDashboard,
                 removeWidget: p.removeWidget,
                 removeDashboardFromState: p.removeDashboardFromState,
                 setDrag: p.setDrag,

@@ -4,7 +4,7 @@ import { finnHub, throttleResObj as queResObj, finnHubQueue } from "../appFuncti
 //Receives list of widgets and checks stale dates in slice/datamodel to see if updates are needed.
 //If data is not fresh dispatch finnHub api request to throttleQueue.
 //Returns finnhub data to mongoDB AND updates slice/ShowData.
-export interface reqObj {
+export interface tgetFinnHubDataReq {
     targetDashBoard: string,
     widgetList: string[],
     finnHubQueue: finnHubQueue,
@@ -16,7 +16,7 @@ export interface resObj {
 
 export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
     'GetFinnhubData',
-    (req: reqObj, thunkAPI: any) => { //{dashboard: string, widgetList: []} //receives list of widgets from a dashboard to update.
+    (req: tgetFinnHubDataReq, thunkAPI: any) => { //{dashboard: string, widgetList: []} //receives list of widgets from a dashboard to update.
         const finnQueue = req.finnHubQueue
         const dataModel = thunkAPI.getState().dataModel.dataSet[req.targetDashBoard] //finnHubData
         const getWidgets = req.widgetList
@@ -55,5 +55,8 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                         return response.json()
                     })
                 return (resObj) //thunk data returned to dataModel(update stale date) and showdata(retain in redux if marked as visable).
+            })
+            .catch((err) => {
+                console.log('finnDashQueue error:', err)
             })
     })

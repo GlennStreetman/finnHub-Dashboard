@@ -8,11 +8,6 @@ export const useBuildVisableData = function (
     dispatch, // Dispatch()
     isInitialMount, //const isInitialMount
 ) {
-    // console.log('build earnings calendar', targetSecurityList,
-    //     widgetKey,
-    //     widgetCopy,
-    //     dispatch,
-    //     isInitialMount)
     useEffect(() => {//On mount, build visable data. On update, if change in target stock, rebuild visable data.
         if (isInitialMount.current === true && widgetCopy === widgetKey) { //on Mount
             isInitialMount.current = false;

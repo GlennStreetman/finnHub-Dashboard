@@ -51,6 +51,7 @@ const showData = createSlice({
             const ap: rBuildVisableDataPayload = action.payload
             const key: string = ap.key
             state.dataSet[key] = {}
+            state.dataSet[key] = {}
             for (const security in ap.securityList) {
                 const thisSecurity: string = ap.securityList[security]
                 state.dataSet[key][thisSecurity] = {}
