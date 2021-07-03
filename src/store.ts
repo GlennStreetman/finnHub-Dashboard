@@ -3,12 +3,14 @@ import exchangeData, { sliceExchangeData } from './slices/sliceExchangeData'
 import exchangeList, { sliceExchangeList } from './slices/sliceExchangeList'
 import dataModel, { sliceDataModel } from './slices/sliceDataModel'
 import showData, { sliceShowData } from './slices/sliceShowData'
+import quotePrice, { sliceQuotePrice } from './slices/sliceQuotePrice'
 
 export interface storeState {
   exchangeData: sliceExchangeData,
   exchangeList: sliceExchangeList,
   dataModel: sliceDataModel,
   showData: sliceShowData,
+  quotePrice: sliceQuotePrice,
 }
 
 export const store = configureStore({
@@ -17,6 +19,7 @@ export const store = configureStore({
     'exchangeList': exchangeList,
     'dataModel': dataModel,
     'showData': showData,
+    'quotePrice': quotePrice,
   },
   middleware: () =>
     getDefaultMiddleware({

@@ -74,6 +74,10 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
         }
     })
 
+    const rStreamData = useSelector((state) => { //REDUX Data associated with this widget.
+        return state.quotePrice.quote
+    })
+
     const focusSecurityList = useMemo(() => { //remove if all securities should stay in focus.
         return Object.keys(p.trackedStocks)
     }, [p.trackedStocks])
@@ -109,9 +113,9 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
     }
 
     function findPrice(stock) {
-        if (p.streamingPriceData[stock] !== undefined) {
-            const sPrice: number = p.streamingPriceData[stock].currentPrice
-            const dayPrice: number = stockData[stock] ? stockData[stock].currentPrice : 0
+        if (rStreamData[stock] !== undefined) {
+            const sPrice: number = rStreamData[stock]
+            const dayPrice: number = stockData[stock] ? stockData[stock] : 0
             const price: number = isNaN(sPrice) === false ? sPrice : dayPrice
             return price
         } else {
@@ -182,7 +186,7 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
                         })}
                     </td>
 
-                    <td className='rightTEFade' key={el + "currentPrice" + returnKey(p.streamingPriceData[el])}>
+                    <td className='rightTEFade' key={el + "currentPrice" + returnKey(rStreamData[el])}>
                         {findPrice(el).toLocaleString(undefined, {
                             minimumFractionDigits: 2,
                             maximumFractionDigits: 2,
@@ -263,7 +267,6 @@ export function quoteBodyProps(that, key = "Quote") {
         apiKey: that.props.apiKey,
         showPane: that.showPane,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        streamingPriceData: that.props.streamingPriceData,
         // updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,

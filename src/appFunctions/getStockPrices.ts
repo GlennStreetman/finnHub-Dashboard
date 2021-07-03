@@ -1,12 +1,15 @@
 import { finnHub, throttleApiReqObj, finnHubQueue } from "./appImport/throttleQueueAPI";
-import { AppState, stock, streamingPriceData, priceObj } from './../App'
+import { AppState, stock } from './../App'
+import { rUpdarUpdateQuotePricePayload } from './../slices/sliceQuotePrice'
 
-function GetStockPrice(context: any, stockDescription: stock, apiKey: string, throttle: finnHubQueue,) {
+function GetStockPrice(context: any, stockObj: stock, apiKey: string, throttle: finnHubQueue,) {
+
     //US ONLY
-    if (stockDescription !== undefined && apiKey !== undefined && stockDescription.exchange === 'US') {
-        const stockSymbol = stockDescription.symbol
-        let stockPriceData: priceObj = { currentPrice: 0 };
-        let that: any = context
+    if (stockObj !== undefined && apiKey !== undefined && stockObj.exchange === 'US') {
+        console.log('getting stock price:', stockObj)
+        const stockSymbol = stockObj.symbol
+        // let stockPriceData: priceObj = { currentPrice: 0 };
+        // let that: any = context
         const queryString = `https://finnhub.io/api/v1/quote?symbol=${stockSymbol}&token=${apiKey}`
         const reqObj: throttleApiReqObj = {
             apiString: queryString,
@@ -19,19 +22,13 @@ function GetStockPrice(context: any, stockDescription: stock, apiKey: string, th
         }
         finnHub(throttle, reqObj)
             .then((data: any) => {
-                if (data.error === 429) { //run again
-                    GetStockPrice(context, stockDescription, apiKey, throttle)
+                if (data.error === 429) { //run again, api rate limit exceeded.
+                    GetStockPrice(context, stockObj, apiKey, throttle)
                 } else {
-                    stockPriceData = {
-                        currentPrice: data?.data?.c,
-                    };
-                    that.setState((prevState: AppState) => {
-                        let newstreamingPriceData: streamingPriceData = Object.assign({}, prevState.streamingPriceData);
-                        const key: string = `US-${stockSymbol}`
-                        newstreamingPriceData[key] = stockPriceData;
-                        const payload: Partial<AppState> = { streamingPriceData: newstreamingPriceData }
-                        return payload;
-                    });
+                    console.log('GO')
+                    let payload: rUpdarUpdateQuotePricePayload = { [stockObj.key]: data?.data?.c }
+                    console.log('context', context.props.rUpdateQuotePrice, payload)
+                    context.props.rUpdateQuotePriceSetup(payload)
                 }
             })
             .catch(error => {

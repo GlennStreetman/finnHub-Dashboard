@@ -44,6 +44,7 @@ import { storeState } from './store'
 import { tGetSymbolList, rExchangeDataLogout } from "./slices/sliceExchangeData";
 import { rSetTargetDashboard, rTargetDashboardLogout } from "./slices/sliceShowData";
 import { rUpdateExchangeList, rExchangeListLogout } from "./slices/sliceExchangeList";
+import { rUpdateQuotePriceStream, rUpdateQuotePriceSetup } from "./slices/sliceQuotePrice";
 import {
     rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus,
     sliceDataModel, rDataModelLogout, rRebuildTargetDashboardModel,
@@ -134,9 +135,9 @@ export interface priceObj {
     currentPrice: number
 }
 
-export interface streamingPriceData {
-    [key: string]: priceObj
-}
+// export interface streamingPriceData {
+//     [key: string]: priceObj
+// }
 
 export interface widgetSetup {
     [key: string]: boolean
@@ -161,6 +162,9 @@ export interface AppProps {
     rExchangeListLogout: Function,
     rTargetDashboardLogout: Function,
     rRebuildTargetWidgetModel: Function,
+    rUpdateQuotePriceStream: Function,
+    rUpdateQuotePriceSetup: Function,
+
 }
 
 export interface AppState {
@@ -185,7 +189,7 @@ export interface AppState {
     // rebuildDataSet: number, //Set to 1 to trigger finnHub Dataset rebuild. 
     socket: any, //socket connection for streaming stock data.
     showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
-    streamingPriceData: streamingPriceData, //data shared between some widgets and watchlist menu. Updated by socket data.
+    // streamingPriceData: streamingPriceData, //data shared between some widgets and watchlist menu. Updated by socket data.
     targetSecurity: string, //target security for widgets. Update changes widget focus.
     watchListMenu: number, //1 = show, 0 = hide
     widgetCopy: widget | null, //copy of state of widget being dragged.
@@ -222,7 +226,7 @@ class App extends React.Component<AppProps, AppState> {
             enableDrag: false,
             socket: "", //socket connection for streaming stock data.
             showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
-            streamingPriceData: {}, //data shared between some widgets and watchlist menu. Updated by socket data.
+            // streamingPriceData: {}, //data shared between some widgets and watchlist menu. Updated by socket data.
             targetSecurity: '', //target security for widgets. Update changes widget focus.
             watchListMenu: 1, //1 = show, 0 = hide
             widgetCopy: null, //copy of state of widget being dragged.
@@ -515,7 +519,7 @@ class App extends React.Component<AppProps, AppState> {
                     setWidgetFocus={this.setWidgetFocus}
                     showStockWidgets={this.state.showStockWidgets}
                     snapWidget={this.snapWidget}
-                    streamingPriceData={this.state.streamingPriceData}
+                    // streamingPriceData={this.state.streamingPriceData}
                     syncGlobalStockList={this.syncGlobalStockList}
                     targetSecurity={this.state.targetSecurity}
                     toggleWidgetBody={this.toggleWidgetBody}
@@ -561,5 +565,7 @@ export default connect(mapStateToProps, {
     rTargetDashboardLogout,
     rRebuildTargetDashboardModel,
     rRebuildTargetWidgetModel,
+    rUpdateQuotePriceStream,
+    rUpdateQuotePriceSetup,
 })(App);
 
