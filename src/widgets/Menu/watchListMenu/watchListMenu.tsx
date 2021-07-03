@@ -1,4 +1,4 @@
-import React, { useState, forwardRef, useRef, useImperativeHandle } from "react";
+import React, { useState, useEffect, forwardRef, useRef, useImperativeHandle } from "react";
 
 
 import Papa from 'papaparse'
@@ -7,8 +7,6 @@ import CsvUpload from './csvUpload.js'
 import ToolTip from '../../../components/toolTip.js'
 import { useAppSelector } from '../../../hooks';
 import { dStock } from '../../../appFunctions/formatStockSymbols'
-
-
 
 const useSelector = useAppSelector
 
@@ -31,25 +29,9 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
     }
   ))
 
-  // export default class WatchListMenu extends React.PureComponent {
-  //   constructor(props) {
-  //     super(props);
-  //     this.state = {
-  // uploadList: null //pass in list to trigger up
-  // };
+  useEffect(() => {
 
-  // let inputReference = React.createRef();
-  //   this.baseState = {mounted: true}
-  //   this.renderWatchedStocks = this.renderWatchedStocks.bind(this);
-  //   this.fileUploadAction = this.fileUploadAction.bind(this);
-  //   this.fileUploadInputChange = this.fileUploadInputChange.bind(this);
-  //   this.returnKey = this.returnKey.bind(this);
-  //   this.resetUploadList = this.resetUploadList.bind(this)
-  // }
-
-  // componentWillUnmount(){
-  //   this.baseState.mounted = false
-  // }
+  }, [p.globalStockList])
 
   function returnKey(key) {
     const retVal = key !== undefined ? key["currentPrice"] : "noDat"
@@ -244,7 +226,7 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
   let propList = {
     apiKey: that.props.apiKey,
     globalStockList: that.props.globalStockList,
-    showPane: that.props.showPane,
+    showPane: that.showPane,
     updateGlobalStockList: that.props.updateGlobalStockList,
     updateWidgetStockList: that.props.updateWidgetStockList,
     widgetKey: key,

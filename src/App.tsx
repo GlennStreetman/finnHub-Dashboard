@@ -316,11 +316,6 @@ class App extends React.Component<AppProps, AppState> {
             LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
         }
 
-        // if (s.rebuildDataSet === 1 && s.login === 1) { //refresh current dashboards api data.
-        //     this.setState({ rebuildDataSet: 0 }, () => {
-        //         this.refreshFinnhubAPIDataVisable()
-        //     })
-        // }
     }
 
     componentWillUnmount() {

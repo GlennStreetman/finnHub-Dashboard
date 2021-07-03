@@ -27,7 +27,6 @@ function GetStockPrice(context: any, stockObj: stock, apiKey: string, throttle: 
                 } else {
                     console.log('GO')
                     let payload: rUpdarUpdateQuotePricePayload = { [stockObj.key]: data?.data?.c }
-                    console.log('context', context.props.rUpdateQuotePrice, payload)
                     context.props.rUpdateQuotePriceSetup(payload)
                 }
             })

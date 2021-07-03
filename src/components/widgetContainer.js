@@ -48,7 +48,7 @@ function WidgetContainer(p) {
         }
     }
 
-    function showPane(updateFunction, fixState = -1) {
+    const showPane = function (updateFunction, fixState = -1) {
         let showMenu = showEditPane === 0 ? 1 : 0;
         fixState !== -1 && (showMenu = fixState);
         updateFunction(showMenu);
