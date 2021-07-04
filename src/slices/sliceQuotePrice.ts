@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { tgetQuotePrices } from '../thunks/thunkGetQuotePrices'
 
 interface quote {
     [key: string]: number
@@ -45,6 +46,17 @@ const quotePrice = createSlice({ //Security quote prices. Updated by v1/quote ro
             }
         },
     },
+    extraReducers: {
+        [tgetQuotePrices.pending.toString()]: (state, action) => {
+        },
+        [tgetQuotePrices.rejected.toString()]: (state, action) => {
+            console.log('2. failed to retrieve stock data for: ', action)
+        },
+        [tgetQuotePrices.fulfilled.toString()]: (state, action) => {
+            const ap = action.payload
+            if (ap) state.quote[ap[0]] = ap[1]
+        },
+    }
 })
 
 export const {

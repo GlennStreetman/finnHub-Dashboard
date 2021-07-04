@@ -3,7 +3,6 @@ import React from "react";
 import queryString from "query-string";
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
-import { GetStockPrice, LoadStockData } from "./appFunctions/getStockPrices";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
 import { logoutServer, Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
 import {
@@ -312,7 +311,6 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if ((s.globalStockList !== prevState.globalStockList && s.login === 1)) { //price data for watchlist, including socket data.
-            LoadStockData(this, s, GetStockPrice, s.finnHubQueue); //sets default day price for watchlist, usefull if socket data not available.
             LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
         }
 

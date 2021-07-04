@@ -1,15 +1,13 @@
 import { finnHub, throttleApiReqObj, finnHubQueue } from "./appImport/throttleQueueAPI";
-import { AppState, stock } from './../App'
-import { rUpdarUpdateQuotePricePayload } from './../slices/sliceQuotePrice'
+import { AppState, stock } from '../App'
+import { rUpdarUpdateQuotePricePayload } from '../slices/sliceQuotePrice'
 
 function GetStockPrice(context: any, stockObj: stock, apiKey: string, throttle: finnHubQueue,) {
 
     //US ONLY
     if (stockObj !== undefined && apiKey !== undefined && stockObj.exchange === 'US') {
-        console.log('getting stock price:', stockObj)
+
         const stockSymbol = stockObj.symbol
-        // let stockPriceData: priceObj = { currentPrice: 0 };
-        // let that: any = context
         const queryString = `https://finnhub.io/api/v1/quote?symbol=${stockSymbol}&token=${apiKey}`
         const reqObj: throttleApiReqObj = {
             apiString: queryString,
