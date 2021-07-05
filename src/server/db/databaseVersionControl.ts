@@ -28,13 +28,13 @@ const getVersion = async () => {
             let version: string
             if (err) {
                 console.log("No version table found, setting up postgres database.");
-                const createDB1 = fs.readFileSync(path.resolve(__dirname, `postgresVersions/1.0_create`))
+                const createDB1 = fs.readFileSync(path.resolve(__dirname, `postgresVersions/1.0_create.sql`))
                 const buildDB = createDB1.toString()
                 console.log(buildDB)
                 await runUpdateQuery(buildDB, '1.0')
                 version = '1.0'
             } else if (rows.rowCount === 0) {
-                const createDB1 = fs.readFileSync(path.resolve(__dirname, `postgresVersions/1.0_create`))
+                const createDB1 = fs.readFileSync(path.resolve(__dirname, `postgresVersions/1.0_create.sql`))
                 const updateQuery = createDB1.toString()
                 console.log(updateQuery)
                 await runUpdateQuery(updateQuery, '1.0')
