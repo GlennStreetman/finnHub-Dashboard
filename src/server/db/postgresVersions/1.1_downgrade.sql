@@ -1,0 +1,2 @@
+DROP TABLE test;
+UPDATE VERSION SET version='1.0';

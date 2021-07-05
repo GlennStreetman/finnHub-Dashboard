@@ -11,7 +11,7 @@ const connectMongo = async (callback) => {
     try {
         MongoClient.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }, (err, db) => {
             _db = db
-            console.log("Connected to MongoDB")
+            console.log("Connected2 to MongoDB")
             return callback(err)
         })
     } catch (e) {

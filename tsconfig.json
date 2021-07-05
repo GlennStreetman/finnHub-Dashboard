@@ -40,5 +40,5 @@
     "node_modules",
     "src/server",
     "build"
-  ]
+  ],
 }

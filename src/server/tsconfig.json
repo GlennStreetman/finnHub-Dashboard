@@ -12,12 +12,11 @@
         "target": "esnext",
         "moduleResolution": "node"
     },
+    "include": [
+        ".",
+    ],
     "exclude": [
         "../src",
         "**/*.test.js"
     ],
-    "include": [
-        "."
-    ]
 }
-//         "../../build",

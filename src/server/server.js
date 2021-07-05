@@ -13,7 +13,7 @@ import dbLive from './db/databaseLive.js';
 import devDB from "./db/databaseLocalPG.js"
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
-import fileUpload from 'express-fileupload';
+import fileUpload from 'express-fileupload';  
 
 import { connectMongo } from "./db/mongoLocal.js"
 
@@ -51,6 +51,7 @@ import renameDashboardMongo from './routes/mongoDB/renameDashboardMongo.js'
 import graphQLRedirect from './routes/graphQL.js'
 //graphQL
 import {schema} from './routes/graphQL/graphQL.js'
+import {versionControl} from './db/databaseVersionControl.js'
 
 const app = express();
 app.use(helmet({
@@ -95,13 +96,16 @@ if (process.env.live === '1') {
   app.listen(process.env.PORT || port, function () {
     console.log("Listening to http://localhost:" + port);
   })
-  // console.log("live path: ", path.join(__dirname, '../../build/'))
   app.use(express.static(path.join(__dirname, '../../build/')));
   const db = dbLive
 
   db.connect()
-    .then(() => console.log("connected to LIVE postgres server"))
+    .then(() => {
+      console.log("connected to LIVE postgres server") 
+      versionControl()
+    })
     .catch(err => console.log(err))
+  
   connectMongo((err) => { console.log("Connected", err) })
 
 } else { //development setup
@@ -120,9 +124,12 @@ if (process.env.live === '1') {
   app.use(express.static(path.join(__dirname, '../../build/'))); //static asset directories are automaticaly served.
   const db = devDB
   db.connect()
-    .then(() => console.log("connected to developement postgres server"))
+    .then(() => {
+      console.log("connected to development postgres server") 
+      versionControl()
+    })
     .catch(err => console.log("ERROR ON PG LOGIN", err))
-  connectMongo((err) => { console.log("Connected", err) })
+  connectMongo((err) => { console.log("Connected1", err) })
 }
 
 app.use('/', login)

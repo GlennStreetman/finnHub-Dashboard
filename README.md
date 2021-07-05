@@ -26,6 +26,7 @@ live = 0 or 1 (0 for development mode NPM RUN client/server, 1 for live NPM Star
 mongo = connection string for mongo db. ex: mongodb://localhost:27017
 testURL = URL for dev environment. ex: http://localhost:5000
 deployURL = URL for deployment environment. ex: https://finn-dash.herokuapp.com
+db_verison = 1.0
 
 FOR HEROKU Hosting + Heroku Postgres addon:  
 API_Key: mailgun api key  
@@ -33,6 +34,7 @@ DATABASE_URL: Database URL provided by Heroku
 DOMAIN_KEY: mailgun domain  
 live: 1  
 session_secret: secret phrase used for express-session management. KEEP SECRET.
+db_verison = 1.0
 
 ## Available Scripts
 
