@@ -2,6 +2,7 @@ import { AppState, globalStockList } from './../App'
 import { rUpdarUpdateQuotePricePayload } from './../slices/sliceQuotePrice'
 
 function UpdateTickerSockets(context: any, socket: any, apiKey: string, globalStockList: globalStockList) {
+
     //opens a series of socket connections to live stream stock prices
     //update limited to once every 3 seconds to have mercy on dom rendering.
     if (apiKey !== undefined && apiKey !== '' && apiKey.indexOf('sandbox') === -1) {
@@ -24,7 +25,6 @@ function UpdateTickerSockets(context: any, socket: any, apiKey: string, globalSt
                         thisSocket.send(JSON.stringify({ type: "subscribe", symbol: USList[stock] }))
                     })
                 }
-
                 // Listen for messages
                 thisSocket.addEventListener("message", function (event: any) {
                     let tickerReponse = JSON.parse(event.data);
@@ -35,25 +35,15 @@ function UpdateTickerSockets(context: any, socket: any, apiKey: string, globalSt
                             const newPrice = response[stock].p
                             globalStockList[symbol] ? updatePaylaod[symbol] = newPrice : //if not defined unsubscribe
                                 thisSocket.send(JSON.stringify({ 'type': 'unsubscribe', 'symbol': symbol }))
-
                         }
-                        context.props.rUpdateQuotePriceStream(updatePaylaod)
-                        // const newPrice: number = tickerReponse.data[0]["p"]
-                        // streamingStockData['US-' + tickerReponse.data[0]["s"]] = newPrice;
-                        // let checkTime = new Date().getTime();
-                        // if (checkTime - lastUpdate > 5000) {
-                        //     lastUpdate = new Date().getTime();
-                        //     // let updatedPrice = Object.assign({}, that.state.streamingPriceData);
-                        //     for (const prop in streamingStockData) {
-                        //         if (updatedPrice[prop] !== undefined) {
-                        //             updatedPrice[prop]["currentPrice"] = streamingStockData[prop][0]
-                        //         } else {
-                        //             thisSocket.send(JSON.stringify({ 'type': 'unsubscribe', 'symbol': tickerReponse.data[0]["s"] }))
-                        //         }
-                        //     }
-                        // const payload: Partial<AppState> = { streamingPriceData: updatedPrice }
-                        // that.setState(payload);
-                        // }
+                        // console.log('socketdata')
+                        if (Date.now() - context.state.socketUpdate > 5000) { //throttle update rate.
+                            // console.log('commiting socket data')
+                            const newStamp = Date.now()
+                            context.setState({ socketUpdate: newStamp }, () => {
+                                context.props.rUpdateQuotePriceStream(updatePaylaod)
+                            })
+                        }
                     }
                 })
             } catch (err) {

@@ -133,12 +133,19 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                         return { status: 429 }
                     } else if (response.status === 200) {
                         return response.json()
-                    } else {
+                    } else if (response.status === 403) {
                         console.log("Response other than 429/200", response.status, response)
                         return {
-                            status: 400,
-                            response: response
+                            status: 403,
+                            // response: { message: '403: Access not granted to finnhub API premium route.' }
                         }
+                    } else {
+                        console.log("Response other than 429/403/200", response.status, response)
+                        return {
+                            status: 400,
+                            // response: { message: 'Problem retrieving data from server' }
+                        }
+
                     }
                 })
                 .then((data: any) => {
@@ -147,7 +154,7 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                             security: reqObj.security,
                             widget: reqObj.widget,
                             apiString: reqObj.apiString,
-                            data: reqObj, //
+                            data: {},
                             dashboard: reqObj.dashboard,
                             widgetName: reqObj.widgetName,
                             widgetType: reqObj.widgetType,
@@ -163,11 +170,27 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                             security: reqObj.security,
                             widget: reqObj.widget,
                             apiString: reqObj.apiString,
-                            data: reqObj,
+                            data: { message: '400: No message from server' },
                             dashboard: reqObj.dashboard,
                             widgetName: reqObj.widgetName,
                             widgetType: reqObj.widgetType,
                             status: 400,
+                            updated: Date.now(),
+                            config: reqObj.config,
+                        }
+                        // console.log('request complete')
+                        throttle.openRequests = throttle.openRequests -= 1
+                        resolve(resObj)
+                    } else if (data.status === 403) {
+                        const resObj: throttleResObj = {
+                            security: reqObj.security,
+                            widget: reqObj.widget,
+                            apiString: reqObj.apiString,
+                            data: { message: '403: Access not granted by FinnhubAPI. Review account status & permissions.' },
+                            dashboard: reqObj.dashboard,
+                            widgetName: reqObj.widgetName,
+                            widgetType: reqObj.widgetType,
+                            status: 403,
                             updated: Date.now(),
                             config: reqObj.config,
                         }

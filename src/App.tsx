@@ -186,7 +186,8 @@ export interface AppState {
     loadStartingDashBoard: number, //flag switches to 1 after attemping to load default dashboard.
     menuList: menuList, //lists of all menu widgets.
     // rebuildDataSet: number, //Set to 1 to trigger finnHub Dataset rebuild. 
-    socket: any, //socket connection for streaming stock data.
+    socket: any, //socket connection for streaming stock data.+
+    socketUpdate: number,
     showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
     // streamingPriceData: streamingPriceData, //data shared between some widgets and watchlist menu. Updated by socket data.
     targetSecurity: string, //target security for widgets. Update changes widget focus.
@@ -221,11 +222,10 @@ class App extends React.Component<AppProps, AppState> {
             login: 0, //login state. 0 logged out, 1 logged in.
             loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
             menuList: {}, //lists of all menu widgets.
-            // rebuildDataSet: 0, //Set to 1 to trigger finnHub Dataset rebuild. 
             enableDrag: false,
             socket: "", //socket connection for streaming stock data.
+            socketUpdate: Date.now(),
             showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
-            // streamingPriceData: {}, //data shared between some widgets and watchlist menu. Updated by socket data.
             targetSecurity: '', //target security for widgets. Update changes widget focus.
             watchListMenu: 1, //1 = show, 0 = hide
             widgetCopy: null, //copy of state of widget being dragged.
