@@ -27,7 +27,7 @@ export default function basicFinancialsGQLFilter(data: FinnHubAPIData, config: a
                 resObj.v.push(timeSeriesData[d]['v'])
             }
         }
-        console.log('resObj', resObj)
+        // console.log('resObj', resObj)
         return resObj
     }
 }

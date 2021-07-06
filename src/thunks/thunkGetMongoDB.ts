@@ -10,6 +10,7 @@ export interface mongoObj {
     dashboard: string,
     widget: string,
     security: string,
+    widgetType: string
 }
 
 export interface getMongoRes {
@@ -32,7 +33,6 @@ export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
                 if (reqObj.dashboard) fetchString = `${fetchString}dashboard=${reqObj.dashboard}`
                 if (reqObj.widget) fetchString = `${fetchString}&widget=${reqObj.widget}`
             }
-            console.log('--------------', fetchString)
             const getData = await fetch(fetchString)
             const freshData = await getData.json()
             const resObj: getMongoRes = {}
@@ -45,7 +45,8 @@ export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
                     key: mongo.key,
                     dashboard: mongo.dashboard,
                     widget: mongo.widget,
-                    security: mongo.security
+                    security: mongo.security,
+                    widgetType: mongo.widgetType
                 }
             }
             return (resObj)

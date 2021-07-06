@@ -94,7 +94,7 @@ const RootQueryType = new g.GraphQLObjectType({
                     SELECT dashboardname as dashboard, globalstocklist as stocks
                     FROM dashboard 
                     WHERE userID = (SELECT id FROM users WHERE  (apiKey = ${apiKey}) OR apialias = ${apiKey})`
-                    console.log('getUserQuery', query)
+                    // console.log('getUserQuery', query)
                     db.query(query, (err, rows) => {
                         if (err) {
                             console.log(err)
@@ -132,7 +132,7 @@ const RootQueryType = new g.GraphQLObjectType({
                             FROM users 
                             WHERE  (apiKey = ${apiKey} OR apialias = ${apiKey})) AND dashboardname = ${dashboardName}
                     )`
-                    console.log('getUserQuery', query)
+                    // console.log('getUserQuery', query)
                     db.query(query, (err, rows) => {
                         if (err) {
                             console.log(err)
@@ -196,7 +196,7 @@ const RootQueryType = new g.GraphQLObjectType({
                             WHERE (apiKey = ${apiKey} OR apialias = ${apiKey})) AND dashboardname = ${dashboardName})
 					AND widgetHeader = ${widget}
                     `
-                    console.log(query)
+                    // console.log(query)
                     try {
                         const returnData = await db.query(query)
                         // console.log('returnData:', returnData)

@@ -40,5 +40,6 @@ export default function financialsAsReportedGQLFilter(data: FinnHubAPIData, conf
             }
         }
     }
+    console.log('return filtered obj', resObj, config)
     return resObj
 }

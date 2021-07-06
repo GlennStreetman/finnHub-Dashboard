@@ -31,6 +31,7 @@ export const tSearchMongoDB = createAsyncThunk( //{dashboard, [securityList]}
                     dashboard: mongo.dashboard,
                     widget: mongo.widget,
                     security: mongo.security,
+                    widgetType: mongo.widgetType,
                 }
             }
             return (res)

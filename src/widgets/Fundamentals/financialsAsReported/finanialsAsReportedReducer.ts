@@ -23,7 +23,7 @@ export interface reportInfo {
     endDate: string,
     filedDate: string,
     acceptedDate: string,
-    report: reportObj
+    report?: reportObj  //REPORTS ONLY RETURNED BY EXCEL 
 }
 
 interface finAsReportedData {
@@ -38,19 +38,14 @@ interface filtersObj {
 }
 
 export function financialsAsReportedReducer(data: finAsReportedData, filters: filtersObj) { //recieves unfiltered finnhub data and reduces to needed visable data
-
-    const resObj: finAsReportedData = { //remember to layer in filters
-        cik: data.cik,
-        data: [],
-        symbol: data.symbol,
-    }
     let seriesData = data.data
     for (const n in seriesData) {
-        const newNode: reportInfo = { ...seriesData[n] }
-        const targetReport = filters.targetReport
-        let filteredNode = { [targetReport]: seriesData[n].report[targetReport] }
-        newNode.report = filteredNode
-        resObj.data.push(newNode)
+        delete seriesData[n].report
+    }
+    const resObj: finAsReportedData = { //remember to layer in filters
+        cik: data.cik,
+        data: seriesData,
+        symbol: data.symbol,
     }
     return resObj
 }

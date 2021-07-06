@@ -42,6 +42,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
             .then((res) => {
                 const resObj: resObj = {}
                 for (const resStock of res) {
+
                     const key: string = `${resStock.dashboard}-${resStock.widget}-${resStock.security}`
                     resObj[key] = resStock
                 }

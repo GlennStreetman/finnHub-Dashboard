@@ -71,7 +71,11 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
-    useEffect((key: number = p.widgetKey, trackedStock = p.trackedStocks, keyList: string[] = Object.keys(p.trackedStocks), updateWidgetConfig: Function = p.updateWidgetConfig) => {
+    useEffect((
+        key: number = p.widgetKey,
+        trackedStock = p.trackedStocks,
+        keyList: string[] = Object.keys(p.trackedStocks),
+        updateWidgetConfig: Function = p.updateWidgetConfig) => {
         //Setup default metric source if none selected.
         if (p.config.targetSecurity === undefined) {
             const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
@@ -83,6 +87,20 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
             })
         }
     }, [p.updateWidgetConfig, rShowData, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
+
+    useEffect((
+        key: number = p.widgetKey,
+        trackedStock = p.trackedStocks,
+        keyList: string[] = Object.keys(p.trackedStocks),
+        updateWidgetConfig: Function = p.updateWidgetConfig) => {
+        //Setup default metric source if none selected.
+        if (p.config.targetSecurity !== undefined && !p.config.year && rShowData?.[0]?.['year']) {
+            const newYear = rShowData?.[0]?.['year']
+            updateWidgetConfig(key, {
+                ...p.config, ...{ year: newYear }
+            })
+        }
+    }, [p.updateWidgetConfig, rShowData, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity, p.config])
 
     function updateWidgetList(stock) {
         if (stock.indexOf(":") > 0) {
@@ -127,7 +145,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     function changeStockSelection(e) { //DELETE IF no target stock
         const target = e.target.value;
         p.updateWidgetConfig(p.widgetKey, {
-            targetSecurity: target,
+            ...p.config, ...{ targetSecurity: target, }
         })
     }
 
@@ -135,7 +153,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         const target = e.target.value;
         const key = `${p.widgetKey}-${p?.config?.targetSecurity}`
         p.updateWidgetConfig(p.widgetKey, {
-            targetReport: target,
+            ...p.config, ...{ targetReport: target, }
         })
         dispatch(tSearchMongoDB([key]))
     }
@@ -144,8 +162,8 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         const newPagination = p.config.pagination + e;
         if (newPagination > -1 && rShowData && newPagination <= Object.keys(rShowData).length - 1) {
             p.updateWidgetConfig(p.widgetKey, {
-                pagination: newPagination,
-                year: rShowData[newPagination]['year']
+                ...p.config,
+                ...{ pagination: newPagination, year: rShowData[newPagination]['year'] }
             })
         }
     }

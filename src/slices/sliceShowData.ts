@@ -9,7 +9,7 @@ import { widgetReducers } from '../registers/dataReducerReg'
 //key should be widget reference.
 
 interface DataNode {
-    [key: string]: Object
+    [key: string]: any
 }
 
 export interface sliceShowData {
@@ -92,12 +92,11 @@ const showData = createSlice({
                     const widgetRef: string = ap[x].widget
                     const security: string = ap[x].security
                     const data: object = ap[x].data
+                    const widgetType = ap[x].widgetType
                     if (state?.dataSet?.[widgetRef]?.[security] !== undefined) {
                         const secObj: DataNode = state.dataSet[widgetRef][security]
-                        if (secObj.filters) { //IF FILTERS NEED TO BE APPLYIED TO REFORMAT DATA.
-                            let widgetType = secObj.filters['widgetType']
+                        if (widgetReducers[widgetType] !== undefined) { //IF Reducers need to be applied to finnHub API data for formatting or performance
                             let filteredDataFunc = widgetReducers[widgetType]
-                            // console.log('filteredDataFunc', filteredDataFunc)
                             let filteredData = filteredDataFunc(data, secObj.filters)
                             filteredData.filters = secObj.filters
                             state.dataSet[widgetRef][security] = filteredData
@@ -117,19 +116,18 @@ const showData = createSlice({
             // return {...state}
         },
         [tGetMongoDB.fulfilled.toString()]: (state, action) => {
-            // console.log('tGetMongoDB', action.payload)
+            console.log('tGetMongoDB', action.payload)
             const ap: any = action.payload
             for (const x in ap) { //FOR 'DB-WIdget-security' key
                 if (ap[x].dashboard === state.targetDashboard) { //if returned data should be visable
                     const widgetRef: string = ap[x].widget
                     const security: string = ap[x].security
                     const data: object = ap[x].data
+                    const widgetType = ap[x].widgetType
                     if (state.dataSet?.[widgetRef]?.[security] !== undefined) { //for target security from payload that is in target daashboard
                         const secObj: DataNode = state.dataSet[widgetRef][security]
-                        if (secObj.filters) { //IF FILTERS NEED TO BE APPLYIED TO REFORMAT DATA.
-                            let widgetType = secObj.filters['widgetType']
+                        if (widgetReducers[widgetType] !== undefined) { //IF Reducers need to be applied to finnHub API data for formatting or performance
                             let filteredDataFunc = widgetReducers[widgetType]
-                            //console.log('filteredDataFunc', widgetType, filteredDataFunc)
                             let filteredData = filteredDataFunc(data, secObj.filters)
                             filteredData.filters = secObj.filters
                             state.dataSet[widgetRef][security] = filteredData
@@ -155,12 +153,11 @@ const showData = createSlice({
                 const widgetRef: string = ap[x].widget
                 const security: string = ap[x].security
                 const data: object = ap[x].data
+                const widgetType = ap[x].widgetType
                 if (state.dataSet?.[widgetRef]?.[security] !== undefined) { //for target security from payload that is in target daashboard
                     const secObj: DataNode = state.dataSet[widgetRef][security]
-                    if (secObj.filters) { //IF FILTERS NEED TO BE APPLYIED TO REFORMAT DATA.
-                        let widgetType = secObj.filters['widgetType']
+                    if (widgetReducers[widgetType] !== undefined) { //IF Reducers need to be applied to finnHub API data for formatting or performance
                         let filteredDataFunc = widgetReducers[widgetType]
-                        //console.log('filteredDataFunc', widgetType, filteredDataFunc)
                         let filteredData = filteredDataFunc(data, secObj.filters)
                         filteredData.filters = secObj.filters
                         state.dataSet[widgetRef][security] = filteredData
