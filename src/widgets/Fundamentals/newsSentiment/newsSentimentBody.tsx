@@ -116,11 +116,11 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
             if (typeof el[1] !== 'object') {
                 return (
                     <tr key={`${el[0]}-${el[1]}`}>
-                        <td>{convertCamelToProper(el[0])}: </td>
-                        <td>{el[1]}</td>
+                        <td key={`${el[0]}-${el[1]}2`}    >{convertCamelToProper(el[0])}: </td>
+                        <td key={`${el[0]}-${el[1]}3`}   >{el[1]}</td>
                     </tr>
                 )
-            } else { return (<></>) }
+            } else { return (<tr key={`${el[0]}-${el[1]}4`}></tr>) }
         }) : <></>
 
         const stockTable =
@@ -164,8 +164,6 @@ export function newsSentimentsProps(that, key = "newWidgetNameProps") {
         filters: that.props.widgetList[key]["filters"],
         showPane: that.showPane,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        // updateDefaultExchange: that.props.updateDefaultExchange,
-        // updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetConfig: that.props.updateWidgetConfig,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,

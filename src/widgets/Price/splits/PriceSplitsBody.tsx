@@ -65,7 +65,11 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
     const [end, setEnd] = useState(startingEndDate())
     const dispatch = useDispatch();
 
-    const rShowData = useSelector((state) => {
+    interface rShowDat {
+        [key: string]: any
+    }
+
+    const rShowData: rShowDat | undefined = useSelector((state) => {
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
@@ -198,11 +202,11 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
         if (typeof rShowData === 'object') {
             let symbolSelectorDropDown = (
                 <>
-                    <div className="div-inline">
-                        {"  Stock:  "}
+                    <div>
                         <select className="btn" value={p.config.targetSecurity} onChange={changeStockSelection}>
                             {newStockList}
                         </select>
+                        {rShowData?.message ? <>{rShowData.message}</> : <></>}
                     </div>
                     <table>
                         <thead>
