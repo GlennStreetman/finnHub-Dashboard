@@ -110,9 +110,9 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     useEffect(() => { //set default series 
         if (seriesList.length > 0 && !p.config.targetSeries) {
             const updateWidgetConf = p.updateWidgetConfig
-            updateWidgetConf(p.widgetKey, { targetSeries: seriesList[0], })
+            updateWidgetConf(p.widgetKey, { ...p.config, ...{ targetSeries: seriesList[0], } })
         }
-    }, [seriesList, p.updateWidgetConfig, p.config.targetSeries, p.widgetKey])
+    }, [seriesList, p.updateWidgetConfig, p.config.targetSeries, p.widgetKey, p.config])
 
     useEffect(() => { //build config setup
         let stockList = Object.keys(p.trackedStocks)
@@ -201,19 +201,19 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     }, [p.config.toggleMode, p.config.targetSecurity, p.config.metricSelection, p.config.seriesSelection, dispatch, p.trackedStocks, p.widgetKey])
 
     function setTargetSeries(el) {
-        p.updateWidgetConfig(p.widgetKey, { targetSeries: el, })
+        p.updateWidgetConfig(p.widgetKey, { ...p.config, ...{ targetSeries: el, } })
     }
 
 
     function setToggleMode(el) {
         p.updateWidgetConfig(p.widgetKey, {
-            toggleMode: el,
+            ...p.config, ...{ toggleMode: el, }
         })
     }
 
     function changeSource(el) {
         p.updateWidgetConfig(p.widgetKey, {
-            targetSecurity: el,
+            ...p.config, ...{ targetSecurity: el, }
         })
     }
 
@@ -225,7 +225,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         orderMetricSelection[indexRef + change] = moveFrom
         if (indexRef + change >= 0 && indexRef + change < p.config[update].length) {
             p.updateWidgetConfig(p.widgetKey, {
-                [update]: orderMetricSelection
+                ...p.config, ...{ [update]: orderMetricSelection }
             })
         }
     }
@@ -240,11 +240,12 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         if (p.config.metricSelection.indexOf(metric) < 0) {
             let newSelection = p.config.metricSelection.slice()
             newSelection.push(metric)
-            p.updateWidgetConfig(p.widgetKey, { metricSelection: newSelection })
+            console.log(newSelection)
+            p.updateWidgetConfig(p.widgetKey, { ...p.config, ...{ metricSelection: newSelection } })
         } else {
             let newSelection = p.config.metricSelection.slice()
             newSelection.splice(newSelection.indexOf(metric), 1)
-            p.updateWidgetConfig(p.widgetKey, { metricSelection: newSelection })
+            p.updateWidgetConfig(p.widgetKey, { ...p.config, ...{ metricSelection: newSelection } })
         }
     }
 
@@ -252,11 +253,11 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         if (p.config.seriesSelection.indexOf(series) < 0) {
             let newSelection = p.config.seriesSelection.slice()
             newSelection.push(series)
-            p.updateWidgetConfig(p.widgetKey, { seriesSelection: newSelection })
+            p.updateWidgetConfig(p.widgetKey, { ...p.config, ...{ seriesSelection: newSelection } })
         } else {
             let newSelection = p.config.seriesSelection.slice()
             newSelection.splice(newSelection.indexOf(series), 1)
-            p.updateWidgetConfig(p.widgetKey, { seriesSelection: newSelection })
+            p.updateWidgetConfig(p.widgetKey, { ...p.config, ...{ seriesSelection: newSelection } })
         }
     }
 
@@ -490,7 +491,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     function changeStockSelection(e) { //DELETE IF no target stock
         const target = e.target.value;
         p.updateWidgetConfig(p.widgetKey, {
-            targetSecurity: target,
+            ...p.config, ...{ targetSecurity: target, }
         })
     }
 

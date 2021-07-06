@@ -20,7 +20,6 @@ const router = express.Router();
 //gets user, none stale, finnhub data. This process deletes stale records.
 router.get('/finnDashData', async (req: finnDashDataReq, res: any) => {
     try {
-        console.log("1get FinndashData", req)
         const client = getDB()
         const database = client.db('finnDash');
         const dataSet = database.collection('dataSet');

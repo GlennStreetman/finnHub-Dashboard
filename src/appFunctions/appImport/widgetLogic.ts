@@ -220,7 +220,7 @@ export const updateWidgetConfig = function (widgetID: number, updateObj: config)
         fetch("/updateGQLFilters", options)
             .then((response) => { return response.json() })
             .then(() => {
-                console.log('finndash data filters updated in mongoDB.')
+                console.log('finndash widget config updated in mongoDB.')
             })
     })
 }
