@@ -105,7 +105,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         targetSeries: '',
     })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
-    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
+    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
 
     useEffect(() => { //set default series 
         if (seriesList.length > 0 && !p.config.targetSeries) {

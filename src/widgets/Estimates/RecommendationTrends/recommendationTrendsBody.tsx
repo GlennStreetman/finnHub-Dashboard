@@ -16,9 +16,6 @@ import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
 
 import { dStock } from './../../../appFunctions/formatStockSymbols'
 
-
-
-
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
@@ -44,28 +41,8 @@ interface DataChartObject {
     strongBuy: object,
 }
 
-//add any additional type guard functions here used for live code.
-// function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
-//     if (arg !== undefined && Object.keys(arg).length > 0 && arg[0].symbol) {
-//         return true
-//     } else {
-//         return false
-//     }
-// }
-
 function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
-
-    // const startingstockData = () => {
-    //     if (isInitialMount.current === true) {
-    //         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-    //             const stockData = JSON.parse(JSON.stringify(p.widgetCopy.stockData))
-    //             return (stockData)
-    //         } else {
-    //             return ([])
-    //         }
-    //     }
-    // }
 
     const startingWidgetCoptyRef = () => {
         if (isInitialMount.current === true) {
@@ -75,7 +52,6 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
         }
     }
 
-    // const [stockData, setStockData] = useState(startingstockData());
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [chartOptions, setchartOptions] = useState({})
     const dispatch = useDispatch(); //allows widget to run redux actions.
@@ -100,7 +76,7 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
 
     useDragCopy(ref, { chartOptions: chartOptions })// stockData: JSON.parse(JSON.stringify(stockData)),   useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
-    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, dispatch) //on change to target security retrieve fresh data from mongoDB
+    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
     useEffect(() => {//create chart data
