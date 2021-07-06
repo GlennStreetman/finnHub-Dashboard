@@ -185,7 +185,8 @@ export interface AppState {
     login: number, //login state. 0 logged out, 1 logged in.
     loadStartingDashBoard: number, //flag switches to 1 after attemping to load default dashboard.
     menuList: menuList, //lists of all menu widgets.
-    // rebuildDataSet: number, //Set to 1 to trigger finnHub Dataset rebuild. 
+    saveDashboardThrottle: number, //delay timer for saving dashboard.
+    saveDashboardFlag: boolean, //sets to true when a save starts.
     socket: any, //socket connection for streaming stock data.+
     socketUpdate: number,
     showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
@@ -223,6 +224,8 @@ class App extends React.Component<AppProps, AppState> {
             loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
             menuList: {}, //lists of all menu widgets.
             enableDrag: false,
+            saveDashboardThrottle: Date.now(),
+            saveDashboardFlag: false,
             socket: "", //socket connection for streaming stock data.
             socketUpdate: Date.now(),
             showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
