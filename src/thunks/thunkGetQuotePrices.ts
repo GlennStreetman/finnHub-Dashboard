@@ -56,11 +56,8 @@ export const tgetQuotePrices = createAsyncThunk( //{dashboard, [securityList]}
                     })
                 } else {
                     let payload = [stockObj.key, data?.data?.c] //tuple
-                    console.log('process payload', payload)
                     return payload
                 }
             }
         }
-        // }
-        // }
     })

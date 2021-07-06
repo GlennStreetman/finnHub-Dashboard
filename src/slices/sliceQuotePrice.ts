@@ -26,7 +26,6 @@ const quotePrice = createSlice({ //Security quote prices. Updated by v1/quote ro
         rUpdateQuotePriceSetup: (state: sliceQuotePrice, action: any) => {
             // if (Date.now() - state.lastUpdate > 5000) { //throttle update rate.
             const ap: rUpdarUpdateQuotePricePayload = action.payload
-            console.log(ap)
             for (const stock in Object.entries(ap)) {
                 const entry = Object.entries(ap)[stock]
                 state.quote[entry[0]] = entry[1]
@@ -37,7 +36,6 @@ const quotePrice = createSlice({ //Security quote prices. Updated by v1/quote ro
         rUpdateQuotePriceStream: (state: sliceQuotePrice, action: any) => {
             if (Date.now() - state.lastUpdate > 5000) { //throttle update rate.
                 const ap: rUpdarUpdateQuotePricePayload = action.payload
-                console.log(ap)
                 for (const stock in Object.entries(ap)) {
                     const entry = Object.entries(ap)[stock]
                     state.quote[entry[0]] = entry[1]
