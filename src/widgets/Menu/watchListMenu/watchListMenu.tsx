@@ -91,6 +91,7 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
                                 <button
                                     key={el + "clck"}
                                     onClick={(e) => {
+                                        console.log('click update')
                                         p.updateGlobalStockList(e, el);
                                     }}
                                 >
@@ -117,6 +118,7 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
     }
 
     function fileUploadAction() {
+        console.log('file upload action')
         if (inputReference.current !== null) inputReference.current.click();
     }
 
@@ -215,13 +217,12 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
                 <CsvUpload
                     uploadList={uploadList}
                     resetUploadList={resetUploadList}
+                    setNewGlobalStockList={p.setNewGlobalStockList}
                     uploadGlobalStockList={p.uploadGlobalStockList}
                 />
             )}
         </>
     );
-
-    // };
 }
 
 export default forwardRef(WatchListMenu)
@@ -235,7 +236,7 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
     let propList = {
         apiKey: that.props.apiKey,
         globalStockList: that.props.globalStockList,
-        showPane: that.showPane,
+        setNewGlobalStockList: that.props.setNewGlobalStockList,
         updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,

@@ -15,7 +15,7 @@ import { setupDashboardObject, NewDashboard, saveDashboard, copyDashboard }
     from "./appFunctions/appImport/setupDashboard";
 import { GetSavedDashBoards, GetSavedDashBoardsRes } from "./appFunctions/appImport/getSavedDashboards";
 import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
-import { updateGlobalStockList } from "./appFunctions/appImport/updateGlobalStockList"
+import { updateGlobalStockList, setNewGlobalStockList } from "./appFunctions/appImport/updateGlobalStockList"
 import { syncGlobalStockList } from "./appFunctions/appImport/syncGlobalStockList"
 import { toggleBackGroundMenu } from "./appFunctions/appImport/toggleBackGroundMenu"
 import { updateAPIFlag } from "./appFunctions/appImport/updateAPIFlag"
@@ -272,6 +272,7 @@ class App extends React.Component<AppProps, AppState> {
         this.updateAPIFlag = updateAPIFlag.bind(this);
         this.updateExchangeList = updateExchangeList.bind(this);
         this.updateDefaultExchange = updateDefaultExchange.bind(this);
+        this.setNewGlobalStockList = setNewGlobalStockList.bind(this)
         this.updateGlobalStockList = updateGlobalStockList.bind(this); //pass stockRef to delete, pass in stockObj to update.
         this.uploadGlobalStockList = this.uploadGlobalStockList.bind(this); //pass in object to replace global list
         this.syncGlobalStockList = syncGlobalStockList.bind(this); //pushes global stock list to all widgets.
@@ -411,10 +412,12 @@ class App extends React.Component<AppProps, AppState> {
             dashBoardData: this.state.dashBoardData,
             targetDashboard: this.state.currentDashBoard,
         }
-        this.props.rRebuildTargetDashboardModel(payload)
+        this.props.rRebuildTargetDashboardModel(payload) //rebuilds redux.Model
+        this.refreshFinnhubAPIDataCurrentDashboard() //queue refresh for all finhub data for this dashboard.
     }
 
     uploadGlobalStockList(newStockObj: stockList) {
+        console.log('new stock obj', newStockObj)
         this.setState({ globalStockList: newStockObj });
     }
 
@@ -512,11 +515,11 @@ class App extends React.Component<AppProps, AppState> {
                     refreshFinnhubAPIDataCurrentDashboard={this.refreshFinnhubAPIDataCurrentDashboard}
                     saveDashboard={this.saveDashboard}
                     setDrag={this.setDrag}
+                    setNewGlobalStockList={this.setNewGlobalStockList}
                     setSecurityFocus={this.setSecurityFocus}
                     setWidgetFocus={this.setWidgetFocus}
                     showStockWidgets={this.state.showStockWidgets}
                     snapWidget={this.snapWidget}
-                    // streamingPriceData={this.state.streamingPriceData}
                     syncGlobalStockList={this.syncGlobalStockList}
                     targetSecurity={this.state.targetSecurity}
                     toggleWidgetBody={this.toggleWidgetBody}

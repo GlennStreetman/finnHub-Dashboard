@@ -265,14 +265,11 @@ export default forwardRef(PriceQuote)
 export function quoteBodyProps(that, key = "Quote") {
     let propList = {
         apiKey: that.props.apiKey,
-        showPane: that.showPane,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        // updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
         exchangeList: that.props.exchangeList,
         defaultExchange: that.props.defaultExchange,
-        // updateDefaultExchange: that.props.updateDefaultExchange,
     };
     return propList;
 }

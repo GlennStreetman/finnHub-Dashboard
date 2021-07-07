@@ -10,7 +10,8 @@ export const loadSavedDashboard = function (target: string, globalStockList: glo
     this.setupDashboardObject(target, globalStockList, widgetList);
     this.setState({
         currentDashBoard: target,
-        targetSecurity: Object.keys(globalStockList)[0]
+        targetSecurity: Object.keys(globalStockList)[0],
+        globalStockList: globalStockList,
     })
     const updateVisable = async function (that: any) {
         const s: AppState = that.state

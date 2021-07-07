@@ -57,7 +57,7 @@ export default class endPointData extends React.Component<any, any> {
         };
         const getData = await fetch('/findMongoData', options)
         const resData: resObj[] = await getData.json()
-        const setData = await produce(s.endPointData, (draftState) => {
+        const setData = produce(s.endPointData, (draftState) => {
             if (resData !== undefined && resData.length) draftState[stock]['data'] = resData[0].data
         })
         this.setState({ endPointData: setData })

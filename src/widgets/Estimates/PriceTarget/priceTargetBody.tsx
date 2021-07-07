@@ -6,7 +6,7 @@ import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
 
 import { useDragCopy } from './../../widgetHooks/useDragCopy'
-import { useTargetSecurity } from '../../widgetHooks/useTargetSecurity'
+
 import { useSearchMongoDb } from '../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from '../../widgetHooks/useBuildVisableData'
 
@@ -45,7 +45,7 @@ function PriceTargetBody(p: { [key: string]: any }, ref: any) {
     }, [p?.config?.targetSecurity])
 
     useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing 
-    useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
+
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
@@ -133,10 +133,7 @@ export function priceTargetProps(that, key = "newWidgetNameProps") {
         defaultExchange: that.props.defaultExchange,
         exchangeList: that.props.exchangeList,
         filters: that.props.widgetList[key]["filters"],
-        showPane: that.showPane,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        // updateDefaultExchange: that.props.updateDefaultExchange,
-        // updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         updateWidgetConfig: that.props.updateWidgetConfig,
         widgetKey: key,

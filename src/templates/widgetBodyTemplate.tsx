@@ -4,7 +4,7 @@ import { useState, useMemo, forwardRef, useRef } from "react";
 import { useAppDispatch, useAppSelector } from '../hooks';
 
 import { useDragCopy } from './../widgets/widgetHooks/useDragCopy'
-import { useTargetSecurity } from './../widgets/widgetHooks/useTargetSecurity'
+
 import { useSearchMongoDb } from './../widgets/widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from './../widgets/widgetHooks/useBuildVisableData'
 import { useStartingFilters } from './../widgets/widgetHooks/useStartingFilters'
@@ -87,7 +87,7 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
     }, [start, end])
 
     useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
+    
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
@@ -190,11 +190,8 @@ export function NewWidgetProps(that, key = "newWidgetNameProps") {
         defaultExchange: that.props.defaultExchange,
         exchangeList: that.props.exchangeList,
         filters: that.props.widgetList[key]["filters"],
-        showPane: that.showPane,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        // updateDefaultExchange: that.props.updateDefaultExchange,
         updateWidgetFilters: that.props.updateWidgetFilters,
-        // updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
         targetSecurity: that.props.targetSecurity,

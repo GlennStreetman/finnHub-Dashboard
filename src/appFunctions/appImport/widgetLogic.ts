@@ -197,10 +197,11 @@ export const UpdateWidgetFilters = function (widgetID: string, data: filters) {
 }
 
 //widget config changes how data is manipulated after being queried.
-export const updateWidgetConfig = function (widgetID: number, updateObj: config) { //updates a widget config object
+export const updateWidgetConfig = function (widgetID: number, updateObj: config) { //updates a widget config object then saves changes to mongoDB & postgres.
+    //config changes used by mongoDB during excel templating.
     const s: AppState = this.state
     const updatedDashboardData: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
-        draftState[s.currentDashBoard].widgetlist[widgetID].config = updateObj
+        draftState[s.currentDashBoard].widgetlist[widgetID].config = { ...updateObj }
     })
 
     const payload: Partial<AppState> = { dashBoardData: updatedDashboardData }

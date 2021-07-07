@@ -10,7 +10,7 @@ import StockSearchPane, { searchPaneProps } from "../../../components/stockSearc
 import CreateTimeSeriesChart, { createOptions } from './createTimeSeriesChart'
 
 import { useDragCopy } from '../../widgetHooks/useDragCopy'
-import { useTargetSecurity } from '../../widgetHooks/useTargetSecurity'
+
 import { useSearchMongoDb } from '../../widgetHooks/useSearchMongoDB'
 
 import { dStock } from './../../../appFunctions/formatStockSymbols'
@@ -104,7 +104,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         symbolView: symbolView,
         targetSeries: '',
     })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
+
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
 
     useEffect(() => { //set default series 
@@ -597,15 +597,11 @@ export function metricsProps(that, key = "newWidgetNameProps") {
         defaultExchange: that.props.defaultExchange,
         exchangeList: that.props.exchangeList,
         filters: that.props.widgetList[key]["filters"],
-        showPane: that.showPane,
         targetSecurity: that.props.targetSecurity,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         updateWidgetConfig: that.props.updateWidgetConfig,
-        updateDefaultExchange: that.props.updateDefaultExchange,
-        // updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
-
     };
     return propList;
 }

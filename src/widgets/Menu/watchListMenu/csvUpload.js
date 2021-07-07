@@ -6,7 +6,8 @@ class CsvUpload extends PureComponent {
     componentDidMount(){
 
         const p = this.props
-        p.uploadGlobalStockList(p.rUpdateObj)
+        // p.uploadGlobalStockList(p.rUpdateObj)
+        p.setNewGlobalStockList(p.rUpdateObj)
         p.resetUploadList()       
     }
     

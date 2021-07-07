@@ -198,7 +198,6 @@ export function marketNewsProps(that, key = "newWidgetNameProps") {
     let propList = {
         apiKey: that.props.apiKey,
         filters: that.props.widgetList[key]["filters"],
-        showPane: that.showPane,
         updateWidgetFilters: that.props.updateWidgetFilters,
         widgetKey: key,
     };

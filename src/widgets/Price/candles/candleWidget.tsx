@@ -7,7 +7,7 @@ import StockSearchPane, { searchPaneProps } from "../../../components/stockSearc
 import CreateCandleStickChart from "./createCandleStickChart";
 
 import { useDragCopy } from './../../widgetHooks/useDragCopy'
-import { useTargetSecurity } from './../../widgetHooks/useTargetSecurity'
+
 import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
 import { useStartingFilters } from './../../widgetHooks/useStartingFilters'
@@ -111,7 +111,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     }, [p?.config?.targetSecurity])
 
     useDragCopy(ref, { chartData: chartData, options: options, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useTargetSecurity(p.widgetKey, p.trackedStocks, p.updateWidgetConfig, p?.config?.targetSecurity,) //sets target security for widget on mount and change to security focus from watchlist.
+
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
@@ -314,10 +314,7 @@ export function candleWidgetProps(that, key = "Candles") {
         defaultExchange: that.props.defaultExchange,
         exchangeList: that.props.exchangeList,
         filters: that.props.widgetList[key]["filters"],
-        showPane: that.showPane,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        // updateDefaultExchange: that.props.updateDefaultExchange,
-        // updateGlobalStockList: that.props.updateGlobalStockList,
         updateWidgetFilters: that.props.updateWidgetFilters,
         updateWidgetConfig: that.props.updateWidgetConfig,
         updateWidgetStockList: that.props.updateWidgetStockList,

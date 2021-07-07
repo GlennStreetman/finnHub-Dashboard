@@ -58,7 +58,7 @@ export const NewDashboard = function newDashboard(newName, dashboards) {
         let returnedDash: dashBoardData = await this.getSavedDashBoards() //get saved dashboard data
         const savedDashboard = returnedDash.dashBoardData[uniqueName]
         //skip redux for now, not needed if no widgets and no stocks
-        const newDashboardObj = await produce(this.state.dashBoardData, (draftState: dashBoardData) => {
+        const newDashboardObj = produce(this.state.dashBoardData, (draftState: dashBoardData) => {
             draftState[uniqueName] = savedDashboard
             return draftState
         })
@@ -120,7 +120,7 @@ export const saveDashboard = async function (dashboardName: string) {
 
 export const copyDashboard = async function (copyName: string) {
     const widgList: widgetList = this.state.dashBoardData[copyName].widgetlist
-    const newWidgetList: widgetList = await produce(widgList, (draftState: widgetList) => {
+    const newWidgetList: widgetList = produce(widgList, (draftState: widgetList) => {
         console.log('saving dashboard copy', widgList)
         const stamp = new Date().getTime()
         const keys = Object.keys(widgList)
@@ -130,7 +130,7 @@ export const copyDashboard = async function (copyName: string) {
             draftState[stamp + k].trackedStocks = {}
             delete draftState[keys[k]]
         }
-        return draftState
+        // return draftState
     })
     const uniqueName = uniqueObjectnName(copyName, this.state.dashBoardData)
     let status = await new Promise((res) => {

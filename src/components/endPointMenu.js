@@ -24,7 +24,7 @@ export default class EndPointMenu extends React.Component {
 
     async showEndPointDataWidget(el, searchType){ //receives dashboard object, builds endpoint display
         const p = this.props
-        let displayWidgetList = await produce(p.dashBoardData[el].widgetlist, (draftState)=>{
+        let displayWidgetList = produce(p.dashBoardData[el].widgetlist, (draftState)=>{
             for (const w in draftState){
                 const widgetName = draftState[w].widgetHeader
                 const widgetNameDistinct = draftState[w].widgetHeader + w //creates a distinct name in case of duplicates
