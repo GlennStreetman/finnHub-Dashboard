@@ -42,7 +42,6 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
             .then((res) => {
                 const resObj: resObj = {}
                 for (const resStock of res) {
-
                     const key: string = `${resStock.dashboard}-${resStock.widget}-${resStock.security}`
                     resObj[key] = resStock
                 }
@@ -51,10 +50,12 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify(resObj),
                 };
-                fetch("/finnDashData", options) //cache finnnDash data to mongoDB.
-                    .then((response) => {
-                        return response.json()
-                    })
+                if (Object.keys(resObj).length > 0) {
+                    fetch("/finnDashData", options) //cache finnnDash data to mongoDB.
+                        .then((response) => {
+                            return response.json()
+                        })
+                }
                 return (resObj) //thunk data returned to dataModel(update stale date) and showdata(retain in redux if marked as visable).
             })
             .catch((err) => {
