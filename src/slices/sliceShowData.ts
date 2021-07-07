@@ -116,7 +116,6 @@ const showData = createSlice({
             // return {...state}
         },
         [tGetMongoDB.fulfilled.toString()]: (state, action) => {
-            console.log('tGetMongoDB', action.payload)
             const ap: any = action.payload
             for (const x in ap) { //FOR 'DB-WIdget-security' key
                 if (ap[x].dashboard === state.targetDashboard) { //if returned data should be visable

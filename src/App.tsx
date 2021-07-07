@@ -11,7 +11,7 @@ import {
     UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig,
     toggleWidgetBody, setWidgetFocus, removeDashboardFromState
 } from "./appFunctions/appImport/widgetLogic";
-import { setupDashboardObject, NewDashboard, saveDashboard }
+import { setupDashboardObject, NewDashboard, saveDashboard, copyDashboard }
     from "./appFunctions/appImport/setupDashboard";
 import { GetSavedDashBoards, GetSavedDashBoardsRes } from "./appFunctions/appImport/getSavedDashboards";
 import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
@@ -163,7 +163,6 @@ export interface AppProps {
     rRebuildTargetWidgetModel: Function,
     rUpdateQuotePriceStream: Function,
     rUpdateQuotePriceSetup: Function,
-
 }
 
 export interface AppState {
@@ -260,6 +259,7 @@ class App extends React.Component<AppProps, AppState> {
         this.newDashboard = NewDashboard.bind(this);
         this.getSavedDashBoards = GetSavedDashBoards.bind(this);
         this.saveDashboard = saveDashboard.bind(this);
+        this.copyDashboard = copyDashboard.bind(this)
 
         //app logic for MOVING widgets and snapping them into location.
         this.setDrag = SetDrag.bind(this);
@@ -490,6 +490,7 @@ class App extends React.Component<AppProps, AppState> {
                     apiKey={this.state.apiKey}
                     availableStocks={this.state.availableStocks}
                     changeWidgetName={this.changeWidgetName}
+                    copyDashboard={this.copyDashboard}
                     currentDashBoard={this.state.currentDashBoard}
                     dashBoardData={this.state.dashBoardData}
                     dashBoardMenu={this.state.dashBoardMenu}

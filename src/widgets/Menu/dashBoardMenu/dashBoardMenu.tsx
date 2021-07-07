@@ -75,16 +75,11 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
         }
     }
 
-    async function copyDashboard(dashboardName) {
-        unMountWidgets()
-        const saveDashboardAs: string = uniqueObjectnName(dashboardName.trim(), p.dashBoardData)
-        if (saveDashboardAs !== '' && saveDashboardAs !== undefined) {
-            let savedDash = await p.saveDashboard(saveDashboardAs)
-            if (savedDash === true) {
-                await p.rebuildDashboardState()
-                // p.refreshFinnhubAPIDataCurrentDashboard()
-            }
-
+    async function copyDashboardFunction(dashboardName) {
+        unMountWidgets() //removes visable data from redux.state.showData
+        if (dashboardName !== '' && dashboardName !== undefined) {
+            await p.copyDashboard(dashboardName)
+            await p.rebuildDashboardState()
         } else {
             setInputText('Enter Name')
         }
@@ -182,7 +177,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                         aria-hidden="true"
                         type="submit"
                         onClick={() => {
-                            copyDashboard(`${dashBoardData[el].dashboardname}`)
+                            copyDashboardFunction(`${dashBoardData[el].dashboardname}`)
                         }}
                     />
                 </td>}
@@ -258,6 +253,7 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
     let propList = {
         getSavedDashBoards: that.props.getSavedDashBoards,
         dashBoardData: that.props.dashBoardData,
+        copyDashboard: that.props.copyDashboard,
         currentDashBoard: that.props.currentDashBoard,
         saveDashboard: that.props.saveDashboard,
         newDashBoard: that.props.newDashboard,

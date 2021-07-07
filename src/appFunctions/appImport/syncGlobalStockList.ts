@@ -17,16 +17,16 @@ export const syncGlobalStockList = async function () {
     this.setState({ dashBoardData: updatedWidgetList }, async () => {
         console.log('Dashboard setup')
         this.rebuildVisableDashboard()
-        let savedDash: boolean = await this.saveDashboard(this.state.currentDashBoard) //saves dashboard setup to server
-        if (savedDash === true) {
-            if (Object.keys(this.state.globalStockList)[0] !== undefined) {
-                await this.setSecurityFocus(Object.keys(this.state.globalStockList)[0]) //await set focus
-                console.log('security focus set')
-                this.refreshFinnhubAPIDataCurrentDashboard()
-                return true
-            } else {
-                return true
-            }
+        this.saveDashboard(this.state.currentDashBoard) //saves dashboard setup to server
+        // if (savedDash === true) {
+        if (Object.keys(this.state.globalStockList)[0] !== undefined) {
+            await this.setSecurityFocus(Object.keys(this.state.globalStockList)[0]) //await set focus
+            console.log('security focus set')
+            this.refreshFinnhubAPIDataCurrentDashboard()
+            return true
+        } else {
+            return true
         }
+        // }
     });
 }
