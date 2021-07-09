@@ -190,7 +190,6 @@ const dataModel = createSlice({
                 }
             }
             state.dataSet[dashboardName][w] = stockUpdate
-            // state.status[dashboardName] = 'Updating'
 
         },
         rResetUpdateFlag: (state: sliceDataModel) => {

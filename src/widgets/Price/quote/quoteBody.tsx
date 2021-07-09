@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { useDragCopy } from './../../widgetHooks/useDragCopy'
 import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
+import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
 
 import { dStock } from './../../../appFunctions/formatStockSymbols'
 
@@ -86,6 +87,7 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
     useDragCopy(ref, { stockData: stockData, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
+    useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey) //sets security focus in config. Used for redux.visable data and widget excel templating.
 
     useEffect(() => { //CREATE STOCK DATA
 

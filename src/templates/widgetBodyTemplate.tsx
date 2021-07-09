@@ -8,7 +8,7 @@ import { useDragCopy } from './../widgets/widgetHooks/useDragCopy'
 import { useSearchMongoDb } from './../widgets/widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from './../widgets/widgetHooks/useBuildVisableData'
 import { useStartingFilters } from './../widgets/widgetHooks/useStartingFilters'
-
+import { useUpdateFocus } from './../widgets/widgetHooks/useUpdateFocus'
 import StockSearchPane, { searchPaneProps } from "../components/stockSearchPaneFunc";
 
 import { dStock } from './../appFunctions/formatStockSymbols'
@@ -87,7 +87,7 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
     }, [start, end])
 
     useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    
+    useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey) //sets security focus in config. Used for redux.visable data and widget excel templating.
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
@@ -197,13 +197,5 @@ export function NewWidgetProps(that, key = "newWidgetNameProps") {
         targetSecurity: that.props.targetSecurity,
     };
     return propList;
-}
-
-//rename
-export const priceSplitsFilters: object = { //IF widget uses filters remember to define default filters here and add to topNavReg as 5th paramater.
-    // startDate: -604800 * 1000 * 52 * 20, //20 years
-    // endDate: 0,
-    //... additional filters...
-    // "Description": 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
 }
 

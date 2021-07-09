@@ -10,6 +10,7 @@ import { useDragCopy } from './../../widgetHooks/useDragCopy'
 import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
 import { useStartingFilters } from './../../widgetHooks/useStartingFilters'
+import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
 
 import { dStock } from './../../../appFunctions/formatStockSymbols'
 
@@ -95,6 +96,7 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
     useSearchMongoDb(p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
+    useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey) //sets security focus in config. Used for redux.visable data and widget excel templating.	
 
     useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
         if (filters['startDate'] === undefined) { //if filters not saved to props
