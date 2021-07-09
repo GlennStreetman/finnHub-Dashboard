@@ -60,10 +60,17 @@ label {
 
 .centerTE {
   text-align: center;
+  white-space: nowrap;
+}
+
+.leftTE {
+  text-align: left;
+  white-space: nowrap;
 }
 
 .rightTE {
   text-align: right;
+  white-space: nowrap;
 }
 
 .rightTEFade {
@@ -72,9 +79,7 @@ label {
   animation-duration: 3s;
 }
 
-.leftTE {
-  text-align: left;
-}
+
 
 .centerBottomTE {
   text-align: center;

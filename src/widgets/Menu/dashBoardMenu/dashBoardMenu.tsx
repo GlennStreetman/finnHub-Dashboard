@@ -1,6 +1,6 @@
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { useAppSelector } from '../../../hooks';
-import { uniqueObjectnName } from './../../../appFunctions/stringFunctions'
+// import { uniqueObjectnName } from './../../../appFunctions/stringFunctions'
 
 import { useAppDispatch } from './../../../hooks';
 import { rUnmountWidget } from './../../../slices/sliceShowData'
@@ -169,7 +169,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                 </>
             }
 
-            <td>{dashboardStatus?.[dashBoardData[el].dashboardname]}</td>
+            <td>{dashboardStatus?.[dashBoardData[el].dashboardname] !== 0 ? dashboardStatus?.[dashBoardData[el].dashboardname] + ' Open API Calls' : 'Ready'}</td>
             {p.showEditPane === 1 &&
                 <td>
                     <button
@@ -187,20 +187,20 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     return (
         <div className="dashBoardMenu" data-testid="dashboardMenu" >
             <div>
-                <table>
+                <table className='dataTable'>
                     <thead>
                         <tr>
                             {p.showEditPane === 1 ?
                                 <>
                                     <td className="centerTE">Remove</td>
                                     <td className="centerTE">Description</td>
-                                    <td className="centerTE">Status</td>
+                                    <td className="leftTE">Status</td>
                                     <td className="centerTE">Copy</td>
                                 </> :
                                 <>
                                     <td className="centerTE">Display</td>
                                     <td className="centerTE">Description</td>
-                                    <td className="centerTE">Status</td>
+                                    <td className="leftTE">Status</td>
                                 </>
                             }
 

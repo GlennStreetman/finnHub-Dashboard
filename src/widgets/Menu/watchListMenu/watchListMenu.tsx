@@ -57,7 +57,7 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
                 <tr key={el + "row"}>
                     {p.showEditPane === 0 &&
                         <>
-                            <td><input
+                            <td className='centerTE'><input
                                 type="radio"
                                 key={el + 'radio'}
                                 checked={p.targetSecurity === g[el].key}
@@ -65,12 +65,6 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
                                     p.setWidgetFocus(g[el].key)
                                     p.setSecurityFocus(g[el].key)
                                 }} /></td>
-                            <td key={el + "symb"}>
-                                {dStock(g[el], p.exchangeList)}
-                            </td>
-                            <td className="leftTE" key={el + 'desc'}>
-                                {g[el].description}
-                            </td>
                             <td className="rightTEFade" key={el + "prc" + returnKey(rShowData[el])}>
                                 {rShowData[el] ? (
                                     rShowData[el] !== undefined &&
@@ -82,6 +76,13 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
                                     <></>
                                 )}
                             </td>
+                            <td className='centerTE' key={el + "symb"}>
+                                {dStock(g[el], p.exchangeList)}
+                            </td>
+                            <td className="leftTE" key={el + 'desc'}>
+                                {g[el].description}
+                            </td>
+
 
                         </>
                     }
@@ -100,9 +101,9 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
                             </td>
                             <td className="centerTE">{g[el]['exchange']}</td>
                             <td className="centerTE">{g[el]['symbol']}</td>
-                            <td className="leftTe">{g[el]['description']}</td>
+                            <td className="leftTE">{g[el]['description']}</td>
                             <td className="centerTE">{g[el]['currency']}</td>
-                            <td className="leftTe">{g[el]['figi']}</td>
+                            <td className="leftTE">{g[el]['figi']}</td>
                             <td className="rightTE">{g[el]['mic']}</td>
                         </>
                     }
@@ -177,23 +178,22 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
                         </button>
                         <ToolTip textFragment={syncText} hintName='sw' /> <br />
                     </div>
-
                 </>
             )}
             <div >
                 {p.showEditPane !== 1 && (<>{React.createElement(StockSearchPane, searchPaneProps(p))}</>)}
             </div>
 
-            <div className='.widgetTableDiv' style={{ overflow: 'scroll' }}>
-                <table className='widgetBodyTable'>
+            <div className='scrollableDiv'>
+                <table className='dataTable'>
                     <thead>
                         <tr>
                             {p.showEditPane === 0 &&
                                 <>
                                     <td className="centerTE">Focus</td>
+                                    <td className="centerTE">Price</td>
                                     <td className="centerTE">Symbol</td>
                                     <td className="centerTE">Name</td>
-                                    <td className="centerTE">Price</td>
                                 </>
                             }
                             {p.showEditPane === 1 &&
@@ -205,7 +205,6 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
                                     <td className="centerTE">Currency</td>
                                     <td className="centerTE">FIGI</td>
                                     <td className="centerTE">MIC</td>
-
                                 </>
                             }
                         </tr>

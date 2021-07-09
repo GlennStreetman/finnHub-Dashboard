@@ -156,8 +156,8 @@ function FundamentalsSECFilings(p: { [key: string]: any }, ref: any) {
         const stockDataTable = (
             <>
                 {symbolSelectorDropDown}
-                <div>
-                    <table>
+                <div className='scrollableDiv'>
+                    <table className='dataTable'>
                         <thead>
                             <tr>
                                 <td>Heading</td>

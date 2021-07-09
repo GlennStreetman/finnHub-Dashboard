@@ -117,8 +117,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         const row = stockList.map((el) =>
             p.showEditPane === 1 ? (
                 <tr key={el + "container"}>
-                    <td key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
-                    <td key={el + "buttonC"}>
+                    <td className="centerTE" key={el + "buttonC"}>
                         <button
                             data-testid={`remove-${el}`}
                             key={el + "button"}
@@ -129,15 +128,27 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                             <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
                         </button>
                     </td>
+                    <td className='centerTE' key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
+                    <td className='leftTE'>{p.trackedStocks[el].description}</td>
+
                 </tr>
             ) : (
                 <tr key={el + "pass"}></tr>
             )
         );
         let stockListTable = (
-            <table>
-                <tbody>{row}</tbody>
-            </table>
+            <div className='scrollableDiv'>
+                <table className='dataTable'>
+                    <thead>
+                        <tr>
+                            <td>Remove</td>
+                            <td>Symbol</td>
+                            <td>Name</td>
+                        </tr>
+                    </thead>
+                    <tbody>{row}</tbody>
+                </table>
+            </div>
         );
         return <>{stockListTable}</>;
     }
@@ -188,7 +199,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                 const val: any = typeof el[1] !== 'object' ? el[1] : <></>
                 return (
                     <tr key={el[0] + p.config.pagination}>
-                        <td>{convertCamelToProper(el[0])}</td>
+                        <td className='rightTE'>{convertCamelToProper(el[0])}: &nbsp;&nbsp;</td>
                         <td>{val}</td>
                     </tr>
                 )
@@ -209,17 +220,19 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                 <button onClick={() => changeIncrememnt(1)}>
                     <i className="fa fa-forward" aria-hidden="true"></i>
                 </button>
-                <table>
-                    <thead>
-                        <tr>
-                            <td>Heading</td>
-                            <td>Value</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {mapstockDataNode}
-                    </tbody>
-                </table>
+                <div className='scrollableDiv'>
+                    <table className='dataTable'>
+                        <thead>
+                            <tr>
+                                <td>Heading</td>
+                                <td>Value</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {mapstockDataNode}
+                        </tbody>
+                    </table>
+                </div>
             </>
         return stockTable
     }

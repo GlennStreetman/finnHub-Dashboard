@@ -128,27 +128,36 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
         const stockList = Object.keys(p.trackedStocks);
         const stockListRows = stockList.map((el) =>
             <tr key={el + "container"}>
-                <td key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
-                <td key={el + "buttonC"}>
+                <td className="centerTE" key={el + "buttonC"}>
                     <button
                         data-testid={`remove-${el}`}
                         key={el + "button"}
                         onClick={() => {
-                            p.updateWidgetStockList(p.widgetKey, el);
+                            p.updateWidgetList(el);
                         }}
                     >
                         <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
                     </button>
                 </td>
+                <td className='centerTE' key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
+                <td className='leftTE'>{p.trackedStocks[el].description}</td>
             </tr>
         )
 
         let searchForm = (
             <>
-
-                <table>
-                    <tbody>{stockListRows}</tbody>
-                </table>
+                <div className='scrollableDiv'>
+                    <table className='dataTable'>
+                        <thead>
+                            <tr>
+                                <td>Remove</td>
+                                <td>Symbol</td>
+                                <td>Name</td>
+                            </tr>
+                        </thead>
+                        <tbody>{stockListRows}</tbody>
+                    </table>
+                </div>
             </>
         );
         return searchForm
@@ -160,7 +169,7 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
         let stockDetailRow = widgetStockList.map((el) =>
             pd[el] ? (
                 <tr key={el + "st" + + pd[el]["currentPrice"]}>
-                    <td key={el + "id"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
+                    <td className='rightTE' key={el + "id"}>{dStock(p.trackedStocks[el], p.exchangeList)}: </td>
                     <td className="rightTE" key={el + "prevClosePrice"}>
                         {pd[el]["prevClosePrice"].toLocaleString(undefined, {
                             minimumFractionDigits: 2,
@@ -213,31 +222,33 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
             )
         );
         let buildTable = (
-            <table className="widgetBodyTable" key={p.widgetKey + "id"}>
-                <thead key={p.widgetKey + "head"}>
-                    <tr key={p.widgetKey + "tr"}>
-                        <td key={p.widgetKey + "stock"}>Symbole:</td>
-                        <td className="centerTE" key={p.widgetKey + "close"}>
-                            Prev Close
-                        </td>
-                        <td className="centerTE" key={p.widgetKey + "open"}>
-                            Day Open
-                        </td>
-                        <td className="centerTE" key={p.widgetKey + "low"}>
-                            Day Low
-                        </td>
-                        <td className="centerTE" key={p.widgetKey + "high"}>
-                            Day High
-                        </td>
-                        <td className="centerTE" key={p.widgetKey + "price"}>
-                            Price
-                        </td>
+            <div className='scrollableDiv'>
+                <table className="dataTable" key={p.widgetKey + "id"}>
+                    <thead key={p.widgetKey + "head"}>
+                        <tr key={p.widgetKey + "tr"}>
+                            <td key={p.widgetKey + "stock"}>Symbole</td>
+                            <td className="centerTE" key={p.widgetKey + "close"}>
+                                Prev<br /> Close
+                            </td>
+                            <td className="centerTE" key={p.widgetKey + "open"}>
+                                Day<br /> Open
+                            </td>
+                            <td className="centerTE" key={p.widgetKey + "low"}>
+                                Day<br /> Low
+                            </td>
+                            <td className="centerTE" key={p.widgetKey + "high"}>
+                                Day<br /> High
+                            </td>
+                            <td className="centerTE" key={p.widgetKey + "price"}>
+                                Price
+                            </td>
 
-                        {p.showEditPane === 1 ? <td key={p.widgetKey + "remove"}>Remove</td> : <></>}
-                    </tr>
-                </thead>
-                <tbody key={p.widgetKey + "body"}>{stockDetailRow}</tbody>
-            </table>
+                            {p.showEditPane === 1 ? <td key={p.widgetKey + "remove"}>Remove</td> : <></>}
+                        </tr>
+                    </thead>
+                    <tbody key={p.widgetKey + "body"}>{stockDetailRow}</tbody>
+                </table>
+            </div>
         );
         return buildTable;
     }

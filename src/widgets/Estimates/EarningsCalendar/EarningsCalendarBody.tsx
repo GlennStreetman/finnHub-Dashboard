@@ -148,17 +148,19 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
         const stockList = Object.keys(p.trackedStocks);
         const stockListRows = stockList.map((el) =>
             <tr key={el + "container"}>
-                <td key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
-                <td key={el + "buttonC"}>
-                    <button data-testid={`remove-${el}`}
+                <td className="centerTE" key={el + "buttonC"}>
+                    <button
+                        data-testid={`remove-${el}`}
                         key={el + "button"}
                         onClick={() => {
-                            p.updateWidgetStockList(p.widgetKey, el);
+                            p.updateWidgetList(el);
                         }}
                     >
                         <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
                     </button>
                 </td>
+                <td className='centerTE' key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
+                <td className='leftTE'>{p.trackedStocks[el].description}</td>
             </tr>
         )
 
@@ -173,9 +175,18 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
                         <input className="btn" id="end" type="date" name="endDate" onChange={updateEndDate} onBlur={updateFilter} value={end}></input>
                     </form>
                 </div>
-                <table>
-                    <tbody>{stockListRows}</tbody>
-                </table>
+                <div className='scrollableDiv'>
+                    <table className='dataTable'>
+                        <thead>
+                            <tr>
+                                <td>Remove</td>
+                                <td>Symbol</td>
+                                <td>Name</td>
+                            </tr>
+                        </thead>
+                        <tbody>{stockListRows}</tbody>
+                    </table>
+                </div>
             </>
         );
         return searchForm
@@ -183,11 +194,11 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
 
     function stockTable() {
         let tableData = rShowData && rShowData?.[pagination] ? Object.entries(rShowData[pagination]).map((el) => {
-            const heading = el[0] ? el[0] : ''
+            const heading = el[0] ? `${el[0]}` : ''
             const value = el[1] ? el[1] : ''
             return <tr key={"row" + heading + pagination}>
-                <td className='rightTE' key={"name" + heading}>{convertCamelToProper(el[0])}</td>
-                <td className='rightTE' key={"vale" + value}>{value}</td>
+                <td className='rightTE' key={"name" + heading}>{convertCamelToProper(el[0])}: &nbsp;&nbsp;</td>
+                <td className='leftTE' key={"vale" + value}>{value}</td>
             </tr>
         }) : <></>
         return tableData
@@ -221,15 +232,17 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
                         <i className="fa fa-forward" aria-hidden="true"></i>
                     </button>
                 </div>
-                <table>
-                    <thead>
-                        <tr>
-                            <td>Heading</td>
-                            <td>Value</td>
-                        </tr>
-                    </thead>
-                    <tbody>{stockTable()}</tbody>
-                </table>
+                <div className='scrollableDiv'>
+                    <table className='dataTable'>
+                        <thead>
+                            <tr>
+                                <td>Heading</td>
+                                <td>Value</td>
+                            </tr>
+                        </thead>
+                        <tbody>{stockTable()}</tbody>
+                    </table>
+                </div>
             </>
         );
         return symbolSelectorDropDown;

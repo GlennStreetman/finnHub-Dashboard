@@ -94,7 +94,7 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
     }
 
     function shortHeadline(headline) {
-        let shortHeadLine = headline.slice(0, 48) + "...";
+        let shortHeadLine = headline.slice(0, 128) + "...";
         return shortHeadLine;
     }
 
@@ -117,8 +117,8 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
         let newsSlice = Array.isArray(rShowData) === true ? rShowData.slice(newStart, newsEnd) : [];
         let mapNews = newsSlice.map((el, index) => (
             <tr key={el + "newsRow" + index}>
-                <td key={el + "newsSource"}>{formatSourceName(el["source"])}</td>
-                <td key={el + "newsHeadline"}>
+                <td className='rightTE' key={el + "newsSource"}>{formatSourceName(el["source"])}: &nbsp;&nbsp;</td>
+                <td className='leftTE' key={el + "newsHeadline"}>
                     <a key={el + "newsUrl"} href={el["url"]} target="_blank" rel="noopener noreferrer">
                         {shortHeadline(el["headline"])}
                     </a>
@@ -127,12 +127,12 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
         ));
 
         let thisnewsTable = (
-            <div className="newsBody">
-                <table>
+            <div className='scrollableDiv'>
+                <table className='dataTable'>
                     <thead>
                         <tr>
                             <td>Source</td>
-                            <td>Headline</td>
+                            <td className='leftTE'>Headline</td>
                         </tr>
                     </thead>
                     <tbody>{mapNews}</tbody>

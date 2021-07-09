@@ -84,25 +84,35 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
         const stockList = Object.keys(p.trackedStocks);
         const stockListRows = stockList.map((el) =>
             <tr key={el + "container"}>
-                <td key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
-                <td key={el + "buttonC"}>
+                <td className="centerTE" key={el + "buttonC"}>
                     <button
                         data-testid={`remove-${el}`}
                         key={el + "button"}
                         onClick={() => {
-                            p.updateWidgetStockList(p.widgetKey, el);
+                            p.updateWidgetList(el);
                         }}
                     >
                         <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
                     </button>
                 </td>
+                <td className='centerTE' key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
+                <td className='leftTE'>{p.trackedStocks[el].description}</td>
             </tr>
         )
 
         let stockTable = (
-            <table>
-                <tbody>{stockListRows}</tbody>
-            </table>
+            <div className='scrollableDiv'>
+                <table className='dataTable'>
+                    <thead>
+                        <tr>
+                            <td>Remove</td>
+                            <td>Symbol</td>
+                            <td>Name</td>
+                        </tr>
+                    </thead>
+                    <tbody>{stockListRows}</tbody>
+                </table>
+            </div>
         );
         return stockTable
     }
@@ -131,12 +141,14 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
             <select className="btn" value={p.config.targetSecurity} onChange={changeStockSelection}>
                 {newSymbolList}
             </select>
-            <table>
-                <thead><tr><td>Symbol</td><td>Description</td></tr></thead>
-                <tbody>
-                    {stockDataRows}
-                </tbody>
-            </table>
+            <div className='scrollableDiv'>
+                <table className='dataTable'>
+                    <thead><tr><td>Symbol</td><td>Description</td></tr></thead>
+                    <tbody>
+                        {stockDataRows}
+                    </tbody>
+                </table>
+            </div>
         </>
     }
 

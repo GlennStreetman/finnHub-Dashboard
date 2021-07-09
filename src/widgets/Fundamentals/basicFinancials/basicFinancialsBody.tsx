@@ -297,7 +297,8 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                     </button>
                 </div>
                 <div>{metricsTable()}</div>
-            </>)
+            </>
+        )
         return metricSelector
     }
 
@@ -372,11 +373,13 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
             let mapStockSelection = stockSelectionSlice.map((el, index) => (
                 <tr key={el + "metricRow" + index}>
-                    <td key={el + "metricdesc"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
-                    <td><input type='radio' name='sourceStock' checked={p.config.targetSecurity === el} onChange={() => changeSource(el)} /></td>
                     <td key={el + "remove"}>
                         <button data-testid={`remove-${el}`} onClick={() => { updateWidgetList(el); }}><i className="fa fa-times" aria-hidden="true" /></button>
                     </td>
+                    <td><input type='radio' name='sourceStock' checked={p.config.targetSecurity === el} onChange={() => changeSource(el)} /></td>
+                    <td className='leftTE' key={el + "metricdesc"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
+                    <td className='leftTE'>{p.trackedStocks[el].description}</td>
+
 
                 </tr>
             ));
@@ -385,9 +388,10 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 if (symbolView === 1) {
                     return (
                         <>
-                            <td>Stock</td>
-                            <td>Source</td>
                             <td>Remove</td>
+                            <td>Source</td>
+                            <td>Stock</td>
+                            <td>Name</td>
                         </>
                     )
                 } else if (orderView === 0) {
@@ -529,8 +533,8 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             )
             let bodyRows = Object.keys(p.trackedStocks).map((el) => {
                 return (
-                    <tr key={thisKey + el + "tr1"}>
-                        <td key={thisKey + el + "td1"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
+                    <tr className='centerTE' key={thisKey + el + "tr1"}>
+                        <td className='rightTE' key={thisKey + el + "td1"}>{dStock(p.trackedStocks[el], p.exchangeList)}: &nbsp;&nbsp;</td>
                         {mapStockData(el)}
                     </tr>
                 )
@@ -539,10 +543,10 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 <div data-testid='metricsSelectors' className="widgetTableDiv">
                     {bodySelector()}
 
-                    <table className='widgetBodyTable'>
+                    <table className='dataTable'>
                         <thead>
-                            <tr>
-                                <td data-testid='symbolLabel' className='centerBottomTE'>Symbol:</td>
+                            <tr className='rightTE'>
+                                <td data-testid='symbolLabel' className='centerBottomTE'>Symbol</td>
                                 {headerRows}
                             </tr>
                         </thead>

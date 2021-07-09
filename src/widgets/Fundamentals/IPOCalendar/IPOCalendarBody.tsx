@@ -131,8 +131,8 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
         if (data !== undefined) {
             let tableData = Object.keys(data).map((el) =>
                 <tr key={"row" + el}>
-                    <td key={"heading" + el}>{convertCamelToProper(el)}</td>
-                    <td key={"value" + el}>{data[el]}</td>
+                    <td className='rightTE' key={"heading" + el}>{convertCamelToProper(el)}:&nbsp;&nbsp;</td>
+                    <td className='leftTE' key={"value" + el}>{data[el]}</td>
                 </tr>
             )
             return tableData
@@ -154,15 +154,18 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
                     </div>
                     <div>
                         {rShowData !== undefined &&
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <td>Heading</td>
-                                        <td>Value</td>
-                                    </tr>
-                                </thead>
-                                <tbody>{stockTable(currentFiling)}</tbody>
-                            </table>}
+                            <div className='scrollableDiv'>
+                                <table className='dataTable'>
+                                    <thead>
+                                        <tr>
+                                            <td>Heading</td>
+                                            <td>Value</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>{stockTable(currentFiling)}</tbody>
+                                </table>
+                            </div>}
+
                     </div>
 
                 </>

@@ -70,11 +70,10 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
 
     function renderSearchPane() {
         const stockList = Object.keys(p.trackedStocks);
-        let row = stockList.map((el) =>
+        let stockListRows = stockList.map((el) =>
             p.showEditPane === 1 ? (
                 <tr key={el + "container"}>
-                    <td key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
-                    <td key={el + "buttonC"}>
+                    <td className="centerTE" key={el + "buttonC"}>
                         <button
                             data-testid={`remove-${el}`}
                             key={el + "button"}
@@ -85,15 +84,26 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
                             <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
                         </button>
                     </td>
+                    <td className='centerTE' key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
+                    <td className='leftTE'>{p.trackedStocks[el].description}</td>
                 </tr>
             ) : (
                 <tr key={el + "pass"}></tr>
             )
         );
         let stockListTable = (
-            <table>
-                <tbody>{row}</tbody>
-            </table>
+            <div className='scrollableDiv'>
+                <table className='dataTable'>
+                    <thead>
+                        <tr>
+                            <td>Remove</td>
+                            <td>Symbol</td>
+                            <td>Name</td>
+                        </tr>
+                    </thead>
+                    <tbody>{stockListRows}</tbody>
+                </table>
+            </div>
         );
         return <>{stockListTable}</>;
     }
@@ -116,8 +126,8 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
             if (typeof el[1] !== 'object') {
                 return (
                     <tr key={`${el[0]}-${el[1]}`}>
-                        <td key={`${el[0]}-${el[1]}2`}    >{convertCamelToProper(el[0])}: </td>
-                        <td key={`${el[0]}-${el[1]}3`}   >{el[1]}</td>
+                        <td className="rightTE" key={`${el[0]}-${el[1]}2`}    >{convertCamelToProper(el[0])}:&nbsp;&nbsp;   </td>
+                        <td className="centerTE" key={`${el[0]}-${el[1]}3`}   >{el[1]}</td>
                     </tr>
                 )
             } else { return (<tr key={`${el[0]}-${el[1]}4`}></tr>) }
@@ -129,8 +139,8 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
                     {newSymbolList}
                 </select>
                 <br />
-                <table>
-                    <thead><tr><td>Metric</td><td>Value</td></tr></thead>
+                <table className='dataTable'>
+                    <thead><tr><td>Metrics</td><td>Value</td></tr></thead>
                     <tbody>{dataRows}</tbody>
                 </table>
             </>

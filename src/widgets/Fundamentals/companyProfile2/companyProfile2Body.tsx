@@ -60,8 +60,7 @@ function FundamentalsCompanyProfile2(p: { [key: string]: any }, ref: any) {
         let row = stockList.map((el) =>
             p.showEditPane === 1 ? (
                 <tr key={el + "container"}>
-                    <td key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
-                    <td key={el + "buttonC"}>
+                    <td className="centerTE" key={el + "buttonC"}>
                         <button
                             data-testid={`remove-${el}`}
                             key={el + "button"}
@@ -72,15 +71,26 @@ function FundamentalsCompanyProfile2(p: { [key: string]: any }, ref: any) {
                             <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
                         </button>
                     </td>
+                    <td className='centerTE' key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
+                    <td className='leftTE'>{p.trackedStocks[el].description}</td>
                 </tr>
             ) : (
                 <tr key={el + "pass"}></tr>
             )
         );
         let stockListTable = (
-            <table>
-                <tbody>{row}</tbody>
-            </table>
+            <div className='scrollableDiv'>
+                <table className='dataTable'>
+                    <thead>
+                        <tr>
+                            <td>Remove</td>
+                            <td>Symbol</td>
+                            <td>Name</td>
+                        </tr>
+                    </thead>
+                    <tbody>{row}</tbody>
+                </table>
+            </div>
         );
         return stockListTable;
     }

@@ -133,18 +133,19 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
         const stockList = Object.keys(p.trackedStocks);
         const stockListRows = stockList.map((el) =>
             <tr key={el + "container"}>
-                <td key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
-                <td key={el + "buttonC"}>
+                <td className="centerTE" key={el + "buttonC"}>
                     <button
                         data-testid={`remove-${el}`}
                         key={el + "button"}
                         onClick={() => {
-                            p.updateWidgetStockList(p.widgetKey, el);
+                            p.updateWidgetList(el);
                         }}
                     >
                         <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
                     </button>
                 </td>
+                <td className='centerTE' key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
+                <td className='leftTE'>{p.trackedStocks[el].description}</td>
             </tr>
         )
 
@@ -159,9 +160,18 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
                         <input className="btn" id="end" type="date" name="endDate" onChange={updateEndDate} onBlur={updateFilter} value={end}></input>
                     </form>
                 </div>
-                <table>
-                    <tbody>{stockListRows}</tbody>
-                </table>
+                <div className='scrollableDiv'>
+                    <table className='dataTable'>
+                        <thead>
+                            <tr>
+                                <td>Remove</td>
+                                <td>Symbol</td>
+                                <td>Name</td>
+                            </tr>
+                        </thead>
+                        <tbody>{stockListRows}</tbody>
+                    </table>
+                </div>
             </>
         );
         return searchForm
@@ -174,9 +184,9 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
             let tableData = sortedData.map((el) => {
 
                 return <tr key={"row" + el.date}>
-                    <td>{el.date}</td>
-                    <td>{el.fromFactor}</td>
-                    <td>{el.toFactor}</td>
+                    <td className='centerTE'>{el.date}</td>
+                    <td className='centerTE'>{el.fromFactor}</td>
+                    <td className='centerTE'>{el.toFactor}</td>
                 </tr>
 
             })
@@ -208,16 +218,18 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
                         </select>
                         {rShowData?.message ? <>{rShowData.message}</> : <></>}
                     </div>
-                    <table>
-                        <thead>
-                            <tr>
-                                <td>Date</td>
-                                <td>From:</td>
-                                <td>To:</td>
-                            </tr>
-                        </thead>
-                        <tbody>{stockTable()}</tbody>
-                    </table>
+                    <div className='scrollableDiv'>
+                        <table className='dataTable'>
+                            <thead>
+                                <tr>
+                                    <td className='centerTE'>Date</td>
+                                    <td className='centerTE'>From</td>
+                                    <td className='centerTE'>To</td>
+                                </tr>
+                            </thead>
+                            <tbody>{stockTable()}</tbody>
+                        </table>
+                    </div>
                 </>
             );
             return symbolSelectorDropDown;

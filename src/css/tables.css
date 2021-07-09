@@ -1,0 +1,10 @@
+.dataTable {
+    width: 99%;
+    height: 100%;
+    overflow: auto
+}
+
+.scrollableDiv {
+        overflow:auto;
+
+}
