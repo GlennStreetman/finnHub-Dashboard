@@ -1,5 +1,5 @@
 import produce from "immer"
-import { reqBody } from '../../server/routes/mongoDB/setMongoFilters'
+import { reqBody } from '../../server/routes/mongoDB/setMongoConfig'
 import { AppState, AppProps, menuList, widget, dashBoardData, widgetList, stockList, stock, filters, config } from './../../App'
 import { rBuildDataModelPayload, rebuildTargetWidgetPayload } from '../../slices/sliceDataModel'
 import { tgetFinnHubDataReq } from './../../thunks/thunkFetchFinnhub'
@@ -215,23 +215,25 @@ export const updateWidgetConfig = function (widgetID: number, updateObj: config)
 
     const payload: Partial<AppState> = { dashBoardData: updatedDashboardData }
     this.setState(payload, () => {
-        if (this.state.enableDrag !== true) this.saveDashboard(this.state.currentDashBoard)
-        const updatedWidgetFilters = updatedDashboardData[s.currentDashBoard].widgetlist[widgetID].config
-        const postBody: reqBody = {
-            widget: widgetID,
-            filters: updatedWidgetFilters,
-        }
-        const options = {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(postBody),
-        };
+        if (this.state.enableDrag !== true) {
+            this.saveDashboard(this.state.currentDashBoard)
+            const updatedWidgetFilters = updatedDashboardData[s.currentDashBoard].widgetlist[widgetID].config
+            const postBody: reqBody = {
+                widget: widgetID,
+                config: updatedWidgetFilters,
+            }
+            const options = {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(postBody),
+            };
 
-        fetch("/updateGQLFilters", options)
-            .then((response) => { return response.json() })
-            .then(() => {
-                console.log('finndash widget config updated in mongoDB.')
-            })
+            fetch("/updateGQLConfig", options)
+                .then((response) => { return response.json() })
+                .then(() => {
+                    console.log('finndash widget config updated in mongoDB.')
+                })
+        }
     })
 }
 

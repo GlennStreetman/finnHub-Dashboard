@@ -5,7 +5,7 @@ const router = express.Router();
 
 export interface reqBody {
     widget: number,
-    filters: Object,
+    config: Object,
 }
 
 interface session {
@@ -18,9 +18,9 @@ interface thisSession extends Request {
     body: any
 }
 
-//updates filters for matching userID and widetID
+//updates config for matching userID and widetID
 //{widget: int, filters: {}}
-router.post("/updateGQLFilters", async (req: thisSession, res: any) => {
+router.post("/updateGQConfigs", async (req: thisSession, res: any) => {
     if (req.session.login === true) {
         console.log("setting MongoDB widget filters.")
         try {
@@ -38,7 +38,7 @@ router.post("/updateGQLFilters", async (req: thisSession, res: any) => {
 
             const update = {
                 $set: {
-                    config: updateData.filters
+                    config: updateData.config
                 }
             }
             await dataSet.updateMany(query, update)

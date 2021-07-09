@@ -46,7 +46,7 @@ import deleeteSavedDashboard from './routes/loggedIn/deleteSavedDashboard.js'
 import finnHubData from './routes/mongoDB/finnHubData.js'
 import findMongoData from './routes/mongoDB/findMongoData.js'
 import deleteFinnDashData from './routes/mongoDB/deleteMongoRecords.js'
-import updateGQLFilters from './routes/mongoDB/setMongoFilters.js'
+import updateGQLConfig from './routes/mongoDB/setMongoConfig.js'
 import renameDashboardMongo from './routes/mongoDB/renameDashboardMongo.js'
 import graphQLRedirect from './routes/graphQL.js'
 //graphQL
@@ -154,7 +154,7 @@ app.use('/', deleeteSavedDashboard)
 app.use('/', finnHubData)
 app.use('/', findMongoData)
 app.use('/', deleteFinnDashData)
-app.use('/', updateGQLFilters)
+app.use('/', updateGQLConfig)
 app.use('/', runTemplate)
 app.use('/', renameDashboardMongo)
 app.use('/', graphQLRedirect)
