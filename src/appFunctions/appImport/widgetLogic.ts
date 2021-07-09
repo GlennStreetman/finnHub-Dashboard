@@ -1,7 +1,8 @@
 import produce from "immer"
 import { reqBody } from '../../server/routes/mongoDB/setMongoFilters'
 import { AppState, AppProps, menuList, widget, dashBoardData, widgetList, stockList, stock, filters, config } from './../../App'
-import { rBuildDataModelPayload } from '../../slices/sliceDataModel'
+import { rBuildDataModelPayload, rebuildTargetWidgetPayload } from '../../slices/sliceDataModel'
+import { tgetFinnHubDataReq } from './../../thunks/thunkFetchFinnhub'
 
 export const NewMenuContainer = function newMenuContainer(widgetDescription: string, widgetHeader: string, widgetConfig: string) {
     const s: AppState = this.state
@@ -27,7 +28,7 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
     //receives info for new widget. Returns updated widgetlist & dashboard data
     // console.log("NEW WIDGET:", widgetDescription, widgetHeader, widgetConfig, defaultFilters)
     const s: AppState = this.state
-
+    const currentDashboard = s.currentDashBoard
     const widgetName: number = new Date().getTime();
     const widgetStockList = s.globalStockList
     const newWidget: widget = {
@@ -45,10 +46,6 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
         yAxis: 20, //prev 5 rem
     };
 
-    // const newWidgetList: widgetList = produce(s.widgetList, (draftState: widgetList) => {
-    //     draftState[widgetName] = newWidget
-    // })
-
     const currentDashBoard: string = s.currentDashBoard
     const newDashBoardData: dashBoardData = produce(s.dashBoardData, (draftState) => {
         draftState[currentDashBoard].widgetlist[widgetName] = newWidget
@@ -60,13 +57,25 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
     }
     this.setState(payload, () => {
         this.saveDashboard(s.currentDashBoard)
-
-        const payload: rBuildDataModelPayload = {
+        // let completeFunction = function () {
+        //     return new Promise((res) => { res(true) })
+        // }
+        const payload: rebuildTargetWidgetPayload = {
             apiKey: s.apiKey,
-            dashBoardData: newDashBoardData
+            dashBoardData: newDashBoardData,
+            targetDashboard: currentDashboard,
+            targetWidget: `${widgetName}`,
         }
-        this.props.rBuildDataModel(payload)
+        this.props.rRebuildTargetWidgetModel(payload)
+        let updatePayload: tgetFinnHubDataReq = {
+            targetDashBoard: currentDashboard,
+            widgetList: [`${widgetName}`],
+            finnHubQueue: s.finnHubQueue,
+            rSetUpdateStatus: this.props.rSetUpdateStatus,
+        }
+        this.props.tGetFinnhubData(updatePayload)
     });
+
 
 }
 

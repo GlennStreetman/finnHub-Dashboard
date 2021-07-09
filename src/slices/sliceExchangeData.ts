@@ -56,6 +56,7 @@ export const tGetSymbolList = createAsyncThunk(
             config: {},
             widget: 'pass',
             security: reqObj.exchange,
+            rSetUpdateStatus: (a) => { }
         }
 
         return finnHub(finnQueue, thisReq) //replace with usestate.

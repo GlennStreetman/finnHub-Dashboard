@@ -5,7 +5,7 @@ import { tGetMongoDB, getMongoRes } from '../thunks/thunkGetMongoDB'
 import { dashBoardData } from './../App'
 
 interface dataStatus {
-    [key: string]: string, //dashboard data setup status: setup in progress, updating, ready
+    [key: number]: number, //dashboard data setup status: count of open api requests.
 }
 
 interface DataNode {
@@ -64,6 +64,7 @@ export interface rRebuildTargetDashboardPayload {
     apiKey: string,
     dashBoardData: dashBoardData,
     targetDashboard: string,
+
 }
 
 export interface rRemoveDashboardPayload {
@@ -81,8 +82,6 @@ const initialState: sliceDataModel = {
     created: 'false',
 }
 
-
-
 const dataModel = createSlice({
     name: 'finnHubData',
     initialState,
@@ -95,7 +94,7 @@ const dataModel = createSlice({
             const dataModel: EndPointAPIList = {} //list of lists. Each list []
             for (const d in apD) { //for each dashboard
                 const dashboardName: string = d
-                state.status[dashboardName] = 'Setup in Progress'
+                state.status[dashboardName] = 0
                 dataModel[dashboardName] = {}
                 const widgetList = apD[d].widgetlist
                 for (const w in widgetList) {  //for each widget
@@ -160,7 +159,6 @@ const dataModel = createSlice({
                 }
             }
             state.dataSet[dashboardName] = newDashboardModel
-            state.status[dashboardName] = 'Updating'
         },
         rRebuildTargetWidgetModel: (state: sliceDataModel, action) => {
             const ap: rebuildTargetWidgetPayload = action.payload
@@ -192,7 +190,7 @@ const dataModel = createSlice({
                 }
             }
             state.dataSet[dashboardName][w] = stockUpdate
-            state.status[dashboardName] = 'Updating'
+            // state.status[dashboardName] = 'Updating'
 
         },
         rResetUpdateFlag: (state: sliceDataModel) => {
@@ -202,7 +200,7 @@ const dataModel = createSlice({
             //set the status of dashboard updates.
             const ap: setUpdateStatus = action.payload
             for (const dataSet in ap) {
-                state.status[dataSet] = ap[dataSet]
+                state.status[dataSet] = state.status[dataSet] + ap[dataSet]
             }
         },
         rDataModelLogout(state: sliceDataModel) {

@@ -331,18 +331,13 @@ class App extends React.Component<AppProps, AppState> {
         const s: AppState = this.state;
         const p: AppProps = this.props;
         await p.tGetMongoDB({ dashboard: this.state.currentDashBoard })
-        p.rSetUpdateStatus({
-            [s.currentDashBoard]: 'Updating'
-        })
         const payload: tgetFinnHubDataReq = {
             targetDashBoard: s.currentDashBoard,
             widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist),
             finnHubQueue: s.finnHubQueue,
+            rSetUpdateStatus: p.rSetUpdateStatus,
         }
         await p.tGetFinnhubData(payload)
-        p.rSetUpdateStatus({
-            [s.currentDashBoard]: 'Ready'
-        })
     }
 
     async refreshFinnhubAPIDataAll() { //queues all finnhub data to be refreshes for all dashboards.
@@ -350,32 +345,22 @@ class App extends React.Component<AppProps, AppState> {
         const p: AppProps = this.props;
         await p.tGetMongoDB()
         const targetDash: string[] = s.dashBoardData?.[s.currentDashBoard]?.widgetlist ? Object.keys(s.dashBoardData?.[s.currentDashBoard]?.widgetlist) : []
-        p.rSetUpdateStatus({
-            [s.currentDashBoard]: 'Updating'
-        })
         for (const widget in targetDash) {
-            await p.tGetFinnhubData({ //get data for default dashboard.
+            p.tGetFinnhubData({ //get data for default dashboard.
                 targetDashBoard: s.currentDashBoard,
                 widgetList: [targetDash[widget]],
                 finnHubQueue: s.finnHubQueue,
+                rSetUpdateStatus: p.rSetUpdateStatus,
             })
         }
-        p.rSetUpdateStatus({
-            [s.currentDashBoard]: 'Ready'
-        })
         const dashBoards: string[] = Object.keys(s.dashBoardData) //get data for dashboards not being shown
         for (const dash of dashBoards) {
             if (dash !== s.currentDashBoard) {
-                p.rSetUpdateStatus({
-                    [dash]: 'Updating'
-                })
                 await p.tGetFinnhubData({ //run in background, do not await.
                     targetDashBoard: dash,
                     widgetList: Object.keys(s.dashBoardData[dash].widgetlist),
                     finnHubQueue: s.finnHubQueue,
-                })
-                p.rSetUpdateStatus({
-                    [dash]: 'Ready'
+                    rSetUpdateStatus: p.rSetUpdateStatus,
                 })
             }
         }

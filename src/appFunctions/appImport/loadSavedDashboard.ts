@@ -1,6 +1,5 @@
 import { AppProps, AppState, globalStockList, widgetList } from './../../App'
 import { rSetTargetDashboardPayload } from './../../slices/sliceShowData'
-import { setUpdateStatus } from './../../slices/sliceDataModel'
 import { tgetFinnHubDataReq } from './../../thunks/thunkFetchFinnhub'
 
 export const loadSavedDashboard = function (target: string, globalStockList: globalStockList, widgetList: widgetList) {
@@ -16,23 +15,13 @@ export const loadSavedDashboard = function (target: string, globalStockList: glo
     const updateVisable = async function (that: any) {
         const s: AppState = that.state
         await that.props.tGetMongoDB({ dashboard: that.state.currentDashBoard })
-        //set updating
-        const status: setUpdateStatus = {
-            [s.currentDashBoard]: 'Updating'
-        }
-        p.rSetUpdateStatus(status)
-        //get dashboard
         const finnHubPayload: tgetFinnHubDataReq = {
             targetDashBoard: s.currentDashBoard,
             widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist),
             finnHubQueue: s.finnHubQueue,
+            rSetUpdateStatus: p.rSetUpdateStatus,
         }
         await that.props.tGetFinnhubData(finnHubPayload)
-        //set ready
-        const statusReady: setUpdateStatus = {
-            [s.currentDashBoard]: 'Ready'
-        }
-        p.rSetUpdateStatus(statusReady)
     }
     updateVisable(this)
 }

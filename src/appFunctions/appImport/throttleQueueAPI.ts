@@ -119,6 +119,8 @@ export interface throttleApiReqObj {
     config: Object,
     widget: string,
     security: string,
+    rSetUpdateStatus: Function,
+    updated?: number,
 }
 
 export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
@@ -149,6 +151,7 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                     }
                 })
                 .then((data: any) => {
+                    if (reqObj.rSetUpdateStatus) reqObj.rSetUpdateStatus({ [reqObj.dashboard]: -1 })
                     if (data.status === 429) {
                         const resObj: throttleResObj = {
                             security: reqObj.security,
@@ -216,6 +219,7 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                     }
                 })
                 .catch((error: any) => {
+                    if (reqObj.rSetUpdateStatus) reqObj.rSetUpdateStatus({ [reqObj.dashboard]: -1 })
                     console.log("finnHub error:", error.message, reqObj)
                     // console.log('request complete')
                     throttle.openRequests = throttle.openRequests -= 1

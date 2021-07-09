@@ -1,6 +1,6 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { stock } from './../App'
-import { finnHub, throttleApiReqObj, finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
+import { finnHub, finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
 
 //receives list of strings to search for.
 //pushes returned string to visableData in redux.
@@ -35,7 +35,7 @@ export const tgetQuotePrices = createAsyncThunk( //{dashboard, [securityList]}
             if (stockObj !== undefined && apiKey !== undefined && stockObj.exchange === 'US') {
                 const stockSymbol = stockObj.symbol
                 const queryString = `https://finnhub.io/api/v1/quote?symbol=${stockSymbol}&token=${apiKey}`
-                const reqObj: throttleApiReqObj = {
+                const reqObj: any = {
                     apiString: queryString,
                     widgetName: 'pass',
                     dashboard: 'pass',
@@ -43,6 +43,7 @@ export const tgetQuotePrices = createAsyncThunk( //{dashboard, [securityList]}
                     config: {},
                     widget: 'pass',
                     security: stockSymbol,
+                    rSetUpdateStatus: (a) => { }
                 }
                 const data: any = await finnHub(throttle, reqObj)
                     .catch(error => {

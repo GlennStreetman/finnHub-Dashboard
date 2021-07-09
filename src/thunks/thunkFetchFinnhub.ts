@@ -1,5 +1,5 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { finnHub, throttleResObj as queResObj, finnHubQueue } from "../appFunctions/appImport/throttleQueueAPI";
+import { finnHub, throttleResObj as queResObj, finnHubQueue, throttleApiReqObj } from "../appFunctions/appImport/throttleQueueAPI";
 
 //Receives list of widgets and checks stale dates in slice/datamodel to see if updates are needed.
 //If data is not fresh dispatch finnHub api request to throttleQueue.
@@ -8,6 +8,7 @@ export interface tgetFinnHubDataReq {
     targetDashBoard: string,
     widgetList: string[],
     finnHubQueue: finnHubQueue,
+    rSetUpdateStatus: Function,
 }
 
 export interface resObj {
@@ -17,25 +18,35 @@ export interface resObj {
 export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
     'GetFinnhubData',
     (req: tgetFinnHubDataReq, thunkAPI: any) => { //{dashboard: string, widgetList: []} //receives list of widgets from a dashboard to update.
+        console.log('tgetFinnHubDataReq req', req)
         const finnQueue = req.finnHubQueue
         const dataModel = thunkAPI.getState().dataModel.dataSet[req.targetDashBoard] //finnHubData
         const getWidgets = req.widgetList
         let requestList: Promise<any>[] = []
         for (const w of getWidgets) { //for each widget ID
+
             const thisWidget = dataModel[w]
+            console.log('getting widget', w, thisWidget)
+            let countQueue = 0
             for (const s in thisWidget) { //for each security
-                const reqObj = { ...thisWidget[s] }
-                reqObj.dashboard = req.targetDashBoard
-                reqObj.widget = w
-                reqObj.security = s
-                reqObj.config = thisWidget[s].config
+                console.log('setting up request for', thisWidget[s])
+                const reqObj: throttleApiReqObj = {
+                    ...thisWidget[s],
+                    dashboard: req.targetDashBoard,
+                    widget: w,
+                    security: s,
+                    config: thisWidget[s].config,
+                    rSetUpdateStatus: req.rSetUpdateStatus,
+                }
                 if (
                     (reqObj.updated === undefined) ||
                     (Date.now() - reqObj.updated >= 1 * 1000 * 60 * 60 * 3) //more than 3 hours old.
                 ) {
                     requestList.push(finnHub(finnQueue, reqObj))
+                    countQueue = countQueue + 1
                 }
             }
+            req.rSetUpdateStatus({ [req.targetDashBoard]: countQueue })
         }
 
         return Promise.all(requestList)
