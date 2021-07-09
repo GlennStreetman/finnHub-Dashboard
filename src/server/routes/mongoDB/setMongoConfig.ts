@@ -20,7 +20,7 @@ interface thisSession extends Request {
 
 //updates config for matching userID and widetID
 //{widget: int, filters: {}}
-router.post("/updateGQConfigs", async (req: thisSession, res: any) => {
+router.post("/updateGQLConfig", async (req: thisSession, res: any) => {
     if (req.session.login === true) {
         console.log("setting MongoDB widget filters.")
         try {

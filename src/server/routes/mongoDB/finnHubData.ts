@@ -49,8 +49,8 @@ router.get('/finnDashData', async (req: finnDashDataReq, res: any) => {
 })
 
 
-//updates MongoDB finnDash.dataset with finnhub data.
-router.post("/finnDashData", async (req: finnDashDataReq, res: any) => {
+
+router.post("/finnDashData", async (req: finnDashDataReq, res: any) => {//updates MongoDB finnDash.dataset with finnhub data.
     if (req.session.login === true) {
         try {
             const client = getDB()
