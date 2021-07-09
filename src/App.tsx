@@ -318,6 +318,13 @@ class App extends React.Component<AppProps, AppState> {
             LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
         }
 
+        const globalKeys = Object.keys(this.state.globalStockList)
+        if (this.state.targetSecurity === '' && globalKeys.length > 0) {
+            this.setState({
+                targetSecurity: globalKeys[0]
+            })
+        }
+
     }
 
     componentWillUnmount() {
