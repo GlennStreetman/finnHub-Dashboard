@@ -26,6 +26,9 @@ import { postDashboard_success_noWidgets } from '../../../server/routes/loggedIn
 import { mockFinnHubDataQuote } from '../../../appFunctions/getStockPrices.mock'
 import { mockFinnhubDataStockSymbol } from '../../../slices/sliceExchangeData.mock'
 import { logUiErrorIntercept } from '../../../server/routes/logUiError.mock'
+import { updateGLConfig_success } from '../../../server/routes/mongoDB/setMongoConfig.mock'
+import { findMongoData_empty } from '../../../server/routes/mongoDB/findMongoData.mock'
+import { deleteFinnDashData_success } from '../../../server/routes/mongoDB/deleteMongoRecords.mock'
 
 //mock service worker for all http requests
 const mockHTTPServer = setupServer(
@@ -40,6 +43,9 @@ const mockHTTPServer = setupServer(
     logUiErrorIntercept, //mock and warn about any user interface errors. SHould this force fail?
     postFindMongoData_success_noData, //return no data
     postUpdateGQLFilters,
+    updateGLConfig_success, //mock update success.
+    findMongoData_empty, //no data found in mongo
+    deleteFinnDashData_success, //delete success
     ) 
 
 

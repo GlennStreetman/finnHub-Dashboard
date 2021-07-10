@@ -135,7 +135,7 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
                         data-testid={`remove-${el}`}
                         key={el + "button"}
                         onClick={() => {
-                            p.updateWidgetList(el);
+                            p.updateWidgetStockList(p.widgetKey, el);
                         }}
                     >
                         <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>

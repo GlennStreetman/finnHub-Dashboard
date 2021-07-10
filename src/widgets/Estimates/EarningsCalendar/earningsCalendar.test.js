@@ -24,6 +24,9 @@ import { postDashboard_success_noWidgets } from '../../../server/routes/loggedIn
 import { mockFinnHubDataQuote } from '../../../appFunctions/getStockPrices.mock'
 import { mockFinnhubDataStockSymbol } from '../../../slices/sliceExchangeData.mock'
 import { logUiErrorIntercept } from '../../../server/routes/logUiError.mock'
+import { updateGLConfig_success } from '../../../server/routes/mongoDB/setMongoConfig.mock'
+import { findMongoData_empty } from '../../../server/routes/mongoDB/findMongoData.mock'
+import { deleteFinnDashData_success } from '../../../server/routes/mongoDB/deleteMongoRecords.mock'
 
 //mock service worker for all http requests
 const mockHTTPServer = setupServer(
@@ -35,7 +38,10 @@ const mockHTTPServer = setupServer(
     postDashboard_success_noWidgets,  //mock save dashboard after loading widget.
     mockFinnHubDataQuote, //mock finnhub quote data for wathclist menu widget.
     mockFinnhubDataStockSymbol, //mock stock data for exchange
-    logUiErrorIntercept //mock and warn about any user interface errors. SHould this force fail?
+    logUiErrorIntercept, //mock and warn about any user interface errors. SHould this force fail?
+    updateGLConfig_success, //mock update success.
+    findMongoData_empty, //no data found in mongo
+    deleteFinnDashData_success, //delete success
     ) 
 
 
@@ -65,20 +71,18 @@ it('Test Single Widget dashboard : EarningsCalendar ', async (done) => {
     })
     expect(getByTestId('Earnings Calendar')).toBeInTheDocument() 
     fireEvent.click(screen.getByTestId('Earnings Calendar')) //copy submenu text
-    //check widget is mounted
+    //check widget is mounted and that buttons in widget body-display function
     await waitFor(() => {
         expect(screen.getByTestId('earningsCalendarBody')).toBeInTheDocument()
-        // screen.debug(screen.getByTestId('earningsCalendarBody'))
         expect(screen.getByTestId('ECstockSelector')).toBeInTheDocument()
-        expect(screen.getByTestId('ECDisplaySelector')).toBeInTheDocument()
-        expect(screen.getByText('Quarter')).toBeInTheDocument()
+        expect(screen.getByText('Quarter:')).toBeInTheDocument()
         expect(screen.getByText('4.99')).toBeInTheDocument()
     })
     // check that edit pane for widget renders and all buttons work
     expect(screen.getByTestId('editPaneButton-EstimatesEarningsCalendar')).toBeInTheDocument() 
     fireEvent.click(getByTestId('editPaneButton-EstimatesEarningsCalendar'))
     await waitFor(() => {
-        expect(screen.getByText('Symbol:')).toBeInTheDocument()
+        expect(screen.getByText('Remove')).toBeInTheDocument()
         expect(screen.getByTestId('remove-US-WMT')).toBeInTheDocument()
         expect(screen.getByTestId('remove-US-COST')).toBeInTheDocument()
         expect(screen.getByText('Start date:')).toBeInTheDocument()

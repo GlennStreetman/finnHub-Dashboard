@@ -18,7 +18,7 @@ interface finnDashDataReq extends Request {
 const router = express.Router();
 
 //gets user, none stale, finnhub data. This process deletes stale records.
-router.get('/finnDashData', async (req: finnDashDataReq, res: any) => {
+router.get('/getFinnDashDataMongo', async (req: finnDashDataReq, res: any) => {
     try {
         const client = getDB()
         const database = client.db('finnDash');
@@ -50,7 +50,7 @@ router.get('/finnDashData', async (req: finnDashDataReq, res: any) => {
 
 
 
-router.post("/finnDashData", async (req: finnDashDataReq, res: any) => {//updates MongoDB finnDash.dataset with finnhub data.
+router.post("/postFinnDashDataMongo", async (req: finnDashDataReq, res: any) => {//updates MongoDB finnDash.dataset with finnhub data.
     if (req.session.login === true) {
         try {
             const client = getDB()

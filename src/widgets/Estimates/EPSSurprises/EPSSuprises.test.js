@@ -24,6 +24,9 @@ import {postDashboard_success_noWidgets} from '../../../server/routes/loggedIn/d
 import {mockFinnHubDataQuote} from '../../../appFunctions/getStockPrices.mock'
 import {mockFinnhubDataStockSymbol} from '../../../slices/sliceExchangeData.mock'
 import {logUiErrorIntercept} from '../../../server/routes/logUiError.mock'
+import { updateGLConfig_success } from '../../../server/routes/mongoDB/setMongoConfig.mock'
+import { findMongoData_empty } from '../../../server/routes/mongoDB/findMongoData.mock'
+import { deleteFinnDashData_success } from '../../../server/routes/mongoDB/deleteMongoRecords.mock'
 
 //mock service worker for all http requests
 const mockHTTPServer = setupServer(
@@ -35,7 +38,10 @@ const mockHTTPServer = setupServer(
     postDashboard_success_noWidgets,  //mock save dashboard after loading widget.
     mockFinnHubDataQuote, //mock finnhub quote data for wathclist menu widget.
     mockFinnhubDataStockSymbol, //mock stock data for exchange
-    logUiErrorIntercept //mock and warn about any user interface errors. SHould this force fail?
+    logUiErrorIntercept, //mock and warn about any user interface errors. SHould this force fail?
+    updateGLConfig_success, //mock update success.
+    findMongoData_empty, //no data found in mongo
+    deleteFinnDashData_success, //delete success
     ) 
 
 
@@ -68,7 +74,6 @@ it('Test Single Widget dashboard : EPS Surprises ', async (done) => {
     //check widget is mounted
     await waitFor(() => {
         expect(screen.getByTestId('EPSSuprisesBody')).toBeInTheDocument()
-        expect(screen.getByText('Selection:')).toBeInTheDocument()
         expect(screen.getByTestId('SelectionLabel')).toBeInTheDocument()
         expect(screen.getByTestId('EPSChart')).toBeInTheDocument()
         expect(screen.getByTestId('canvasChart')).toBeInTheDocument()
@@ -77,7 +82,7 @@ it('Test Single Widget dashboard : EPS Surprises ', async (done) => {
     expect(screen.getByTestId('editPaneButton-EstimatesEPSSurprises')).toBeInTheDocument() 
     fireEvent.click(getByTestId('editPaneButton-EstimatesEPSSurprises'))
     await waitFor(() => {
-        expect(screen.getByText('Symbol:')).toBeInTheDocument()
+        expect(screen.getByText('Remove')).toBeInTheDocument()
         expect(screen.getByTestId('remove-US-WMT')).toBeInTheDocument()
         expect(screen.getByTestId('remove-US-COST')).toBeInTheDocument()
     })

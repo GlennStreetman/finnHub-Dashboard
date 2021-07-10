@@ -58,7 +58,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                     body: JSON.stringify(resObj),
                 };
                 if (Object.keys(resObj).length > 0) {
-                    fetch("/finnDashData", options) //cache finnnDash data to mongoDB.
+                    fetch("/postFinnDashDataMongo", options) //cache finnnDash data to mongoDB.
                         .then((response) => {
                             return response.json()
                         })

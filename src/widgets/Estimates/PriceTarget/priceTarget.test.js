@@ -25,6 +25,9 @@ import { postDashboard_success_noWidgets } from '../../../server/routes/loggedIn
 import { mockFinnHubDataQuote } from '../../../appFunctions/getStockPrices.mock'
 import { mockFinnhubDataStockSymbol } from '../../../slices/sliceExchangeData.mock'
 import { logUiErrorIntercept } from '../../../server/routes/logUiError.mock'
+import { updateGLConfig_success } from '../../../server/routes/mongoDB/setMongoConfig.mock'
+import { findMongoData_empty } from '../../../server/routes/mongoDB/findMongoData.mock'
+import { deleteFinnDashData_success } from '../../../server/routes/mongoDB/deleteMongoRecords.mock'
 
 //mock service worker for all http requests
 const mockHTTPServer = setupServer(
@@ -36,7 +39,10 @@ const mockHTTPServer = setupServer(
     postDashboard_success_noWidgets,  //mock save dashboard after loading widget.
     mockFinnHubDataQuote, //mock finnhub quote data for wathclist menu widget.
     mockFinnhubDataStockSymbol, //mock stock data for exchange
-    logUiErrorIntercept //mock and warn about any user interface errors. SHould this force fail?
+    logUiErrorIntercept, //mock and warn about any user interface errors. SHould this force fail?
+    updateGLConfig_success, //mock update success.
+    findMongoData_empty, //no data found in mongo
+    deleteFinnDashData_success, //delete success	
     ) 
 
 
@@ -71,16 +77,11 @@ it('Test Single Widget dashboard : Price Target ', async (done) => {
         expect(screen.getByTestId('priceTargetBody')).toBeInTheDocument() //testID for widgets outer most div
         expect(screen.getByTestId('ptSelectStock')).toBeInTheDocument()
         expect(screen.getByTestId('ptRow')).toBeInTheDocument()
-        expect(screen.getByText('Last Updated')).toBeInTheDocument()
+        expect(screen.getByText('Last Updated:')).toBeInTheDocument()
     })
     // check that edit pane for widget renders and all buttons work
     expect(screen.getByTestId('editPaneButton-EstimatesPriceTarget')).toBeInTheDocument() //update with widgetID
     fireEvent.click(getByTestId('editPaneButton-EstimatesPriceTarget')) //update with widgetID
-    await waitFor(() => {
-        expect(screen.getByTestId('priceTargetSearchPane')).toBeInTheDocument()
-
-        //additional tests for widget setup menu render.
-    })
     //test functionality of widget setup menu
     //remove target stock example
     fireEvent.click(screen.getByTestId('remove-US-WMT')) 

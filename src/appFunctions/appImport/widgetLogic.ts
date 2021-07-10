@@ -123,6 +123,7 @@ export const LockWidgets = function (toggle: number) {
 
 export const UpdateWidgetStockList = function updateWidgetStockList(widgetId: number, symbol: string, stockObj: stock | Object = {}) {
     //adds if not present, else removes stock from widget specific stock list.
+    console.log('updating stock list', widgetId, symbol, stockObj)
     const s: AppState = this.state
     if (isNaN(widgetId) === false) {
 

@@ -25,6 +25,9 @@ import { postDashboard_success_noWidgets } from '../../../server/routes/loggedIn
 import { mockFinnHubDataQuote } from '../../../appFunctions/getStockPrices.mock'
 import { mockFinnhubDataStockSymbol } from '../../../slices/sliceExchangeData.mock'
 import { logUiErrorIntercept } from '../../../server/routes/logUiError.mock'
+import { updateGLConfig_success } from '../../../server/routes/mongoDB/setMongoConfig.mock'
+import { findMongoData_empty } from '../../../server/routes/mongoDB/findMongoData.mock'
+import { deleteFinnDashData_success } from '../../../server/routes/mongoDB/deleteMongoRecords.mock'
 
 //mock service worker for all http requests
 const mockHTTPServer = setupServer(
@@ -36,8 +39,11 @@ const mockHTTPServer = setupServer(
     postDashboard_success_noWidgets,  //mock save dashboard after loading widget.
     mockFinnHubDataQuote, //mock finnhub quote data for wathclist menu widget.
     mockFinnhubDataStockSymbol, //mock stock data for exchange
-    logUiErrorIntercept //mock and warn about any user interface errors. SHould this force fail?
-    ) 
+    logUiErrorIntercept, //mock and warn about any user interface errors. SHould this force fail?
+    updateGLConfig_success, //mock update success.
+    findMongoData_empty, //no data found in mongo
+    deleteFinnDashData_success, //delete success	
+) 
 
 
 beforeAll(() => {mockHTTPServer.listen({
@@ -75,7 +81,6 @@ it('Test Single Widget dashboard : Recommendation Trends ', async (done) => {
     expect(screen.getByTestId('editPaneButton-EstimatesRecommendationTrends')).toBeInTheDocument() //update with widgetID
     fireEvent.click(getByTestId('editPaneButton-EstimatesRecommendationTrends')) //update with widgetID
     await waitFor(() => {
-        expect(screen.getByTestId('recTrendEditPane')).toBeInTheDocument()
         expect(screen.getByTestId('remove-US-WMT')).toBeInTheDocument()
         expect(screen.getByTestId('remove-US-COST')).toBeInTheDocument()
     })
