@@ -1,5 +1,5 @@
 export const checkLoginStatus = function(processLogin, updateExchangeList, updateDefaultExchange, finnHubQueue){
-    console.log('CHECKING LOGGIN STATUS')
+    // console.log('CHECKING LOGGIN STATUS')
     fetch("/checkLogin")
     .then((response) => response.json())
     .then((data) => {

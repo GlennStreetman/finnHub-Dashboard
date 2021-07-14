@@ -374,7 +374,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     async rebuildDashboardState() { //fetches dashboard data, then updates s.dashBoardData, then builds redux model.
-        console.log('running rebuild')
+        // console.log('running rebuild')
         try {
             const data: GetSavedDashBoardsRes = await this.getSavedDashBoards()
             if ((data.dashBoardData[data.currentDashBoard] === undefined && Object.keys(data.dashBoardData))) { //if invalid current dashboard returned

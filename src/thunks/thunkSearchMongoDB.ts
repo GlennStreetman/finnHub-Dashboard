@@ -1,8 +1,8 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { reqObj, resObj } from '../server/routes/mongoDB/findMongoData'
-//receives list of strings to search for.
+//receives list of strings to search for. WidgetKey-targetSecurity
 //pushes returned string to visableData in redux.
-export const tSearchMongoDB = createAsyncThunk( //{dashboard, [securityList]}
+export const tSearchMongoDB = createAsyncThunk( //{ [widgetKey-securityList]}
     'tSearch',
     async (req: string[], thunkAPI: any) => { //{list of securities}
         //if stale pop from list 
@@ -11,7 +11,6 @@ export const tSearchMongoDB = createAsyncThunk( //{dashboard, [securityList]}
             searchList: req,
             dashboard: dashboard
         }
-
         try {
             const options = {
                 method: "POST",
@@ -20,7 +19,7 @@ export const tSearchMongoDB = createAsyncThunk( //{dashboard, [securityList]}
             };
             const getData = await fetch('/findMongoData', options)
             const resData: resObj[] = await getData.json()
-            const res = {}
+            const res = req.reduce((acc, curr) => ({ ...acc, [`${dashboard}-${curr}`]: '' }), {});
             for (const x in resData) {
                 const mongo: resObj = resData[x]
                 res[mongo.key] = {

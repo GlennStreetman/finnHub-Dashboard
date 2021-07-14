@@ -166,23 +166,36 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
     return (
         <>
             {p.showEditPane === 1 && (
-                <>
-                    <div>
-                        <input type="file" hidden ref={inputReference} onChange={fileUploadInputChange} />
-                        <button className="ui button" onClick={fileUploadAction}>
-                            Upload
-                        </button>
-                        <ToolTip textFragment={helpText} hintName='wl' /> <br />
-                        <button className="ui button" onClick={() => { p.syncGlobalStockList() }}>
-                            Sync
-                        </button>
-                        <ToolTip textFragment={syncText} hintName='sw' /> <br />
-                    </div>
-                </>
+                <div style={{ width: '100%', backgroundColor: '#1d69ab' }}>
+                    <table>
+                        <tbody>
+                            <tr>
+                                <td>
+                                    <ToolTip textFragment={helpText} hintName='wl' /></td>
+                                <td>
+                                    <input type="file" hidden ref={inputReference} onChange={fileUploadInputChange} />
+                                    <button className="ui button" onClick={fileUploadAction}>
+                                        Upload
+                                    </button>
+                                </td>
+                            </tr>
+                            <tr style={{ backgroundColor: 'inherit' }}>
+                                <td>
+                                    <ToolTip textFragment={syncText} hintName='sw' />
+                                </td>
+                                <td>
+                                    <button className="ui button" onClick={() => { p.syncGlobalStockList() }}>
+                                        Sync
+                                    </button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             )}
-            <div >
-                {p.showEditPane !== 1 && (<>{React.createElement(StockSearchPane, searchPaneProps(p))}</>)}
-            </div>
+
+            {p.showEditPane !== 1 && (<>{React.createElement(StockSearchPane, searchPaneProps(p))}</>)}
+
 
             <div className='scrollableDiv'>
                 <table className='dataTable'>

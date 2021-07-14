@@ -55,6 +55,7 @@ function WidgetContainer(p) {
     }
 
     function updateHeader(e) {//changes widget name.
+        // console.log('updating headers')
         if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
             p.changeWidgetName('widgetList', p.widgetKey, e.target.value);
         } else{
@@ -74,7 +75,7 @@ function WidgetContainer(p) {
         let widgetWidth = 200
 
         function dragMouseDown(e) {
-            console.log('start drag')
+        // console.log('start drag')
         e = e || window.event;
         e.preventDefault();
 
@@ -134,6 +135,8 @@ function WidgetContainer(p) {
     let widgetProps = p.widgetBodyProps ? p.widgetBodyProps() : {}
     widgetProps["showEditPane"] = showEditPane;
     if (p.widgetKey !== "dashBoardMenu") {
+        widgetProps['updateDefaultExchange'] = p.updateDefaultExchange
+        widgetProps['currentDashBoard'] = p.currentDashBoard
         widgetProps['searchText'] = searchText
         widgetProps['changeSearchText'] = changeSearchText
         widgetProps['updateAPIFlag'] = p.updateAPIFlag
@@ -161,7 +164,7 @@ function WidgetContainer(p) {
                 {renderHeader}
             </>
             ) : (
-            <input type="text" id={p.widgetKey + "HeaderValue"} value={renderHeader} onChange={updateHeader} />
+            <input data-testid={`rename-${p.widgetList["widgetType"]}`} type="text" id={p.widgetKey + "HeaderValue"} value={renderHeader} onChange={updateHeader} />
             )}
 
             <button

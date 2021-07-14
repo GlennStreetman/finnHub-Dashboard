@@ -10,7 +10,6 @@ import StockSearchPane, { searchPaneProps } from "../../../components/stockSearc
 import CreateTimeSeriesChart, { createOptions } from './createTimeSeriesChart'
 
 import { useDragCopy } from '../../widgetHooks/useDragCopy'
-
 import { useSearchMongoDb } from '../../widgetHooks/useSearchMongoDB'
 
 import { dStock } from './../../../appFunctions/formatStockSymbols'
@@ -105,7 +104,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         targetSeries: '',
     })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
 
-    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
+    useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
 
     useEffect(() => { //set default series 
         if (seriesList.length > 0 && !p.config.targetSeries) {

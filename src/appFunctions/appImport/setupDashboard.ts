@@ -76,7 +76,6 @@ export const saveDashboard = async function (dashboardName: string) {
         await new Promise(resolve => setTimeout(resolve, 1000));
         return this.saveDashboard(dashboardName) //try again
     } else if (this.state.saveDashboardFlag === false && now - this.state.saveDashboardThrottle > 5000) {
-        console.log('starting save')
         this.setState({
             saveDashboardThrottle: now,
             saveDashboardFlag: true,
@@ -109,7 +108,7 @@ export const saveDashboard = async function (dashboardName: string) {
         })
     } else if (this.state.saveDashboardFlag === false && now - this.state.saveDashboardThrottle < 5000) {
         //if not updating but flag not set to true, suspend save and try again after timer.
-        console.log('retry save')
+
         const waitPeriod = 5000 - (now - this.state.saveDashboardThrottle) > 0 ? 5000 - (now - this.state.saveDashboardThrottle) : 1000
         await new Promise(resolve => setTimeout(resolve, waitPeriod));
         return this.saveDashboard(dashboardName) //try again

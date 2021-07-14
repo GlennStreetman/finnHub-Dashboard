@@ -1,10 +1,71 @@
 .dataTable {
-    width: 99%;
+    width: 99.9%;
     height: 100%;
     overflow: auto
 }
 
+.filterTable {
+    background-color: #1d69ab;
+    margin: 0px;
+}
+
 .scrollableDiv {
         overflow:auto;
+}
 
+.centerTE {
+    text-align: center;
+    white-space: nowrap;
+  }
+  
+.leftTE {
+text-align: left;
+white-space: nowrap;
+}
+
+.rightTE {
+text-align: right;
+white-space: nowrap;
+}
+
+.rightTEFade {
+text-align: right;
+animation-name: test;
+animation-duration: 3s;
+}
+
+
+
+.centerBottomTE {
+text-align: center;
+vertical-align: bottom;
+}
+
+tr:nth-child(even) {
+background-color: #f0f0f0;
+/* border-bottom: 1px solid black; */
+}
+
+thead {
+/* border-bottom: 1px solid #000; */
+background-color: #dcdcdc;
+font-weight: bold;
+padding: 2px;
+vertical-align: bottom;
+text-align: center;
+text-transform: capitalize;
+}
+
+table {
+border-collapse: collapse;
+
+border: 5px;
+}
+
+td {
+padding: 2px;
+}
+
+th {
+padding: 2px;
 }

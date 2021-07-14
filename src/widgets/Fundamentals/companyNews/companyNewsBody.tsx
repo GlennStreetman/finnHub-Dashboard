@@ -3,16 +3,19 @@ import { useState, useMemo, forwardRef, useRef } from "react";
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 
+//components
+import WidgetFocus from '../../../components/widgetFocus'
+import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 
+//hooks
 import { useDragCopy } from '../../widgetHooks/useDragCopy'
-
 import { useSearchMongoDb } from '../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from '../../widgetHooks/useBuildVisableData'
 import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
 import { useStartingFilters } from '../../widgetHooks/useStartingFilters'
 
-import { dStock } from './../../../appFunctions/formatStockSymbols'
+// import { dStock } from './../../../appFunctions/formatStockSymbols'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -97,7 +100,7 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
 
     useDragCopy(ref, { newsIncrementor: newsIncrementor, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey, p.config.targetSecurity) //sets security focus in config. Used for redux.visable data and widget excel templating.
-    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
+    useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
 
@@ -136,51 +139,57 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
         if (newIncrement > 0 && newIncrement < 11) setNewsIncrementor(newIncrement)
     }
 
-    function updateWidgetList(stock) {
-        if (stock.indexOf(":") > 0) {
-            const stockSymbole = stock.slice(0, stock.indexOf(":"));
-            p.updateWidgetStockList(p.widgetKey, stockSymbole);
-        } else {
-            p.updateWidgetStockList(p.widgetKey, stock);
-        }
-    }
+    // function updateWidgetList(stock) {
+    //     if (stock.indexOf(":") > 0) {
+    //         const stockSymbole = stock.slice(0, stock.indexOf(":"));
+    //         p.updateWidgetStockList(p.widgetKey, stockSymbole);
+    //     } else {
+    //         p.updateWidgetStockList(p.widgetKey, stock);
+    //     }
+    // }
 
     function editNewsListForm() {
-        let newsList = Object.keys(p.trackedStocks);
-        let stockNewsRow = newsList.map((el) =>
-            p.showEditPane === 1 ? (
-                <tr key={el + "container"}>
-                    <td className="centerTE" key={el + "buttonC"}>
-                        <button
-                            data-testid={`remove-${el}`}
-                            key={el + "button"}
-                            onClick={() => {
-                                updateWidgetList(el);
-                            }}
-                        >
-                            <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
-                        </button>
-                    </td>
-                    <td className='centerTE' key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
-                    <td className='leftTE'>{p.trackedStocks[el].description}</td>
-                </tr>
-            ) : (
-                <tr key={el + "pass"}></tr>
-            )
-        );
+        // let newsList = Object.keys(p.trackedStocks);
+        // let stockNewsRow = newsList.map((el) =>
+        //     p.showEditPane === 1 ? (
+        //         <tr key={el + "container"}>
+        //             <td className="centerTE" key={el + "buttonC"}>
+        //                 <button
+        //                     data-testid={`remove-${el}`}
+        //                     key={el + "button"}
+        //                     onClick={() => {
+        //                         updateWidgetList(el);
+        //                     }}
+        //                 >
+        //                     <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
+        //                 </button>
+        //             </td>
+        //             <td className='centerTE' key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
+        //             <td className='leftTE'>{p.trackedStocks[el].description}</td>
+        //         </tr>
+        //     ) : (
+        //         <tr key={el + "pass"}></tr>
+        //     )
+        // );
         let stockNewsTable = (
-            <div className='scrollableDiv'>
-                <table className='dataTable'>
-                    <thead>
-                        <tr>
-                            <td>Remove</td>
-                            <td>Symbol</td>
-                            <td>Name</td>
-                        </tr>
-                    </thead>
-                    <tbody>{stockNewsRow}</tbody>
-                </table>
-            </div>
+            <WidgetRemoveSecurityTable
+                trackedStocks={p.trackedStocks}
+                widgetKey={p.widgetKey}
+                updateWidgetStockList={p.updateWidgetStockList}
+                exchangeList={p.exchangeList}
+            />
+            // <div className='scrollableDiv'>
+            //     <table className='dataTable'>
+            //         <thead>
+            //             <tr>
+            //                 <td>Remove</td>
+            //                 <td>Symbol</td>
+            //                 <td>Name</td>
+            //             </tr>
+            //         </thead>
+            //         <tbody>{stockNewsRow}</tbody>
+            //     </table>
+            // </div>
         );
         return stockNewsTable;
     }
@@ -218,18 +227,26 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
     }
 
     function displayNews() {
-        let newSymbolList = Object.keys(p.trackedStocks).map((el) => (
-            <option key={el + "ddl"} value={el}>
-                {dStock(p.trackedStocks[el], p.exchangeList)}
-            </option>
-        ));
+        // let newSymbolList = Object.keys(p.trackedStocks).map((el) => (
+        //     <option key={el + "ddl"} value={el}>
+        //         {dStock(p.trackedStocks[el], p.exchangeList)}
+        //     </option>
+        // ));
 
         let symbolSelectorDropDown = (
             <>
                 <div>
-                    <select value={p.config.targetSecurity} onChange={changeStockSelection}>
+                    <WidgetFocus
+                        widgetType={p.widgetType} updateWidgetConfig={p.updateWidgetConfig}
+                        widgetKey={p.widgetKey}
+                        trackedStocks={p.trackedStocks}
+                        exchangeList={p.exchangeList}
+                        config={p.config}
+                        callback={() => { setNewsIncrementor(1) }}
+                    />
+                    {/* <select value={p.config.targetSecurity} onChange={changeStockSelection}>
                         {newSymbolList}
-                    </select>
+                    </select> */}
                     <button onClick={() => changeIncrememnt(-1)}>
                         <i className="fa fa-backward" aria-hidden="true"></i>
                     </button>
@@ -271,13 +288,13 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
 
     }
 
-    function changeStockSelection(e) { //DELETE IF no target stock
-        const target = e.target.value;
-        p.updateWidgetConfig(p.widgetKey, {
-            targetSecurity: target,
-        })
-        setNewsIncrementor(1)
-    }
+    // function changeStockSelection(e) { //DELETE IF no target stock
+    //     const target = e.target.value;
+    //     p.updateWidgetConfig(p.widgetKey, {
+    //         targetSecurity: target,
+    //     })
+    //     setNewsIncrementor(1)
+    // }
 
     function renderStockData() {
         return (

@@ -6,11 +6,12 @@ export const useUpdateFocus = function ( //on update to p.targetFocus update p.c
     newFocus: string, //p.targetSecurity
     updateWidgetConfig: Function, //p.updateWidgetConfig
     key: number, // p.widgetKey, 
-    targetSecurity: string,
+    targetSecurity: string, //p.config.targetSecurity
 ) {
     useEffect(() => { //Setup default metric source if none selected or not in list of target stocks
-        console.log('newFocus', newFocus)
-        const payload = { targetSecurity: newFocus }
-        if (newFocus && newFocus !== '' && newFocus !== targetSecurity) updateWidgetConfig(key, payload)
-    }, [newFocus, key, updateWidgetConfig, targetSecurity])
+        if (newFocus && newFocus !== '') { //&& newFocus !== targetSecurity
+            const payload = { targetSecurity: newFocus }
+            updateWidgetConfig(key, payload)
+        }
+    }, [newFocus, key, updateWidgetConfig]) //targetSecurity
 }

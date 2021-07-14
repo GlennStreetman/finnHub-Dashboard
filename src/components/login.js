@@ -46,7 +46,7 @@ class login extends React.Component {
 
     componentDidMount(){
         const p = this.props
-        console.log("Loading loggin screen.")
+        // console.log("Loading loggin screen.")
         if (this.props.queryData.reset === '1') {
             const user = this.props.queryData.users
             fetch(`/findSecret?user=${user}`)

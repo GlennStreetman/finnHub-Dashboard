@@ -80,15 +80,31 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
 }
 
 export const ChangeWidgetName = function (stateRef: 'widgetList' | 'menuList', widgetID: string | number, newName: string) {
-    const s: AppState = this.state
-    const widgetGroup: widgetList | menuList = s[stateRef]
-    const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
-        draftState[widgetID].widgetHeader = newName
-    })
-    const payload: Partial<AppState> = {
-        [stateRef]: newWidgetList,
+    // console.log(stateRef, widgetID, newName)
+    if (stateRef === 'menuList') {
+        const s: AppState = this.state
+        const widgetGroup: menuList = s[stateRef]
+        const newWidgetList: menuList = produce(widgetGroup, (draftState) => {
+            draftState[widgetID].widgetHeader = newName
+        })
+        const payload: Partial<AppState> = {
+            [stateRef]: newWidgetList,
+        }
+        this.setState(payload);
+    } else {
+        const s: AppState = this.state
+        const widgetGroup: widgetList = s.dashBoardData[s.currentDashBoard].widgetlist
+        const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
+            draftState[widgetID].widgetHeader = newName
+        })
+        const newDashboardData: dashBoardData = produce(s.dashBoardData, (draftState) => {
+            draftState[s.currentDashBoard].widgetlist = newWidgetList
+        })
+        const payload: Partial<AppState> = {
+            'dashBoardData': newDashboardData,
+        }
+        this.setState(payload);
     }
-    this.setState(payload);
 }
 
 export const RemoveWidget = async function (stateRef: 'widgetList' | 'menuList', widgetID: string | number) {
@@ -123,7 +139,6 @@ export const LockWidgets = function (toggle: number) {
 
 export const UpdateWidgetStockList = function updateWidgetStockList(widgetId: number, symbol: string, stockObj: stock | Object = {}) {
     //adds if not present, else removes stock from widget specific stock list.
-    console.log('updating stock list', widgetId, symbol, stockObj)
     const s: AppState = this.state
     if (isNaN(widgetId) === false) {
 
@@ -144,7 +159,6 @@ export const UpdateWidgetStockList = function updateWidgetStockList(widgetId: nu
                 draftState[widgetId]["trackedStocks"] = trackingSymbolList;
             } else {
                 //remove stock from list
-                console.log("removing stock", symbol)
                 delete trackingSymbolList[symbol]
                 draftState[widgetId]["trackedStocks"] = trackingSymbolList
             }
@@ -184,36 +198,40 @@ export const UpdateWidgetFilters = function (widgetID: string, data: filters) {
         const payload: Partial<AppState> = {
             dashBoardData: newDashBoardData,
         }
-        console.log('update widget filter payload:', payload)
+        // console.log('update widget filter payload:', payload)
         this.setState(payload, async () => {
             //delete records from mongoDB then rebuild dataset.
             let res = await fetch(`/deleteFinnDashData?widgetID=${widgetID}`)
             if (res.status === 200) {
-                // console.log('DELETE RECORDS', res)
-                // const payload: rBuildDataModelPayload = {
-                //     apiKey: s.apiKey,
-                //     dashBoardData: newDashBoardData
-                // }
-                p.rRebuildTargetWidgetModel({
+                p.rRebuildTargetWidgetModel({ //rebuild data model (removes stale dates)
                     apiKey: this.state.apiKey,
                     dashBoardData: this.state.dashBoardData,
                     targetDashboard: this.state.currentDashBoard,
                     targetWidget: widgetID,
                 })
+                //remove visable data?
+                const getDataPayload = {//fetch fresh data
+                    targetDashBoard: s.currentDashBoard,
+                    widgetList: [widgetID],
+                    finnHubQueue: s.finnHubQueue,
+                    rSetUpdateStatus: p.rSetUpdateStatus,
+                }
+                p.tGetFinnhubData(getDataPayload)
                 this.saveDashboard(this.state.currentDashBoard)
+
             } else { console.log("Problem updating widget filters.") }
         })
     } catch { console.log("Problem updating widget filters.") }
 }
 
 //widget config changes how data is manipulated after being queried.
-export const updateWidgetConfig = function (widgetID: number, updateObj: config) { //updates a widget config object then saves changes to mongoDB & postgres.
+export const updateWidgetConfig = function (widgetID: number, updateObj: config) { //replaces widget config object then saves changes to mongoDB & postgres.
     //config changes used by mongoDB during excel templating.
     const s: AppState = this.state
     const updatedDashboardData: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
-        draftState[s.currentDashBoard].widgetlist[widgetID].config = { ...updateObj }
+        const oldConfig = draftState[s.currentDashBoard].widgetlist[widgetID].config
+        draftState[s.currentDashBoard].widgetlist[widgetID].config = { ...oldConfig, ...updateObj }
     })
-
     const payload: Partial<AppState> = { dashBoardData: updatedDashboardData }
     this.setState(payload, () => {
         if (this.state.enableDrag !== true) {
@@ -232,7 +250,7 @@ export const updateWidgetConfig = function (widgetID: number, updateObj: config)
             fetch("/updateGQLConfig", options)
                 .then((response) => { return response.json() })
                 .then(() => {
-                    console.log('finndash widget config updated in mongoDB.')
+                    // console.log('finndash widget config updated in mongoDB.')
                 })
         }
     })

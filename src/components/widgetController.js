@@ -29,6 +29,7 @@ function WidgetController(p){
                 targetSecurity: p.targetSecurity,
                 toggleWidgetBody: p.toggleWidgetBody,
                 updateAPIFlag: p.updateAPIFlag,
+                updateDefaultExchange: p.updateDefaultExchange,
                 updateDashBoards: p.updateDashBoards,
                 updateWidgetConfig: p.updateWidgetConfig,
                 widgetBodyProps: returnBodyProps({props: p}, el.widgetType, el.widgetID),

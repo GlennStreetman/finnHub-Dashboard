@@ -7,16 +7,19 @@ import { storeState } from './../../../store'
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { convertCamelToProper } from './../../../appFunctions/stringFunctions'
 
+//components
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import WidgetFocus from '../../../components/widgetFocus'
+import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
+import WidgetFilterDates from '../../../components/widgetFilterDates'
 
+//hooks
 import { useDragCopy } from './../../widgetHooks/useDragCopy'
 import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
 import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
 
 import { useStartingFilters } from './../../widgetHooks/useStartingFilters'
-
-import { dStock } from './../../../appFunctions/formatStockSymbols'
 
 
 const useDispatch = useAppDispatch
@@ -117,77 +120,33 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
 
     useDragCopy(ref, { pagination: pagination, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey, p.config.targetSecurity) //sets security focus in config. Used for redux.visable data and widget excel templating.
-    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
+    useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
 
-    function updateStartDate(e) {
-        setStart(e.target.value)
-    }
-
     function changePagination(e) {
         const newIncrement = pagination + e;
-        if (newIncrement > 0 && newIncrement < Object.keys(rShowData ? rShowData : 1).length) setPagination(newIncrement)
-    }
-
-    function updateEndDate(e) {
-        setEnd(e.target.value)
-    }
-
-    function updateFilter(e) {
-        if (isNaN(new Date(e.target.value).getTime()) === false) {
-            const now = Date.now()
-            const target = new Date(e.target.value).getTime();
-            const offset = target - now
-            const name = e.target.name;
-            p.updateWidgetFilters(p.widgetKey, { [name]: offset })
-        }
+        if (newIncrement >= 0 && newIncrement < Object.keys(rShowData ? rShowData : 1).length) setPagination(newIncrement)
     }
 
     function renderSearchPane() {
-        //add search pane rendering logic here. Additional filters need to be added below.
-        const stockList = Object.keys(p.trackedStocks);
-        const stockListRows = stockList.map((el) =>
-            <tr key={el + "container"}>
-                <td className="centerTE" key={el + "buttonC"}>
-                    <button
-                        data-testid={`remove-${el}`}
-                        key={el + "button"}
-                        onClick={() => {
-                            p.updateWidgetStockList(p.widgetKey, el);
-                        }}
-                    >
-                        <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
-                    </button>
-                </td>
-                <td className='centerTE' key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
-                <td className='leftTE'>{p.trackedStocks[el].description}</td>
-            </tr>
-        )
-
-        let searchForm = ( // onBlur={updateFilter}
+        let searchForm = (
             <>
-                <div className="stockSearch">
-                    <form className="form-stack">
-                        <label htmlFor="start">Start date:</label>
-                        <input className="btn" id="start" type="date" name="startDate" onChange={updateStartDate} onBlur={updateFilter} value={start}></input>
-                        <br />
-                        <label htmlFor="end">End date:</label>
-                        <input className="btn" id="end" type="date" name="endDate" onChange={updateEndDate} onBlur={updateFilter} value={end}></input>
-                    </form>
-                </div>
-                <div className='scrollableDiv'>
-                    <table className='dataTable'>
-                        <thead>
-                            <tr>
-                                <td>Remove</td>
-                                <td>Symbol</td>
-                                <td>Name</td>
-                            </tr>
-                        </thead>
-                        <tbody>{stockListRows}</tbody>
-                    </table>
-                </div>
+                <WidgetFilterDates
+                    start={start}
+                    end={end}
+                    setStart={setStart}
+                    setEnd={setEnd}
+                    updateWidgetFilters={p.updateWidgetFilters}
+                    widgetKey={p.widgetKey}
+                    widgetType={p.widgetType}
+                />
+                <WidgetRemoveSecurityTable
+                    trackedStocks={p.trackedStocks}
+                    widgetKey={p.widgetKey}
+                    updateWidgetStockList={p.updateWidgetStockList}
+                    exchangeList={p.exchangeList}
+                />
             </>
         );
         return searchForm
@@ -205,31 +164,24 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
         return tableData
     }
 
-    function changeStockSelection(e) { //DELETE IF no target stock
-        const target = e.target.value;
-        p.updateWidgetConfig(p.widgetKey, {
-            targetSecurity: target,
-        })
-    }
-
     function renderStockData() {
-        let newStockList = Object.keys(p.trackedStocks).map((el) => (
-            <option key={el + "ddl"} value={el}>
-                {dStock(p.trackedStocks[el], p.exchangeList)}
-            </option>
-        ));
-
 
         let symbolSelectorDropDown = (
             <>
                 <div id='earningsCalendarBody'>
-                    <select data-testid="ECstockSelector" className="btn" value={p.config.targetSecurity} onChange={changeStockSelection}>
-                        {newStockList}
-                    </select>
-                    <button onClick={() => changePagination(-1)}>
+                    <WidgetFocus
+                        widgetType={p.widgetType}
+                        updateWidgetConfig={p.updateWidgetConfig}
+                        widgetKey={p.widgetKey}
+                        trackedStocks={p.trackedStocks}
+                        exchangeList={p.exchangeList}
+                        config={p.config}
+
+                    />
+                    <button data-testid="pageForward" onClick={() => changePagination(-1)}>
                         <i className="fa fa-backward" aria-hidden="true"></i>
                     </button>
-                    <button onClick={() => changePagination(1)}>
+                    <button data-testid="pageBackward" onClick={() => changePagination(1)}>
                         <i className="fa fa-forward" aria-hidden="true"></i>
                     </button>
                 </div>

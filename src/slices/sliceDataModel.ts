@@ -3,6 +3,7 @@ import { widgetDict } from '../registers/endPointsReg'
 import { tGetFinnhubData, resObj } from '../thunks/thunkFetchFinnhub'
 import { tGetMongoDB, getMongoRes } from '../thunks/thunkGetMongoDB'
 import { dashBoardData } from './../App'
+import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB'
 
 interface dataStatus {
     [key: number]: number, //dashboard data setup status: count of open api requests.
@@ -87,7 +88,7 @@ const dataModel = createSlice({
     initialState,
     reducers: {
         rBuildDataModel: (state: sliceDataModel, action) => { //{apiKey, dashboardData}
-            console.log('building data model')
+            // console.log('building data model')
             //receivies dashboard object and builds dataset from scratch.
             const ap: rBuildDataModelPayload = action.payload
             const apD: dashBoardData = ap.dashBoardData
@@ -256,6 +257,28 @@ const dataModel = createSlice({
                 if (state.dataSet?.[dashboard]?.[widget]?.[security]) {
                     state.dataSet[dashboard][widget][security].updated = updated
                     state.dataSet[dashboard][widget][security].stale = stale
+                }
+            }
+        },
+        [tSearchMongoDB.pending.toString()]: (state, action) => {
+            // console.log('1. Getting stock data!')
+            // return {...state}
+        },
+        [tSearchMongoDB.rejected.toString()]: (state, action) => {
+            console.log('2. failed to find data from Mongo: ', action)
+            // return {...state}
+        },
+        [tSearchMongoDB.fulfilled.toString()]: (state, action) => {
+            // console.log('tSearchMongoDB', action.payload)
+            const ap: any = action.payload
+            for (const x in ap) {
+                if (ap[x] === '') {
+                    const searchList = x.split('-')
+                    const dashboard = searchList[0]
+                    const widget = searchList[1]
+                    const security = `${searchList[2]}-${searchList[3]}`
+                    if (state.dataSet?.[dashboard]?.[widget]?.[security]) state.dataSet[dashboard][widget][security].stale = -1
+                    if (state.dataSet?.[dashboard]?.[widget]?.[security]) state.dataSet[dashboard][widget][security].updated = -1
                 }
             }
         },

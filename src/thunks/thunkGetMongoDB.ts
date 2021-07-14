@@ -26,7 +26,6 @@ export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
     'tgetMongoDb',
     async (reqObj: tgetMongoDBReq | false = false) => {
         try {
-            console.log("Getting cached finnhub data")
             let fetchString = '/getFinnDashDataMongo'
             if (reqObj) { //build request string with filters.
                 fetchString = fetchString + '?'

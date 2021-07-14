@@ -149,19 +149,21 @@ const showData = createSlice({
             // console.log('tSearchMongoDB', action.payload)
             const ap: any = action.payload
             for (const x in ap) {
-                const widgetRef: string = ap[x].widget
-                const security: string = ap[x].security
-                const data: object = ap[x].data
-                const widgetType = ap[x].widgetType
-                if (state.dataSet?.[widgetRef]?.[security] !== undefined) { //for target security from payload that is in target daashboard
-                    const secObj: DataNode = state.dataSet[widgetRef][security]
-                    if (widgetReducers[widgetType] !== undefined) { //IF Reducers need to be applied to finnHub API data for formatting or performance
-                        let filteredDataFunc = widgetReducers[widgetType]
-                        let filteredData = filteredDataFunc(data, secObj.filters)
-                        filteredData.filters = secObj.filters
-                        state.dataSet[widgetRef][security] = filteredData
-                    } else { //no filters
-                        state.dataSet[widgetRef][security] = ap[x].data
+                if (ap[x] !== '') {
+                    const widgetRef: string = ap[x].widget
+                    const security: string = ap[x].security
+                    const data: object = ap[x].data
+                    const widgetType = ap[x].widgetType
+                    if (state.dataSet?.[widgetRef]?.[security] !== undefined) { //for target security from payload that is in target daashboard
+                        const secObj: DataNode = state.dataSet[widgetRef][security]
+                        if (widgetReducers[widgetType] !== undefined) { //IF Reducers need to be applied to finnHub API data for formatting or performance
+                            let filteredDataFunc = widgetReducers[widgetType]
+                            let filteredData = filteredDataFunc(data, secObj.filters)
+                            filteredData.filters = secObj.filters
+                            state.dataSet[widgetRef][security] = filteredData
+                        } else { //no filters
+                            state.dataSet[widgetRef][security] = ap[x].data
+                        }
                     }
                 }
             }

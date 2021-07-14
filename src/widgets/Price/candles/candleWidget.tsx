@@ -3,7 +3,6 @@ import { useState, useEffect, useMemo, forwardRef, useRef } from "react";
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 
-import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 import CreateCandleStickChart from "./createCandleStickChart";
 
 import { useDragCopy } from './../../widgetHooks/useDragCopy'
@@ -13,7 +12,10 @@ import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
 import { useStartingFilters } from './../../widgetHooks/useStartingFilters'
 import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
 
-import { dStock } from './../../../appFunctions/formatStockSymbols'
+import WidgetFocus from '../../../components/widgetFocus'
+import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
+import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -113,7 +115,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
 
     useDragCopy(ref, { chartData: chartData, options: options, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey, p.config.targetSecurity) //sets security focus in config. Used for redux.visable data and widget excel templating.	
-    useSearchMongoDb(p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
+    useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
 
@@ -176,60 +178,16 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         }
     }, [p.config.targetSecurity, rShowData, p.filters.endDate, p.filters.startDate, start, end])
 
-    function updateWidgetList(stock) {
-        if (stock.indexOf(":") > 0) {
-            const stockSymbole = stock.slice(0, stock.indexOf(":"));
-            p.updateWidgetStockList(p.widgetKey, stockSymbole);
-        } else {
-            p.updateWidgetStockList(p.widgetKey, stock);
-        }
-    }
-
-    function changeStockSelection(e) {
-        const target = e.target.value;
-        p.updateWidgetConfig(p.widgetKey, {
-            targetSecurity: target,
-        })
-    }
-
     function editCandleListForm() {
-        let candleList = Object.keys(p.trackedStocks);
-        let CandleListRow = candleList.map((el) =>
-            p.showEditPane === 1 ? (
-                <tr key={el + "container"}>
-                    <td className="centerTE" key={el + "buttonC"}>
-                        <button
-                            data-testid={`remove-${el}`}
-                            key={el + "button"}
-                            onClick={() => {
-                                updateWidgetList(el);
-                            }}
-                        >
-                            <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
-                        </button>
-                    </td>
-                    <td className='centerTE' key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
-                    <td className='leftTE'>{p.trackedStocks[el].description}</td>
-                </tr>
-            ) : (
-                <tr key={el + "pass"}></tr>
-            )
+        let securityList = (
+            <WidgetRemoveSecurityTable
+                trackedStocks={p.trackedStocks}
+                widgetKey={p.widgetKey}
+                updateWidgetStockList={p.updateWidgetStockList}
+                exchangeList={p.exchangeList}
+            />
         );
-        let stockCandleTable = (
-            <div className='scrollableDiv'>
-                <table className='dataTable'>
-                    <thead>
-                        <tr>
-                            <td>Remove</td>
-                            <td>Symbol</td>
-                            <td>Name</td>
-                        </tr>
-                    </thead>
-                    <tbody>{CandleListRow}</tbody>
-                </table>
-            </div>
-        );
-        return stockCandleTable;
+        return securityList;
     }
 
     function updateStartDate(e) {
@@ -257,18 +215,17 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     }
 
     function displayCandleGraph() {
-        let newSymbolList = Object.keys(p.trackedStocks).map((el) => (
-            <option key={el + "ddl"} value={el}>
-                {dStock(p.trackedStocks[el], p.exchangeList)}
-            </option>
-        ));
 
         let symbolSelectorDropDown = (
             <>
                 <div className="div-stack">
-                    <select className="btn" value={p?.config?.targetSecurity} onChange={changeStockSelection}>
-                        {newSymbolList}
-                    </select>
+                    <WidgetFocus
+                        widgetType={p.widgetType} updateWidgetConfig={p.updateWidgetConfig}
+                        widgetKey={p.widgetKey}
+                        trackedStocks={p.trackedStocks}
+                        exchangeList={p.exchangeList}
+                        config={p.config}
+                    />
                 </div>
                 <div className="graphDiv">
                     <CreateCandleStickChart candleData={options} />
