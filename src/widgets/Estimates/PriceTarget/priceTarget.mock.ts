@@ -4,9 +4,9 @@ const testDashboard = { //setup containing a single dashboard, TEST, and one wid
     savedDashBoards: {
         TEST: {
             dashboardname: 'TEST',
-            globalstocklist: '{"US-WMT":{"currency":"USD","description":"WALMART INC","displaySymbol":"WMT","figi":"BBG000BWXBC2","mic":"XNYS","symbol":"WMT","type":"Common Stock","exchange":"US","key":"US-WMT"},"US-COST":{"currency":"USD","description":"COSTCO WHOLESALE CORP","displaySymbol":"COST","figi":"BBG000F6H8W8","mic":"XNAS","symbol":"COST","type":"Common Stock","exchange":"US","key":"US-COST"},"US-BEST":{"currency":"USD","description":"BEST INC - ADR","displaySymbol":"BEST","figi":"BBG00H1H9511","mic":"XNYS","symbol":"BEST","type":"ADR","exchange":"US","key":"US-BEST"},"US-GME":{"currency":"USD","description":"GAMESTOP CORP-CLASS A","displaySymbol":"GME","figi":"BBG000BB5BF6","mic":"XNYS","symbol":"GME","type":"Common Stock","exchange":"US","key":"US-GME"},"US-HD":{"currency":"USD","description":"HOME DEPOT INC","displaySymbol":"HD","figi":"BBG000BKZB36","mic":"XNYS","symbol":"HD","type":"Common Stock","exchange":"US","key":"US-HD"}}',
+            globalstocklist: '{ "US-WMT": { "currency": "USD", "description": "WALMART INC", "displaySymbol": "WMT", "figi": "BBG000BWXBC2", "mic": "XNYS", "symbol": "WMT", "type": "Common Stock", "exchange": "US", "key": "US-WMT" }, "US-COST": { "currency": "USD", "description": "COSTCO WHOLESALE CORP", "displaySymbol": "COST", "figi": "BBG000F6H8W8", "mic": "XNAS", "symbol": "COST", "type": "Common Stock", "exchange": "US", "key": "US-COST" } }',
             id: 1875,
-            widgetlist: {}
+            widgetlist: {},
         }
     },
     menuSetup: {
@@ -38,7 +38,7 @@ const testDashboard = { //setup containing a single dashboard, TEST, and one wid
 export const getDashboard_success =     //auto login check rejected.
     rest.get("/dashboard", (req, res, ctx) => {
         const resObj = testDashboard
-        console.log('RETURNING DASHBOARD DATA MOCK')
+        // console.log('RETURNING DASHBOARD DATA MOCK')
         return res(
             ctx.status(200),
             ctx.json(resObj)
@@ -46,29 +46,37 @@ export const getDashboard_success =     //auto login check rejected.
     })
 
 //default data to be returned for test purposes for all stocks.
-const resData = {
+const resData_WMT = {
     "lastUpdated": "2019-06-03 00:00:00",
     "symbol": "NFLX",
-    "targetHigh": 500,
-    "targetLow": 166,
-    "targetMean": 387.03,
-    "targetMedian": 417.5
+    "targetHigh": 100,
+    "targetLow": 101,
+    "targetMean": 102,
+    "targetMedian": 103
 }
 
-const resObj = resData
+const resData_COST = {
+    "lastUpdated": "2019-06-03 00:00:00",
+    "symbol": "NFLX",
+    "targetHigh": 200,
+    "targetLow": 201,
+    "targetMean": 202,
+    "targetMedian": 203
+}
 
 export const mockFinnHubData = //MOCK API REQUEST FOR THIS WIDGET. Remember to update api string on next line.
     rest.get("https://finnhub.io/api/v1/stock/price-target*", (req, res, ctx) => {
-        console.log('return mocked finnhub data /earnings')
+        const symbol = req.url.searchParams.get('symbol')
+        let resData = symbol === 'WMT' ? resData_WMT : resData_COST
         return res(
             ctx.status(200),
-            ctx.json(resObj)
+            ctx.json(resData)
         )
     })
 
 export const getCheckLogin_success =     //auto login check rejected.
     rest.get("/checkLogin", (req, res, ctx) => {
-        console.log('get/CheckLogin success, returning login 1')
+        console.log('check login')
         return res(
             ctx.status(200),
             ctx.json({
@@ -76,9 +84,43 @@ export const getCheckLogin_success =     //auto login check rejected.
                 login: 1,
                 ratelimit: 25,
                 apiAlias: 'alias',
-                widgetsetup: '{"EstimatesPriceTarget":true}', //UPDATE NEEDED IF premium feature. First item from topNavReg tuple.
+                widgetsetup: '{"EstimatesPriceTarget":true,"PriceSplits":true}',
                 exchangelist: ['US'],
                 defaultexchange: ['US',]
             })
+        )
+    })
+
+const exchangeData = [
+    {
+        "currency": "USD",
+        "description": "TESLA INC",
+        "displaySymbol": "TSLA",
+        "figi": "BBG000N9MNX3",
+        "mic": "XNAS",
+        "symbol": "TSLA",
+        "type": "Common Stock",
+        "exchange": "US",
+        "key": "US-TSLA"
+    },
+    {
+        "currency": "USD",
+        "description": "APPLE INC",
+        "displaySymbol": "AAPL",
+        "figi": "BBG000B9XRY4",
+        "mic": "XNAS",
+        "symbol": "AAPL",
+        "type": "Common Stock",
+        "exchange": "US",
+        "key": "US-AAPL"
+    }
+]
+
+
+export const mockExchangeData =
+    rest.get("https://finnhub.io/api/v1/stock/symbol", (req, res, ctx) => {
+        return res(
+            ctx.status(200),
+            ctx.json(exchangeData)
         )
     })

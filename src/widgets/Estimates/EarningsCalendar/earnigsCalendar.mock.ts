@@ -158,7 +158,6 @@ const resData_COST_toggle = {
 export const mockFinnHubData = //MOCK API REQUEST FOR THIS WIDGET. Remember to update api string on next line.
     rest.get("https://finnhub.io/api/v1/calendar/earnings*", (req, res, ctx) => {
         const symbol = req.url.searchParams.get('symbol')
-        // console.log('mock symbol', symbol)
         let resData = symbol === 'WMT' ? resData_WMT : resData_COST
         return res(
             ctx.status(200),
@@ -169,7 +168,6 @@ export const mockFinnHubData = //MOCK API REQUEST FOR THIS WIDGET. Remember to u
 export const mockFinnHubData_toggle = //MOCK API REQUEST FOR THIS WIDGET. Remember to update api string on next line.
     rest.get("https://finnhub.io/api/v1/calendar/earnings*", (req, res, ctx) => {
         const symbol = req.url.searchParams.get('symbol')
-        // console.log('mock symbol', symbol)
         let resData = symbol === 'WMT' ? resData_WMT_toggle : resData_COST_toggle
         return res(
             ctx.status(200),

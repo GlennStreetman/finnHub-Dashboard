@@ -38,6 +38,7 @@ interface dataListObject {
 }
 
 function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
+
     const isInitialMount = useRef(true); //update to false after first render.
 
     const startingWidgetCoptyRef = () => {
@@ -96,7 +97,7 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
             animationEnabled: true,
             exportEnabled: true,
             title: {
-                text: `${p.config.targetSecurity}: EPS Surprises'`
+                text: `${p.config.targetSecurity}: EPS Surprises`
             },
             axisX: {
                 title: ""
@@ -148,7 +149,8 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
             <>
                 <div data-testid="SelectionLabel" className="div-stack" >
                     <WidgetFocus
-                        widgetType={p.widgetType} updateWidgetConfig={p.updateWidgetConfig}
+                        widgetType={p.widgetType}
+                        updateWidgetConfig={p.updateWidgetConfig}
                         widgetKey={p.widgetKey}
                         trackedStocks={p.trackedStocks}
                         exchangeList={p.exchangeList}
@@ -163,7 +165,7 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
         return chartBody;
     }
     return (
-        <div data-testid="EPSSuprisesBody">
+        <div data-testid="EPSSurprisesBody">
             {p.showEditPane === 1 && (
                 <>
                     {React.createElement(StockSearchPane, searchPaneProps(p))}

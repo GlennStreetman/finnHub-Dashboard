@@ -115,7 +115,7 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
             exportEnabled: true,
             theme: "light1",
             title: {
-                text: p.config.targetSecurity,
+                text: `Recommendation Trends: ${p.config.targetSecurity}`,
                 fontFamily: "verdana"
             },
             axisY: {

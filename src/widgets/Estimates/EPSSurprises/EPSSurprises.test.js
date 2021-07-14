@@ -6,7 +6,6 @@ import 'whatwg-fetch';
 import React from "react";
 import '@testing-library/jest-dom/extend-expect'
 import { screen, render,  waitFor, fireEvent} from '@testing-library/react' //prettyDOM
-import { configure } from '@testing-library/react'
 
 import { setupServer } from 'msw/node'
 
@@ -16,7 +15,7 @@ import { store } from '../../../store'
 import { Provider } from 'react-redux'
 
 //mock routes
-import {mockFinnHubData, getDashboard_success, mockExchangeData, } from './recommendationTrends.mock'
+import {mockFinnHubData, getDashboard_success, mockExchangeData, } from './EPSSuprises.mock'
 import { getCheckLogin_success } from '../../../server/routes/loginRoutes/checkLogin.mock'
 import { getFinnDashData_noData, postFinnDashData_noSave }  from '../../../server/routes/mongoDB/finnHubData.mock'
 import { postDashboard_success_noWidgets } from '../../../server/routes/loggedIn/dashboard.mock'
@@ -44,7 +43,7 @@ const mockHTTPServer = setupServer(
     mockExchangeData, //exchange data for TSLA and AAPL
     getCheckLogin_success,  //auto login, mock user data
     getDashboard_success, //default dashboard setup
-    mockFinnHubData, //mock finnhub earnings endpoint 
+    mockFinnHubData, //mock finnhub endpoint 
     getFinnDashData_noData, //mock mongo cached data empty.
     postFinnDashData_noSave, //mock post finndashdata save. 
     postDashboard_success_noWidgets,  //mock save dashboard after loading widget.
@@ -54,19 +53,10 @@ const mockHTTPServer = setupServer(
     updateGLConfig_success, //mock update success.
     findMongoData_empty, //no data found in mongo
     deleteFinnDashData_success, //delete success
-    )
-    
-configure({
-    getElementError: (message, container) => {
-        const error = new Error(message);
-        error.name = 'TestingLibraryElementError';
-        error.stack = null;
-        return error;
-    },
-    });
+    ) 
 
-const widgetType = 'EstimatesRecommendationTrends'
-const body = 'recTrendBody'
+const widgetType = 'EstimatesEPSSurprises'
+const body = 'EPSSurprisesBody'
 
 beforeAll(() => {mockHTTPServer.listen({
     onUnhandledRequest: 'warn',
@@ -83,7 +73,7 @@ beforeEach( async ()=>{
         expect(screen.getByTestId('dashboardMenu')).toBeInTheDocument()
     })
     
-    await addWidget('estimatesDropdown', 'Estimate', 'Recommendation Trends') //mount widget to be tested.
+    await addWidget('estimatesDropdown', 'Estimate', 'EPS Surprises') //mount widget to be tested.
 })
 
 afterEach( async ()=>{
@@ -99,54 +89,57 @@ it(`Test ${widgetType} Widget: Change focus renders body change. `, async (done)
 
     await testBodyRender([ //test that widget body renders api data.
         ['getByTestId', body], 
-        ['getByText', 'Recommendation Trends: US-WMT'], 
+        ['getByText', 'US-WMT: EPS Surprises:'], 
+
     ]) 
 
     await setSecurityFocus(widgetType, 'US-COST') //select new target security for widget.
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText', 'Quarter:'], 
-        ['getByText', 'Recommendation Trends: US-COST'], 
+        ['getByText', 'US-COST: EPS Surprises:'],
     ])
     await toggleEditPane(widgetType)
         done()
 })
 
-it(`Test ${widgetType} Widget: Toggle Button shows config screen.`, async (done) => { 
-    //toggle to testing edit pane
-    await toggleEditPane(widgetType)
-    await waitFor(() => { //test setup screen loaded.
-        expect(screen.getByText('Remove')).toBeInTheDocument()
-        expect(screen.getByTestId('remove-US-WMT')).toBeInTheDocument()
-        expect(screen.getByTestId('remove-US-COST')).toBeInTheDocument()
-    })
-    done()
-})
+// it(`Test ${widgetType} Widget: Toggle Button shows config screen.`, async (done) => { 
+//     //toggle to testing edit pane
+//     await toggleEditPane(widgetType)
+//     await waitFor(() => { //test setup screen loaded.
+//         expect(screen.getByText('Remove')).toBeInTheDocument()
+//         expect(screen.getByTestId('remove-US-WMT')).toBeInTheDocument()
+//         expect(screen.getByTestId('remove-US-COST')).toBeInTheDocument()
+//     })
+//     done()
+// })
 
-it(`Test ${widgetType} Widget: Rename widget works.`, async (done) => { 
-    await toggleEditPane(widgetType) //toggle to edit pane
-    await newWidgetName(widgetType, ['test', 'Test', 'Test!', 'test!$', 'test,', 'renameTookEffect']) //rename widget multiple times
-    await toggleEditPane(widgetType) //toggle to data pane.
-    expect(screen.getByText('renameTookEffect')).toBeInTheDocument()
-    await toggleEditPane(widgetType) //toggle to data pane.
-    done()
-})
 
-it(`Test ${widgetType} Widget: Add security from widget config screen works.`, async (done) => { 
-    await toggleEditPane(widgetType) //toggle to edit pane
-    await addSecurity(widgetType, [['TSLA', 'US-TSLA: TESLA INC'], ['AAPL', 'US-AAPL: APPLE INC']]) //add security to widget with search bar
-    await waitFor(() => {
-        expect(screen.getByTestId('remove-US-TSLA')).toBeInTheDocument()
-        expect(screen.getByTestId('remove-US-AAPL')).toBeInTheDocument()
-    })
-    done()
-})
+// it(`Test ${widgetType} Widget: Rename widget works.`, async (done) => { 
+//     await toggleEditPane(widgetType) //toggle to edit pane
+//     await newWidgetName(widgetType, ['test', 'Test', 'Test!', 'test!$', 'test,', 'renameTookEffect']) //rename widget multiple times
+//     await toggleEditPane(widgetType) //toggle to data pane.
+//     expect(screen.getByText('renameTookEffect')).toBeInTheDocument()
+//     await toggleEditPane(widgetType) //toggle to data pane.
+//     done()
+// })
 
-it(`Test ${widgetType} Widget: Test that removing securities from edit pane works.`, async (done) => { 
-    await toggleEditPane(widgetType) //toggle to edit pane
-    await fireEvent.click(screen.getByTestId('remove-US-WMT'))    //remove target stock
-    await waitFor(async () => {
-        await expect(screen.queryByTestId('remove-US-WMT')).toBe(null)
-        expect(screen.getByTestId('remove-US-COST')).toBeInTheDocument()
-    })
-    done()
-})
+// it(`Test ${widgetType} Widget: Add security from widget config screen works.`, async (done) => { 
+//     await toggleEditPane(widgetType) //toggle to edit pane
+//     await addSecurity(widgetType, [['TSLA', 'US-TSLA: TESLA INC'], ['AAPL', 'US-AAPL: APPLE INC']]) //add security to widget with search bar
+//     await waitFor(() => {
+//         expect(screen.getByTestId('remove-US-TSLA')).toBeInTheDocument()
+//         expect(screen.getByTestId('remove-US-AAPL')).toBeInTheDocument()
+//     })
+//     done()
+// })
+
+// it(`Test ${widgetType} Widget: Test that removing securities from edit pane works.`, async (done) => { 
+//     await toggleEditPane(widgetType) //toggle to edit pane
+//     await fireEvent.click(screen.getByTestId('remove-US-WMT'))    //remove target stock
+//     await waitFor(async () => {
+//         await expect(screen.queryByTestId('remove-US-WMT')).toBe(null)
+//         expect(screen.getByTestId('remove-US-COST')).toBeInTheDocument()
+//     })
+//     done()
+// })
+

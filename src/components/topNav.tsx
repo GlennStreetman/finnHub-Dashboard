@@ -91,7 +91,7 @@ class TopNav extends React.Component<topNavProps, topNavState> {
         const p: topNavProps = this.props
 
         let widgetDropDown = <>
-            <ul id='ddu' className='sub-Menu'>
+            <ul id='ddu' className='sub-Menu' data-testid='widgetDropDown'>
                 <li id='ddi' className='menu-item-has-children'><a data-testid="estimatesDropdown" href='#1'>Estimate</a>
                     {this.dropDownList(estimateOptions)}
                 </li>
