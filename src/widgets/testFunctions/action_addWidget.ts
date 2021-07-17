@@ -10,12 +10,13 @@ const addWidget = async function (category: string, categoryText: string, widget
         expect(screen.getByTestId(category)).toBeInTheDocument() //estimatesDropDown, fundamentalsDropdown, priceDropDown
     })
     fireEvent.mouseOver(screen.getByText(categoryText)); //Estimate, Fundamental, Price
-    // console.log(console.log(prettyDOM(screen.getByTestId('widgetDropDown'))))
+    // console.log(prettyDOM(screen.getByTestId('widgetDropDown')))
     await waitFor(() => {
         expect(screen.getByTestId(widgetText)).toBeInTheDocument() //copy submenu text
     })
     expect(screen.getByTestId(widgetText)).toBeInTheDocument()
     fireEvent.click(screen.getByTestId(widgetText)) //copy submenu text
+    // console.log('widget loaded')
 }
 
 export { addWidget }

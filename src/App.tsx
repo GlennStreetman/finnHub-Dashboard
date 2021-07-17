@@ -324,7 +324,6 @@ class App extends React.Component<AppProps, AppState> {
                 targetSecurity: globalKeys[0]
             })
         }
-
     }
 
     componentWillUnmount() {

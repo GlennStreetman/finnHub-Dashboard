@@ -12,7 +12,7 @@ export default class ReactChart extends React.PureComponent {
     let CanvasJSChart = CanvasJSReact.CanvasJSChart;
     let options = this.props.chartOptions;
     return (
-      <div data-testid={`canvasChart`}>
+      <div data-testid={`${this.props.testid}`}>
         {this.props.chartOptions !== undefined && <CanvasJSChart  options={options} onRef={(ref) => (this.chart = ref)} />}
       </div>
     );

@@ -172,7 +172,7 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
                     />
                 </div>
                 <div className="graphDiv">
-                    <RecTrendChart chartOptions={chartOptions} />
+                    <RecTrendChart chartOptions={chartOptions} targetSecurity={p.config.targetSecurity} />
                 </div>
             </div>
         );

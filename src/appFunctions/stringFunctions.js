@@ -20,7 +20,7 @@ export function findByString(searchObj, searchList){ //find value in nested obje
             let foundObj = searchObj[searchTerm]
             return findByString(foundObj, searchList)
         } else {
-            console.log('FILTER NOT FOUND:', searchList)
+            // console.log('FILTER NOT FOUND:', searchList)
             return({})
         }
     }

@@ -82,7 +82,7 @@ function findByString(searchObj, thisSearch){ //find value in nested object
             let foundObj = searchObj[searchTerm]
             return findByString(foundObj, searchList)
         } else {
-            console.log('FILTER NOT FOUND:', searchList)
+            // console.log('FILTER NOT FOUND:', searchList)
             return({})
         }
     }

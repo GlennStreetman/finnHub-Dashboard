@@ -38,7 +38,7 @@ const testDashboard = { //setup containing a single dashboard, TEST, and one wid
 export const getDashboard_success =     //auto login check rejected.
     rest.get("/dashboard", (req, res, ctx) => {
         const resObj = testDashboard
-        console.log('RETURNING DASHBOARD DATA MOCK')
+        // console.log('RETURNING DASHBOARD DATA MOCK')
         return res(
             ctx.status(200),
             ctx.json(resObj)
@@ -103,7 +103,7 @@ export const mockFinnHubData =
 
 export const getCheckLogin_success =     //auto login check rejected.
     rest.get("/checkLogin", (req, res, ctx) => {
-        console.log('get/CheckLogin success, returning login 1')
+        // console.log('get/CheckLogin success, returning login 1')
         return res(
             ctx.status(200),
             ctx.json({
@@ -112,8 +112,8 @@ export const getCheckLogin_success =     //auto login check rejected.
                 ratelimit: 25,
                 apiAlias: 'alias',
                 widgetsetup: '{"EstimatesPriceTarget":true}', //UPDATE NEEDED IF premium feature. First item from topNavReg tuple.
-                exchangelist: ['US'],
-                defaultexchange: ['US',]
+                exchangelist: 'US,AS',
+                defaultexchange: 'US'
             })
         )
     })

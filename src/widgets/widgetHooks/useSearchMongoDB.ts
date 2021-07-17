@@ -15,13 +15,11 @@ export const useSearchMongoDb = function (
 ) {
     useEffect(() => { //on change to targetSecurity rebuild data set.
         if (isInitialMount.current === true && widgetCopy === widgetKey) {
-            // console.log('pass')
         } else if (targetSecurity && targetSecurity !== '' && isInitialMount.current !== true) {
             const target = `${widgetKey}-${targetSecurity}`
             dispatch(tSearchMongoDB([target]))
                 .then((res) => {
                     if (Object.values(res.payload)[0] === '') {
-                        // console.log('Warning: Could not retrieve data from cache. Forcing update from finnhub API')
                         const payload = {
                             targetDashBoard: currentDashBoard,
                             widgetList: [widgetKey],

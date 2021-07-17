@@ -8,6 +8,7 @@ export const useUpdateFocus = function ( //on update to p.targetFocus update p.c
     key: number, // p.widgetKey, 
     targetSecurity: string, //p.config.targetSecurity
 ) {
+
     useEffect(() => { //Setup default metric source if none selected or not in list of target stocks
         if (newFocus && newFocus !== '') { //&& newFocus !== targetSecurity
             const payload = { targetSecurity: newFocus }

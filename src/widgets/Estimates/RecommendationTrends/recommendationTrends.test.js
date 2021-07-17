@@ -63,7 +63,7 @@ configure({
         error.stack = null;
         return error;
     },
-    });
+});
 
 const widgetType = 'EstimatesRecommendationTrends'
 const body = 'recTrendBody'
@@ -99,13 +99,13 @@ it(`Test ${widgetType} Widget: Change focus renders body change. `, async (done)
 
     await testBodyRender([ //test that widget body renders api data.
         ['getByTestId', body], 
-        ['getByText', 'Recommendation Trends: US-WMT'], 
+        ['getByTestId', 'chart-US-WMT'], 
     ]) 
 
     await setSecurityFocus(widgetType, 'US-COST') //select new target security for widget.
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
-        ['getByText', 'Quarter:'], 
-        ['getByText', 'Recommendation Trends: US-COST'], 
+        ['getByTestId', body], 
+        ['getByTestId', 'chart-US-COST'], 
     ])
     await toggleEditPane(widgetType)
         done()

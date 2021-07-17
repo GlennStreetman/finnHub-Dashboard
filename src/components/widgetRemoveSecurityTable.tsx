@@ -6,7 +6,7 @@ interface Props {
     trackedStocks: stockList,
     widgetKey: string,
     updateWidgetStockList: Function,
-    exchangeList: string[]
+    exchangeList: string[],
 }
 
 export default function WidgetRemoveSecurityTable(p: Props): ReactElement {

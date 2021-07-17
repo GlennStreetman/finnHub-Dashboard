@@ -158,7 +158,7 @@ function EstimatesEPSSurprises(p: { [key: string]: any }, ref: any) {
                     />
                 </div>
                 <div className="graphDiv" data-testid={`EPSChart`}>
-                    <ReactChart chartOptions={chartOptions} />
+                    <ReactChart chartOptions={chartOptions} testid={`chart-${p.widgetType}`} />
                 </div>
             </>
         );

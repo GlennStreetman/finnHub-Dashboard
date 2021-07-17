@@ -22,8 +22,8 @@ rest.get("/checkLogin", (req, res, ctx) =>{
             ratelimit: 25,
             apiAlias: 'alias',
             widgetsetup: '{"PriceSplits":false}',
-            exchangelist: ['US'],
-            defaultexchange: ['US',]
+            exchangelist: 'US,AS',
+            defaultexchange: 'US'
         })
     )
 })

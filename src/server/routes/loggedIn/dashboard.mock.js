@@ -31,7 +31,7 @@ rest.get("/dashboard", (req, res, ctx) =>{
         menuSetup: menuList,
         message: '',
     }
-    console.log('RETURNING DASHBOARD DATA MOCK')
+    // console.log('RETURNING DASHBOARD DATA MOCK')
     return res(
         ctx.status(200),
         ctx.json(resObj)

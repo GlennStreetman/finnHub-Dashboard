@@ -9,8 +9,8 @@ interface session {
 }
 
 export interface reqObj { //fetch post/findMongoData
-    searchList: string[],
-    dashboard: string,
+    searchList: string[], //list of widgetKeys to search for.
+    dashboard: string, //dashboard name
 }
 
 interface findMongoDataPost extends Request {
@@ -66,7 +66,7 @@ router.post('/findMongoData', async (req: findMongoDataPost, res: any) => {
             }
             const findDataSet = await dataSet.find(options)
             const resList: resObj[] = []
-            await findDataSet.forEach((data: resObj) => {
+            await findDataSet.forEach((data: resObj) => { //map this
                 resList.push(data)
             })
 

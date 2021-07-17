@@ -172,7 +172,6 @@ class TopNav extends React.Component<topNavProps, topNavState> {
                         </li>
                         <li id='LogButton' className='navItem'>
                             <a id='LogButtonLink' href="#home" onClick={async () => {
-                                console.log('CLICK')
                                 await this.props.logoutServer()
                                 this.props.logOut()
                             }}>

@@ -7,9 +7,9 @@ export function sStock(stock){
 //use where stock symbols are displayed to user.
 export function dStock(stock, exList){
     if (exList.length <= 1) {
-        return stock.key
+        return stock?.symbol
     } else {
-        return stock.symbol
+        return stock?.key
     }
 }
 

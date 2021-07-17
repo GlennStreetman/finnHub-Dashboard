@@ -146,7 +146,6 @@ const showData = createSlice({
             // return {...state}
         },
         [tSearchMongoDB.fulfilled.toString()]: (state, action) => {
-            // console.log('tSearchMongoDB', action.payload)
             const ap: any = action.payload
             for (const x in ap) {
                 if (ap[x] !== '') {

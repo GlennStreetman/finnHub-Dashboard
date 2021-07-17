@@ -5,9 +5,11 @@
 import 'whatwg-fetch';
 import React from "react";
 import '@testing-library/jest-dom/extend-expect'
-import { screen, render,  waitFor, fireEvent} from '@testing-library/react' //prettyDOM
+import { screen, render,  waitFor, fireEvent,prettyDOM} from '@testing-library/react' //prettyDOM
+import { configure } from '@testing-library/react'
 
 import { setupServer } from 'msw/node'
+// import {jest} from 'jest'
 
 //components
 import App from '../../../App'
@@ -38,6 +40,7 @@ import { changeFilter } from '../../testFunctions/action_ChangeFilter'
 //test procedures
 import {testBodyRender} from '../../testFunctions/test_bodyRender'
 
+jest.mock('./../../../appFunctions/appImport/setupDashboard')
 //mock service worker for all http requests
 const mockHTTPServer = setupServer(
     mockExchangeData, //exchange data for TSLA and AAPL
@@ -54,6 +57,15 @@ const mockHTTPServer = setupServer(
     findMongoData_empty, //no data found in mongo
     deleteFinnDashData_success, //delete success
     ) 
+
+    configure({
+        getElementError: (message, container) => {
+            const error = new Error(`${message}`); //Debug Node: ${prettyDOM(screen.getByTestId(body), 30000)}
+            error.name = 'TestingLibraryElementError';
+            error.stack = null;
+            return error;
+        },
+    });
 
 const widgetType = 'EstimatesEarningsCalendar'
 const body = 'earningsCalendarBody'
@@ -96,7 +108,7 @@ it(`Test ${widgetType} Widget: Change focus renders body change. `, async (done)
     await setSecurityFocus(widgetType, 'US-COST') //select new target security for widget.
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText', 'Quarter:'], 
-        ['getByText','3.33']
+        ['getByText','3.31']
     ])
     await toggleEditPane(widgetType)
         done()
@@ -111,17 +123,17 @@ it(`Test ${widgetType} Widget: Change pagination.`, async (done) => { //needs nu
     await clickPagination('pageForward') //click forward pagination button. Showing costco currently.
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText', 'Quarter:'], 
-        ['getByText','2.22']
+        ['getByText','2.21']
     ]) 
     await setSecurityFocus(widgetType, 'US-COST') //select new target security for widget.
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText', 'Quarter:'], 
-        ['getByText','3.33']
+        ['getByText','3.31']
     ]) 
     await clickPagination('pageForward') //click forward pagination button. Showing costco currently.
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText', 'Quarter:'], 
-        ['getByText','4.44']
+        ['getByText','4.41']
     ]) 
     await toggleEditPane(widgetType)
     done()

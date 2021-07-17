@@ -18,6 +18,7 @@ import { useDragCopy } from './../../widgetHooks/useDragCopy'
 import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
 import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
+import { useResetPagination } from './../../widgetHooks/useResetPagination'
 
 import { useStartingFilters } from './../../widgetHooks/useStartingFilters'
 
@@ -123,10 +124,12 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
+    useResetPagination(p.config.targetSecurity, setPagination)
 
     function changePagination(e) {
         const newIncrement = pagination + e;
-        if (newIncrement >= 0 && newIncrement < Object.keys(rShowData ? rShowData : 1).length) setPagination(newIncrement)
+        // console.log('change pagination', newIncrement)
+        if (newIncrement >= 0 && newIncrement < Object.keys(rShowData ? rShowData : { 1: 1 }).length) setPagination(newIncrement)
     }
 
     function renderSearchPane() {
@@ -178,10 +181,10 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
                         config={p.config}
 
                     />
-                    <button data-testid="pageForward" onClick={() => changePagination(-1)}>
+                    <button data-testid="pageBackward" onClick={() => changePagination(-1)}>
                         <i className="fa fa-backward" aria-hidden="true"></i>
                     </button>
-                    <button data-testid="pageBackward" onClick={() => changePagination(1)}>
+                    <button data-testid="pageForward" onClick={() => changePagination(1)}>
                         <i className="fa fa-forward" aria-hidden="true"></i>
                     </button>
                 </div>

@@ -92,7 +92,6 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
                                 <button
                                     key={el + "clck"}
                                     onClick={(e) => {
-                                        console.log('click update')
                                         p.updateGlobalStockList(e, el);
                                     }}
                                 >

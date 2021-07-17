@@ -8,6 +8,7 @@ export default function basicFinancialsEndPoint(stockList: StockObj[], filters, 
         const stockSymbol = stockList[stock].symbol
         const key = stockList[stock].key
         const queryString = `https://finnhub.io/api/v1/stock/metric?symbol=${stockSymbol}&metric=all&token=${apiKey}`
+        // console.log(queryString)
         if (types.reStock.test(stockSymbol) === true && types.finnHubAPI.test(queryString) === true) {
             queryStringObj[key] = (queryString)
         } else {

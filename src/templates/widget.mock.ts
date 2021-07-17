@@ -144,7 +144,7 @@ export const mockExchangeData =
         )
     })
 
-export const getCheckLogin_success =     //auto login check rejected.
+export const getCheckLogin_success =     //use this if premium route. Update widgetSetup below
     rest.get("/checkLogin", (req, res, ctx) => {
         console.log('check login')
         return res(

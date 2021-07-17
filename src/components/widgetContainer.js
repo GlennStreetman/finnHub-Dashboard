@@ -154,7 +154,8 @@ function WidgetContainer(p) {
         key={p.widgetKey + "container" + p.widgetList.column} 
         id={p.widgetKey + "box"} 
         style={compStyle} 
-        className="widgetBox"  
+        className="widgetBox"
+        data-testid={`container-${p.widgetList.widgetType}`}  
     >
         {p.widgetLockDown === 0 ? (
         <div className="widgetHeader">

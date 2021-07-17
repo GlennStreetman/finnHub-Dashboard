@@ -6,6 +6,7 @@ import 'whatwg-fetch';
 import React from "react";
 import '@testing-library/jest-dom/extend-expect'
 import { screen, render,  waitFor, fireEvent} from '@testing-library/react' //prettyDOM
+import { configure } from '@testing-library/react'
 
 import { setupServer } from 'msw/node'
 
@@ -54,6 +55,15 @@ const mockHTTPServer = setupServer(
     findMongoData_empty, //no data found in mongo
     deleteFinnDashData_success, //delete success
     ) 
+
+configure({
+    getElementError: (message, container) => {
+        const error = new Error(message);
+        error.name = 'TestingLibraryElementError';
+        error.stack = null;
+        return error;
+    },
+});
 
 const widgetType = 'EstimatesEarningsCalendar'
 const body = 'earningsCalendarBody'

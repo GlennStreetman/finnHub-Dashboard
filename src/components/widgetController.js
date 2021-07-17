@@ -14,6 +14,7 @@ function WidgetController(p){
                 changeWidgetName: p.changeWidgetName,
                 currentDashBoard: p.currentDashBoard,
                 enableDrag: p.enableDrag,
+                exchangeList: p.exchangeList,
                 finnHubQueue: p.finnHubQueue,
                 key: el.widgetId,
                 loadSavedDashboard: p.loadSavedDashboard,

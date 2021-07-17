@@ -8,7 +8,7 @@ export const tSearchMongoDB = createAsyncThunk( //{ [widgetKey-securityList]}
         //if stale pop from list 
         const dashboard = thunkAPI.getState().showData.targetDashboard
         const reqData: reqObj = {
-            searchList: req,
+            searchList: req, //list of widget keys that need to be found in mongoDB. widgetKey-Security. ex: "1626322988025-US-AAPL"
             dashboard: dashboard
         }
         try {

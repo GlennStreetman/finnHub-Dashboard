@@ -45,9 +45,9 @@ class CreateTimeSeriesChart extends React.PureComponent {
         var CanvasJSChart = CanvasJSReact.CanvasJSChart;
         let options = this.props.candleData;
         return (
-            <>
+            <div data-testid={this.props.testid}>
                 {this.props.candleData !== undefined && <CanvasJSChart options={options} onRef={(ref) => (this.chart = ref)} />}
-            </>
+            </div>
         );
 
         /*You can get reference to the chart instance as shown above using onRef. This allows you to access all chart properties and methods*/

@@ -51,7 +51,7 @@ const resData_WMT = {
         {
             "date": "2020-01-28",
             "epsActual": 1.11,
-            "epsEstimate": 1.11,
+            "epsEstimate": 1.12,
             "hour": "amc",
             "quarter": 1,
             "revenueActual": 91819000000,
@@ -61,7 +61,7 @@ const resData_WMT = {
         },
         {
             "date": "2019-10-30",
-            "epsActual": 2.22,
+            "epsActual": 2.21,
             "epsEstimate": 2.22,
             "hour": "amc",
             "quarter": 4,
@@ -77,7 +77,7 @@ const resData_COST = {
     "earningsCalendar": [
         {
             "date": "2020-01-28",
-            "epsActual": 3.33,
+            "epsActual": 3.31,
             "epsEstimate": 3.33,
             "hour": "amc",
             "quarter": 1,
@@ -88,7 +88,7 @@ const resData_COST = {
         },
         {
             "date": "2019-10-30",
-            "epsActual": 4.44,
+            "epsActual": 4.41,
             "epsEstimate": 4.44,
             "hour": "amc",
             "quarter": 4,
@@ -105,7 +105,7 @@ const resData_WMT_toggle = {
     "earningsCalendar": [
         {
             "date": "2020-01-28",
-            "epsActual": 5.55,
+            "epsActual": 5.51,
             "epsEstimate": 5.55,
             "hour": "amc",
             "quarter": 1,
@@ -116,7 +116,7 @@ const resData_WMT_toggle = {
         },
         {
             "date": "2019-10-30",
-            "epsActual": 6.66,
+            "epsActual": 6.61,
             "epsEstimate": 6.66,
             "hour": "amc",
             "quarter": 4,
@@ -132,7 +132,7 @@ const resData_COST_toggle = {
     "earningsCalendar": [
         {
             "date": "2020-01-28",
-            "epsActual": 7.77,
+            "epsActual": 7.71,
             "epsEstimate": 7.77,
             "hour": "amc",
             "quarter": 1,
@@ -143,7 +143,7 @@ const resData_COST_toggle = {
         },
         {
             "date": "2019-10-30",
-            "epsActual": 8.88,
+            "epsActual": 8.81,
             "epsEstimate": 8.88,
             "hour": "amc",
             "quarter": 4,
