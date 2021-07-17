@@ -167,7 +167,7 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
             {p.showEditPane === 1 && (
                 <div style={{ width: '100%', backgroundColor: '#1d69ab' }}>
                     <table>
-                        <tbody>
+                        <tbody style={{}}>
                             <tr>
                                 <td>
                                     <ToolTip textFragment={helpText} hintName='wl' /></td>

@@ -265,12 +265,19 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     function getMetrics() {
         let metricSelector = (
             <>
-                <div>
+                <div style={{ width: '100%', backgroundColor: '#1d69ab' }}>
                     <table>
-                        <thead>
+                        <thead style={{
+                            backgroundColor: '#dcdcdc',
+                            fontWeight: 'normal',
+                            padding: '0px',
+                            verticalAlign: 'bottom',
+                            textAlign: 'center',
+                            textTransform: 'capitalize'
+                        }}>
                             <tr>
-                                <td>Metrics</td>
-                                <td>Series</td>
+                                <td style={{ backgroundColor: '#1d69ab', color: 'white' }}>Metrics</td>
+                                <td style={{ backgroundColor: '#1d69ab', color: 'white' }}>Series</td>
                             </tr>
                         </thead>
                         <tbody>
@@ -293,25 +300,31 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                                         onChange={() => setToggleMode('series')}
                                     />
                                 </td>
+                                <td>
+                                    <button onClick={() => changeIncrememnt(-1)}>
+                                        <i className="fa fa-backward" aria-hidden="true" />
+                                    </button>
+                                </td>
+                                <td>
+                                    <button onClick={() => changeIncrememnt(1)}>
+                                        <i className="fa fa-forward" aria-hidden="true" />
+                                    </button>
+                                </td>
+                                <td>
+                                    {symbolView === 0 && (
+                                        <button onClick={() => { orderView === 1 ? setOrderView(0) : setOrderView(1) }}>
+                                            {orderView === 0 ? 'Order' : 'Selection'}
+                                        </button>
+                                    )}
+                                </td>
+                                <td>
+                                    <button data-testid='symbolViewSelector' onClick={() => { symbolView === 1 ? setSymbolView(0) : setSymbolView(1) }}>
+                                        {symbolView === 0 ? 'Stocks' : 'Metrics'}
+                                    </button>
+                                </td>
                             </tr>
                         </tbody>
                     </table>
-                </div>
-                <div>
-                    <button onClick={() => changeIncrememnt(-1)}>
-                        <i className="fa fa-backward" aria-hidden="true" />
-                    </button>
-                    <button onClick={() => changeIncrememnt(1)}>
-                        <i className="fa fa-forward" aria-hidden="true" />
-                    </button>
-                    {symbolView === 0 && (
-                        <button onClick={() => { orderView === 1 ? setOrderView(0) : setOrderView(1) }}>
-                            {orderView === 0 ? 'Order' : 'Selection'}
-                        </button>
-                    )}
-                    <button data-testid='symbolViewSelector' onClick={() => { symbolView === 1 ? setSymbolView(0) : setSymbolView(1) }}>
-                        {symbolView === 0 ? 'Stocks' : 'Metrics'}
-                    </button>
                 </div>
                 <div>{metricsTable()}</div>
             </>
@@ -400,12 +413,12 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
             let mapStockSelection = stockSelectionSlice.map((el, index) => (
                 <tr key={el + "metricRow" + index}>
-                    <td key={el + "remove"}>
+                    <td className='centerTE' key={el + "remove"}>
                         <button data-testid={`remove-${el}`} onClick={() => { updateWidgetList(el); }}><i className="fa fa-times" aria-hidden="true" /></button>
                     </td>
-                    <td><input type='radio' name='sourceStock' checked={p.config.targetSecurity === el} onChange={() => changeSource(el)} /></td>
-                    <td className='leftTE' key={el + "metricdesc"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
-                    <td className='leftTE'>{p.trackedStocks[el].description}</td>
+                    <td className='centerTE'><input type='radio' name='sourceStock' checked={p.config.targetSecurity === el} onChange={() => changeSource(el)} /></td>
+                    <td className='centerTE' key={el + "metricdesc"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
+                    <td className='centerTE'>{p.trackedStocks[el].description}</td>
 
 
                 </tr>
@@ -448,8 +461,8 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 }
             }
             let metricSelectTable = (
-                <div className="widgetTableDiv">
-                    <table className='widgetBodyTable'>
+                <div className="dataTable">
+                    <table className='dataTable'>
                         <thead>
                             <tr>
                                 {metricSelectTableheading()}
