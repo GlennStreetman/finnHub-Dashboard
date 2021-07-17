@@ -312,7 +312,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                                 </td>
                                 <td>
                                     {symbolView === 0 && (
-                                        <button onClick={() => { orderView === 1 ? setOrderView(0) : setOrderView(1) }}>
+                                        <button onClick={() => { orderView === 1 ? setOrderView(0) : setOrderView(1); setMetricIncrementor(1) }}>
                                             {orderView === 0 ? 'Order' : 'Selection'}
                                         </button>
                                     )}
