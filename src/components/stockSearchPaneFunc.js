@@ -40,7 +40,8 @@
         )
         const helpText = <>
             Select Exchange to search. <br />
-            Click manage account to update exchange list. 
+            Click manage account to update exchange list.<br />
+            Enter stock name or symbol to search for stocks.
         </>
         const helpText2 = <>
             Enter stock name or symbol to search for stocks. <br />
@@ -66,15 +67,16 @@
                 }
             }}
             >
+            <ToolTip textFragment={this.props.exchangeList.length > 1 ? helpText : helpText2} hintName='sspe2' />
             {this.props.exchangeList.length > 1 && <>
-                <ToolTip textFragment={helpText} hintName='sspe' />
+                {/* <ToolTip textFragment={helpText} hintName='sspe' /> */}
             {/* <label htmlFor="exchangeList">Exchange:</label> */}
             <select value={this.props.defaultExchange} name='exchangeList' onChange={this.changeDefault}>
                 {exchangeOptions}
             </select></>
             } 
 
-            <ToolTip textFragment={helpText2} hintName='sspe2' />
+            
             <label htmlFor="stockSearch">Security: </label>
             <input size='18' 
                 autoComplete="off" 
