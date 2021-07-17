@@ -390,10 +390,10 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             let mapMetricSelection = metricSelectionSlice.map((el, index) => (
                 <tr key={el + "metricRow" + index}>
                     <td key={el + "metricdesc"}>{convertCamelToProper(el)}</td>
-                    <td key={el + "up"}>
+                    <td className='centerTE' key={el + "up"}>
                         <button onClick={() => changeOrder(index, -1, 'metricSelection')}><i className="fa fa-sort-asc" aria-hidden="true"></i></button>
                     </td>
-                    <td key={el + "down"}>
+                    <td className='centerTE' key={el + "down"}>
                         <button onClick={() => changeOrder(index, 1, 'metricSelection')}><i className="fa fa-sort-desc" aria-hidden="true"></i></button>
                     </td>
                 </tr>
