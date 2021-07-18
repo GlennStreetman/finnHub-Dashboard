@@ -33,17 +33,6 @@ export interface FinnHubAPIDataArray {
     [index: number]: FinnHubAPIData
 }
 
-//add any additional type guard functions here used for live code.
-function isFinnHubData(arg: any): arg is FinnHubAPIDataArray { //typeguard
-    return true
-    // if (arg !== undefined && Object.keys(arg).length > 0 && arg[Object.keys(arg)[0]].filters) {
-    //     return true
-    // } else {
-    //     // console.log('didnt pass', arg)
-    //     return false
-    // }
-}
-
 function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
 
@@ -172,22 +161,16 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     }, [p.updateWidgetConfig, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
 
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
-        if (isFinnHubData(rShowData) === true) {
-
-            const newData: FinnHubAPIDataArray = {}
-            for (const node in rShowData) {
-                newData[node] = {
-                    metrics: {},
-                    series: {},
-                }
-                if (rShowData?.[node]?.['metric']) { newData[node].metrics = rShowData[node]['metric'] }
-                if (rShowData?.[node]?.['series']?.['annual']) newData[node].series = rShowData[node]['series']['annual']
+        const newData: FinnHubAPIDataArray = {}
+        for (const node in rShowData) {
+            newData[node] = {
+                metrics: {},
+                series: {},
             }
-            setStockData(newData)
-        } else {
-            console.log('does not pass guard')
-            setStockData({})
+            if (rShowData?.[node]?.['metric']) { newData[node].metrics = rShowData[node]['metric'] }
+            if (rShowData?.[node]?.['series']?.['annual']) newData[node].series = rShowData[node]['series']['annual']
         }
+        setStockData(newData)
     }, [rShowData])
 
     useEffect(() => { //sets up lists used in widget configuration menu.
