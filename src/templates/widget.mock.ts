@@ -160,3 +160,68 @@ export const getCheckLogin_success =     //use this if premium route. Update wid
             })
         )
     })
+
+//data to be returned for test purposes for after filter change.
+const resData_WMT_toggle = {
+    "earningsCalendar": [
+        {
+            "date": "2020-01-28",
+            "epsActual": 5.51,
+            "epsEstimate": 5.55,
+            "hour": "amc",
+            "quarter": 1,
+            "revenueActual": 91819000000,
+            "revenueEstimate": 88496400810,
+            "symbol": "WMT",
+            "year": 2020
+        },
+        {
+            "date": "2019-10-30",
+            "epsActual": 6.61,
+            "epsEstimate": 6.66,
+            "hour": "amc",
+            "quarter": 4,
+            "revenueActual": 64040000000,
+            "revenueEstimate": 62985161760,
+            "symbol": "WMT",
+            "year": 2019
+        }
+    ]
+}
+
+const resData_COST_toggle = {
+    "earningsCalendar": [
+        {
+            "date": "2020-01-28",
+            "epsActual": 7.71,
+            "epsEstimate": 7.77,
+            "hour": "amc",
+            "quarter": 1,
+            "revenueActual": 91819000000,
+            "revenueEstimate": 88496400810,
+            "symbol": "COST",
+            "year": 2020
+        },
+        {
+            "date": "2019-10-30",
+            "epsActual": 8.81,
+            "epsEstimate": 8.88,
+            "hour": "amc",
+            "quarter": 4,
+            "revenueActual": 64040000000,
+            "revenueEstimate": 62985161760,
+            "symbol": "COST",
+            "year": 2019
+        }
+    ]
+}
+
+export const mockFinnHubData_toggle = //MOCK API REQUEST FOR THIS WIDGET. Remember to update api string on next line.
+    rest.get("https://finnhub.io/api/v1/calendar/earnings*", (req, res, ctx) => {
+        const symbol = req.url.searchParams.get('symbol')
+        let resData = symbol === 'WMT' ? resData_WMT_toggle : resData_COST_toggle
+        return res(
+            ctx.status(200),
+            ctx.json(resData)
+        )
+    })

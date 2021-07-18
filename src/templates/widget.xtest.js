@@ -6,6 +6,8 @@ import 'whatwg-fetch';
 import React from "react";
 import '@testing-library/jest-dom/extend-expect'
 import { screen, render,  waitFor, fireEvent} from '@testing-library/react' //prettyDOM
+        // let renameList = screen.getByTestId(body)
+        // console.log(prettyDOM(renameList))
 import { configure } from '@testing-library/react'
 
 import { setupServer } from 'msw/node'

@@ -7,6 +7,7 @@ import { useAppDispatch, useAppSelector } from '../../../hooks';
 import WidgetFocus from '../../../components/widgetFocus'
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import WidgetFilterDates from '../../../components/widgetFilterDates'
 
 //hooks
 import { useDragCopy } from '../../widgetHooks/useDragCopy'
@@ -14,8 +15,6 @@ import { useSearchMongoDb } from '../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from '../../widgetHooks/useBuildVisableData'
 import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
 import { useStartingFilters } from '../../widgetHooks/useStartingFilters'
-
-// import { dStock } from './../../../appFunctions/formatStockSymbols'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -130,7 +129,7 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
     }
 
     function shortHeadline(headline) {
-        let shortHeadLine = headline.slice(0, 32) + "...";
+        let shortHeadLine = headline.slice(0, 128) + "...";
         return shortHeadLine;
     }
 
@@ -139,38 +138,8 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
         if (newIncrement > 0 && newIncrement < 11) setNewsIncrementor(newIncrement)
     }
 
-    // function updateWidgetList(stock) {
-    //     if (stock.indexOf(":") > 0) {
-    //         const stockSymbole = stock.slice(0, stock.indexOf(":"));
-    //         p.updateWidgetStockList(p.widgetKey, stockSymbole);
-    //     } else {
-    //         p.updateWidgetStockList(p.widgetKey, stock);
-    //     }
-    // }
-
     function editNewsListForm() {
-        // let newsList = Object.keys(p.trackedStocks);
-        // let stockNewsRow = newsList.map((el) =>
-        //     p.showEditPane === 1 ? (
-        //         <tr key={el + "container"}>
-        //             <td className="centerTE" key={el + "buttonC"}>
-        //                 <button
-        //                     data-testid={`remove-${el}`}
-        //                     key={el + "button"}
-        //                     onClick={() => {
-        //                         updateWidgetList(el);
-        //                     }}
-        //                 >
-        //                     <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
-        //                 </button>
-        //             </td>
-        //             <td className='centerTE' key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
-        //             <td className='leftTE'>{p.trackedStocks[el].description}</td>
-        //         </tr>
-        //     ) : (
-        //         <tr key={el + "pass"}></tr>
-        //     )
-        // );
+
         let stockNewsTable = (
             <WidgetRemoveSecurityTable
                 trackedStocks={p.trackedStocks}
@@ -178,18 +147,6 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
                 updateWidgetStockList={p.updateWidgetStockList}
                 exchangeList={p.exchangeList}
             />
-            // <div className='scrollableDiv'>
-            //     <table className='dataTable'>
-            //         <thead>
-            //             <tr>
-            //                 <td>Remove</td>
-            //                 <td>Symbol</td>
-            //                 <td>Name</td>
-            //             </tr>
-            //         </thead>
-            //         <tbody>{stockNewsRow}</tbody>
-            //     </table>
-            // </div>
         );
         return stockNewsTable;
     }
@@ -201,8 +158,8 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
         let newsSlice = Array.isArray(rShowData) === true ? rShowData.slice(newStart, newsEnd) : []
         let mapNews = Array.isArray(newsSlice) ? newsSlice.map((el, index) => (
             <tr key={el + "newsRow" + index}>
-                <td key={el + "newsSource"}>{formatSourceName(el["source"])}</td>
-                <td key={el + "newsHeadline"}>
+                <td className='rightTE' key={el + "newsSource"}>{formatSourceName(el["source"])}</td>
+                <td className='leftTE' key={el + "newsHeadline"}>
                     <a key={el + "newsUrl"} href={el["url"]} target="_blank" rel="noopener noreferrer">
                         {shortHeadline(el["headline"])}
                     </a>
@@ -216,7 +173,7 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
                     <thead>
                         <tr>
                             <td>Source</td>
-                            <td>Headline</td>
+                            <td className='leftTE'>Headline</td>
                         </tr>
                     </thead>
                     <tbody data-testid='newBodyTable'>{mapNews}</tbody>
@@ -227,11 +184,6 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
     }
 
     function displayNews() {
-        // let newSymbolList = Object.keys(p.trackedStocks).map((el) => (
-        //     <option key={el + "ddl"} value={el}>
-        //         {dStock(p.trackedStocks[el], p.exchangeList)}
-        //     </option>
-        // ));
 
         let symbolSelectorDropDown = (
             <>
@@ -244,13 +196,10 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
                         config={p.config}
                         callback={() => { setNewsIncrementor(1) }}
                     />
-                    {/* <select value={p.config.targetSecurity} onChange={changeStockSelection}>
-                        {newSymbolList}
-                    </select> */}
-                    <button onClick={() => changeIncrememnt(-1)}>
+                    <button data-testid='pageBackward' onClick={() => changeIncrememnt(-1)}>
                         <i className="fa fa-backward" aria-hidden="true"></i>
                     </button>
-                    <button onClick={() => changeIncrememnt(1)}>
+                    <button data-testid='pageForward' onClick={() => changeIncrememnt(1)}>
                         <i className="fa fa-forward" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -272,29 +221,20 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
 
         return (
             <>
-                <div className="stockSearch">
-                    <form className="form-stack">
-                        <label htmlFor="start">Start date:</label>
-                        <input className="btn" id="start" type="date" name="startDate" onChange={updateStartDate} onBlur={updateFilter} value={start}></input>
-                        <br />
-                        <label htmlFor="end">End date:</label>
-                        <input className="btn" id="end" type="date" name="endDate" onChange={updateEndDate} onBlur={updateFilter} value={end}></input>
-                    </form>
-                </div>
-
+                <WidgetFilterDates
+                    start={start}
+                    end={end}
+                    setStart={setStart}
+                    setEnd={setEnd}
+                    updateWidgetFilters={p.updateWidgetFilters}
+                    widgetKey={p.widgetKey}
+                    widgetType={p.widgetType}
+                />
                 <div>{Object.keys(p.trackedStocks).length > 0 ? editNewsListForm() : <></>}</div>
             </>
         )
 
     }
-
-    // function changeStockSelection(e) { //DELETE IF no target stock
-    //     const target = e.target.value;
-    //     p.updateWidgetConfig(p.widgetKey, {
-    //         targetSecurity: target,
-    //     })
-    //     setNewsIncrementor(1)
-    // }
 
     function renderStockData() {
         return (
