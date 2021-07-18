@@ -39,13 +39,6 @@ export interface FinnHubAPIData {
     data: finnHubFilingObj,
 }
 
-// interface config {
-//     targetSecurity: string,
-//     year: number,
-//     pagination: number,
-//     targetReport: string,
-// }
-
 function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
 
@@ -86,7 +79,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     ) => {
         //Setup default metric source if none selected.
         if (p.config.targetSecurity === undefined) {
-            console.log('setting starting config')
+            // console.log('setting starting config')
             const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
             updateWidgetConfig(key, {
                 targetSecurity: newSource,
@@ -167,7 +160,8 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         const stockTable =
             <>
                 <WidgetFocus
-                    widgetType={p.widgetType} updateWidgetConfig={p.updateWidgetConfig}
+                    widgetType={p.widgetType}
+                    updateWidgetConfig={p.updateWidgetConfig}
                     widgetKey={p.widgetKey}
                     trackedStocks={p.trackedStocks}
                     exchangeList={p.exchangeList}
@@ -176,10 +170,10 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                 <select data-testid='financialsAsReportedSelection' className="btn" value={p.config.targetReport} onChange={changeReportSelection}>
                     {reportSelection}
                 </select>
-                <button onClick={() => changeIncrememnt(-1)}>
+                <button data-testid="pageBackward" onClick={() => changeIncrememnt(-1)}>
                     <i className="fa fa-backward" aria-hidden="true"></i>
                 </button>
-                <button onClick={() => changeIncrememnt(1)}>
+                <button data-testid="pageForward" onClick={() => changeIncrememnt(1)}>
                     <i className="fa fa-forward" aria-hidden="true"></i>
                 </button>
                 <div className='scrollableDiv'>

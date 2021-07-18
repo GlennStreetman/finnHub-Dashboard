@@ -4,7 +4,7 @@ const testDashboard = { //setup containing a single dashboard, TEST, and one wid
     savedDashBoards: {
         TEST: {
             dashboardname: 'TEST',
-            globalstocklist: '{"US-WMT":{"currency":"USD","description":"WALMART INC","displaySymbol":"WMT","figi":"BBG000BWXBC2","mic":"XNYS","symbol":"WMT","type":"Common Stock","exchange":"US","key":"US-WMT"},"US-COST":{"currency":"USD","description":"COSTCO WHOLESALE CORP","displaySymbol":"COST","figi":"BBG000F6H8W8","mic":"XNAS","symbol":"COST","type":"Common Stock","exchange":"US","key":"US-COST"},"US-BEST":{"currency":"USD","description":"BEST INC - ADR","displaySymbol":"BEST","figi":"BBG00H1H9511","mic":"XNYS","symbol":"BEST","type":"ADR","exchange":"US","key":"US-BEST"},"US-GME":{"currency":"USD","description":"GAMESTOP CORP-CLASS A","displaySymbol":"GME","figi":"BBG000BB5BF6","mic":"XNYS","symbol":"GME","type":"Common Stock","exchange":"US","key":"US-GME"},"US-HD":{"currency":"USD","description":"HOME DEPOT INC","displaySymbol":"HD","figi":"BBG000BKZB36","mic":"XNYS","symbol":"HD","type":"Common Stock","exchange":"US","key":"US-HD"}}',
+            globalstocklist: '{ "US-WMT": { "currency": "USD", "description": "WALMART INC", "displaySymbol": "WMT", "figi": "BBG000BWXBC2", "mic": "XNYS", "symbol": "WMT", "type": "Common Stock", "exchange": "US", "key": "US-WMT" }, "US-COST": { "currency": "USD", "description": "COSTCO WHOLESALE CORP", "displaySymbol": "COST", "figi": "BBG000F6H8W8", "mic": "XNAS", "symbol": "COST", "type": "Common Stock", "exchange": "US", "key": "US-COST" } }',
             id: 1875,
             widgetlist: {}
         }
@@ -38,7 +38,7 @@ const testDashboard = { //setup containing a single dashboard, TEST, and one wid
 export const getDashboard_success =     //auto login check rejected.
     rest.get("/dashboard", (req, res, ctx) => {
         const resObj = testDashboard
-        console.log('RETURNING DASHBOARD DATA MOCK')
+        // console.log('RETURNING DASHBOARD DATA MOCK')
         return res(
             ctx.status(200),
             ctx.json(resObj)
@@ -46,16 +46,44 @@ export const getDashboard_success =     //auto login check rejected.
     })
 
 //default data to be returned for test purposes for all stocks.
-const resData = {
+const resData_WMT = {
     "cik": "320193",
     "data": [
         {
             "accessNumber": "0000320193-19-000119",
-            "symbol": "AAPL",
-            "cik": "320193",
+            "symbol": "WMT",
+            "cik": "11111-CIK",
             "year": 2019,
             "quarter": 0,
-            "form": "10-K",
+            "form": "10-KWMT",
+            "startDate": "2018-09-30 00:00:00",
+            "endDate": "2019-09-28 00:00:00",
+            "filedDate": "2019-10-31 00:00:00",
+            "acceptedDate": "2019-10-30 18:12:36",
+            "report": {
+                "bs": {
+                    "Assets": 338516000000,
+                    "Liabilities": 248028000000,
+                    "InventoryNet": 4106000000,
+                },
+                "cf": {
+                    "NetIncomeLoss": 55256000000,
+                    "InterestPaidNet": 3423000000,
+                },
+                "ic": {
+                    "GrossProfit": 98392000000,
+                    "NetIncomeLoss": 55256000000,
+                    "OperatingExpenses": 34462000000,
+                }
+            }
+        },
+        {
+            "accessNumber": "0000320193-19-000119",
+            "symbol": "WMT",
+            "cik": "11111-CIK2",
+            "year": 2019,
+            "quarter": 0,
+            "form": "10-KWMT2",
             "startDate": "2018-09-30 00:00:00",
             "endDate": "2019-09-28 00:00:00",
             "filedDate": "2019-10-31 00:00:00",
@@ -78,23 +106,119 @@ const resData = {
             }
         }
     ],
-    "symbol": "AAPL"
+    "symbol": "WMT"
 }
 
-const resObj = resData
+const resData_COST = {
+    "cik": "320193",
+    "data": [
+        {
+            "accessNumber": "0000320193-19-000119",
+            "symbol": "COST",
+            "cik": "320193-COST",
+            "year": 2019,
+            "quarter": 0,
+            "form": "10-K-COST",
+            "startDate": "2018-09-30 00:00:00",
+            "endDate": "2019-09-28 00:00:00",
+            "filedDate": "2019-10-31 00:00:00",
+            "acceptedDate": "2019-10-30 18:12:36",
+            "report": {
+                "bs": {
+                    "Assets": 338516000000,
+                    "Liabilities": 248028000000,
+                    "InventoryNet": 4106000000,
+                },
+                "cf": {
+                    "NetIncomeLoss": 55256000000,
+                    "InterestPaidNet": 3423000000,
+                },
+                "ic": {
+                    "GrossProfit": 98392000000,
+                    "NetIncomeLoss": 55256000000,
+                    "OperatingExpenses": 34462000000,
+                }
+            }
+        },
+        {
+            "accessNumber": "0000320193-19-000119",
+            "symbol": "COST",
+            "cik": "320193-COST2",
+            "year": 2019,
+            "quarter": 0,
+            "form": "10-K-COST2",
+            "startDate": "2018-09-30 00:00:00",
+            "endDate": "2019-09-28 00:00:00",
+            "filedDate": "2019-10-31 00:00:00",
+            "acceptedDate": "2019-10-30 18:12:36",
+            "report": {
+                "bs": {
+                    "Assets": 338516000000,
+                    "Liabilities": 248028000000,
+                    "InventoryNet": 4106000000,
+                },
+                "cf": {
+                    "NetIncomeLoss": 55256000000,
+                    "InterestPaidNet": 3423000000,
+                },
+                "ic": {
+                    "GrossProfit": 98392000000,
+                    "NetIncomeLoss": 55256000000,
+                    "OperatingExpenses": 34462000000,
+                }
+            }
+        }
+    ],
+    "symbol": "COST"
+}
 
 export const mockFinnHubData = //MOCK API REQUEST FOR THIS WIDGET. Remember to update api string on next line.
     rest.get("https://finnhub.io/api/v1/stock/financials-reported*", (req, res, ctx) => {
-        console.log('return mocked finnhub data /earnings')
+        const symbol = req.url.searchParams.get('symbol')
+        let resData = symbol === 'WMT' ? resData_WMT : resData_COST
         return res(
             ctx.status(200),
-            ctx.json(resObj)
+            ctx.json(resData)
+        )
+    })
+
+const exchangeData = [
+    {
+        "currency": "USD",
+        "description": "TESLA INC",
+        "displaySymbol": "TSLA",
+        "figi": "BBG000N9MNX3",
+        "mic": "XNAS",
+        "symbol": "TSLA",
+        "type": "Common Stock",
+        "exchange": "US",
+        "key": "US-TSLA"
+    },
+    {
+        "currency": "USD",
+        "description": "APPLE INC",
+        "displaySymbol": "AAPL",
+        "figi": "BBG000B9XRY4",
+        "mic": "XNAS",
+        "symbol": "AAPL",
+        "type": "Common Stock",
+        "exchange": "US",
+        "key": "US-AAPL"
+    }
+]
+
+
+export const mockExchangeData =
+    rest.get("https://finnhub.io/api/v1/stock/symbol", (req, res, ctx) => {
+        return res(
+            ctx.status(200),
+            ctx.json(exchangeData)
         )
     })
 
 export const getCheckLogin_success =     //auto login check rejected.
     rest.get("/checkLogin", (req, res, ctx) => {
-        console.log('get/CheckLogin success, returning login 1')
+        // console.log('get/CheckLogin success, returning login 1')
         return res(
             ctx.status(200),
             ctx.json({
@@ -111,7 +235,7 @@ export const getCheckLogin_success =     //auto login check rejected.
 
 export const postFindMongoData_success_noData =
     rest.post("/findMongoData", (req, res, ctx) => {
-        console.log('post/CheckLogin success, no data')
+        // console.log('post/CheckLogin success, no data')
         return res(
             ctx.status(200),
             ctx.json({})
@@ -120,7 +244,7 @@ export const postFindMongoData_success_noData =
 
 export const postUpdateGQLFilters =
     rest.post("/updateGQLFilters", (req, res, ctx) => {
-        console.log('post/CheckLogin success, no data')
+        // console.log('post/CheckLogin success, no data')
         return res(
             ctx.status(200),
             ctx.json({ message: `Update filters Complete` })
