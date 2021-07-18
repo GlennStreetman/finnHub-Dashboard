@@ -85,7 +85,8 @@ function FundamentalsCompanyProfile2(p: { [key: string]: any }, ref: any) {
         const stockTable =
             <>
                 <WidgetFocus
-                    widgetType={p.widgetType} updateWidgetConfig={p.updateWidgetConfig}
+                    widgetType={p.widgetType}
+                    updateWidgetConfig={p.updateWidgetConfig}
                     widgetKey={p.widgetKey}
                     trackedStocks={p.trackedStocks}
                     exchangeList={p.exchangeList}

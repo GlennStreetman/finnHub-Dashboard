@@ -260,8 +260,8 @@ export const getCheckLogin_success =     //auto login check rejected.
                 ratelimit: 25,
                 apiAlias: 'alias',
                 widgetsetup: '{"EstimatesEarningsCalendar":true}', //UPDATE NEEDED IF premium feature. First item from topNavReg tuple.
-                exchangelist: ['US'],
-                defaultexchange: ['US',]
+                exchangelist: 'US,AS',
+                defaultexchange: 'US'
             })
         )
     })

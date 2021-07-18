@@ -155,8 +155,8 @@ export const getCheckLogin_success =     //use this if premium route. Update wid
                 ratelimit: 25,
                 apiAlias: 'alias',
                 widgetsetup: '{"EstimatesPriceTarget":true,"PriceSplits":true}', //<--- Make sure this includes widget if premium route.
-                exchangelist: ['US'],
-                defaultexchange: ['US',]
+                exchangelist: 'US,AS',
+                defaultexchange: 'US'
             })
         )
     })
