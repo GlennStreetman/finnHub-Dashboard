@@ -8,6 +8,7 @@ import { useDragCopy } from './../../widgetHooks/useDragCopy'
 import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
 import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
+import { useResetPagination } from './../../widgetHooks/useResetPagination'
 
 import WidgetFocus from '../../../components/widgetFocus'
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
@@ -44,12 +45,12 @@ function FundamentalsSECFilings(p: { [key: string]: any }, ref: any) {
 
     const startingPagination = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            return (p.widgetCopy.pageinationInt)
+            return (p.widgetCopy.pagination)
         } else { return (1) }
     }
 
     const [widgetCopy] = useState(startingWidgetCoptyRef())
-    const [pageinationInt, setPageinationInt] = useState(startingPagination());
+    const [pagination, setPagination] = useState(startingPagination());
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
@@ -65,14 +66,15 @@ function FundamentalsSECFilings(p: { [key: string]: any }, ref: any) {
         return [p?.config?.targetSecurity]
     }, [p?.config?.targetSecurity])
 
-    useDragCopy(ref, { pageinationInt: pageinationInt, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useDragCopy(ref, { pagination: pagination, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey, p.config.targetSecurity) //sets security focus in config. Used for redux.visable data and widget excel templating.	
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
+    useResetPagination(p.config.targetSecurity, setPagination)
 
     function changeIncrement(e) {
-        const newpageinationInt = pageinationInt + e;
-        if (newpageinationInt > 0 && newpageinationInt < 251) setPageinationInt(newpageinationInt);
+        const newpagination = pagination + e;
+        if (newpagination > 0 && newpagination < 251) setPagination(newpagination);
     }
 
     function formatURLS(e) {
@@ -110,7 +112,7 @@ function FundamentalsSECFilings(p: { [key: string]: any }, ref: any) {
 
     function renderStockData() {
 
-        const currentFiling = rShowData ? rShowData?.[pageinationInt] : {}
+        const currentFiling = rShowData ? rShowData?.[pagination] : {}
         const symbolSelectorDropDown = (
             <>
                 <div>
@@ -121,10 +123,10 @@ function FundamentalsSECFilings(p: { [key: string]: any }, ref: any) {
                         exchangeList={p.exchangeList}
                         config={p.config}
                     />
-                    <button onClick={() => changeIncrement(-1)}>
+                    <button data-testid='pageBackward' onClick={() => changeIncrement(-1)}>
                         <i className="fa fa-backward" aria-hidden="true"></i>
                     </button>
-                    <button onClick={() => changeIncrement(1)}>
+                    <button data-testid='pageForward' onClick={() => changeIncrement(1)}>
                         <i className="fa fa-forward" aria-hidden="true"></i>
                     </button>
                 </div>
@@ -133,7 +135,7 @@ function FundamentalsSECFilings(p: { [key: string]: any }, ref: any) {
         const stockDataTable = (
             <>
                 {symbolSelectorDropDown}
-                <div className='scrollableDiv'>
+                <div data-testid='secData' className='scrollableDiv'>
                     <table className='dataTable'>
                         <thead>
                             <tr>
