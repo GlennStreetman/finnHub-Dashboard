@@ -3,6 +3,7 @@ import { useState, forwardRef, useRef, useMemo } from "react";
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
+import WidgetFilterDates from '../../../components/widgetFilterDates'
 
 import { useDragCopy } from './../../widgetHooks/useDragCopy'
 import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
@@ -88,37 +89,17 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
 
-    function updateFilter(e) {
-        console.log('UPDATE FILTER', start, end)
-        if (isNaN(new Date(e.target.value).getTime()) === false) {
-            const now = Date.now()
-            const target = new Date(e.target.value).getTime();
-            const offset = target - now
-            const name = e.target.name;
-            console.log(name, e.target.value)
-            p.updateWidgetFilters(p.widgetKey, { [name]: offset })
-        }
-    }
-
-    function updateStartDate(e) {
-        setStart(e.target.value)
-    }
-
-    function updateEndDate(e) {
-        setEnd(e.target.value)
-    }
-
     function renderSearchPane() {
         return <>
-            <div className="stockSearch">
-                <form className="form-stack">
-                    <label htmlFor="start">Start date:</label>
-                    <input className="btn" id="start" type="date" name="startDate" onChange={updateStartDate} onBlur={updateFilter} value={start}></input>
-                    <br />
-                    <label htmlFor="end">End date:</label>
-                    <input className="btn" id="end" type="date" name="endDate" onChange={updateEndDate} onBlur={updateFilter} value={end}></input>
-                </form>
-            </div>
+            <WidgetFilterDates
+                start={start}
+                end={end}
+                setStart={setStart}
+                setEnd={setEnd}
+                updateWidgetFilters={p.updateWidgetFilters}
+                widgetKey={p.widgetKey}
+                widgetType={p.widgetType}
+            />
         </>
     }
 
@@ -145,11 +126,11 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
             let symbolSelectorDropDown = (
                 <>
                     <div>
-                        <button onClick={() => changeIncrement(-1)}>
+                        <button data-testid='pageBackward' onClick={() => changeIncrement(-1)}>
                             <i className="fa fa-backward" aria-hidden="true"></i>
                         </button>
                         <button onClick={() => changeIncrement(1)}>
-                            <i className="fa fa-forward" aria-hidden="true"></i>
+                            <i data-testid='pageForward' className="fa fa-forward" aria-hidden="true"></i>
                         </button>
                     </div>
                     <div>
@@ -165,9 +146,7 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
                                     <tbody>{stockTable(currentFiling)}</tbody>
                                 </table>
                             </div>}
-
                     </div>
-
                 </>
             );
             return symbolSelectorDropDown;

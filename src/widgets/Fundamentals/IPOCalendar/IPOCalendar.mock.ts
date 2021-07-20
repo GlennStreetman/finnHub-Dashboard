@@ -4,7 +4,7 @@ const testDashboard = { //setup containing a single dashboard, TEST, and one wid
     savedDashBoards: {
         TEST: {
             dashboardname: 'TEST',
-            globalstocklist: '{"US-WMT":{"currency":"USD","description":"WALMART INC","displaySymbol":"WMT","figi":"BBG000BWXBC2","mic":"XNYS","symbol":"WMT","type":"Common Stock","exchange":"US","key":"US-WMT"},"US-COST":{"currency":"USD","description":"COSTCO WHOLESALE CORP","displaySymbol":"COST","figi":"BBG000F6H8W8","mic":"XNAS","symbol":"COST","type":"Common Stock","exchange":"US","key":"US-COST"},"US-BEST":{"currency":"USD","description":"BEST INC - ADR","displaySymbol":"BEST","figi":"BBG00H1H9511","mic":"XNYS","symbol":"BEST","type":"ADR","exchange":"US","key":"US-BEST"},"US-GME":{"currency":"USD","description":"GAMESTOP CORP-CLASS A","displaySymbol":"GME","figi":"BBG000BB5BF6","mic":"XNYS","symbol":"GME","type":"Common Stock","exchange":"US","key":"US-GME"},"US-HD":{"currency":"USD","description":"HOME DEPOT INC","displaySymbol":"HD","figi":"BBG000BKZB36","mic":"XNYS","symbol":"HD","type":"Common Stock","exchange":"US","key":"US-HD"}}',
+            globalstocklist: '{ "US-WMT": { "currency": "USD", "description": "WALMART INC", "displaySymbol": "WMT", "figi": "BBG000BWXBC2", "mic": "XNYS", "symbol": "WMT", "type": "Common Stock", "exchange": "US", "key": "US-WMT" }, "US-COST": { "currency": "USD", "description": "COSTCO WHOLESALE CORP", "displaySymbol": "COST", "figi": "BBG000F6H8W8", "mic": "XNAS", "symbol": "COST", "type": "Common Stock", "exchange": "US", "key": "US-COST" } }',
             id: 1875,
             widgetlist: {}
         }
@@ -38,7 +38,7 @@ const testDashboard = { //setup containing a single dashboard, TEST, and one wid
 export const getDashboard_success =     //auto login check rejected.
     rest.get("/dashboard", (req, res, ctx) => {
         const resObj = testDashboard
-        console.log('RETURNING DASHBOARD DATA MOCK')
+        // console.log('RETURNING DASHBOARD DATA MOCK')
         return res(
             ctx.status(200),
             ctx.json(resObj)
@@ -46,39 +46,72 @@ export const getDashboard_success =     //auto login check rejected.
     })
 
 //default data to be returned for test purposes for all stocks.
-const resData = {
+const resData_WMT = {
     "ipoCalendar": [
         {
             "date": "2020-04-03",
             "exchange": "NASDAQ Global",
-            "name": "ZENTALIS PHARMACEUTICALS, LLC",
+            "name": "Walmarttest",
             "numberOfShares": 7650000,
             "price": "16.00-18.00",
-            "status": "expected",
+            "status": "expected1",
             "symbol": "ZNTL",
             "totalSharesValue": 158355000
         },
         {
             "date": "2020-04-01",
             "exchange": "NASDAQ Global",
-            "name": "WIMI HOLOGRAM CLOUD INC.",
+            "name": "Walmarttest2",
             "numberOfShares": 5000000,
             "price": "5.50-7.50",
-            "status": "expected",
+            "status": "expected2",
             "symbol": "WIMI",
             "totalSharesValue": 43125000
         },
     ]
 }
 
-const resObj = resData
-
 export const mockFinnHubData = //MOCK API REQUEST FOR THIS WIDGET. Remember to update api string on next line.
     rest.get("https://finnhub.io/api/v1/calendar/ipo*", (req, res, ctx) => {
-        console.log('return mocked finnhub data /earnings')
+        // console.log('returning finnhub data')
+        const symbol = req.url.searchParams.get('symbol')
+        let resData = symbol === 'WMT' ? resData_WMT : resData_WMT
         return res(
             ctx.status(200),
-            ctx.json(resObj)
+            ctx.json(resData)
+        )
+    })
+
+const exchangeData = [
+    {
+        "currency": "USD",
+        "description": "TESLA INC",
+        "displaySymbol": "TSLA",
+        "figi": "BBG000N9MNX3",
+        "mic": "XNAS",
+        "symbol": "TSLA",
+        "type": "Common Stock",
+        "exchange": "US",
+        "key": "US-TSLA"
+    },
+    {
+        "currency": "USD",
+        "description": "APPLE INC",
+        "displaySymbol": "AAPL",
+        "figi": "BBG000B9XRY4",
+        "mic": "XNAS",
+        "symbol": "AAPL",
+        "type": "Common Stock",
+        "exchange": "US",
+        "key": "US-AAPL"
+    }
+]
+
+export const mockExchangeData =
+    rest.get("https://finnhub.io/api/v1/stock/symbol", (req, res, ctx) => {
+        return res(
+            ctx.status(200),
+            ctx.json(exchangeData)
         )
     })
 
@@ -117,4 +150,37 @@ export const postUpdateGQLFilters =
         )
     })
 
+//data to be returned for test purposes for after filter change.
+const resData_WMT_toggle = {
+    "ipoCalendar": [
+        {
+            "date": "2020-04-03",
+            "exchange": "NASDAQ Global",
+            "name": "Walmarttest3",
+            "numberOfShares": 7650000,
+            "price": "16.00-18.00",
+            "status": "expected3",
+            "symbol": "ZNTL",
+            "totalSharesValue": 158355000
+        },
+        {
+            "date": "2020-04-01",
+            "exchange": "NASDAQ Global",
+            "name": "Walmarttest3",
+            "numberOfShares": 5000000,
+            "price": "5.50-7.50",
+            "status": "expected2",
+            "symbol": "WIMI",
+            "totalSharesValue": 43125000
+        },
+    ]
+}
+
+export const mockFinnHubData_toggle = //MOCK API REQUEST FOR THIS WIDGET. Remember to update api string on next line.
+    rest.get("https://finnhub.io/api/v1/calendar/ipo*", (req, res, ctx) => {
+        return res(
+            ctx.status(200),
+            ctx.json(resData_WMT_toggle)
+        )
+    })
 
