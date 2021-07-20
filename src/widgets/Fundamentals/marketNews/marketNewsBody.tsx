@@ -160,13 +160,13 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
         let symbolSelectorDropDown = (
             <>
                 <div>
-                    <select value={p.filters.categorySelection} onChange={changeCategory}>
+                    <select data-testid={`focus-${p.widgetType}`} value={p.filters.categorySelection} onChange={changeCategory}>
                         {newSymbolList}
                     </select>
-                    <button onClick={() => changeIncrememnt(-1)}>
+                    <button data-testid='pageBackward' onClick={() => changeIncrememnt(-1)}>
                         <i className="fa fa-backward" aria-hidden="true"></i>
                     </button>
-                    <button onClick={() => changeIncrememnt(1)}>
+                    <button data-testid='pageForward' onClick={() => changeIncrememnt(1)}>
                         <i className="fa fa-forward" aria-hidden="true"></i>
                     </button>
                 </div>
