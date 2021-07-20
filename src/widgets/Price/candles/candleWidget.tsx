@@ -4,6 +4,8 @@ import { useState, useEffect, useMemo, forwardRef, useRef } from "react";
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 
 import CreateCandleStickChart from "./createCandleStickChart";
+import WidgetFilterDates from '../../../components/widgetFilterDates'
+import ToolTip from './../../../components/toolTip.js'
 
 import { useDragCopy } from './../../widgetHooks/useDragCopy'
 
@@ -152,7 +154,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                     animationEnabled: true,
                     exportEnabled: true,
                     title: {
-                        text: p.config.targetSecurity + ": " + start + " - " + end,
+                        text: `Price Candles: ${p.config.targetSecurity}`,
                     },
                     axisX: {
                         valueFormatString: "YYYY-MM-DD",
@@ -190,31 +192,23 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         return securityList;
     }
 
-    function updateStartDate(e) {
-        setStart(e.target.value)
-    }
-
-    function updateEndDate(e) {
-        setEnd(e.target.value)
-    }
-
-    function updateFilterDate(e) {
-        console.log('UPDATE FILTER', e.target.name, start, end)
-        if (isNaN(new Date(e.target.value).getTime()) === false) {
-            const now = Date.now()
-            const target = new Date(e.target.value).getTime();
-            const offset = target - now
-            const name = e.target.name;
-            console.log(name, e.target.value)
-            p.updateWidgetFilters(p.widgetKey, { [name]: offset })
-        }
-    }
-
     function updateFilterResolution(e) {
         p.updateWidgetFilters(p.widgetKey, { [e.target.name]: e.target.value })
     }
 
     function displayCandleGraph() {
+
+        const resObj = {
+            1: 'Daily',
+            5: '5 Day',
+            15: '15 Day',
+            30: '30 Day',
+            D: 'Daily',
+            W: 'Weekly',
+            M: 'Monthly',
+        }
+
+        const resText = resObj[p.filters.resolution]
 
         let symbolSelectorDropDown = (
             <>
@@ -227,7 +221,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                         config={p.config}
                     />
                 </div>
-                <div className="graphDiv">
+                <div data-testid={`${resText} Price Candles: ${p.config.targetSecurity}`} className="graphDiv">
                     <CreateCandleStickChart candleData={options} />
                 </div>
             </>
@@ -241,6 +235,10 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
         </option>
     ));
 
+    const helpText = <>
+        Select data resulotion for candle chart. <br />
+    </>
+
     return (
         <div data-testid='candleBody'>
             {p.showEditPane === 1 && (
@@ -248,20 +246,40 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                     <div className="searchPane">
                         {React.createElement(StockSearchPane, searchPaneProps(p))}
                         <div className="stockSearch">
-                            <form className="form-inline">
+                            {/* <form className="form-inline">
                                 <label htmlFor="start">Start date:</label>
                                 <input className="btn" id="start" type="date" name="startDate" onChange={updateStartDate} onBlur={updateFilterDate} value={start}></input>
                                 <p>
                                     <label htmlFor="end">End date:</label>
                                     <input className="btn" id="end" type="date" name="endDate" onChange={updateEndDate} onBlur={updateFilterDate} value={end}></input>
                                 </p>
-                                <p>
-                                    <label htmlFor="resBtn">Resolution:</label>
-                                    <select id="resBtn" className="btn" name='resolution' value={p.filters.resolution} onChange={updateFilterResolution}>
-                                        {resolutionList}
-                                    </select>
-                                </p>
-                            </form>
+                                <p> */}
+                            <WidgetFilterDates
+                                start={start}
+                                end={end}
+                                setStart={setStart}
+                                setEnd={setEnd}
+                                updateWidgetFilters={p.updateWidgetFilters}
+                                widgetKey={p.widgetKey}
+                                widgetType={p.widgetType}
+                            />
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td>
+                                            <ToolTip textFragment={helpText} hintName='candeRes' />
+                                        </td>
+                                        <td style={{ color: 'white' }} className='rightTE'><label htmlFor="resBtn">Resolution:</label></td>
+                                        <td>
+                                            <select data-testid='candleResolutionSelect' id="resBtn" className="btn" name='resolution' value={p.filters.resolution} onChange={updateFilterResolution}>
+                                                {resolutionList}
+                                            </select>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            {/* </p>
+                            </form> */}
                         </div>
                     </div>
                     <div>{Object.keys(p.trackedStocks).length > 0 ? editCandleListForm() : <></>}</div>
