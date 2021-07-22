@@ -146,7 +146,7 @@ export const mockExchangeData =
 
 export const getCheckLogin_success =     //use this if premium route. Update widgetSetup below
     rest.get("/checkLogin", (req, res, ctx) => {
-        console.log('check login')
+        // console.log('check login')
         return res(
             ctx.status(200),
             ctx.json({

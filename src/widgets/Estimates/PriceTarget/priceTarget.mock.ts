@@ -76,7 +76,7 @@ export const mockFinnHubData = //MOCK API REQUEST FOR THIS WIDGET. Remember to u
 
 export const getCheckLogin_success =     //auto login check rejected.
     rest.get("/checkLogin", (req, res, ctx) => {
-        console.log('check login')
+        // console.log('check login')
         return res(
             ctx.status(200),
             ctx.json({

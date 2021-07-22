@@ -394,7 +394,7 @@ const resData_COST_toggle = [
 
 export const mockFinnHubData_toggle = //MOCK API REQUEST FOR THIS WIDGET. Remember to update api string on next line.
     rest.get("https://finnhub.io/api/v1/company-news*", (req, res, ctx) => {
-        console.log('RETURN TOGGLE DATA')
+        // console.log('RETURN TOGGLE DATA')
         const symbol = req.url.searchParams.get('symbol')
         let resData = symbol === 'WMT' ? resData_WMT_toggle : resData_COST_toggle
         return res(
