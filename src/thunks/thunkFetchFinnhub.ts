@@ -62,6 +62,9 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                         .then((response) => {
                             return response.json()
                         })
+                        .catch((err) => {
+                            console.log('error caching data to mongoDb: ', err)
+                        })
                 }
                 return (resObj) //thunk data returned to dataModel(update stale date) and showdata(retain in redux if marked as visable).
             })
