@@ -12,7 +12,7 @@ router.get('/deleteFinnDashData', async (req, res) => {
             const database = client.db('finnDash');
             const dataSet = database.collection('dataSet');
             // const widgetSearch = RegExp(`^${req.query['widgetID']}`, 'i')
-            const widgetID = req.query['widgetID']
+            const widgetID = typeof req.query['widgetID'] === 'number' ? req.query['widgetID'].toString() :  req.query['widgetID']
             const deleteList = await dataSet.deleteMany({ //delete stale records for user
                 userID: req.session.uID,
                 widget: widgetID
