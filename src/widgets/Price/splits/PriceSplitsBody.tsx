@@ -12,6 +12,8 @@ import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
 import WidgetFocus from '../../../components/widgetFocus'
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import WidgetFilterDates from '../../../components/widgetFilterDates'
+
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -108,39 +110,21 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
         }
     }, [p.filters, p.updateWidgetFilters, p.widgetKey, start, end])
 
-    function updateStartDate(e) {
-        setStart(e.target.value)
-    }
 
-    function updateEndDate(e) {
-        setEnd(e.target.value)
-    }
-
-    function updateFilter(e) {
-        console.log('UPDATE FILTER', start, end)
-        if (isNaN(new Date(e.target.value).getTime()) === false) {
-            const now = Date.now()
-            const target = new Date(e.target.value).getTime();
-            const offset = target - now
-            const name = e.target.name;
-            console.log(name, e.target.value)
-            p.updateWidgetFilters(p.widgetKey, { [name]: offset })
-        }
-    }
 
     function renderSearchPane() {
 
         let searchForm = (
             <>
-                <div className="stockSearch">
-                    <form className="form-stack">
-                        <label htmlFor="start">Start date:</label>
-                        <input className="btn" id="start" type="date" name="startDate" onChange={updateStartDate} onBlur={updateFilter} value={start}></input>
-                        <br />
-                        <label htmlFor="end">End date:</label>
-                        <input className="btn" id="end" type="date" name="endDate" onChange={updateEndDate} onBlur={updateFilter} value={end}></input>
-                    </form>
-                </div>
+                <WidgetFilterDates
+                    start={start}
+                    end={end}
+                    setStart={setStart}
+                    setEnd={setEnd}
+                    updateWidgetFilters={p.updateWidgetFilters}
+                    widgetKey={p.widgetKey}
+                    widgetType={p.widgetType}
+                />
                 <WidgetRemoveSecurityTable
                     trackedStocks={p.trackedStocks}
                     widgetKey={p.widgetKey}
