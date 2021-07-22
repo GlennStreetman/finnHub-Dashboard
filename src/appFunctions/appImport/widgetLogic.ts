@@ -29,7 +29,7 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
     // console.log("NEW WIDGET:", widgetDescription, widgetHeader, widgetConfig, defaultFilters)
     const s: AppState = this.state
     const currentDashboard = s.currentDashBoard
-    const widgetName: number = new Date().getTime();
+    const widgetName: string = new Date().getTime().toString();
     const widgetStockList = s.globalStockList
     const newWidget: widget = {
         column: 0,
