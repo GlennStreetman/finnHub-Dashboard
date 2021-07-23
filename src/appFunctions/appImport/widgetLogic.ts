@@ -32,7 +32,7 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
     const widgetName: string = new Date().getTime().toString();
     const widgetStockList = s.globalStockList
     const newWidget: widget = {
-        column: 0,
+        column: 1,
         columnOrder: -1,
         config: {}, //used to save user setup for the widget that does not require new api request.
         filters: defaultFilters, //used to save user setup that requires new api request.
