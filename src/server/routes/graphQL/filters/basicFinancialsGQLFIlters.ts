@@ -39,18 +39,3 @@ export default function basicFinancialsGQLFilter(data: FinnHubAPIData, config: a
         return resObj
     }
 }
-
-// let resObj = {
-//     period: [],
-//     v: [],
-// }
-// const targetSeries = config.targetSeries
-// const timeSeriesData: [] = data?.series?.annual?.[targetSeries]
-// if (timeSeriesData) {
-//     for (const d in timeSeriesData) {
-//         resObj.period.push(timeSeriesData[d]['period'])
-//         resObj.v.push(timeSeriesData[d]['v'])
-//     }
-// }
-// // console.log('resObj', resObj)
-// return resObj
