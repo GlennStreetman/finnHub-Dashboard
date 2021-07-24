@@ -19,10 +19,6 @@ interface resNode {
     [key: string]: string | number, //report data
 }
 
-interface resObj {
-    [key: string]: resNode
-}
-
 export default function financialsAsReportedGQLFilter(data: FinnHubAPIData, config: Object = {}) {
     //convert time series list to Object: Keys = period, values = object
     const resObj = {}

@@ -22,7 +22,7 @@ import StockSearchPane, { searchPaneProps } from "../../../components/stockSearc
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
-interface FinnHubCandleData {
+export interface FinnHubCandleData {
     c: number[],
     h: number[],
     l: number[],

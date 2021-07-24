@@ -5,11 +5,14 @@ export const candleExcel = async function (apiKey, currentDashBoard, widgetHeade
         dashboard: currentDashBoard,
         widget: widgetHeader,
         columnKeys: [
+            { Date: 'date'},
             { Time: 't' }, 
             { Open: 'c' }, 
             { High: 'h' }, 
             { Low: 'l' }, 
-            { Close: 'c' }]
+            { Close: 'c' },
+        ]
+            
     };
 
     if (security) data.security = security

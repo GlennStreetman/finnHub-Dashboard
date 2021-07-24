@@ -11,9 +11,10 @@ import priceSplitsGQLFilter  from "./filters/priceSplitsGQLFilters.js";
 import financialsAsReportedGQLFilter from './filters/financialsAsReportedGQLFilters.js'
 import ipoCalendarGQLFilter from './filters/ipoCalendarGQLFilters.js'
 import newsSentimentGQLFilter from './filters/newsSentimentGQLFilters.js'
+import priceCandlesGQLFilters from './filters/priceCandlesGQLFilters.js'
 
 export const filterDict = { //Remember to convert time series data into an object list, time value should be key.
-    // PriceCandles: candleWidgetGQLFilter,
+    PriceCandles: priceCandlesGQLFilters,
     // PriceQuote: quoteWidgetGQLFilter,
     PriceSplits: priceSplitsGQLFilter,
     FundamentalsBasicFinancials: basicFinancialsGQLFilter,
