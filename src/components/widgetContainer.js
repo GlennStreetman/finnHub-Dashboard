@@ -121,7 +121,7 @@ function WidgetContainer(p) {
     display: show
     };
 
-    const visStatus = p.widgetList.showBody || p.stateRef === 'menuWidget' ? 'block' : 'none'
+    const visStatus = p.widgetList.showBody || p.widgetList.showBody === undefined  ? 'block' : 'none' //|| p.stateRef === 'menuWidget'
     const bodyVisable = {
         display: visStatus,
     }
@@ -178,13 +178,14 @@ function WidgetContainer(p) {
             <i className="fa fa-arrows" aria-hidden="true"></i>
             </button>
             <>
-                {p.stateRef !== 'menuWidget' ?
+                {/* {p.stateRef !== 'menuWidget' ? */}
                 <button  
                     className="headerButtons" 
-                    onClick={() => {p.toggleWidgetBody(p.widgetKey)}
+                    onClick={() => {p.toggleWidgetBody(p.widgetKey, p.stateRef)}
                 }>
                 {p.widgetList.showBody !== false ? <i className="fa fa-caret-square-o-right" aria-hidden="true" /> : <i className="fa fa-caret-square-o-down" aria-hidden="true" />}
-                </button> : <></>}
+                </button> 
+                {/* : <></>} */}
 
                 <button data-testid={`editPaneButton-${p.widgetList["widgetType"]}`} className="headerButtons" onClick={() => {showPane(setShowEditPane, -1)}}>
                 <i className="fa fa-pencil-square-o" aria-hidden="true" />

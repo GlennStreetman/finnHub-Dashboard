@@ -18,6 +18,7 @@ export const NewMenuContainer = function newMenuContainer(widgetDescription: str
             xAxis: "5rem",
             yAxis: "5rem",
             widgetConfig: widgetConfig,
+            showBody: true,
         };
     });
     const payload: Partial<AppState> = { menuList: newMenuList }
@@ -275,12 +276,22 @@ export const ToggleWidgetVisability = function toggleWidgetVisability() {
     this.setState(payload)
 }
 
-export const toggleWidgetBody = function (widgetID) {
+export const toggleWidgetBody = function (widgetID: string, stateRef: 'menuWidget' | 'stockWidget') {
     const s: AppState = this.state
-    const updatedWidget: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
-        draftState[s.currentDashBoard].widgetlist[widgetID].showBody = !draftState[s.currentDashBoard].widgetlist[widgetID].showBody
-    })
-    this.setState({ dashBoardData: updatedWidget })
+    console.log(widgetID, stateRef)
+    if (stateRef === 'stockWidget') {
+        const updatedWidget: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
+            draftState[s.currentDashBoard].widgetlist[widgetID].showBody = !draftState[s.currentDashBoard].widgetlist[widgetID].showBody
+        })
+        this.setState({ dashBoardData: updatedWidget })
+    } else {
+        const updatedWidget: menuList = produce(s.menuList, (draftState: menuList) => {
+            draftState[widgetID].showBody = draftState[widgetID].showBody !== undefined ? !draftState[widgetID].showBody : false
+        })
+        console.log()
+        this.setState({ menuList: updatedWidget })
+    }
+
 }
 
 export const removeDashboardFromState = function (widgetName) {

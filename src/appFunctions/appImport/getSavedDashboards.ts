@@ -55,7 +55,7 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
         const noDashboards = Object.keys(parseDashBoard).length === 0 ? true : false
         const defaultDash = parseDashBoard[data.default] ? data.default : parseDashBoard[Object.keys(parseDashBoard)[0]]
 
-        const GetSavedDashboardsRes: GetSavedDashBoardsRes = noDashboards ? blankDashboard : {
+        const GetSavedDashboardsRes: any = noDashboards ? blankDashboard : {
             dashBoardData: parseDashBoard,
             currentDashBoard: defaultDash,
             menuList: menuList,

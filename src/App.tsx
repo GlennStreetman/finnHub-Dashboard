@@ -124,6 +124,7 @@ export interface menu {
     widgetType: string,
     xAxis: string,
     yAxis: string,
+    showBody: boolean,
 }
 
 export interface menuList {
