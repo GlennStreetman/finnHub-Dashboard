@@ -120,12 +120,12 @@ class TopNav extends React.Component<topNavProps, topNavState> {
                         </a>
                     </li>
 
-                    <li id='ddi' className='navItem'>
+                    {/* <li id='ddi' className='navItem'>
                         <a href="#contact" onClick={() => (this.props.widgetLockDown === 0 ? this.props.lockWidgets(1) : this.props.lockWidgets(0))}>
                             {this.props.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}
                         </a>
-                    </li>
-                    <li id='ddi' className="menu-item-has-children"><a data-testid="widgetsDropdown" href="#contact">Widgets</a>
+                    </li> */}
+                    <li id='ddi' className="menu-item-has-children"><a data-testid="widgetsDropdown" href="#contact">Add Widgets</a>
                         {widgetDropDown}
                     </li>
 
@@ -155,11 +155,11 @@ class TopNav extends React.Component<topNavProps, topNavState> {
                                 Templates
                             </a>
                         </li>
-                        <li id='endPointButton' className="navItem">
+                        {/* <li id='endPointButton' className="navItem">
                             <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('endPoint') }}>
                                 Endpoints
                             </a>
-                        </li>
+                        </li> */}
                         <li id='manageAccountButton' className="navItem">
                             <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('manageAccount') }}>
                                 Manage Account

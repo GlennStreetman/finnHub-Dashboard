@@ -24,7 +24,11 @@ const blankDashboard = {
         }
     },
     currentDashBoard: 'NEW',
-    menuList: { "watchListMenu": { "column": 0, "columnOrder": -1, "widgetConfig": "menuWidget", "widgetHeader": "WatchList", "widgetID": "watchListMenu", "widgetType": "watchListMenu", "xAxis": "5rem", "yAxis": "5rem" }, "dashBoardMenu": { "column": 0, "columnOrder": -1, "widgetConfig": "menuWidget", "widgetHeader": "Saved Dashboards", "widgetID": "dashBoardMenu", "widgetType": "dashBoardMenu", "xAxis": "5rem", "yAxis": "5rem" } },
+    menuList: {
+        "watchListMenu": { "column": 0, "columnOrder": -3, "widgetConfig": "menuWidget", "widgetHeader": "WatchList", "widgetID": "watchListMenu", "widgetType": "watchListMenu", "xAxis": "5rem", "yAxis": "5rem" },
+        "dashBoardMenu": { "column": 0, "columnOrder": -2, "widgetConfig": "menuWidget", "widgetHeader": "Saved Dashboards", "widgetID": "dashBoardMenu", "widgetType": "dashBoardMenu", "xAxis": "5rem", "yAxis": "5rem" },
+        "GQLMenu": { "column": 0, "columnOrder": -1, "widgetConfig": "menuWidget", "widgetHeader": "Graph QL", "widgetID": "GQLMenu", "widgetType": "GQLMenu", "xAxis": "5rem", "yAxis": "5rem" },
+    },
     message: 'No saved dashboards'
 }
 

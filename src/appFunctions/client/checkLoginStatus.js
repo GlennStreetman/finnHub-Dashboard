@@ -8,6 +8,8 @@ export const checkLoginStatus = function(processLogin, updateExchangeList, updat
             updateExchangeList(data.exchangelist)
             updateDefaultExchange(data.defaultexchange)
             finnHubQueue.updateInterval(data.ratelimit)
-        } else {console.log('FAILED LOGIN', data)}
+        } else {
+            // console.log('FAILED LOGIN', data)
+        }
     })
 }

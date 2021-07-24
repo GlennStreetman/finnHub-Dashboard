@@ -1,6 +1,7 @@
 //import widget and menu objects here and then add to widgetlookup below.
 import DashBoardMenu from "../widgets/Menu/dashBoardMenu/dashBoardMenu";
 import WatchListMenu from "../widgets/Menu/watchListMenu/watchListMenu";
+import GQLMenu from '../widgets/Menu/GQLMenu/GQLMenu'
 
 import EstimatesRecommendationTrends from "../widgets/Estimates/RecommendationTrends/recommendationTrendsBody";
 import EstimatesPriceTarget from "../widgets/Estimates/PriceTarget/priceTargetBody";
@@ -21,6 +22,7 @@ import PriceQuote from "../widgets/Price/quote/quoteBody";
 import PriceCandles from "../widgets/Price/candles/candleWidget"; //fix names
 import PriceSplits from "../widgets/Price/splits/PriceSplitsBody";
 
+
 export let widgetLookUp = {
     EstimatesRecommendationTrends: EstimatesRecommendationTrends,
     EstimatesPriceTarget: EstimatesPriceTarget,
@@ -40,5 +42,6 @@ export let widgetLookUp = {
     PriceSplits:PriceSplits,
     dashBoardMenu: DashBoardMenu,
     watchListMenu: WatchListMenu,
+    GQLMenu: GQLMenu,
 }; 
 

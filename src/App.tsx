@@ -32,7 +32,7 @@ import Login from "./components/login";
 import AboutMenu from "./components/AboutMenu";
 import AccountMenu, { accountMenuProps } from "./components/accountMenu";
 import WidgetMenu, { widgetMenuProps } from "./components/widgetMenu";
-import EndPointMenu, { endPointProps } from "./components/endPointMenu";
+// import EndPointMenu, { endPointProps } from "./widgets/Menu/GQLMenu/endPointMenu";
 import ExchangeMenu, { exchangeMenuProps } from "./components/exchangeMenu";
 import TemplateMenu, { templateMenuProps } from "./components/templateMenu";
 import { WidgetController } from "./components/widgetController";
@@ -408,7 +408,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     uploadGlobalStockList(newStockObj: stockList) {
-        console.log('new stock obj', newStockObj)
         this.setState({ globalStockList: newStockObj });
     }
 
@@ -417,7 +416,6 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     setSecurityFocus(target: string) {
-        console.log('setting security focus:', target)
         this.setState({ targetSecurity: target }, () => { return true })
     }
 
@@ -439,7 +437,7 @@ class App extends React.Component<AppProps, AppState> {
             );
 
         const backGroundSelection: { [key: string]: React.ReactElement } = { //topnav menus.
-            endPoint: React.createElement(EndPointMenu, endPointProps(this)),
+            // endPoint: React.createElement(EndPointMenu, endPointProps(this)),
             manageAccount: React.createElement(AccountMenu, accountMenuProps(this)),
             widgetMenu: React.createElement(WidgetMenu, widgetMenuProps(this)),
             about: React.createElement(AboutMenu, { apiFlag: this.state.apiFlag }),

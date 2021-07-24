@@ -1,6 +1,7 @@
 //Import props function from each widget/menu here and add to returnBodyProps function below.
 import { dashBoardMenuProps } from "./../widgets/Menu/dashBoardMenu/dashBoardMenu";
 import { watchListMenuProps } from "./../widgets/Menu/watchListMenu/watchListMenu";
+import {gqlMenuProps} from './../widgets/Menu/GQLMenu/GQLMenu'
 
 import { recommendationTrendsProps } from "./../widgets/Estimates/RecommendationTrends/recommendationTrendsBody";
 import { priceTargetProps } from "./../widgets/Estimates/PriceTarget/priceTargetBody";
@@ -25,6 +26,7 @@ export function returnBodyProps(that, key, ref = "pass") {
     let widgetBodyProps = {
         watchListMenu: () => watchListMenuProps(that, key),
         dashBoardMenu: () => dashBoardMenuProps(that, key),
+        GQLMenu: () => gqlMenuProps(that, key),
         EstimatesRecommendationTrends: () => recommendationTrendsProps(that, ref),
         EstimatesPriceTarget: () => priceTargetProps(that, ref),
         EstimatesEPSSurprises: () => EPSSurprisesProps(that, ref),
