@@ -86,9 +86,9 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
         const thisQuerySecurity = `{security ${queryPropsWidget} {${returnValues}}}`
 
         return (
-            <tr>
-                <td>{FocusDashboard[el].widgetHeader}</td>
-                <td><a href={`//${baseURL}?query=${thisQuerySecurity}`} target='_blank' rel="noreferrer">Data</a></td>
+            <tr key={el + 'showSec'}>
+                <td key={el + 'showSec2'}>{FocusDashboard[el].widgetHeader}</td>
+                <td key={el + 'showSec3'}><a href={`//${baseURL}?query=${thisQuerySecurity}`} target='_blank' rel="noreferrer">Data</a></td>
             </tr>
         )
     })

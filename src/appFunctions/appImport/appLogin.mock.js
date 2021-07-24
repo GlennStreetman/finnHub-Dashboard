@@ -9,7 +9,7 @@ let mockLogin = function(apiKey, setLogin, apiAlias, widgetSetup){
 export const processLoginMock = jest.fn(mockLogin)
 
 let mockLogout = function(){
-    console.log('mock logout success')
+    // console.log('mock logout success')
     return new Promise(async (res) => {
         const val = await logoutServer()
         res(val)
