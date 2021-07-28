@@ -126,27 +126,13 @@ export const SnapOrder = function snapOrder(widget: string, column: number, yyAx
     this.setState(payload, () => { return true })
 }
 
-export const SnapWidget = async function snapWidget(stateRef: string, widgetId: string, xxAxis: number, yyAxis: number) {
-    //adjust column based upon status of hidden menu columns.
+export const SnapWidget = async function snapWidget(stateRef: 'menuWidget' | 'widgetList', widgetId: string, xxAxis: number, yyAxis: number) {
+    //snaps widget to desired location mouse up. If stateRef = menuwidget it should always snap to column 0.
     const s: AppState = this.state
-    const addColumn: { [key: string]: any } = {}
-    const thisColumn = s.menuList.dashBoardMenu.column
-    addColumn[thisColumn] = []
-    addColumn[s.menuList.watchListMenu.column] = []
-    addColumn[s.menuList.dashBoardMenu.column].push(s.dashBoardMenu)
-    addColumn[s.menuList.watchListMenu.column].push(s.watchListMenu)
-    const wList = s.dashBoardData[s.currentDashBoard].widgetlist
-    for (const w in wList) {
-        if (addColumn[wList[w].column] !== undefined) {
-            addColumn[wList[w].column].push(1)
-        }
-    }
-    let column: number = Math.floor(xxAxis / 400)
-    for (const x in addColumn) {
-        if (addColumn[x].reduce((a: number, b: number) => a + b, 0) === 0) {
-            column = column + 1
-        }
-    }
+    let column: number = stateRef !== 'menuWidget' ? Math.floor(xxAxis / 400) : 0 //base column calc
+    if (stateRef !== 'menuWidget' && s.showMenuColumn === false) column = column + 1 //add 1 if menu column is hidden.
+
+    console.log(widgetId, column, yyAxis, stateRef)
     await this.snapOrder(widgetId, column, yyAxis, stateRef)
     this.saveDashboard(this.state.currentDashBoard)
 }

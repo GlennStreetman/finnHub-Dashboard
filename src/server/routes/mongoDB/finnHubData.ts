@@ -20,6 +20,7 @@ const router = express.Router();
 //gets user, none stale, finnhub data. This process deletes stale records.
 router.get('/getFinnDashDataMongo', async (req: finnDashDataReq, res: any) => {
     try {
+        console.log('/getFinnDashDataMongo1')
         const client = getDB()
         const database = client.db('finnDash');
         const dataSet = database.collection('dataSet');
@@ -39,10 +40,10 @@ router.get('/getFinnDashDataMongo', async (req: finnDashDataReq, res: any) => {
             resList.push(data)
         })
         res.status(200).json({ resList })
-
+        console.log('/getFinnDashDataMongo2')
     }
     catch (err) {
-        console.log(err)
+        console.log('getFinnDashDataMongo Error: ', err)
         res.status(500).json({ message: `Problem finding user dataset.` });
     }
 })

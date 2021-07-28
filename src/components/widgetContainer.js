@@ -117,11 +117,14 @@ function WidgetContainer(p) {
         }
     }
 
-    const compStyle = {
-    display: show
-    };
 
-    const visStatus = p.widgetList.showBody || p.widgetList.showBody === undefined  ? 'block' : 'none' //|| p.stateRef === 'menuWidget'
+    const visStatus = p.widgetList.column === 0 && p.showMenuColumn === false ? 'none' : 'block' //hide widget if showbody === false
+
+    const compStyle = {
+        display: visStatus
+        };
+    
+    
     const bodyVisable = {
         display: visStatus,
     }
@@ -179,15 +182,13 @@ function WidgetContainer(p) {
             <i className="fa fa-arrows" aria-hidden="true"></i>
             </button>
             <>
-                {/* {p.stateRef !== 'menuWidget' ? */}
                 <button  
                     className="headerButtons" 
                     onClick={() => {p.toggleWidgetBody(p.widgetKey, p.stateRef)}
                 }>
-                {p.widgetList.showBody !== false ? <i className="fa fa-caret-square-o-right" aria-hidden="true" /> : <i className="fa fa-caret-square-o-down" aria-hidden="true" />}
-                </button> 
-                {/* : <></>} */}
-
+                {p.widgetList.showBody !== false ? <i className="fa fa-caret-square-o-down" aria-hidden="true" /> : <i className="fa fa-caret-square-o-right" aria-hidden="true" />}
+                </button>                                                                                               
+                
                 <button data-testid={`editPaneButton-${p.widgetList["widgetType"]}`} className="headerButtons" onClick={() => {showPane(setShowEditPane, -1)}}>
                 <i className="fa fa-pencil-square-o" aria-hidden="true" />
                 </button>
@@ -205,6 +206,7 @@ function WidgetContainer(p) {
 
         <div className="widgetFooter">
         {p.widgetList.showBody !== false && showEditPane === 1 && (
+                p.stateRef !== 'menuWidget' ?
                 <button
                 onClick={async () => {
                     if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
@@ -216,13 +218,12 @@ function WidgetContainer(p) {
                         }
                         dispatch(rUnmountWidget(payload))
                         dispatch(rRemoveWidgetDataModel(payload))
-                    } else {
-                        p.menuWidgetToggle(p.widgetKey);
                     }
                 }}
                 >
-                <i className="fa fa-times" aria-hidden="true" data-testid={`removeWidget-${p.widgetList["widgetType"]}`}></i>
+                    <i className="fa fa-times" aria-hidden="true" data-testid={`removeWidget-${p.widgetList["widgetType"]}`}></i>
                 </button>
+                : <></>
         )}
 
         {p.widgetList.showBody !== false && showEditPane !== 1 && (

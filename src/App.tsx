@@ -177,7 +177,7 @@ export interface AppState {
     apiAlias: string,
     backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
     currentDashBoard: string, //dashboard being displayed
-    dashBoardMenu: number, //1 = show, 0 = hide
+    // dashBoardMenu: number, //1 = show, 0 = hide
     dashBoardData: dashBoardData, //All saved dashboards
     defaultExchange: string,
     enableDrag: boolean,
@@ -186,6 +186,7 @@ export interface AppState {
     // globalStockList: defaultGlobalStockList, //default stocks for new widgets.
     login: number, //login state. 0 logged out, 1 logged in.
     loadStartingDashBoard: number, //flag switches to 1 after attemping to load default dashboard.
+    showMenuColumn: boolean, //true shows column 0
     menuList: menuList, //lists of all menu widgets.
     saveDashboardThrottle: number, //delay timer for saving dashboard.
     saveDashboardFlag: boolean, //sets to true when a save starts.
@@ -194,7 +195,7 @@ export interface AppState {
     showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
     // streamingPriceData: streamingPriceData, //data shared between some widgets and watchlist menu. Updated by socket data.
     targetSecurity: string, //target security for widgets. Update changes widget focus.
-    watchListMenu: number, //1 = show, 0 = hide
+    // watchListMenu: number, //1 = show, 0 = hide
     widgetCopy: widget | null, //copy of state of widget being dragged.
     widgetLockDown: number, //1 removes buttons from all widgets.
     widgetSetup: widgetSetup, //activates premium api routes.
@@ -216,7 +217,7 @@ class App extends React.Component<AppProps, AppState> {
             apiAlias: "",
             backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
             currentDashBoard: "", //dashboard being displayed
-            dashBoardMenu: 1, //1 = show, 0 = hide
+            // dashBoardMenu: 1, //1 = show, 0 = hide
             dashBoardData: {}, //All saved dashboards
             defaultExchange: "US",
             exchangeList: ["US"], //list of all exchanges activated under account management.
@@ -224,6 +225,7 @@ class App extends React.Component<AppProps, AppState> {
             // globalStockList: defaultGlobalStockList, //default stocks for new widgets.
             login: 0, //login state. 0 logged out, 1 logged in.
             loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
+            showMenuColumn: true, //true shows column 0
             menuList: {}, //lists of all menu widgets.
             enableDrag: false,
             saveDashboardThrottle: Date.now(),
@@ -232,7 +234,7 @@ class App extends React.Component<AppProps, AppState> {
             socketUpdate: Date.now(),
             showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
             targetSecurity: '', //target security for widgets. Update changes widget focus.
-            watchListMenu: 1, //1 = show, 0 = hide
+            // watchListMenu: 1, //1 = show, 0 = hide
             widgetCopy: null, //copy of state of widget being dragged.
             widgetLockDown: 0, //1 removes buttons from all widgets.
             widgetSetup: {},//activates premium api routes.
@@ -256,6 +258,7 @@ class App extends React.Component<AppProps, AppState> {
         this.updateWidgetConfig = updateWidgetConfig.bind(this);
         this.toggleWidgetBody = toggleWidgetBody.bind(this)
         this.setWidgetFocus = setWidgetFocus.bind(this)
+        this.menuWidgetToggle = MenuWidgetToggle.bind(this)
 
         //App logic for setting up dashboards.
         this.newDashboard = NewDashboard.bind(this);
@@ -310,7 +313,6 @@ class App extends React.Component<AppProps, AppState> {
         ) {
             this.setState({
                 apiFlag: 1,
-                watchListMenu: 0,
                 aboutMenu: 0,
                 showStockWidgets: 0,
             }, () => { this.toggleBackGroundMenu('about') })
@@ -433,7 +435,7 @@ class App extends React.Component<AppProps, AppState> {
 
     render() {
         const s: AppState = this.state
-        const menuWidgetToggle = MenuWidgetToggle(this);
+        // const menuWidgetToggle = MenuWidgetToggle(this);
         const quaryData = queryString.parse(window.location.search);
         const loginScreen =
             this.state.login === 0 && this.state.backGroundMenu === "" ? (
@@ -475,21 +477,20 @@ class App extends React.Component<AppProps, AppState> {
                     apiFlag={this.state.apiFlag}
                     backGroundMenu={this.state.backGroundMenu}
                     currentDashBoard={this.state.currentDashBoard}
-                    dashBoardMenu={this.state.dashBoardMenu}
                     finnHubQueue={this.state.finnHubQueue}
                     lockWidgets={this.lockWidgets}
                     login={this.state.login}
                     logOut={this.logOut}
                     logoutServer={this.logoutServer}
                     menuList={this.state.menuList}
-                    menuWidgetToggle={menuWidgetToggle}
+                    menuWidgetToggle={this.menuWidgetToggle}
                     newMenuContainer={this.newMenuContainer}
-                    saveDashboard={this.saveDashboard} //saveDashboard
+                    saveDashboard={this.saveDashboard}
+                    showMenuColumn={this.state.showMenuColumn}
                     showStockWidgets={this.state.showStockWidgets}
                     toggleBackGroundMenu={this.toggleBackGroundMenu}
                     toggleWidgetVisability={this.toggleWidgetVisability}
                     updateAPIFlag={this.updateAPIFlag}
-                    watchListMenu={this.state.watchListMenu}
                     widgetLockDown={this.state.widgetLockDown}
                     widgetSetup={this.state.widgetSetup}
                 />
@@ -501,7 +502,6 @@ class App extends React.Component<AppProps, AppState> {
                     currentDashBoard={this.state.currentDashBoard}
                     dashBoardData={this.state.dashBoardData}
                     dashboardID={dashboardID}
-                    dashBoardMenu={this.state.dashBoardMenu}
                     defaultExchange={this.state.defaultExchange}
                     exchangeList={this.state.exchangeList}
                     finnHubQueue={this.state.finnHubQueue}
@@ -510,7 +510,7 @@ class App extends React.Component<AppProps, AppState> {
                     loadSavedDashboard={this.loadSavedDashboard}
                     login={this.state.login}
                     menuList={this.state.menuList}
-                    menuWidgetToggle={menuWidgetToggle}
+                    menuWidgetToggle={this.menuWidgetToggle}
                     moveWidget={this.moveWidget}
                     newDashboard={this.newDashboard}
                     processLogin={this.processLogin}
@@ -523,6 +523,7 @@ class App extends React.Component<AppProps, AppState> {
                     setNewGlobalStockList={this.setNewGlobalStockList}
                     setSecurityFocus={this.setSecurityFocus}
                     setWidgetFocus={this.setWidgetFocus}
+                    showMenuColumn={this.state.showMenuColumn}
                     showStockWidgets={this.state.showStockWidgets}
                     snapWidget={this.snapWidget}
                     syncGlobalStockList={this.syncGlobalStockList}
@@ -537,7 +538,6 @@ class App extends React.Component<AppProps, AppState> {
                     updateWidgetFilters={this.updateWidgetFilters}
                     updateWidgetStockList={this.updateWidgetStockList}
                     uploadGlobalStockList={this.uploadGlobalStockList}
-                    watchListMenu={this.state.watchListMenu}
                     widgetCopy={this.state.widgetCopy}
                     widgetList={widgetList}
                     widgetLockDown={this.state.widgetLockDown}

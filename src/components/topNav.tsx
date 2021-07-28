@@ -9,7 +9,7 @@ interface topNavProps {
     apiFlag: number,
     backGroundMenu: string,
     currentDashBoard: string,
-    dashBoardMenu: number,
+    // dashBoardMenu: number,
     login: number,
     logOut: Function,
     lockWidgets: Function,
@@ -17,12 +17,13 @@ interface topNavProps {
     menuList: menuList,
     menuWidgetToggle: Function,
     newMenuContainer: Function,
+    showMenuColumn: boolean,
     showStockWidgets: number,
     saveDashboard: Function,
     toggleBackGroundMenu: Function,
     toggleWidgetVisability: Function,
     updateAPIFlag: Function,
-    watchListMenu: number,
+    // watchListMenu: number,
     widgetLockDown: number,
     widgetSetup: widgetSetup,
     finnHubQueue: finnHubQueue,
@@ -109,22 +110,11 @@ class TopNav extends React.Component<topNavProps, topNavState> {
                 return (<>
 
                     <li id='ddi' className='navItem'>
-                        <a href="#contact" onClick={() => this.props.menuWidgetToggle("dashBoardMenu", "Saved Dashboards")}>
-                            {this.props.dashBoardMenu === 0 ? "Show Dashboard Menu" : "Hide Dashboard Menu"}
+                        <a href="#contact" onClick={() => this.props.menuWidgetToggle(!this.props.showMenuColumn)}>
+                            {this.props.showMenuColumn === true ? "Hide Menu Column" : "Show Menu Column"}
                         </a>
                     </li>
 
-                    <li id='ddi' className='navItem'>
-                        <a href="#contact" onClick={() => this.props.menuWidgetToggle("watchListMenu", "WatchList")}>
-                            {this.props.watchListMenu === 0 ? "Show Watchlist Menu" : "Hide Watchlist Menu"}
-                        </a>
-                    </li>
-
-                    {/* <li id='ddi' className='navItem'>
-                        <a href="#contact" onClick={() => (this.props.widgetLockDown === 0 ? this.props.lockWidgets(1) : this.props.lockWidgets(0))}>
-                            {this.props.widgetLockDown === 0 ? "Lock Widgets" : "Unlock Widgets"}
-                        </a>
-                    </li> */}
                     <li id='ddi' className="menu-item-has-children"><a data-testid="widgetsDropdown" href="#contact">Add Widgets</a>
                         {widgetDropDown}
                     </li>

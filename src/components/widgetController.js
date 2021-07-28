@@ -5,10 +5,9 @@ import {returnBodyProps} from "../registers/widgetControllerReg.js"
 function WidgetController(p){
 
     function renderWidgetGroup(widgetObjList) {
-        
         if (widgetObjList !== undefined && widgetObjList[0]['pass'] === undefined) {
-            widgetObjList.sort((a,b) => (a.columnOrder > b.columnOrder) ? 1 : -1)
-            const widgetGroup = widgetObjList.map((el) => {
+            widgetObjList.sort((a,b) => (a.columnOrder > b.columnOrder) ? 1 : -1) //sort into column order.
+            const widgetGroup = widgetObjList.map((el) => { //for each widget, add props.
             const thisWidgetProps = {
                 apiKey: p.apiKey,
                 changeWidgetName: p.changeWidgetName,
@@ -25,6 +24,7 @@ function WidgetController(p){
                 removeDashboardFromState: p.removeDashboardFromState,
                 setDrag: p.setDrag,
                 setSecurityFocus: p.setSecurityFocus,
+                showMenuColumn: p.showMenuColumn,
                 showStockWidgets: p.showStockWidgets,
                 snapWidget: p.snapWidget,
                 stateRef: el.widgetConfig,
@@ -90,7 +90,8 @@ function WidgetController(p){
         if (widgetGroups?.[thisColumn]) widgetGroups?.[thisColumn].push(allWidgets[w])
         }
     }
-
+    
+    // if (p.showMenuColumn === false) widgetGroups.shift()
     const renderWidgetColumns = Object.keys(widgetGroups).map((el) => {
         return <div key={el+"divkey"} style={{padding: "1px",}}>
             {renderWidgetGroup(widgetGroups[el])}

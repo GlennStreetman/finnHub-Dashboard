@@ -1,11 +1,23 @@
-export function MenuWidgetToggle(context) {
+import produce from 'immer'
+export function MenuWidgetToggle(show: boolean) {
     //Create dashboard menu if first time looking at, else toggle visability
-    return function toggleFunction(menuName, dashName = "pass", that = context) {
-        if (that.state.menuList[menuName] === undefined) {
-            that.newMenuContainer(menuName, dashName, "menuWidget");
-            that.setState({ [menuName]: 1 });
-        } else {
-            that.state[menuName] === 1 ? that.setState({ [menuName]: 0 }) : that.setState({ [menuName]: 1 });
+    console.log('toggle')
+    const s = this.state
+    const widgetList = s.dashBoardData[s.currentDashBoard].widgetList
+    const newWidgetList = produce(widgetList, (draftState) => {
+        for (const x in draftState) { //hide any widgets in column 1
+            if (draftState[x].column === 0) draftState[x].showBody = show
         }
-    }
+    })
+    const newMenuList = produce(s.menuList, (draftState) => {
+        for (const x in draftState) { //hide any widgets in column 1
+            draftState[x].showBody = show
+        }
+    })
+
+    this.setState({
+        widgetList: newWidgetList,
+        menuList: newMenuList,
+        showMenuColumn: show,
+    })
 }
