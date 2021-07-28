@@ -1,20 +1,8 @@
 import produce from "immer"
 
-import { AppState, globalStockList, widgetList, dashBoardData } from './../../App'
+import { AppState, widgetList, dashBoardData } from './../../App'
 import { uniqueObjectnName } from './../stringFunctions'
 
-
-
-export const setupDashboardObject = async function (target: string, newGlobalList: globalStockList, newWidgetList: widgetList) {
-    //setup global security list and widgets.
-    this.setState(() => {
-        const update: Partial<AppState> = {
-            globalStockList: newGlobalList,
-            currentDashBoard: target,
-        }
-        return update
-    });
-}
 
 const saveNewDashboard = async (uniqueName, menuList) => {
     let status = await new Promise((res) => {
@@ -49,7 +37,6 @@ export const NewDashboard = function newDashboard(newName, dashboards) {
     this.setState(() => {
         const update: Partial<AppState> = {
             currentDashBoard: uniqueName,
-            globalStockList: {},
             zIndex: [],
         }
         return update
@@ -85,7 +72,7 @@ export const saveDashboard = async function (dashboardName: string) {
             let status = await new Promise((res) => {
                 const data = {
                     dashBoardName: dashboardName,
-                    globalStockList: this.state.globalStockList,
+                    globalStockList: this.state.dashBoardData[this.state.currentDashBoard].globalstocklist,
                     widgetList: this.state.dashBoardData[this.state.currentDashBoard].widgetlist,
                     menuList: this.state.menuList,
                 };

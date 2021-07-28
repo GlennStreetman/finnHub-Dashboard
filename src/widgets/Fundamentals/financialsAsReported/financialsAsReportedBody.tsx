@@ -4,7 +4,7 @@ import { convertCamelToProper } from './../../../appFunctions/stringFunctions'
 
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
-import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
+import { tSearchMongoDB, tSearchMongoDBReq } from '../../../thunks/thunkSearchMongoDB'
 
 import { useDragCopy } from './../../widgetHooks/useDragCopy'
 import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
@@ -67,8 +67,8 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     }, [p?.config?.targetSecurity])
 
     useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey, p.config.targetSecurity) //sets security focus in config. Used for redux.visable data and widget excel templating.	
-    useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
+    useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey, isInitialMount, p.config) //sets security focus in config. Used for redux.visable data and widget excel templating.	
+    useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
     useEffect(( //starting config
@@ -119,7 +119,8 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         const target = e.target.value;
         const key = `${p.widgetKey}-${p?.config?.targetSecurity}`
         p.updateWidgetConfig(p.widgetKey, { targetReport: target })
-        dispatch(tSearchMongoDB([key]))
+        const tSearchMongoDBObj: tSearchMongoDBReq = { searchList: [key], dashboardID: p.dashboardID }
+        dispatch(tSearchMongoDB(tSearchMongoDBObj))
     }
 
     function changeIncrememnt(e) {

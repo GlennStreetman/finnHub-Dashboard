@@ -8,17 +8,13 @@ export const saveDashboard = async function (dashboardName: string) {
         await new Promise(resolve => setTimeout(resolve, 1000));
         return this.saveDashboard(dashboardName) //try again
     } else if (this.state.saveDashboardFlag === false && now - this.state.saveDashboardThrottle > 5000) {
-        // this.setState({
-        //     saveDashboardThrottle: now,
-        //     saveDashboardFlag: true,
-        // }, 
-        // async () => {
         await new Promise(resolve => setTimeout(resolve, 5000));
         this.setState({ saveDashboardFlag: false })
+        const globalStockList = this.state.dashBoardData[this.state.currentDashBoard].globalstocklist
         let status = await new Promise((res) => {
             const data = {
                 dashBoardName: dashboardName,
-                globalStockList: this.state.globalStockList,
+                globalStockList: globalStockList,
                 widgetList: this.state.dashBoardData[this.state.currentDashBoard].widgetlist,
                 menuList: this.state.menuList,
             };
@@ -38,8 +34,6 @@ export const saveDashboard = async function (dashboardName: string) {
                 })
         })
         return status
-        // }
-        // )
     } else if (this.state.saveDashboardFlag === false && now - this.state.saveDashboardThrottle < 5000) {
         //if not updating but flag not set to true, suspend save and try again after timer.
 

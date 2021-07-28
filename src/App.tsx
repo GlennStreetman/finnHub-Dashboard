@@ -1,6 +1,8 @@
 import React from "react";
 // import "./App.css";
 import queryString from "query-string";
+
+import produce from 'immer'
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
@@ -11,7 +13,7 @@ import {
     UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig,
     toggleWidgetBody, setWidgetFocus, removeDashboardFromState
 } from "./appFunctions/appImport/widgetLogic";
-import { setupDashboardObject, NewDashboard, saveDashboard, copyDashboard }
+import { NewDashboard, saveDashboard, copyDashboard }
     from "./appFunctions/appImport/setupDashboard";
 import { GetSavedDashBoards, GetSavedDashBoardsRes } from "./appFunctions/appImport/getSavedDashboards";
 import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
@@ -181,7 +183,7 @@ export interface AppState {
     enableDrag: boolean,
     exchangeList: string[], //list of all exchanges activated under account management.
     finnHubQueue: finnHubQueue,
-    globalStockList: defaultGlobalStockList, //default stocks for new widgets.
+    // globalStockList: defaultGlobalStockList, //default stocks for new widgets.
     login: number, //login state. 0 logged out, 1 logged in.
     loadStartingDashBoard: number, //flag switches to 1 after attemping to load default dashboard.
     menuList: menuList, //lists of all menu widgets.
@@ -203,7 +205,7 @@ class App extends React.Component<AppProps, AppState> {
     constructor(props: AppProps) {
         super(props);
 
-        const defaultGlobalStockList = {};
+        // const defaultGlobalStockList = {};
 
         this.state = {
             accountMenu: 0,
@@ -219,7 +221,7 @@ class App extends React.Component<AppProps, AppState> {
             defaultExchange: "US",
             exchangeList: ["US"], //list of all exchanges activated under account management.
             finnHubQueue: createFunctionQueueObject(1, 1000, true),
-            globalStockList: defaultGlobalStockList, //default stocks for new widgets.
+            // globalStockList: defaultGlobalStockList, //default stocks for new widgets.
             login: 0, //login state. 0 logged out, 1 logged in.
             loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
             menuList: {}, //lists of all menu widgets.
@@ -256,7 +258,6 @@ class App extends React.Component<AppProps, AppState> {
         this.setWidgetFocus = setWidgetFocus.bind(this)
 
         //App logic for setting up dashboards.
-        this.setupDashboardObject = setupDashboardObject.bind(this);
         this.newDashboard = NewDashboard.bind(this);
         this.getSavedDashBoards = GetSavedDashBoards.bind(this);
         this.saveDashboard = saveDashboard.bind(this);
@@ -315,11 +316,12 @@ class App extends React.Component<AppProps, AppState> {
             }, () => { this.toggleBackGroundMenu('about') })
         }
 
-        if ((s.globalStockList !== prevState.globalStockList && s.login === 1)) { //price data for watchlist, including socket data.
-            LoadTickerSocket(this, prevState, s.globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
+        const globalStockList = s.dashBoardData?.[s.currentDashBoard]?.globalstocklist ? s.dashBoardData?.[s.currentDashBoard].globalstocklist : {}
+        if ((globalStockList !== prevState.dashBoardData?.[prevState.currentDashBoard]?.globalstocklist && s.login === 1)) { //price data for watchlist, including socket data.
+            LoadTickerSocket(this, prevState, globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
         }
 
-        const globalKeys = Object.keys(this.state.globalStockList)
+        const globalKeys = Object.keys(globalStockList)
         if (this.state.targetSecurity === '' && globalKeys.length > 0) {
             this.setState({
                 targetSecurity: globalKeys[0]
@@ -337,8 +339,9 @@ class App extends React.Component<AppProps, AppState> {
         console.log('refresh finnhub data for current dashboard', this.state.currentDashBoard)
         const s: AppState = this.state;
         const p: AppProps = this.props;
-        await p.tGetMongoDB({ dashboard: this.state.currentDashBoard })
+        await p.tGetMongoDB({ dashboard: s.dashBoardData[s.currentDashBoard].id })
         const payload: tgetFinnHubDataReq = {
+            dashboardID: s.dashBoardData[s.currentDashBoard].id,
             targetDashBoard: s.currentDashBoard,
             widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist),
             finnHubQueue: s.finnHubQueue,
@@ -353,22 +356,26 @@ class App extends React.Component<AppProps, AppState> {
         await p.tGetMongoDB()
         const targetDash: string[] = s.dashBoardData?.[s.currentDashBoard]?.widgetlist ? Object.keys(s.dashBoardData?.[s.currentDashBoard]?.widgetlist) : []
         for (const widget in targetDash) {
-            p.tGetFinnhubData({ //get data for default dashboard.
+            const payload: tgetFinnHubDataReq = { //get data for default dashboard.
+                dashboardID: s.dashBoardData[s.currentDashBoard].id,
                 targetDashBoard: s.currentDashBoard,
                 widgetList: [targetDash[widget]],
                 finnHubQueue: s.finnHubQueue,
                 rSetUpdateStatus: p.rSetUpdateStatus,
-            })
+            }
+            p.tGetFinnhubData(payload)
         }
         const dashBoards: string[] = Object.keys(s.dashBoardData) //get data for dashboards not being shown
         for (const dash of dashBoards) {
             if (dash !== s.currentDashBoard) {
-                await p.tGetFinnhubData({ //run in background, do not await.
+                const payload: tgetFinnHubDataReq = { //run in background, do not await.
+                    dashboardID: s.dashBoardData[dash].id,
                     targetDashBoard: dash,
                     widgetList: Object.keys(s.dashBoardData[dash].widgetlist),
                     finnHubQueue: s.finnHubQueue,
                     rSetUpdateStatus: p.rSetUpdateStatus,
-                })
+                }
+                await p.tGetFinnhubData(payload)
             }
         }
     }
@@ -383,7 +390,7 @@ class App extends React.Component<AppProps, AppState> {
             const payload = {
                 dashBoardData: data.dashBoardData,
                 currentDashBoard: data.currentDashBoard,
-                globalStockList: data.dashBoardData[data.currentDashBoard].globalstocklist,
+                // globalStockList: data.dashBoardData[data.currentDashBoard].globalstocklist,
                 menuList: data.menuList!,
             }
             this.setState(payload, () => {
@@ -409,7 +416,11 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     uploadGlobalStockList(newStockObj: stockList) {
-        this.setState({ globalStockList: newStockObj });
+        const newDashboardObj = produce(this.state.dashBoardData, (draftState: dashBoardData) => {
+            draftState[this.state.currentDashBoard].globalstocklist = newStockObj
+            return draftState
+        })
+        this.setState({ dashBoardData: newDashboardObj });
     }
 
     updateAPIKey(newKey: string) {
@@ -453,6 +464,9 @@ class App extends React.Component<AppProps, AppState> {
         const widgetList = this.state.dashBoardData?.[this.state.currentDashBoard]?.['widgetlist'] ?
             this.state.dashBoardData?.[this.state.currentDashBoard]['widgetlist'] : {}
 
+        const globalStockList = s.dashBoardData?.[s.currentDashBoard]?.globalstocklist ? s.dashBoardData?.[s.currentDashBoard].globalstocklist : {}
+        const dashboardID = this.state.dashBoardData?.[this.state.currentDashBoard]?.id ? this.state.dashBoardData[this.state.currentDashBoard].id : ''
+
         return (
             <>
                 <TopNav
@@ -486,12 +500,13 @@ class App extends React.Component<AppProps, AppState> {
                     copyDashboard={this.copyDashboard}
                     currentDashBoard={this.state.currentDashBoard}
                     dashBoardData={this.state.dashBoardData}
+                    dashboardID={dashboardID}
                     dashBoardMenu={this.state.dashBoardMenu}
                     defaultExchange={this.state.defaultExchange}
                     exchangeList={this.state.exchangeList}
                     finnHubQueue={this.state.finnHubQueue}
                     getSavedDashBoards={this.getSavedDashBoards}
-                    globalStockList={this.state.globalStockList}
+                    globalStockList={globalStockList}
                     loadSavedDashboard={this.loadSavedDashboard}
                     login={this.state.login}
                     menuList={this.state.menuList}

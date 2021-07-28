@@ -31,7 +31,7 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
     const s: AppState = this.state
     const currentDashboard = s.currentDashBoard
     const widgetName: string = new Date().getTime().toString();
-    const widgetStockList = s.globalStockList
+    const widgetStockList = s.dashBoardData[currentDashboard].globalstocklist
     const newWidget: widget = {
         column: 1,
         columnOrder: -1,
@@ -69,6 +69,7 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
         }
         this.props.rRebuildTargetWidgetModel(payload)
         let updatePayload: tgetFinnHubDataReq = {
+            dashboardID: s.dashBoardData[s.currentDashBoard].id,
             targetDashBoard: currentDashboard,
             widgetList: [`${widgetName}`],
             finnHubQueue: s.finnHubQueue,
@@ -211,7 +212,8 @@ export const UpdateWidgetFilters = function (widgetID: string, data: filters) {
                     targetWidget: widgetID,
                 })
                 //remove visable data?
-                const getDataPayload = {//fetch fresh data
+                const getDataPayload: tgetFinnHubDataReq = {//fetch fresh data
+                    dashboardID: s.dashBoardData[s.currentDashBoard].id,
                     targetDashBoard: s.currentDashBoard,
                     widgetList: [widgetID],
                     finnHubQueue: s.finnHubQueue,

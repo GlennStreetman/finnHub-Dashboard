@@ -1,5 +1,5 @@
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
-import { dashBoardData } from '../../../App'
+import { dashBoardData, globalStockList } from '../../../App'
 // import { findByLabelText } from "@testing-library/dom";
 
 interface endPointMenuProps {
@@ -8,6 +8,7 @@ interface endPointMenuProps {
     dashBoardData: dashBoardData,
     currentDashBoard: string,
     targetSecurity: string,
+    globalStockList: globalStockList,
 }
 
 function EndPointMenu(p: endPointMenuProps, ref: any) {
@@ -45,8 +46,8 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
         const target = e.target.value;
         setSecurityFocus(target)
     }
-
-    const securityOptionsList = Object.keys(p.dashBoardData[targetDashboard].globalstocklist).map((el) =>
+    const globalStockList = p.globalStockList ? p.globalStockList : {}
+    const securityOptionsList = Object.keys(globalStockList).map((el) =>
         <option key={el + "sec"} value={el}>
             {el}
         </option>
@@ -61,7 +62,7 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
         <><td>Widget</td><td>All</td><td>{securityFocus}</td></> :
         <><td>Widget</td><td>Data</td></>
 
-    const FocusDashboard = p.dashBoardData[targetDashboard].widgetlist
+    const FocusDashboard = p.dashBoardData[targetDashboard].widgetlist ? p.dashBoardData[targetDashboard].widgetlist : {}
     const showBodyWidget = Object.keys(FocusDashboard).map((el) => {
         const apiToggle = p.apiAlias ? p.apiAlias : p.apiKey
         const queryPropsAll = `(key: "${apiToggle}" dashboard: "${targetDashboard}" widget: "${FocusDashboard[el].widgetHeader}")`
@@ -144,6 +145,7 @@ export function gqlMenuProps(that, key = "AccountMenu") {
         apiAlias: that.props.apiAlias,
         currentDashBoard: that.props.currentDashBoard,
         targetSecurity: that.props.targetSecurity,
+        globalStockList: that.props.globalStockList
     };
     return propList;
 }

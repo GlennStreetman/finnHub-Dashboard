@@ -13,6 +13,7 @@ function WidgetController(p){
                 apiKey: p.apiKey,
                 changeWidgetName: p.changeWidgetName,
                 currentDashBoard: p.currentDashBoard,
+                dashboardID: p.dashboardID,
                 enableDrag: p.enableDrag,
                 exchangeList: p.exchangeList,
                 finnHubQueue: p.finnHubQueue,

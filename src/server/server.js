@@ -54,6 +54,7 @@ import {schema} from './routes/graphQL/graphQL.js'
 import {versionControl} from './db/databaseVersionControl.js'
 
 const app = express();
+
 app.use(helmet({
   contentSecurityPolicy: false,
 }))

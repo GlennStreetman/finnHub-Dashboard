@@ -7,6 +7,7 @@ export const updateDefaultExchange = function (ex: string, getSymbol: boolean = 
         const payload: Partial<AppState> = { defaultExchange: ex }
         this.setState(payload);
         const tGetSymbolObj: reqObj = {
+
             exchange: ex,
             apiKey: s.apiKey,
             finnHubQueue: s.finnHubQueue,

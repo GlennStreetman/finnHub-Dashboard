@@ -3,7 +3,7 @@ import { useState, useEffect, forwardRef, useRef } from "react";
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { rBuildVisableData } from '../../../slices/sliceShowData'
-import { tSearchMongoDB } from '../../../thunks/thunkSearchMongoDB'
+import { tSearchMongoDB, tSearchMongoDBReq } from '../../../thunks/thunkSearchMongoDB'
 import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
 
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
@@ -95,7 +95,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         targetSeries: '',
     })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
 
-    useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount) //on change to target security retrieve fresh data from mongoDB
+    useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
 
     useEffect(() => { //set default series 
         if (seriesList.length > 0 && !p.config.targetSeries) {
@@ -182,8 +182,9 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
     useEffect(() => {//refresh data on change to filters.
         let searchList = Object.keys(p.trackedStocks).map((el) => `${p.widgetKey}-${el}`)
-        dispatch(tSearchMongoDB(searchList))
-    }, [p.config.toggleMode, p.config.targetSecurity, p.config.metricSelection, p.config.seriesSelection, dispatch, p.trackedStocks, p.widgetKey])
+        const tSearchmongoDBOBj: tSearchMongoDBReq = { searchList: searchList, dashboardID: p.dashboardID }
+        dispatch(tSearchMongoDB(tSearchmongoDBOBj))
+    }, [p.config.toggleMode, p.config.targetSecurity, p.config.metricSelection, p.config.seriesSelection, dispatch, p.trackedStocks, p.widgetKey, p.dashboardID])
 
     function setTargetSeries(el) {
         p.updateWidgetConfig(p.widgetKey, { ...p.config, ...{ targetSeries: el, } })

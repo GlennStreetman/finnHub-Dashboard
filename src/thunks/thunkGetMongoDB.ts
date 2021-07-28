@@ -19,7 +19,7 @@ export interface getMongoRes {
 
 interface tgetMongoDBReq {
     widget?: string,
-    dashboard?: string
+    dashboard?: number | string
 }
 
 export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
@@ -29,7 +29,7 @@ export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
             let fetchString = '/getFinnDashDataMongo'
             if (reqObj) { //build request string with filters.
                 fetchString = fetchString + '?'
-                if (reqObj.dashboard) fetchString = `${fetchString}dashboard=${reqObj.dashboard}`
+                if (reqObj.dashboard) fetchString = `${fetchString}dashboardID=${reqObj.dashboard}`
                 if (reqObj.widget) fetchString = `${fetchString}&widget=${reqObj.widget}`
             }
             const getData = await fetch(fetchString)

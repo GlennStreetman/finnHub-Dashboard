@@ -4,8 +4,9 @@ import produce from "immer"
 
 export const updateGlobalStockList = async function (event: Event, stockRef: string, stockObj: StockObj | Object = {}) {
     //Adds/removes a single stock from global stock list and updates current dashboard. if no stock object passed, remove from global stock list, else add.
-    console.log('updating global', stockObj)
-    const currentStockObj = { ...this.state.globalStockList };
+    // console.log('updating global', stockObj)
+    const globalStockList = this.state.dashBoardData[this.state.currentDashBoard].globalstocklist
+    const currentStockObj = { ...globalStockList };
     if (currentStockObj[stockRef] === undefined) {
         currentStockObj[stockRef] = { ...stockObj };
         currentStockObj[stockRef]["dStock"] = function (ex: string) {
@@ -27,7 +28,6 @@ export const updateGlobalStockList = async function (event: Event, stockRef: str
 
 
     const payload: Partial<AppState> = {
-        globalStockList: currentStockObj,
         dashBoardData: updateCurrentDashboard
     }
     this.setState(payload, () => {
@@ -49,7 +49,6 @@ export const setNewGlobalStockList = function (replacementGlobalList) {
     const newFocus = replacementGlobalList[Object.keys(replacementGlobalList)[0]] ? replacementGlobalList[Object.keys(replacementGlobalList)[0]].key : ''
 
     const payload: Partial<AppState> = {
-        globalStockList: replacementGlobalList,
         dashBoardData: updateCurrentDashboard,
         targetSecurity: newFocus,
     }

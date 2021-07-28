@@ -31,9 +31,8 @@ router.get('/getFinnDashDataMongo', async (req: finnDashDataReq, res: any) => {
         const reqFilter = {
             userID: req.session.uID,
         }
-        if (req.query['dashboard']) reqFilter['dashboard'] = req.query['widget']
+        if (req.query['dashboard']) reqFilter['dashboard'] = req.query['dashboard']
         if (req.query['widget']) reqFilter['widget'] = req.query['widget']
-
         const findDataSet = dataSet.find(reqFilter)
         const resList: any[] = []
         await findDataSet.forEach((data: any) => {
@@ -71,6 +70,7 @@ router.post("/postFinnDashDataMongo", async (req: finnDashDataReq, res: any) => 
                         key: record,
                         widget: u.widget,
                         dashboard: u.dashboard,
+                        dashboardID: u.dashboardID,
                         widgetName: u.widgetName,
                         retrieved: u.updated,
                         stale: u.updated + 1000 * 60 * 60 * 3, //stale after 3 hours, consider setting up user defined variable.

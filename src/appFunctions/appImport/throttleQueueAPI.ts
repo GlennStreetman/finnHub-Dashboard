@@ -99,6 +99,7 @@ export const createFunctionQueueObject = function (maxRequestPerInterval: number
 //throttle =  que object returned by function above.
 
 export interface throttleResObj {
+    dashboardID: number | string,
     security: string,
     widget: string,
     apiString: string,
@@ -112,6 +113,7 @@ export interface throttleResObj {
 }
 
 export interface throttleApiReqObj {
+    dashboardID: number | string,
     apiString: string,
     widgetName: string,
     dashboard: string,
@@ -154,6 +156,7 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                     if (reqObj.rSetUpdateStatus) reqObj.rSetUpdateStatus({ [reqObj.dashboard]: -1 })
                     if (data.status === 429) {
                         const resObj: throttleResObj = {
+                            dashboardID: reqObj.dashboardID,
                             security: reqObj.security,
                             widget: reqObj.widget,
                             apiString: reqObj.apiString,
@@ -170,6 +173,7 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                         resolve(resObj)
                     } else if (data.status === 400) {
                         const resObj: throttleResObj = {
+                            dashboardID: reqObj.dashboardID,
                             security: reqObj.security,
                             widget: reqObj.widget,
                             apiString: reqObj.apiString,
@@ -186,6 +190,7 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                         resolve(resObj)
                     } else if (data.status === 403) {
                         const resObj: throttleResObj = {
+                            dashboardID: reqObj.dashboardID,
                             security: reqObj.security,
                             widget: reqObj.widget,
                             apiString: reqObj.apiString,
@@ -202,6 +207,7 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                         resolve(resObj)
                     } else {
                         const resObj: throttleResObj = {
+                            dashboardID: reqObj.dashboardID,
                             security: reqObj.security,
                             widget: reqObj.widget,
                             apiString: reqObj.apiString,
@@ -224,6 +230,7 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                     // console.log('request complete')
                     throttle.openRequests = throttle.openRequests -= 1
                     const thisError: throttleResObj = {
+                        dashboardID: reqObj.dashboardID,
                         security: reqObj.security,
                         widget: reqObj.widget,
                         apiString: reqObj.apiString,

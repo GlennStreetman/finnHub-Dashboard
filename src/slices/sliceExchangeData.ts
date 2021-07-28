@@ -49,6 +49,7 @@ export const tGetSymbolList = createAsyncThunk(
         const finnQueue = reqObj.finnHubQueue
         const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${reqObj.exchange}&token=${reqObj.apiKey}`
         const thisReq: throttleApiReqObj = {
+            dashboardID: 'pass',
             apiString: apiString,
             widgetName: 'pass',
             dashboard: 'pass',

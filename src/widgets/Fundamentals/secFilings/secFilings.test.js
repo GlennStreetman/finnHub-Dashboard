@@ -5,7 +5,7 @@
 import 'whatwg-fetch';
 import React from "react";
 import '@testing-library/jest-dom/extend-expect'
-import { screen, render,  waitFor, fireEvent, prettyDOM} from '@testing-library/react' //prettyDOM
+import { screen, render,  waitFor, fireEvent} from '@testing-library/react' //prettyDOM
         // let renameList = screen.getByTestId(body)
         // console.log(prettyDOM(renameList))
 import { configure } from '@testing-library/react'
@@ -36,7 +36,7 @@ import { clickPagination } from '../../testFunctions/action_clickPagination'
 import { toggleEditPane } from '../../testFunctions/action_toggleEditPane'
 import { newWidgetName } from '../../testFunctions/action_newWidgetName'
 import { addSecurity } from '../../testFunctions/action_addSecurity'
-import { changeFilter } from '../../testFunctions/action_ChangeFilter'
+// import { changeFilter } from '../../testFunctions/action_ChangeFilter'
 
 //test procedures
 import {testBodyRender} from '../../testFunctions/test_bodyRender'

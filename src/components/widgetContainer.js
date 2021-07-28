@@ -144,6 +144,7 @@ function WidgetContainer(p) {
         widgetProps['config'] = p.widgetList.config
         widgetProps['updateDashBoards'] = p.updateDashBoards
         widgetProps['finnHubQueue'] = p.finnHubQueue
+        widgetProps['dashboardID'] = p.dashboardID
     } 
     if (p.widgetCopy) {
     widgetProps['widgetCopy'] = p.widgetCopy

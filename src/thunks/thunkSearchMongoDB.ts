@@ -2,14 +2,20 @@ import { createAsyncThunk } from '@reduxjs/toolkit';
 import { reqObj, resObj } from '../server/routes/mongoDB/findMongoData'
 //receives list of strings to search for. WidgetKey-targetSecurity
 //pushes returned string to visableData in redux.
+
+export interface tSearchMongoDBReq {
+    searchList: string[],
+    dashboardID: number | string,
+}
+
 export const tSearchMongoDB = createAsyncThunk( //{ [widgetKey-securityList]}
     'tSearch',
-    async (req: string[], thunkAPI: any) => { //{list of securities}
+    async (req: tSearchMongoDBReq, thunkAPI: any) => { //{list of securities}
         //if stale pop from list 
-        const dashboard = thunkAPI.getState().showData.targetDashboard
+        // const dashboard = thunkAPI.getState().showData.targetDashboard
         const reqData: reqObj = {
-            searchList: req, //list of widget keys that need to be found in mongoDB. widgetKey-Security. ex: "1626322988025-US-AAPL"
-            dashboard: dashboard
+            searchList: req.searchList, //list of widget keys that need to be found in mongoDB. widgetKey-Security. ex: "1626322988025-US-AAPL"
+            dashboard: req.dashboardID
         }
         try {
             const options = {
@@ -19,7 +25,7 @@ export const tSearchMongoDB = createAsyncThunk( //{ [widgetKey-securityList]}
             };
             const getData = await fetch('/findMongoData', options)
             const resData: resObj[] = await getData.json()
-            const res = req.reduce((acc, curr) => ({ ...acc, [`${dashboard}-${curr}`]: '' }), {});
+            const res = req.searchList.reduce((acc, curr) => ({ ...acc, [`${req.dashboardID}-${curr}`]: '' }), {});
             for (const x in resData) {
                 const mongo: resObj = resData[x]
                 res[mongo.key] = {

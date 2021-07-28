@@ -19,6 +19,7 @@ const addSecurity = async function (widgetType: string, addSecuritys: string[]) 
             expect(screen.getByTestId(`remove-US-${addSecuritys[x][0]}`)).toBeInTheDocument()
         })
     }
+    return true
 }
 
 export { addSecurity }

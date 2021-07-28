@@ -115,7 +115,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                 const dashboard = p.dashBoardData[Object.keys(dashBoardData)[x]]
                 const testDashboardName = dashboard.dashboardname
                 if (testDashboardName !== dashboardName) { //load non-deleted dashboard
-                    p.loadSavedDashboard(testDashboardName, dashboard.globalstocklist, dashboard.widgetlist);
+                    p.loadSavedDashboard(testDashboardName);
                     break
                 }
             }
@@ -160,7 +160,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                             checked={p.currentDashBoard === p.dashBoardData?.[el]?.dashboardname} //
                             onChange={() => {
                                 unMountWidgets()
-                                p.loadSavedDashboard(p.dashBoardData?.[el]?.dashboardname, dashBoardData[el].globalstocklist, dashBoardData[el].widgetlist);
+                                p.loadSavedDashboard(p.dashBoardData?.[el]?.dashboardname);
                                 setInputText(dashBoardData[el].dashboardname)
                             }}
                         />

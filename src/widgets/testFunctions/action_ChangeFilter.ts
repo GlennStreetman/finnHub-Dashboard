@@ -14,6 +14,7 @@ const changeFilter = async function (widgetType: string, newDate: string) { //ne
     })
     let focusChange = screen.getByTestId(`toDate-${widgetType}`) as HTMLInputElement
     focusChange.focus()
+    return true
 }
 
 export { changeFilter }

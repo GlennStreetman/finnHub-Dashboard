@@ -5,6 +5,7 @@ import { finnHub, throttleResObj as queResObj, finnHubQueue, throttleApiReqObj }
 //If data is not fresh dispatch finnHub api request to throttleQueue.
 //Returns finnhub data to mongoDB AND updates slice/ShowData.
 export interface tgetFinnHubDataReq {
+    dashboardID: number,
     targetDashBoard: string,
     widgetList: string[],
     finnHubQueue: finnHubQueue,
@@ -28,6 +29,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
             for (const s in thisWidget) { //for each security
                 const reqObj: throttleApiReqObj = {
                     ...thisWidget[s],
+                    dashboardID: req.dashboardID,
                     dashboard: req.targetDashBoard,
                     widget: w,
                     security: s,
@@ -49,7 +51,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
             .then((res) => {
                 const resObj: resObj = {}
                 for (const resStock of res) {
-                    const key: string = `${resStock.dashboard}-${resStock.widget}-${resStock.security}`
+                    const key: string = `${resStock.dashboardID}-${resStock.widget}-${resStock.security}`
                     resObj[key] = resStock
                 }
                 const options = {

@@ -31,12 +31,13 @@
     "helmet": "^4.6.0",
     "idb": "^6.0.0",
     "immer": "^8.0.1",
+    "jest-canvas-mock": "^2.3.1",
     "mailgun-js": "^0.6.7",
     "md5": "^2.3.0",
     "mongodb": "^3.6.4",
-    "nodemon": "^2.0.4",
     "morgan": "^1.10.0",
     "node-fetch": "^2.6.1",
+    "nodemon": "^2.0.4",
     "pg": "^8.5.1",
     "pg-format": "^1.0.4",
     "query-string": "^6.14.1",
@@ -72,8 +73,8 @@
     "build": "react-scripts build && npx tsc -p src/server/tsconfig.json && npm run copy-files",
     "heroku-postbuild": "react-scripts build && npm run tsc",
     "eject": "react-scripts eject",
-    "test": "jest",
-    "test-f": "jest --reporters=jest-silent-reporter "
+    "test": "jest --runInBand --no-cache",
+    "test-f": "jest --runInBand --reporters=jest-silent-reporter"
   },
   "eslintConfig": {
     "extends": "react-app"
@@ -98,7 +99,6 @@
     "@types/node-fetch": "^2.5.10",
     "babel-jest": "^26.6.3",
     "dotenv": "^8.2.0",
-    "enzyme": "^3.11.0",
     "enzyme-adapter-react-16": "^1.15.6",
     "eslint-config-airbnb": "^18.2.1",
     "eslint-plugin-import": "^2.22.1",
@@ -106,7 +106,6 @@
     "eslint-plugin-react": "^7.21.5",
     "eslint-plugin-react-hooks": "^4.0.0",
     "jest": "^26.6.0",
-    "jest-canvas-mock": "^2.3.1",
     "jest-silent-reporter": "^0.5.0",
     "msw": "^0.28.2",
     "redux-devtools": "^3.7.0",

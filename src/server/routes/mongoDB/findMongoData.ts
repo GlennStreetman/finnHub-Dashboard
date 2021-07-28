@@ -10,7 +10,7 @@ interface session {
 
 export interface reqObj { //fetch post/findMongoData
     searchList: string[], //list of widgetKeys to search for.
-    dashboard: string, //dashboard name
+    dashboard: string | number, //dashboard name
 }
 
 interface findMongoDataPost extends Request {
@@ -49,12 +49,11 @@ router.post('/findMongoData', async (req: findMongoDataPost, res: any) => {
             const body: reqObj = req.body
             const searchList = body.searchList
             const dashboard = body.dashboard
-            const client = getDB()
+            const client = await getDB()
             const database = client.db('finnDash');
             const dataSet = database.collection('dataSet');
-            const findList = [{ key: 'plug' }]
+            const findList: any[] = []
             for (const key in searchList) {
-
                 const thisKey = dashboard + '-' + searchList[key]
                 findList.push({
                     key: thisKey
@@ -69,7 +68,6 @@ router.post('/findMongoData', async (req: findMongoDataPost, res: any) => {
             await findDataSet.forEach((data: resObj) => { //map this
                 resList.push(data)
             })
-
             res.status(200).json(resList) //returns list of objects.
 
         }

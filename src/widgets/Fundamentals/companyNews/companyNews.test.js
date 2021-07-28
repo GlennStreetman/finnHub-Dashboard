@@ -103,39 +103,48 @@ it(`Test ${widgetType} Widget: Change focus renders body change. `, async (done)
         ['getByText', 'Walmart Source 1'],      
     ]) 
 
-    await setSecurityFocus(widgetType, 'US-COST') //select new target security for widget.
+    setSecurityFocus(widgetType, 'US-COST') //select new target security for widget.
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText','Costco Headline 1'],
         ['getByText', 'Costco Source 1'],     
     ])
-    await toggleEditPane(widgetType)
+    toggleEditPane(widgetType)
         done()
 })
 
 it(`Test ${widgetType} Widget: Change pagination.`, async (done) => { //needs numbers udpated and maybe a change focus resets pagination?
     //test pagination
+    console.log('test1', new Date())
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText','Walmart Headline 1'],
         ['getByText', 'Walmart Source 1'], 
-    ]) 
+    ])
+    console.log('test2', new Date())
+ 
     await clickPagination('pageForward') //click forward pagination button. Showing costco currently.
+    console.log('test3', new Date())
+
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText','Walmart Headline 11'],
         ['getByText', 'Walmart Source 11'], 
     ]) 
-    await setSecurityFocus(widgetType, 'US-COST') //select new target security for widget.
+    console.log('test4', new Date())
+
+    setSecurityFocus(widgetType, 'US-COST') //select new target security for widget.
+    console.log('test5', new Date())
+
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText','Costco Headline 1'],
         ['getByText', 'Costco Source 1'],  
     ]) 
 
-    await toggleEditPane(widgetType)
+    toggleEditPane(widgetType)
     done()
 })
 
 it(`Test ${widgetType} Widget: Toggle Button shows config screen.`, async (done) => { 
     //toggle to testing edit pane
-    await toggleEditPane(widgetType)
+    toggleEditPane(widgetType)
     await waitFor(() => { //test setup screen loaded.
         expect(screen.getByText('Remove')).toBeInTheDocument()
         expect(screen.getByTestId('remove-US-WMT')).toBeInTheDocument()
@@ -147,16 +156,16 @@ it(`Test ${widgetType} Widget: Toggle Button shows config screen.`, async (done)
 
 
 it(`Test ${widgetType} Widget: Rename widget works.`, async (done) => { 
-    await toggleEditPane(widgetType) //toggle to edit pane
+    toggleEditPane(widgetType) //toggle to edit pane
     await newWidgetName(widgetType, ['test', 'Test', 'Test!', 'test!$', 'test,', 'renameTookEffect']) //rename widget multiple times
-    await toggleEditPane(widgetType) //toggle to data pane.
+    toggleEditPane(widgetType) //toggle to data pane.
     expect(screen.getByText('renameTookEffect')).toBeInTheDocument()
-    await toggleEditPane(widgetType) //toggle to data pane.
+    toggleEditPane(widgetType) //toggle to data pane.
     done()
 })
 
 it(`Test ${widgetType} Widget: Add security from widget config screen works.`, async (done) => { 
-    await toggleEditPane(widgetType) //toggle to edit pane
+    toggleEditPane(widgetType) //toggle to edit pane
     await addSecurity(widgetType, [['TSLA', 'US-TSLA: TESLA INC'], ['AAPL', 'US-AAPL: APPLE INC']]) //add security to widget with search bar
     await waitFor(() => {
         expect(screen.getByTestId('remove-US-TSLA')).toBeInTheDocument()
@@ -166,20 +175,20 @@ it(`Test ${widgetType} Widget: Add security from widget config screen works.`, a
 })
 
 it(`Test ${widgetType} Widget: Test that changing filters fetches new data.`, async (done) => { 
-    await toggleEditPane(widgetType) //toggle to edit pane
+    toggleEditPane(widgetType) //toggle to edit pane
     mockHTTPServer.use(mockFinnHubData_toggle) //toggle retrieval data so that we can test that updating filters pulls new data.
     await changeFilter(widgetType, '1999-01-01')
-    await toggleEditPane(widgetType)
+    toggleEditPane(widgetType)
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText','tWalmart Headline 1'],
         ['getByText', 'tWalmart Source 1'], 
     ])
-    await toggleEditPane(widgetType) //toggle to edit pane
+    toggleEditPane(widgetType) //toggle to edit pane
     done()
 })
 
 it(`Test ${widgetType} Widget: Test that removing securities from edit pane works.`, async (done) => { 
-    await toggleEditPane(widgetType) //toggle to edit pane
+    toggleEditPane(widgetType) //toggle to edit pane
     await fireEvent.click(screen.getByTestId('remove-US-WMT'))    //remove target stock
     await waitFor(async () => {
         await expect(screen.queryByTestId('remove-US-WMT')).toBe(null)

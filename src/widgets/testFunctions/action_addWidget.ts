@@ -16,7 +16,7 @@ const addWidget = async function (category: string, categoryText: string, widget
     })
     expect(screen.getByTestId(widgetText)).toBeInTheDocument()
     fireEvent.click(screen.getByTestId(widgetText)) //copy submenu text
-    // console.log('widget loaded')
+    return true
 }
 
 export { addWidget }

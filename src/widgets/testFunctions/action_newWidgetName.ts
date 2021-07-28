@@ -8,6 +8,7 @@ const newWidgetName = async function (widgetType: string, newName: string[]) { /
             expect(renameField.value).toBe(newName[x])
         })
     }
+    return true
 }
 
 export { newWidgetName }
