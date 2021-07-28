@@ -32,10 +32,8 @@ export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
                 if (reqObj.dashboard) fetchString = `${fetchString}dashboardID=${reqObj.dashboard}`
                 if (reqObj.widget) fetchString = `${fetchString}&widget=${reqObj.widget}`
             }
-            console.log('getFinnDashDataMongo', new Date())
             const getData = await fetch(fetchString)
             const freshData = await getData.json()
-            console.log('getFinnDashDataMongo Fresh', new Date())
             const resObj: getMongoRes = {}
             for (const x in freshData.resList) {
                 const mongo = freshData.resList[x]

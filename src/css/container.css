@@ -24,17 +24,25 @@
   flex-direction: row;
 }
 
+.menuHeader {
+  padding: 5px;
+  z-index: 1;
+  background-color: #1d69ab;
+  color: #fff;
+  /* display: flex; */
+  flex-direction: row;
+}
+
 .headerButtons {
   float: right;
 }
 
 .widgetFooter {
-  /* overflow: hidden; */
   padding: 2px;
-  /* cursor: move; */
   z-index: 1;
   background-color: #1d69ab;
   color: #1d69ab;
   flex-direction: row;
   text-align: right;
+  min-height: 10px;
 }

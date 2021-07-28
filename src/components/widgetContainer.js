@@ -117,13 +117,11 @@ function WidgetContainer(p) {
         }
     }
 
-
     const visStatus = p.widgetList.column === 0 && p.showMenuColumn === false ? 'none' : 'block' //hide widget if showbody === false
 
     const compStyle = {
         display: visStatus
         };
-    
     
     const bodyVisable = {
         display: visStatus,
@@ -162,7 +160,7 @@ function WidgetContainer(p) {
         data-testid={`container-${p.widgetList.widgetType}`}  
     >
         {p.widgetLockDown === 0 ? (
-        <div className="widgetHeader">
+        <div className={p.stateRef === 'menuWidget' ? "menuHeader" : "widgetHeader"}>
             {showEditPane === 0 ? (
             <>
                 {widgetProps['helpText'] !== undefined && <ToolTip textFragment={widgetProps['helpText'][0]} hintName={widgetProps['helpText'][1]} />}
