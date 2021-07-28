@@ -19,15 +19,27 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
 
     useImperativeHandle(ref, () => ({ state: {} }))
 
-    useEffect(() => {
+    useEffect(() => { //update security focus on change to target security
         setSecurityFocus(p.targetSecurity)
     }, [p.targetSecurity])
+
+
+    useEffect(() => { //update dashboard on change to target dashboard
+        setTargetDashboard(p.currentDashBoard)
+    }, [p.currentDashBoard])
 
     const url = window.location
     let baseURL = url.protocol + "/" + url.host + "/" + url.pathname.split('/')[1] + 'graphQL';
     baseURL = baseURL.indexOf('localhost') >= 0 ?
         baseURL.replace('http:/localhost:3000', 'localhost:5000') : //makes redirect work in dev mode.
         baseURL.replace('https:/', '')
+
+    let endpointURL = url.protocol + "/" + url.host + "/" + url.pathname.split('/')[1] + 'qGraphQL';
+    endpointURL = endpointURL.indexOf('localhost') >= 0 ?
+        endpointURL.replace('http:/localhost:3000', 'localhost:5000') : //makes redirect work in dev mode.
+        endpointURL.replace('https:/', '')
+
+
     const apiToggle = p.apiAlias ? p.apiAlias : p.apiKey
     const defaultQuery = `{dashboardList(key: "${apiToggle}") {dashboard}}`
 
@@ -57,7 +69,7 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
         const target = e.target.value;
         setToggleView(target)
     }
-    //Widget, All Securities, securityFocus || security, widget, data   
+
     const showDataHeadings = toggleView === 'widget' ?
         <><td>Widget</td><td>All</td><td>{securityFocus}</td></> :
         <><td>Widget</td><td>Data</td></>
@@ -70,13 +82,18 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
         const returnValues = `dashboard, widgetType, widgetName, security, data`
         const thisQueryAll = `{widget ${queryPropsAll} {${returnValues}}}`
         const thisQuerySecurity = `{widget ${queryPropsSecurity} {${returnValues}}}`
-        // return(<a href={`//${baseURL}?query=${thisQuery}`} target='_blank' rel="noreferrer">{el}</a>)
 
         return (
             <tr key={el + 'tr'}>
                 <td key={el + 'td1'}>{FocusDashboard[el].widgetHeader}</td>
-                <td key={el + 'td2'}><a href={`//${baseURL}?query=${thisQueryAll}`} target='_blank' rel="noreferrer">All Data</a></td>
-                <td key={el + 'td3'}><a href={`//${baseURL}?query=${thisQuerySecurity}`} target='_blank' rel="noreferrer">Security Data</a></td>
+                <td key={el + 'td2'}>
+                    <td><a href={`//${baseURL}?query=${thisQueryAll}`} target='_blank' rel="noreferrer">Web</a></td>
+                    <td><a href={`//${endpointURL}?query=${thisQueryAll}`} target='_blank' rel="noreferrer">API</a></td>
+                </td>
+                <td key={el + 'td3'}>
+                    <td><a href={`//${baseURL}?query=${thisQuerySecurity}`} target='_blank' rel="noreferrer">Web</a></td>
+                    <td><a href={`//${endpointURL}?query=${thisQuerySecurity}`} target='_blank' rel="noreferrer">API</a></td>
+                </td>
             </tr>
         )
     })
@@ -106,14 +123,6 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
                                 <option value='security'>security</option>
                             </select>
                         </td>
-                        <td style={{ color: 'white' }} className='rightTE'>
-                            Dash:
-                        </td>
-                        <td>
-                            <select value={targetDashboard} onChange={changeDashboardSelection}>
-                                {dashboardOptionList}
-                            </select>
-                        </td>
                         {toggleView === 'widget' ? <><td style={{ color: 'white' }} className='rightTE'>Focus:</td>
                             <td>
                                 <select value={securityFocus} onChange={changeSecurityFocus}>{securityOptionsList}</select>
@@ -133,7 +142,7 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
                     {toggleView === 'widget' ? showBodyWidget : showBodySecurity}
                 </tbody>
             </table>
-            <a href={`//${baseURL}?query=${defaultQuery}`} target='_blank' rel="noreferrer">Explore graphQL</a>
+            <a style={{ margin: '5px' }} href={`//${baseURL}?query=${defaultQuery}`} target='_blank' rel="noreferrer">Explore graphQL</a>
         </div></>
     );
 }

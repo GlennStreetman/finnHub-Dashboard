@@ -27,7 +27,10 @@ function WidgetContainer(p) {
 
     useEffect(() => {
         const visable = ()=>{
-            if (p.stateRef === "menuWidget" && p.showMenu === 0){
+            if (p.widgetList.column === 0 && p.showMenuColumn === false) {
+                return "none"
+            }
+            else if (p.stateRef === "menuWidget" && p.showMenu === 0){
                 return "none"
             } else if (p.showStockWidgets === 0) {
                 return "none"
@@ -36,7 +39,9 @@ function WidgetContainer(p) {
             }
         }
         setShow(visable)
-    },[p.showMenu, p.showStockWidgets, p.stateRef])
+    },[p.showMenu, p.showStockWidgets, p.stateRef, p.showMenuColumn, p.widgetList.column])
+
+    // const visStatus = p.widgetList.column === 0 && p.showMenuColumn === false ? 'none' : 'block' //hide widget if showbody === false
 
     useEffect(() => {
         setShowEditPane(0)
@@ -117,14 +122,12 @@ function WidgetContainer(p) {
         }
     }
 
-    const visStatus = p.widgetList.column === 0 && p.showMenuColumn === false ? 'none' : 'block' //hide widget if showbody === false
-
     const compStyle = {
-        display: visStatus
+        display: show
         };
     
     const bodyVisable = {
-        display: visStatus,
+        display: show,
     }
     const excelFunction = excelRegister[p.widgetList.widgetType]
 
