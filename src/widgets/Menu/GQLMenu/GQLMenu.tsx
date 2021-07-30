@@ -43,16 +43,16 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
     const apiToggle = p.apiAlias ? p.apiAlias : p.apiKey
     const defaultQuery = `{dashboardList(key: "${apiToggle}") {dashboard}}`
 
-    function changeDashboardSelection(e) {
-        const target = e.target.value;
-        setTargetDashboard(target)
-    }
+    // function changeDashboardSelection(e) {
+    //     const target = e.target.value;
+    //     setTargetDashboard(target)
+    // }
 
-    const dashboardOptionList = Object.keys(p.dashBoardData).map((el) =>
-        <option key={el + "db"} value={el}>
-            {el}
-        </option>
-    )
+    // const dashboardOptionList = Object.keys(p.dashBoardData).map((el) =>
+    //     <option key={el + "db"} value={el}>
+    //         {el}
+    //     </option>
+    // )
 
     function changeSecurityFocus(e) {
         const target = e.target.value;
@@ -87,12 +87,17 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
             <tr key={el + 'tr'}>
                 <td key={el + 'td1'}>{FocusDashboard[el].widgetHeader}</td>
                 <td key={el + 'td2'}>
-                    <td><a href={`//${baseURL}?query=${thisQueryAll}`} target='_blank' rel="noreferrer">Web</a></td>
-                    <td><a href={`//${endpointURL}?query=${thisQueryAll}`} target='_blank' rel="noreferrer">API</a></td>
+                    <table><tbody><tr>
+                        <td><a href={`//${baseURL}?query=${thisQueryAll}`} target='_blank' rel="noreferrer">Web</a></td>
+                        <td><a href={`//${endpointURL}?query=${thisQueryAll}`} target='_blank' rel="noreferrer">API</a></td>
+                    </tr></tbody></table>
                 </td>
+
                 <td key={el + 'td3'}>
-                    <td><a href={`//${baseURL}?query=${thisQuerySecurity}`} target='_blank' rel="noreferrer">Web</a></td>
-                    <td><a href={`//${endpointURL}?query=${thisQuerySecurity}`} target='_blank' rel="noreferrer">API</a></td>
+                    <table><tbody><tr>
+                        <td><a href={`//${baseURL}?query=${thisQuerySecurity}`} target='_blank' rel="noreferrer">Web</a></td>
+                        <td><a href={`//${endpointURL}?query=${thisQuerySecurity}`} target='_blank' rel="noreferrer">API</a></td>
+                    </tr></tbody></table>
                 </td>
             </tr>
         )

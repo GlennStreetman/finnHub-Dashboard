@@ -67,7 +67,7 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
     function renderStockData() {
 
         const dataRows = typeof rShowData === 'object' ? Object.entries(rShowData).map((el) => {
-            if (typeof el[1] !== 'object') {
+            if (typeof el[1] !== 'object' && el[0] !== 'filters') {
                 return (
                     <tr key={`${el[0]}-${el[1]}`}>
                         <td className="rightTE" key={`${el[0]}-${el[1]}2`}    >{convertCamelToProper(el[0])}:&nbsp;&nbsp;   </td>

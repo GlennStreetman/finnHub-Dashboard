@@ -496,6 +496,7 @@ class App extends React.Component<AppProps, AppState> {
                 />
                 <WidgetController
                     apiKey={this.state.apiKey}
+                    apiAlias={this.state.apiAlias}
                     availableStocks={this.state.availableStocks}
                     changeWidgetName={this.changeWidgetName}
                     copyDashboard={this.copyDashboard}
