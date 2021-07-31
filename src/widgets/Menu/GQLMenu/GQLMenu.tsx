@@ -74,7 +74,7 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
         <><td>Widget</td><td>All</td><td>{securityFocus}</td></> :
         <><td>Widget</td><td>Data</td></>
 
-    const FocusDashboard = p.dashBoardData[targetDashboard].widgetlist ? p.dashBoardData[targetDashboard].widgetlist : {}
+    const FocusDashboard = p.dashBoardData?.[targetDashboard]?.widgetlist ? p.dashBoardData[targetDashboard].widgetlist : {}
     const showBodyWidget = Object.keys(FocusDashboard).map((el) => {
         const apiToggle = p.apiAlias ? p.apiAlias : p.apiKey
         const queryPropsAll = `(key: "${apiToggle}" dashboard: "${targetDashboard}" widget: "${FocusDashboard[el].widgetHeader}")`

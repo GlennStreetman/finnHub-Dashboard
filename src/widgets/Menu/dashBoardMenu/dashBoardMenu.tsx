@@ -169,7 +169,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                 </>
             }
 
-            <td>{dashboardStatus?.[dashBoardData[el].dashboardname] !== 0 ? dashboardStatus?.[dashBoardData[el].dashboardname] + ' Open API Calls' : 'Ready'}</td>
+            <td>{dashboardStatus?.[dashBoardData[el].dashboardname] ? dashboardStatus?.[dashBoardData[el].dashboardname] + ' Open API Calls' : 'Ready'}</td>
             {p.showEditPane === 1 &&
                 <td>
                     <button
