@@ -185,46 +185,46 @@ export const UpdateWidgetStockList = function updateWidgetStockList(widgetId: nu
 }
 
 //widget filters change how data is queried from finnHub
-export const UpdateWidgetFilters = function (widgetID: string, data: filters) {
+export const UpdateWidgetFilters = async function (widgetID: string, data: filters) {
+    return new Promise((resolve, reject) => {
+        try {
+            const s: AppState = this.state
+            const p: AppProps = this.props
 
-    try {
-        const s: AppState = this.state
-        const p: AppProps = this.props
-
-        const newDashBoardData: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
-            draftState[s.currentDashBoard].widgetlist[widgetID].filters = {
-                ...draftState[s.currentDashBoard].widgetlist[widgetID].filters,
-                ...data
-            }
-        })
-        const payload: Partial<AppState> = {
-            dashBoardData: newDashBoardData,
-        }
-        // console.log('update widget filter payload:', payload)
-        this.setState(payload, async () => {
-            //delete records from mongoDB then rebuild dataset.
-            let res = await fetch(`/deleteFinnDashData?widgetID=${widgetID}`)
-            if (res.status === 200) {
-                p.rRebuildTargetWidgetModel({ //rebuild data model (removes stale dates)
-                    apiKey: this.state.apiKey,
-                    dashBoardData: this.state.dashBoardData,
-                    targetDashboard: this.state.currentDashBoard,
-                    targetWidget: widgetID,
-                })
-                //remove visable data?
-                const getDataPayload: tgetFinnHubDataReq = {//fetch fresh data
-                    dashboardID: s.dashBoardData[s.currentDashBoard].id,
-                    targetDashBoard: s.currentDashBoard,
-                    widgetList: [widgetID],
-                    finnHubQueue: s.finnHubQueue,
-                    rSetUpdateStatus: p.rSetUpdateStatus,
+            const newDashBoardData: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
+                draftState[s.currentDashBoard].widgetlist[widgetID].filters = {
+                    ...draftState[s.currentDashBoard].widgetlist[widgetID].filters,
+                    ...data
                 }
-                p.tGetFinnhubData(getDataPayload)
-                this.saveDashboard(this.state.currentDashBoard)
-
-            } else { console.log("Problem updating widget filters.") }
-        })
-    } catch { console.log("Problem updating widget filters.") }
+            })
+            const payload: Partial<AppState> = {
+                dashBoardData: newDashBoardData,
+            }
+            this.setState(payload, async () => {
+                //delete records from mongoDB then rebuild dataset.
+                let res = await fetch(`/deleteFinnDashData?widgetID=${widgetID}`)
+                if (res.status === 200) {
+                    p.rRebuildTargetWidgetModel({ //rebuild data model (removes stale dates)
+                        apiKey: this.state.apiKey,
+                        dashBoardData: this.state.dashBoardData,
+                        targetDashboard: this.state.currentDashBoard,
+                        targetWidget: widgetID,
+                    })
+                    //remove visable data?
+                    const getDataPayload: tgetFinnHubDataReq = {//fetch fresh data
+                        dashboardID: s.dashBoardData[s.currentDashBoard].id,
+                        targetDashBoard: s.currentDashBoard,
+                        widgetList: [widgetID],
+                        finnHubQueue: s.finnHubQueue,
+                        rSetUpdateStatus: p.rSetUpdateStatus,
+                    }
+                    p.tGetFinnhubData(getDataPayload)
+                    this.saveDashboard(this.state.currentDashBoard)
+                    resolve(true)
+                } else { console.log("Problem updating widget filters."); resolve(true) }
+            })
+        } catch { console.log("Problem updating widget filters."); resolve(true) }
+    })
 }
 
 //widget config changes how data is manipulated after being queried.

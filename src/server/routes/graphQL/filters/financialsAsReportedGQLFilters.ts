@@ -25,7 +25,7 @@ export default function financialsAsReportedGQLFilter(data: FinnHubAPIData, conf
     const dataList = data.data
     //flatten data object and conver to time series format so that i can be used by templateing.
     for (const d in dataList) {
-        if (dataList[d].year === config?.['year']) {
+        if (dataList[d].year === config?.['year'] && dataList[d].quarter === config?.['quarter']) {
             const generalData = dataList[d]
             let outerData = { ...generalData } //to be applied to each time series line item.
             delete outerData.report

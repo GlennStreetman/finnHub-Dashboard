@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 
-export const useStartingFilters = function ( //on update to p.targetFocus update p.config.targetSecurity
+export const useStartingFilters = function (//sets default filters, if not setup.
 
     checkValue: string, //filters['valueToCheck']
     updateObj: Object,
@@ -10,6 +10,7 @@ export const useStartingFilters = function ( //on update to p.targetFocus update
 ) {
     useEffect(() => {
         if (checkValue === undefined) { //if filters not saved to props
+            console.log('use starting filters', key, updateObj)
             update(key, updateObj)
         }
     }, [checkValue, updateObj, update, key])

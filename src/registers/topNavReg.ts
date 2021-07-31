@@ -8,6 +8,7 @@ import { EarningsCalendarFilters } from '../widgets/Estimates/EarningsCalendar/E
 import { companyNewsFilters } from '../widgets/Fundamentals/companyNews/companyNewsBody';
 import { IPOCalendarFilters } from '../widgets/Fundamentals/IPOCalendar/IPOCalendarBody';
 import { marketNewsFilters } from '../widgets/Fundamentals/marketNews/marketNewsBody';
+import { financialsAsReportedFilters } from '../widgets/Fundamentals/financialsAsReported/financialsAsReportedBody'
 
 //1.widget Type, 2.Widget Name, 3.widget class, 4.widget Name?, 5.filters(optional), 6.api tier[free,hybird,premium]
 export let estimateOptions: [string, string, string, string, filters | undefined, string][] = [
@@ -21,7 +22,7 @@ export let fundamentalsOptions: [string, string, string, string, filters | undef
     ["FundamentalsBasicFinancials", "Basic Financials", "stockWidget", "Basic Financials", , 'Free'],
     ["FundamentalsCompanyProfile2", "Profile 2", "stockWidget", "Company Profile 2", , 'Free'],
     ["FundamentalsCompanyNews", "Company News", "stockWidget", "Company News", companyNewsFilters, 'Free'],
-    ["FundamentalsFinancialsAsReported", "Financials As Reported", "stockWidget", "Fin. As Reported", , 'Free'],
+    ["FundamentalsFinancialsAsReported", "Financials As Reported", "stockWidget", "Fin. As Reported", financialsAsReportedFilters, 'Free'],
     ["FundamentalsIPOCalendar", "IPO Calendar", "marketWidget", "IPO Calendar", IPOCalendarFilters, 'Free'],
     ["FundamentalsMarketNews", "Market News", "marketWidget", "Market News", marketNewsFilters, 'Free'],
     ["FundamentalsNewsSentiment", "News Sentiment", "stockWidget", "News Sentiments", , 'Free'],

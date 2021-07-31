@@ -71,13 +71,13 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
-    useEffect(( //starting config
+    useEffect(( //if target security is undefined.
         key: number = p.widgetKey,
         trackedStock = p.trackedStocks,
         keyList: string[] = Object.keys(p.trackedStocks),
         updateWidgetConfig: Function = p.updateWidgetConfig
     ) => {
-        //Setup default metric source if none selected.
+        //if target securiyt is undefined
         if (p.config.targetSecurity === undefined) {
             // console.log('setting starting config')
             const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
@@ -85,22 +85,24 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                 targetSecurity: newSource,
                 targetReport: 'bs',
                 pagination: 0,
-                year: rShowData ? rShowData[0].year : ''
+                year: rShowData ? rShowData[0]?.year : '',
+                quarter: rShowData ? rShowData[0]?.quarter : ''
             })
         }
     }, [p.updateWidgetConfig, rShowData, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
 
-    useEffect(( //starting config
+    useEffect(( //if config.year is blank.
         key: number = p.widgetKey,
         updateWidgetConfig: Function = p.updateWidgetConfig
     ) => {
-        //Setup default metric source if none selected.
-        if (p.config.year === '') {
-            updateWidgetConfig(key, {
-                year: rShowData ? rShowData[0].year : ''
-            })
-        }
-    }, [p.updateWidgetConfig, rShowData, p.widgetKey, p.config.year])
+        // //Setup default metric source if none selected.
+        // if (p.config.year === '') {
+        updateWidgetConfig(key, {
+            year: rShowData ? rShowData[p.config.pagination]?.year : '',
+            quarter: rShowData ? rShowData[p.config.pagination]?.quarter : ''
+        })
+        // }
+    }, [p.updateWidgetConfig, rShowData, p.widgetKey, p.config.year, p.config.pagination])
 
     function renderSearchPane() {
 
@@ -123,15 +125,21 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         dispatch(tSearchMongoDB(tSearchMongoDBObj))
     }
 
+    async function changeFrequencySelection(e) {
+        const target = e.target.value;
+        await p.updateWidgetFilters(p.widgetKey, { frequency: target })
+        p.updateWidgetConfig(p.widgetKey, {
+            pagination: 0,
+        })
+    }
+
     function changeIncrememnt(e) {
         const newPagination = p.config.pagination + e;
         if (newPagination > -1 && rShowData && newPagination <= Object.keys(rShowData).length - 1) {
             p.updateWidgetConfig(p.widgetKey, {
-                ...p.config,
-                ...{
-                    pagination: newPagination,
-                    year: rShowData[newPagination]['year']
-                }
+                pagination: newPagination,
+                year: rShowData[newPagination]['year'],
+                quarter: rShowData[newPagination]['quarter'],
             })
         }
     }
@@ -143,6 +151,13 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                 <option key='bs' value='bs'> Balance Sheet</option>
                 <option key='ic' value='ic' > Income Statement </option>
                 <option key='cf' value='cf' > Cash Flow </option>
+            </>
+
+        const frequencySeleciton =
+            <>
+                <option key='quarterly' value='quarterly'> Quartelry </option>
+                <option key='annual' value='annual' > Annual </option>
+
             </>
 
         const stockDataNode = rShowData ? rShowData[p.config.pagination] : []
@@ -168,6 +183,9 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                     exchangeList={p.exchangeList}
                     config={p.config}
                 />
+                <select data-testid='frequencySelectionm' className="btn" value={p.filters.frequency} onChange={changeFrequencySelection}>
+                    {frequencySeleciton}
+                </select>
                 <select data-testid='financialsAsReportedSelection' className="btn" value={p.config.targetReport} onChange={changeReportSelection}>
                     {reportSelection}
                 </select>
@@ -223,12 +241,17 @@ export function financialsAsReportedProps(that, key = "newWidgetNameProps") {
         filters: that.props.widgetList[key]["filters"],
         targetSecurity: that.props.targetSecurity,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
+        updateWidgetFilters: that.props.updateWidgetFilters,
         updateWidgetStockList: that.props.updateWidgetStockList,
         updateWidgetConfig: that.props.updateWidgetConfig,
         widgetKey: key,
         widgetHeader: that.props.widgetList[key].widgetHeader
     };
     return propList;
+}
+
+export const financialsAsReportedFilters = { //IF widget uses filters remember to define default filters here and add to topNavReg as 5th paramater.
+    frequency: 'annual'
 }
 
 

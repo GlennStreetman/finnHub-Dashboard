@@ -7,7 +7,8 @@ export default function financialsAsReportedEndPoint(stockList: StockObj[], filt
     for (const stock in stockList) {
         const stockSymbol = stockList[stock].symbol
         const key = stockList[stock].key
-        const queryString = `https://finnhub.io/api/v1/stock/financials-reported?symbol=${stockSymbol}&token=${apiKey}`
+        const frequency = filters.frequency ? filters.frequency : 'annual'
+        const queryString = `https://finnhub.io/api/v1/stock/financials-reported?symbol=${stockSymbol}&token=${apiKey}&freq=${frequency}`
         if (types.reStock.test(stockSymbol) === true && types.finnHubAPI.test(queryString) === true) {
             queryStringObj[key] = (queryString)
         } else {

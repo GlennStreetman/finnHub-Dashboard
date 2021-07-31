@@ -103,18 +103,6 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
 
-    function updateFilter(e) {
-        console.log('UPDATE FILTER', start, end)
-        if (isNaN(new Date(e.target.value).getTime()) === false) {
-            const now = Date.now()
-            const target = new Date(e.target.value).getTime();
-            const offset = target - now
-            const name = e.target.name;
-            console.log(name, e.target.value)
-            p.updateWidgetFilters(p.widgetKey, { [name]: offset })
-        }
-    }
-
     function formatSourceName(source) {//clean up source names for news articles.
         let formattedSource = source;
         formattedSource = formattedSource.replace(".com", "");
@@ -207,14 +195,6 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
             </>
         );
         return symbolSelectorDropDown;
-    }
-
-    function updateStartDate(e) {
-        setStart(e.target.value)
-    }
-
-    function updateEndDate(e) {
-        setEnd(e.target.value)
     }
 
     function renderSearchPane() {
