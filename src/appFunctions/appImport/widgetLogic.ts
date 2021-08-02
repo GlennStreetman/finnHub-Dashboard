@@ -4,10 +4,20 @@ import { AppState, AppProps, menuList, widget, dashBoardData, widgetList, stockL
 import { rBuildDataModelPayload, rebuildTargetWidgetPayload } from '../../slices/sliceDataModel'
 import { tgetFinnHubDataReq } from './../../thunks/thunkFetchFinnhub'
 
+function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
+    const testName = iterator === 0 ? widgetName : widgetName + iterator
+    if (nameList.includes(testName)) {
+        return uniqueName(widgetName, nameList, iterator + 1)
+    } else {
+        return testName
+    }
+}
+
 export const NewMenuContainer = function newMenuContainer(widgetDescription: string, widgetHeader: string, widgetConfig: string) {
     const s: AppState = this.state
     const widgetName = widgetDescription;
     const menuList: menuList = s.menuList
+
     let newMenuList = produce(menuList, (draftState: menuList) => {
         draftState[widgetName] = {
             column: 0,
@@ -32,6 +42,13 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
     const currentDashboard = s.currentDashBoard
     const widgetName: string = new Date().getTime().toString();
     const widgetStockList = s.dashBoardData[currentDashboard].globalstocklist
+
+    const widgetList = this.state.dashBoardData[this.state.currentDashBoard].widgetlist
+    const widgetIds = widgetList ? Object.keys(widgetList) : []
+    const widgetNameList = widgetIds.map((el) => widgetList[el].widgetHeader)
+    // console.log(stateRef, newName, widgetNameList)
+    const useName = uniqueName(widgetHeader, widgetNameList)
+
     const newWidget: widget = {
         column: 1,
         columnOrder: -1,
@@ -41,7 +58,7 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
         trackedStocks: widgetStockList,
         widgetID: widgetName,
         widgetType: widgetDescription,
-        widgetHeader: widgetHeader,
+        widgetHeader: useName,
         widgetConfig: widgetConfig, //reference to widget type. Menu or data widget.
         xAxis: 20, //prev 5 rem
         yAxis: 20, //prev 5 rem
@@ -81,13 +98,19 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
 
 }
 
+
 export const ChangeWidgetName = function (stateRef: 'widgetList' | 'menuList', widgetID: string | number, newName: string) {
     // console.log(stateRef, widgetID, newName)
+    const widgetList = this.state.dashBoardData[this.state.currentDashBoard].widgetlist
+    const widgetIds = widgetList ? Object.keys(widgetList) : []
+    const widgetNameList = widgetIds.map((el) => widgetList[el].widgetHeader)
+    // console.log(stateRef, newName, widgetNameList)
+    const useName = uniqueName(newName, widgetNameList)
     if (stateRef === 'menuList') {
         const s: AppState = this.state
         const widgetGroup: menuList = s[stateRef]
         const newWidgetList: menuList = produce(widgetGroup, (draftState) => {
-            draftState[widgetID].widgetHeader = newName
+            draftState[widgetID].widgetHeader = useName
         })
         const payload: Partial<AppState> = {
             [stateRef]: newWidgetList,
@@ -97,7 +120,7 @@ export const ChangeWidgetName = function (stateRef: 'widgetList' | 'menuList', w
         const s: AppState = this.state
         const widgetGroup: widgetList = s.dashBoardData[s.currentDashBoard].widgetlist
         const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
-            draftState[widgetID].widgetHeader = newName
+            draftState[widgetID].widgetHeader = useName
         })
         const newDashboardData: dashBoardData = produce(s.dashBoardData, (draftState) => {
             draftState[s.currentDashBoard].widgetlist = newWidgetList
@@ -105,7 +128,9 @@ export const ChangeWidgetName = function (stateRef: 'widgetList' | 'menuList', w
         const payload: Partial<AppState> = {
             'dashBoardData': newDashboardData,
         }
-        this.setState(payload);
+        this.setState(payload, () => {
+            this.saveDashboard(this.state.currentDashBoard)
+        });
     }
 }
 

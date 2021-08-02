@@ -59,8 +59,11 @@ function WidgetContainer(p) {
         updateFunction(showMenu);
     }
 
+    function trackUpdate(e) {//changes widget name.
+        setRenderHeader(e.target.value)
+    }
+
     function updateHeader(e) {//changes widget name.
-        // console.log('updating headers')
         if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
             p.changeWidgetName('widgetList', p.widgetKey, e.target.value);
         } else{
@@ -170,7 +173,7 @@ function WidgetContainer(p) {
                 {renderHeader}
             </>
             ) : (
-            <input data-testid={`rename-${p.widgetList["widgetType"]}`} type="text" id={p.widgetKey + "HeaderValue"} value={renderHeader} onChange={updateHeader} />
+            <input data-testid={`rename-${p.widgetList["widgetType"]}`} type="text" id={p.widgetKey + "HeaderValue"} value={renderHeader} onChange={trackUpdate} onBlur={updateHeader} />
             )}
 
             <button
