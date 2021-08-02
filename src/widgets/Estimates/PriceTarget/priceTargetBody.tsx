@@ -71,7 +71,7 @@ function PriceTargetBody(p: { [key: string]: any }, ref: any) {
         const stockDataRows = rShowData ? Object.keys(rShowData).map((el) =>
             <tr key={el + "row"}>
                 <td className='rightTE' key={el + "symbol"}>{convertCamelToProper(el)}: &nbsp;&nbsp;</td>
-                <td key={el + "name"}>{parseList.includes(el) ? parseInt(rShowData[el]).toFixed(2) : rShowData[el]}</td>
+                <td key={el + "name"}>{parseList.includes(el) ? parseInt(rShowData[el]).toLocaleString('en-US', { minimumFractionDigits: 2 }) : rShowData[el]}</td>
             </tr>
         ) : <></>
         return <>
