@@ -198,12 +198,13 @@ function WidgetContainer(p) {
         ) : (
         <div className="widgetHeader">{renderHeader}</div>
         )}
+        {p.widgetList.showBody !== false ? (
         <div className='widgetBody' style={bodyVisable} key={p.showBody}>
 
         <ErrorBoundary widgetType={p.widgetList["widgetType"]}>
         {React.createElement(widgetLookUp[p.widgetList["widgetType"]], {ref: myRef, ...widgetProps })}
         </ErrorBoundary> 
-        </div>
+        </div> ) : (<></>)}
 
         <div className="widgetFooter">
         {p.widgetList.showBody !== false && showEditPane === 1 && (
