@@ -132,7 +132,6 @@ export const SnapWidget = async function snapWidget(stateRef: 'menuWidget' | 'wi
     let column: number = stateRef !== 'menuWidget' ? Math.floor(xxAxis / 400) : 0 //base column calc
     if (stateRef !== 'menuWidget' && s.showMenuColumn === false) column = column + 1 //add 1 if menu column is hidden.
 
-    console.log(widgetId, column, yyAxis, stateRef)
     await this.snapOrder(widgetId, column, yyAxis, stateRef)
     this.saveDashboard(this.state.currentDashBoard)
 }

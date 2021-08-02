@@ -17,7 +17,6 @@ export default function WidgetFocus(p: props): ReactElement {
     //selector that sets widgets security focus. Used with widgets that display a single security at a time.
 
     function changeStockSelection(e) {
-        console.log('FIRING CHANGE STOCK SELECTIOn')
         const target = e.target.value;
         p.updateWidgetConfig(p.widgetKey, {
             ...p.config, ...{ targetSecurity: target }
