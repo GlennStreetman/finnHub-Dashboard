@@ -318,12 +318,12 @@ class App extends React.Component<AppProps, AppState> {
             }, () => { this.toggleBackGroundMenu('about') })
         }
 
-        const globalStockList = s.dashBoardData?.[s.currentDashBoard]?.globalstocklist ? s.dashBoardData?.[s.currentDashBoard].globalstocklist : {}
-        if ((globalStockList !== prevState.dashBoardData?.[prevState.currentDashBoard]?.globalstocklist && s.login === 1)) { //price data for watchlist, including socket data.
+        const globalStockList = s.dashBoardData?.[s.currentDashBoard]?.globalstocklist ? s.dashBoardData?.[s.currentDashBoard].globalstocklist : false
+        if ((globalStockList && globalStockList !== prevState.dashBoardData?.[prevState.currentDashBoard]?.globalstocklist && s.login === 1)) { //price data for watchlist, including socket data.
             LoadTickerSocket(this, prevState, globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
         }
 
-        const globalKeys = Object.keys(globalStockList)
+        const globalKeys = globalStockList ? Object.keys(globalStockList) : []
         if (this.state.targetSecurity === '' && globalKeys.length > 0) {
             this.setState({
                 targetSecurity: globalKeys[0]
