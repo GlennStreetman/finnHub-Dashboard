@@ -101,17 +101,25 @@ function WidgetController(p){
     const widgetMasterStyle = {
         display: "flex",
         "flexDirection": "row",
-        top: "60px",
-        left: "5px",
         padding: "1px",
     };
 
+    const topFlex = {
+        display: "flex",
+        "flexDirection": "column",
+    };
+
+    const topPlaceHolder = {
+        margin: "30px",
+    }
+
     return p.login === 1 ? (
-        <>
+        <div style={topFlex}>
+            <div style={topPlaceHolder}></div>
             <div className='widgetMaster' style={widgetMasterStyle}>
                 {renderWidgetColumns}
             </div>
-        </>
+        </div>
     ) : (
         <>
         </>

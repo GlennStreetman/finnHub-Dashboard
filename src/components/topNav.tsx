@@ -125,7 +125,6 @@ class TopNav extends React.Component<topNavProps, topNavState> {
         }
 
         return this.props.login === 1 ? (
-
             <nav className="mainNavigation">
 
                 <ul id='ddu' className="menu">

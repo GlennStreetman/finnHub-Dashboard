@@ -36,6 +36,15 @@
 }
 
 .mainNavigation {
+  position: fixed;
+  top: 0;
+  left: 0px;
+  right: 0px;
+  width: 100%;
   background-color: #1d69ab;
   display: flex;
+  z-index: 1000;
+  overflow: auto;
+  /* height: 9% */
 }
+
