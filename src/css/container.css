@@ -33,8 +33,21 @@
   flex-direction: row;
 }
 
-.headerButtons {
+.widgetButtonHead {
   float: right;
+  background-color: #1d69ab;
+  border: none;
+  color: white;
+  box-sizing: border-box;
+  display: block;
+}
+
+.widgetButtonFoot {
+  background-color: #1d69ab;
+  border: none;
+  color: white;
+  box-sizing: border-box;
+
 }
 
 .widgetFooter {
@@ -42,7 +55,9 @@
   z-index: 1;
   background-color: #1d69ab;
   color: #1d69ab;
-  flex-direction: row;
   text-align: right;
-  min-height: 10px;
+  box-sizing: border-box;
+  width: 100%;
+  /* min-height: 10px; */
+
 }

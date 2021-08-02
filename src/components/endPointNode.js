@@ -72,7 +72,7 @@ export default class EndPointNode extends React.PureComponent {
                 return (
                     <li className='liNode'  key={ind + 'dataObj1'}>
                     <div key={ind + 'dataObj1Div1'} className='endPointDivRow' >
-                        {this.isLink(el)} - <button key={ind + 'dataObj1button1'} className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
+                        {this.isLink(el)} - <button key={ind + 'dataObj1button1'} className='widgetButtonHeadLeft' onClick={() => this.toggleDataButton(el)}>
                             <i key={ind + 'dataObj1link'} className="fa fa-caret-square-o-down" aria-hidden="true"></i>
                         </button>
                     </div>
@@ -83,7 +83,7 @@ export default class EndPointNode extends React.PureComponent {
                 return (
                     <li className='liNode' key={ind + 'dataObj2'}>
                         <div key={ind + 'dataObj2Div1'} className='endPointDivRow' >
-                            {this.isLink(el)}<button key={ind + 'dataObj2button1'}  className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
+                            {this.isLink(el)}<button key={ind + 'dataObj2button1'}  className='widgetButtonHeadLeft' onClick={() => this.toggleDataButton(el)}>
                                 <i key={ind + 'dataObj2link1'}  className="fa fa-caret-square-o-down" aria-hidden="true"></i>
                             </button>
                             <div key={ind + 'dataObj2div2'} className='endPointDivColumn'>
@@ -104,7 +104,7 @@ export default class EndPointNode extends React.PureComponent {
                 return (
                     <li className='liNode' key={ind + 'NotData'}>
                         <div  key={ind + 'NotDatadiv1'}>
-                            {this.isLink(el)} <button  key={ind + 'NotDatabutton1'} className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
+                            {this.isLink(el)} <button  key={ind + 'NotDatabutton1'} className='widgetButtonHeadLeft' onClick={() => this.toggleDataButton(el)}>
                                 <i  key={ind + 'NotDatalink1'}  className="fa fa-caret-square-o-right" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -118,7 +118,7 @@ export default class EndPointNode extends React.PureComponent {
                     <li className='liNode'  key={ind + 'NotData'}>
                         <div key={ind + 'NotDatadiv1'} className='endPointDivRow' >
                             {this.isLink(el)}
-                            <button key={ind + 'NotDatabutton1'}  className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
+                            <button key={ind + 'NotDatabutton1'}  className='widgetButtonHeadLeft' onClick={() => this.toggleDataButton(el)}>
                                 <i key={ind + 'NotDatalink1'} className="fa fa-caret-square-o-down" aria-hidden="true"></i>
                             </button>
                             <div key={ind + 'NotDatadiv2'} className='endPointDivColumn'>

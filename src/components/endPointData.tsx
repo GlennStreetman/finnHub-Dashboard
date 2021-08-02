@@ -96,7 +96,7 @@ export default class endPointData extends React.Component<any, any> {
                 return (
                     <li className='liNode' key={ind + 'li'}>
                         <div key={ind}>
-                            {this.isLink(el)} - <button className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
+                            {this.isLink(el)} - <button className='widgetButtonHeadLeft' onClick={() => this.toggleDataButton(el)}>
                                 <i className="fa fa-caret-square-o-right" aria-hidden="true"></i>
                             </button>
                         </div>
@@ -114,7 +114,7 @@ export default class endPointData extends React.Component<any, any> {
                 return (
                     <li className='liNode' key={ind + 'li'}>
                         <div className='endPointDivRow' key={ind}>
-                            {this.isLink(el)} <button className='headerButtonsLeft' onClick={() => this.toggleDataButton(el)}>
+                            {this.isLink(el)} <button className='widgetButtonHeadLeft' onClick={() => this.toggleDataButton(el)}>
                                 <i className="fa fa-caret-square-o-down" aria-hidden="true"></i>
                             </button>
                             <div className='endPointDivColumn'>{thisNode}</div>

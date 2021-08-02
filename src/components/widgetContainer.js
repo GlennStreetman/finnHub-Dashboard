@@ -174,7 +174,7 @@ function WidgetContainer(p) {
             )}
 
             <button
-            className="headerButtons"
+            className="widgetButtonHead"
             id={p.widgetList["widgetID"]}
             onMouseOver={() => {
                 dragElement();
@@ -184,13 +184,13 @@ function WidgetContainer(p) {
             </button>
             <>
                 <button  
-                    className="headerButtons" 
+                    className="widgetButtonHead" 
                     onClick={() => {p.toggleWidgetBody(p.widgetKey, p.stateRef)}
                 }>
                 {p.widgetList.showBody !== false ? <i className="fa fa-caret-square-o-down" aria-hidden="true" /> : <i className="fa fa-caret-square-o-right" aria-hidden="true" />}
                 </button>                                                                                               
                 
-                <button data-testid={`editPaneButton-${p.widgetList["widgetType"]}`} className="headerButtons" onClick={() => {showPane(setShowEditPane, -1)}}>
+                <button data-testid={`editPaneButton-${p.widgetList["widgetType"]}`} className="widgetButtonHead" onClick={() => {showPane(setShowEditPane, -1)}}>
                 <i className="fa fa-pencil-square-o" aria-hidden="true" />
                 </button>
             </>
@@ -231,7 +231,7 @@ function WidgetContainer(p) {
         {p.widgetList.showBody !== false && showEditPane !== 1 && (
 
             excelRegister_singleSecurity[p.widgetList.widgetType] && ( //button returns data for target securities associated with widget.
-                <button onClick={()=>excelFunction(p.apiKey, p.currentDashBoard, p.widgetList.widgetHeader, p.widgetList.config.targetSecurity, p.widgetList.config)}>
+                <button className='widgetButtonFoot' onClick={()=>excelFunction(p.apiKey, p.currentDashBoard, p.widgetList.widgetHeader, p.widgetList.config.targetSecurity, p.widgetList.config)}>
                     <i className="fa fa-file-excel-o" aria-hidden="true" data-testid={`excelButton-${p.widgetList["widgetType"]}`}></i>
                 </button>
             )
@@ -240,7 +240,7 @@ function WidgetContainer(p) {
         {p.widgetList.showBody !== false && showEditPane !== 1 && (
 
             excelRegister[p.widgetList.widgetType] && ( //button returns data for all securities associated with widget.
-                <button onClick={()=>excelFunction(p.apiKey, p.currentDashBoard, p.widgetList.widgetHeader,false,p.widgetList.config)}>
+                <button className='widgetButtonFoot' onClick={()=>excelFunction(p.apiKey, p.currentDashBoard, p.widgetList.widgetHeader,false,p.widgetList.config)}>
                     <i className="fa fa-list" aria-hidden="true" data-testid={`excelButton-${p.widgetList["widgetType"]}`}></i>
                 </button>
             )
