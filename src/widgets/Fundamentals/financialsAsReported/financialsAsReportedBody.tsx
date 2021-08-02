@@ -77,9 +77,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         keyList: string[] = Object.keys(p.trackedStocks),
         updateWidgetConfig: Function = p.updateWidgetConfig
     ) => {
-        //if target securiyt is undefined
         if (p.config.targetSecurity === undefined) {
-            // console.log('setting starting config')
             const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
             updateWidgetConfig(key, {
                 targetSecurity: newSource,
@@ -91,17 +89,15 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         }
     }, [p.updateWidgetConfig, rShowData, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
 
-    useEffect(( //if config.year is blank.
+    useEffect(( //on change to pagination set config year and quarter.
         key: number = p.widgetKey,
         updateWidgetConfig: Function = p.updateWidgetConfig
     ) => {
-        // //Setup default metric source if none selected.
-        // if (p.config.year === '') {
         updateWidgetConfig(key, {
             year: rShowData ? rShowData[p.config.pagination]?.year : '',
-            quarter: rShowData ? rShowData[p.config.pagination]?.quarter : ''
+            quarter: rShowData ? rShowData[p.config.pagination]?.quarter : '',
+            pagination: p.config.pagination ? p.config.pagination : 0
         })
-        // }
     }, [p.updateWidgetConfig, rShowData, p.widgetKey, p.config.year, p.config.pagination])
 
     function renderSearchPane() {
