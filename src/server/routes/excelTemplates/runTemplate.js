@@ -516,6 +516,9 @@ router.post('/generateTemplate', async (req, res) => { //create and process widg
                 dataPointSheetMulti(w, ws, s, templateData)
             }
         }
+        w.views = [
+            {x: 0, y:0, height: 20000, firstSheet: 0, activeTab: 1, visability: 'visable'}
+        ]
         await w.xlsx.writeFile(tempFile)
         await res.status(200).sendFile(tempFile, ()=>{
             fs.unlinkSync(workBookName)
