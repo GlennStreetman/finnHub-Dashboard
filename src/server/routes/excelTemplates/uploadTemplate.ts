@@ -1,7 +1,7 @@
 import express from 'express';
 import appRootPath from 'app-root-path'
 import fs from 'fs';
-import { makeTempDir } from './runTemplate.js'
+import { makeTempDir } from './actions/makeTempDir.js'
 
 const router = express.Router();
 
@@ -10,13 +10,13 @@ interface session {
     uID: number,
 }
 
-interface uploadTemplatePost extends Request {
+interface uploadTemplate extends Request {
     session: session,
     files: any
 }
 
 
-router.get('/uploadTemplate', (req: uploadTemplatePost, res: any) => {
+router.get('/uploadTemplate', (req: uploadTemplate, res: any) => {
     if (req.session.login === true) {
         const userDirecotry = `${appRootPath}/uploads/${req.session.uID}/`
         // let directory_name = "example_dir";
@@ -36,7 +36,7 @@ router.get('/uploadTemplate', (req: uploadTemplatePost, res: any) => {
     }
 })
 
-router.post("/uploadTemplate", async (req: uploadTemplatePost, res: any) => {
+router.post("/uploadTemplate", async (req: uploadTemplate, res: any) => {
     if (req.session.login === true) {
         const userID = req.session.uID
 

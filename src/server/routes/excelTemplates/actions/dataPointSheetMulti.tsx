@@ -1,0 +1,30 @@
+import { templateData } from './buildTemplateData'
+import { printTemplateWorksheets } from './printTemplateWorksheets.js'
+
+export const dataPointSheetMulti = function (workbook, ws, s, templateData: templateData) {
+    console.log('---PROCESSING MULTI---')
+    let rowIterator = 0 //if multiSheet = 'false: add 1 for each line written so that writer doesnt fall out of sync with file.
+    printTemplateWorksheets(workbook, s, templateData[s].sheetKeys, ws) //create new worksheets for each security
+    const templateWorksheet = templateData[s]
+    for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will almost always add rows to return file.
+        const dataRow = templateWorksheet[row].data //list of rows to be updated from template file. 
+        const writeRows = templateWorksheet[row].writeRows //used to create range of rows we need to  update.
+        const keyColumns = templateWorksheet[row].keyColumns //list of key columns for each row. {...integers: integer}
+        let currentKey = '' //the current security key
+        for (let step = 1; step <= writeRows; step++) { //iterate over new rows that data will populate into
+            for (const updateCell in dataRow) { //{...rowInteger: {...security || key Integer: value || timeSeries{}}}
+                if (keyColumns[updateCell]) {  //update if key column integer. If security this test will fail as security ref is string.
+                    currentKey = dataRow?.[updateCell]?.[step - 1]
+                    if (dataRow[updateCell][step - 1] && typeof dataRow[updateCell][step - 1] === 'string') {
+                        ws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][step - 1]
+                    }
+                } else { //update data point cells.
+                    const tws = workbook.getWorksheet(`${s}-${currentKey}`)
+                    if (tws !== undefined) tws.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][currentKey]
+                }
+            }
+            ws.getRow(row + rowIterator).commit()
+        }
+    }
+    workbook.removeWorksheet(ws.id)
+}
