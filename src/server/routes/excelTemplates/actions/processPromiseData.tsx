@@ -5,7 +5,7 @@ export interface processedPromiseData {
     [key: string]: any
 }
 
-export const processPromiseData = (req: GQLReqObj[]) => {
+export const processPromiseData = (req: GQLReqObj[]): processedPromiseData => {
     //build dataObj containing results of mongoDB ALL requests
     const dataObj: processedPromiseData = { keys: [] }
     const keyList: Set<string> = new Set()

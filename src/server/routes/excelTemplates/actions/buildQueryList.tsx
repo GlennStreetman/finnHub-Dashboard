@@ -6,7 +6,7 @@ const buildQueryList = (path): Promise<GQLReqObj>[] => {
     //From requested template, builds list of mongoDB promises requests from Query sheet.
     const returnList: Promise<GQLReqObj>[] = []
     let workbook = xlsx.readFile(path);
-    const querySheet = workbook.Sheets['Query']
+    const querySheet = workbook.Sheets['Query'] ? workbook.Sheets['Query'] : workbook.Sheets['query']
     const queryList: any = Papa.parse(xlsx.utils.sheet_to_csv(querySheet)).data
     for (const q in queryList) { //for each query in special query sheet.
         if (queryList?.[q]?.[0] && queryList[q][0] !== '') {

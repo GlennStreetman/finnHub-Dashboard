@@ -3,11 +3,7 @@ import appRootPath from 'app-root-path'
 import fs from 'fs';
 import format from "pg-format";
 
-// import xlsx from 'xlsx';
 import Excel from 'exceljs';
-
-// import Papa from 'papaparse';
-// import fetch from 'node-fetch';
 
 import dbLive from "../../db/databaseLive.js"
 import devDB from "../../db/databaseLocalPG.js"
@@ -55,32 +51,39 @@ router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user
     const trimFileName = req.query.template.slice(0, req.query.template.indexOf('.xls'))
     const tempFile = `${appRootPath}/uploads/${user}/temp/${trimFileName}${Date.now()}.xlsx`
 
+    //make any needed directories in temp folder for user.
     await makeTempDir(uploadsFolder)
     await makeTempDir(tempFolder)
     await makeTempDir(tempPath)
-    try {
+
+    try { //begin running template request.
         if (fs.existsSync(workBookPath)) { //if template name provided by get requests exists
             const promiseList = await buildQueryList(workBookPath) //List of promises built from excel templates query sheet
             const promiseData = await Promise.all(promiseList)  //after promises run process promise data {keys: [], data: {}} FROM mongoDB
                 .then((res) => {
                     return processPromiseData(res)
                 })
+            console.log('---running template data----1')
             const templateData = await buildTemplateData(promiseData, workBookPath) //{...sheetName {...row:{data:{}, writeRows: number, keyColumns: {}}}} from Template File
+            console.log('---running template data----2')
             const workbook = new Excel.Workbook()
             await workbook.xlsx.readFile(workBookPath)
+            console.log('---running template data1----3')
             for (const dataNode in templateData) { //for each worksheet
-                const worksheets = workbook.getWorksheet(dataNode)
-                let timeSeriesFlag = checkTimeSeriesStatus(worksheets, promiseData)  //set to 1 if worksheet contains time series data.
+                const worksheet = workbook.getWorksheet(dataNode)
+                let timeSeriesFlag = checkTimeSeriesStatus(worksheet, promiseData)  //set to 1 if worksheet contains time series data.
                 if (timeSeriesFlag === 1) {
-                    writeTimeSeriesSheetSingle(worksheets, dataNode, templateData)
+                    writeTimeSeriesSheetSingle(worksheet, dataNode, templateData)
                 } else if (multiSheet !== 'true') {
-                    dataPointSheetSingle(worksheets, dataNode, templateData)
+                    dataPointSheetSingle(worksheet, dataNode, templateData)
                 } else {
-                    dataPointSheetMulti(workbook, worksheets, dataNode, templateData)
+                    dataPointSheetMulti(workbook, worksheet, dataNode, templateData)
                 }
             }
-            const deleteSheet = workbook.getWorksheet('Query')
-            workbook.removeWorksheet(deleteSheet.id)
+            console.log('---running template data1----4')
+            const deleteSheet = workbook.getWorksheet('Query') ? workbook.getWorksheet('Query') : workbook.getWorksheet('query')
+            if (deleteSheet.id) workbook.removeWorksheet(deleteSheet.id)
+            console.log('---running template data1----5')
             await workbook.xlsx.writeFile(tempFile)
             res.status(200).sendFile(tempFile, () => {
                 fs.unlinkSync(tempFile)
@@ -125,7 +128,7 @@ router.post('/generateTemplate', async (req, res) => { //create and process widg
     let visable = reqData.visable ? `visable: "${reqData.visable}"` : ''
 
     let queryRow = querySheet.getRow(1)
-    queryRow.getCell(1).value = 'dataName'
+    queryRow.getCell(1).value = reqData.widget
     queryRow.getCell(2).value = `{widget(key: "${reqData.apiKey}" dashboard: "${reqData.dashboard}" widget: "${reqData.widget}" ${security} ${visable} ) {security, data}}`
     queryRow.getCell(3).value = '***ADD Columns A and B to the "Query" worksheet when designing custom excel templates***'
     queryRow.getCell(3).font = { bold: true }
@@ -148,7 +151,7 @@ router.post('/generateTemplate', async (req, res) => { //create and process widg
     queryRow = querySheet.getRow(5)
     queryRow.getCell(3).value = '&=keys.keys'
     for (let d in dataColumns) {
-        queryRow.getCell(parseInt(d) + 4).value = `&=dataName.${Object.values(dataColumns[d])[0]}`
+        queryRow.getCell(parseInt(d) + 4).value = `&=${reqData.widget}.${Object.values(dataColumns[d])[0]}`
     }
     queryRow.commit()
 
@@ -163,7 +166,7 @@ router.post('/generateTemplate', async (req, res) => { //create and process widg
     dataRow = dataSheet.getRow(2)
     dataRow.getCell(1).value = '&=keys.keys'
     for (let d in dataColumns) {
-        dataRow.getCell(parseInt(d) + 2).value = `&=dataName.${Object.values(dataColumns[d])[0]}`
+        dataRow.getCell(parseInt(d) + 2).value = `&=${reqData.widget}.${Object.values(dataColumns[d])[0]}`
     }
     dataRow.commit()
     //  write/overwrite user dataTemplate
