@@ -63,12 +63,12 @@ router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user
                 .then((res) => {
                     return processPromiseData(res)
                 })
-            console.log('---running template data----1')
+            // console.log('---running template data----1')
             const templateData = await buildTemplateData(promiseData, workBookPath) //{...sheetName {...row:{data:{}, writeRows: number, keyColumns: {}}}} from Template File
-            console.log('---running template data----2')
+            // console.log('---running template data----2')
             const workbook = new Excel.Workbook()
             await workbook.xlsx.readFile(workBookPath)
-            console.log('---running template data1----3')
+            // console.log('---running template data1----3')
             for (const dataNode in templateData) { //for each worksheet
                 const worksheet = workbook.getWorksheet(dataNode)
                 let timeSeriesFlag = checkTimeSeriesStatus(worksheet, promiseData)  //set to 1 if worksheet contains time series data.
@@ -80,10 +80,10 @@ router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user
                     dataPointSheetMulti(workbook, worksheet, dataNode, templateData)
                 }
             }
-            console.log('---running template data1----4')
+            // console.log('---running template data1----4')
             const deleteSheet = workbook.getWorksheet('Query') ? workbook.getWorksheet('Query') : workbook.getWorksheet('query')
             if (deleteSheet.id) workbook.removeWorksheet(deleteSheet.id)
-            console.log('---running template data1----5')
+            // console.log('---running template data1----5')
             await workbook.xlsx.writeFile(tempFile)
             res.status(200).sendFile(tempFile, () => {
                 fs.unlinkSync(tempFile)

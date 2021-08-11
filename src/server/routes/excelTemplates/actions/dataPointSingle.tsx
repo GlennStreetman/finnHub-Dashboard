@@ -1,17 +1,21 @@
 
 import { templateData } from './buildTemplateData'
 
-export const dataPointSheetSingle = function (ws, s, templateData: templateData) {
+export const dataPointSheetSingle = function (ws, dataNode, templateData: templateData) {
     console.log('data point sheet single')
-    let rowIterator = 0 //if multiSheet = 'false: add 1 for each line written so that writer doesnt fall out of sync with file.
-    const templateWorksheet = templateData[s]
+    let rowIterator = 0 //add 1 for each line written so that writer doesnt fall out of sync with file.
+
+    const templateWorksheet = templateData[dataNode] //template data
+
     const addedRows: number[] = [] //if multiSheet = 'false: list of rows added to template. Used to adjust any excel formulas as they dont auto update when adding rows.
+
     for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will almost always add rows to return file.
         const dataRow = templateWorksheet[row].data //list of rows to be updated from template file. 
         const writeRows = templateWorksheet[row].writeRows //used to create range of rows we need to  update.
         const keyColumns = templateWorksheet[row].keyColumns //list of key columns for each row. {...integers: integer}
         let currentKey = '' //the current security key
-        for (let step = 1; step <= writeRows; step++) { //iterate over new rows that data will populate into
+
+        for (let step = 1; step <= writeRows; step++) { //iterate over new rows that data will populate into and write values.
             for (const updateCell in dataRow) { //{...rowInteger: {...security || key Integer: value || timeSeries{}}}
                 if (keyColumns[updateCell]) {  //update if key column integer. If security this test will fail as security ref is string.
                     currentKey = dataRow?.[updateCell]?.[step - 1]
