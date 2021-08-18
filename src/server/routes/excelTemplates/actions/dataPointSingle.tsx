@@ -2,11 +2,10 @@
 import { templateData } from './buildTemplateData'
 
 export const dataPointSheetSingle = function (ws, dataNode, templateData: templateData) {
-    console.log('data point sheet single')
+    // console.log('data point sheet single', ws, dataNode, templateData)
     let rowIterator = 0 //add 1 for each line written so that writer doesnt fall out of sync with file.
 
     const templateWorksheet = templateData[dataNode] //template data
-
     const addedRows: number[] = [] //if multiSheet = 'false: list of rows added to template. Used to adjust any excel formulas as they dont auto update when adding rows.
 
     for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will almost always add rows to return file.
@@ -35,6 +34,7 @@ export const dataPointSheetSingle = function (ws, dataNode, templateData: templa
             }
         }
     }
+
 
     ws.eachRow({ includeEmpty: false }, (row, rowNumber) => {
         //update all formula cells. Offset their row references by number of rows added before or inside of formula range.

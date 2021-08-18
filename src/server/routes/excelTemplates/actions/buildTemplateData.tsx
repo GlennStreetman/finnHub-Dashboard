@@ -24,7 +24,7 @@ async function buildTemplateData(promiseData: processedPromiseData, workBookPath
     await wb.xlsx.readFile(workBookPath)
     const templateData = {}
     wb.eachSheet((worksheet) => { //for each worksheet not named Query.
-        if (worksheet.name.toLowerCase() !== 'query') {
+        if (worksheet.name !== 'Query') {
             templateData[worksheet.name] = { sheetKeys: new Set() } //sheet keys used in case data points need to be split into multiple worksheets.
             worksheet.eachRow((row, rowNumber) => {
                 const thisRow = {
@@ -56,7 +56,8 @@ async function buildTemplateData(promiseData: processedPromiseData, workBookPath
             })
         }
     })
-    return templateData //excel XML file with template printed, ready to be poopulated with data.
+
+    return templateData //object describing data that needs to be populated with data.
 }
 
 export { buildTemplateData }

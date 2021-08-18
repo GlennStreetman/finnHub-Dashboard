@@ -2,8 +2,11 @@ import express from 'express';
 import appRootPath from 'app-root-path'
 import fs from 'fs';
 import format from "pg-format";
+import util from 'util'
 
 import Excel from 'exceljs';
+import AdmZip from 'adm-zip';
+// import xml2js from 'xml2js';
 
 import dbLive from "../../db/databaseLive.js"
 import devDB from "../../db/databaseLocalPG.js"
@@ -18,6 +21,8 @@ import { checkTimeSeriesStatus } from './actions/checkTimeSeriesStatus.js'
 import { writeTimeSeriesSheetSingle } from './actions/writeTimeSeriesSheetSingle.js'
 import { dataPointSheetSingle } from './actions/dataPointSingle.js'
 import { dataPointSheetMulti } from './actions/dataPointSheetMulti.js'
+import { createChartSheetObj } from './actions/createChartSheetObj.js'
+import { copyAllChartsSingle, copyAllChartsMulti } from './actions/copyAllCharts.js'
 
 const db = process.env.live === "1" ? dbLive : devDB;
 
@@ -33,6 +38,36 @@ interface uploadTemplate extends Request {
     query: any
 }
 
+interface drawingrelsObj {
+    chartSource: string
+    colorSource: string
+    styleSource: string
+    chart_RelsSource: string
+}
+
+export interface drawingRelsListObj { //key should be target
+    [key: string]: drawingrelsObj
+}
+
+// interface outputSheets {
+//     [key: string]: string[]
+// }
+
+interface sheetObj { //1 sheet 1 drawing xml, but 1 or many chart/color/style xmls.
+    alias: string
+    outputSheets: string[]
+    worksheetSource: string
+    worksheet_relsSource: string //drawing tag in worksheet xml is standard <drawing r:id="rId1"/> 1 tag for each _rel <Relationship/> added to end of xml. Target= needs to match new drawing source.
+    worksheetTag: string
+    drawingSource: string
+    drawing_relsSource: drawingRelsListObj //drawing rel file cane have 1 or many relationshiups. KEY should automatical match source id after copy. Target tag needs to match new chart tag.
+
+}
+
+export interface chartSheetObj { //key is sheet. 1 sheet, 0 or 1 drawing file.
+    [key: string]: sheetObj
+}
+
 router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user configured excel template and return result.
     const apiKey = format('%L', req.query['key'])
     const multiSheet = req.query['multi']
@@ -44,48 +79,82 @@ router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user
     //copy target template into temp folder
     const userRows = await db.query(findUser)
     const user = userRows?.rows?.[0]?.id
-    const workBookPath = `${appRootPath}/uploads/${user}/${req.query.template}`
+    const workBookPath = `${appRootPath}/uploads/${user}/${req.query.template}` //path for template.
     const uploadsFolder = `${appRootPath}/uploads/`
     const tempFolder = `${appRootPath}/uploads/${user}/`
+    const dumpFolder = `${appRootPath}/uploads/${user}/dump`
+    const dumpFolderSource = `${appRootPath}/uploads/${user}/dump/source/`
+    const dumpFolderOutput = `${appRootPath}/uploads/${user}/dump/output/`
     const tempPath = `${appRootPath}/uploads/${user}/temp/`
     const trimFileName = req.query.template.slice(0, req.query.template.indexOf('.xls'))
-    const tempFile = `${appRootPath}/uploads/${user}/temp/${trimFileName}${Date.now()}.xlsx`
+    const tempFile = `${appRootPath}/uploads/${user}/temp/${trimFileName}${Date.now()}.xlsx` //path for output file.
 
     //make any needed directories in temp folder for user.
-    await makeTempDir(uploadsFolder)
-    await makeTempDir(tempFolder)
-    await makeTempDir(tempPath)
+    makeTempDir(uploadsFolder)
+    makeTempDir(tempFolder)
+    makeTempDir(dumpFolder)
+    fs.rmdirSync(dumpFolderSource, { recursive: true });
+    fs.rmdirSync(dumpFolderOutput, { recursive: true });
+    makeTempDir(dumpFolderSource)
+    makeTempDir(dumpFolderOutput)
+    makeTempDir(tempPath)
 
     try { //begin running template request.
         if (fs.existsSync(workBookPath)) { //if template name provided by get requests exists
+            // //create list of source charts.
+            const chartSheetsMap: chartSheetObj = {}
+            const zip = new AdmZip(workBookPath)
+            zip.extractAllTo(dumpFolderSource, true) //unzip excel template file to dump folder.
+            let filenames = fs.readdirSync(`${dumpFolderSource}/xl/worksheets/`);
+            filenames.forEach((fileName) => { //for each worksheet in worksheet dir.
+                if (fileName.indexOf('.') > 0) { //with file extension, not path.
+                    const thisWorksheetText = fs.readFileSync(`${dumpFolderSource}/xl/worksheets/${fileName}`, { encoding: 'utf-8' })
+                    if (thisWorksheetText.includes('<drawing')) { //If worksheet includes a <drawing /> tag then it has charts.
+                        const workbookXML_rels = fs.readFileSync(`${dumpFolderSource}/xl/_rels/workbook.xml.rels`, { encoding: 'utf-8' })
+                        const wookbookXML = fs.readFileSync(`${dumpFolderSource}/xl/workbook.xml`, { encoding: 'utf-8' })
+                        createChartSheetObj(fileName, workbookXML_rels, wookbookXML, chartSheetsMap, dumpFolderSource) //
+                    }
+                }
+            });
+
             const promiseList = await buildQueryList(workBookPath) //List of promises built from excel templates query sheet
             const promiseData = await Promise.all(promiseList)  //after promises run process promise data {keys: [], data: {}} FROM mongoDB
                 .then((res) => {
                     return processPromiseData(res)
                 })
-            // console.log('---running template data----1')
-            const templateData = await buildTemplateData(promiseData, workBookPath) //{...sheetName {...row:{data:{}, writeRows: number, keyColumns: {}}}} from Template File
-            // console.log('---running template data----2')
-            const workbook = new Excel.Workbook()
+            const templateData = await buildTemplateData(promiseData, workBookPath) //reads template file, build templating object.
+            const workbook = new Excel.Workbook() //file description, used to create return excel file.
             await workbook.xlsx.readFile(workBookPath)
-            // console.log('---running template data1----3')
+
             for (const dataNode in templateData) { //for each worksheet
+
                 const worksheet = workbook.getWorksheet(dataNode)
-                let timeSeriesFlag = checkTimeSeriesStatus(worksheet, promiseData)  //set to 1 if worksheet contains time series data.
-                if (timeSeriesFlag === 1) {
+                let timeSeriesFlag: boolean = checkTimeSeriesStatus(worksheet, promiseData)  //Checks worksheet to see if it contains time series data. Returns 1 if time series found.
+                if (timeSeriesFlag === true) {
+                    console.log('time series')
                     writeTimeSeriesSheetSingle(worksheet, dataNode, templateData)
-                } else if (multiSheet !== 'true') {
+                } else if (multiSheet !== `true`) {
+                    console.log('singeSheet')
                     dataPointSheetSingle(worksheet, dataNode, templateData)
-                } else {
-                    dataPointSheetMulti(workbook, worksheet, dataNode, templateData)
+                }
+                else { //should multi be removed?
+                    console.log('multiSheet')
+                    dataPointSheetMulti(workbook, worksheet, dataNode, templateData, chartSheetsMap)
                 }
             }
-            // console.log('---running template data1----4')
+
+            //delete the query sheet
             const deleteSheet = workbook.getWorksheet('Query') ? workbook.getWorksheet('Query') : workbook.getWorksheet('query')
             if (deleteSheet.id) workbook.removeWorksheet(deleteSheet.id)
-            // console.log('---running template data1----5')
+
             await workbook.xlsx.writeFile(tempFile)
-            res.status(200).sendFile(tempFile, () => {
+
+            console.log('chartSheets', util.inspect(chartSheetsMap, { showHidden: false, depth: null }))
+            const outputFile = multiSheet !== `true` ?
+                await copyAllChartsSingle(tempFile, dumpFolderSource, dumpFolderOutput, chartSheetsMap) :
+                await copyAllChartsMulti(tempFile, dumpFolderSource, dumpFolderOutput, chartSheetsMap)
+
+            res.status(200).sendFile(outputFile, () => {
                 fs.unlinkSync(tempFile)
             })
 
@@ -176,25 +245,26 @@ router.post('/generateTemplate', async (req, res) => { //create and process widg
         .then((res) => {
             return processPromiseData(res)
         })
-
     const templateData = await buildTemplateData(promiseData, workBookName) //{...sheetName {...row:{data:{}, writeRows: number, keyColumns: {}}}} from Template File
+    console.log('templateData', templateData)
     const newWorkbook: any = new Excel.Workbook()
     await newWorkbook.xlsx.readFile(workBookName)
-    for (const s in templateData) { //for each worksheet
-        const worksheets = newWorkbook.getWorksheet(s)
+    for (const dataNode in templateData) { //for each worksheet
+        const worksheets = newWorkbook.getWorksheet(dataNode)
         let timeSeriesFlag = checkTimeSeriesStatus(worksheets, promiseData)  //set to 1 if worksheet contains time series data.
-        if (timeSeriesFlag === 1) {
-            writeTimeSeriesSheetSingle(worksheets, s, templateData)
-        } else { //if (multiSheet !== true) {
-            dataPointSheetSingle(worksheets, s, templateData)
-        } // else {
-        //     dataPointSheetMulti(w, ws, s, templateData)
-        // }
+        if (timeSeriesFlag === true) {
+            console.log('here')
+            writeTimeSeriesSheetSingle(worksheets, dataNode, templateData)
+        } else {
+            console.log('there')
+            dataPointSheetSingle(worksheets, dataNode, templateData)
+        }
     }
     newWorkbook.views = [
         { x: 0, y: 0, height: 20000, firstSheet: 0, activeTab: 1, visability: 'visable' }
     ]
     await newWorkbook.xlsx.writeFile(tempFile)
+
     await res.status(200).sendFile(tempFile, () => {
         fs.unlinkSync(workBookName)
         fs.unlinkSync(tempFile)

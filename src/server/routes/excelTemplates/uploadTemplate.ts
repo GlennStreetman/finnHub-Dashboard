@@ -42,8 +42,8 @@ router.post("/uploadTemplate", async (req: uploadTemplate, res: any) => {
 
         const uploadsFolder = `${appRootPath}/uploads/`
         const tempFolder = `${appRootPath}/uploads/${userID}/`
-        await makeTempDir(uploadsFolder)
-        await makeTempDir(tempFolder)
+        makeTempDir(uploadsFolder)
+        makeTempDir(tempFolder)
 
         try {
             if (!req.files) {

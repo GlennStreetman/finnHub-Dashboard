@@ -1,10 +1,11 @@
 import { templateData } from './buildTemplateData'
 import { printTemplateWorksheets } from './printTemplateWorksheets.js'
+import { chartSheetObj } from './../runTemplate'
 
-export const dataPointSheetMulti = function (workbook, worksheet, dataNode, templateData: templateData) {
-    console.log('---PROCESSING MULTI---')
+export const dataPointSheetMulti = function (workbook, worksheet, dataNode, templateData: templateData, chartSheets: chartSheetObj) {
+    // console.log('---PROCESSING MULTI---', templateData[dataNode])
     let rowIterator = 0 //if multiSheet = 'false: add 1 for each line written so that writer doesnt fall out of sync with file.
-    printTemplateWorksheets(workbook, dataNode, templateData[dataNode].sheetKeys, worksheet) //create new worksheets for each security
+    printTemplateWorksheets(workbook, dataNode, templateData[dataNode].sheetKeys, worksheet, chartSheets) //create new worksheets for each security
     const templateWorksheet = templateData[dataNode]
     for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will almost always add rows to return file.
         const dataRow = templateWorksheet[row].data //list of rows to be updated from template file. 
@@ -23,7 +24,7 @@ export const dataPointSheetMulti = function (workbook, worksheet, dataNode, temp
                 } else { //update data point cells.
                     const thisWorkSheet = workbook.getWorksheet(`${dataNode}-${currentKey}`)
                     if (thisWorkSheet !== undefined) thisWorkSheet.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][currentKey]
-                    console.log('Row', parseInt(row), 'Cell', parseInt(updateCell), dataRow[updateCell][currentKey])
+                    // console.log('Row', parseInt(row), 'Cell', parseInt(updateCell), dataRow[updateCell][currentKey])
                 }
             }
             worksheet.getRow(row + rowIterator).commit()
