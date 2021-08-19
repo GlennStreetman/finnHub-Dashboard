@@ -55,6 +55,11 @@ function findDrawingSource(sheetRelsFile: string, dumpFolder, returnRels: boolea
     })
 }
 
+// function readWorkbook(){
+//     xml2js.parseString(wookbookXML, async (err, res) => {
+//         const relationshipListSheets = res.workbook.sheets
+// }
+
 function findWorksheetXMLTag(worksheetSource: string): Promise<string> {
     const worksheetXML = fs.readFileSync(worksheetSource, { encoding: 'utf-8' })
     return new Promise((resolve, reject) => {

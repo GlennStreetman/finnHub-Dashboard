@@ -22,7 +22,8 @@ import { writeTimeSeriesSheetSingle } from './actions/writeTimeSeriesSheetSingle
 import { dataPointSheetSingle } from './actions/dataPointSingle.js'
 import { dataPointSheetMulti } from './actions/dataPointSheetMulti.js'
 import { createChartSheetObj } from './actions/createChartSheetObj.js'
-import { copyAllChartsSingle, copyAllChartsMulti } from './actions/copyAllCharts.js'
+import { copyAllChartsSingle } from './actions/copyAllChartsSingle.js'
+import { copyAllChartsMulti } from './actions/copyAllChartsMulti.js'
 
 const db = process.env.live === "1" ? dbLive : devDB;
 
@@ -153,7 +154,7 @@ router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user
             const outputFile = multiSheet !== `true` ?
                 await copyAllChartsSingle(tempFile, dumpFolderSource, dumpFolderOutput, chartSheetsMap) :
                 await copyAllChartsMulti(tempFile, dumpFolderSource, dumpFolderOutput, chartSheetsMap)
-
+            console.log('Sending output file')
             res.status(200).sendFile(outputFile, () => {
                 fs.unlinkSync(tempFile)
             })
