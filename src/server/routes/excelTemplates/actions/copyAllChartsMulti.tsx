@@ -1,4 +1,4 @@
-
+import { produce } from 'immer'
 import AdmZip from 'adm-zip';
 import xml2js from 'xml2js';
 import fs from 'fs';
@@ -59,7 +59,7 @@ const copyWorksheetRelationFileMulti = (worksheetName, chartSheetsMap, outputFol
         xml2js.parseString(worksheetRelsXML, (err, res) => {
             res.Relationships.Relationship.forEach((el) => {
                 if (el['$']['Target'].includes('../drawings/')) {
-                    el['$']['Target'] = `../drawings/drawing${drawingIterator.value}`
+                    el['$']['Target'] = `../drawings/drawing${drawingIterator.value}.xml`
                     // drawingLookup[outpufile].push(`drawing${drawingIterator.value}`)
                     drawingLookup[outpufile] = `drawing${drawingIterator.value}`
                     drawingIterator.value = drawingIterator.value + 1
@@ -143,7 +143,7 @@ const copyDrawingFilesMulti = (
     const returnList: Promise<any>[] = []
     for (const newWorksheet of chartSheetsMap[worksheetName].outputSheets) {
         returnList.push(new Promise((resolve, reject) => {
-            console.log('drawingLookup', drawingLookup)
+            // console.log('drawingLookup', drawingLookup)
             const drawingLookupName = drawingLookup[newWorksheet]
             const copyFileName = chartSheetsMap[worksheetName].drawingSource.replace(`${dumpFolderSource}xl/drawings/`, '')
             const relsPath = chartSheetsMap[worksheetName].drawingSource.replace(copyFileName, '')
@@ -193,24 +193,6 @@ const copyChartFilesMulti =
                         })
                     }))
 
-                    // xml2js.parseString(copyChartXML, (err, res) => {
-                    //     if (err) {
-                    //         console.log(err)
-                    //         resolve(true)
-                    //     } else {
-                    //         const workthroughlist: any[] = Object.values(res.Relationships.Relationship)
-                    //         Object.values(workthroughlist).forEach((el) => {
-                    //             if (el['$'].Target.includes('style')) { el['$'].Target = `style${v}.xml` }
-                    //             if (el['$'].Target.includes('colors')) { el['$'].Target = `colors${v}.xml` }
-                    //         })
-
-                    //         const builder = new xml2js.Builder()
-                    //         const xml = builder.buildObject(res)
-
-                    // }
-                    // })
-
-
                     const chartSourceFilename = chartSources.chartSource.replace(`${dumpFolderSource}xl/charts/`, '').replace('.xml', '')
                     overrides.addOverride(chartSourceFilename, `chart${v}`)
                     const colorSourceFilename = chartSources.colorSource.replace(`${dumpFolderSource}xl/charts/`, '').replace('.xml', '')
@@ -221,9 +203,15 @@ const copyChartFilesMulti =
                     const copyChartXML = fs.readFileSync(chartSources.chartSource, { encoding: 'utf-8' })
                     copyList.push(new Promise((resolve, reject) => {
                         const chartALias = chartSheetsMap[worksheetName].alias
-                        console.log('REplacing: ', `${chartALias}!`, 'WITH:', `${outputAlias}!`)
-                        copyChartXML.replace(`${chartALias}!`, `${outputAlias}!`)
-                        fs.writeFileSync(`${outputFolder}/xl/charts/chart${v}.xml`, copyChartXML)
+                        const formatALias = "'" + chartALias + "'!"
+                        const regCheck = new RegExp(`${formatALias}`, 'g')
+                        const updatedFormula = copyChartXML.replace(regCheck, `'${outputAlias}'!`)
+
+                        const formatALias2 = "" + chartALias + "!"
+                        const regCheck2 = new RegExp(`${formatALias2}`, 'g')
+                        const updatedFormula2 = updatedFormula.replace(regCheck2, `'${outputAlias}'!`)
+
+                        fs.writeFileSync(`${outputFolder}/xl/charts/chart${v}.xml`, updatedFormula2)
                         resolve(true)
                     }))
 
@@ -253,6 +241,7 @@ const findOverrides = (dumpFolderSource) => {
 }
 
 const writeNewOverrides = (overrides, outputFolder: string) => {
+    console.log('OVERRIDES', overrides)
     const readOverrides = fs.readFileSync(`${outputFolder}/[Content_Types].xml`, { encoding: 'utf-8' })
     xml2js.parseString(readOverrides, async (err, res) => {
         // console.log('----OVERRIDES----', res.Types.Override)
@@ -277,9 +266,12 @@ export const copyAllChartsMulti = async function (targetFile: string, dumpFolder
             sourceOverrides: findOverrides(dumpFolderSource),
             newOverrides: [],
             addOverride: function (oldName, newName) {
-                const copySource = { ...this.sourceOverrides[oldName] }
-                const updateTag = copySource['$'].PartName.replace(oldName, newName)
-                copySource['$'].PartName = updateTag
+
+                const copySource = produce(this.sourceOverrides[oldName], (draftState) => {
+                    draftState['$'].PartName = draftState['$'].PartName.replace(oldName.trim(), newName.trim())
+                    return draftState
+                })
+                // console.log('copy source:', copySource)
                 this.newOverrides.push(copySource)
             },
         }
@@ -304,13 +296,13 @@ export const copyAllChartsMulti = async function (targetFile: string, dumpFolder
                 // //chart functions && rename formula sheet refs.
                 await copyChartFilesMulti(k, chartSheetsMap, outputFolder, dumpFolderSource, chartNameLookup, overrides)
                 // console.log('OVERRIDE LIST', overrides.newOverrides)
-                writeNewOverrides(overrides, outputFolder)
 
                 res(true)
             })
         })
 
         Promise.all(actionChainList).then(() => {
+            writeNewOverrides(overrides, outputFolder)
             const zip = new AdmZip();
             const outputFilename = outputFolder.replace('output/', 'final.xlsx')
             console.log('outputFilename1', outputFilename)

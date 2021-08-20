@@ -134,7 +134,6 @@ export const copyAllChartsSingle = async function (targetFile: string, dumpFolde
                 //chart functions && rename formula sheet refs.
                 await copyChartFiles(k, chartSheetsMap, outputFolder, dumpFolderSource)
 
-
                 res(true)
             })
         })
