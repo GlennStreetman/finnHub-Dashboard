@@ -55,11 +55,6 @@ function findDrawingSource(sheetRelsFile: string, dumpFolder, returnRels: boolea
     })
 }
 
-// function readWorkbook(){
-//     xml2js.parseString(wookbookXML, async (err, res) => {
-//         const relationshipListSheets = res.workbook.sheets
-// }
-
 function findWorksheetXMLTag(worksheetSource: string): Promise<string> {
     const worksheetXML = fs.readFileSync(worksheetSource, { encoding: 'utf-8' })
     return new Promise((resolve, reject) => {
@@ -107,7 +102,6 @@ function buildRelationshipObj(ID: string, dumpFolder: string, wookbookXML: strin
 }
 
 export const createChartSheetObj = (sheetName: string, relsXML: string, wookbookXML: string, chartSheetObj: chartSheetObj, dumpFolder: string) => {
-    // console.log('WORKSHEET NAME', sheetName)
     return new Promise((resolve, reject) => {
         xml2js.parseString(relsXML, async (err, res) => {
             const relationshipList = res.Relationships.Relationship
@@ -118,3 +112,4 @@ export const createChartSheetObj = (sheetName: string, relsXML: string, wookbook
         })
     })
 }
+

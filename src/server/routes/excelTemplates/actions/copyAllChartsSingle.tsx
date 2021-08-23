@@ -6,13 +6,18 @@ import util from 'util'
 import { chartSheetObj, drawingRelsListObj } from '../runTemplate'
 import { AnyARecord } from 'node:dns';
 
-const copyWorksheetRelationFile = (worksheetName, chartSheetsMap, outputFolder) => {
-    fs.copyFileSync(chartSheetsMap[worksheetName].worksheet_relsSource, `${outputFolder}/xl/worksheets/_rels/${worksheetName}.rels`)
+const copyWorksheetRelationFile = (worksheetName: string, chartSheetsMap: chartSheetObj, outputFolder: string, newAliasMap: { [key: string]: string }) => {
+    const sourceAlias = chartSheetsMap[worksheetName].alias
+    const newWorksheetXMLRef = newAliasMap[sourceAlias]
+
+    fs.copyFileSync(chartSheetsMap[worksheetName].worksheet_relsSource, `${outputFolder}/xl/worksheets/_rels/${newWorksheetXMLRef}.rels`)
 }
 
-const addWorksheetDrawingsTag = (worksheetName: string, chartSheetsMap: chartSheetObj, outputFolder: string): Promise<boolean> => {
+const addWorksheetDrawingsTag = (worksheetName: string, chartSheetsMap: chartSheetObj, outputFolder: string, newAliasMap: { [key: string]: string }): Promise<boolean> => {
+    const sourceAlias = chartSheetsMap[worksheetName].alias
+    const newWorksheetXMLRef = newAliasMap[sourceAlias]
     const tag = chartSheetsMap[worksheetName].worksheetTag
-    const worksheetXML = fs.readFileSync(`${outputFolder}/xl/worksheets/${worksheetName}`, { encoding: 'utf-8' })
+    const worksheetXML = fs.readFileSync(`${outputFolder}/xl/worksheets/${newWorksheetXMLRef}`, { encoding: 'utf-8' })
     return new Promise((resolve, reject) => {
         xml2js.parseString(worksheetXML, async (err, res) => {
             if (err) {
@@ -21,14 +26,14 @@ const addWorksheetDrawingsTag = (worksheetName: string, chartSheetsMap: chartShe
                 res.worksheet.drawing = tag
                 const builder = new xml2js.Builder()
                 const xml = builder.buildObject(res)
-                fs.writeFile(`${outputFolder}/xl/worksheets/${worksheetName}`, xml, (err) => { if (err) console.log(err) })
+                fs.writeFile(`${outputFolder}/xl/worksheets/${newWorksheetXMLRef}`, xml, (err) => { if (err) console.log(err) })
                 resolve(true)
             }
         })
     })
 }
 
-const copyDrawingRelationFiles = (worksheetName, chartSheetsMap, outputFolder, dumpFolderSource) => {
+const copyDrawingRelationFiles = (worksheetName: string, chartSheetsMap: chartSheetObj, outputFolder: string, dumpFolderSource: string) => {
     return new Promise((resolve, reject) => {
         const copyFileName = chartSheetsMap[worksheetName].drawingSource.replace(`${dumpFolderSource}xl/drawings/`, '')
         const relsPath = chartSheetsMap[worksheetName].drawingSource.replace(copyFileName, '')
@@ -46,7 +51,7 @@ const copyDrawingRelationFiles = (worksheetName, chartSheetsMap, outputFolder, d
     })
 }
 
-const copyDrawingFiles = (worksheetName, chartSheetsMap, outputFolder, dumpFolderSource) => {
+const copyDrawingFiles = (worksheetName: string, chartSheetsMap: chartSheetObj, outputFolder: string, dumpFolderSource: string) => {
     return new Promise((resolve, reject) => {
         const copyFileName = chartSheetsMap[worksheetName].drawingSource.replace(`${dumpFolderSource}xl/drawings/`, '')
         const relsPath = chartSheetsMap[worksheetName].drawingSource.replace(copyFileName, '')
@@ -64,7 +69,7 @@ const copyDrawingFiles = (worksheetName, chartSheetsMap, outputFolder, dumpFolde
 
 const copyFilePromise = util.promisify(fs.copyFile);
 
-const copyChartFiles = (worksheetName, chartSheetsMap, outputFolder, dumpFolderSource) => {
+const copyChartFiles = (worksheetName: string, chartSheetsMap: chartSheetObj, outputFolder: string, dumpFolderSource: string) => {
     return new Promise((resolve, reject) => {
         const chartObj: drawingRelsListObj = chartSheetsMap[worksheetName].drawing_relsSource
         const copyList: Promise<any>[] = []
@@ -95,7 +100,6 @@ const findOverrides = (dumpFolderSource) => {
             if (el['$'].PartName.includes('/xl/charts/')) returnList.push(el)
         })
     })
-    console.log('RETURN LIST', returnList)
     return returnList
 }
 
@@ -103,17 +107,37 @@ const copyChartOverrides = (overrides, outputFolder: string) => {
     const readOverrides = fs.readFileSync(`${outputFolder}/[Content_Types].xml`, { encoding: 'utf-8' })
     xml2js.parseString(readOverrides, async (err, res) => {
         res.Types.Override = res.Types.Override.concat(overrides)
-        console.log('OUTPUT', res.Types.Override)
         const builder = new xml2js.Builder()
         const xml = builder.buildObject(res)
         fs.writeFileSync(`${outputFolder}/[Content_Types].xml`, xml)
     })
 }
 
+const findNewAlias = (outputFolder) => { //match worksheet aliases to sheet?.xmls
+    const wookbookXML = fs.readFileSync(`${outputFolder}/xl/workbook.xml`, { encoding: 'utf-8' })
+    const sheetIDs = {}
+    xml2js.parseString(wookbookXML, async (err, res) => {
+        res.workbook.sheets[0].sheet.forEach((el) => {
+            sheetIDs[el['$']['r:id']] = el['$'].name
+        }, {})
+    })
+
+    const newAliases = {}
+    const workbookXML_rels = fs.readFileSync(`${outputFolder}/xl/_rels/workbook.xml.rels`, { encoding: 'utf-8' })
+    xml2js.parseString(workbookXML_rels, async (err, res) => {
+        console.log(res.Relationships)
+        res.Relationships.Relationship.forEach((el) => {
+            if (el['$'].Target.includes('worksheets/')) newAliases[sheetIDs[el['$'].Id]] = el['$'].Target.replace('worksheets/', '')
+        })
+    })
+
+    return newAliases
+}
+
 export const copyAllChartsSingle = async function (targetFile: string, dumpFolderSource, outputFolder, chartSheetsMap: chartSheetObj): Promise<string> {
 
     return new Promise(async (resolve, reject) => {
-
+        console.log('chartSheetsMap', chartSheetsMap)
         const unZip = new AdmZip(targetFile)
         unZip.extractAllTo(outputFolder, true) //unzip excel template file to dump folder.
 
@@ -121,11 +145,12 @@ export const copyAllChartsSingle = async function (targetFile: string, dumpFolde
         if (!fs.existsSync(`${outputFolder}/xl/drawings/_rels/`)) fs.mkdirSync(`${outputFolder}/xl/drawings/_rels/`, { recursive: true })
         if (!fs.existsSync(`${outputFolder}/xl/charts/_rels/`)) fs.mkdirSync(`${outputFolder}/xl/charts/_rels/`, { recursive: true })
 
+        const newAliasList: { [key: string]: string } = findNewAlias(outputFolder) //{alias: sheet?.xml}
 
         const actionChainList = Object.keys(chartSheetsMap).map(async (k) => { //promise all these file operations. Make sure each promise throws an error if failed.
             return new Promise(async (res) => {
-                copyWorksheetRelationFile(k, chartSheetsMap, outputFolder)//copy relation file
-                await addWorksheetDrawingsTag(k, chartSheetsMap, outputFolder)//add drawing tag.
+                copyWorksheetRelationFile(k, chartSheetsMap, outputFolder, newAliasList)//copy relation file
+                await addWorksheetDrawingsTag(k, chartSheetsMap, outputFolder, newAliasList)//add drawing tag.
                 //drawing functions
                 await copyDrawingRelationFiles(k, chartSheetsMap, outputFolder, dumpFolderSource)
                 await copyDrawingFiles(k, chartSheetsMap, outputFolder, dumpFolderSource)

@@ -48,10 +48,8 @@ const mapSheetAliases = function (chartSheetsMap: chartSheetObj, outputFolder: s
 const copyWorksheetRelationFileMulti = (worksheetName, chartSheetsMap, outputFolder, aliasMap, drawingIterator) => {
     //for each new worksheet, create the source relationship file with an updated file name
     //target needs to be set to the eventual name of the new drawing file that will be created in the next step.
-    console.log('----copyWorksheetRelationFileMulti----')
     const drawingLookup = {}
     const worksheetRelsXML = fs.readFileSync(chartSheetsMap[worksheetName].worksheet_relsSource, { encoding: 'utf-8' })
-    console.log('DONE READING ', chartSheetsMap[worksheetName].worksheet_relsSource)
     for (const outpufile of chartSheetsMap[worksheetName].outputSheets) {
         const newName = aliasMap[outpufile]
         // drawingLookup[outpufile] = []
@@ -143,7 +141,6 @@ const copyDrawingFilesMulti = (
     const returnList: Promise<any>[] = []
     for (const newWorksheet of chartSheetsMap[worksheetName].outputSheets) {
         returnList.push(new Promise((resolve, reject) => {
-            // console.log('drawingLookup', drawingLookup)
             const drawingLookupName = drawingLookup[newWorksheet]
             const copyFileName = chartSheetsMap[worksheetName].drawingSource.replace(`${dumpFolderSource}xl/drawings/`, '')
             const relsPath = chartSheetsMap[worksheetName].drawingSource.replace(copyFileName, '')
@@ -153,7 +150,6 @@ const copyDrawingFilesMulti = (
                     console.log(err)
                     reject(err)
                 } else {
-                    console.log(`copied drawings ${drawingLookupName}.xml`)
                 }
                 resolve(true)
             })
@@ -178,7 +174,6 @@ const copyChartFilesMulti =
             Object.values(chartSheetsMap[worksheetName].outputSheets).forEach((outputAlias) => { //each sheet
                 Object.entries(chartNameLookup[outputAlias]).forEach(([k, v]) => { //each alias
                     const suffix = outputAlias.replace(`${chartSheetsMap[worksheetName].alias}-`, '')
-                    console.log('copyChartFilesMulti', chartSheetsMap, sourceWorksheets, outputAlias, suffix)
                     const chartSources = chartSheetsMap[worksheetName].drawing_relsSource[k]
                     const worksheetXML = fs.readFileSync(chartSources.chart_RelsSource, { encoding: 'utf-8' }) //read _rels source file.
                     copyList.push(new Promise((resolve, reject) => {
@@ -215,15 +210,11 @@ const copyChartFilesMulti =
                         //replace any reference to source worksheet aliases
 
                         sourceWorksheets.forEach((alias => { //for each source worksheet, replace worksheet alias reference, in excel formulas, with updated worksheet alias.
-                            console.log('REPLACE', alias, 'WITH', `'${alias}-${suffix}'!`)
-                            // const chartALias = chartSheetsMap[worksheetName].alias
                             const formatALias = "'" + alias + "'!"
                             const regCheck = new RegExp(`${formatALias}`, 'g')
-                            // copyChartXML = copyChartXML.replace(regCheck, `'${outputAlias}'!`)
                             copyChartXML = copyChartXML.replace(regCheck, `'${alias}-${suffix}'!`)
                             const formatALias2 = alias + "!"
                             const regCheck2 = new RegExp(`${formatALias2}`, 'g')
-                            //copyChartXML = copyChartXML.replace(regCheck2, `'${outputAlias}'!`)
                             copyChartXML = copyChartXML.replace(regCheck2, `'${alias}-${suffix}'!`)
                         }))
 
@@ -317,7 +308,6 @@ export const copyAllChartsMulti = async function (
             writeNewOverrides(overrides, outputFolder)
             const zip = new AdmZip();
             const outputFilename = outputFolder.replace('output/', 'final.xlsx')
-            console.log('outputFilename1', outputFilename)
             zip.addLocalFolder(outputFolder, '')
             zip.writeZip(outputFilename);
             resolve(outputFolder.replace('output/', 'final.xlsx'))
