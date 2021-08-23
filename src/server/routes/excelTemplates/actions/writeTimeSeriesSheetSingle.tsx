@@ -3,6 +3,7 @@ import { templateData } from './buildTemplateData'
 export const writeTimeSeriesSheetSingle = function (ws, datanode, templateData: templateData) {
     let rowIterator = 0 //if multiSheet = 'false: add 1 for each line written so that writer doesnt fall out of sync with file.
     const templateWorksheet = templateData[datanode]
+
     const addedRows: number[] = [] //if multiSheet = 'false: list of rows added to template. Used to adjust any excel formulas as they dont auto update when adding rows.
     for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will add rows = time series count X number of securities.
         const dataRow = templateWorksheet[row].data //list of rows to be updated from template file. 

@@ -164,17 +164,25 @@ const copyDrawingFilesMulti = (
 
 const copyChartFilesMulti =
     (
-        worksheetName: string, chartSheetsMap: chartSheetObj, outputFolder: string, dumpFolderSource: string, chartNameLookup: { [key: string]: { [key: string]: string[] } }, overrides
+        worksheetName: string,
+        chartSheetsMap: chartSheetObj,
+        outputFolder: string,
+        dumpFolderSource: string,
+        chartNameLookup: { [key: string]: { [key: string]: string[] } },
+        overrides,
+        sourceWorksheets: string[]
     ) => {
-        return new Promise((resolve, reject) => {
-            const copyList: Promise<any>[] = []
-            Object.values(chartSheetsMap[worksheetName].outputSheets).forEach((outputAlias) => {
-                Object.entries(chartNameLookup[outputAlias]).forEach(([k, v]) => {
-                    const chartSources = chartSheetsMap[worksheetName].drawing_relsSource[k]
 
-                    const worksheetXML = fs.readFileSync(chartSources.chart_RelsSource, { encoding: 'utf-8' })
+        return new Promise((resolve, reject) => { //for each output worksheet that contains a chart.
+            const copyList: Promise<any>[] = []
+            Object.values(chartSheetsMap[worksheetName].outputSheets).forEach((outputAlias) => { //each sheet
+                Object.entries(chartNameLookup[outputAlias]).forEach(([k, v]) => { //each alias
+                    const suffix = outputAlias.replace(`${chartSheetsMap[worksheetName].alias}-`, '')
+                    console.log('copyChartFilesMulti', chartSheetsMap, sourceWorksheets, outputAlias, suffix)
+                    const chartSources = chartSheetsMap[worksheetName].drawing_relsSource[k]
+                    const worksheetXML = fs.readFileSync(chartSources.chart_RelsSource, { encoding: 'utf-8' }) //read _rels source file.
                     copyList.push(new Promise((resolve, reject) => {
-                        xml2js.parseString(worksheetXML, (err, res) => {
+                        xml2js.parseString(worksheetXML, (err, res) => { // copy styles, colors, _rels
                             if (err) {
                                 console.log(err)
                                 resolve(true)
@@ -193,6 +201,7 @@ const copyChartFilesMulti =
                         })
                     }))
 
+                    //update list of xml <Overrides> for new files being created. To be used in [Content_Types].xml
                     const chartSourceFilename = chartSources.chartSource.replace(`${dumpFolderSource}xl/charts/`, '').replace('.xml', '')
                     overrides.addOverride(chartSourceFilename, `chart${v}`)
                     const colorSourceFilename = chartSources.colorSource.replace(`${dumpFolderSource}xl/charts/`, '').replace('.xml', '')
@@ -200,18 +209,26 @@ const copyChartFilesMulti =
                     const styleSourceFilename = chartSources.styleSource.replace(`${dumpFolderSource}xl/charts/`, '').replace('.xml', '')
                     overrides.addOverride(styleSourceFilename, `style${v}`)
 
-                    const copyChartXML = fs.readFileSync(chartSources.chartSource, { encoding: 'utf-8' })
-                    copyList.push(new Promise((resolve, reject) => {
-                        const chartALias = chartSheetsMap[worksheetName].alias
-                        const formatALias = "'" + chartALias + "'!"
-                        const regCheck = new RegExp(`${formatALias}`, 'g')
-                        const updatedFormula = copyChartXML.replace(regCheck, `'${outputAlias}'!`)
+                    let copyChartXML = fs.readFileSync(chartSources.chartSource, { encoding: 'utf-8' }) //read chart source file.
+                    copyList.push(new Promise((resolve, reject) => { //update chart formula references.
 
-                        const formatALias2 = "" + chartALias + "!"
-                        const regCheck2 = new RegExp(`${formatALias2}`, 'g')
-                        const updatedFormula2 = updatedFormula.replace(regCheck2, `'${outputAlias}'!`)
+                        //replace any reference to source worksheet aliases
 
-                        fs.writeFileSync(`${outputFolder}/xl/charts/chart${v}.xml`, updatedFormula2)
+                        sourceWorksheets.forEach((alias => { //for each source worksheet, replace worksheet alias reference, in excel formulas, with updated worksheet alias.
+                            console.log('REPLACE', alias, 'WITH', `'${alias}-${suffix}'!`)
+                            // const chartALias = chartSheetsMap[worksheetName].alias
+                            const formatALias = "'" + alias + "'!"
+                            const regCheck = new RegExp(`${formatALias}`, 'g')
+                            // copyChartXML = copyChartXML.replace(regCheck, `'${outputAlias}'!`)
+                            copyChartXML = copyChartXML.replace(regCheck, `'${alias}-${suffix}'!`)
+                            const formatALias2 = alias + "!"
+                            const regCheck2 = new RegExp(`${formatALias2}`, 'g')
+                            //copyChartXML = copyChartXML.replace(regCheck2, `'${outputAlias}'!`)
+                            copyChartXML = copyChartXML.replace(regCheck2, `'${alias}-${suffix}'!`)
+                        }))
+
+
+                        fs.writeFileSync(`${outputFolder}/xl/charts/chart${v}.xml`, copyChartXML)
                         resolve(true)
                     }))
 
@@ -231,7 +248,6 @@ const findOverrides = (dumpFolderSource) => {
     const returnObj = {}
     const readOverrides = fs.readFileSync(`${dumpFolderSource}/[Content_Types].xml`, { encoding: 'utf-8' })
     xml2js.parseString(readOverrides, async (err, res) => {
-        // console.log('----OVERRIDES----', res.Types.Override)
         res.Types.Override.forEach((el) => {
             if (el['$'].PartName.includes('/xl/drawings/')) returnObj[el['$'].PartName.replace('/xl/drawings/', '').replace('.xml', '')] = el
             if (el['$'].PartName.includes('/xl/charts/')) returnObj[el['$'].PartName.replace('/xl/charts/', '').replace('.xml', '')] = el
@@ -241,10 +257,8 @@ const findOverrides = (dumpFolderSource) => {
 }
 
 const writeNewOverrides = (overrides, outputFolder: string) => {
-    console.log('OVERRIDES', overrides)
     const readOverrides = fs.readFileSync(`${outputFolder}/[Content_Types].xml`, { encoding: 'utf-8' })
     xml2js.parseString(readOverrides, async (err, res) => {
-        // console.log('----OVERRIDES----', res.Types.Override)
         res.Types.Override = res.Types.Override.concat(overrides.newOverrides)
         const builder = new xml2js.Builder()
         const xml = builder.buildObject(res)
@@ -252,50 +266,48 @@ const writeNewOverrides = (overrides, outputFolder: string) => {
     })
 }
 
-export const copyAllChartsMulti = async function (targetFile: string, dumpFolderSource: string, outputFolder: string, chartSheetsMap: chartSheetObj): Promise<string> {
+export const copyAllChartsMulti = async function (
+    targetFile: string,
+    dumpFolderSource: string,
+    outputFolder: string,
+    chartSheetsMap: chartSheetObj,
+    sourceWorksheets: string[]): Promise<string> {
     //workbook.sheet.rID -> workbook.rels.name = worksheet.name
     return new Promise(async (resolve, reject) => {
 
         const unZip = new AdmZip(targetFile)
         unZip.extractAllTo(outputFolder, true) //unzip excel template file to dump folder.
 
-
-        let drawingIterator = { value: 1 }
-        let chartIterator = { value: 1 }
-        const overrides = {
-            sourceOverrides: findOverrides(dumpFolderSource),
-            newOverrides: [],
-            addOverride: function (oldName, newName) {
-
-                const copySource = produce(this.sourceOverrides[oldName], (draftState) => {
-                    draftState['$'].PartName = draftState['$'].PartName.replace(oldName.trim(), newName.trim())
-                    return draftState
-                })
-                // console.log('copy source:', copySource)
-                this.newOverrides.push(copySource)
-            },
-        }
-
+        //create folder structure needed for copy operations below.
         if (!fs.existsSync(`${outputFolder}/xl/worksheets/_rels/`)) fs.mkdirSync(`${outputFolder}/xl/worksheets/_rels/`, { recursive: true })
         if (!fs.existsSync(`${outputFolder}/xl/drawings/_rels/`)) fs.mkdirSync(`${outputFolder}/xl/drawings/_rels/`, { recursive: true })
         if (!fs.existsSync(`${outputFolder}/xl/charts/_rels/`)) fs.mkdirSync(`${outputFolder}/xl/charts/_rels/`, { recursive: true })
 
-        const aliasMap: { [key: string]: string } = await mapSheetAliases(chartSheetsMap, outputFolder)
-        // console.log('ALIASMAP', aliasMap)
+        let drawingIterator = { value: 1 } //drawing?.xml unique name incrementor
+        let chartIterator = { value: 1 }  //chart?, style?, color? .xml unique name incrementor
+        const overrides = { //list of source and new xml <Override> tags that need to be inserted into [content_Types].xml
+            sourceOverrides: findOverrides(dumpFolderSource),
+            newOverrides: [],
+            addOverride: function (oldName, newName) {
+                const copySource = produce(this.sourceOverrides[oldName], (draftState) => {
+                    draftState['$'].PartName = draftState['$'].PartName.replace(oldName.trim(), newName.trim())
+                    return draftState
+                })
+                this.newOverrides.push(copySource)
+            },
+        }
+        const aliasMap: { [key: string]: string } = await mapSheetAliases(chartSheetsMap, outputFolder) //matches excel sheet names, that are visable to user, to xml sheet ids.
 
         const actionChainList = Object.keys(chartSheetsMap).map(async (k) => { //promise all these file operations. Make sure each promise throws an error if failed.
             return new Promise(async (res) => {
-                //sheet functions
-                const drawingLookup: { [key: string]: string } = copyWorksheetRelationFileMulti(k, chartSheetsMap, outputFolder, aliasMap, drawingIterator)//copy relation file
-                // console.log('Drawing Lookup: ', drawingLookup)
-                await Promise.all(addWorkSheetDrawingsMulti(k, chartSheetsMap, outputFolder, aliasMap))//add drawing tag.
-                // //drawing functions
-                const chartNameLookup: { [key: string]: { [key: string]: string[] } } = {}
-                await Promise.all(copyDrawingRelationFilesMulti(k, chartSheetsMap, outputFolder, dumpFolderSource, drawingLookup, chartIterator, chartNameLookup))
-                await Promise.all(copyDrawingFilesMulti(k, chartSheetsMap, outputFolder, dumpFolderSource, drawingLookup, overrides))
-                // //chart functions && rename formula sheet refs.
-                await copyChartFilesMulti(k, chartSheetsMap, outputFolder, dumpFolderSource, chartNameLookup, overrides)
-                // console.log('OVERRIDE LIST', overrides.newOverrides)
+
+                const drawingLookup: { [key: string]: string } = copyWorksheetRelationFileMulti(k, chartSheetsMap, outputFolder, aliasMap, drawingIterator)//copy relation  xmlfile
+                const chartNameLookup: { [key: string]: { [key: string]: string[] } } = {} //lookup object from --> to mapping of copied charts.
+
+                await Promise.all(addWorkSheetDrawingsMulti(k, chartSheetsMap, outputFolder, aliasMap))//add drawing tag to worksheets that will have charts.
+                await Promise.all(copyDrawingRelationFilesMulti(k, chartSheetsMap, outputFolder, dumpFolderSource, drawingLookup, chartIterator, chartNameLookup)) //copy drawing_rel xmls.
+                await Promise.all(copyDrawingFilesMulti(k, chartSheetsMap, outputFolder, dumpFolderSource, drawingLookup, overrides)) //copy drawing xmls
+                await copyChartFilesMulti(k, chartSheetsMap, outputFolder, dumpFolderSource, chartNameLookup, overrides, sourceWorksheets) //copy chart, style, colors, _rel xmls for charts
 
                 res(true)
             })

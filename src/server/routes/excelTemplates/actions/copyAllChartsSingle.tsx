@@ -90,7 +90,6 @@ const findOverrides = (dumpFolderSource) => {
     const returnList: AnyARecord[] = []
     const readOverrides = fs.readFileSync(`${dumpFolderSource}/[Content_Types].xml`, { encoding: 'utf-8' })
     xml2js.parseString(readOverrides, async (err, res) => {
-        // console.log('----OVERRIDES----', res.Types.Override)
         res.Types.Override.forEach((el) => {
             if (el['$'].PartName.includes('/xl/drawings/')) returnList.push(el)
             if (el['$'].PartName.includes('/xl/charts/')) returnList.push(el)
@@ -103,7 +102,6 @@ const findOverrides = (dumpFolderSource) => {
 const copyChartOverrides = (overrides, outputFolder: string) => {
     const readOverrides = fs.readFileSync(`${outputFolder}/[Content_Types].xml`, { encoding: 'utf-8' })
     xml2js.parseString(readOverrides, async (err, res) => {
-        // console.log('----OVERRIDES----', res.Types.Override, '--------------', overrides)
         res.Types.Override = res.Types.Override.concat(overrides)
         console.log('OUTPUT', res.Types.Override)
         const builder = new xml2js.Builder()

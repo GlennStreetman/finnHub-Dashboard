@@ -34,6 +34,7 @@ import reset from './routes/accounts/reset.js'
 
 import uploadTemplate from './routes/excelTemplates/uploadTemplate.js'
 import runTemplate from './routes/excelTemplates/runTemplate.js'
+import generateTemplate from './routes/excelTemplates/generateTemplate.js'
 import deleteTemplate from './routes/excelTemplates/deleteTemplate.js'
 
 // import endPoint  from './routes/endPoint.js'
@@ -157,6 +158,7 @@ app.use('/', findMongoData)
 app.use('/', deleteFinnDashData)
 app.use('/', updateGQLConfig)
 app.use('/', runTemplate)
+app.use('/', generateTemplate)
 app.use('/', renameDashboardMongo)
 app.use('/', graphQLRedirect)
 app.use('/graphql', eg.graphqlHTTP({

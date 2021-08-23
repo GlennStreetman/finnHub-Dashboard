@@ -19,7 +19,7 @@ export const dataPointSheetMulti = function (workbook, worksheet, dataNode, temp
                     const thisWorkSheet = workbook.getWorksheet(`${dataNode}-${currentKey}`)
                     if (dataRow[updateCell][step - 1] && typeof dataRow[updateCell][step - 1] === 'string') {
                         thisWorkSheet.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][step - 1]
-                        console.log('Key', parseInt(row), 'Cell', parseInt(updateCell), dataRow[updateCell][step - 1])
+                        // console.log('Key', parseInt(row), 'Cell', parseInt(updateCell), dataRow[updateCell][step - 1])
                     }
                 } else { //update data point cells.
                     const thisWorkSheet = workbook.getWorksheet(`${dataNode}-${currentKey}`)
