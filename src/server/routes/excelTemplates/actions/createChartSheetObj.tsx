@@ -60,7 +60,6 @@ function findWorksheetXMLTag(worksheetSource: string): Promise<string> {
     return new Promise((resolve, reject) => {
         xml2js.parseString(worksheetXML, async (err, res) => {
             const tag = res.worksheet.drawing
-            console.log('TAG', tag)
             resolve(tag)
         })
     })

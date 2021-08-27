@@ -7,18 +7,28 @@ import { chartSheetObj } from '../runTemplate'
 
 const copyFilePromise = util.promisify(fs.copyFile);
 
-function readWorkbook(outputFolder: string): { [key: string]: string } {
-    const workbookSheetRelations = {}
+interface xmlLookupOb {
+    [key: string]: string
+}
+
+
+function readWorkbook(outputFolder: string): [xmlLookupOb, xmlLookupOb] {
+    const workbookSheetRelations: xmlLookupOb = {}
+    const workbookDefinedNames: xmlLookupOb = {}
     const worksheetXML = fs.readFileSync(`${outputFolder}xl/workbook.xml`, { encoding: 'utf-8' })
     xml2js.parseString(worksheetXML, async (err, res) => {
         res.workbook.sheets[0].sheet.forEach((el) => {
             workbookSheetRelations[el['$']['name']] = el['$']['r:id']
         })
+        res.workbook.definedNames[0].definedName.forEach((el) => {
+            workbookDefinedNames[el['$']['name']] = el
+        })
     })
-    return workbookSheetRelations
+
+    return [workbookSheetRelations, workbookDefinedNames]
 }
 
-function readWorkbookRels(outputFolder: string): { [key: string]: string } {
+function readWorkbookRels(outputFolder: string): xmlLookupOb {
     const workbookSheetRelations = {}
     const worksheetXML = fs.readFileSync(`${outputFolder}xl/_rels/workbook.xml.rels`, { encoding: 'utf-8' })
     xml2js.parseString(worksheetXML, async (err, res) => {
@@ -29,10 +39,10 @@ function readWorkbookRels(outputFolder: string): { [key: string]: string } {
     return workbookSheetRelations
 }
 
-const mapSheetAliases = function (chartSheetsMap: chartSheetObj, outputFolder: string): { [key: string]: string } {
+const mapSheetAliases = function (chartSheetsMap: chartSheetObj, outputFolder: string): [xmlLookupOb, xmlLookupOb] {
     //read workbook and workbook rels to match worksheet alias, the name an excel user can see, to the actual excel xml file name.
     const worksheetAliasMap = {}
-    const workbookSheetMap: { [key: string]: string } = readWorkbook(outputFolder)
+    const [workbookSheetMap, definedNames] = readWorkbook(outputFolder)
     const readWorkbookRelsMap: { [key: string]: string } = readWorkbookRels(outputFolder)
     Object.entries(workbookSheetMap).forEach(([k, v]) => worksheetAliasMap[k] = readWorkbookRelsMap[v])
 
@@ -42,7 +52,8 @@ const mapSheetAliases = function (chartSheetsMap: chartSheetObj, outputFolder: s
             aliasMap[el] = worksheetAliasMap[el]
         })
     })
-    return aliasMap
+
+    return [aliasMap, definedNames]
 }
 
 const copyWorksheetRelationFileMulti = (worksheetName, chartSheetsMap, outputFolder, aliasMap, drawingIterator) => {
@@ -51,7 +62,6 @@ const copyWorksheetRelationFileMulti = (worksheetName, chartSheetsMap, outputFol
     const drawingLookup = {}
     const worksheetRelsXML = fs.readFileSync(chartSheetsMap[worksheetName].worksheet_relsSource, { encoding: 'utf-8' })
     for (const outpufile of chartSheetsMap[worksheetName].outputSheets) {
-        console.log('OUTPUT FILE COPY', outpufile)
         const newName = aliasMap[outpufile]
         // drawingLookup[outpufile] = []
 
@@ -120,13 +130,13 @@ const copyDrawingRelationFilesMulti = (
             const drawingRelsXML = fs.readFileSync(from, { encoding: 'utf-8' })
 
             xml2js.parseString(drawingRelsXML, (err, res) => {
-                // chartNameLookup[newWorksheet][copyFileName] = []
+
                 res.Relationships.Relationship.forEach((el) => {
-                    if (el['$']['Target'].includes('../charts/')) {
-                        const oldTarget = el['$']['Target'].replace('../charts/', '').replace('.xml', '')
+                    if (el['$']['Target'].includes('../charts/')) { //if relation is a reference to a chart.
+                        const oldTarget = el['$']['Target'].replace('../charts/', '').replace('.xml', '') //suffix not including file type with number ref.
+                        const oldTargetSuffix = oldTarget.replace(new RegExp(`[0-9]`, 'g'), '') //strip number ref from suffix.
                         if (!chartNameLookup[newWorksheet][oldTarget]) chartNameLookup[newWorksheet][oldTarget] = []
-                        // chartNameLookup[newWorksheet] = { [oldTarget]: [] }
-                        el['$']['Target'] = `../charts/chart${chartIterator.value}.xml`
+                        el['$']['Target'] = `../charts/${oldTargetSuffix}${chartIterator.value}.xml`
                         chartNameLookup[newWorksheet][oldTarget].push(`${chartIterator.value}`)
                         chartIterator.value = chartIterator.value + 1
                     }
@@ -173,21 +183,19 @@ const copyChartFilesMulti =
         dumpFolderSource: string,
         chartNameLookup: { [key: string]: { [key: string]: string[] } },
         overrides,
-        sourceWorksheets: string[]
+        sourceWorksheets: string[], //list of all worksheets in original template
+        definedNames, //defineName tags in workbook.xml that corrospond to some char types that use cx:f tags. cx:f tags denote a names range.
     ) => {
 
         return new Promise((resolve, reject) => { //for each output worksheet that contains a chart.
             const copyList: Promise<any>[] = []
-            // console.log(`chartSheetsMap[worksheetName]`, chartSheetsMap[worksheetName])
             Object.values(chartSheetsMap[worksheetName].outputSheets).forEach((outputAlias) => { //each sheet
-                console.log('creating charts for: ', outputAlias)
-                console.log('FROM TO', chartNameLookup[outputAlias])
-                Object.entries(chartNameLookup[outputAlias]).forEach(([key, el]) => { //for each source chart.
-                    const suffix = outputAlias.replace(`${chartSheetsMap[worksheetName].alias}-`, '')
-                    el.forEach((chartref) => { //for each destination chart.
-                        const chartSources = chartSheetsMap[worksheetName].drawing_relsSource[key]
-                        console.log('HERE', `chart${chartref}`, chartSheetsMap[worksheetName])
-                        const worksheetXML = fs.readFileSync(`${dumpFolderSource}xl/charts/_rels/${key}.xml.rels`, { encoding: 'utf-8' }) //read _rels source file.
+                Object.entries(chartNameLookup[outputAlias]).forEach(([sourceChartName, chartNumberLookup]) => { //for each source chart.
+                    const chartNamePrefix = sourceChartName.replace(new RegExp(`[0-9]`, 'g'), '') //chart?.xml file name prefix. Normaly chart or chartEx
+                    const suffix = outputAlias.replace(`${chartSheetsMap[worksheetName].alias}-`, '') //worksheet suffix ex: US-AAPL
+                    chartNumberLookup.forEach((chartref) => { //for each destination chart.
+                        const chartSources = chartSheetsMap[worksheetName].drawing_relsSource[sourceChartName]
+                        const worksheetXML = fs.readFileSync(`${dumpFolderSource}xl/charts/_rels/${sourceChartName}.xml.rels`, { encoding: 'utf-8' }) //read _rels source file.
                         copyList.push(new Promise((resolve, reject) => {
                             xml2js.parseString(worksheetXML, (err, res) => { // copy styles, colors, _rels
                                 if (err) {
@@ -202,7 +210,7 @@ const copyChartFilesMulti =
 
                                     const builder = new xml2js.Builder()
                                     const xml = builder.buildObject(res)
-                                    fs.writeFileSync(`${outputFolder}/xl/charts/_rels/chart${chartref}.xml.rels`, xml)
+                                    fs.writeFileSync(`${outputFolder}/xl/charts/_rels/${chartNamePrefix}${chartref}.xml.rels`, xml) //write chart rels
                                     resolve(true)
                                 }
                             })
@@ -210,7 +218,7 @@ const copyChartFilesMulti =
 
                         //update list of xml <Overrides> for new files being created. To be used in [Content_Types].xml
                         const chartSourceFilename = chartSources.chartSource.replace(`${dumpFolderSource}xl/charts/`, '').replace('.xml', '')
-                        overrides.addOverride(chartSourceFilename, `chart${chartref}`)
+                        overrides.addOverride(chartSourceFilename, `${chartNamePrefix}${chartref}`)
                         const colorSourceFilename = chartSources.colorSource.replace(`${dumpFolderSource}xl/charts/`, '').replace('.xml', '')
                         overrides.addOverride(colorSourceFilename, `colors${chartref}`)
                         const styleSourceFilename = chartSources.styleSource.replace(`${dumpFolderSource}xl/charts/`, '').replace('.xml', '')
@@ -218,8 +226,6 @@ const copyChartFilesMulti =
 
                         let copyChartXML = fs.readFileSync(chartSources.chartSource, { encoding: 'utf-8' }) //read chart source file.
                         copyList.push(new Promise((resolve, reject) => { //update chart formula references.
-
-                            //replace any reference to source worksheet aliases
 
                             sourceWorksheets.forEach((alias => { //for each source worksheet, replace worksheet alias reference, in excel formulas, with updated worksheet alias.
                                 const formatALias = "'" + alias + "'!"
@@ -230,12 +236,11 @@ const copyChartFilesMulti =
                                 copyChartXML = copyChartXML.replace(regCheck2, `'${alias}-${suffix}'!`)
                             }))
 
-
-                            fs.writeFileSync(`${outputFolder}/xl/charts/chart${chartref}.xml`, copyChartXML)
+                            definedNames.addNewSourceNameTag(copyChartXML, suffix, `${outputFolder}/xl/charts/${chartNamePrefix}${chartref}.xml`) //updates xml defineName ref, if it exists.
                             resolve(true)
                         }))
 
-                        // copyList.push(copyFilePromise(chartSources.chartSource, `${outputFolder}/xl/charts/chart${v}.xml`)) //copy chart
+                        // copyList.push(copyFilePromise(chartSources.chartSource, `${outputFolder}/xl/charts/${chartNamePrefix}${chartref}.xml`)) //copy chart
                         copyList.push(copyFilePromise(chartSources.colorSource, `${outputFolder}/xl/charts/colors${chartref}.xml`)) //copy color
                         copyList.push(copyFilePromise(chartSources.styleSource, `${outputFolder}/xl/charts/style${chartref}.xml`)) //copy styles
                     })
@@ -260,6 +265,25 @@ const findOverrides = (dumpFolderSource) => {
     return returnObj
 }
 
+const writeNewDefineNames = (defineNames, outputFolder: string, sourceFolder: string) => {
+    return new Promise((resolve, reject) => {
+        const sourceWOrkbook = fs.readFileSync(`${sourceFolder}/xl/workbook.xml`, { encoding: 'utf-8' })
+        let extLst
+        xml2js.parseString(sourceWOrkbook, async (err, res) => {
+            extLst = res.workbook.extLst
+        })
+
+        const readWorkbook = fs.readFileSync(`${outputFolder}/xl/workbook.xml`, { encoding: 'utf-8' })
+        xml2js.parseString(readWorkbook, async (err, res) => {
+            res.workbook.definedNames[0].definedName = defineNames.newChartDefineNameXMLTags
+            res.workbook.extLst = extLst
+            const builder = new xml2js.Builder()
+            const xml = builder.buildObject(res)
+            fs.writeFile(`${outputFolder}xl/workbook.xml`, xml, (err) => { if (err) { console.log(err) } else { resolve(true) } })
+        })
+    })
+}
+
 const writeNewOverrides = (overrides, outputFolder: string) => {
     const readOverrides = fs.readFileSync(`${outputFolder}/[Content_Types].xml`, { encoding: 'utf-8' })
     xml2js.parseString(readOverrides, async (err, res) => {
@@ -272,17 +296,15 @@ const writeNewOverrides = (overrides, outputFolder: string) => {
 
 export const copyAllChartsMulti = async function (
     targetFile: string,
-    dumpFolderSource: string,
+    sourceFolder: string,
     outputFolder: string,
     chartSheetsMap: chartSheetObj,
     sourceWorksheets: string[]): Promise<string> {
-    //workbook.sheet.rID -> workbook.rels.name = worksheet.name
+
     return new Promise(async (resolve, reject) => {
 
         const unZip = new AdmZip(targetFile)
         unZip.extractAllTo(outputFolder, true) //unzip excel template file to dump folder.
-
-        // const newAliasList: { [key: string]: string } = findNewAlias(outputFolder) //{alias: sheet?.xml}
 
         //create folder structure needed for copy operations below.
         if (!fs.existsSync(`${outputFolder}/xl/worksheets/_rels/`)) fs.mkdirSync(`${outputFolder}/xl/worksheets/_rels/`, { recursive: true })
@@ -292,7 +314,7 @@ export const copyAllChartsMulti = async function (
         let drawingIterator = { value: 1 } //drawing?.xml unique name incrementor
         let chartIterator = { value: 1 }  //chart?, style?, color? .xml unique name incrementor
         const overrides = { //list of source and new xml <Override> tags that need to be inserted into [content_Types].xml
-            sourceOverrides: findOverrides(dumpFolderSource),
+            sourceOverrides: findOverrides(sourceFolder),
             newOverrides: [],
             addOverride: function (oldName, newName) {
                 const copySource = produce(this.sourceOverrides[oldName], (draftState) => {
@@ -302,25 +324,55 @@ export const copyAllChartsMulti = async function (
                 this.newOverrides.push(copySource)
             },
         }
-        const aliasMap: { [key: string]: string } = await mapSheetAliases(chartSheetsMap, outputFolder) //matches excel sheet names, that are visable to user, to xml sheet ids.
+
+        const [aliasMap, definedNamesSource] = await mapSheetAliases(chartSheetsMap, outputFolder) //matches excel sheet names, that are visable to user, to xml sheet ids.
+        const definedNames = { //list of source and new xml <Override> tags that need to be inserted into [content_Types].xml
+            sourceNames: definedNamesSource, //list of source worksheet aliases.
+            newChartDefineNameXMLTags: [], //list of xml tags that need to be added to the defined names section of worksheetXML.
+            newSourceNameIterator: 1,
+            addNewSourceNameTag: function (copyChartXML, suffix, outputURL) { //takes xml string representation of chart. Updates XML define name refs & updates NewSourceNameXMLTags
+                // console.log('---ADDNEWSOURCENAMETAGE----', outputURL)
+                Object.keys(this.sourceNames).forEach((name) => { //for each source chart name, replace sourcename with updated output name.
+                    if (copyChartXML.includes(name)) {
+                        const newSourceName = '_xlchart.v1.' + this.newSourceNameIterator
+                        const regReplaceName = new RegExp(`${name}`, 'g')
+                        copyChartXML = copyChartXML.replace(regReplaceName, newSourceName) //replace old defineName ref in chart.xml
+                        const updateXMLTag = produce(this.sourceNames[name], (draftState) => {  //update $name and _
+                            draftState['$'].name = newSourceName //update name ref
+                            sourceWorksheets.forEach((ws) => { //update '_' sheet ref.
+                                if (draftState['_'].includes(`${ws}!`)) {
+                                    draftState['_'] = draftState['_'].replace(ws, `'${ws}-${suffix}'`)
+                                }
+                            })
+                        })
+                        this.newChartDefineNameXMLTags.push(updateXMLTag)
+                    }
+                    // console.log('newChartDefineNameXMLTags', this.newChartDefineNameXMLTags)
+                    fs.writeFileSync(outputURL, copyChartXML)
+                    this.newSourceNameIterator = this.newSourceNameIterator + 1
+                })
+            },
+        }
 
         const actionChainList = Object.keys(chartSheetsMap).map(async (k) => { //promise all these file operations. Make sure each promise throws an error if failed.
             return new Promise(async (res) => {
                 const chartNameLookup: { [key: string]: { [key: string]: string[] } } = {} //lookup object from --> to mapping of copied charts.
 
-                const drawingLookup: { [key: string]: string } = copyWorksheetRelationFileMulti(k, chartSheetsMap, outputFolder, aliasMap, drawingIterator)//copy relation  xmlfile
-                await Promise.all(addWorkSheetDrawingsMulti(k, chartSheetsMap, outputFolder, aliasMap))//add drawing tag to worksheets that will have charts.
+                //copy relation  xmlfile
+                const drawingLookup: { [key: string]: string } = copyWorksheetRelationFileMulti(k, chartSheetsMap, outputFolder, aliasMap, drawingIterator)
+                //add drawing tag to worksheets that will have charts.
+                await Promise.all(addWorkSheetDrawingsMulti(k, chartSheetsMap, outputFolder, aliasMap))
                 //drawing sheet and rels.
-                await Promise.all(copyDrawingRelationFilesMulti(k, chartSheetsMap, outputFolder, dumpFolderSource, drawingLookup, chartIterator, chartNameLookup)) //copy drawing_rel xmls.
-                await Promise.all(copyDrawingFilesMulti(k, chartSheetsMap, outputFolder, dumpFolderSource, drawingLookup, overrides)) //copy drawing xmls
+                await Promise.all(copyDrawingRelationFilesMulti(k, chartSheetsMap, outputFolder, sourceFolder, drawingLookup, chartIterator, chartNameLookup)) //copy drawing_rel xmls.
+                await Promise.all(copyDrawingFilesMulti(k, chartSheetsMap, outputFolder, sourceFolder, drawingLookup, overrides)) //copy drawing xmls
                 //chart functions && rename formula sheet refs.
-                await copyChartFilesMulti(k, chartSheetsMap, outputFolder, dumpFolderSource, chartNameLookup, overrides, sourceWorksheets) //copy chart, style, colors, _rel xmls for charts
-
+                await copyChartFilesMulti(k, chartSheetsMap, outputFolder, sourceFolder, chartNameLookup, overrides, sourceWorksheets, definedNames) //copy chart, style, colors, _rel xmls for charts
                 res(true)
             })
         })
 
-        Promise.all(actionChainList).then(() => {
+        Promise.all(actionChainList).then(async () => {
+            await writeNewDefineNames(definedNames, outputFolder, sourceFolder)
             writeNewOverrides(overrides, outputFolder)
             const zip = new AdmZip();
             const outputFilename = outputFolder.replace('output/', 'final.xlsx')
