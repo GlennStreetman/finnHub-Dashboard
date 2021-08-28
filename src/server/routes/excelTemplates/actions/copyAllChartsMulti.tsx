@@ -4,6 +4,7 @@ import xml2js from 'xml2js';
 import fs from 'fs';
 import util from 'util'
 import { chartSheetObj } from '../runTemplate'
+import { templateData } from './buildTemplateData.js'
 
 const copyFilePromise = util.promisify(fs.copyFile);
 
@@ -185,6 +186,7 @@ const copyChartFilesMulti =
         overrides,
         sourceWorksheets: string[], //list of all worksheets in original template
         definedNames, //defineName tags in workbook.xml that corrospond to some char types that use cx:f tags. cx:f tags denote a names range.
+        templateData: templateData, //
     ) => {
 
         return new Promise((resolve, reject) => { //for each output worksheet that contains a chart.
@@ -227,7 +229,22 @@ const copyChartFilesMulti =
                         let copyChartXML = fs.readFileSync(chartSources.chartSource, { encoding: 'utf-8' }) //read chart source file.
                         copyList.push(new Promise((resolve, reject) => { //update chart formula references.
 
-                            sourceWorksheets.forEach((alias => { //for each source worksheet, replace worksheet alias reference, in excel formulas, with updated worksheet alias.
+                            sourceWorksheets.forEach((alias => {
+                                const regexString = `${alias}!\\$[A-Z]{1,3}\\$[0-9]{1,7}:\\$[A-Z]{1,3}\\$[0-9]{1,7}` //any excel formula that matches alias string with single quotes around sheet alias.
+                                const stringFinder = new RegExp(regexString, 'g')
+                                const matchList = [...new Set(copyChartXML.match(stringFinder))]
+                                if (matchList.length > 0) matchList.forEach((el) => {
+                                    //for each unique matching string replace that matching string with a array reference that ends at last cell from time series data. 
+                                    let startRow = el.slice(0, el.lastIndexOf(':'))
+                                    startRow = startRow.slice(startRow.lastIndexOf('$') + 1, startRow.length)
+                                    const endRow = parseInt(startRow) + parseInt(templateData[alias][startRow].writeRows) - 1
+                                    const replaceString = el.slice(0, el.lastIndexOf('$')) + '$' + endRow
+                                    copyChartXML = copyChartXML.replace(el, replaceString)
+                                })
+                            }))
+
+                            sourceWorksheets.forEach((alias => {//for each source worksheet 
+                                //replace worksheet alias reference, in excel formulas, with updated worksheet alias.
                                 const formatALias = "'" + alias + "'!"
                                 const regCheck = new RegExp(`${formatALias}`, 'g')
                                 copyChartXML = copyChartXML.replace(regCheck, `'${alias}-${suffix}'!`)
@@ -236,7 +253,8 @@ const copyChartFilesMulti =
                                 copyChartXML = copyChartXML.replace(regCheck2, `'${alias}-${suffix}'!`)
                             }))
 
-                            definedNames.addNewSourceNameTag(copyChartXML, suffix, `${outputFolder}/xl/charts/${chartNamePrefix}${chartref}.xml`) //updates xml defineName ref, if it exists.
+                            definedNames.addNewSourceNameTag(copyChartXML, suffix, `${outputFolder}/xl/charts/${chartNamePrefix}${chartref}.xml`, templateData) //updates xml defineName ref, if it exists.
+                            console.log('SOURCE NAME TAG ADDED')
                             resolve(true)
                         }))
 
@@ -295,11 +313,13 @@ const writeNewOverrides = (overrides, outputFolder: string) => {
 }
 
 export const copyAllChartsMulti = async function (
-    targetFile: string,
-    sourceFolder: string,
-    outputFolder: string,
-    chartSheetsMap: chartSheetObj,
-    sourceWorksheets: string[]): Promise<string> {
+    targetFile: string, //target output folder
+    sourceFolder: string, //source file folder
+    outputFolder: string, //output file folder.
+    chartSheetsMap: chartSheetObj, //see chartSheetObj interface. Map of relationships between charts xml files and sheets.
+    sourceWorksheets: string[], //list of source sheet aliases.
+    templateData: templateData,
+): Promise<string> {
 
     return new Promise(async (resolve, reject) => {
 
@@ -330,18 +350,29 @@ export const copyAllChartsMulti = async function (
             sourceNames: definedNamesSource, //list of source worksheet aliases.
             newChartDefineNameXMLTags: [], //list of xml tags that need to be added to the defined names section of worksheetXML.
             newSourceNameIterator: 1,
-            addNewSourceNameTag: function (copyChartXML, suffix, outputURL) { //takes xml string representation of chart. Updates XML define name refs & updates NewSourceNameXMLTags
-                // console.log('---ADDNEWSOURCENAMETAGE----', outputURL)
+            addNewSourceNameTag: function (copyChartXML, suffix, outputURL, templateData) { //takes xml string representation of chart. Updates XML define name refs & updates NewSourceNameXMLTags
                 Object.keys(this.sourceNames).forEach((name) => { //for each source chart name, replace sourcename with updated output name.
                     if (copyChartXML.includes(name)) {
                         const newSourceName = '_xlchart.v1.' + this.newSourceNameIterator
-                        const regReplaceName = new RegExp(`${name}`, 'g')
-                        copyChartXML = copyChartXML.replace(regReplaceName, newSourceName) //replace old defineName ref in chart.xml
+                        const newSourceNameTag = '>_xlchart.v1.' + this.newSourceNameIterator + '<'
+                        const regReplaceName = new RegExp(`>${name}<`, 'g')
+                        copyChartXML = copyChartXML.replace(regReplaceName, newSourceNameTag) //replace old defineName ref in chart.xml
                         const updateXMLTag = produce(this.sourceNames[name], (draftState) => {  //update $name and _
                             draftState['$'].name = newSourceName //update name ref
                             sourceWorksheets.forEach((ws) => { //update '_' sheet ref.
                                 if (draftState['_'].includes(`${ws}!`)) {
-                                    draftState['_'] = draftState['_'].replace(ws, `'${ws}-${suffix}'`)
+                                    if (draftState['_'].indexOf(':') < 1) { //column reference
+                                        draftState['_'] = draftState['_'].replace(ws, `'${ws}-${suffix}'`)
+                                    } else { //array reference
+                                        let el = draftState['_']
+                                        const alias = el.slice(0, el.indexOf('!'))
+                                        let startRow = el.slice(0, el.lastIndexOf(':'))
+                                        startRow = startRow.slice(startRow.lastIndexOf('$') + 1, startRow.length)
+                                        const endRow = parseInt(startRow) + parseInt(templateData[alias][startRow].writeRows) - 1
+                                        const replaceString = el.slice(0, el.lastIndexOf('$')) + '$' + endRow
+                                        el = el.replace(el, replaceString)
+                                        draftState['_'] = el.replace(ws, `'${ws}-${suffix}'`) //update ws name to new alias.
+                                    }
                                 }
                             })
                         })
@@ -366,7 +397,8 @@ export const copyAllChartsMulti = async function (
                 await Promise.all(copyDrawingRelationFilesMulti(k, chartSheetsMap, outputFolder, sourceFolder, drawingLookup, chartIterator, chartNameLookup)) //copy drawing_rel xmls.
                 await Promise.all(copyDrawingFilesMulti(k, chartSheetsMap, outputFolder, sourceFolder, drawingLookup, overrides)) //copy drawing xmls
                 //chart functions && rename formula sheet refs.
-                await copyChartFilesMulti(k, chartSheetsMap, outputFolder, sourceFolder, chartNameLookup, overrides, sourceWorksheets, definedNames) //copy chart, style, colors, _rel xmls for charts
+                await copyChartFilesMulti(k, chartSheetsMap, outputFolder, sourceFolder, chartNameLookup, overrides, sourceWorksheets, definedNames, templateData) //copy chart, style, colors, _rel xmls for charts
+                console.log('Done with action chain list.')
                 res(true)
             })
         })

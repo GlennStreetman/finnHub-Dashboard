@@ -26,13 +26,13 @@ async function buildTemplateData(promiseData: processedPromiseData, workBookPath
     wb.eachSheet((worksheet) => { //for each worksheet not named Query.
         if (worksheet.name !== 'Query') {
             templateData[worksheet.name] = { sheetKeys: new Set() } //sheet keys used in case data points need to be split into multiple worksheets.
-            worksheet.eachRow((row, rowNumber) => {
+            worksheet.eachRow((row, rowNumber) => { //for each row in sheet.
                 const thisRow = {
                     data: {},
                     writeRows: 0, //if zero skip in later steps. Used for inserting new rows if greater than 1.
                     keyColumns: {}, //list of columns where key needs to be updated.
                 }
-                for (const x in row.values) {
+                for (const x in row.values) { //for each value in row.
                     if (typeof row?.values?.[x] === 'string' && row?.values?.[x]?.slice(0, 2) === '&=') { //if template formula detected.
                         const searchStringRaw = row.values[x]
                         const searchString = searchStringRaw.slice(2, searchStringRaw.length)
@@ -41,7 +41,8 @@ async function buildTemplateData(promiseData: processedPromiseData, workBookPath
                             for (const s in dataObj) {
                                 templateData[worksheet.name]['sheetKeys'].add(s)
                                 if (typeof dataObj[s] === 'object') { //count number of rows if time series data in dataset.
-                                    thisRow.writeRows = thisRow.writeRows + Object.keys(dataObj[s]).length
+                                    // thisRow.writeRows = thisRow.writeRows + Object.keys(dataObj[s]).length
+                                    if (Object.keys(dataObj[s]).length > thisRow.writeRows) thisRow.writeRows = Object.keys(dataObj[s]).length
                                 }
                             }
                             if (Object.keys(dataObj).length > thisRow.writeRows) { thisRow.writeRows = Object.keys(dataObj).length }

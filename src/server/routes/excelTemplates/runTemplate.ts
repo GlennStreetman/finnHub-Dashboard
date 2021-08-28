@@ -53,8 +53,7 @@ interface sheetObj { //1 sheet 1 drawing xml, but 1 or many chart/color/style xm
     worksheet_relsSource: string //drawing tag in worksheet xml is standard <drawing r:id="rId1"/> 1 tag for each _rel <Relationship/> added to end of xml. Target= needs to match new drawing source.
     worksheetTag: string
     drawingSource: string
-    drawing_relsSource: drawingRelsListObj //drawing rel file cane have 1 or many relationshiups. KEY should automatical match source id after copy. Target tag needs to match new chart tag.
-
+    drawing_relsSource: drawingRelsListObj //drawing rel file can have 1 or many relationshiups. KEY should automatical match source id after copy. Target tag needs to match new chart tag.
 }
 
 export interface chartSheetObj { //key is sheet. 1 sheet, 0 or 1 drawing file.
@@ -99,7 +98,6 @@ router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user
             const zip = new AdmZip(workBookPath)
             zip.extractAllTo(dumpFolderSource, true) //unzip excel template file to dump folder.
             let filenames = fs.readdirSync(`${dumpFolderSource}/xl/worksheets/`);
-            console.log('filenames', filenames)
             filenames.forEach((fileName) => { //for each worksheet in worksheet dir.
                 const fileNamePath = `${dumpFolderSource}/xl/worksheets/${fileName}`
                 if (fs.existsSync(fileNamePath) && fs.lstatSync(fileNamePath).isDirectory() === false) { //with file extension, not path.
@@ -118,6 +116,7 @@ router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user
                     return processPromiseData(res)
                 })
             const templateData: templateData = await buildTemplateData(promiseData, workBookPath) //reads template file, returns {source:{write rows, outputSheets}}
+            console.log('templateData', templateData)
             const sourceWorksheets: string[] = Object.keys(templateData) //list of source worksheets
             const workbook = new Excel.Workbook() //file description, used to create return excel file.
             await workbook.xlsx.readFile(workBookPath)
@@ -144,7 +143,7 @@ router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user
 
             const outputFile = multiSheet !== `true` ?
                 await copyAllChartsSingle(tempFile, dumpFolderSource, dumpFolderOutput, chartSheetsMap) :
-                await copyAllChartsMulti(tempFile, dumpFolderSource, dumpFolderOutput, chartSheetsMap, sourceWorksheets)
+                await copyAllChartsMulti(tempFile, dumpFolderSource, dumpFolderOutput, chartSheetsMap, sourceWorksheets, templateData)
             console.log('Sending output file')
             res.status(200).sendFile(outputFile, () => {
                 fs.unlinkSync(tempFile)
