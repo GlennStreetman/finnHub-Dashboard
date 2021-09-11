@@ -17,9 +17,6 @@ import { writeTimeSeriesSheetSingle } from './actions/writeTimeSeriesSheetSingle
 import { writeTimeSeriesSheetMulti } from './actions/writeTimeSeriesSheetMulti.js'
 import { dataPointSheetSingle } from './actions/dataPointSingle.js'
 import { dataPointSheetMulti } from './actions/dataPointSheetMulti.js'
-// import { createChartSheetObj } from './actions/createChartSheetObj.js'
-// import { copyAllChartsSingle } from './actions/copyAllChartsSingle.js'
-// import { copyAllChartsMulti } from './actions/copyAllChartsMulti.js'
 import copyCharts from './actions/copyCharts.js'
 
 
@@ -116,8 +113,8 @@ router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user
             if (deleteSheet.id) workbook.removeWorksheet(deleteSheet.id)
 
             await workbook.xlsx.writeFile(tempFile) //source temp file.
-
-            const outputFileName = await copyCharts(templateData, workBookPath, tempFile, dumpFolder, tempFolder, trimFileName)
+            console.log('copying charts')
+            const outputFileName = await copyCharts(templateData, workBookPath, tempFile, dumpFolder, tempFolder, trimFileName, multiSheet)
 
             console.log('Sending output file')
             res.status(200).sendFile(outputFileName, () => {

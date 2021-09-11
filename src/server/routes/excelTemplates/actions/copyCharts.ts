@@ -22,7 +22,9 @@ function replaceWorksheetAlias(worksheetList: string[], excelCellRef: string, ou
     return newCellRef
 }
 
-export default async function copyCharts(templateData: templateData, fromFile: string, toFile: string, xmlFolder: string, tempFolder: string, outputFileName: string) {
+export default async function copyCharts(templateData: templateData, fromFile: string, toFile: string, xmlFolder: string, tempFolder: string, outputFileName: string, multiSheet: string) {
+
+    console.log('---FINAL---', fromFile, toFile, xmlFolder, tempFolder)
 
     try {
 
@@ -31,47 +33,78 @@ export default async function copyCharts(templateData: templateData, fromFile: s
         const source = await readCharts(fromFile, `${xmlFolder}`)
         const output = await readCharts(toFile, `${xmlFolder}`)
 
-        console.log('done reading charts')
+        if (multiSheet === 'true') {
 
-        // Object.keys(templateData).forEach((sourceWorksheet) => { //for each source worksheet
-        for (const sourceWorksheet of Object.keys(templateData)) {
-            // console.log('WORKSHEET', sourceWorksheet)
-            const outputSheets: string[] | undefined = templateData?.[sourceWorksheet]?.sheetKeys ? [...templateData[sourceWorksheet].sheetKeys] : undefined
+            for (const sourceWorksheet of Object.keys(templateData)) { //for each worksheet
+                console.log('SHEET KEYS', [...templateData[sourceWorksheet].sheetKeys])
+                const outputSheets: string[] | undefined = templateData?.[sourceWorksheet]?.sheetKeys ? [...templateData[sourceWorksheet].sheetKeys] : undefined
 
-            // if (outputSheets) outputSheets.forEach((outputWorksheetRef) => { //for sheet created from source worksheet.
-            if (outputSheets) for (const outputWorksheetRef of outputSheets) {
-                const outputWorksheetAlias = `${sourceWorksheet}-${outputWorksheetRef}`
+                if (outputSheets) for (const outputWorksheetRef of outputSheets) { // for each associated output sheet.
+                    const outputWorksheetAlias = `${sourceWorksheet}-${outputWorksheetRef}`
 
-                // if (source.summary()?.[sourceWorksheet]) Object.entries(source.summary()[sourceWorksheet]).forEach(async ([chart, refs]) => { // for each chart in worksheet
+                    const worksheetSummaryItems = Object.entries(source.summary()[sourceWorksheet])
+                    if (worksheetSummaryItems) for (const x of worksheetSummaryItems) { // for each chart in worksheet
+
+                        const chart = x[0]
+
+                        const replaceCellRefs = source.summary()[sourceWorksheet][chart].reduce((acc, ref) => {
+                            return { ...acc, [ref]: replaceWorksheetAlias(Object.keys(templateData), ref, outputWorksheetRef) }
+                        }, {})
+
+                        console.log('copy chart -->', outputWorksheetAlias, chart, replaceCellRefs)
+
+                        await copyChart(
+                            source,
+                            output,
+                            sourceWorksheet,
+                            chart,
+                            outputWorksheetAlias,
+                            replaceCellRefs,
+                        )
+
+                        console.log('finish copy chart', outputWorksheetAlias, chart)
+                    }
+                }
+            }
+        } else {
+            console.log('processing single')
+            for (const sourceWorksheet of Object.keys(templateData)) { //for each worksheet
+                // console.log('SHEET KEYS', [...templateData[sourceWorksheet].sheetKeys])
+                // const outputSheets: string[] | undefined = templateData?.[sourceWorksheet]?.sheetKeys ? [...templateData[sourceWorksheet].sheetKeys] : undefined
+
+                // if (outputSheets) for (const outputWorksheetRef of outputSheets) { // for each associated output sheet.
+                //     const outputWorksheetAlias = `${sourceWorksheet}-${outputWorksheetRef}`
+
                 const worksheetSummaryItems = Object.entries(source.summary()[sourceWorksheet])
                 if (worksheetSummaryItems) for (const x of worksheetSummaryItems) { // for each chart in worksheet
 
                     const chart = x[0]
-                    // const refs = x[0]
-
+                    // console.log('copyChart', chart)
                     const replaceCellRefs = source.summary()[sourceWorksheet][chart].reduce((acc, ref) => {
-                        return { ...acc, [ref]: replaceWorksheetAlias(Object.keys(templateData), ref, outputWorksheetRef) }
+                        return { ...acc, [ref]: ref }
                     }, {})
 
-                    console.log('copy chart', outputWorksheetAlias, chart)
+                    console.log('copy chart single -->', chart, replaceCellRefs)
 
                     await copyChart(
                         source,
                         output,
                         sourceWorksheet,
                         chart,
-                        outputWorksheetAlias,
+                        sourceWorksheet,
                         replaceCellRefs,
                     )
 
-                    console.log('finish copy chart', outputWorksheetAlias, chart)
+                    console.log('finish copy chart single', sourceWorksheet, chart)
                 }
+                // }
             }
+
         }
-        // console.log('FINALIZING', output, output.summary())
-        const tempFileName = `${tempFolder}testFinal${Date.now() / 1000}.xlsx`
+
+        const tempFileName = `${tempFolder}${outputFileName}${Date.now() / 1000}.xlsx`
         await writeCharts(output, tempFileName)
-        // console.log('done writing: ', tempFileName)
+
         return tempFileName
     } catch (error) {
         console.log('CopyCharts.ts - Problem copying charts: ', error)
