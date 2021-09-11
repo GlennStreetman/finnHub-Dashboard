@@ -3,7 +3,7 @@ import appRootPath from 'app-root-path'
 import fs from 'fs';
 import format from "pg-format";
 import Excel from 'exceljs';
-import AdmZip from 'adm-zip';
+// import AdmZip from 'adm-zip';
 import dbLive from "../../db/databaseLive.js"
 import devDB from "../../db/databaseLocalPG.js"
 
@@ -17,9 +17,11 @@ import { writeTimeSeriesSheetSingle } from './actions/writeTimeSeriesSheetSingle
 import { writeTimeSeriesSheetMulti } from './actions/writeTimeSeriesSheetMulti.js'
 import { dataPointSheetSingle } from './actions/dataPointSingle.js'
 import { dataPointSheetMulti } from './actions/dataPointSheetMulti.js'
-import { createChartSheetObj } from './actions/createChartSheetObj.js'
-import { copyAllChartsSingle } from './actions/copyAllChartsSingle.js'
-import { copyAllChartsMulti } from './actions/copyAllChartsMulti.js'
+// import { createChartSheetObj } from './actions/createChartSheetObj.js'
+// import { copyAllChartsSingle } from './actions/copyAllChartsSingle.js'
+// import { copyAllChartsMulti } from './actions/copyAllChartsMulti.js'
+import copyCharts from './actions/copyCharts.js'
+
 
 const db = process.env.live === "1" ? dbLive : devDB;
 
@@ -72,43 +74,18 @@ router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user
     const userRows = await db.query(findUser)
     const user = userRows?.rows?.[0]?.id
     const workBookPath = `${appRootPath}/uploads/${user}/${req.query.template}` //path for template.
-    const uploadsFolder = `${appRootPath}/uploads/`
-    const tempFolder = `${appRootPath}/uploads/${user}/`
     const dumpFolder = `${appRootPath}/uploads/${user}/dump`
-    const dumpFolderSource = `${appRootPath}/uploads/${user}/dump/source/`
-    const dumpFolderOutput = `${appRootPath}/uploads/${user}/dump/output/`
-    const tempPath = `${appRootPath}/uploads/${user}/temp/`
+    const tempFolder = `${appRootPath}/uploads/${user}/temp/`
     const trimFileName = req.query.template.slice(0, req.query.template.indexOf('.xls'))
     const tempFile = `${appRootPath}/uploads/${user}/temp/${trimFileName}${Date.now()}.xlsx` //path for output file.
 
-    //make any needed directories in temp folder for user.
-    makeTempDir(uploadsFolder)
-    makeTempDir(tempFolder)
-    makeTempDir(dumpFolder)
-    fs.rmdirSync(dumpFolderSource, { recursive: true });
-    fs.rmdirSync(dumpFolderOutput, { recursive: true });
-    makeTempDir(dumpFolderSource)
-    makeTempDir(dumpFolderOutput)
-    makeTempDir(tempPath)
+    if (!fs.existsSync(dumpFolder)) makeTempDir(dumpFolder) //location of xmls.
+    if (!fs.existsSync(tempFolder)) makeTempDir(tempFolder) //location of output worksheets.
 
     try { //begin running template request.
         if (fs.existsSync(workBookPath)) { //if template name provided by get requests exists
-            // //create list of source charts.
+
             const chartSheetsMap: chartSheetObj = {}
-            const zip = new AdmZip(workBookPath)
-            zip.extractAllTo(dumpFolderSource, true) //unzip excel template file to dump folder.
-            let filenames = fs.readdirSync(`${dumpFolderSource}/xl/worksheets/`);
-            filenames.forEach((fileName) => { //for each worksheet in worksheet dir.
-                const fileNamePath = `${dumpFolderSource}/xl/worksheets/${fileName}`
-                if (fs.existsSync(fileNamePath) && fs.lstatSync(fileNamePath).isDirectory() === false) { //with file extension, not path.
-                    const thisWorksheetText = fs.readFileSync(fileNamePath, { encoding: 'utf-8' })
-                    if (thisWorksheetText.includes('<drawing')) { //If worksheet includes a <drawing /> tag then it has charts.
-                        const workbookXML_rels = fs.readFileSync(`${dumpFolderSource}/xl/_rels/workbook.xml.rels`, { encoding: 'utf-8' })
-                        const wookbookXML = fs.readFileSync(`${dumpFolderSource}/xl/workbook.xml`, { encoding: 'utf-8' })
-                        createChartSheetObj(fileName, workbookXML_rels, wookbookXML, chartSheetsMap, dumpFolderSource) //
-                    }
-                }
-            });
 
             const promiseList = await buildQueryList(workBookPath) //List of promises built from excel templates query sheet
             const promiseData = await Promise.all(promiseList)  //after promises run process promise data {keys: [], data: {}} FROM mongoDB
@@ -116,8 +93,7 @@ router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user
                     return processPromiseData(res)
                 })
             const templateData: templateData = await buildTemplateData(promiseData, workBookPath) //reads template file, returns {source:{write rows, outputSheets}}
-            console.log('templateData', templateData)
-            const sourceWorksheets: string[] = Object.keys(templateData) //list of source worksheets
+            // console.log('templateData', templateData)
             const workbook = new Excel.Workbook() //file description, used to create return excel file.
             await workbook.xlsx.readFile(workBookPath)
 
@@ -139,14 +115,14 @@ router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user
             const deleteSheet = workbook.getWorksheet('Query') ? workbook.getWorksheet('Query') : workbook.getWorksheet('query')
             if (deleteSheet.id) workbook.removeWorksheet(deleteSheet.id)
 
-            await workbook.xlsx.writeFile(tempFile)
+            await workbook.xlsx.writeFile(tempFile) //source temp file.
 
-            const outputFile = multiSheet !== `true` ?
-                await copyAllChartsSingle(tempFile, dumpFolderSource, dumpFolderOutput, chartSheetsMap) :
-                await copyAllChartsMulti(tempFile, dumpFolderSource, dumpFolderOutput, chartSheetsMap, sourceWorksheets, templateData)
+            const outputFileName = await copyCharts(templateData, workBookPath, tempFile, dumpFolder, tempFolder, trimFileName)
+
             console.log('Sending output file')
-            res.status(200).sendFile(outputFile, () => {
-                fs.unlinkSync(tempFile)
+            res.status(200).sendFile(outputFileName, () => {
+                // fs.unlinkSync(tempFile)
+
             })
 
         }
@@ -155,6 +131,5 @@ router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user
         res.status(400).json({ message: "Error running excel template" }, error)
     }
 })
-
 
 export default router

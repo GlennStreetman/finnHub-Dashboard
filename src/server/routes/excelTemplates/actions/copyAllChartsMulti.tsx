@@ -163,14 +163,8 @@ const copyDrawingFilesMulti = (
             const copyFileName = chartSheetsMap[worksheetName].drawingSource.replace(`${dumpFolderSource}xl/drawings/`, '')
             const relsPath = chartSheetsMap[worksheetName].drawingSource.replace(copyFileName, '')
             overrides.addOverride(copyFileName.replace('.xml', ''), drawingLookupName)
-            fs.copyFile(`${relsPath}/${copyFileName}`, `${outputFolder}/xl/drawings/${drawingLookupName}.xml`, (err) => {
-                if (err) {
-                    console.log(err)
-                    reject(err)
-                } else {
-                }
-                resolve(true)
-            })
+            fs.copyFileSync(`${relsPath}/${copyFileName}`, `${outputFolder}/xl/drawings/${drawingLookupName}.xml`)
+            resolve(true)
         }))
     }
     return returnList
@@ -320,6 +314,8 @@ export const copyAllChartsMulti = async function (
     sourceWorksheets: string[], //list of source sheet aliases.
     templateData: templateData,
 ): Promise<string> {
+
+    console.log('chartSheetMap', util.inspect(chartSheetsMap, false, null, true /* enable colors */))
 
     return new Promise(async (resolve, reject) => {
 

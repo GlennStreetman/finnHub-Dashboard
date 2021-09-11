@@ -19,6 +19,7 @@
     "canvasjs": "^1.8.3",
     "concurrently": "^6.0.0",
     "cookie-parser": "^1.4.5",
+    "copy-excel-chart": "^1.0.15",
     "copyfiles": "^2.4.1",
     "cors": "^2.8.5",
     "crypto-random-string": "^3.3.1",
