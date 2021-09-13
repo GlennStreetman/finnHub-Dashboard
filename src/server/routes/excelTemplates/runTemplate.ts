@@ -19,6 +19,8 @@ import { dataPointSheetSingle } from './actions/dataPointSingle.js'
 import { dataPointSheetMulti } from './actions/dataPointSheetMulti.js'
 import copyCharts from './actions/copyCharts.js'
 
+import util from 'util'
+
 
 const db = process.env.live === "1" ? dbLive : devDB;
 
@@ -90,11 +92,13 @@ router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user
                     return processPromiseData(res)
                 })
             const templateData: templateData = await buildTemplateData(promiseData, workBookPath) //reads template file, returns {source:{write rows, outputSheets}}
+
+            // console.log('templateData: ', util.inspect(templateData, { showHidden: false, depth: null, colors: true }))
             // console.log('templateData', templateData)
             const workbook = new Excel.Workbook() //file description, used to create return excel file.
             await workbook.xlsx.readFile(workBookPath)
 
-            for (const dataNode in templateData) { //for each worksheet
+            for (const dataNode in templateData) { //for each entry
                 const worksheet = workbook.getWorksheet(dataNode)
                 let timeSeriesFlag: boolean = checkTimeSeriesStatus(worksheet, promiseData)  //Checks worksheet to see if it contains time series data. Returns 1 if time series found.
                 if (timeSeriesFlag === true) {
@@ -113,10 +117,8 @@ router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user
             if (deleteSheet.id) workbook.removeWorksheet(deleteSheet.id)
 
             await workbook.xlsx.writeFile(tempFile) //source temp file.
-            console.log('copying charts')
             const outputFileName = await copyCharts(templateData, workBookPath, tempFile, dumpFolder, tempFolder, trimFileName, multiSheet)
 
-            console.log('Sending output file')
             res.status(200).sendFile(outputFileName, () => {
                 // fs.unlinkSync(tempFile)
 

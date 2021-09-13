@@ -3,32 +3,24 @@ import { printTemplateWorksheets } from './printTemplateWorksheets.js'
 import { chartSheetObj } from './../runTemplate'
 
 export const dataPointSheetMulti = function (workbook, worksheet, dataNode, templateData: templateData, chartSheets: chartSheetObj) {
-    // console.log('---PROCESSING MULTI---', templateData[dataNode])
+
     let rowIterator = 0 //if multiSheet = 'false: add 1 for each line written so that writer doesnt fall out of sync with file.
     printTemplateWorksheets(workbook, dataNode, templateData[dataNode].sheetKeys, worksheet, chartSheets) //create new worksheets for each security
     const templateWorksheet = templateData[dataNode]
-    for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will almost always add rows to return file.
-        const dataRow = templateWorksheet[row].data //list of rows to be updated from template file. 
-        const writeRows = templateWorksheet[row].writeRows //used to create range of rows we need to  update.
-        const keyColumns = templateWorksheet[row].keyColumns //list of key columns for each row. {...integers: integer}
-        let currentKey = '' //the current security key
-        for (let step = 1; step <= writeRows; step++) { //iterate over new rows that data will populate into
-            for (const updateCell in dataRow) { //{...rowInteger: {...security || key Integer: value || timeSeries{}}}
-                if (keyColumns[updateCell]) {
-                    currentKey = dataRow?.[updateCell]?.[step - 1]
-                    const thisWorkSheet = workbook.getWorksheet(`${dataNode}-${currentKey}`)
-                    if (dataRow[updateCell][step - 1] && typeof dataRow[updateCell][step - 1] === 'string') {
-                        thisWorkSheet.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][step - 1]
-                        // console.log('Key', parseInt(row), 'Cell', parseInt(updateCell), dataRow[updateCell][step - 1])
-                    }
-                } else { //update data point cells.
-                    const thisWorkSheet = workbook.getWorksheet(`${dataNode}-${currentKey}`)
-                    if (thisWorkSheet !== undefined) thisWorkSheet.getRow(parseInt(row) + rowIterator).getCell(parseInt(updateCell)).value = dataRow[updateCell][currentKey]
-                    // console.log('Row', parseInt(row), 'Cell', parseInt(updateCell), dataRow[updateCell][currentKey])
+    const sheetKeys = templateWorksheet.sheetKeys
+    for (const sheetKey of sheetKeys) { //for each security
+        const thisWorkSheet = workbook.getWorksheet(`${dataNode}-${sheetKey}`) //get the worksheet to be updated.
+        for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will almost always add rows to return file.
+            const keyColumns = templateWorksheet[row].keyColumns
+            if (templateWorksheet[row].data) { //if data is present its the skeet keys entry.
+                for (const dataPoint in templateWorksheet[row].data) {
+                    const point = templateWorksheet[row].data[dataPoint]
+                    const findData = keyColumns[`${dataPoint}`] ? sheetKey : point[sheetKey] //if key column, return key, else return data.
+                    thisWorkSheet.getRow(parseInt(row) + rowIterator).getCell(parseInt(dataPoint)).value = findData
+                    worksheet.getRow(row + rowIterator).commit()
                 }
             }
-            worksheet.getRow(row + rowIterator).commit()
         }
     }
-    workbook.removeWorksheet(worksheet.id)
+    workbook.removeWorksheet(worksheet.id) //remove the source worksheet
 }

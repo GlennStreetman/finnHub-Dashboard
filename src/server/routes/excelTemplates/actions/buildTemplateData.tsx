@@ -5,7 +5,7 @@ import { processedPromiseData } from './processPromiseData.js'
 
 interface thisRow {
     data: Object,
-    writeRows: number,
+    writeRows: { [key: string]: number }, //key is security id. number is row counts
     keyColumns: Object
 }
 
@@ -29,7 +29,7 @@ async function buildTemplateData(promiseData: processedPromiseData, workBookPath
             worksheet.eachRow((row, rowNumber) => { //for each row in sheet.
                 const thisRow = {
                     data: {},
-                    writeRows: 0, //if zero skip in later steps. Used for inserting new rows if greater than 1.
+                    writeRows: {}, //if zero skip in later steps. Used for inserting new rows if greater than 1.
                     keyColumns: {}, //list of columns where key needs to be updated.
                 }
                 for (const x in row.values) { //for each value in row.
@@ -38,11 +38,11 @@ async function buildTemplateData(promiseData: processedPromiseData, workBookPath
                         const searchString = searchStringRaw.slice(2, searchStringRaw.length)
                         if (searchString !== 'keys.keys') { //if data column
                             const dataObj = getDataSlice(promiseData, searchString) //could {key: string} pairs OR {key: OBJECT} pairs
-                            for (const s in dataObj) {
-                                templateData[worksheet.name]['sheetKeys'].add(s)
-                                if (typeof dataObj[s] === 'object') { //count number of rows if time series data in dataset.
-                                    // thisRow.writeRows = thisRow.writeRows + Object.keys(dataObj[s]).length
-                                    if (Object.keys(dataObj[s]).length > thisRow.writeRows) thisRow.writeRows = Object.keys(dataObj[s]).length
+                            for (const security in dataObj) {
+                                templateData[worksheet.name]['sheetKeys'].add(security)
+                                if (typeof dataObj[security] === 'object') { //count number of rows if time series data in dataset.
+                                    // if (Object.keys(dataObj[security]).length > thisRow.writeRows) thisRow.writeRows = Object.keys(dataObj[s]).length
+                                    thisRow.writeRows[security] = Object.keys(dataObj[security]).length ? Object.keys(dataObj[security]).length : 1
                                 }
                             }
                             if (Object.keys(dataObj).length > thisRow.writeRows) { thisRow.writeRows = Object.keys(dataObj).length }

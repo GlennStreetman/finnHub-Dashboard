@@ -7,7 +7,7 @@ export const writeTimeSeriesSheetSingle = function (ws, datanode, templateData: 
     const addedRows: number[] = [] //if multiSheet = 'false: list of rows added to template. Used to adjust any excel formulas as they dont auto update when adding rows.
     for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will add rows = time series count X number of securities.
         const dataRow = templateWorksheet[row].data //list of rows to be updated from template file. 
-        const writeRows = templateWorksheet[row].writeRows //used to create range of rows we need to  update.
+        const writeRows = templateWorksheet[row].writeRows && Object.entries(templateWorksheet[row].writeRows).length ? Object.entries(templateWorksheet[row].writeRows).length : 0 //used to create range of rows we need to  update.
         const keyColumns = templateWorksheet[row].keyColumns //list of key columns for each row. {...integers: integer}
         let currentKey = '' //the current security key
         let currKeyColumn = '' //ref to the source of current security key

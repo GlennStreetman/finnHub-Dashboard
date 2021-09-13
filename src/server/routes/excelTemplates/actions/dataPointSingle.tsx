@@ -10,7 +10,7 @@ export const dataPointSheetSingle = function (ws, dataNode, templateData: templa
 
     for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will almost always add rows to return file.
         const dataRow = templateWorksheet[row].data //list of rows to be updated from template file. 
-        const writeRows = templateWorksheet[row].writeRows //used to create range of rows we need to  update.
+        const writeRows = dataRow ? Object.keys(dataRow).length : 0//used to create range of rows we need to  update.
         const keyColumns = templateWorksheet[row].keyColumns //list of key columns for each row. {...integers: integer}
         let currentKey = '' //the current security key
 
