@@ -5,7 +5,7 @@ A web deployable applicaiton that allows you to quickly design and visualize you
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).  
 Backend uses [Express Server](https://expressjs.com).  
 User Login info and dashboard data is saved in a [PostgreSQL database](https://www.postgresql.org).  
-See /db/postgres_schema.sql for required database schema.  
+Required Postgres schema should auto build the first time express is launched. 
 The registration process requires that express have access to an SMTP server in order to send registration emails. Recommend Mailgun.  
 Register a [Mailgun Account](https://www.mailgun.com/) and add your apikeys to the .env setup below.
 
