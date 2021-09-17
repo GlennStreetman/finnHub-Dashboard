@@ -26,43 +26,65 @@ class AboutMenu extends React.PureComponent<aboutMenuProps2> {
                         <b>What is FinnDash:</b> An easy to use Web interface for your FinnHub.io API data. <br />
                         <b>What does finnDash Do?</b> <br />
 
-                        Rapidly design dashboards for your data, no need for any coding or command line. <br />
-                        <iframe
-                            title='iFrameDb'
-                            src="https://giphy.com/embed/CkmwigKBV1tV8YBudB"
-                            width="480"
-                            height="270"
-                            frameBorder="0"
-                            className="giphy-embed"
-                            style={{ pointerEvents: 'none' }} /><br />
+                        <table width='100%'>
+                            <thead />
+                            <tbody>
 
+                                <tr>Rapidly design dashboards for your data, no need for any coding or command line. <br /></tr>
+                                <tr>
+                                    <iframe
+                                        title='iFrameDb'
+                                        src="https://giphy.com/embed/Y5UscA4cFsO38eCH5x"
+                                        width="720"
+                                        height="405"
+                                        frameBorder="0"
+                                        className="giphy-embed"
+                                        style={{ pointerEvents: 'none' }} /><br />
 
-                        Review your data in excel with a single click.
-                        <iframe
-                            title='iFrameExcel'
-                            src="https://giphy.com/embed/L09jTt1uXWKuI5uIwq"
-                            width="480"
-                            height="270"
-                            frameBorder="0"
-                            className="giphy-embed"
-                            style={{ pointerEvents: 'none' }} />
-                        <br />
+                                </tr>
 
-                        Explore and share your Dashboard datasets using a GraphQL interface.
+                                <tr>Review your data in excel with a single click.</tr>
+                                <tr>
+                                    <iframe
+                                        title='iFrameExcel'
+                                        src="https://giphy.com/embed/L09jTt1uXWKuI5uIwq"
+                                        width="720"
+                                        height="405"
+                                        frameBorder="0"
+                                        className="giphy-embed"
+                                        style={{ pointerEvents: 'none' }} />
+                                </tr>
+                                <br />
 
-                        <iframe
-                            title='iFrameGraphQL'
-                            src="https://giphy.com/embed/O0czKGv5B8zP1to1DK"
-                            width="480"
-                            height="270"
-                            frameBorder="0"
-                            className="giphy-embed"
-                            allowFullScreen
-                            style={{ pointerEvents: 'none' }} />
-                        <br />
+                                <tr>Explore and share your Dashboard datasets using a GraphQL interface.</tr>
+                                <tr>
+                                    <iframe
+                                        title='iFrameGraphQL'
+                                        src="https://giphy.com/embed/O0czKGv5B8zP1to1DK"
+                                        width="720"
+                                        height="405"
+                                        frameBorder="0"
+                                        className="giphy-embed"
+                                        allowFullScreen
+                                        style={{ pointerEvents: 'none' }} />
+                                </tr>
+                                <br />
 
-                        Build Complex excel templates that are filled with your dashboard data.
+                                <tr>Build Complex excel templates that are filled with your dashboard data.</tr>
+                                <tr>
+                                    <iframe
+                                        title='iFrameTemplate'
+                                        src="https://giphy.com/embed/4kl7W11ntfC0qUoSWN"
+                                        width="720"
+                                        height="405"
+                                        frameBorder="0"
+                                        className="giphy-embed"
+                                        allowFullScreen
+                                        style={{ pointerEvents: 'none' }} />
+                                </tr>
 
+                            </tbody>
+                        </table>
 
                         <b>Getting Started: </b> <br />
                         {this.props.apiFlag > 0 ? (
