@@ -10,7 +10,7 @@ export const dataPointSheetMulti = function (workbook, worksheet, dataNode, temp
     const sheetKeys = templateWorksheet.sheetKeys
     for (const sheetKey of sheetKeys) { //for each security
         const thisWorkSheet = workbook.getWorksheet(`${dataNode}-${sheetKey}`) //get the worksheet to be updated.
-        for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet. This operation will almost always add rows to return file.
+        for (const row in templateWorksheet) { // for each TEMPLATE row in worksheet.
             const keyColumns = templateWorksheet[row].keyColumns
             if (templateWorksheet[row].data) { //if data is present its the skeet keys entry.
                 for (const dataPoint in templateWorksheet[row].data) {

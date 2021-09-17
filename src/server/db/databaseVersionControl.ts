@@ -56,7 +56,7 @@ const versionControl = async function () {
     const envVersion: number = parseFloat(envVersionString)
     const dbVersionString = await getVersion()
     const dbVersion = typeof dbVersionString === 'string' ? parseFloat(dbVersionString) : false
-    // console.log('HERE', envVersion, dbVersion, dbVersionString)
+    console.log('HERE', envVersion, dbVersion, dbVersionString)
     if (envVersion && envVersion === dbVersion) { //base case: DB up to date.
         console.log(`database schema up to date. v${dbVersion}`)
         return true
