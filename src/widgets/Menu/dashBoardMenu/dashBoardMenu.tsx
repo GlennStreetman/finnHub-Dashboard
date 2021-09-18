@@ -230,6 +230,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                                     value="New"
                                     onClick={() => {
                                         p.newDashBoard(inputText, p.dashBoardData);
+                                        p.rAddNewDashboard({ dashboardName: inputText })
                                     }}
                                 />
                             </td>
@@ -263,6 +264,7 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
         rebuildDashboardState: that.props.rebuildDashboardState,
         refreshFinnhubAPIDataCurrentDashboard: that.props.refreshFinnhubAPIDataCurrentDashboard,
         removeDashboardFromState: that.props.removeDashboardFromState,
+        rAddNewDashboard: that.props.rAddNewDashboard,
     };
     return propList;
 }

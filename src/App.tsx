@@ -49,7 +49,7 @@ import { rUpdateQuotePriceStream, rUpdateQuotePriceSetup } from "./slices/sliceQ
 import {
     rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus,
     sliceDataModel, rDataModelLogout, rRebuildTargetDashboardModel,
-    rRebuildTargetWidgetModel
+    rRebuildTargetWidgetModel, rAddNewDashboard
 } from "./slices/sliceDataModel";
 import { tGetFinnhubData, tgetFinnHubDataReq } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
@@ -166,6 +166,7 @@ export interface AppProps {
     rRebuildTargetWidgetModel: Function,
     rUpdateQuotePriceStream: Function,
     rUpdateQuotePriceSetup: Function,
+    rAddNewDashboard: Function,
 }
 
 export interface AppState {
@@ -543,6 +544,7 @@ class App extends React.Component<AppProps, AppState> {
                     widgetList={widgetList}
                     widgetLockDown={this.state.widgetLockDown}
                     zIndex={this.state.zIndex}
+                    rAddNewDashboard={this.props.rAddNewDashboard}
                 />
                 {loginScreen}
                 {backGroundMenu()}
@@ -573,5 +575,6 @@ export default connect(mapStateToProps, {
     rRebuildTargetWidgetModel,
     rUpdateQuotePriceStream,
     rUpdateQuotePriceSetup,
+    rAddNewDashboard
 })(App);
 

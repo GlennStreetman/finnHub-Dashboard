@@ -72,6 +72,10 @@ export interface rRemoveDashboardPayload {
     dashboardName: string,
 }
 
+export interface rAddDashboardPayload {
+    dashboardName: string,
+}
+
 export interface rRemoveWidgetDataModelPayload {
     dashboardName: string,
     widgetKey: string,
@@ -220,6 +224,11 @@ const dataModel = createSlice({
             const targetWidget = ap.widgetKey
             delete state.dataSet?.[targetDashboard]?.[targetWidget]
         },
+        rAddNewDashboard(state: sliceDataModel, action) {
+            const ap: rAddDashboardPayload = action.payload
+            const targetDashboard = ap.dashboardName
+            state.dataSet[targetDashboard] = {}
+        }
     },
     extraReducers: {
         [tGetFinnhubData.pending.toString()]: (state, action) => {
@@ -293,6 +302,7 @@ export const {
     rRemoveDashboardDataModel,
     rRemoveWidgetDataModel,
     rRebuildTargetDashboardModel,
-    rRebuildTargetWidgetModel
+    rRebuildTargetWidgetModel,
+    rAddNewDashboard
 } = dataModel.actions
 export default dataModel.reducer
