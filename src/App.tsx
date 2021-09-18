@@ -545,6 +545,7 @@ class App extends React.Component<AppProps, AppState> {
                     widgetLockDown={this.state.widgetLockDown}
                     zIndex={this.state.zIndex}
                     rAddNewDashboard={this.props.rAddNewDashboard}
+                    rSetTargetDashboard={this.props.rSetTargetDashboard}
                 />
                 {loginScreen}
                 {backGroundMenu()}

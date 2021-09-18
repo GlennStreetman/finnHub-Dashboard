@@ -42,6 +42,7 @@ function WidgetController(p){
                 getSavedDashBoards: p.getSavedDashBoards,
                 rebuildDashboardState: p.rebuildDashboardState,
                 rAddNewDashboard: p.rAddNewDashboard,
+                rSetTargetDashboard: p.rSetTargetDashboard,
             }
             if (el.widgetConfig === 'menuWidget') {
                 thisWidgetProps['menuWidgetToggle'] = p.menuWidgetToggle
