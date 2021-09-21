@@ -71,7 +71,7 @@
     "tsc": "npx tsc -p src/server/tsconfig.json",
     "tscd": "npx tsc -w -p src/server/tsconfig.json",
     "server": "nodemon --watch './src/server' --ignore sessions/ --trace-warnings --loader ts-node ./build/server/server.js",
-    "client": "SET PORT=3000 && react-scripts start",
+    "client": "set PORT=3000 && react-scripts start",
     "start": "node ./build/server/server.js",
     "build": "react-scripts build && npx tsc -p src/server/tsconfig.json && npm run copy-files",
     "heroku-postbuild": "react-scripts build && npm run tsc",
