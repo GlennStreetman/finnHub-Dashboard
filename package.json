@@ -73,7 +73,7 @@
     "server": "nodemon --watch './src/server' --ignore sessions/ --trace-warnings --loader ts-node ./build/server/server.js",
     "client": "set PORT=3000 && react-scripts start",
     "start": "node ./build/server/server.js",
-    "build": "react-scripts build && npx tsc -p src/server/tsconfig.json && npm run copy-files",
+    "build": "react-scripts build  && npm run copy-files && npx tsc -p src/server/tsconfig.json",
     "heroku-postbuild": "react-scripts build && npm run tsc",
     "eject": "react-scripts eject",
     "test": "jest --runInBand --no-cache",
