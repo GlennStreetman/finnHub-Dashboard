@@ -72,9 +72,9 @@ function WidgetContainer(p) {
     }
 
     function dragElement() {
-        const widgetState = widgetRef.current;
-        if (widgetState.state === undefined) {widgetState.state = {}}
-        widgetState.state.widgetID = p.widgetList.widgetID
+        const widgetState = widgetRef?.current ? widgetRef.current : {state: {}}
+        if (widgetState && widgetState?.state === undefined) {widgetState.state = {}}
+        if (widgetState?.state?.widgetID) widgetState.state.widgetID = p.widgetList.widgetID
         let xAxis = 0;
         let yAxis = 0;
 
