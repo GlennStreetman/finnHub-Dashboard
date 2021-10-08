@@ -255,6 +255,7 @@ export const UpdateWidgetFilters = async function (widgetID: string, data: filte
 //widget config changes how data is manipulated after being queried.
 export const updateWidgetConfig = function (widgetID: number, updateObj: config) { //replaces widget config object then saves changes to mongoDB & postgres.
     //config changes used by mongoDB during excel templating.
+    // console.log('setting up config', widgetID, updateObj)
     const s: AppState = this.state
     const updatedDashboardData: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
         const oldConfig = draftState[s.currentDashBoard].widgetlist[widgetID].config
