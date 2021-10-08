@@ -39,7 +39,8 @@ import { addSecurity } from '../../testFunctions/action_addSecurity'
 //test procedures
 import {testBodyRender} from '../../testFunctions/test_bodyRender'
 
-jest.mock('./../../../appFunctions/appImport/setupDashboard')
+// jest.mock('./../../../appFunctions/appImport/setupDashboard')
+
 //mock service worker for all http requests
 const mockHTTPServer = setupServer(
     mockExchangeData, //exchange data for TSLA and AAPL
@@ -57,6 +58,9 @@ const mockHTTPServer = setupServer(
     deleteFinnDashData_success, //delete success
     ) 
 
+const widgetType = 'EstimatesEPSSurprises'
+const body = 'EPSSurprisesBody'
+
 configure({
     getElementError: (message, container) => {
         const error = new Error(`Debug Node: ${prettyDOM(screen.getByTestId(body), 30000)} ${message}`); //Debug Node: ${prettyDOM(screen.getByTestId(body), 30000)}
@@ -65,9 +69,6 @@ configure({
         return error;
     },
 });
-
-const widgetType = 'EstimatesEPSSurprises'
-const body = 'EPSSurprisesBody'
 
 beforeAll(() => {mockHTTPServer.listen({
     onUnhandledRequest: 'warn',
