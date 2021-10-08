@@ -10,6 +10,7 @@ export interface tgetFinnHubDataReq {
     widgetList: string[],
     finnHubQueue: finnHubQueue,
     rSetUpdateStatus: Function,
+    forceUpdate?: boolean, //set to true to force update of all requests.
 }
 
 export interface resObj {
@@ -38,6 +39,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                 }
                 if (
                     (reqObj.updated === undefined) ||
+                    req.forceUpdate === true ||
                     (Date.now() - reqObj.updated >= 1 * 1000 * 60 * 60 * 3) //more than 3 hours old.
                 ) {
                     requestList.push(finnHub(finnQueue, reqObj))
@@ -46,7 +48,6 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
             }
             req.rSetUpdateStatus({ [req.targetDashBoard]: countQueue })
         }
-
         return Promise.all(requestList)
             .then((res) => {
                 const resObj: resObj = {}

@@ -5,9 +5,7 @@
 import 'whatwg-fetch';
 import React from "react";
 import '@testing-library/jest-dom/extend-expect'
-import { screen, render,  waitFor, fireEvent} from '@testing-library/react' //prettyDOM
-        // let renameList = screen.getByTestId(body)
-        // console.log(prettyDOM(renameList))
+import { screen, render,  waitFor, fireEvent, prettyDOM} from '@testing-library/react' //prettyDOM
 import { configure } from '@testing-library/react'
 
 import { setupServer } from 'msw/node'
@@ -89,7 +87,8 @@ beforeEach( async ()=>{
 })
 
 afterEach( async ()=>{
-    //unmount widget 
+    let renameList = screen.getByTestId(body)
+    // console.log(prettyDOM(renameList, 300000))
     expect(screen.getByTestId(`removeWidget-${widgetType}`)).toBeInTheDocument() 
     fireEvent.click(screen.getByTestId(`removeWidget-${widgetType}`))
     await waitFor(async () => {
@@ -98,13 +97,11 @@ afterEach( async ()=>{
 })
 
 it(`Test ${widgetType} Widget: Change focus renders body change. `, async (done) => {
-
     await testBodyRender([ //test that widget body renders api data.
         ['getByTestId', body], 
         ['getByText', '11111-CIK'], 
         ['getByText','10-KWMT']
     ]) 
-
     await setSecurityFocus(widgetType, 'US-COST') //select new target security for widget.
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText', '320193-COST'], 
@@ -125,6 +122,7 @@ it(`Test ${widgetType} Widget: Change pagination.`, async (done) => { //needs nu
         ['getByText', '11111-CIK2'], 
         ['getByText','10-KWMT2']
     ]) 
+    // let renameList = screen.getByTestId(body)
     await setSecurityFocus(widgetType, 'US-COST') //select new target security for widget.
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText', '320193-COST'], 
@@ -149,7 +147,6 @@ it(`Test ${widgetType} Widget: Toggle Button shows config screen.`, async (done)
     })
     done()
 })
-
 
 it(`Test ${widgetType} Widget: Rename widget works.`, async (done) => { 
     await toggleEditPane(widgetType) //toggle to edit pane

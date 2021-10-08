@@ -3,6 +3,8 @@ import { tSearchMongoDB, tSearchMongoDBReq } from '../../thunks/thunkSearchMongo
 import { tGetFinnhubData } from '../../thunks/thunkFetchFinnhub'
 import { finnHubQueue } from "./../../appFunctions/appImport/throttleQueueAPI"
 import { rSetUpdateStatus } from "./../../slices/sliceDataModel";
+
+import { tgetFinnHubDataReq } from './../../thunks/thunkFetchFinnhub'
 //updates widgets config.targetSecurity for any widget that uses a target security.
 export const useSearchMongoDb = function (
     currentDashBoard: string, //string name of current dashboard, not id.
@@ -21,13 +23,15 @@ export const useSearchMongoDb = function (
             const tSearchMongoDBObj: tSearchMongoDBReq = { searchList: [target], dashboardID: dashboardID }
             dispatch(tSearchMongoDB(tSearchMongoDBObj))
                 .then((res) => {
-                    if (Object.values(res.payload)[0] === '') {
-                        const payload = {
+                    if (Object.values(res.payload)[0] === '') { //if no payload returned get new finnhub data.
+
+                        const payload: tgetFinnHubDataReq = {
                             dashboardID: dashboardID,
                             targetDashBoard: currentDashBoard,
                             widgetList: [widgetKey],
                             finnHubQueue: finnHubQueue,
                             rSetUpdateStatus: rSetUpdateStatus,
+                            forceUpdate: true
                         }
                         dispatch(tGetFinnhubData(payload))
                     }

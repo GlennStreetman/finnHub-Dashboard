@@ -77,7 +77,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         keyList: string[] = Object.keys(p.trackedStocks),
         updateWidgetConfig: Function = p.updateWidgetConfig
     ) => {
-        if (p.config.targetSecurity === undefined) {
+        if (!p.config.targetSecurity) {
             const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
             updateWidgetConfig(key, {
                 targetSecurity: newSource,
@@ -91,14 +91,21 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
 
     useEffect(( //on change to pagination set config year and quarter.
         key: number = p.widgetKey,
-        updateWidgetConfig: Function = p.updateWidgetConfig
+        updateWidgetConfig: Function = p.updateWidgetConfig,
+        trackedStock = p.trackedStocks,
+        keyList: string[] = Object.keys(p.trackedStocks),
     ) => {
-        updateWidgetConfig(key, {
-            year: rShowData ? rShowData[p.config.pagination]?.year : '',
-            quarter: rShowData ? rShowData[p.config.pagination]?.quarter : '',
-            pagination: p.config.pagination ? p.config.pagination : 0
-        })
-    }, [p.updateWidgetConfig, rShowData, p.widgetKey, p.config.year, p.config.pagination])
+        const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
+        if (!p.config.quarter || p.config.year) {
+            updateWidgetConfig(key, {
+                targetSecurity: p.config.targetSecurity ? p.config.targetSecurity : newSource,
+                targetReport: p.config.targetReport ? p.config.targetReport : 'bs',
+                year: rShowData ? rShowData[p.config.pagination]?.year : '',
+                quarter: rShowData ? rShowData[p.config.pagination]?.quarter : '',
+                pagination: p.config.pagination ? p.config.pagination : 0
+            })
+        }
+    }, [p.updateWidgetConfig, rShowData, p.widgetKey, p.config.year, p.config.pagination, p.config.targetReport, p.config.targetSecurity, p.trackedStocks, p.config.quarter])
 
     function renderSearchPane() {
 
@@ -116,7 +123,14 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     function changeReportSelection(e) {
         const target = e.target.value;
         const key = `${p.widgetKey}-${p?.config?.targetSecurity}`
-        p.updateWidgetConfig(p.widgetKey, { targetReport: target })
+
+        p.updateWidgetConfig(p.widgetKey, {
+            targetSecurity: p.config.targetSecurity,
+            targetReport: target,
+            year: p.config.year,
+            quarter: p.config.quarter,
+            pagination: p.config.pagination
+        })
         const tSearchMongoDBObj: tSearchMongoDBReq = { searchList: [key], dashboardID: p.dashboardID }
         dispatch(tSearchMongoDB(tSearchMongoDBObj))
     }
@@ -125,6 +139,10 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         const target = e.target.value;
         await p.updateWidgetFilters(p.widgetKey, { frequency: target })
         p.updateWidgetConfig(p.widgetKey, {
+            targetSecurity: p.config.targetSecurity,
+            targetReport: p.config.targetReort,
+            year: p.config.year,
+            quarter: p.config.quarter,
             pagination: 0,
         })
     }
@@ -133,6 +151,8 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         const newPagination = p.config.pagination + e;
         if (newPagination > -1 && rShowData && newPagination <= Object.keys(rShowData).length - 1) {
             p.updateWidgetConfig(p.widgetKey, {
+                targetSecurity: p.config.targetSecurity,
+                targetReport: p.config.targetReport,
                 pagination: newPagination,
                 year: rShowData[newPagination]['year'],
                 quarter: rShowData[newPagination]['quarter'],

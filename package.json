@@ -76,8 +76,8 @@
     "build": "react-scripts build  && npm run copy-files && npx tsc -p src/server/tsconfig.json",
     "heroku-postbuild": "react-scripts build && npm run tsc",
     "eject": "react-scripts eject",
-    "test": "jest --runInBand --no-cache",
-    "test-f": "jest --runInBand --reporters=jest-silent-reporter"
+    "test": "jest",
+    "test-f": "jest"
   },
   "eslintConfig": {
     "extends": "react-app"

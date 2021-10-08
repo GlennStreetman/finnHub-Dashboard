@@ -176,6 +176,7 @@ export const mockFinnHubData = //MOCK API REQUEST FOR THIS WIDGET. Remember to u
     rest.get("https://finnhub.io/api/v1/stock/financials-reported*", (req, res, ctx) => {
         const symbol = req.url.searchParams.get('symbol')
         let resData = symbol === 'WMT' ? resData_WMT : resData_COST
+        // console.log('returning mocked data: ', symbol, resData)
         return res(
             ctx.status(200),
             ctx.json(resData)
@@ -218,7 +219,6 @@ export const mockExchangeData =
 
 export const getCheckLogin_success =     //auto login check rejected.
     rest.get("/checkLogin", (req, res, ctx) => {
-        // console.log('get/CheckLogin success, returning login 1')
         return res(
             ctx.status(200),
             ctx.json({
@@ -235,7 +235,6 @@ export const getCheckLogin_success =     //auto login check rejected.
 
 export const postFindMongoData_success_noData =
     rest.post("/findMongoData", (req, res, ctx) => {
-        // console.log('post/CheckLogin success, no data')
         return res(
             ctx.status(200),
             ctx.json({})
@@ -244,7 +243,6 @@ export const postFindMongoData_success_noData =
 
 export const postUpdateGQLFilters =
     rest.post("/updateGQLFilters", (req, res, ctx) => {
-        // console.log('post/CheckLogin success, no data')
         return res(
             ctx.status(200),
             ctx.json({ message: `Update filters Complete` })

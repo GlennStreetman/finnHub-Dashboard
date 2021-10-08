@@ -7,7 +7,6 @@ const testBodyRender = async function (testList: string[][]) { //list of string 
             expect(screen[testList[x][0]](testList[x][1], { exact: false })).toBeInTheDocument()
         })
     }
-    console.log('testList', testList)
     return true
 }
 
