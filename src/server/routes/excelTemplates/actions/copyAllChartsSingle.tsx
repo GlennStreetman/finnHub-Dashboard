@@ -4,7 +4,7 @@ import xml2js from 'xml2js';
 import fs from 'fs';
 import util from 'util'
 import { chartSheetObj, drawingRelsListObj } from '../runTemplate'
-import { AnyARecord } from 'node:dns';
+// import { AnyARecord } from 'node:dns';
 
 const copyWorksheetRelationFile = (worksheetName: string, chartSheetsMap: chartSheetObj, outputFolder: string, newAliasMap: { [key: string]: string }) => {
     const sourceAlias = chartSheetsMap[worksheetName].alias
@@ -92,7 +92,7 @@ const copyChartFiles = (worksheetName: string, chartSheetsMap: chartSheetObj, ou
 }
 
 const findOverrides = (dumpFolderSource) => {
-    const returnList: AnyARecord[] = []
+    const returnList: any[] = [] //AnyARecord
     const readOverrides = fs.readFileSync(`${dumpFolderSource}/[Content_Types].xml`, { encoding: 'utf-8' })
     xml2js.parseString(readOverrides, async (err, res) => {
         res.Types.Override.forEach((el) => {

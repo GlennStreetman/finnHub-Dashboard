@@ -1,7 +1,7 @@
 {
     "extends": "./../../tsconfig.json",
     "compilerOptions": {
-        "watch": true,
+        "watch": false,
         "allowSyntheticDefaultImports": true,
         "outDir": "../../build",
         "allowJs": true,

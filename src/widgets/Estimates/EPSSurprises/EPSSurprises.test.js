@@ -39,8 +39,6 @@ import { addSecurity } from '../../testFunctions/action_addSecurity'
 //test procedures
 import {testBodyRender} from '../../testFunctions/test_bodyRender'
 
-// jest.mock('./../../../appFunctions/appImport/setupDashboard')
-
 //mock service worker for all http requests
 const mockHTTPServer = setupServer(
     mockExchangeData, //exchange data for TSLA and AAPL
