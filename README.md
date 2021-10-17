@@ -22,10 +22,8 @@ pgdatabase = postgres database name
 pgport = postress server port  
 devDB = PG <--SQLite3 support depricated. Some work needed for SQL3 tag to work  
 ssl = allow  
-live = 0 or 1 (0 for development mode NPM RUN client/server, 1 for live NPM Start)  
 mongo = connection string for mongo db. ex: mongodb://localhost:27017  
-testURL = URL for dev environment. ex: http://localhost:5000  
-deployURL = URL for deployment environment. ex: https://finn-dash.herokuapp.com  
+URL = URL for dev environment. ex: http://localhost:5000  
 db_verison = 1.0  
 
 ### FOR HEROKU Hosting + Heroku Postgres addon:  
