@@ -1,16 +1,15 @@
 import express from 'express';
 import format from 'pg-format';
-import dbLive from "./../../db/databaseLive.js"
 import devDB from "./../../db/databaseLocalPG.js"
 import mGun from 'mailgun-js'
 import cryptoRandomString from 'crypto-random-string';
 
 const router = express.Router();
-const db = process.env.live === "1" ? dbLive : devDB;
+const db = devDB;
 const API_KEY = process.env.API_KEY || 1;
 const DOMAIN = process.env.DOMAIN_KEY || 1;
 const mailgun = new mGun({ apiKey: API_KEY, domain: DOMAIN });
-const URL = process.env.live === '1' ? process.env.deployURL : process.env.testURL
+const URL = process.env.testURL
 
 router.get("/forgot", (req, res, next) => {
     console.log("reseting password")

@@ -1,9 +1,8 @@
 import express from "express";  
 import format from "pg-format"; //USE FOR ALL QUERY STRING parameters. Helps prevent SQL injection.
-import dbLive from "./../db/databaseLive.js"
 import devDB from "./../db/databaseLocalPG.js"
 
-const db = process.env.live === "1" ? dbLive : devDB;
+const db =  devDB;
 
 const router = express.Router();
 

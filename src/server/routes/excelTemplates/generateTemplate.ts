@@ -3,7 +3,6 @@ import appRootPath from 'app-root-path'
 import fs from 'fs';
 import format from "pg-format";
 import Excel from 'exceljs';
-import dbLive from "../../db/databaseLive.js"
 import devDB from "../../db/databaseLocalPG.js"
 
 //import template actions
@@ -16,7 +15,7 @@ import { writeTimeSeriesSheetSingle } from './actions/writeTimeSeriesSheetSingle
 import { dataPointSheetSingle } from './actions/dataPointSingle.js'
 
 
-const db = process.env.live === "1" ? dbLive : devDB;
+const db = devDB;
 
 const router = express.Router();
 

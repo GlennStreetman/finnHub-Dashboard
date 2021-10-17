@@ -1,9 +1,8 @@
 import express from 'express';
-import dbLive from "../../db/databaseLive.js";
 import devDB from "../../db/databaseLocalPG.js"
 
 const router = express.Router();
-const db = process.env.live === '1' ? dbLive : devDB
+const db =  devDB
 
 //checks login status when site is initialy loaded.
 router.get("/checkLogin", (req, res, next) => {

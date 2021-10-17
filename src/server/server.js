@@ -9,8 +9,7 @@ import bodyParser from "body-parser";
 import path from "path";
 import morgan from 'morgan'; //request logger middleware.
 import sessionFileStore from 'session-file-store';
-import dbLive from './db/databaseLive.js';
-import devDB from "./db/databaseLocalPG.js"
+import {connectPostgres} from "./db/databaseLocalPG.js"
 import { dirname } from 'path';
 import { fileURLToPath } from 'url';
 import fileUpload from 'express-fileupload';  
@@ -52,9 +51,15 @@ import renameDashboardMongo from './routes/mongoDB/renameDashboardMongo.js'
 import graphQLRedirect from './routes/graphQL.js'
 //graphQL
 import {schema} from './routes/graphQL/graphQL.js'
-import {versionControl} from './db/databaseVersionControl.js'
 
 const app = express();
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+
+console.log('STARTING EXPRESS', __dirname)
+
+if (process.env.echo) console.log(process.env.echo)
 
 app.use(helmet({
   contentSecurityPolicy: false,
@@ -65,7 +70,6 @@ app.use(fileUpload({
   safeFileNames: true
 }));
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
 
 dotenv.config()
 app.use(cookieParser());
@@ -83,9 +87,6 @@ app.use(bodyParser.urlencoded({
   extended: true
 }));
 
-//LOAD CONFIG.
-console.log("env =", process.env.live)
-if (process.env.live === '1') {
   app.use(
     session({
       store: new FileStore(fileStoreOptions),
@@ -94,45 +95,12 @@ if (process.env.live === '1') {
       saveUninitialized: true,
       cookie: { secure: false, sameSite: true },
     }))
-  console.log("loading live server config")
-  app.listen(process.env.PORT || port, function () {
-    console.log("Listening to http://localhost:" + port);
-  })
-  app.use(express.static(path.join(__dirname, '../../build/')));
-  const db = dbLive
-
-  db.connect()
-    .then(() => {
-      console.log("connected to LIVE postgres server") 
-      versionControl()
-    })
-    .catch(err => console.log(err))
-  
-  connectMongo((err) => { console.log("Connected", err) })
-
-} else { //development setup
-  app.use(
-    session({
-      store: new FileStore(fileStoreOptions),
-      secret: process.env.session_secret,
-      resave: false,
-      saveUninitialized: true,
-      cookie: { secure: false, sameSite: true },
-    }))
-  console.log("loading dev server config")
-  // const path  from "path");
   app.listen(port, function () { console.log(`serving the direcotry @ http`) })
   console.log("dev path ", path.join(__dirname, '../../build/'))
   app.use(express.static(path.join(__dirname, '../../build/'))); //static asset directories are automaticaly served.
-  const db = devDB
-  db.connect()
-    .then(() => {
-      console.log("connected to development postgres server") 
-      versionControl()
-    })
-    .catch(err => console.log("ERROR ON PG LOGIN", err))
+  connectPostgres() //if postgres connection fails it retries every 5 seconds.
   connectMongo((err) => { console.log("Connected1", err) })
-}
+
 
 app.use('/', login)
 app.use('/', checkLogin)

@@ -1,10 +1,9 @@
 import express from 'express';
-import dbLive from "./../../db/databaseLive.js"
 import devDB from "./../../db/databaseLocalPG.js"
 import md5 from 'md5';
 
 const router =  express.Router();
-const db = process.env.live === "1" ? dbLive : devDB;
+const db = devDB;
 
 //checks answer to secret question.
 router.get("/secretQuestion", (req, res, next) => {

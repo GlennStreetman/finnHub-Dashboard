@@ -1,7 +1,5 @@
 import fetch from 'node-fetch';
-// import Papa from 'papaparse';
-
-const rootURL = process.env.live === '1' ? process.env.deployURL : process.env.testURL
+const rootURL = process.env.URL
 
 
 interface dataNode {

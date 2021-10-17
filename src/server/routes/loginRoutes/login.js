@@ -2,11 +2,11 @@
 import express from 'express';
 import format from 'pg-format';
 import md5 from 'md5';
-import dbLive from "../../db/databaseLive.js";
 import devDB from '../../db/databaseLocalPG.js';
 
 const router = express.Router();
-const db = process.env.live === '1' ? dbLive : devDB
+const db =  devDB
+
 
 router.get("/login", (req, res, next) => {
     

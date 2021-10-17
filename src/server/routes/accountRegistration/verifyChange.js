@@ -1,9 +1,8 @@
 import express from 'express';
 import format from 'pg-format';
-import dbLive from "./../../db/databaseLive.js"
 import devDB from "./../../db/databaseLocalPG.js"
 const router =  express.Router();
-const db = process.env.live === "1" ? dbLive : devDB;
+const db = devDB;
 
 //verifys a change to email address.
 router.get("/verifyChange", (req, res, next) => {

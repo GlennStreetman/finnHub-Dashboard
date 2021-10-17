@@ -2,12 +2,12 @@ import express from "express";
 import format  from "pg-format";
 import cryptoRandomString from "crypto-random-string";
 import md5 from "md5";
-import dbLive from '../../db/databaseLive.js';
 import devDB from "../../db/databaseLocalPG.js";
 import mailgun from "mailgun-js";
 
-const URL = process.env.live === "1" ? process.env.deployURL : process.env.testURL;
-const db = process.env.live === "1" ? dbLive : devDB;
+const URL = process.env.URL
+const db = devDB;
+
 
 const router = express.Router();
 //mailgun config data, needs to be set to be imported if not available in process.env

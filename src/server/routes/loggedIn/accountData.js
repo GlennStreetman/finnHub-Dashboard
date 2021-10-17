@@ -1,14 +1,13 @@
 import express from 'express';  
 import format from 'pg-format';
 import cryptoRandomString from 'crypto-random-string';
-import dbLive from "./../../db/databaseLive.js"
 import devDB from "./../../db/databaseLocalPG.js"
 import mGun from 'mailgun-js'
 
 
 const router = express.Router();
-const db = process.env.live === "1" ? dbLive : devDB;
-const URL = process.env.live === '1' ? process.env.deployURL : process.env.testURL
+const db =  devDB;
+const URL = process.env.URL
 
 const API_KEY = process.env.API_KEY || 1;
 const DOMAIN = process.env.DOMAIN_KEY || 1;

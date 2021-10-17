@@ -1,24 +1,17 @@
-// import express from 'express';
-// import eg from 'express-graphql'
+
 import g from 'graphql'
 import format from 'pg-format';
-// import _ from 'lodash'
 
 import { getDB } from '../../db/mongoLocal.js'
 import { filterDict } from './GQLFilters.js'
 
-// import {getDB} from '../../db/mongoLocal.js'
-import dbLive from "../../db/databaseLive.js"
 import devDB from "../../db/databaseLocalPG.js"
 import { GraphQLJSONObject } from 'graphql-type-json'; //GraphQLJSON
 
 import { finnHubData } from '../../db/mongoTypes'
 
-// const router =  express.Router();
+const db = devDB;
 
-const db = process.env.live === "1" ? dbLive : devDB;
-// const postgres = db
-// const mongo = getDB
 
 
 const security = new g.GraphQLObjectType({

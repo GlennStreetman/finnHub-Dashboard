@@ -1,9 +1,10 @@
 import Client from 'pg'
 import dotenv from 'dotenv';
+import versionControl from "./databaseVersionControl.js"
+
 dotenv.config()
 
-// console.log("PGDEV", process.env.pguser, process.env.pghost, process.env.pgdatabase, process.env.pgpassword, process.env.pgport)
-const devDB = new Client.Client
+let devDB = new Client.Client
 ({
     sslmode: 'disable',
     user: process.env.pguser ,
@@ -13,11 +14,18 @@ const devDB = new Client.Client
     port: process.env.pgport
 })
 
-// devDB.connect()
-// .then(() => console.log("connected to developement postgres server"))
-// .catch(err => console.log(err))
+export function connectPostgres(){
+    console.log('Connecting to postgres server')
+    devDB.connect()
+        .then(() => {
+            console.log("connected to development postgres server") 
+            versionControl(devDB)
+        })
+        .catch((err) => {
+            console.log("ERROR ON PG LOGIN", err)
+            devDB = new Client.Client()
+            setTimeout(()=>{connectPostgres()}, 5000)
+        })
+}
 
 export default devDB
-
-//remember to setup env variables to connect
-//https://node-postgres.com/features/connecting#environment-variables

@@ -3,8 +3,6 @@ import appRootPath from 'app-root-path'
 import fs from 'fs';
 import format from "pg-format";
 import Excel from 'exceljs';
-// import AdmZip from 'adm-zip';
-import dbLive from "../../db/databaseLive.js"
 import devDB from "../../db/databaseLocalPG.js"
 
 //import template actions
@@ -21,8 +19,7 @@ import copyCharts from './actions/copyCharts.js'
 
 import util from 'util'
 
-
-const db = process.env.live === "1" ? dbLive : devDB;
+const db = devDB;
 
 const router = express.Router();
 
