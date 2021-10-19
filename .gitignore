@@ -17,6 +17,6 @@ db.sqlite
 /sessions
 /ssl
 cert
-*.env
+*.env*
 /uploads/*
 /uploads/*/*

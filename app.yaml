@@ -36,10 +36,16 @@ services:
         ports:
         - 8080:8080
     dashboard:
-        build: .
+        build:
+            context: .
+            dockerfile: Dockerfile
         ports:
         - 5000:5000
-
+        volumes:
+            - ./src:/app/src
+            - ./build:/app/build
+            - ./nodemon.json:/app/nodemon.json
+        command: npm run server
 volumes:
     mongo-data:
         driver: local

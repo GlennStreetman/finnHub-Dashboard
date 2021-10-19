@@ -1,5 +1,5 @@
-build
 node_modules
 .dockerignore
 Dockerfile
 app.yaml
+app.prod.yaml

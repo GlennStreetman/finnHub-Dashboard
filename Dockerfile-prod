@@ -3,3 +3,6 @@ WORKDIR /app
 COPY package*.json .
 RUN npm ci
 COPY . ./
+
+FROM dev as prod
+RUN npm run build

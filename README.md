@@ -20,7 +20,6 @@ pghost = postgres host name
 pgpassword = postgress password  
 pgdatabase = postgres database name  
 pgport = postress server port  
-devDB = PG <--SQLite3 support depricated. Some work needed for SQL3 tag to work  
 ssl = allow  
 mongo = connection string for mongo db. ex: mongodb://localhost:27017  
 URL = URL for dev environment. ex: http://localhost:5000  

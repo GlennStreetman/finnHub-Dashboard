@@ -1,0 +1,12 @@
+{
+    "watch": [
+        "./src"
+    ],
+    "ext": "js,mjs,json,ts",
+    "ignore": [
+        "./server/sessions/"
+    ],
+    "trace-warnings": true,
+    "verbose": true,
+    "legacyWatch": true
+}

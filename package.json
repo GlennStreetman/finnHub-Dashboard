@@ -40,7 +40,6 @@
     "mongodb": "^3.6.4",
     "morgan": "^1.10.0",
     "node-fetch": "^2.6.1",
-    "nodemon": "^2.0.4",
     "pg": "^8.5.1",
     "pg-format": "^1.0.4",
     "query-string": "^6.14.1",
@@ -71,10 +70,10 @@
     "copy-files": "copyfiles ./src/server/db/postgresVersions/* ./build/server/db/postgresVersions/ -f",
     "tsc": "npx tsc -p src/server/tsconfig.json",
     "tscd": "npx tsc -w -p src/server/tsconfig.json",
-    "server": "nodemon -e js,mjs,json,ts --ignore sessions/ --trace-warnings ./build/server/server.js",
+    "server": "nodemon ./build/server/server.js",
     "client": "set PORT=3000 && react-scripts start",
     "start": "node ./build/server/server.js",
-    "build": "react-scripts build  && npm run copy-files && npx tsc -p src/server/tsconfig.json && node ./build/server/server.js",
+    "build": "react-scripts build  && npm run copy-files && npx tsc -p src/server/tsconfig.json",
     "heroku-postbuild": "react-scripts build && npm run tsc",
     "eject": "react-scripts eject",
     "test": "jest",
@@ -96,6 +95,7 @@
     ]
   },
   "devDependencies": {
+    "nodemon": "^2.0.4",
     "@babel/preset-env": "^7.14.2",
     "@testing-library/jest-dom": "^5.12.0",
     "@testing-library/react": "^11.2.7",

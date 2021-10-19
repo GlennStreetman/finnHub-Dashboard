@@ -56,9 +56,6 @@ const app = express();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
-
-console.log('STARTING EXPRESS', __dirname)
-
 if (process.env.echo) console.log(process.env.echo)
 
 app.use(helmet({
