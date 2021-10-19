@@ -12,7 +12,7 @@ router.get("/login", (req, res, next) => {
     
     let loginText = format('%L', req.query["loginText"])
     let pwText = format('%L', req.query["pwText"])
-    console.log("Processing login request:",loginText,pwText )
+    console.log("Processing login request2:",loginText )
     let loginQuery = `SELECT id, loginname, apikey, apialias, ratelimit, emailconfirmed, exchangelist, defaultexchange, widgetsetup
         FROM users WHERE loginName =${loginText} 
         AND password = '${md5(pwText)}'`;
