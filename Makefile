@@ -1,7 +1,7 @@
 down:
 	docker-compose down
 dev:
-	docker-compose -f  app.yaml up
+	docker-compose -f app.yaml up
 sdev:
 	docker-compose -f  app.yaml up -d
 prod:

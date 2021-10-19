@@ -2,12 +2,14 @@ A web deployable applicaiton that allows you to quickly design and visualize you
 
 [Working Example](https://finn-dash.herokuapp.com/) requires going through registration process and working Finnhub.io API Key.
 
+Deploy using [Docker](https://www.docker.com/).  
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).  
 Backend uses [Express Server](https://expressjs.com).  
 User Login info and dashboard data is saved in a [PostgreSQL database](https://www.postgresql.org).  
 Required Postgres schema should auto build the first time express is launched. 
 The registration process requires that express have access to an SMTP server in order to send registration emails. Recommend Mailgun.  
 Register a [Mailgun Account](https://www.mailgun.com/) and add your apikeys to the .env setup below.
+
 
 ## .env setup
 
@@ -19,47 +21,33 @@ pguser = postgres user name
 pghost = postgres host name  
 pgpassword = postgress password  
 pgdatabase = postgres database name  
-pgport = postress server port  
+pgport = postress server port (5432 is default)
 ssl = allow  
 mongo = connection string for mongo db. ex: mongodb://localhost:27017  
 URL = URL for dev environment. ex: http://localhost:5000  
-db_verison = 1.0  
+version = 1.0
+SKIP_PREFLIGHT_CHECK=true
+echo = message prints on startup of express server
 
-### FOR HEROKU Hosting + Heroku Postgres addon:  
-API_Key: mailgun api key  
-DATABASE_URL: Database URL provided by Heroku  
-DOMAIN_KEY: mailgun domain  
-live: 1  
-session_secret: secret phrase used for express-session management. KEEP SECRET.  
-db_verison = 1.0
+## Available Scripts  
+See Makefile if you have make installed.
 
-## Available Scripts
+### `docker-compose -f  app.yaml -f app.prod.yaml  up --build`
 
-In the project directory, you can run:
+Builds and then starts production environment.<br />
+Open [http://localhost:5000](http://localhost:5000) to view it in browser.  
+make prod
 
-### `npm run client`
+### `docker-compose -f app.yaml up`
 
-Runs the react app in the development mode.<br />
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+Runs project in development mode.
+Open [http://localhost:5000](http://localhost:5000) to view it in browser.    
+Make sure typescript is running in watch mode during development.  
+make dev
 
-The page will reload if you make edits.<br />
-You will also see any lint errors in the console.
 
-### `npm run server`
+### `npm run tscd`
 
-Runs the express server in development mode.<br />
-Send HTTP requests [http://localhost:5000](http://localhost:5000) to test routes.
+Run while developing project.  
+If this step is skipped nodemon will not hot load your changes into docker.
 
-### `npm start`
-
-    Run the build/live version, app is returned from express server.
-
-### `npm run build`
-
-Builds the app for production to the `build` folder.<br />
-It correctly bundles React in production mode and optimizes the build for the best performance.
-
-The build is minified and the filenames include the hashes.<br />
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
