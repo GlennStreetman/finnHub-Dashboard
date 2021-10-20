@@ -96,7 +96,6 @@ afterEach( async ()=>{
 })
 
 it(`Test ${widgetType} Widget: Change focus renders body change. `, async (done) => {
-
     await testBodyRender([ //test that widget body renders api data.
         ['getByTestId', body], 
         ['getByText','Walmart Headline 1'],
@@ -114,25 +113,16 @@ it(`Test ${widgetType} Widget: Change focus renders body change. `, async (done)
 
 it(`Test ${widgetType} Widget: Change pagination.`, async (done) => { //needs numbers udpated and maybe a change focus resets pagination?
     //test pagination
-    console.log('test1', new Date())
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText','Walmart Headline 1'],
         ['getByText', 'Walmart Source 1'], 
     ])
-    console.log('test2', new Date())
- 
     await clickPagination('pageForward') //click forward pagination button. Showing costco currently.
-    console.log('test3', new Date())
-
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText','Walmart Headline 11'],
         ['getByText', 'Walmart Source 11'], 
     ]) 
-    console.log('test4', new Date())
-
     setSecurityFocus(widgetType, 'US-COST') //select new target security for widget.
-    console.log('test5', new Date())
-
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText','Costco Headline 1'],
         ['getByText', 'Costco Source 1'],  

@@ -14,17 +14,18 @@ let devDB = new Client.Client
     port: process.env.pgport
 })
 
-export function connectPostgres(){
+export function connectPostgres(arg=false){
     console.log('Connecting to postgres server')
     devDB.connect()
         .then(() => {
             console.log("connected to development postgres server") 
-            versionControl(devDB)
+            versionControl(devDB, arg)
         })
         .catch((err) => {
             console.log("ERROR ON PG LOGIN", err)
             devDB = new Client.Client()
             setTimeout(()=>{connectPostgres()}, 5000)
+            return true
         })
 }
 

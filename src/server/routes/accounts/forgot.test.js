@@ -42,7 +42,7 @@ beforeAll((done) => {
                     console.log("forgot beforeAll setup error.");
                 } 
                 done()
-                return (console.log('findSecret setup complete'))
+                return (true)
             }) 
         }
     })

@@ -87,9 +87,9 @@ describe('Get login cookie:', ()=>{
         request(app)
             .get("/secretQuestion?loginText=goodbye&user=newPWTest")
             .then(res => {
-                console.log("SECRET RESPONSE", res.statusCode)
+                // console.log("SECRET RESPONSE", res.statusCode)
                 cookieJar = res.header['set-cookie']
-                console.log(cookieJar)
+                // console.log(cookieJar)
                 done()
             })
     })

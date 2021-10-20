@@ -43,7 +43,7 @@ beforeAll((done) => {
     VALUES (	
         'loginTest',	'loginTest@test.com',	'735a2320bac0f32172023078b2d3ae56',	'hello',	
         '69faab6268350295550de7d587bc323d',	'',	'',	'1',	
-        '1',	'US',	'US',	30,
+        '1',	'US',	'US',	1,
         '{"PriceSplits":false}',
         'testalias'	
     )
@@ -60,7 +60,7 @@ beforeAll((done) => {
     VALUES (	
         'loginTest_notVerified',	'loginTest_notVerified.com', '735a2320bac0f32172023078b2d3ae56',	'hello',	
         '69faab6268350295550de7d587bc323d',	'',	'',	'0',	
-        '1',	'US',	'US',	30, 
+        '1',	'US',	'US',	1, 
         '{"PriceSplits":false}',
         'testAlias2'
     )
@@ -72,13 +72,13 @@ beforeAll((done) => {
     SET confirmemaillink = '071e3afe81e12ff2cebcd41164a7a295', emailconfirmed = '0'
     WHERE loginname = 'verifyEmailTest';
     `
-    // console.log(setupDB)
+    
     db.connect()
     db.query(setupDB, (err) => {
         if (err) {
             console.log("verifyEmail beforeAll setup error.");
+            done()
         } else {
-            console.log("verifyEmail db setup success")
             done()
         }
     })

@@ -1,0 +1,15 @@
+
+version: '3.9'
+services:
+    testdashboard:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+        - 5000:5000
+        volumes:
+            - ./src:/app/src
+            - ./build:/app/build
+            - ./nodemon.json:/app/nodemon.json
+            - ./mockdb.js:/app/mockdb.js
+        command: npm run test

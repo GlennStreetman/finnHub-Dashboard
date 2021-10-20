@@ -12,7 +12,7 @@ const mailgun = new mGun({ apiKey: API_KEY, domain: DOMAIN });
 const URL = process.env.testURL
 
 router.get("/forgot", (req, res, next) => {
-    console.log("reseting password")
+    // console.log("reseting password")
     let loginName = format('%L', req.query["loginText"]);
     let forgotQuery = `SELECT id, loginName, email FROM users WHERE email = ${loginName}`;
     
@@ -40,7 +40,7 @@ router.get("/forgot", (req, res, next) => {
                     console.log("Error on password reset /forgot:", err)
                     res.status(400).json({message: "Error during password reset. Check email"});
                 } else if (rows.rowCount !== 1) {
-                    console.log("Failed to update user info, try restarting reset process.");
+                    // console.log("Failed to update user info, try restarting reset process.");
                     res.status(401).json({message: "Email not found."});
                 } else {
                     mailgun.messages().send(mailgunData, (error, body) => {
@@ -53,7 +53,7 @@ router.get("/forgot", (req, res, next) => {
                 }
             })
         } else {
-            console.log("failed email check");
+            // console.log("failed email check");
             res.status(401).json({message: "Email not found."});
         }
     });

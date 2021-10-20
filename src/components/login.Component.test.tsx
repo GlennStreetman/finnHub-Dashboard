@@ -19,8 +19,12 @@ import { checkPasswordMock } from '../appFunctions/client/checkPassword.mock'
 import { registerAccountMock } from '../appFunctions/client/registerAccount.mock'
 import { getSavedDashBoardsMock } from '../appFunctions/appImport/setupDashboard.mock';
 
-
-const server = setupServer(getLogin_succeed, getCheckLogin_fail, getRegister_success, getDashboard_success_noWidgets)
+const server = setupServer(
+    getLogin_succeed,
+    getCheckLogin_fail,
+    getRegister_success,
+    getDashboard_success_noWidgets
+)
 
 beforeAll(() => { server.listen() })
 // afterEach(() => { server.resetHandlers() })
@@ -69,7 +73,6 @@ it('component/Login Action:click Register: Register button loads register screen
     const Login = wrapper.find('login').instance()
     Login.registerAccount = registerAccountMock
     const link2 = wrapper.find('#loginLink2')
-
     expect(Login.state.showMenu).toBe(0) //login menu
     link2.simulate('click') //CLICK link2 effect
     wrapper.find('login').setState({
@@ -83,8 +86,8 @@ it('component/Login Action:click Register: Register button loads register screen
     expect(Login.state.showMenu).toBe(2) //register menu
     wrapper.find('.loginBtn').simulate('click') //CLICK register
     expect(registerAccountMock).toHaveBeenCalledTimes(1)
+    console.log(registerAccountMock.mock.results[0].value)
     await registerAccountMock.mock.results[0].value
-
     expect(Login.state.message).toBe('Thank you for registering, please check your email and follow the confirmation link.')
     done()
 })

@@ -48,17 +48,20 @@ const getVersion = async (db) => {
     })
 };
 
-const versionControl = async function (db) {
+const versionControl = async function (db, arg) {
     // const __dirname = dirname(fileURLToPath(import.meta.url));
     console.log('!checking postgres version:', process.env.version)
     const envVersionString = process.env.version ? process.env.version : '1.0'
     const envVersion = parseFloat(envVersionString)
     const dbVersionString = await getVersion(db)
     const dbVersion = typeof dbVersionString === 'string' ? parseFloat(dbVersionString) : false
-    console.log('HERE', envVersion, dbVersion, dbVersionString)
+    console.log('Checking Version: ', envVersion, dbVersion, dbVersionString)
     if (envVersion && envVersion === dbVersion) { //base case: DB up to date.
         console.log(`database schema up to date. v${dbVersion}`)
-        return true
+        if (arg === true) { 
+            console.log('test mode flag true, exiting')
+            process.exit(0)
+        }
     } else if (envVersion && typeof dbVersion === 'number' && envVersion > dbVersion) { //env version greater, run update recursive
         console.log(`Upgrading postgres schema from v${dbVersion}`)
         const getUpdateQuery = fs.readFileSync(path.resolve(`./build/server/db/postgresVersions/${dbVersionString}_upgrade.sql`))

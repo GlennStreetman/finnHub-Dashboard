@@ -21,7 +21,7 @@ router.get("/newPW", (req, res, next) => {
         AND 1 = ${reset} 
         AND resetpasswordlink = 'testpasswordlink' 
         AND passwordconfirmed = true` ;
-    console.log(newQuery);
+    // console.log(newQuery);
     db.query(newQuery, (err, rows) => {
     if (err) {
         console.log("ERROR /newPW: ", err)

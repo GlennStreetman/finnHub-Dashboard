@@ -13,7 +13,7 @@ router.get("/checkLogin", (req, res, next) => {
         FROM users
         WHERE id = ${uID}
     `;
-    console.log(apiKeysQuery)
+    // console.log(apiKeysQuery)
     const retrieveAPIKeys = () => {
         // console.log("getting APIKeys");
         // console.log(req.session);

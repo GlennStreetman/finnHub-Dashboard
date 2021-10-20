@@ -12,11 +12,11 @@ router.get("/login", (req, res, next) => {
     
     let loginText = format('%L', req.query["loginText"])
     let pwText = format('%L', req.query["pwText"])
-    console.log("Processing login request2:",loginText )
+    // console.log("Processing login request2:",loginText )
     let loginQuery = `SELECT id, loginname, apikey, apialias, ratelimit, emailconfirmed, exchangelist, defaultexchange, widgetsetup
         FROM users WHERE loginName =${loginText} 
         AND password = '${md5(pwText)}'`;
-    console.log(loginQuery)
+    // console.log(loginQuery)
     let info = { //return object.
         key: "", 
         login: 0,
@@ -46,10 +46,10 @@ router.get("/login", (req, res, next) => {
             req.session.login = true
             res.status(200).json(info);
         } else if (rows.rowCount === 1 && login.emailconfirmed !== true) {
-            console.log("Email not confirmed")
+            // console.log("Email not confirmed")
             res.status(401).json({message: `Email not confirmed. Please check email for confirmation message.`})
         } else {    
-            console.log("Login and password did not match.")
+            // console.log("Login and password did not match.")
             res.status(401).json({message: `Login and Password did not match.`})
         }
     });
