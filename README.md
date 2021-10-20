@@ -1,8 +1,10 @@
-A web deployable applicaiton that allows you to quickly design and visualize your [Finnhub Stock API data](https://finnhub.io/) in a [dashboard format](https://github.com/GlennStreetman/finnHub-Dashboard/blob/master/public/Example_small.jpg). Each dashboard then becomes its own API endpoint that you can query using graphQL. After you are done designing your dashboards you can push your data to Excel.
+A web deployable applicaiton that allows you to quickly design and visualize your [Finnhub Stock API data](https://finnhub.io/) in a [dashboard format](https://github.com/GlennStreetman/finnHub-Dashboard/blob/master/public/Example_small.jpg).  
+Each dashboard then becomes its own API endpoint that you can query using graphQL.  
+After you are done designing your dashboards you can push your data to Excel.
 
 [Working Example](https://finn-dash.herokuapp.com/) requires going through registration process and working Finnhub.io API Key.
 
-Deployed using [Docker](https://www.docker.com/).  
+### Deployed using [Docker](https://www.docker.com/).  
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).   
 The user registration process requires email registration. Recommend Mailgun.  
 Register a [Mailgun Account](https://www.mailgun.com/) and add your apikeys to the .env setup below.
@@ -36,18 +38,15 @@ version = 1.0
 Best run using [make](https://www.gnu.org/software/make/)  
 
 ### `docker-compose -f  app.yaml -f app.prod.yaml  up --build`
-
 Builds and then starts production environment.<br />
 Open [http://localhost:5000](http://localhost:5000) to view it in browser.  
 >make prod
 
 ### `docker-compose -f app.yaml up`
-
-Runs project in development mode.
+s project in development mode.
 Open [http://localhost:5000](http://localhost:5000) to view it in browser.    
 Make sure typescript is running in watch mode during development.  
 >make dev
-
 
 ### `npm run tscd`  
 Run while developing project.  
