@@ -207,8 +207,6 @@ class App extends React.Component<AppProps, AppState> {
     constructor(props: AppProps) {
         super(props);
 
-        // const defaultGlobalStockList = {};
-
         this.state = {
             accountMenu: 0,
             availableStocks: [],
