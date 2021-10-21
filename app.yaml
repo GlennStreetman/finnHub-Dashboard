@@ -41,11 +41,12 @@ services:
             dockerfile: Dockerfile
         ports:
         - 5000:5000
+        - 3000:3000
         volumes:
             - ./src:/app/src
             - ./build:/app/build
             - ./nodemon.json:/app/nodemon.json
-        command: npm run server
+        command: npm run dev
 volumes:
     mongo-data:
         driver: local
