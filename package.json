@@ -70,6 +70,7 @@
     "copy-files": "copyfiles ./src/server/db/postgresVersions/* ./build/server/db/postgresVersions/ -f",
     "tsc": "npx tsc -p src/server/tsconfig.json",
     "tscd": "npx tsc -w -p src/server/tsconfig.json",
+    "dev": "concurrently \"nodemon ./build/server/server.js\" \"set PORT=3000 && react-scripts start\"",
     "server": "nodemon ./build/server/server.js",
     "client": "set PORT=3000 && react-scripts start",
     "start": "node ./build/server/server.js",
