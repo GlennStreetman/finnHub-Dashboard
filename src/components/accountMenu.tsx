@@ -13,6 +13,8 @@ interface accountMenuProps2 {
     updateAPIKey: Function,
     exchangeList: string[],
     toggleBackGroundMenu: Function,
+    tGetSymbolList: Function,
+    defaultExchange: string,
 }
 
 interface accountMenuState {
@@ -128,6 +130,11 @@ class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
                     });
                 }
             });
+        if (changeField === 'apikey' && newValue !== '') this.props.tGetSymbolList({
+            exchange: this.props.defaultExchange,
+            apiKey: newValue,
+            finnHubQueue: this.props.finnHubQueue,
+        })
     }
 
     showEditPane(targetField: string) {
@@ -180,13 +187,13 @@ class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
                                         <button onClick={() => this.showEditPane("apikey")}>edit</button>
                                     </td>
                                 </tr>
-                                <tr>
+                                {/* <tr>
                                     <td>webHook Key:</td>
                                     <td>{this.state.webHook}</td>
                                     <td>
                                         <button onClick={() => this.showEditPane("webhook")}>edit</button>
                                     </td>
-                                </tr>
+                                </tr> */}
                                 <tr>
                                     <td>Active Exchanges: </td>
                                     <td>{this.props.exchangeList.toString()}</td>
@@ -262,6 +269,9 @@ export function accountMenuProps(that: any, key = "AccountMenu") {
         updateAPIKey: that.updateAPIKey,
         exchangeList: that.state.exchangeList,
         toggleBackGroundMenu: that.toggleBackGroundMenu,
+        tGetSymbolList: that.props.tGetSymbolList,
+        defaultExchange: that.state.defaultExchange,
+
     };
     return propList;
 }
