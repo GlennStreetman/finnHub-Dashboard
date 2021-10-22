@@ -1,14 +1,15 @@
 import express from 'express';
 import format from 'pg-format';
-import devDB from "./../../db/databaseLocalPG.js"
+import postgresDB from "./../../db/databaseLocalPG.js"
 
 const router =  express.Router();
-const db = devDB;
+
 
 //user should only be hitting this endpoint after visiting password reset link sent to their email.
 //find and return secret question for specified user WHERE password reset flag has been set to 1.
 //flag set to 1 by password reset link in email.
 router.get("/findSecret", (req, res, next) => {
+    const db = postgresDB;
     // req.session.userName = req.query['user']
     let userID = format('%L', req.query['user'])
     let verifyUpdate = `

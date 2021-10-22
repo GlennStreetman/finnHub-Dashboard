@@ -1,12 +1,13 @@
 import express from 'express';
 import format from 'pg-format';
-import devDB from "../../db/databaseLocalPG.js"
+import postgresDB from "../../db/databaseLocalPG.js"
 
 const router =  express.Router();
-const db = devDB
+
 
 //user visits reset link, from their email, and get redirected to reset password screen in app.
 router.get("/reset", (req, res, next) => {
+    const db = postgresDB
     // console.log(req.query)
     let verifyID = format('%L', req.query['id'])
     req.session.userName = req.query['users']

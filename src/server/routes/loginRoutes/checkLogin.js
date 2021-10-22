@@ -1,11 +1,12 @@
 import express from 'express';
-import devDB from "../../db/databaseLocalPG.js"
+import postgresDB from "../../db/databaseLocalPG.js"
 
 const router = express.Router();
-const db =  devDB
+
 
 //checks login status when site is initialy loaded.
 router.get("/checkLogin", (req, res, next) => {
+    const db = postgresDB
     const resData = { login: 0 };
     const uID = req.session["uID"];
     const apiKeysQuery = `

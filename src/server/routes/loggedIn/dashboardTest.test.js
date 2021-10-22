@@ -119,7 +119,7 @@ beforeAll((done) => {
     db.connect()
     db.query(setupDB, (err) => {
         if (err) {
-            console.log("accountData setup error.");
+            console.log("accountData setup error.", err);
         } else {
 
             done()

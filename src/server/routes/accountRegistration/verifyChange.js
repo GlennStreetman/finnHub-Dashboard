@@ -1,11 +1,12 @@
 import express from 'express';
 import format from 'pg-format';
-import devDB from "./../../db/databaseLocalPG.js"
+import postgresDB from "./../../db/databaseLocalPG.js"
 const router =  express.Router();
-const db = devDB;
+
 
 //verifys a change to email address.
 router.get("/verifyChange", (req, res, next) => {
+    const db = postgresDB;
     let verifyID = format('%L', req.query['id'])
     let verifyUpdate = `
     UPDATE users

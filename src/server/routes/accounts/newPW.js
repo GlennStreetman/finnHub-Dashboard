@@ -1,14 +1,15 @@
 import express from 'express';
 import format from 'pg-format';
-import devDB from "./../../db/databaseLocalPG.js"
+import postgresDB from "./../../db/databaseLocalPG.js"
 import md5 from 'md5';
 
 const router =  express.Router();
-const db = devDB;
+
 
 //redirect to /newPW from /reset route.
 //username and resesion reset flag should be set by redirect.
 router.get("/newPW", (req, res, next) => {
+    const db = postgresDB;
     // console.log("/newPW:", req.session)
     const newPW = format('%L', req.query.newPassword)
     const userName = format('%L', req.session.userName)

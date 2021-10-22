@@ -28,11 +28,11 @@ export const registerAccount = async function registerAccount(loginText, pwText,
         }
         const data = await res.json()
         data.status = res.status
-        if (data.message === "new user created") {
-            return({ message: "Thank you for registering, please check your email and follow the confirmation link." });
-        } else {
-            return(data);
-        }
+        // if (data.message === "new user created") {
+        //     return({ message: "Thank you for registering, please check your email and follow the confirmation link." });
+        // } else {
+        return(data);
+        // }
         
     } else {
         const updateObj = {message: 'Please review warnings'}

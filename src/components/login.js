@@ -140,6 +140,7 @@ class login extends React.Component {
                     this.setState({message: data.message}) //sp
                 } else if (data.status === 200) {
                     this.setState({message: data.message}, ()=>this.clearText(0))
+                    this.setState({showMenu: 0})
                 } else {
                     this.setState({message: data.message})
                 }

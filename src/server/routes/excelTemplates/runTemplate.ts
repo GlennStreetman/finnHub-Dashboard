@@ -3,7 +3,7 @@ import appRootPath from 'app-root-path'
 import fs from 'fs';
 import format from "pg-format";
 import Excel from 'exceljs';
-import devDB from "../../db/databaseLocalPG.js"
+import postgresDB from "../../db/databaseLocalPG.js"
 
 //import template actions
 import { buildQueryList } from './actions/buildQueryList.js'
@@ -17,9 +17,9 @@ import { dataPointSheetSingle } from './actions/dataPointSingle.js'
 import { dataPointSheetMulti } from './actions/dataPointSheetMulti.js'
 import copyCharts from './actions/copyCharts.js'
 
-import util from 'util'
+// import util from 'util'
 
-const db = devDB;
+
 
 const router = express.Router();
 
@@ -59,6 +59,7 @@ export interface chartSheetObj { //key is sheet. 1 sheet, 0 or 1 drawing file.
 }
 
 router.get('/runTemplate', async (req: uploadTemplate, res: any) => { //run user configured excel template and return result.
+    const db = postgresDB;
     const apiKey = format('%L', req.query['key'])
     const multiSheet = req.query['multi']
     const findUser = `

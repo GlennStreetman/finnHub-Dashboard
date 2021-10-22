@@ -1,12 +1,13 @@
 import express from 'express';
-import devDB from "./../../db/databaseLocalPG.js"
+import postgresDB from "./../../db/databaseLocalPG.js"
 import md5 from 'md5';
 
 const router =  express.Router();
-const db = devDB;
+
 
 //checks answer to secret question.
 router.get("/secretQuestion", (req, res, next) => {
+    const db = postgresDB;
     const loginText = md5(req.query["loginText"])
     const user = req.query["user"]
     // console.log(loginText, user)

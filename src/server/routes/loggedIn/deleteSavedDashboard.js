@@ -1,13 +1,13 @@
 import express from 'express';  
 import format from 'pg-format';
-import devDB from "./../../db/databaseLocalPG.js"
+import postgresDB from "./../../db/databaseLocalPG.js"
 
 const router = express.Router();
-const db =  devDB;
+
 
 
 router.get("/deleteSavedDashboard", (req, res, next) => {
-
+    const db = postgresDB;
     if (req.session.login === true) {  
         const uId = req.session["uID"];
         const deleteDash = format("%L", req.query["dashID"]);

@@ -1,12 +1,12 @@
 import express from 'express';  
 import format from 'pg-format';
 import cryptoRandomString from 'crypto-random-string';
-import devDB from "./../../db/databaseLocalPG.js"
+import postgresDB from "./../../db/databaseLocalPG.js"
 import mGun from 'mailgun-js'
 
 
 const router = express.Router();
-const db =  devDB;
+
 const URL = process.env.URL
 
 const API_KEY = process.env.API_KEY || 1;
@@ -18,6 +18,7 @@ function emailIsValid(email) {
 };
 
 router.get("/accountData", (req, res, next) => {
+    const db =  postgresDB;
   // thisRequest = req.query;
     if (req.session.login === true) {
         const accountDataQuery = `
@@ -44,6 +45,7 @@ router.get("/accountData", (req, res, next) => {
 });
 
 router.post("/accountData", (req, res) => {
+    const db =  postgresDB;
     // console.log(req.body);
     if (req.session.login === true) {  
         

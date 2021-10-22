@@ -3,7 +3,7 @@ import appRootPath from 'app-root-path'
 import fs from 'fs';
 import format from "pg-format";
 import Excel from 'exceljs';
-import devDB from "../../db/databaseLocalPG.js"
+import postgresDB from "../../db/databaseLocalPG.js"
 
 //import template actions
 import { buildQueryList } from './actions/buildQueryList.js'
@@ -15,7 +15,7 @@ import { writeTimeSeriesSheetSingle } from './actions/writeTimeSeriesSheetSingle
 import { dataPointSheetSingle } from './actions/dataPointSingle.js'
 
 
-const db = devDB;
+
 
 const router = express.Router();
 
@@ -46,6 +46,7 @@ export interface chartSheetObj { //key is sheet. 1 sheet, 0 or 1 drawing file.
 }
 
 router.post('/generateTemplate', async (req, res) => { //create and process widget derived template.
+    const db = postgresDB;
     // Post: apiKey, dashboard, widget, columnKeys <--Make this alias if available or key
     const reqData = req.body
     const apiKey = format('%L', reqData.apiKey)

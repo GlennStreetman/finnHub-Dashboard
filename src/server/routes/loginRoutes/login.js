@@ -2,14 +2,14 @@
 import express from 'express';
 import format from 'pg-format';
 import md5 from 'md5';
-import devDB from '../../db/databaseLocalPG.js';
+import postgresDB from '../../db/databaseLocalPG.js';
 
 const router = express.Router();
-const db =  devDB
+
 
 
 router.get("/login", (req, res, next) => {
-    
+    const db =  postgresDB
     let loginText = format('%L', req.query["loginText"])
     let pwText = format('%L', req.query["pwText"])
     // console.log("Processing login request2:",loginText )

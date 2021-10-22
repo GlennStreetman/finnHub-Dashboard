@@ -1,12 +1,13 @@
 import express from 'express';  
 import format from 'pg-format';
-import devDB from "./../../db/databaseLocalPG.js"
+import postgresDB from "./../../db/databaseLocalPG.js"
 
 const router = express.Router();
 
-const db = devDB;
+
 
 router.get("/dashboard", (req, res, next) => { //returns requested dashboard to user.
+    const db = postgresDB;
     if (req.session.login === true) { 
         const getSavedDashBoards = `
             SELECT *
@@ -95,6 +96,7 @@ router.get("/dashboard", (req, res, next) => { //returns requested dashboard to 
 });
 
 router.post("/dashboard", (req, res, next) => { //saves users dashboard
+    const db = postgresDB;
     if (req.session.login === true) {  
     let dashBoardName = format("%L", req.body.dashBoardName);
     let globalStockList = format("%L", JSON.stringify(req.body.globalStockList));
@@ -235,6 +237,7 @@ router.post("/dashboard", (req, res, next) => { //saves users dashboard
 
 
 router.post("/renameDashboard", (req, res, next) => { //{newName: string, dbID: number}
+    const db = postgresDB;
     if (req.session.login === true) { 
         let newName = format("%L", req.body.newName);
         let dbID = format("%L", req.body.dbID);

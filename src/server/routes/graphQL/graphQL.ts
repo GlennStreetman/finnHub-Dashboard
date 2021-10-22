@@ -5,13 +5,10 @@ import format from 'pg-format';
 import { getDB } from '../../db/mongoLocal.js'
 import { filterDict } from './GQLFilters.js'
 
-import devDB from "../../db/databaseLocalPG.js"
+import postgresDB from "../../db/databaseLocalPG.js"
 import { GraphQLJSONObject } from 'graphql-type-json'; //GraphQLJSON
 
 import { finnHubData } from '../../db/mongoTypes'
-
-const db = devDB;
-
 
 
 const security = new g.GraphQLObjectType({
@@ -88,6 +85,7 @@ const RootQueryType = new g.GraphQLObjectType({
                     FROM dashboard 
                     WHERE userID = (SELECT id FROM users WHERE  (apiKey = ${apiKey}) OR apialias = ${apiKey})`
                     // console.log('getUserQuery', query)
+                    const db = postgresDB;
                     db.query(query, (err, rows) => {
                         if (err) {
                             console.log(err)
@@ -126,6 +124,7 @@ const RootQueryType = new g.GraphQLObjectType({
                             WHERE  (apiKey = ${apiKey} OR apialias = ${apiKey})) AND dashboardname = ${dashboardName}
                     )`
                     // console.log('getUserQuery', query)
+                    const db = postgresDB;
                     db.query(query, (err, rows) => {
                         if (err) {
                             console.log(err)
@@ -191,6 +190,7 @@ const RootQueryType = new g.GraphQLObjectType({
                     `
                     // console.log(query)
                     try {
+                        const db = postgresDB;
                         const returnData = await db.query(query)
                         // console.log('returnData:', returnData)
                         let dataConfig = JSON.parse(returnData.rows[0].config)
@@ -273,6 +273,7 @@ const RootQueryType = new g.GraphQLObjectType({
                     `
                     // console.log('getUserQuery', query)
                     try {
+                        const db = postgresDB;
                         const returnData = await db.query(query)
                         // console.log('This Data: ', returnData.rows[0])
                         const findWidgetIds = [{ widget: 'plug' }]

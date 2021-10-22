@@ -1,12 +1,15 @@
 import express from "express";  
 import format from "pg-format"; //USE FOR ALL QUERY STRING parameters. Helps prevent SQL injection.
-import devDB from "./../db/databaseLocalPG.js"
+import postgresDB from "./../db/databaseLocalPG.js"
 
-const db =  devDB;
+
 
 const router = express.Router();
 
 router.post("/logUiError", (req, res) => {
+
+    const db =  postgresDB;
+
     const widget = format("%L", req.body.widget);
     const errorMessage = format("%L", JSON.stringify(req.body.errorMessage));
 
