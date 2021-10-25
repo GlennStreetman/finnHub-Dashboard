@@ -31,7 +31,9 @@ pgport = 5432
 ssl = allow  
 mongo = mongodb://root:example@mongo:27017/  #root is usename, example is password.
 URL = http://localhost:5000  
-version = 1.0 
+version = 1.0  
+legacyWatch=true  
+CHOKIDAR_USEPOLLING=true  
 
 ### If default user or passwords are changed in the .env file make sure to reflect the changes in the corresponding .yaml files. 
 
