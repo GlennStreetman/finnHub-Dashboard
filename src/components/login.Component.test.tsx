@@ -88,7 +88,9 @@ it('component/Login Action:click Register: Register button loads register screen
     expect(registerAccountMock).toHaveBeenCalledTimes(1)
     console.log(registerAccountMock.mock.results[0].value)
     await registerAccountMock.mock.results[0].value
-    expect(Login.state.message).toBe('Thank you for registering, please check your email and follow the confirmation link.')
+    const messageList = ['Thank you for registering, please check your email and follow the confirmation link.', 'new user created']
+    expect(messageList).toContain(Login.state.message)
+    // expect(Login.state.message).toBe('Thank you for registering, please check your email and follow the confirmation link.' || 'new user created')
     done()
 })
 

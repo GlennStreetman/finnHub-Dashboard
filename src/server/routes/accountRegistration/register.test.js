@@ -9,6 +9,7 @@ import request from 'supertest';
 import sessionFileStore from 'session-file-store';
 import db from '../../db/databaseLocalPG.js';
 import register from './register.js';
+import { assert } from 'console';
 
 const app = express();
 dotenv.config()
@@ -46,7 +47,7 @@ beforeAll((done) => {
     VALUES (	
         'registertest_taken',	'registertest_taken@test.com',	'735a2320bac0f32172023078b2d3ae56',	'hello',	
         '69faab6268350295550de7d587bc323d',	'',	'',	'071e3afe81e12ff2cebcd41164a7a295',	
-        '1',	'US',	'US',	30	
+        '1',	'US',	'US',	1	
     )
     ON CONFLICT
     DO NOTHING
@@ -70,6 +71,8 @@ afterAll((done)=>{
 
 test("Valid new login post/register", (done) => {
 
+    const messageList = ['Thank you for registering, please check your email and follow the confirmation link.', 'new user created']
+
     request(app)
         .post("/register")
         .send({
@@ -79,12 +82,11 @@ test("Valid new login post/register", (done) => {
             secretQuestion: "hellotest",
             secretAnswer: "goodbye",
         })
-        // .set('Accept', 'application/json')
         .expect("Content-Type", /json/)
-        .expect({
-            message: "new user created",
+        .then(res=>{
+            assert(messageList.includes(res.body.message, true))
         })
-        .expect(200, done);
+        done()
 });
 
 test("Invalid email post/register", (done) => {
