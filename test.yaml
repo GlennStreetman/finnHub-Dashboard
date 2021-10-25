@@ -12,4 +12,5 @@ services:
             - ./build:/app/build
             - ./nodemon.json:/app/nodemon.json
             - ./mockdb.js:/app/mockdb.js
-        command: npm run test
+            - ./package.json:/app/package.json
+        command: npm run testci

@@ -70,7 +70,7 @@
     "copy-files": "copyfiles ./src/server/db/postgresVersions/* ./build/server/db/postgresVersions/ -f",
     "tsc": "npx tsc -p src/server/tsconfig.json",
     "tscd": "npx tsc -w -p src/server/tsconfig.json",
-    "dev": "concurrently \"nodemon ./build/server/server.js\" \"set PORT=3000 && react-scripts start\"",
+    "dev": "concurrently \"nodemon ./build/server/server.js\" \"set PORT=3000 && react-scripts start\" \"npx tsc -w -p src/server/tsconfig.json\" ",
     "server": "nodemon ./build/server/server.js",
     "client": "set PORT=3000 && react-scripts start",
     "start": "node ./build/server/server.js",
@@ -78,6 +78,7 @@
     "heroku-postbuild": "react-scripts build && npm run tsc",
     "eject": "react-scripts eject",
     "test": "node mockdb && jest",
+    "testci": "pghost=testPostgres jest --ci --runInBand",
     "test-f": "jest"
   },
   "eslintConfig": {
@@ -117,6 +118,7 @@
     "nodemon": "^2.0.4",
     "redux-devtools": "^3.7.0",
     "supertest": "^6.1.3",
+    "test-ci": "^1.0.4",
     "ts-jest": "^26.5.6"
   },
   "type": "module"
