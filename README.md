@@ -4,9 +4,9 @@ After you are done designing your dashboards you can push your data to Excel.
 
 [Working Example](https://finn-dash.herokuapp.com/) requires going through registration process and working Finnhub.io API Key.
 
-### Deployed using [Docker](https://www.docker.com/).  
+### Deployed using [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/).  
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).   
-The user registration process requires email registration. Recommend Mailgun.  
+The user registration process can use email registration. Recommend Mailgun.  
 Register a [Mailgun Account](https://www.mailgun.com/) and add your apikeys to the .env setup below.
 
 ## Setup  
