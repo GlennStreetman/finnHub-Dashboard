@@ -1,12 +1,23 @@
 
 version: '3.9'
 services:
+    nginx:
+        depends_on:
+            - dashboard
+        restart: always # because it is routing traffic to our entire app
+        volumes:
+            - ./nginx/:/etc/nginx/templates
+        build:
+            dockerfile: Dockerfile
+            context: ./nginx
+        ports:
+        - '80:80'
     mongo:
         image: mongo
         restart: always
         environment:
-            MONGO_INITDB_ROOT_USERNAME: root
-            MONGO_INITDB_ROOT_PASSWORD: example
+            MONGO_INITDB_ROOT_USERNAME: "${mongoUser}"
+            MONGO_INITDB_ROOT_PASSWORD: "${mongoPassword}"
         ports: 
         - 27017:27017
         volumes: 
@@ -17,15 +28,15 @@ services:
         ports:
         - 8081:8081
         environment:
-            ME_CONFIG_MONGODB_ADMINUSERNAME: root
-            ME_CONFIG_MONGODB_ADMINPASSWORD: example
-            ME_CONFIG_MONGODB_URL: mongodb://root:example@mongo:27017/
+            ME_CONFIG_MONGODB_ADMINUSERNAME: "${mongoUser}"
+            ME_CONFIG_MONGODB_ADMINPASSWORD: "${mongoPassword}"
+            ME_CONFIG_MONGODB_URL: "${mongo}"
     postgresdocker:
         image: postgres
         restart: always
         environment:
-            POSTGRES_USER: postgres
-            POSTGRES_PASSWORD: example
+            POSTGRES_USER: "${pguser}"
+            POSTGRES_PASSWORD: "${pgpassword}"
         ports: 
         - 5432:5432
         volumes:
@@ -46,6 +57,7 @@ services:
             - ./src:/app/src
             - ./build:/app/build
             - ./nodemon.json:/app/nodemon.json
+            - ./.env:/app/.env
         command: npm run dev
 volumes:
     mongo-data:
