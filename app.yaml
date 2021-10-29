@@ -2,17 +2,14 @@
 version: '3.9'
 services:
     nginx:
-        image: nginx
         depends_on:
             - dashboard
         restart: always # because it is routing traffic to our entire app
-        volumes:
-            - ./nginx/:/etc/nginx/templates
         build:
             dockerfile: Dockerfile
             context: ./nginx
         ports:
-        - '80:80'
+            - '80:80'
     mongo:
         image: mongo
         restart: always
