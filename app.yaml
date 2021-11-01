@@ -1,15 +1,15 @@
 
 version: '3.9'
 services:
-    nginx:
-        depends_on:
-            - dashboard
-        restart: always # because it is routing traffic to our entire app
-        build:
-            dockerfile: Dockerfile
-            context: ./nginx
-        ports:
-            - '80:80'
+    # nginx:
+    #     depends_on:
+    #         - dashboard
+    #     restart: always # because it is routing traffic to our entire app
+    #     build:
+    #         dockerfile: Dockerfile
+    #         context: ./nginx
+    #     ports:
+    #         - '80:80'
     mongo:
         image: mongo
         restart: always
