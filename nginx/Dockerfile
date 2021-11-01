@@ -1,7 +1,7 @@
 # Pull in the from the official nginx image.
 FROM nginx
 
-EXPOSE 9999
+EXPOSE 80
 
 # Delete the default welcome to nginx page.
 RUN rm /usr/share/nginx/html/*

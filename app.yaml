@@ -9,7 +9,7 @@ services:
             dockerfile: Dockerfile
             context: ./nginx
         ports:
-            - '9999:80'
+            - '80:80'
     mongo:
         image: mongo
         restart: always
