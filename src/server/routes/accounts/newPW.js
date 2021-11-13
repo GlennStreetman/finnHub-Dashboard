@@ -9,6 +9,7 @@ const router =  express.Router();
 //redirect to /newPW from /reset route.
 //username and resesion reset flag should be set by redirect.
 router.get("/newPW", (req, res, next) => {
+    console.log('new password request received')
     const db = postgresDB;
     // console.log("/newPW:", req.session)
     const newPW = format('%L', req.query.newPassword)
@@ -19,10 +20,9 @@ router.get("/newPW", (req, res, next) => {
     UPDATE users 
     SET password = '${md5(newPW)}', passwordconfirmed = false, resetpasswordlink = '' 
     WHERE loginName = ${userName} 
-        AND 1 = ${reset} 
-        AND resetpasswordlink = 'testpasswordlink' 
-        AND passwordconfirmed = true` ;
-    // console.log(newQuery);
+    AND 1 = ${reset} 
+    AND passwordconfirmed = true` ;
+    console.log(newQuery);
     db.query(newQuery, (err, rows) => {
     if (err) {
         console.log("ERROR /newPW: ", err)
@@ -31,7 +31,6 @@ router.get("/newPW", (req, res, next) => {
         // console.log("password reset");
         res.status(200).json({message: "true"});
     } else {
-
         res.status(401).json({message: "Password not updated, restart process."});
     }
     });

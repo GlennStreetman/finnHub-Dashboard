@@ -70,26 +70,28 @@ export const saveDashboard = async function (dashboardName: string) {
             await new Promise(resolve => setTimeout(resolve, 5000));
             this.setState({ saveDashboardFlag: false })
             let status = await new Promise((res) => {
-                const data = {
-                    dashBoardName: dashboardName,
-                    globalStockList: this.state.dashBoardData[this.state.currentDashBoard].globalstocklist,
-                    widgetList: this.state.dashBoardData[this.state.currentDashBoard].widgetlist,
-                    menuList: this.state.menuList,
-                };
-                const options = {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify(data),
-                };
-                fetch("/dashBoard", options) //posts that data to be saved.
-                    .then(res => res.json())
-                    .then((data) => {
-                        res(true)
-                    })
-                    .catch((err) => {
-                        console.log("dashboard save error: ", err)
-                        res(false)
-                    })
+                if (this.state.login === 1) {
+                    const data = {
+                        dashBoardName: dashboardName,
+                        globalStockList: this.state.dashBoardData[this.state.currentDashBoard].globalstocklist,
+                        widgetList: this.state.dashBoardData[this.state.currentDashBoard].widgetlist,
+                        menuList: this.state.menuList,
+                    };
+                    const options = {
+                        method: "POST",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify(data),
+                    };
+                    fetch("/dashBoard", options) //posts that data to be saved.
+                        .then(res => res.json())
+                        .then((data) => {
+                            res(true)
+                        })
+                        .catch((err) => {
+                            console.log("dashboard save error: ", err)
+                            res(false)
+                        })
+                }
             })
             return status
         })

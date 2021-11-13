@@ -1,7 +1,6 @@
-export const completeLogin = function(that, data){
-    const p = that.props
+export const completeLogin = function(p, data, setMessage){
     if (data.login) {
-        that.setState({message: ""})
+        setMessage("")
         p.processLogin(data["key"], data["login"], data['apiAlias'], data['widgetsetup']);
         p.updateExchangeList(data.exchangelist)
         p.updateDefaultExchange(data.defaultexchange)
