@@ -1,7 +1,7 @@
 import produce from 'immer'
 export function MenuWidgetToggle(show: boolean) {
     //Create dashboard menu if first time looking at, else toggle visability
-    console.log('toggle')
+    // console.log('toggle', show)
     const s = this.state
     const widgetList = s.dashBoardData[s.currentDashBoard].widgetList
     const newWidgetList = produce(widgetList, (draftState) => {

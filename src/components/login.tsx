@@ -1,6 +1,7 @@
 import React from "react";
 import { useState, useEffect } from "react";
 import { Redirect } from 'react-router-dom'
+import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
 
 import { checkPassword } from "../appFunctions/client/checkPassword";
 import { forgotLogin } from "../appFunctions/client/forgotLogin";
@@ -12,13 +13,18 @@ import { completeLogin } from "./componentFunctions/completeLogin"
 
 import { styled } from '@material-ui/core/styles';
 import { Grid, Paper, Button, TextField, Box, Typography } from '@material-ui/core/';
-// import { financialsAsReportedProps } from "src/widgets/Fundamentals/financialsAsReported/financialsAsReportedBody";
+
+interface loginProps {
+    queryData: any,
+    processLogin: Function,
+    updateExchangeList: Function,
+    updateDefaultExchange: Function,
+    finnHubQueue: finnHubQueue,
+}
 
 const MyPaper = styled(Paper)({ color: "#1d69ab", variant: "outlined", borderRadius: 20, padding: 25 });
-const MyWarnings = styled(Typography)({ color: 'Secondary', variant: "h6" })
-// const MyGrid = styled(Grid)({ xs: 10, sm: 8, md: 4, lg: 4, xl: 4, align: "center" });
 
-export default function Login(p) {
+export default function Login(p: loginProps) {
 
     const [showMenu, setShowMenu] = useState(0); //0 = login, 1 = recover, 2 = register, 3 = secret question, 4 reset password
     const [message, setMessage] = useState(""); //message from server

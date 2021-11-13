@@ -1,9 +1,9 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
-// import "./App.css";
 import queryString from "query-string";
-
 import produce from 'immer'
+import { createTheme, ThemeProvider } from '@material-ui/core/styles'
+
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
@@ -31,6 +31,7 @@ import { MenuWidgetToggle } from "./appFunctions/appImport/menuWidgetToggle"
 
 //component imports
 import TopNav from "./components/topNav";
+import BottomNav from "./components/bottomNav";
 import Login from "./components/login";
 import AboutMenu from "./components/AboutMenu";
 import AccountMenu, { accountMenuProps } from "./components/accountMenu";
@@ -203,6 +204,23 @@ export interface AppState {
     widgetSetup: widgetSetup, //activates premium api routes.
     zIndex: string[], //list widgets. Index location sets zIndex
 }
+
+const outerTheme = createTheme({
+    palette: {
+        primary: {
+            // light: '#757ce8',
+            main: '#1d69ab',
+            // dark: '#002884',
+            // contrastText: '#fff',
+        },
+        //   secondary: {
+        //     light: '#ff7961',
+        //     main: '#f44336',
+        //     dark: '#ba000d',
+        //     contrastText: '#000',
+        //   },
+    },
+});
 
 class App extends React.Component<AppProps, AppState> {
     constructor(props: AppProps) {
@@ -469,90 +487,94 @@ class App extends React.Component<AppProps, AppState> {
         const globalStockList = s.dashBoardData?.[s.currentDashBoard]?.globalstocklist ? s.dashBoardData?.[s.currentDashBoard].globalstocklist : {}
         const dashboardID = this.state.dashBoardData?.[this.state.currentDashBoard]?.id ? this.state.dashBoardData[this.state.currentDashBoard].id : ''
 
+        const bottomNav = this.state.login === 1 ? <BottomNav menuWidgetToggle={this.menuWidgetToggle} showMenuColumn={this.state.showMenuColumn} /> : <></>
+
         return (
-            <BrowserRouter>
-                <Switch>
-                    <Route path="/">
-                        <TopNav
-                            AccountMenu={this.state.accountMenu}
-                            AddNewWidgetContainer={this.AddNewWidgetContainer}
-                            apiFlag={this.state.apiFlag}
-                            backGroundMenu={this.state.backGroundMenu}
-                            currentDashBoard={this.state.currentDashBoard}
-                            finnHubQueue={this.state.finnHubQueue}
-                            lockWidgets={this.lockWidgets}
-                            login={this.state.login}
-                            logOut={this.logOut}
-                            logoutServer={this.logoutServer}
-                            menuList={this.state.menuList}
-                            menuWidgetToggle={this.menuWidgetToggle}
-                            newMenuContainer={this.newMenuContainer}
-                            saveDashboard={this.saveDashboard}
-                            showMenuColumn={this.state.showMenuColumn}
-                            showStockWidgets={this.state.showStockWidgets}
-                            toggleBackGroundMenu={this.toggleBackGroundMenu}
-                            toggleWidgetVisability={this.toggleWidgetVisability}
-                            updateAPIFlag={this.updateAPIFlag}
-                            widgetLockDown={this.state.widgetLockDown}
-                            widgetSetup={this.state.widgetSetup}
-                        />
-                        <WidgetController
-                            apiKey={this.state.apiKey}
-                            apiAlias={this.state.apiAlias}
-                            availableStocks={this.state.availableStocks}
-                            changeWidgetName={this.changeWidgetName}
-                            copyDashboard={this.copyDashboard}
-                            currentDashBoard={this.state.currentDashBoard}
-                            dashBoardData={this.state.dashBoardData}
-                            dashboardID={dashboardID}
-                            defaultExchange={this.state.defaultExchange}
-                            exchangeList={this.state.exchangeList}
-                            finnHubQueue={this.state.finnHubQueue}
-                            getSavedDashBoards={this.getSavedDashBoards}
-                            globalStockList={globalStockList}
-                            loadSavedDashboard={this.loadSavedDashboard}
-                            login={this.state.login}
-                            menuList={this.state.menuList}
-                            menuWidgetToggle={this.menuWidgetToggle}
-                            moveWidget={this.moveWidget}
-                            newDashboard={this.newDashboard}
-                            processLogin={this.processLogin}
-                            removeWidget={this.removeWidget}
-                            removeDashboardFromState={this.removeDashboardFromState}
-                            rebuildDashboardState={this.rebuildDashboardState}
-                            refreshFinnhubAPIDataCurrentDashboard={this.refreshFinnhubAPIDataCurrentDashboard}
-                            saveDashboard={this.saveDashboard}
-                            setDrag={this.setDrag}
-                            setNewGlobalStockList={this.setNewGlobalStockList}
-                            setSecurityFocus={this.setSecurityFocus}
-                            setWidgetFocus={this.setWidgetFocus}
-                            showMenuColumn={this.state.showMenuColumn}
-                            showStockWidgets={this.state.showStockWidgets}
-                            snapWidget={this.snapWidget}
-                            syncGlobalStockList={this.syncGlobalStockList}
-                            targetSecurity={this.state.targetSecurity}
-                            toggleWidgetBody={this.toggleWidgetBody}
-                            updateAPIFlag={this.updateAPIFlag}
-                            updateAPIKey={this.updateAPIKey}
-                            updateDashBoards={this.updateDashBoards}
-                            updateDefaultExchange={this.updateDefaultExchange}
-                            updateGlobalStockList={this.updateGlobalStockList}
-                            updateWidgetConfig={this.updateWidgetConfig}
-                            updateWidgetFilters={this.updateWidgetFilters}
-                            updateWidgetStockList={this.updateWidgetStockList}
-                            uploadGlobalStockList={this.uploadGlobalStockList}
-                            widgetCopy={this.state.widgetCopy}
-                            widgetList={widgetList}
-                            widgetLockDown={this.state.widgetLockDown}
-                            zIndex={this.state.zIndex}
-                            rAddNewDashboard={this.props.rAddNewDashboard}
-                            rSetTargetDashboard={this.props.rSetTargetDashboard}
-                        />
-                        {loginScreen}
-                        {backGroundMenu()}
-                    </Route>
-                </Switch>
-            </BrowserRouter>
+            <ThemeProvider theme={outerTheme}>
+                <BrowserRouter>
+                    <Switch>
+                        <Route path="/">
+                            <TopNav
+                                AccountMenu={this.state.accountMenu}
+                                AddNewWidgetContainer={this.AddNewWidgetContainer}
+                                apiFlag={this.state.apiFlag}
+                                backGroundMenu={this.state.backGroundMenu}
+                                currentDashBoard={this.state.currentDashBoard}
+                                finnHubQueue={this.state.finnHubQueue}
+                                lockWidgets={this.lockWidgets}
+                                login={this.state.login}
+                                logOut={this.logOut}
+                                logoutServer={this.logoutServer}
+                                menuList={this.state.menuList}
+                                newMenuContainer={this.newMenuContainer}
+                                saveDashboard={this.saveDashboard}
+                                showMenuColumn={this.state.showMenuColumn}
+                                showStockWidgets={this.state.showStockWidgets}
+                                toggleBackGroundMenu={this.toggleBackGroundMenu}
+                                toggleWidgetVisability={this.toggleWidgetVisability}
+                                updateAPIFlag={this.updateAPIFlag}
+                                widgetLockDown={this.state.widgetLockDown}
+                                widgetSetup={this.state.widgetSetup}
+                            />
+                            <WidgetController
+                                apiKey={this.state.apiKey}
+                                apiAlias={this.state.apiAlias}
+                                availableStocks={this.state.availableStocks}
+                                changeWidgetName={this.changeWidgetName}
+                                copyDashboard={this.copyDashboard}
+                                currentDashBoard={this.state.currentDashBoard}
+                                dashBoardData={this.state.dashBoardData}
+                                dashboardID={dashboardID}
+                                defaultExchange={this.state.defaultExchange}
+                                exchangeList={this.state.exchangeList}
+                                finnHubQueue={this.state.finnHubQueue}
+                                getSavedDashBoards={this.getSavedDashBoards}
+                                globalStockList={globalStockList}
+                                loadSavedDashboard={this.loadSavedDashboard}
+                                login={this.state.login}
+                                menuList={this.state.menuList}
+                                menuWidgetToggle={this.menuWidgetToggle}
+                                moveWidget={this.moveWidget}
+                                newDashboard={this.newDashboard}
+                                processLogin={this.processLogin}
+                                removeWidget={this.removeWidget}
+                                removeDashboardFromState={this.removeDashboardFromState}
+                                rebuildDashboardState={this.rebuildDashboardState}
+                                refreshFinnhubAPIDataCurrentDashboard={this.refreshFinnhubAPIDataCurrentDashboard}
+                                saveDashboard={this.saveDashboard}
+                                setDrag={this.setDrag}
+                                setNewGlobalStockList={this.setNewGlobalStockList}
+                                setSecurityFocus={this.setSecurityFocus}
+                                setWidgetFocus={this.setWidgetFocus}
+                                showMenuColumn={this.state.showMenuColumn}
+                                showStockWidgets={this.state.showStockWidgets}
+                                snapWidget={this.snapWidget}
+                                syncGlobalStockList={this.syncGlobalStockList}
+                                targetSecurity={this.state.targetSecurity}
+                                toggleWidgetBody={this.toggleWidgetBody}
+                                updateAPIFlag={this.updateAPIFlag}
+                                updateAPIKey={this.updateAPIKey}
+                                updateDashBoards={this.updateDashBoards}
+                                updateDefaultExchange={this.updateDefaultExchange}
+                                updateGlobalStockList={this.updateGlobalStockList}
+                                updateWidgetConfig={this.updateWidgetConfig}
+                                updateWidgetFilters={this.updateWidgetFilters}
+                                updateWidgetStockList={this.updateWidgetStockList}
+                                uploadGlobalStockList={this.uploadGlobalStockList}
+                                widgetCopy={this.state.widgetCopy}
+                                widgetList={widgetList}
+                                widgetLockDown={this.state.widgetLockDown}
+                                zIndex={this.state.zIndex}
+                                rAddNewDashboard={this.props.rAddNewDashboard}
+                                rSetTargetDashboard={this.props.rSetTargetDashboard}
+                            />
+                            {loginScreen}
+                            {backGroundMenu()}
+                            {bottomNav}
+                        </Route>
+                    </Switch>
+                </BrowserRouter>
+            </ThemeProvider>
         );
     }
 }

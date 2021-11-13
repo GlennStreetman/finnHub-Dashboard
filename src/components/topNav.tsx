@@ -1,7 +1,15 @@
-import React from "react";
+
 import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg'
 import { menuList, widgetSetup, filters } from './../App'
 import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
+
+import { AppBar, Toolbar, Button, Tooltip } from '@material-ui/core/';
+import WidgetsIcon from '@material-ui/icons/Widgets';
+import TableChartIcon from '@material-ui/icons/TableChart';
+import AccountBoxIcon from '@material-ui/icons/AccountBox';
+import InfoIcon from '@material-ui/icons/Info';
+import LockRoundedIcon from '@material-ui/icons/LockRounded';
+import LockOpenRoundedIcon from '@material-ui/icons/LockOpenRounded';
 
 interface topNavProps {
     AccountMenu: number,
@@ -9,13 +17,11 @@ interface topNavProps {
     apiFlag: number,
     backGroundMenu: string,
     currentDashBoard: string,
-    // dashBoardMenu: number,
     login: number,
     logOut: Function,
     lockWidgets: Function,
     logoutServer: Function,
     menuList: menuList,
-    menuWidgetToggle: Function,
     newMenuContainer: Function,
     showMenuColumn: boolean,
     showStockWidgets: number,
@@ -23,48 +29,14 @@ interface topNavProps {
     toggleBackGroundMenu: Function,
     toggleWidgetVisability: Function,
     updateAPIFlag: Function,
-    // watchListMenu: number,
     widgetLockDown: number,
     widgetSetup: widgetSetup,
     finnHubQueue: finnHubQueue,
 }
 
-interface topNavState {
-    AboutAPIKeyReminder: number,
-    showAddWidgetDropdown: number,
-    showEstimates: number,
-    showFundamentals: number,
-    showCost: number,
-}
+export default function TopNav(p: topNavProps) {
 
-interface TopNav { //plug
-    [key: string]: any
-}
-
-class TopNav extends React.Component<topNavProps, topNavState> {
-    constructor(props: topNavProps) {
-        super(props);
-        this.state = {
-            AboutAPIKeyReminder: 0,
-            showAddWidgetDropdown: 0,
-            showEstimates: 0,
-            showFundamentals: 0,
-            showCost: 0,
-        };
-        this.dropDownList = this.dropDownList.bind(this);
-        this.isChecked = this.isChecked.bind(this);
-    }
-
-    componentDidUpdate(prevProps: topNavProps) {
-        const p = this.props
-
-        if (p.apiFlag === 1 && p.apiFlag !== prevProps.apiFlag) {
-            this.setState({ AboutAPIKeyReminder: 1 })
-        }
-    }
-
-    isChecked(el: [string, string, string, string, filters | undefined, string]) {
-        const p: topNavProps = this.props
+    function isChecked(el: [string, string, string, string, filters | undefined, string]) {
         if (p.widgetSetup[el[0]] !== undefined) {
             return p.widgetSetup[el[0]]
         } else if (p.widgetSetup[el[0]] === undefined && el[5] === 'Free') {
@@ -74,12 +46,12 @@ class TopNav extends React.Component<topNavProps, topNavState> {
         }
     }
 
-    dropDownList(dropList: [string, string, string, string, filters | undefined, string][]) {
+    function dropDownList(dropList: [string, string, string, string, filters | undefined, string][]) {
         let newList = dropList.map((el) => {
             let [a, b, c, d, e] = el
-            if (this.isChecked(el) === true) {
+            if (isChecked(el) === true) {
                 return (<li key={a + 'li'} id='ddi'>
-                    <a key={a} data-testid={d} href="#r" onClick={() => { this.props.AddNewWidgetContainer(a, b, c, e); }}>
+                    <a key={a} data-testid={d} href="#r" onClick={() => { p.AddNewWidgetContainer(a, b, c, e); }}>
                         {d}
                     </a>
                 </li>)
@@ -88,100 +60,93 @@ class TopNav extends React.Component<topNavProps, topNavState> {
         return <ul id='ddu' className='sub-menu'>{newList}</ul>
     }
 
-    render() {
-        const p: topNavProps = this.props
+    let widgetDropDown = <>
+        <ul id='ddu' className='sub-Menu' data-testid='widgetDropDown'>
+            <li id='ddi' className='menu-item-has-children'><a data-testid="estimatesDropdown" href='#1'>Estimate</a>
+                {dropDownList(estimateOptions)}
+            </li>
+            <li id='ddi' className='menu-item-has-children'><a data-testid="fundamentalsDropDown" href='#2'>Fundamentals</a>
+                {dropDownList(fundamentalsOptions)}
+            </li>
+            <li id='ddi' className='menu-item-has-children'><a data-testid="priceDropDown" href='#3'>Price Data</a>
+                {dropDownList(priceOptions)}
+            </li>
+        </ul>
+    </>
 
-        let widgetDropDown = <>
-            <ul id='ddu' className='sub-Menu' data-testid='widgetDropDown'>
-                <li id='ddi' className='menu-item-has-children'><a data-testid="estimatesDropdown" href='#1'>Estimate</a>
-                    {this.dropDownList(estimateOptions)}
-                </li>
-                <li id='ddi' className='menu-item-has-children'><a data-testid="fundamentalsDropDown" href='#2'>Fundamentals</a>
-                    {this.dropDownList(fundamentalsOptions)}
-                </li>
-                <li id='ddi' className='menu-item-has-children'><a data-testid="priceDropDown" href='#3'>Price Data</a>
-                    {this.dropDownList(priceOptions)}
-                </li>
-            </ul>
-        </>
-
-        const showDashBoardButtons = () => {
-            if (this.props.showStockWidgets === 1) {
-                return (<>
-
-                    <li id='ddi' className='navItem'>
-                        <a href="#contact" onClick={() => this.props.menuWidgetToggle(!this.props.showMenuColumn)}>
-                            {this.props.showMenuColumn === true ? "Hide Menu Column" : "Show Menu Column"}
+    const showDashBoardButtons = () => {
+        if (p.showStockWidgets === 1) {
+            return (<>
+                <li id='ddi' className="menu-item-has-children">
+                    <Tooltip title="Add Widget" placement="bottom">
+                        <a data-testid="widgetsDropdown" href="#contact">
+                            <WidgetsIcon />
                         </a>
-                    </li>
+                    </Tooltip>
+                    {widgetDropDown}
+                </li>
 
-                    <li id='ddi' className="menu-item-has-children"><a data-testid="widgetsDropdown" href="#contact">Add Widgets</a>
-                        {widgetDropDown}
-                    </li>
+            </>
+            )
+        } else { return <></> }
+    }
 
-                </>
-                )
-            } else { return <></> }
-        }
-
-        return this.props.login === 1 ? (
-            <nav className="mainNavigation">
-
+    return p.login === 1 ? (
+        <AppBar position="static">
+            <Toolbar >
+                <img src="logo2.png" alt="logo" />
                 <ul id='ddu' className="menu">
-                    <li id='ddi'><img src="logo2.png" alt="logo"></img></li>
+                    <li id='ddi'></li>
                     {showDashBoardButtons()}
                 </ul>
 
                 <div className="navItemEnd">
                     <ul id='ddu' className="sub-menu">
                         <li id='toggleBackGroundMenuButton' className="navItem">
-                            <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('') }}>
-                                {this.props.backGroundMenu === '' ? " " : "Back to Dashboards"}
+                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('') }}>
+                                {p.backGroundMenu === '' ? " " : "Back to Dashboards"}
                             </a>
                         </li>
                         <li id='templatesButton' className="navItem">
-                            <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('templates') }}>
-                                Templates
+                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('templates') }}>
+                                <Tooltip title="Excel Templates" placement="bottom"><TableChartIcon /></Tooltip>
                             </a>
                         </li>
-                        {/* <li id='endPointButton' className="navItem">
-                            <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('endPoint') }}>
-                                Endpoints
-                            </a>
-                        </li> */}
                         <li id='manageAccountButton' className="navItem">
-                            <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('manageAccount') }}>
-                                Manage Account
+                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('manageAccount') }}>
+                                <Tooltip title="Manage Account" placement="bottom"><AccountBoxIcon /></Tooltip>
                             </a>
                         </li>
                         <li id='aboutButton' className='navItem'>
-                            <a href="#home" onClick={() => { this.props.toggleBackGroundMenu('about') }}>
-                                About
+                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('about') }}>
+                                <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>
                             </a>
                         </li>
                         <li id='LogButton' className='navItem'>
                             <a id='LogButtonLink' href="#home" onClick={async () => {
-                                await this.props.logoutServer()
-                                this.props.logOut()
+                                await p.logoutServer()
+                                p.logOut()
                             }}>
-                                {p.login === 0 ? "Login" : "Logout"}
+                                <Tooltip title="Logout" placement="bottom"><LockRoundedIcon /></Tooltip>
+
                             </a>
                         </li>
                     </ul>
                 </div>
-            </nav>
+            </Toolbar>
+        </AppBar>
 
-        ) : (
-            <>
-                <div className="topnav">
-                    <div className='navItemEnd'>
-                        <a id='aboutButton' href="#home" onClick={() => { this.props.toggleBackGroundMenu('about') }}>
-                            {this.props.backGroundMenu === 'about' ? "Login" : "About"}
-                        </a>
-                    </div>
+    ) : (
+        <>
+            <div className="topnav">
+                <div className='navItemEnd'>
+                    <a id='aboutButton' href="#home" onClick={() => { p.toggleBackGroundMenu('about') }}>
+                        {p.backGroundMenu === 'about' ?
+                            <Tooltip title="Login" placement="bottom"><LockOpenRoundedIcon /></Tooltip> :
+                            <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>}
+                    </a>
                 </div>
-            </>
-        );
-    }
+            </div>
+        </>
+    );
 }
-export default TopNav;
