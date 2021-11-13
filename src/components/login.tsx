@@ -1,6 +1,6 @@
 import React from "react";
 import { useState, useEffect } from "react";
-// import {BrowserRouter as Router, Route, Switch} from 'react-router-dom'
+import { Redirect } from 'react-router-dom'
 
 import { checkPassword } from "../appFunctions/client/checkPassword";
 import { forgotLogin } from "../appFunctions/client/forgotLogin";
@@ -11,9 +11,11 @@ import { registerAccount } from "../appFunctions/client/registerAccount";
 import { completeLogin } from "./componentFunctions/completeLogin"
 
 import { styled } from '@material-ui/core/styles';
-import { Grid, Paper, Button, TextField, Box } from '@material-ui/core/';
+import { Grid, Paper, Button, TextField, Box, Typography } from '@material-ui/core/';
+// import { financialsAsReportedProps } from "src/widgets/Fundamentals/financialsAsReported/financialsAsReportedBody";
 
 const MyPaper = styled(Paper)({ color: "#1d69ab", variant: "outlined", borderRadius: 20, padding: 25 });
+const MyWarnings = styled(Typography)({ color: 'Secondary', variant: "h6" })
 // const MyGrid = styled(Grid)({ xs: 10, sm: 8, md: 4, lg: 4, xl: 4, align: "center" });
 
 export default function Login(p) {
@@ -35,6 +37,7 @@ export default function Login(p) {
     const [warn4, setWarn4] = useState("");
     const [warn5, setWarn5] = useState("");
     const [warn6, setWarn6] = useState("");
+    const [base, setBase] = useState(false); //if true, redirect to '/'
 
     const textLookup = {
         text0: text0,
@@ -88,16 +91,23 @@ export default function Login(p) {
                     console.error("No server response: ", error);
                 });
         }
+    }, [p]);
 
+    useEffect(() => {
         if (p.queryData.message === '1') {
             setMessage("Thank you for registering. Please login.")
         }
         if (p.queryData.message === '2') {
             setMessage("Problem validating email address.")
         }
-    }, [p]);
+        if (p.queryData.message !== '1' && p.queryData.message !== '2' && p.queryData.message) {
+            setMessage(p.queryData.message.replaceAll("%", " "))
+        }
+    })
 
     useEffect(() => { checkLoginStatus(p.processLogin, p.updateExchangeList, p.updateDefaultExchange, p.finnHubQueue) }, [])
+
+    useEffect(() => { if (base === true) setBase(false) })
 
     function emailIsValid(email) {
         return /\S+@\S+\.\S+/.test(email);
@@ -109,6 +119,7 @@ export default function Login(p) {
     };
 
     function clearText(showMenuRef) {
+        console.log('reseting')
         setText0("")
         setText1("")
         setText2("")
@@ -124,7 +135,10 @@ export default function Login(p) {
         setWarn5("")
         setWarn6("")
         setShowMenu(showMenuRef)
+        window.history.pushState({ message: "" }, "", "/")
+        setMessage("")
         return true
+
     }
 
     function handleEnterKeyPress(e, keyFunction) {
@@ -188,7 +202,7 @@ export default function Login(p) {
             secretQuestion(text0, userName)
                 .then((data) => {
                     if (data.message === "correct") {
-                        setMessage("username: " + data["users"])
+                        setMessage("")
                         setText0(data["question"])
                         clearText(4)
                     } else {
@@ -206,6 +220,7 @@ export default function Login(p) {
                     if (data.message === '' || data.message === true) {
                         setMessage("Password Updated. Please login with your new password")
                         clearText(0)
+                        setBase(true)
                     } else {
                         setMessage("Problem updating password. Please restart process.")
                     }
@@ -268,7 +283,9 @@ export default function Login(p) {
         </div>
     )
 
-    return (
+    const redirectTag = base === true ? <Redirect to="/?" /> : <></>
+
+    return (<>
         <Grid container onKeyDown={(e) => handleEnterKeyPress(e, submitFunctionLookup[showMenu])}>
             <Grid item xs={1} sm={2} md={4} lg={4} xl={4} />
             {/*
@@ -307,13 +324,16 @@ export default function Login(p) {
                     </MyPaper>
                 </Box>
                 <Box pt={2}>
-                    {message}
+                    <Typography variant="h6" color="secondary">{message}</Typography>
                 </Box>
             </Grid>
 
             <Grid item xs={1} sm={2} md={4} lg={4} xl={4} />
 
         </Grid >
+
+        {redirectTag}
+    </>
     );
 
 }
