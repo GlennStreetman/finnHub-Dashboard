@@ -16,7 +16,6 @@ interface topNavProps {
     AddNewWidgetContainer: Function,
     apiFlag: number,
     backGroundMenu: string,
-    currentDashBoard: string,
     login: number,
     logOut: Function,
     lockWidgets: Function,

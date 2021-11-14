@@ -5,7 +5,7 @@ import produce from "immer"
 export const updateGlobalStockList = async function (event: Event, stockRef: string, stockObj: StockObj | Object = {}) {
     //Adds/removes a single stock from global stock list and updates current dashboard. if no stock object passed, remove from global stock list, else add.
     // console.log('updating global', stockObj)
-    const globalStockList = this.state.dashBoardData[this.state.currentDashBoard].globalstocklist
+    const globalStockList = this.state.dashBoardData[this.props.currentDashboard].globalstocklist
     const currentStockObj = { ...globalStockList };
     if (currentStockObj[stockRef] === undefined) {
         currentStockObj[stockRef] = { ...stockObj };
@@ -23,7 +23,7 @@ export const updateGlobalStockList = async function (event: Event, stockRef: str
     const oldState: AppState = this.state;
     const dbData = oldState.dashBoardData
     let updateCurrentDashboard: dashBoardData = produce(dbData, (draftState: dashBoardData) => {
-        draftState[this.state.currentDashBoard].globalstocklist = currentStockObj
+        draftState[this.props.currentDashboard].globalstocklist = currentStockObj
     })
 
 
@@ -31,7 +31,7 @@ export const updateGlobalStockList = async function (event: Event, stockRef: str
         dashBoardData: updateCurrentDashboard
     }
     this.setState(payload, () => {
-        this.saveDashboard(this.state.currentDashBoard)
+        this.saveDashboard(this.props.currentDashboard)
     });
 
     event instanceof Event === true && event.preventDefault();
@@ -43,7 +43,7 @@ export const setNewGlobalStockList = function (replacementGlobalList) {
     const oldState: AppState = this.state;
     const dbData = oldState.dashBoardData
     let updateCurrentDashboard: dashBoardData = produce(dbData, (draftState: dashBoardData) => {
-        draftState[this.state.currentDashBoard].globalstocklist = replacementGlobalList
+        draftState[this.props.currentDashboard].globalstocklist = replacementGlobalList
     })
 
     const newFocus = replacementGlobalList[Object.keys(replacementGlobalList)[0]] ? replacementGlobalList[Object.keys(replacementGlobalList)[0]].key : ''
@@ -54,6 +54,6 @@ export const setNewGlobalStockList = function (replacementGlobalList) {
     }
 
     this.setState(payload, () => {
-        this.saveDashboard(this.state.currentDashBoard)
+        this.saveDashboard(this.props.currentDashboard)
     })
 }

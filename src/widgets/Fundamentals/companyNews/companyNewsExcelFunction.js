@@ -1,7 +1,7 @@
-export const companyNewsExcel = function (apiKey, currentDashBoard, widgetHeader,security, config) {
+export const companyNewsExcel = function (apiKey, currentDashboard, widgetHeader,security, config) {
     const data = { 
         apiKey: apiKey,
-        dashboard: currentDashBoard,
+        dashboard: currentDashboard,
         widget: widgetHeader,
         columnKeys: [ //<-- DEFINE Column headers and finnHub data keys.
             { Category: 'category' }, 

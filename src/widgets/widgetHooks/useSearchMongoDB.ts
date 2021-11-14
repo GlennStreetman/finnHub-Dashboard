@@ -7,7 +7,7 @@ import { rSetUpdateStatus } from "./../../slices/sliceDataModel";
 import { tgetFinnHubDataReq } from './../../thunks/thunkFetchFinnhub'
 //updates widgets config.targetSecurity for any widget that uses a target security.
 export const useSearchMongoDb = function (
-    currentDashBoard: string, //string name of current dashboard, not id.
+    currentDashboard: string, //string name of current dashboard, not id.
     finnHubQueue: finnHubQueue, //queue object
     targetSecurity: string, //p.config.targetSecurity
     widgetKey: string, //p.widgetKey 
@@ -27,7 +27,7 @@ export const useSearchMongoDb = function (
 
                         const payload: tgetFinnHubDataReq = {
                             dashboardID: dashboardID,
-                            targetDashBoard: currentDashBoard,
+                            targetDashBoard: currentDashboard,
                             widgetList: [widgetKey],
                             finnHubQueue: finnHubQueue,
                             rSetUpdateStatus: rSetUpdateStatus,
@@ -37,7 +37,7 @@ export const useSearchMongoDb = function (
                     }
                 })
         }
-    }, [targetSecurity, widgetKey, dispatch, isInitialMount, widgetCopy, currentDashBoard, finnHubQueue, dashboardID])
+    }, [targetSecurity, widgetKey, dispatch, isInitialMount, widgetCopy, currentDashboard, finnHubQueue, dashboardID])
 }
 
 //CONDITIONS THAT ONE OF MUST RETURN FALSE

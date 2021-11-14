@@ -7,16 +7,16 @@ export const loadSavedDashboard = function (target: string) {
     const payload: rSetTargetDashboardPayload = { targetDashboard: target }
     this.props.rSetTargetDashboard(payload)
     this.setState({
-        currentDashBoard: target,
+        currentDashboard: target,
         targetSecurity: Object.keys(this.state.dashBoardData[target].globalstocklist)[0],
     })
     const updateVisable = async function (that: any) {
         const s: AppState = that.state
-        await that.props.tGetMongoDB({ dashboard: s.dashBoardData[s.currentDashBoard].id })
+        await that.props.tGetMongoDB({ dashboard: s.dashBoardData[p.currentDashboard].id })
         const finnHubPayload: tgetFinnHubDataReq = {
-            dashboardID: s.dashBoardData[s.currentDashBoard].id,
-            targetDashBoard: s.currentDashBoard,
-            widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist),
+            dashboardID: s.dashBoardData[p.currentDashboard].id,
+            targetDashBoard: p.currentDashboard,
+            widgetList: Object.keys(s.dashBoardData[p.currentDashboard].widgetlist),
             finnHubQueue: s.finnHubQueue,
             rSetUpdateStatus: p.rSetUpdateStatus,
         }

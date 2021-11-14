@@ -86,7 +86,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     }
 
     function unMountWidgets() { //removes visable data from redux for dashboard.
-        const widdgetKeys = Object.keys(p.dashBoardData?.[p.currentDashBoard]?.widgetlist)
+        const widdgetKeys = Object.keys(p.dashBoardData?.[p.currentDashboard]?.widgetlist)
         for (const x in widdgetKeys) {
             const widgetKey = widdgetKeys[x]
             const payload = {
@@ -109,7 +109,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
         const deleteKeyList = Object.keys(p.dashBoardData[dashboardName]['widgetlist'])
         for (const x in deleteKeyList) fetch(`/deleteFinnDashData?widgetID=${deleteKeyList[x]}`) //drop data from mongo.
 
-        if (dashboardName === p.currentDashBoard && Object.keys(dashBoardData).length > 1) { //if shown dashboard is deleted.
+        if (dashboardName === p.currentDashboard && Object.keys(dashBoardData).length > 1) { //if shown dashboard is deleted.
             unMountWidgets()
             for (const x in Object.keys(dashBoardData)) {
                 const dashboard = p.dashBoardData[Object.keys(dashBoardData)[x]]
@@ -119,7 +119,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                     break
                 }
             }
-        } else if (dashboardName === p.currentDashBoard && Object.keys(dashBoardData).length === 1) {
+        } else if (dashboardName === p.currentDashboard && Object.keys(dashBoardData).length === 1) {
             unMountWidgets() //removes widgets from redux visable data model.
             p.newDashBoard('NEW', p.dashBoardData)
         }
@@ -157,7 +157,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                         <input
                             type='radio'
                             key={el + 'radio'}
-                            checked={p.currentDashBoard === p.dashBoardData?.[el]?.dashboardname} //
+                            checked={p.currentDashboard === p.dashBoardData?.[el]?.dashboardname} //
                             onChange={() => {
                                 unMountWidgets()
                                 p.loadSavedDashboard(p.dashBoardData?.[el]?.dashboardname);
@@ -256,7 +256,7 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
         getSavedDashBoards: that.props.getSavedDashBoards,
         dashBoardData: that.props.dashBoardData,
         copyDashboard: that.props.copyDashboard,
-        currentDashBoard: that.props.currentDashBoard,
+        currentDashboard: that.props.currentDashboard,
         saveDashboard: that.props.saveDashboard,
         newDashBoard: that.props.newDashboard,
         helpText: [helpText, 'DBM'],

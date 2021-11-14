@@ -4,28 +4,31 @@ import exchangeList, { sliceExchangeList } from './slices/sliceExchangeList'
 import dataModel, { sliceDataModel } from './slices/sliceDataModel'
 import showData, { sliceShowData } from './slices/sliceShowData'
 import quotePrice, { sliceQuotePrice } from './slices/sliceQuotePrice'
+import currentDashboard from './slices/sliceCurrentDashboard'
 
 export interface storeState {
-  exchangeData: sliceExchangeData,
-  exchangeList: sliceExchangeList,
-  dataModel: sliceDataModel,
-  showData: sliceShowData,
-  quotePrice: sliceQuotePrice,
+    exchangeData: sliceExchangeData,
+    exchangeList: sliceExchangeList,
+    dataModel: sliceDataModel,
+    showData: sliceShowData,
+    quotePrice: sliceQuotePrice,
+    currentDashboard: string,
 }
 
 export const store = configureStore({
-  reducer: {
-    'exchangeData': exchangeData,
-    'exchangeList': exchangeList,
-    'dataModel': dataModel,
-    'showData': showData,
-    'quotePrice': quotePrice,
-  },
-  middleware: () =>
-    getDefaultMiddleware({
-      immutableCheck: false,
-      serializableCheck: false,
-    })
+    reducer: {
+        'exchangeData': exchangeData,
+        'exchangeList': exchangeList,
+        'dataModel': dataModel,
+        'showData': showData,
+        'quotePrice': quotePrice,
+        'currentDashboard': currentDashboard,
+    },
+    middleware: () =>
+        getDefaultMiddleware({
+            immutableCheck: false,
+            serializableCheck: false,
+        })
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

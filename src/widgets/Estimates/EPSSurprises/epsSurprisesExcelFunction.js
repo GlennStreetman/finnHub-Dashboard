@@ -1,7 +1,7 @@
-export const epsSuprisesExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
+export const epsSuprisesExcel = function (apiKey, currentDashboard, widgetHeader, security) {
     const data = { 
         apiKey: apiKey,
-        dashboard: currentDashBoard,
+        dashboard: currentDashboard,
         widget: widgetHeader,
         columnKeys: [ //<-- DEFINE Column headers and finnHub data keys.
             { Actual: 'actual' }, 

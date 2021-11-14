@@ -1,4 +1,4 @@
-import { AppState, globalStockList } from './../App'
+import { AppState, AppProps, globalStockList } from './../App'
 import { rUpdarUpdateQuotePricePayload } from './../slices/sliceQuotePrice'
 
 function UpdateTickerSockets(context: any, socket: any, apiKey: string, globalStockList: globalStockList) {
@@ -55,10 +55,10 @@ function UpdateTickerSockets(context: any, socket: any, apiKey: string, globalSt
     }
 }
 
-function LoadTickerSocket(context: any, prevState: AppState, globalStockList: globalStockList, socket: any, apiKey: string, updateTickerSockets: Function) {
+function LoadTickerSocket(context: any, prevState: AppState, prevProps: AppProps, globalStockList: globalStockList, socket: any, apiKey: string, updateTickerSockets: Function) {
     const that = context
     //    /console.log('SOCKET', apiKey)
-    if (globalStockList !== prevState.dashBoardData?.[prevState.currentDashBoard]?.globalstocklist && apiKey !== "" && apiKey) {
+    if (globalStockList !== prevState.dashBoardData?.[prevProps.currentDashboard]?.globalstocklist && apiKey !== "" && apiKey) {
         if (socket === '' && apiKey !== undefined && apiKey !== '' && apiKey.indexOf('sandbox') === -1) {
             socket = new WebSocket(`wss://ws.finnhub.io?token=${apiKey}`)
         }

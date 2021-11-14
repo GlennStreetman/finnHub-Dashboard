@@ -6,14 +6,14 @@ interface endPointMenuProps {
     apiAlias: string,
     apiKey: string,
     dashBoardData: dashBoardData,
-    currentDashBoard: string,
+    currentDashboard: string,
     targetSecurity: string,
     globalStockList: globalStockList,
 }
 
 function EndPointMenu(p: endPointMenuProps, ref: any) {
 
-    const [targetDashboard, setTargetDashboard] = useState(p.currentDashBoard ? p.currentDashBoard : '')
+    const [targetDashboard, setTargetDashboard] = useState(p.currentDashboard ? p.currentDashboard : '')
     const [securityFocus, setSecurityFocus] = useState(p.targetSecurity ? p.targetSecurity : '')
     const [toggleView, setToggleView] = useState('widget') //widget or security
 
@@ -25,8 +25,8 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
 
 
     useEffect(() => { //update dashboard on change to target dashboard
-        setTargetDashboard(p.currentDashBoard)
-    }, [p.currentDashBoard])
+        setTargetDashboard(p.currentDashboard)
+    }, [p.currentDashboard])
 
     const url = window.location
     let baseURL = url.protocol + "/" + url.host + "/" + url.pathname.split('/')[1] + 'graphQL';
@@ -157,7 +157,7 @@ export function gqlMenuProps(that, key = "AccountMenu") {
         dashBoardData: that.props.dashBoardData,
         apiKey: that.props.apiKey,
         apiAlias: that.props.apiAlias,
-        currentDashBoard: that.props.currentDashBoard,
+        currentDashboard: that.props.currentDashboard,
         targetSecurity: that.props.targetSecurity,
         globalStockList: that.props.globalStockList
     };

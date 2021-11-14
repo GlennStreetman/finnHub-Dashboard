@@ -1,7 +1,7 @@
-export const quoteExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
+export const quoteExcel = function (apiKey, currentDashboard, widgetHeader, security) {
     const data = { 
         apiKey: apiKey,
-        dashboard: currentDashBoard,
+        dashboard: currentDashboard,
         widget: widgetHeader,
         columnKeys: [ //<-- DEFINE Column headers and finnHub data keys.
             { Current: 'c' }, 

@@ -1,5 +1,5 @@
 
-export const financialsAsReportedExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
+export const financialsAsReportedExcel = function (apiKey, currentDashboard, widgetHeader, security) {
 
     const columnKeys = [
         {AccessNumber: 'accessNumber'},
@@ -21,7 +21,7 @@ export const financialsAsReportedExcel = function (apiKey, currentDashBoard, wid
     
     const data = { 
         apiKey: apiKey,
-        dashboard: currentDashBoard,
+        dashboard: currentDashboard,
         widget: widgetHeader,
         columnKeys: columnKeys
     };

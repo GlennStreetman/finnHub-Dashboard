@@ -1,8 +1,8 @@
-export const candleExcel = async function (apiKey, currentDashBoard, widgetHeader, security) {
+export const candleExcel = async function (apiKey, currentDashboard, widgetHeader, security) {
     
     const data = {
         apiKey: apiKey,
-        dashboard: currentDashBoard,
+        dashboard: currentDashboard,
         widget: widgetHeader,
         columnKeys: [
             { Date: 'date'},

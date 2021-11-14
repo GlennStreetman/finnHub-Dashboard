@@ -14,7 +14,7 @@ export const SetDrag = function setDrag(stateRef: 'menuWidget' | 'widgetList', w
 
         const thisList: menuList | dashBoardData = s[ref]
         updatedWidgetLocation = produce(thisList, (draftState: menuList | dashBoardData) => {
-            draftState[s.currentDashBoard]['widgetlist'][widgetId]['column'] = 'drag'
+            draftState[this.props.currentDashboard]['widgetlist'][widgetId]['column'] = 'drag'
         })
     }
     return new Promise((resolve) => {
@@ -42,8 +42,8 @@ export const MoveWidget = function moveWidget(stateRef: 'menuWidget' | 'widgetLi
     } else {
         const thisList: menuList | dashBoardData = s[ref]
         updatedWidgetLocation = produce(thisList, (draftState: menuList | widgetList) => {
-            draftState[s.currentDashBoard]['widgetlist'][widgetId]["xAxis"] = xxAxis;
-            draftState[s.currentDashBoard]['widgetlist'][widgetId]["yAxis"] = yyAxis;
+            draftState[this.props.currentDashboard]['widgetlist'][widgetId]["xAxis"] = xxAxis;
+            draftState[this.props.currentDashboard]['widgetlist'][widgetId]["yAxis"] = yyAxis;
         })
     }
     const payload: Partial<AppState> = { [ref]: updatedWidgetLocation }
@@ -64,7 +64,7 @@ export const SnapOrder = function snapOrder(widget: string, column: number, yyAx
         dashBoardData: s.dashBoardData
     }
     const newWidgetLists: Partial<AppState> = produce(draft, (draftState: Partial<AppState>) => {
-        const thisWidgetList = draftState?.dashBoardData?.[s.currentDashBoard]?.widgetlist
+        const thisWidgetList = draftState?.dashBoardData?.[this.props.currentDashboard]?.widgetlist
         let allWidgets: (menu | widget)[] = [...Object.values(draftState.menuList!) as menu[], ...Object.values(thisWidgetList!) as widget[]]
         allWidgets = allWidgets.filter(w => (w['column'] === column ? true : false))
         allWidgets = allWidgets.sort((a, b) => (a.columnOrder > b.columnOrder) ? 1 : -1)
@@ -133,5 +133,5 @@ export const SnapWidget = async function snapWidget(stateRef: 'menuWidget' | 'wi
     if (stateRef !== 'menuWidget' && s.showMenuColumn === false) column = column + 1 //add 1 if menu column is hidden.
 
     await this.snapOrder(widgetId, column, yyAxis, stateRef)
-    this.saveDashboard(this.state.currentDashBoard)
+    this.saveDashboard(this.props.currentDashboard)
 }

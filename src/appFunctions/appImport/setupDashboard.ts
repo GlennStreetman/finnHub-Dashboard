@@ -34,9 +34,9 @@ export const NewDashboard = function newDashboard(newName, dashboards) {
     console.log('creating new dashboard')
     const testname = newName ? newName : 'DASHBOARD'
     const uniqueName = uniqueObjectnName(testname, dashboards)
+    this.props.rUpdateCurrentDashboard(uniqueName)
     this.setState(() => {
         const update: Partial<AppState> = {
-            currentDashBoard: uniqueName,
             zIndex: [],
         }
         return update
@@ -73,8 +73,8 @@ export const saveDashboard = async function (dashboardName: string) {
                 if (this.state.login === 1) {
                     const data = {
                         dashBoardName: dashboardName,
-                        globalStockList: this.state.dashBoardData[this.state.currentDashBoard].globalstocklist,
-                        widgetList: this.state.dashBoardData[this.state.currentDashBoard].widgetlist,
+                        globalStockList: this.state.dashBoardData[this.props.currentDashboard].globalstocklist,
+                        widgetList: this.state.dashBoardData[this.props.currentDashboard].widgetlist,
                         menuList: this.state.menuList,
                     };
                     const options = {
