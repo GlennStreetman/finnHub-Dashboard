@@ -81,6 +81,7 @@ function WidgetController(p) {
                 if (el.widgetConfig === 'menuWidget') {
                     thisWidgetProps['showMenu'] = p[el.widgetID]
                     thisWidgetProps['setWidgetFocus'] = p.setWidgetFocus
+                    thisWidgetProps['rUpdateCurrentDashboard'] = p.rUpdateCurrentDashboard
                 }
                 if (p.widgetCopy?.widgetID === el.widgetID) {
                     thisWidgetProps.widgetCopy = p.widgetCopy

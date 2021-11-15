@@ -1,8 +1,7 @@
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
-import { useAppSelector } from '../../../hooks';
+import { useAppSelector, useAppDispatch } from '../../../hooks';
 // import { uniqueObjectnName } from './../../../appFunctions/stringFunctions'
 
-import { useAppDispatch } from './../../../hooks';
 import { rUnmountWidget } from './../../../slices/sliceShowData'
 import { rRemoveDashboardDataModel } from './../../../slices/sliceDataModel'
 
@@ -15,6 +14,10 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     const [inputText, setInputText] = useState('Enter Name')
     const [newNames, setNewNames] = useState({})
     const useSelector = useAppSelector
+
+    const currentDashboard = useSelector((state) => {     //finnhub data stored in redux
+        return (state.currentDashboard)
+    })
 
     const dashboardStatus = useSelector((state) => { //REDUX Data associated with this widget.
         if (state.dataModel !== undefined &&
@@ -86,7 +89,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     }
 
     function unMountWidgets() { //removes visable data from redux for dashboard.
-        const widdgetKeys = Object.keys(p.dashBoardData?.[p.currentDashboard]?.widgetlist)
+        const widdgetKeys = Object.keys(p.dashBoardData?.[currentDashboard]?.widgetlist)
         for (const x in widdgetKeys) {
             const widgetKey = widdgetKeys[x]
             const payload = {
@@ -109,7 +112,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
         const deleteKeyList = Object.keys(p.dashBoardData[dashboardName]['widgetlist'])
         for (const x in deleteKeyList) fetch(`/deleteFinnDashData?widgetID=${deleteKeyList[x]}`) //drop data from mongo.
 
-        if (dashboardName === p.currentDashboard && Object.keys(dashBoardData).length > 1) { //if shown dashboard is deleted.
+        if (dashboardName === currentDashboard && Object.keys(dashBoardData).length > 1) { //if shown dashboard is deleted.
             unMountWidgets()
             for (const x in Object.keys(dashBoardData)) {
                 const dashboard = p.dashBoardData[Object.keys(dashBoardData)[x]]
@@ -119,7 +122,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                     break
                 }
             }
-        } else if (dashboardName === p.currentDashboard && Object.keys(dashBoardData).length === 1) {
+        } else if (dashboardName === currentDashboard && Object.keys(dashBoardData).length === 1) {
             unMountWidgets() //removes widgets from redux visable data model.
             p.newDashBoard('NEW', p.dashBoardData)
         }
@@ -157,7 +160,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                         <input
                             type='radio'
                             key={el + 'radio'}
-                            checked={p.currentDashboard === p.dashBoardData?.[el]?.dashboardname} //
+                            checked={currentDashboard === p.dashBoardData?.[el]?.dashboardname} //
                             onChange={() => {
                                 unMountWidgets()
                                 p.loadSavedDashboard(p.dashBoardData?.[el]?.dashboardname);
@@ -256,7 +259,7 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
         getSavedDashBoards: that.props.getSavedDashBoards,
         dashBoardData: that.props.dashBoardData,
         copyDashboard: that.props.copyDashboard,
-        currentDashboard: that.props.currentDashboard,
+        // currentDashboard: that.props.currentDashboard,
         saveDashboard: that.props.saveDashboard,
         newDashBoard: that.props.newDashboard,
         helpText: [helpText, 'DBM'],
@@ -267,6 +270,7 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
         removeDashboardFromState: that.props.removeDashboardFromState,
         rAddNewDashboard: that.props.rAddNewDashboard,
         rSetTargetDashboard: that.props.rSetTargetDashboard,
+        rUpdateCurrentDashboard: that.props.rUpdateCurrentDashboard
     };
     return propList;
 }

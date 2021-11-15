@@ -87,7 +87,6 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
         this.props.rRebuildTargetWidgetModel(payload)
         let updatePayload: tgetFinnHubDataReq = {
             dashboardID: s.dashBoardData[this.props.currentDashboard].id,
-            targetDashBoard: currentDashboard,
             widgetList: [`${widgetName}`],
             finnHubQueue: s.finnHubQueue,
             rSetUpdateStatus: this.props.rSetUpdateStatus,
@@ -238,7 +237,6 @@ export const UpdateWidgetFilters = async function (widgetID: string, data: filte
                     //remove visable data?
                     const getDataPayload: tgetFinnHubDataReq = {//fetch fresh data
                         dashboardID: s.dashBoardData[this.props.currentDashboard].id,
-                        targetDashBoard: this.props.currentDashboard,
                         widgetList: [widgetID],
                         finnHubQueue: s.finnHubQueue,
                         rSetUpdateStatus: p.rSetUpdateStatus,

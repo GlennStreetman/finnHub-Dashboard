@@ -372,7 +372,6 @@ class App extends React.Component<AppProps, AppState> {
         await p.tGetMongoDB({ dashboard: s.dashBoardData[p.currentDashboard].id })
         const payload: tgetFinnHubDataReq = {
             dashboardID: s.dashBoardData[p.currentDashboard].id,
-            targetDashBoard: p.currentDashboard,
             widgetList: Object.keys(s.dashBoardData[p.currentDashboard].widgetlist),
             finnHubQueue: s.finnHubQueue,
             rSetUpdateStatus: p.rSetUpdateStatus,
@@ -388,7 +387,6 @@ class App extends React.Component<AppProps, AppState> {
         for (const widget in targetDash) {
             const payload: tgetFinnHubDataReq = { //get data for default dashboard.
                 dashboardID: s.dashBoardData[p.currentDashboard].id,
-                targetDashBoard: p.currentDashboard,
                 widgetList: [targetDash[widget]],
                 finnHubQueue: s.finnHubQueue,
                 rSetUpdateStatus: p.rSetUpdateStatus,
@@ -400,7 +398,6 @@ class App extends React.Component<AppProps, AppState> {
             if (dash !== p.currentDashboard) {
                 const payload: tgetFinnHubDataReq = { //run in background, do not await.
                     dashboardID: s.dashBoardData[dash].id,
-                    targetDashBoard: dash,
                     widgetList: Object.keys(s.dashBoardData[dash].widgetlist),
                     finnHubQueue: s.finnHubQueue,
                     rSetUpdateStatus: p.rSetUpdateStatus,
@@ -571,6 +568,7 @@ class App extends React.Component<AppProps, AppState> {
                                 zIndex={this.state.zIndex}
                                 rAddNewDashboard={this.props.rAddNewDashboard}
                                 rSetTargetDashboard={this.props.rSetTargetDashboard}
+                                rUpdateCurrentDashboard={this.props.rUpdateCurrentDashboard}
                             />
                             {loginScreen}
                             {backGroundMenu()}

@@ -6,7 +6,6 @@ import { finnHub, throttleResObj as queResObj, finnHubQueue, throttleApiReqObj }
 //Returns finnhub data to mongoDB AND updates slice/ShowData.
 export interface tgetFinnHubDataReq {
     dashboardID: number,
-    targetDashBoard: string,
     widgetList: string[],
     finnHubQueue: finnHubQueue,
     rSetUpdateStatus: Function,
@@ -20,8 +19,11 @@ export interface resObj {
 export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
     'GetFinnhubData',
     (req: tgetFinnHubDataReq, thunkAPI: any) => { //{dashboard: string, widgetList: []} //receives list of widgets from a dashboard to update.
+
+        const currentDashboard = thunkAPI.getState().currentDashboard
+
         const finnQueue = req.finnHubQueue
-        const dataModel = thunkAPI.getState().dataModel.dataSet[req.targetDashBoard] //finnHubData
+        const dataModel = thunkAPI.getState().dataModel.dataSet[currentDashboard] //finnHubData
         const getWidgets = req.widgetList
         let requestList: Promise<any>[] = []
         for (const w of getWidgets) { //for each widget ID
@@ -31,7 +33,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                 const reqObj: throttleApiReqObj = {
                     ...thisWidget[s],
                     dashboardID: req.dashboardID,
-                    dashboard: req.targetDashBoard,
+                    dashboard: currentDashboard,
                     widget: w,
                     security: s,
                     config: thisWidget[s].config,
@@ -46,7 +48,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                     countQueue = countQueue + 1
                 }
             }
-            req.rSetUpdateStatus({ [req.targetDashBoard]: countQueue })
+            req.rSetUpdateStatus({ [currentDashboard]: countQueue })
         }
         return Promise.all(requestList)
             .then((res) => {
