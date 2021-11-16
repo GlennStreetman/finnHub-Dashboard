@@ -40,8 +40,8 @@ export let widgetLookUp = {
     PriceQuote: PriceQuote,
     PriceCandles: PriceCandles,
     PriceSplits:PriceSplits,
-    dashBoardMenu: DashBoardMenu,
-    watchListMenu: WatchListMenu,
+    DashBoardMenu: DashBoardMenu,
+    WatchListMenu: WatchListMenu,
     GQLMenu: GQLMenu,
 }; 
 

@@ -24,8 +24,8 @@ import {PriceSplitsProps} from "../widgets/Price/splits/PriceSplitsBody";
 
 export function returnBodyProps(that, key, ref = "pass") {
     let widgetBodyProps = {
-        watchListMenu: () => watchListMenuProps(that, key),
-        dashBoardMenu: () => dashBoardMenuProps(that, key),
+        WatchListMenu: () => watchListMenuProps(that, key),
+        DashBoardMenu: () => dashBoardMenuProps(that, key),
         GQLMenu: () => gqlMenuProps(that, key),
         EstimatesRecommendationTrends: () => recommendationTrendsProps(that, ref),
         EstimatesPriceTarget: () => priceTargetProps(that, ref),

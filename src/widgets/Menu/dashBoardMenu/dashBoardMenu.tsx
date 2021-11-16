@@ -59,13 +59,14 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     }
 
     async function postNameChange(e) {
-        if (!p.dashboardData[e.target.value]) {
+        console.log('rename:', e.target.value, e.target.id)
+        if (!p.dashboardData[e.target.value]) {  //if name doesnt exist
             const data: any = {
                 dbID: dashboardData[e.target.id].id,
                 oldName: dashboardData[e.target.id].dashboardname,
                 newName: e.target.value.toUpperCase()
             }
-
+            console.log(data)
             const options = {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },

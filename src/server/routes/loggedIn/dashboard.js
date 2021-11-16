@@ -85,7 +85,7 @@ router.get("/dashboard", (req, res, next) => { //returns requested dashboard to 
                         // console.log("WIDGETS", r.savedDashBoards["TEST"].widgetlist)
                         res.status(200).json(r);
                     } else {
-                        res.status(401).json({message: "No dashboards retrieved"})
+                        res.status(201).json({message: "No dashboards retrieved"})
                     }
             }});
             }

@@ -26,8 +26,8 @@ const blankDashboard = {
     },
     currentDashBoard: 'NEW',
     menuList: {
-        "watchListMenu": { 'showBody': true, "column": 0, "columnOrder": -3, "widgetConfig": "menuWidget", "widgetHeader": "WatchList", "widgetID": "watchListMenu", "widgetType": "watchListMenu", "xAxis": "5rem", "yAxis": "5rem" },
-        "dashBoardMenu": { 'showBody': true, "column": 0, "columnOrder": -2, "widgetConfig": "menuWidget", "widgetHeader": "Saved Dashboards", "widgetID": "dashBoardMenu", "widgetType": "dashBoardMenu", "xAxis": "5rem", "yAxis": "5rem" },
+        "WatchListMenu": { 'showBody': true, "column": 0, "columnOrder": -3, "widgetConfig": "menuWidget", "widgetHeader": "WatchList", "widgetID": "WatchListMenu", "widgetType": "WatchListMenu", "xAxis": "5rem", "yAxis": "5rem" },
+        "DashBoardMenu": { 'showBody': true, "column": 0, "columnOrder": -2, "widgetConfig": "menuWidget", "widgetHeader": "Saved Dashboards", "widgetID": "DashBoardMenu", "widgetType": "DashBoardMenu", "xAxis": "5rem", "yAxis": "5rem" },
         "GQLMenu": { 'showBody': true, "column": 0, "columnOrder": -1, "widgetConfig": "menuWidget", "widgetHeader": "Graph QL", "widgetID": "GQLMenu", "widgetType": "GQLMenu", "xAxis": "5rem", "yAxis": "5rem" },
     },
     message: 'No saved dashboards'
@@ -65,7 +65,8 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
         }
         return (GetSavedDashboardsRes)
 
-    } else if (res.status === 401) {
+    } else if (res.status === 201) {
+        console.log('returning blank dashboard', blankDashboard)
         return (blankDashboard)
     } else {
         return (blankDashboard)

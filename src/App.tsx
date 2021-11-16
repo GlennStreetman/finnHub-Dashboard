@@ -250,6 +250,10 @@ class App extends React.Component<AppProps, AppState> {
             this.rebuildDashboardState()
         }
 
+        if (p.dashboardData?.[p.currentDashboard] && !p.dashboardData?.[p.currentDashboard]?.id) {
+            this.newDashboard(p.currentDashboard, p.dashboardData, rSetDashboardData)
+        }
+
         if ((prevProps.dataModel.created === 'false' && p.dataModel.created === 'true' && s.login === 1) ||
             (p.dataModel.created === 'updated' && s.login === 1)) {//on login or data model update update dataset with finnHub data.
             p.rResetUpdateFlag() //sets all dashboards status to updating in redux store.
@@ -331,6 +335,7 @@ class App extends React.Component<AppProps, AppState> {
         try {
             const data: GetSavedDashBoardsRes = await this.getSavedDashBoards()
             if ((data.dashboardData[data.currentDashBoard] === undefined && Object.keys(data.dashboardData))) { //if invalid current dashboard returned
+                console.log('invalid dashboard')
                 data.currentDashBoard = Object.keys(data.dashboardData)[0]
             }
             this.props.rSetDashboardData(data.dashboardData)
@@ -338,10 +343,11 @@ class App extends React.Component<AppProps, AppState> {
             this.props.rSetMenuList(data.menuList)
             this.props.rSetTargetDashboard({ targetDashboard: data.currentDashBoard }) //update target dashboard in redux dataModel
             this.props.rBuildDataModel({ ...data, apiKey: this.state.apiKey })
-            return true
+            if (data.message === 'No saved dashboards') { return (true) } else { return (false) }
 
         } catch (error: any) {
             console.error("Failed to recover dashboards", error);
+            return false
         }
     }
 

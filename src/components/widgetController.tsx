@@ -42,7 +42,6 @@ function WidgetController(p) {
         if (widgetObjList !== undefined && widgetObjList[0]['pass'] === undefined) {
             widgetObjList.sort((a, b) => (a.columnOrder > b.columnOrder) ? 1 : -1) //sort into column order.
             const widgetGroup = widgetObjList.map((el) => { //for each widget, add props.
-                if (!el.showBody) el.showBody = true
                 const thisWidgetProps: any = {
                     apiKey: p.apiKey,
                     changeWidgetName: p.changeWidgetName,

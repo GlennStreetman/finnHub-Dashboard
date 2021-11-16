@@ -43,7 +43,7 @@ export const NewDashboard = function newDashboard(newName: string, dashboards: s
         }
         return update
     }, async () => {
-        await saveNewDashboard(uniqueName, this.state.menuList) //saves dashboard setup to server
+        await saveNewDashboard(uniqueName, this.props.menuList) //saves dashboard setup to server
         let returnedDash: sliceDashboardData = await this.getSavedDashBoards() //get saved dashboard data
         const savedDashboard = returnedDash.dashboardData[uniqueName]
         //skip redux for now, not needed if no widgets and no stocks
