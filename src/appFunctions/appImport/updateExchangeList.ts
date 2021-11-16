@@ -1,4 +1,4 @@
-import { AppState, AppProps } from './../../App'
+import { AppProps } from './../../App'
 import { rUpdateExchangeListPayload } from './../../slices/sliceExchangeList'
 
 export const updateExchangeList = function (ex: string) {
@@ -11,10 +11,8 @@ export const updateExchangeList = function (ex: string) {
             exchangeList: newList,
         };
         p.rUpdateExchangeList(payload);
-        const newState: Partial<AppState> = { exchangeList: newList }
-        this.setState(newState);
     } else {
-        const newState: Partial<AppState> = { exchangeList: ex }
-        this.setState(newState);
+        const payload: Partial<AppProps> = { exchangeList: ex }
+        p.rUpdateExchangeList(payload);
     }
 }

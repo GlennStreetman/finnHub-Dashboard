@@ -58,6 +58,9 @@ import { rUpdateCurrentDashboard } from './slices/sliceCurrentDashboard'
 import { rSetTargetSecurity } from "./slices/sliceTargetSecurity";
 import { rSetMenuList, sliceMenuList } from "./slices/sliceMenuList";
 import { stockList, widget, sliceDashboardData, rSetDashboardData } from './slices/sliceDashboardData'
+import { rSetApiKey } from './slices/sliceAPiKey'
+import { rSetApiAlias } from './slices/sliceApiAlias'
+import { rSetDefaultExchange } from './slices/sliceDefaultExchange'
 
 export interface defaultGlobalStockList {
     [key: string]: any
@@ -74,11 +77,14 @@ export interface widgetSetup {
 interface App { [key: string]: any }
 
 export interface AppProps {
-    dashboardData: sliceDashboardData
+    apiKey: string,
+    apiAlias: string,
+    defaultExchange: string,
+    exchangeList: string[],
+    dashboardData: sliceDashboardData,
     menuList: sliceMenuList,
     targetSecurity: string,
     currentDashboard: string,
-    rExchangeList: string[],
     dataModel: sliceDataModel,
     tGetSymbolList: Function,
     tGetFinnhubData: Function,
@@ -101,33 +107,26 @@ export interface AppProps {
     rSetTargetSecurity: Function,
     rSetMenuList: Function,
     rSetDashboardData: Function,
+    rSetApiKey: Function,
+    rSetApiAlias,
+    rSetDefaultExchange,
 }
 
 export interface AppState {
     accountMenu: number,
-    availableStocks: any,
     aboutMenu: number,
     apiFlag: number, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
-    apiKey: string, //API key retrieved from login database.
-    apiAlias: string,
     backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
-    defaultExchange: string,
     enableDrag: boolean,
-    exchangeList: string[], //list of all exchanges activated under account management.
     finnHubQueue: finnHubQueue,
-    // globalStockList: defaultGlobalStockList, //default stocks for new widgets.
     login: number, //login state. 0 logged out, 1 logged in.
     loadStartingDashBoard: number, //flag switches to 1 after attemping to load default dashboard.
     showMenuColumn: boolean, //true shows column 0
-    // menuList: menuList, //lists of all menu widgets.
     saveDashboardThrottle: number, //delay timer for saving dashboard.
     saveDashboardFlag: boolean, //sets to true when a save starts.
     socket: any, //socket connection for streaming stock data.+
     socketUpdate: number,
     showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
-    // streamingPriceData: streamingPriceData, //data shared between some widgets and watchlist menu. Updated by socket data.
-    // targetSecurity: string, //target security for widgets. Update changes widget focus.
-    // watchListMenu: number, //1 = show, 0 = hide
     widgetCopy: widget | null, //copy of state of widget being dragged.
     widgetLockDown: number, //1 removes buttons from all widgets.
     widgetSetup: widgetSetup, //activates premium api routes.
@@ -167,14 +166,9 @@ class App extends React.Component<AppProps, AppState> {
 
         this.state = {
             accountMenu: 0,
-            availableStocks: [],
             aboutMenu: 0,
             apiFlag: 0, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
-            apiKey: "", //API key retrieved from login database.
-            apiAlias: "",
             backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
-            defaultExchange: "US",
-            exchangeList: ["US"], //list of all exchanges activated under account management.
             finnHubQueue: createFunctionQueueObject(1, 1000, true),
             login: 0, //login state. 0 logged out, 1 logged in.
             loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
@@ -187,7 +181,7 @@ class App extends React.Component<AppProps, AppState> {
             showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
             widgetCopy: null, //copy of state of widget being dragged.
             widgetLockDown: 0, //1 removes buttons from all widgets.
-            widgetSetup: {},//activates premium api routes.
+            widgetSetup: {},//items added to list add premium api route widgets (i.e. NOT FREE from finnhub.io).
             zIndex: [], //list widgets. Index location sets zIndex
         };
 
@@ -261,8 +255,8 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if ( //if apikey not setup show about menu
-            (s.apiKey === '' && s.apiFlag === 0 && s.login === 1) ||
-            (s.apiKey === null && s.apiFlag === 0 && s.login === 1)
+            (this.props.apiKey === '' && s.apiFlag === 0 && s.login === 1) ||
+            (this.props.apiKey === null && s.apiFlag === 0 && s.login === 1)
         ) {
             this.setState({
                 apiFlag: 1,
@@ -273,18 +267,12 @@ class App extends React.Component<AppProps, AppState> {
 
         const globalStockList = this.props.dashboardData?.[p.currentDashboard]?.globalstocklist ? this.props.dashboardData?.[p.currentDashboard].globalstocklist : false
         if ((globalStockList && globalStockList !== prevProps.dashboardData?.[prevProps.currentDashboard]?.globalstocklist && s.login === 1)) { //price data for watchlist, including socket data.
-            LoadTickerSocket(this, prevState, prevProps, globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
+            LoadTickerSocket(this, prevState, prevProps, globalStockList, s.socket, this.props.apiKey, UpdateTickerSockets);
         }
 
         const globalKeys = globalStockList ? Object.keys(globalStockList) : []
         if (this.props.targetSecurity === '' && globalKeys.length > 0) {
             this.props.rSetTargetSecurity(globalKeys[0])
-        }
-    }
-
-    componentWillUnmount() {
-        if (this.state.socket !== "") {
-            this.state.socket.close();
         }
     }
 
@@ -342,7 +330,7 @@ class App extends React.Component<AppProps, AppState> {
             this.props.rUpdateCurrentDashboard(data.currentDashBoard)
             this.props.rSetMenuList(data.menuList)
             this.props.rSetTargetDashboard({ targetDashboard: data.currentDashBoard }) //update target dashboard in redux dataModel
-            this.props.rBuildDataModel({ ...data, apiKey: this.state.apiKey })
+            this.props.rBuildDataModel({ ...data, apiKey: this.props.apiKey })
             if (data.message === 'No saved dashboards') { return (true) } else { return (false) }
 
         } catch (error: any) {
@@ -353,7 +341,7 @@ class App extends React.Component<AppProps, AppState> {
 
     rebuildVisableDashboard() {
         const payload = {
-            apiKey: this.state.apiKey,
+            apiKey: this.props.apiKey,
             dashboardData: this.props.dashboardData,
             targetDashboard: this.props.currentDashboard,
         }
@@ -371,7 +359,7 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     updateAPIKey(newKey: string) {
-        this.setState({ apiKey: newKey });
+        this.props.rSetApiKey(newKey)
     }
 
     setSecurityFocus(target: string) {
@@ -442,18 +430,16 @@ class App extends React.Component<AppProps, AppState> {
                                 widgetSetup={this.state.widgetSetup}
                             />
                             <WidgetController
-                                apiKey={this.state.apiKey}
-                                apiAlias={this.state.apiAlias}
-                                availableStocks={this.state.availableStocks}
+                                apiKey={this.props.apiKey}
+                                // apiAlias={this.state.apiAlias}
                                 changeWidgetName={this.changeWidgetName}
                                 copyDashboard={this.copyDashboard}
                                 currentDashboard={this.props.currentDashboard}
                                 dashboardData={this.props.dashboardData}
                                 dashboardID={dashboardID}
-                                defaultExchange={this.state.defaultExchange}
-                                exchangeList={this.state.exchangeList}
+                                defaultExchange={this.props.defaultExchange}
+                                exchangeList={this.props.exchangeList}
                                 finnHubQueue={this.state.finnHubQueue}
-                                getSavedDashBoards={this.getSavedDashBoards}
                                 globalStockList={globalStockList}
                                 loadSavedDashboard={this.loadSavedDashboard}
                                 login={this.state.login}
@@ -504,12 +490,15 @@ class App extends React.Component<AppProps, AppState> {
 }
 
 const mapStateToProps = (state: storeState) => ({
-    rExchangeList: state.exchangeList.exchangeList,
+    exchangeList: state.exchangeList.exchangeList,
     dataModel: state.dataModel,
     currentDashboard: state.currentDashboard,
     targetSecurity: state.targetSecurity,
     menuList: state.menuList,
     dashboardData: state.dashboardData,
+    apiKey: state.apiKey,
+    apiAlias: state.apiAlias,
+    defaultExchange: state.defaultExchange
 });
 
 export default connect(mapStateToProps, {
@@ -534,5 +523,8 @@ export default connect(mapStateToProps, {
     rSetTargetSecurity,
     rSetMenuList,
     rSetDashboardData,
+    rSetApiKey,
+    rSetApiAlias,
+    rSetDefaultExchange,
 })(App);
 

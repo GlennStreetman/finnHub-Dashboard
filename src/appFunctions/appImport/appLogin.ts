@@ -16,13 +16,14 @@ export const Logout = function () {
 }
 
 export const ProcessLogin = function (apiKey: string, setLogin: number, apiAlias: string, widgetSetup: string) {
+    const p: AppProps = this.props
     const parseSetup: widgetSetup = JSON.parse(widgetSetup)
     const payload: Partial<AppState> = {
         login: setLogin,
-        apiKey: apiKey,
-        apiAlias: apiAlias,
         widgetSetup: parseSetup,
     }
+    p.rSetApiAlias(apiAlias)
+    p.rSetApiKey(apiKey)
     this.setState(payload, () => { return true });
 }
 

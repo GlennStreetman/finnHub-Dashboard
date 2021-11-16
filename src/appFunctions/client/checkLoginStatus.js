@@ -6,7 +6,7 @@ export const checkLoginStatus = function(processLogin, updateExchangeList, updat
         if (data.login === 1) {
             processLogin(data.apiKey, 1, data.apiAlias, data.widgetsetup)
             updateExchangeList(data.exchangelist)
-            updateDefaultExchange(data.defaultexchange)
+            updateDefaultExchange(data.defaultexchange, data.apiKey)
             finnHubQueue.updateInterval(data.ratelimit)
         } else {
             // console.log('FAILED LOGIN', data)

@@ -73,7 +73,7 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
     this.props.rSetDashboardData(newDashboardData)
     this.saveDashboard(currentDash)
     const payload: rebuildTargetWidgetPayload = {
-        apiKey: s.apiKey,
+        apiKey: p.apiKey,
         dashboardData: newDashboardData,
         targetDashboard: currentDashboard,
         targetWidget: `${widgetName}`,

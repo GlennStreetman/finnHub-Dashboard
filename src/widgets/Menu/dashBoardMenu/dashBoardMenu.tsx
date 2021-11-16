@@ -108,22 +108,26 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     }
 
     async function deleteDashBoard(dashBoardId, dashboardName) {
+        console.log('deleting dashboard')
         await fetch(`/deleteSavedDashboard?dashID=${dashBoardId}`) //delete from postgres
 
         const deleteKeyList = Object.keys(p.dashboardData[dashboardName]['widgetlist'])
         for (const x in deleteKeyList) fetch(`/deleteFinnDashData?widgetID=${deleteKeyList[x]}`) //drop data from mongo.
 
         if (dashboardName === currentDashboard && Object.keys(dashboardData).length > 1) { //if shown dashboard is deleted.
+            console.log(1)
             unMountWidgets()
             for (const x in Object.keys(dashboardData)) {
                 const dashboard = p.dashboardData[Object.keys(dashboardData)[x]]
                 const testDashboardName = dashboard.dashboardname
                 if (testDashboardName !== dashboardName) { //load non-deleted dashboard
+                    console.log(1.1)
                     p.loadSavedDashboard(testDashboardName);
                     break
                 }
             }
         } else if (dashboardName === currentDashboard && Object.keys(dashboardData).length === 1) {
+            console.log(2)
             unMountWidgets() //removes widgets from redux visable data model.
             p.newDashBoard('NEW', p.dashboardData)
         }

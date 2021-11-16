@@ -72,7 +72,6 @@ function WidgetController(p) {
                     widgetList: el,
                     widgetLockDown: p.widgetLockDown,
                     zIndex: p.zIndex,
-                    getSavedDashBoards: p.getSavedDashBoards,
                     rebuildDashboardState: p.rebuildDashboardState,
                     rAddNewDashboard: p.rAddNewDashboard,
                     rSetTargetDashboard: p.rSetTargetDashboard,

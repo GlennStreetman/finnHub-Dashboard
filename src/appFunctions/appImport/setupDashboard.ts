@@ -32,7 +32,7 @@ const saveNewDashboard = async (uniqueName, menuList) => {
     return status
 }
 
-export const NewDashboard = function newDashboard(newName: string, dashboards: sliceDashboardData, rSetDashboardData: Function) {
+export const NewDashboard = function newDashboard(newName: string, dashboards: sliceDashboardData) {
     console.log('creating new dashboard')
     const testname = newName ? newName : 'DASHBOARD'
     const uniqueName = uniqueObjectnName(testname, dashboards)
@@ -51,7 +51,7 @@ export const NewDashboard = function newDashboard(newName: string, dashboards: s
             draftState[uniqueName] = savedDashboard
             return draftState
         })
-        rSetDashboardData(newDashboardObj)
+        this.props.rSetDashboardData(newDashboardObj)
     })
 }
 
@@ -75,7 +75,7 @@ export const saveDashboard = async function (dashboardName: string) {
                         dashBoardName: dashboardName,
                         globalStockList: this.props.dashboardData[this.props.currentDashboard].globalstocklist,
                         widgetList: this.props.dashboardData[this.props.currentDashboard].widgetlist,
-                        menuList: this.state.menuList,
+                        menuList: this.props.menuList,
                     };
                     const options = {
                         method: "POST",
@@ -126,7 +126,7 @@ export const copyDashboard = async function (copyName: string) {
             dashBoardName: uniqueName,
             globalStockList: {},
             widgetList: newWidgetList,
-            menuList: this.state.menuList,
+            menuList: this.props.menuList,
         };
         const options = {
             method: "POST",

@@ -5,7 +5,7 @@ export interface sliceExchangeList {
 }
 
 const startingState: sliceExchangeList = {
-    exchangeList: [], //list of active exchanges
+    exchangeList: ['US'], //list of active exchanges
 }
 
 export interface rUpdateExchangeListPayload {
