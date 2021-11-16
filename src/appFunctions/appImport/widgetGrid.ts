@@ -1,26 +1,31 @@
 import produce from "immer"
-import { AppState, widget, menu, menuList, widgetList, dashBoardData } from './../../App'
+import { AppState, AppProps } from './../../App'
+import { sliceMenuList, menu } from './../../slices/sliceMenuList'
+import { sliceDashboardData, widget, widgetList } from "src/slices/sliceDashboardData"
 
-export const SetDrag = function setDrag(stateRef: 'menuWidget' | 'widgetList', widgetId: string | number, widgetCopy: widget) {
+export const SetDrag = function setDrag(stateRef: 'menuWidget' | 'widgetList', widgetId: string | number, widgetCopy: widget, rSetMenuList: Function) {
     const s: AppState = this.state
-    const ref = stateRef === "menuWidget" ? "menuList" : "dashBoardData";
+    const p: AppProps = this.props
+    const ref = stateRef === "menuWidget" ? "menuList" : "sliceDashboardData";
     let updatedWidgetLocation
-    if (stateRef === 'menuWidget') {
-        const thisList: menuList | dashBoardData = s[ref]
-        updatedWidgetLocation = produce(thisList, (draftState: menuList | widgetList) => {
+    if (stateRef === 'menuWidget') { //if menu widget set drag
+        const thisList: sliceMenuList | sliceDashboardData = s[ref]
+        updatedWidgetLocation = produce(thisList, (draftState: sliceMenuList | widgetList) => {
             draftState[widgetId]['column'] = 'drag'
         })
-    } else {
-
-        const thisList: menuList | dashBoardData = s[ref]
-        updatedWidgetLocation = produce(thisList, (draftState: menuList | dashBoardData) => {
+    } else { //if not menuwidget set drag
+        const thisList: sliceMenuList | sliceDashboardData = s[ref]
+        updatedWidgetLocation = produce(thisList, (draftState: sliceMenuList | sliceDashboardData) => {
             draftState[this.props.currentDashboard]['widgetlist'][widgetId]['column'] = 'drag'
         })
     }
+
     return new Promise((resolve) => {
+
+        stateRef = 'menuWidget' ? p.rSetMenuList(updatedWidgetLocation) : p.rSetDashboardData(updatedWidgetLocation)
+
         const payload: Partial<AppState> = {
             enableDrag: true,
-            [ref]: updatedWidgetLocation,
             widgetCopy: widgetCopy
         }
         this.setState(payload, () => {
@@ -31,17 +36,17 @@ export const SetDrag = function setDrag(stateRef: 'menuWidget' | 'widgetList', w
 
 export const MoveWidget = function moveWidget(stateRef: 'menuWidget' | 'widgetList', widgetId: string | number, xxAxis: number, yyAxis: number, thisCallBack = () => { }) {
     const s: AppState = this.state
-    const ref = stateRef === "menuWidget" ? "menuList" : "dashBoardData";
+    const ref = stateRef === "menuWidget" ? "menuList" : "sliceDashboardData";
     let updatedWidgetLocation
     if (stateRef === 'menuWidget') {
-        const thisList: menuList | dashBoardData = s[ref]
-        updatedWidgetLocation = produce(thisList, (draftState: menuList | widgetList) => {
+        const thisList: sliceMenuList | sliceDashboardData = s[ref]
+        updatedWidgetLocation = produce(thisList, (draftState: sliceMenuList | widgetList) => {
             draftState[widgetId]["xAxis"] = xxAxis;
             draftState[widgetId]["yAxis"] = yyAxis;
         })
     } else {
-        const thisList: menuList | dashBoardData = s[ref]
-        updatedWidgetLocation = produce(thisList, (draftState: menuList | widgetList) => {
+        const thisList: sliceMenuList | sliceDashboardData = s[ref]
+        updatedWidgetLocation = produce(thisList, (draftState: sliceMenuList | widgetList) => {
             draftState[this.props.currentDashboard]['widgetlist'][widgetId]["xAxis"] = xxAxis;
             draftState[this.props.currentDashboard]['widgetlist'][widgetId]["yAxis"] = yyAxis;
         })
@@ -58,13 +63,12 @@ export const MoveWidget = function moveWidget(stateRef: 'menuWidget' | 'widgetLi
 }
 
 export const SnapOrder = function snapOrder(widget: string, column: number, yyAxis: number, wType: string) {
-    const s: AppState = this.state
-    const draft: Partial<AppState> = {
-        menuList: s.menuList,
-        dashBoardData: s.dashBoardData
+    const draft = {
+        menuList: this.props.menuList,
+        sliceDashboardData: this.props.dashboardData
     }
-    const newWidgetLists: Partial<AppState> = produce(draft, (draftState: Partial<AppState>) => {
-        const thisWidgetList = draftState?.dashBoardData?.[this.props.currentDashboard]?.widgetlist
+    const newWidgetLists: Partial<AppProps> = produce(draft, (draftState: Partial<AppProps>) => {
+        const thisWidgetList = draftState?.dashboardData?.[this.props.currentDashboard]?.widgetlist
         let allWidgets: (menu | widget)[] = [...Object.values(draftState.menuList!) as menu[], ...Object.values(thisWidgetList!) as widget[]]
         allWidgets = allWidgets.filter(w => (w['column'] === column ? true : false))
         allWidgets = allWidgets.sort((a, b) => (a.columnOrder > b.columnOrder) ? 1 : -1)
@@ -110,18 +114,18 @@ export const SnapOrder = function snapOrder(widget: string, column: number, yyAx
             newMenu[widget].columnOrder = insertionPoint
         }
     })
-    const newMenu: menuList = produce(newWidgetLists, (draft: Partial<AppState>) => {
-        const updatedMenu: menuList = draft.menuList!
+    const newMenu: sliceMenuList = produce(newWidgetLists, (draft: Partial<AppProps>) => {
+        const updatedMenu: sliceMenuList = draft.menuList!
         return updatedMenu
     })
-    const newWidget: dashBoardData = produce(newWidgetLists, (draft: Partial<AppState>) => {
-        const updatedWidgetList: dashBoardData = draft.dashBoardData!
+    const newWidget: sliceDashboardData = produce(newWidgetLists, (draft: Partial<AppProps>) => {
+        const updatedWidgetList: sliceDashboardData = draft.dashboardData!
         return updatedWidgetList
     })
+    this.props.rSetMenuList(newMenu)
+    this.props.rSetDashboardData(newWidget)
     const payload: Partial<AppState> = {
         enableDrag: false,
-        menuList: newMenu,
-        dashBoardData: newWidget,
     }
     this.setState(payload, () => { return true })
 }

@@ -1,9 +1,12 @@
 
 import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg'
-import { menuList, widgetSetup, filters } from './../App'
+import { widgetSetup, } from './../App'
 import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
 
-import { AppBar, Toolbar, Button, Tooltip } from '@material-ui/core/';
+import { sliceMenuList } from './../slices/sliceMenuList'
+import { filters } from './../slices/sliceDashboardData'
+
+import { AppBar, Toolbar, Tooltip } from '@material-ui/core/';
 import WidgetsIcon from '@material-ui/icons/Widgets';
 import TableChartIcon from '@material-ui/icons/TableChart';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
@@ -20,7 +23,7 @@ interface topNavProps {
     logOut: Function,
     lockWidgets: Function,
     logoutServer: Function,
-    menuList: menuList,
+    menuList: sliceMenuList,
     newMenuContainer: Function,
     showMenuColumn: boolean,
     showStockWidgets: number,

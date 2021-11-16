@@ -151,7 +151,6 @@ function WidgetContainer(p) {
         widgetProps['updateAPIFlag'] = p.updateAPIFlag
         widgetProps['widgetType'] = p.widgetList["widgetType"]
         widgetProps['config'] = p.widgetList.config
-        widgetProps['updateDashBoards'] = p.updateDashBoards
         widgetProps['finnHubQueue'] = p.finnHubQueue
         widgetProps['dashboardID'] = p.dashboardID
     }
@@ -213,8 +212,9 @@ function WidgetContainer(p) {
             ) : (
                 <div className="widgetHeader">{renderHeader}</div>
             )}
+
             {p.widgetList.showBody !== false ? (
-                <div className='widgetBody' style={bodyVisable} key={p.showBody}>
+                <div className='widgetBody' style={bodyVisable} key={p.widgetList.showBody}>
 
                     <ErrorBoundary widgetType={p.widgetList["widgetType"]}>
                         {React.createElement(widgetLookUp[p.widgetList["widgetType"]], { ref: myRef, ...widgetProps })}
@@ -227,7 +227,7 @@ function WidgetContainer(p) {
                         <button
                             onClick={async () => {
                                 if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
-                                    p.removeWidget("dashBoardData", p.widgetKey);
+                                    p.removeWidget(p.widgetKey);
                                     fetch(`/deleteFinnDashData?widgetID=${p.widgetKey}`)
                                     const payload = {
                                         widgetKey: p.widgetKey,

@@ -1,23 +1,14 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
-import { stock } from './../App'
+import { stock } from './../slices/sliceDashboardData'
 import { finnHub, finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
 
-//receives list of strings to search for.
-//pushes returned string to visableData in redux.
+
 
 interface tGetQuotePricesReq {
     stock: stock,
     apiKey: string,
     throttle: finnHubQueue
 }
-
-// export function getQuotePrices(reqObj: tGetQuotePricesReq){
-//     const globalStockList = reqObj.globalStockList
-//     if (Object.keys(globalStockList).length !== 0) {
-//         for (const stock in globalStockList) {
-//             tgetQuotePrices(stock, reqObj.apiKey, reqObj.throttle)
-//         }
-// }
 
 export const tgetQuotePrices = createAsyncThunk( //{dashboard, [securityList]}
     'tGetQuotePrices',

@@ -1,6 +1,6 @@
 import React, { ReactElement } from 'react'
 import { dStock } from '../appFunctions/formatStockSymbols'
-import { stockList } from '../App'
+import { stockList } from './..//slices/sliceDashboardData'
 
 interface Props {
     trackedStocks: stockList,

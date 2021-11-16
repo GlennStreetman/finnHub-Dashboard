@@ -42,15 +42,16 @@ function WidgetController(p) {
         if (widgetObjList !== undefined && widgetObjList[0]['pass'] === undefined) {
             widgetObjList.sort((a, b) => (a.columnOrder > b.columnOrder) ? 1 : -1) //sort into column order.
             const widgetGroup = widgetObjList.map((el) => { //for each widget, add props.
+                if (!el.showBody) el.showBody = true
                 const thisWidgetProps: any = {
                     apiKey: p.apiKey,
                     changeWidgetName: p.changeWidgetName,
                     currentDashboard: p.currentDashboard,
                     dashboardID: p.dashboardID,
-                    enableDrag: p.enableDrag,
+                    enableDrag: p.enableDrag ? p.enableDrag : false,
                     exchangeList: p.exchangeList,
                     finnHubQueue: p.finnHubQueue,
-                    key: el.widgetId,
+                    // key: el.widgetID,
                     loadSavedDashboard: p.loadSavedDashboard,
                     moveWidget: p.moveWidget,
                     refreshFinnhubAPIDataCurrentDashboard: p.refreshFinnhubAPIDataCurrentDashboard,
@@ -66,7 +67,6 @@ function WidgetController(p) {
                     toggleWidgetBody: p.toggleWidgetBody,
                     updateAPIFlag: p.updateAPIFlag,
                     updateDefaultExchange: p.updateDefaultExchange,
-                    updateDashBoards: p.updateDashBoards,
                     updateWidgetConfig: p.updateWidgetConfig,
                     widgetBodyProps: returnBodyProps({ props: p }, el.widgetType, el.widgetID),
                     widgetKey: el.widgetID,
@@ -79,14 +79,13 @@ function WidgetController(p) {
                     rSetTargetDashboard: p.rSetTargetDashboard,
                 }
                 if (el.widgetConfig === 'menuWidget') {
-                    thisWidgetProps['showMenu'] = p[el.widgetID]
+                    // thisWidgetProps['showMenu'] = '1'
                     thisWidgetProps['setWidgetFocus'] = p.setWidgetFocus
                     thisWidgetProps['rUpdateCurrentDashboard'] = p.rUpdateCurrentDashboard
                 }
                 if (p.widgetCopy?.widgetID === el.widgetID) {
                     thisWidgetProps.widgetCopy = p.widgetCopy
                 }
-
                 const subComponent = React.createElement(WidgetContainer, thisWidgetProps)
                 return (
                     <div key={el.widgetID + 'thisKey'} style={{ padding: "1px" }}>

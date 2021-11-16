@@ -1,5 +1,6 @@
 
-import { menuList, dashBoardData } from './../../App'
+import { sliceMenuList } from './../../slices/sliceMenuList'
+import { sliceDashboardData } from './../../slices/sliceDashboardData'
 
 interface serverData { //replace after route is conerted to typescript
     savedDashBoards: any,
@@ -9,14 +10,14 @@ interface serverData { //replace after route is conerted to typescript
 }
 
 export interface GetSavedDashBoardsRes {
-    dashBoardData: dashBoardData
+    dashboardData: sliceDashboardData
     currentDashBoard: string
-    menuList: menuList
+    menuList: sliceMenuList
     message?: string
 }
 
 const blankDashboard = {
-    dashBoardData: {
+    dashboardData: {
         NEW: {
             dashboardname: 'NEW',
             globalstocklist: {},
@@ -25,14 +26,15 @@ const blankDashboard = {
     },
     currentDashBoard: 'NEW',
     menuList: {
-        "watchListMenu": { "column": 0, "columnOrder": -3, "widgetConfig": "menuWidget", "widgetHeader": "WatchList", "widgetID": "watchListMenu", "widgetType": "watchListMenu", "xAxis": "5rem", "yAxis": "5rem" },
-        "dashBoardMenu": { "column": 0, "columnOrder": -2, "widgetConfig": "menuWidget", "widgetHeader": "Saved Dashboards", "widgetID": "dashBoardMenu", "widgetType": "dashBoardMenu", "xAxis": "5rem", "yAxis": "5rem" },
-        "GQLMenu": { "column": 0, "columnOrder": -1, "widgetConfig": "menuWidget", "widgetHeader": "Graph QL", "widgetID": "GQLMenu", "widgetType": "GQLMenu", "xAxis": "5rem", "yAxis": "5rem" },
+        "watchListMenu": { 'showBody': true, "column": 0, "columnOrder": -3, "widgetConfig": "menuWidget", "widgetHeader": "WatchList", "widgetID": "watchListMenu", "widgetType": "watchListMenu", "xAxis": "5rem", "yAxis": "5rem" },
+        "dashBoardMenu": { 'showBody': true, "column": 0, "columnOrder": -2, "widgetConfig": "menuWidget", "widgetHeader": "Saved Dashboards", "widgetID": "dashBoardMenu", "widgetType": "dashBoardMenu", "xAxis": "5rem", "yAxis": "5rem" },
+        "GQLMenu": { 'showBody': true, "column": 0, "columnOrder": -1, "widgetConfig": "menuWidget", "widgetHeader": "Graph QL", "widgetID": "GQLMenu", "widgetType": "GQLMenu", "xAxis": "5rem", "yAxis": "5rem" },
     },
     message: 'No saved dashboards'
 }
 
 export const GetSavedDashBoards = async function getSavedDashBoards() {
+    // console.log('getting saved dashboards')
     let res = await fetch("/dashBoard")
     let data: serverData = await res.json()
     if (res.status === 200) {
@@ -47,7 +49,7 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
             }
             delete parseDashBoard[dash].widgetlist['null']
         }
-        const menuList: menuList = {}
+        const menuList: sliceMenuList = {}
         for (const menu in data.menuSetup) {
             menuList[menu] = data.menuSetup[menu]
         }
@@ -56,7 +58,7 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
         const defaultDash = parseDashBoard[data.default] ? data.default : parseDashBoard[Object.keys(parseDashBoard)[0]]
 
         const GetSavedDashboardsRes: any = noDashboards ? blankDashboard : {
-            dashBoardData: parseDashBoard,
+            dashboardData: parseDashBoard,
             currentDashBoard: defaultDash,
             menuList: menuList,
             message: 'ok'
@@ -64,7 +66,6 @@ export const GetSavedDashBoards = async function getSavedDashBoards() {
         return (GetSavedDashboardsRes)
 
     } else if (res.status === 401) {
-        console.log(401)
         return (blankDashboard)
     } else {
         return (blankDashboard)

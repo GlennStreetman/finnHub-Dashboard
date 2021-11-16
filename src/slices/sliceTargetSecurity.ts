@@ -2,11 +2,11 @@ import { createSlice } from '@reduxjs/toolkit';
 
 const initialState: string = ""
 
-const currentDashboard = createSlice({
-    name: 'currentDashboard',
+const targetSecurity = createSlice({
+    name: 'targetSecurity',
     initialState,
     reducers: {
-        rUpdateCurrentDashboard: (state: string, action: any) => {
+        rSetTargetSecurity: (state: string, action: any) => {
             const ap: string = action.payload
             state = ap
             return state
@@ -15,6 +15,6 @@ const currentDashboard = createSlice({
 })
 
 export const {
-    rUpdateCurrentDashboard,
-} = currentDashboard.actions
-export default currentDashboard.reducer
+    rSetTargetSecurity,
+} = targetSecurity.actions
+export default targetSecurity.reducer

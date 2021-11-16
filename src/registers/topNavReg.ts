@@ -1,7 +1,7 @@
 //dropdown menu: widget Object, Widget default name, family, Dropdown list description
 //imported by topNav component.
 /* eslint-disable no-sparse-arrays*/
-import { filters } from './../App'
+import { filters } from './../slices/sliceDashboardData'
 import { candleWidgetFilters } from '../widgets/Price/candles/candleWidget';
 import { priceSplitsFilters } from '../widgets/Price/splits/PriceSplitsBody';
 import { EarningsCalendarFilters } from '../widgets/Estimates/EarningsCalendar/EarningsCalendarBody';

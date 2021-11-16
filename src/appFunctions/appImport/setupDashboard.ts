@@ -1,6 +1,8 @@
 import produce from "immer"
 
-import { AppState, widgetList, dashBoardData } from './../../App'
+import { AppState, } from './../../App'
+import { sliceMenuList } from './../../slices/sliceMenuList'
+import { sliceDashboardData, widgetList } from './../../slices/sliceDashboardData'
 import { uniqueObjectnName } from './../stringFunctions'
 
 
@@ -30,7 +32,7 @@ const saveNewDashboard = async (uniqueName, menuList) => {
     return status
 }
 
-export const NewDashboard = function newDashboard(newName, dashboards) {
+export const NewDashboard = function newDashboard(newName: string, dashboards: sliceDashboardData, rSetDashboardData: Function) {
     console.log('creating new dashboard')
     const testname = newName ? newName : 'DASHBOARD'
     const uniqueName = uniqueObjectnName(testname, dashboards)
@@ -42,16 +44,14 @@ export const NewDashboard = function newDashboard(newName, dashboards) {
         return update
     }, async () => {
         await saveNewDashboard(uniqueName, this.state.menuList) //saves dashboard setup to server
-        let returnedDash: dashBoardData = await this.getSavedDashBoards() //get saved dashboard data
-        const savedDashboard = returnedDash.dashBoardData[uniqueName]
+        let returnedDash: sliceDashboardData = await this.getSavedDashBoards() //get saved dashboard data
+        const savedDashboard = returnedDash.dashboardData[uniqueName]
         //skip redux for now, not needed if no widgets and no stocks
-        const newDashboardObj = produce(this.state.dashBoardData, (draftState: dashBoardData) => {
+        const newDashboardObj = produce(this.props.dashboardData, (draftState: sliceDashboardData) => {
             draftState[uniqueName] = savedDashboard
             return draftState
         })
-        this.setState({
-            dashBoardData: newDashboardObj
-        })
+        rSetDashboardData(newDashboardObj)
     })
 }
 
@@ -73,8 +73,8 @@ export const saveDashboard = async function (dashboardName: string) {
                 if (this.state.login === 1) {
                     const data = {
                         dashBoardName: dashboardName,
-                        globalStockList: this.state.dashBoardData[this.props.currentDashboard].globalstocklist,
-                        widgetList: this.state.dashBoardData[this.props.currentDashboard].widgetlist,
+                        globalStockList: this.props.dashboardData[this.props.currentDashboard].globalstocklist,
+                        widgetList: this.props.dashboardData[this.props.currentDashboard].widgetlist,
                         menuList: this.state.menuList,
                     };
                     const options = {
@@ -107,7 +107,7 @@ export const saveDashboard = async function (dashboardName: string) {
 }
 
 export const copyDashboard = async function (copyName: string) {
-    const widgList: widgetList = this.state.dashBoardData[copyName].widgetlist
+    const widgList: widgetList = this.props.dashboardData[copyName].widgetlist
     const newWidgetList: widgetList = produce(widgList, (draftState: widgetList) => {
         console.log('saving dashboard copy', widgList)
         const stamp = new Date().getTime()
@@ -120,7 +120,7 @@ export const copyDashboard = async function (copyName: string) {
         }
         // return draftState
     })
-    const uniqueName = uniqueObjectnName(copyName, this.state.dashBoardData)
+    const uniqueName = uniqueObjectnName(copyName, this.props.dashboardData)
     let status = await new Promise((res) => {
         const data = {
             dashBoardName: uniqueName,

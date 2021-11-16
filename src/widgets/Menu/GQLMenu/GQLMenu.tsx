@@ -1,11 +1,12 @@
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
-import { dashBoardData, globalStockList } from '../../../App'
+
+import { sliceDashboardData, globalStockList } from './../../../slices/sliceDashboardData'
 // import { findByLabelText } from "@testing-library/dom";
 
 interface endPointMenuProps {
     apiAlias: string,
     apiKey: string,
-    dashBoardData: dashBoardData,
+    dashboardData: sliceDashboardData,
     currentDashboard: string,
     targetSecurity: string,
     globalStockList: globalStockList,
@@ -43,17 +44,6 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
     const apiToggle = p.apiAlias ? p.apiAlias : p.apiKey
     const defaultQuery = `{dashboardList(key: "${apiToggle}") {dashboard}}`
 
-    // function changeDashboardSelection(e) {
-    //     const target = e.target.value;
-    //     setTargetDashboard(target)
-    // }
-
-    // const dashboardOptionList = Object.keys(p.dashBoardData).map((el) =>
-    //     <option key={el + "db"} value={el}>
-    //         {el}
-    //     </option>
-    // )
-
     function changeSecurityFocus(e) {
         const target = e.target.value;
         setSecurityFocus(target)
@@ -74,7 +64,7 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
         <><td>Widget</td><td>All</td><td>{securityFocus}</td></> :
         <><td>Widget</td><td>Data</td></>
 
-    const FocusDashboard = p.dashBoardData?.[targetDashboard]?.widgetlist ? p.dashBoardData[targetDashboard].widgetlist : {}
+    const FocusDashboard = p.dashboardData?.[targetDashboard]?.widgetlist ? p.dashboardData[targetDashboard].widgetlist : {}
     const showBodyWidget = Object.keys(FocusDashboard).map((el) => {
         const apiToggle = p.apiAlias ? p.apiAlias : p.apiKey
         const queryPropsAll = `(key: "${apiToggle}" dashboard: "${targetDashboard}" widget: "${FocusDashboard[el].widgetHeader}")`
@@ -154,7 +144,7 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
 
 export function gqlMenuProps(that, key = "AccountMenu") {
     let propList = {
-        dashBoardData: that.props.dashBoardData,
+        dashboardData: that.props.dashboardData,
         apiKey: that.props.apiKey,
         apiAlias: that.props.apiAlias,
         currentDashboard: that.props.currentDashboard,

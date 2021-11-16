@@ -1,6 +1,6 @@
-import React, { ReactElement } from 'react'
+import { ReactElement } from 'react'
 import { dStock } from '../appFunctions/formatStockSymbols'
-import { stockList, config } from '../App'
+import { stockList, config } from './.././slices/sliceDashboardData'
 
 interface props {
     widgetType: string,

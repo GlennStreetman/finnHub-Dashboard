@@ -40,10 +40,10 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
 
     useEffect(() => {
         let returnObj = {}
-        let keyList = Object.keys(p.dashBoardData)
+        let keyList = Object.keys(p.dashboardData)
         for (const x in keyList) returnObj[keyList[x]] = keyList[x]
         setNewNames(returnObj)
-    }, [p.dashBoardData])
+    }, [p.dashboardData])
 
 
     function handleChange(e) {
@@ -52,17 +52,17 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     }
 
     function stageNameChange(e) { //newName, widgetName 
-        const dbName = dashBoardData[e.target.id].dashboardname
+        const dbName = dashboardData[e.target.id].dashboardname
         let updateNewNames = { ...newNames }
-        updateNewNames[dashBoardData[dbName].dashboardname] = e.target.value
+        updateNewNames[dashboardData[dbName].dashboardname] = e.target.value
         setNewNames(updateNewNames)
     }
 
     async function postNameChange(e) {
-        if (!p.dashBoardData[e.target.value]) {
+        if (!p.dashboardData[e.target.value]) {
             const data: any = {
-                dbID: dashBoardData[e.target.id].id,
-                oldName: dashBoardData[e.target.id].dashboardname,
+                dbID: dashboardData[e.target.id].id,
+                oldName: dashboardData[e.target.id].dashboardname,
                 newName: e.target.value.toUpperCase()
             }
 
@@ -89,7 +89,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     }
 
     function unMountWidgets() { //removes visable data from redux for dashboard.
-        const widdgetKeys = Object.keys(p.dashBoardData?.[currentDashboard]?.widgetlist)
+        const widdgetKeys = Object.keys(p.dashboardData?.[currentDashboard]?.widgetlist)
         for (const x in widdgetKeys) {
             const widgetKey = widdgetKeys[x]
             const payload = {
@@ -109,34 +109,34 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     async function deleteDashBoard(dashBoardId, dashboardName) {
         await fetch(`/deleteSavedDashboard?dashID=${dashBoardId}`) //delete from postgres
 
-        const deleteKeyList = Object.keys(p.dashBoardData[dashboardName]['widgetlist'])
+        const deleteKeyList = Object.keys(p.dashboardData[dashboardName]['widgetlist'])
         for (const x in deleteKeyList) fetch(`/deleteFinnDashData?widgetID=${deleteKeyList[x]}`) //drop data from mongo.
 
-        if (dashboardName === currentDashboard && Object.keys(dashBoardData).length > 1) { //if shown dashboard is deleted.
+        if (dashboardName === currentDashboard && Object.keys(dashboardData).length > 1) { //if shown dashboard is deleted.
             unMountWidgets()
-            for (const x in Object.keys(dashBoardData)) {
-                const dashboard = p.dashBoardData[Object.keys(dashBoardData)[x]]
+            for (const x in Object.keys(dashboardData)) {
+                const dashboard = p.dashboardData[Object.keys(dashboardData)[x]]
                 const testDashboardName = dashboard.dashboardname
                 if (testDashboardName !== dashboardName) { //load non-deleted dashboard
                     p.loadSavedDashboard(testDashboardName);
                     break
                 }
             }
-        } else if (dashboardName === currentDashboard && Object.keys(dashBoardData).length === 1) {
+        } else if (dashboardName === currentDashboard && Object.keys(dashboardData).length === 1) {
             unMountWidgets() //removes widgets from redux visable data model.
-            p.newDashBoard('NEW', p.dashBoardData)
+            p.newDashBoard('NEW', p.dashboardData)
         }
         unMountDashboard(dashboardName) //removes dashboard from redux datamodel.
         p.removeDashboardFromState(dashboardName) //removes dashboard from App.state
     }
 
-    let dashBoardData = p.dashBoardData;
-    let savedDashBoards = Object.keys({ ...dashBoardData }).map((el) => (
-        <tr key={dashBoardData[el].id + "tr"}>
+    let dashboardData = p.dashboardData;
+    let savedDashBoards = Object.keys({ ...dashboardData }).map((el) => (
+        <tr key={dashboardData[el].id + "tr"}>
             {p.showEditPane === 1 ? //if showing edit pane
                 <>
                     <td className="centerTE">
-                        <button onClick={() => deleteDashBoard(dashBoardData[el].id, dashBoardData[el].dashboardname)}>
+                        <button onClick={() => deleteDashBoard(dashboardData[el].id, dashboardData[el].dashboardname)}>
                             <i className="fa fa-times" aria-hidden="true"></i>
                         </button>
                     </td>
@@ -148,7 +148,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                             type="text"
                             id={el}
                             list="stockSearch1"
-                            value={newNames[dashBoardData[el].dashboardname] ? newNames[dashBoardData[el].dashboardname] : ''}
+                            value={newNames[dashboardData[el].dashboardname] ? newNames[dashboardData[el].dashboardname] : ''}
                             onChange={stageNameChange}
                             onBlur={postNameChange}
                         />
@@ -160,19 +160,19 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                         <input
                             type='radio'
                             key={el + 'radio'}
-                            checked={currentDashboard === p.dashBoardData?.[el]?.dashboardname} //
+                            checked={currentDashboard === p.dashboardData?.[el]?.dashboardname} //
                             onChange={() => {
                                 unMountWidgets()
-                                p.loadSavedDashboard(p.dashBoardData?.[el]?.dashboardname);
-                                setInputText(dashBoardData[el].dashboardname)
+                                p.loadSavedDashboard(p.dashboardData?.[el]?.dashboardname);
+                                setInputText(dashboardData[el].dashboardname)
                             }}
                         />
                     </td>
-                    <td key={dashBoardData[el].id + "te"}>{dashBoardData[el].dashboardname}</td>
+                    <td key={dashboardData[el].id + "te"}>{dashboardData[el].dashboardname}</td>
                 </>
             }
 
-            <td>{dashboardStatus?.[dashBoardData[el].dashboardname] ? dashboardStatus?.[dashBoardData[el].dashboardname] + ' Open API Calls' : 'Ready'}</td>
+            <td>{dashboardStatus?.[dashboardData[el].dashboardname] ? dashboardStatus?.[dashboardData[el].dashboardname] + ' Open API Calls' : 'Ready'}</td>
             {p.showEditPane === 1 &&
                 <td>
                     <button
@@ -180,7 +180,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                         aria-hidden="true"
                         type="submit"
                         onClick={() => {
-                            copyDashboardFunction(`${dashBoardData[el].dashboardname}`)
+                            copyDashboardFunction(`${dashboardData[el].dashboardname}`)
                         }}
                     />
                 </td>}
@@ -232,7 +232,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                                     type="submit"
                                     value="New"
                                     onClick={() => {
-                                        p.newDashBoard(inputText, p.dashBoardData);
+                                        p.newDashBoard(inputText, p.dashboardData);
                                         p.rAddNewDashboard({ dashboardName: inputText })
                                         p.rSetTargetDashboard({ targetDashboard: inputText })
                                     }}
@@ -257,14 +257,12 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
 
     let propList = {
         getSavedDashBoards: that.props.getSavedDashBoards,
-        dashBoardData: that.props.dashBoardData,
+        dashboardData: that.props.dashboardData,
         copyDashboard: that.props.copyDashboard,
-        // currentDashboard: that.props.currentDashboard,
         saveDashboard: that.props.saveDashboard,
         newDashBoard: that.props.newDashboard,
         helpText: [helpText, 'DBM'],
         loadSavedDashboard: that.props.loadSavedDashboard,
-        updateDashBoards: that.props.updateDashBoards,
         rebuildDashboardState: that.props.rebuildDashboardState,
         refreshFinnhubAPIDataCurrentDashboard: that.props.refreshFinnhubAPIDataCurrentDashboard,
         removeDashboardFromState: that.props.removeDashboardFromState,

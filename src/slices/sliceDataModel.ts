@@ -2,7 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import { widgetDict } from '../registers/endPointsReg'
 import { tGetFinnhubData, resObj } from '../thunks/thunkFetchFinnhub'
 import { tGetMongoDB, getMongoRes } from '../thunks/thunkGetMongoDB'
-import { dashBoardData } from './../App'
+import { sliceDashboardData } from './..//slices/sliceDashboardData'
 import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB'
 
 interface dataStatus {
@@ -51,19 +51,19 @@ interface EndPointAPIList {
 
 export interface rBuildDataModelPayload {
     apiKey: string,
-    dashBoardData: dashBoardData
+    dashboardData: sliceDashboardData
 }
 
 export interface rebuildTargetWidgetPayload {
     apiKey: string,
-    dashBoardData: dashBoardData,
+    dashboardData: sliceDashboardData,
     targetDashboard: string,
     targetWidget: string,
 }
 
 export interface rRebuildTargetDashboardPayload {
     apiKey: string,
-    dashBoardData: dashBoardData,
+    dashboardData: sliceDashboardData,
     targetDashboard: string,
 
 }
@@ -95,7 +95,7 @@ const dataModel = createSlice({
             // console.log('building data model')
             //receivies dashboard object and builds dataset from scratch.
             const ap: rBuildDataModelPayload = action.payload
-            const apD: dashBoardData = ap.dashBoardData
+            const apD: sliceDashboardData = ap.dashboardData
             const dataModel: EndPointAPIList = {} //list of lists. Each list []
             for (const d in apD) { //for each dashboard
                 const dashboardName: string = d
@@ -133,7 +133,7 @@ const dataModel = createSlice({
         },
         rRebuildTargetDashboardModel: (state: sliceDataModel, action) => {
             const ap: rRebuildTargetDashboardPayload = action.payload
-            const apD: dashBoardData = ap.dashBoardData
+            const apD: sliceDashboardData = ap.dashboardData
             const dashboardName: string = ap.targetDashboard
             const targetDashboard = apD?.[dashboardName]
 
@@ -167,7 +167,7 @@ const dataModel = createSlice({
         },
         rRebuildTargetWidgetModel: (state: sliceDataModel, action) => {
             const ap: rebuildTargetWidgetPayload = action.payload
-            const apD: dashBoardData = ap.dashBoardData
+            const apD: sliceDashboardData = ap.dashboardData
             const dashboardName: string = ap.targetDashboard
             const w: string = ap.targetWidget //widget name
 

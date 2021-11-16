@@ -10,12 +10,12 @@ export const saveDashboard = async function (dashboardName: string) {
     } else if (this.state.saveDashboardFlag === false && now - this.state.saveDashboardThrottle > 5000) {
         await new Promise(resolve => setTimeout(resolve, 5000));
         this.setState({ saveDashboardFlag: false })
-        const globalStockList = this.state.dashBoardData[this.props.currentDashboard].globalstocklist
+        const globalStockList = this.props.dashboardData[this.props.currentDashboard].globalstocklist
         let status = await new Promise((res) => {
             const data = {
                 dashBoardName: dashboardName,
                 globalStockList: globalStockList,
-                widgetList: this.state.dashBoardData[this.props.currentDashboard].widgetlist,
+                widgetList: this.props.dashboardData[this.props.currentDashboard].widgetlist,
                 menuList: this.state.menuList,
             };
             const options = {

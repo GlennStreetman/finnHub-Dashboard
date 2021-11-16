@@ -5,6 +5,9 @@ import dataModel, { sliceDataModel } from './slices/sliceDataModel'
 import showData, { sliceShowData } from './slices/sliceShowData'
 import quotePrice, { sliceQuotePrice } from './slices/sliceQuotePrice'
 import currentDashboard from './slices/sliceCurrentDashboard'
+import targetSecurity from './slices/sliceTargetSecurity'
+import menuList, { sliceMenuList } from './slices/sliceMenuList'
+import dashboardData, { sliceDashboardData } from './slices/sliceDashboardData'
 
 export interface storeState {
     exchangeData: sliceExchangeData,
@@ -13,6 +16,9 @@ export interface storeState {
     showData: sliceShowData,
     quotePrice: sliceQuotePrice,
     currentDashboard: string,
+    targetSecurity: string,
+    menuList: sliceMenuList,
+    dashboardData: sliceDashboardData,
 }
 
 export const store = configureStore({
@@ -23,6 +29,9 @@ export const store = configureStore({
         'showData': showData,
         'quotePrice': quotePrice,
         'currentDashboard': currentDashboard,
+        'targetSecurity': targetSecurity,
+        'menuList': menuList,
+        'dashboardData': dashboardData,
     },
     middleware: () =>
         getDefaultMiddleware({
