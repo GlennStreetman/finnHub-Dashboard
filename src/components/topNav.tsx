@@ -1,6 +1,6 @@
 
 import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg'
-import { widgetSetup, } from './../App'
+import { widgetSetup, setApp } from './../App'
 import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
 
 import { sliceMenuList } from './../slices/sliceMenuList'
@@ -30,10 +30,10 @@ interface topNavProps {
     saveDashboard: Function,
     toggleBackGroundMenu: Function,
     toggleWidgetVisability: Function,
-    updateAPIFlag: Function,
     widgetLockDown: number,
     widgetSetup: widgetSetup,
     finnHubQueue: finnHubQueue,
+    setAppState: setApp,
 }
 
 export default function TopNav(p: topNavProps) {
@@ -105,22 +105,22 @@ export default function TopNav(p: topNavProps) {
                 <div className="navItemEnd">
                     <ul id='ddu' className="sub-menu">
                         <li id='toggleBackGroundMenuButton' className="navItem">
-                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('') }}>
+                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('', p.setAppState) }}>
                                 {p.backGroundMenu === '' ? " " : "Back to Dashboards"}
                             </a>
                         </li>
                         <li id='templatesButton' className="navItem">
-                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('templates') }}>
+                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('templates', p.setAppState) }}>
                                 <Tooltip title="Excel Templates" placement="bottom"><TableChartIcon /></Tooltip>
                             </a>
                         </li>
                         <li id='manageAccountButton' className="navItem">
-                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('manageAccount') }}>
+                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('manageAccount', p.setAppState) }}>
                                 <Tooltip title="Manage Account" placement="bottom"><AccountBoxIcon /></Tooltip>
                             </a>
                         </li>
                         <li id='aboutButton' className='navItem'>
-                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('about') }}>
+                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('about', p.setAppState) }}>
                                 <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>
                             </a>
                         </li>
@@ -142,7 +142,7 @@ export default function TopNav(p: topNavProps) {
         <>
             <div className="topnav">
                 <div className='navItemEnd'>
-                    <a id='aboutButton' href="#home" onClick={() => { p.toggleBackGroundMenu('about') }}>
+                    <a id='aboutButton' href="#home" onClick={() => { p.toggleBackGroundMenu('about', p.setAppState) }}>
                         {p.backGroundMenu === 'about' ?
                             <Tooltip title="Login" placement="bottom"><LockOpenRoundedIcon /></Tooltip> :
                             <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>}

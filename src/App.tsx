@@ -1,8 +1,12 @@
 import React from "react";
+import { useState, useEffect } from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import queryString from "query-string";
 import produce from 'immer'
 import { createTheme, ThemeProvider } from '@material-ui/core/styles'
+
+import { useAppDispatch, useAppSelector } from './hooks';
+
 
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
@@ -21,10 +25,9 @@ import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appIm
 import { updateGlobalStockList, setNewGlobalStockList } from "./appFunctions/appImport/updateGlobalStockList"
 import { syncGlobalStockList } from "./appFunctions/appImport/syncGlobalStockList"
 import { toggleBackGroundMenu } from "./appFunctions/appImport/toggleBackGroundMenu"
-import { updateAPIFlag } from "./appFunctions/appImport/updateAPIFlag"
+
 import { updateExchangeList } from "./appFunctions/appImport/updateExchangeList"
 import { updateDefaultExchange } from "./appFunctions/appImport/updateDefaultExchange"
-import { loadSavedDashboard } from "./appFunctions/appImport/loadSavedDashboard"
 import { updateWidgetSetup } from "./appFunctions/appImport/updateWidgetSetup"
 
 
@@ -116,7 +119,7 @@ export interface AppState {
     accountMenu: number,
     aboutMenu: number,
     apiFlag: number, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
-    backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
+    backGroundMenuFlag: string, //reference to none widet info displayed when s.showWidget === 0
     enableDrag: boolean,
     finnHubQueue: finnHubQueue,
     login: number, //login state. 0 logged out, 1 logged in.
@@ -131,6 +134,27 @@ export interface AppState {
     widgetLockDown: number, //1 removes buttons from all widgets.
     widgetSetup: widgetSetup, //activates premium api routes.
     zIndex: string[], //list widgets. Index location sets zIndex
+}
+
+export interface setApp {
+    setAccountMenu: Function,
+    setAboutMenu: Function,
+    setApiFlag: Function, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
+    setBackGroundMenuFlag: Function, //reference to none widet info displayed when s.showWidget === 0
+    setEnableDrag: Function,
+    setFinnHubQueue: Function,
+    setLogin: Function, //login state. 0 logged out, 1 logged in.
+    setLoadStartingDashBoard: Function, //flag switches to 1 after attemping to load default dashboard.
+    setShowMenuColumn: Function, //true shows column 0
+    setSaveDashboardThrottle: Function, //delay timer for saving dashboard.
+    setSaveDashboardFlag: Function, //sets to true when a save starts.
+    setSocket: Function, //socket connection for streaming stock data.+
+    setSocketUpdate: Function,
+    setShowStockWidgets: Function, //0 hide dashboard, 1 show dashboard.
+    setWidgetCopy: Function, //copy of state of widget being dragged.
+    setWidgetLockDown: Function, //1 removes buttons from all widgets.
+    setWidgetSetup: Function, //activates premium api routes.
+    setZIndex: Function, //list widgets. Index location sets zIndex
 }
 
 const outerTheme = createTheme({
@@ -160,177 +184,136 @@ const outerTheme = createTheme({
     },
 });
 
-class App extends React.Component<AppProps, AppState> {
-    constructor(props: AppProps) {
-        super(props);
+const useDispatch = useAppDispatch
+const useSelector = useAppSelector
 
-        this.state = {
-            accountMenu: 0,
-            aboutMenu: 0,
-            apiFlag: 0, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
-            backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
-            finnHubQueue: createFunctionQueueObject(1, 1000, true),
-            login: 0, //login state. 0 logged out, 1 logged in.
-            loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
-            showMenuColumn: true, //true shows column 0
-            enableDrag: false,
-            saveDashboardThrottle: Date.now(),
-            saveDashboardFlag: false,
-            socket: "", //socket connection for streaming stock data.
-            socketUpdate: Date.now(),
-            showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
-            widgetCopy: null, //copy of state of widget being dragged.
-            widgetLockDown: 0, //1 removes buttons from all widgets.
-            widgetSetup: {},//items added to list add premium api route widgets (i.e. NOT FREE from finnhub.io).
-            zIndex: [], //list widgets. Index location sets zIndex
-        };
 
-        this.baseState = this.state; //used to reset state upon logout.
-        //login state logic.
-        this.logOut = Logout.bind(this);
-        this.logoutServer = logoutServer.bind(this)
-        this.processLogin = ProcessLogin.bind(this);
+function App() {
 
-        //app logic for creating/removing, modifying, populating widgets.
-        this.newMenuContainer = NewMenuContainer.bind(this);
-        this.AddNewWidgetContainer = AddNewWidgetContainer.bind(this);
-        this.changeWidgetName = ChangeWidgetName.bind(this);
-        this.lockWidgets = LockWidgets.bind(this);
-        this.updateWidgetFilters = UpdateWidgetFilters.bind(this);
-        this.updateWidgetStockList = UpdateWidgetStockList.bind(this);
-        this.toggleWidgetVisability = ToggleWidgetVisability.bind(this);
-        this.updateWidgetConfig = updateWidgetConfig.bind(this);
-        this.toggleWidgetBody = toggleWidgetBody.bind(this)
-        this.setWidgetFocus = setWidgetFocus.bind(this)
+    const dispatch = useDispatch(); //allows widget to run redux actions.
 
-        //App logic for setting up dashboards.
-        this.newDashboard = NewDashboard.bind(this);
-        this.getSavedDashBoards = GetSavedDashBoards.bind(this);
-        this.saveDashboard = saveDashboard.bind(this);
-        this.copyDashboard = copyDashboard.bind(this)
+    const [accountMenu, setAccountMenu] = useState(0)
+    const [aboutMenu, setAboutMenu] = useState(0)
+    const [apiFlag, setApiFlag] = useState(0) //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
+    const [backGroundMenuFlag, setBackGroundMenuFlag] = useState("") //reference to none widet info displayed when s.showWidget === 0
+    const [finnHubQueue, setFinnHubQueue] = useState(createFunctionQueueObject(1, 1000, true))
+    const [login, setLogin] = useState(0) //login state. 0 logged out, 1 process login. 2 logged in.
+    const [loadStartingDashBoard, setLoadStartingDashbBoard] = useState(0) //flag switches to 1 after attemping to load default dashboard.
+    const [showMenuColumn, setShowMenuColumn] = useState(true) //true shows column 0
+    const [enableDrag, setEnableDrag] = useState(false)
+    const [saveDashboardThrottle, setSaveDashboardThrottle] = useState(Date.now())
+    const [saveDashboardFlag, setSaveDashboardFlag] = useState(false)
+    const [socket, setSocket] = useState("") //socket connection for streaming stock data.
+    const [socketUpdate, setSocketUpdate] = useState(Date.now())
+    const [showStockWidgets, setShowStockWidgets] = useState(1) //0 hide dashboard, 1 show dashboard.
+    const [widgetCopy, setWidgetCopy] = useState(null) //copy of state of widget being dragged.
+    const [widgetLockDown, setWidgetLockDown] = useState(0) //1 removes buttons from all widgets.
+    const [widgetSetup, setWidgetSetup] = useState({})//items added to list add premium api route widgets (i.e. NOT FREE from finnhub.io).
+    const [zIndex, setZIndex] = useState([]) //list widgets. Index location sets zIndex
 
-        //app logic for MOVING widgets and snapping them into location.
-        this.setDrag = SetDrag.bind(this);
-        this.moveWidget = MoveWidget.bind(this);
-        this.snapWidget = SnapWidget.bind(this);
-        this.snapOrder = SnapOrder.bind(this);
-
-        //update and apply state, in module.
-        this.updateAPIKey = this.updateAPIKey.bind(this);
-        this.updateAPIFlag = updateAPIFlag.bind(this);
-        this.updateExchangeList = updateExchangeList.bind(this);
-        this.updateDefaultExchange = updateDefaultExchange.bind(this);
-        this.setNewGlobalStockList = setNewGlobalStockList.bind(this)
-        this.updateGlobalStockList = updateGlobalStockList.bind(this); //pass stockRef to delete, pass in stockObj to update.
-        this.uploadGlobalStockList = this.uploadGlobalStockList.bind(this); //pass in object to replace global list
-        this.syncGlobalStockList = syncGlobalStockList.bind(this); //pushes global stock list to all widgets.
-        this.toggleBackGroundMenu = toggleBackGroundMenu.bind(this); //hides widgets and shows menu from topbar.
-        this.loadSavedDashboard = loadSavedDashboard.bind(this) // loads a dashboard
-        this.setSecurityFocus = this.setSecurityFocus.bind(this) //Sets target security for all widgets that have security dropdown selector 
-        this.updateWidgetSetup = updateWidgetSetup.bind(this) //saves current dashboard to postgres.
-        this.rebuildDashboardState = this.rebuildDashboardState.bind(this) //sets this.props.dashboardData. Used to build dataModel in redux
-        this.refreshFinnhubAPIDataAll = this.refreshFinnhubAPIDataAll.bind(this) //For All Dashboards: gets data from mongo if available, else queues updates with finnhub.io
-        this.refreshFinnhubAPIDataCurrentDashboard = this.refreshFinnhubAPIDataCurrentDashboard.bind(this)
-        this.removeDashboardFromState = removeDashboardFromState.bind(this)
-        this.removeWidget = RemoveWidget.bind(this)
-        this.rebuildVisableDashboard = this.rebuildVisableDashboard.bind(this) //rebuilds dashboard in redux state.dataModel
+    const appState: AppState = {
+        accountMenu: accountMenu,
+        aboutMenu: aboutMenu,
+        apiFlag: apiFlag,
+        backGroundMenuFlag: backGroundMenuFlag,
+        finnHubQueue: finnHubQueue,
+        login: login,
+        loadStartingDashBoard: loadStartingDashBoard,
+        showMenuColumn: showMenuColumn,
+        enableDrag: enableDrag,
+        saveDashboardThrottle: saveDashboardThrottle,
+        saveDashboardFlag: saveDashboardFlag,
+        socket: socket,
+        socketUpdate: socketUpdate,
+        showStockWidgets: showStockWidgets,
+        widgetCopy: widgetCopy,
+        widgetLockDown: widgetLockDown,
+        widgetSetup: widgetSetup,
+        zIndex: zIndex,
     }
 
-    componentDidUpdate(prevProps: AppProps, prevState: AppState) {
-        const s: AppState = this.state;
-        const p: AppProps = this.props;
-        if (s.login === 1 && prevState.login === 0) { //on login build dashboard state, then use state to build redux dataModel.
-            console.log('logged in')
-            this.rebuildDashboardState()
-        }
-
-        if (p.dashboardData?.[p.currentDashboard] && !p.dashboardData?.[p.currentDashboard]?.id) {
-            this.newDashboard(p.currentDashboard, p.dashboardData, rSetDashboardData)
-        }
-
-        if ((prevProps.dataModel.created === 'false' && p.dataModel.created === 'true' && s.login === 1) ||
-            (p.dataModel.created === 'updated' && s.login === 1)) {//on login or data model update update dataset with finnHub data.
-            p.rResetUpdateFlag() //sets all dashboards status to updating in redux store.
-            this.refreshFinnhubAPIDataAll() //fetches finnhub api data, from mongo if avilable, else queues Finnhub.io api alls. When complete sets dashboard status ready.
-        }
-
-        if ( //if apikey not setup show about menu
-            (this.props.apiKey === '' && s.apiFlag === 0 && s.login === 1) ||
-            (this.props.apiKey === null && s.apiFlag === 0 && s.login === 1)
-        ) {
-            this.setState({
-                apiFlag: 1,
-                aboutMenu: 0,
-                showStockWidgets: 0,
-            }, () => { this.toggleBackGroundMenu('about') })
-        }
-
-        const globalStockList = this.props.dashboardData?.[p.currentDashboard]?.globalstocklist ? this.props.dashboardData?.[p.currentDashboard].globalstocklist : false
-        if ((globalStockList && globalStockList !== prevProps.dashboardData?.[prevProps.currentDashboard]?.globalstocklist && s.login === 1)) { //price data for watchlist, including socket data.
-            LoadTickerSocket(this, prevState, prevProps, globalStockList, s.socket, this.props.apiKey, UpdateTickerSockets);
-        }
-
-        const globalKeys = globalStockList ? Object.keys(globalStockList) : []
-        if (this.props.targetSecurity === '' && globalKeys.length > 0) {
-            this.props.rSetTargetSecurity(globalKeys[0])
-        }
+    const setAppState: setApp = {
+        setAccountMenu: setAccountMenu,
+        setAboutMenu: setAboutMenu,
+        setApiFlag: setApiFlag,
+        setBackGroundMenuFlag: setBackGroundMenuFlag,
+        setFinnHubQueue: setFinnHubQueue,
+        setLogin: setLogin,
+        setLoadStartingDashBoard: setLoadStartingDashbBoard,
+        setShowMenuColumn: setShowMenuColumn,
+        setEnableDrag: setEnableDrag,
+        setSaveDashboardThrottle: setSaveDashboardThrottle,
+        setSaveDashboardFlag: setSaveDashboardFlag,
+        setSocket: setSocket,
+        setSocketUpdate: setSocketUpdate,
+        setShowStockWidgets: setShowStockWidgets,
+        setWidgetCopy: setWidgetCopy,
+        setWidgetLockDown: setWidgetLockDown,
+        setWidgetSetup: setWidgetSetup,
+        setZIndex: setZIndex,
     }
 
-    async refreshFinnhubAPIDataCurrentDashboard() { //queues all finnhub data to be refreshed for current dashboard.
-        console.log('refresh finnhub data for current dashboard', this.propp.currentDashboard)
-        const s: AppState = this.state;
-        const p: AppProps = this.props;
-        await p.tGetMongoDB({ dashboard: this.props.dashboardData[p.currentDashboard].id })
-        const payload: tgetFinnHubDataReq = {
-            dashboardID: this.props.dashboardData[p.currentDashboard].id,
-            widgetList: Object.keys(this.props.dashboardData[p.currentDashboard].widgetlist),
-            finnHubQueue: s.finnHubQueue,
-            rSetUpdateStatus: p.rSetUpdateStatus,
-        }
-        await p.tGetFinnhubData(payload)
-    }
+    // const baseState = this.state; //used to reset state upon logout.
 
-    async refreshFinnhubAPIDataAll() { //queues all finnhub data to be refreshes for all dashboards.
-        const s: AppState = this.state;
-        const p: AppProps = this.props;
-        await p.tGetMongoDB()
-        const targetDash: string[] = this.props.dashboardData?.[p.currentDashboard]?.widgetlist ? Object.keys(this.props.dashboardData?.[p.currentDashboard]?.widgetlist) : []
-        for (const widget in targetDash) {
-            const payload: tgetFinnHubDataReq = { //get data for default dashboard.
-                dashboardID: this.props.dashboardData[p.currentDashboard].id,
-                widgetList: [targetDash[widget]],
-                finnHubQueue: s.finnHubQueue,
-                rSetUpdateStatus: p.rSetUpdateStatus,
-            }
-            p.tGetFinnhubData(payload)
-        }
-        const dashBoards: string[] = Object.keys(this.props.dashboardData) //get data for dashboards not being shown
-        for (const dash of dashBoards) {
-            if (dash !== p.currentDashboard) {
-                const payload: tgetFinnHubDataReq = { //run in background, do not await.
-                    dashboardID: this.props.dashboardData[dash].id,
-                    widgetList: Object.keys(this.props.dashboardData[dash].widgetlist),
-                    finnHubQueue: s.finnHubQueue,
-                    rSetUpdateStatus: p.rSetUpdateStatus,
-                }
-                await p.tGetFinnhubData(payload)
-            }
-        }
-    }
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const apiAlias = useSelector((state) => { return state.apiAlias })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const dataModel = useSelector((state) => { return state.dataModel })
+    const menuList = useSelector((state) => { return state.menuList })
+    const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
+    const defaultExchange = useSelector((state) => { return state.defaultExchange })
 
-    async rebuildDashboardState() { //fetches dashboard data, then updates this.props.dashboardData, then builds redux model.
+    //ALL EFFECTS
+    useEffect(() => { //process login. This should be moved into login function.
+        if (login === 1) {
+            setLogin(2)
+            rebuildDashboardState()
+        }
+    }, [login])
+
+    useEffect(() => { //create new dashboard if none exists. This should be moved server side. A dashboard should always be returned.
+        if (dashboardData?.[currentDashboard] && !dashboardData?.[currentDashboard]?.id) {
+            NewDashboard(currentDashboard, dashboardData)
+        }
+    }, [dashboardData, currentDashboard])
+
+    useEffect(() => { //on login or data model update update dataset with finnHub data.
+        if ((dataModel.created === 'true' && login === 1) || (dataModel.created === 'updated' && login === 1)) {
+            rResetUpdateFlag() //sets all dashboards status to updating in redux store.
+            refreshFinnhubAPIDataAll() //fetches finnhub api data, from mongo if avilable, else queues Finnhub.io api alls. When complete sets dashboard status ready.
+        }
+    }, [dataModel.created, login])
+
+    // useEffect(()=>{                   MOVE INTO SNACK BAR!
+
+    //     if ( //if apikey not setup show about menu
+    //         (apiKey === '' && s.apiFlag === 0 && s.login === 1) ||
+    //         (apiKey === null && s.apiFlag === 0 && s.login === 1)
+    //     ) {
+    //         this.setState({
+    //             apiFlag: 1,
+    //             aboutMenu: 0,
+    //             showStockWidgets: 0,
+    //         }, () => { this.toggleBackGroundMenu('about') })
+    //     }
+    // }, [])
+
+    // useEffect(()=>{}, [])
+
+    const rebuildDashboardState = async function () { //fetches dashboard data, then updates dashboardData, then builds redux model.
         // console.log('running rebuild')
         try {
-            const data: GetSavedDashBoardsRes = await this.getSavedDashBoards()
+            const data: GetSavedDashBoardsRes = await GetSavedDashBoards()
             if ((data.dashboardData[data.currentDashBoard] === undefined && Object.keys(data.dashboardData))) { //if invalid current dashboard returned
                 console.log('invalid dashboard')
                 data.currentDashBoard = Object.keys(data.dashboardData)[0]
             }
-            this.props.rSetDashboardData(data.dashboardData)
-            this.props.rUpdateCurrentDashboard(data.currentDashBoard)
-            this.props.rSetMenuList(data.menuList)
-            this.props.rSetTargetDashboard({ targetDashboard: data.currentDashBoard }) //update target dashboard in redux dataModel
-            this.props.rBuildDataModel({ ...data, apiKey: this.props.apiKey })
+            rSetDashboardData(data.dashboardData)
+            rUpdateCurrentDashboard(data.currentDashBoard)
+            rSetMenuList(data.menuList)
+            rSetTargetDashboard({ targetDashboard: data.currentDashBoard }) //update target dashboard in redux dataModel
+            rBuildDataModel({ ...data, apiKey: apiKey })
             if (data.message === 'No saved dashboards') { return (true) } else { return (false) }
 
         } catch (error: any) {
@@ -339,111 +322,185 @@ class App extends React.Component<AppProps, AppState> {
         }
     }
 
-    rebuildVisableDashboard() {
-        const payload = {
-            apiKey: this.props.apiKey,
-            dashboardData: this.props.dashboardData,
-            targetDashboard: this.props.currentDashboard,
+    // const globalStockList = dashboardData?.[p.currentDashboard]?.globalstocklist ? dashboardData?.[p.currentDashboard].globalstocklist : false
+    // if ((globalStockList && globalStockList !== prevProps.dashboardData?.[prevProps.currentDashboard]?.globalstocklist && s.login === 1)) { //price data for watchlist, including socket data.
+    //     LoadTickerSocket(this, prevState, prevProps, globalStockList, s.socket, apiKey, UpdateTickerSockets);
+    // }
+
+    // const globalKeys = globalStockList ? Object.keys(globalStockList) : []
+    // if (targetSecurity === '' && globalKeys.length > 0) {
+    //     rSetTargetSecurity(globalKeys[0])
+    // }
+
+    const refreshFinnhubAPIDataCurrentDashboard = async function () { //queues all finnhub data to be refreshed for current dashboard.
+        console.log('refresh finnhub data for current dashboard', currentDashboard)
+        await tGetMongoDB({ dashboard: dashboardData[currentDashboard].id })
+        const payload: tgetFinnHubDataReq = {
+            dashboardID: dashboardData[currentDashboard].id,
+            widgetList: Object.keys(dashboardData[currentDashboard].widgetlist),
+            finnHubQueue: finnHubQueue,
+            rSetUpdateStatus: rSetUpdateStatus,
         }
-        this.props.rRebuildTargetDashboardModel(payload) //rebuilds redux.Model
-        this.refreshFinnhubAPIDataCurrentDashboard() //queue refresh for all finhub data for this dashboard.
+        tGetFinnhubData(payload)
     }
 
-    uploadGlobalStockList(newStockObj: stockList) {
-        const newDashboardObj = produce(this.props.dashboardData, (draftState: sliceDashboardData) => {
-            draftState[this.props.currentDashboard].globalstocklist = newStockObj
+    const refreshFinnhubAPIDataAll = async function () { //queues all finnhub data to be refreshes for all dashboards.
+        await tGetMongoDB()
+        const targetDash: string[] = dashboardData?.[currentDashboard]?.widgetlist ? Object.keys(dashboardData?.[currentDashboard]?.widgetlist) : []
+        for (const widget in targetDash) {
+            const payload: tgetFinnHubDataReq = { //get data for default dashboard.
+                dashboardID: dashboardData[currentDashboard].id,
+                widgetList: [targetDash[widget]],
+                finnHubQueue: finnHubQueue,
+                rSetUpdateStatus: rSetUpdateStatus,
+            }
+            tGetFinnhubData(payload)
+        }
+        const dashBoards: string[] = Object.keys(dashboardData) //get data for dashboards not being shown
+        for (const dash of dashBoards) {
+            if (dash !== currentDashboard) {
+                const payload: tgetFinnHubDataReq = { //run in background, do not await.
+                    dashboardID: dashboardData[dash].id,
+                    widgetList: Object.keys(dashboardData[dash].widgetlist),
+                    finnHubQueue: finnHubQueue,
+                    rSetUpdateStatus: rSetUpdateStatus,
+                }
+                await tGetFinnhubData(payload)
+            }
+        }
+    }
+
+    function rebuildVisableDashboard() {
+        const payload = {
+            apiKey: apiKey,
+            dashboardData: dashboardData,
+            targetDashboard: currentDashboard,
+        }
+        rRebuildTargetDashboardModel(payload) //rebuilds redux.Model
+        refreshFinnhubAPIDataCurrentDashboard() //queue refresh for all finhub data for this dashboard.
+    }
+
+    function uploadGlobalStockList(newStockObj: stockList) {
+        const newDashboardObj = produce(dashboardData, (draftState: sliceDashboardData) => {
+            draftState[currentDashboard].globalstocklist = newStockObj
             return draftState
         })
 
-        this.props.rSetDashboardData(newDashboardObj)
+        rSetDashboardData(newDashboardObj)
     }
 
-    updateAPIKey(newKey: string) {
-        this.props.rSetApiKey(newKey)
+    function updateAPIKey(newKey: string) {
+        rSetApiKey(newKey)
     }
 
-    setSecurityFocus(target: string) {
-        this.props.rSetTargetSecurity(target)
+    function setSecurityFocus(target: string) {
+        rSetTargetSecurity(target)
         return true
         // this.setState({ targetSecurity: target }, () => { return true })
     }
 
-    render() {
-        const s: AppState = this.state
-        const p: AppProps = this.props
-        const quaryData = queryString.parse(window.location.search);
-        const loginScreen =
-            this.state.login === 0 && this.state.backGroundMenu === "" ? (
-                <Login
-                    processLogin={this.processLogin}
-                    queryData={quaryData}
-                    updateExchangeList={this.updateExchangeList}
-                    updateDefaultExchange={this.updateDefaultExchange}
-                    finnHubQueue={this.state.finnHubQueue}
-                />
-            ) : (
-                <></>
-            );
 
-        const backGroundSelection: { [key: string]: React.ReactElement } = { //topnav menus.
-            manageAccount: React.createElement(AccountMenu, accountMenuProps(this)),
-            widgetMenu: React.createElement(WidgetMenu, widgetMenuProps(this)),
-            about: React.createElement(AboutMenu, { apiFlag: this.state.apiFlag }),
-            exchangeMenu: React.createElement(ExchangeMenu, exchangeMenuProps(this)),
-            templates: React.createElement(TemplateMenu, templateMenuProps(this)),
-        };
+    const quaryData = queryString.parse(window.location.search);
+    const loginScreen =
+        login === 0 && backGroundMenuFlag === "" ? (
+            <Login
+                processLogin={ProcessLogin}
+                queryData={quaryData}
+                updateExchangeList={updateExchangeList}
+                updateDefaultExchange={updateDefaultExchange}
+                finnHubQueue={finnHubQueue}
+            />
+        ) : (
+            <></>
+        );
 
-        const backGroundMenu = () => {
-            return <div className="backgroundMenu">{backGroundSelection[s.backGroundMenu]}</div>;
-        };
+    const accountMenuPropsObj: accountMenuProps = {
+        finnHubQueue: finnHubQueue,
+        apiKey: apiKey,
+        widgetKey: 'AccountMenu',
+        updateAPIKey: updateAPIKey,
+        exchangeList: exchangeList,
+        toggleBackGroundMenu: toggleBackGroundMenu,
+        tGetSymbolList: tGetSymbolList,
+        defaultExchange: defaultExchange,
+        setAppState: setAppState,
+    }
 
-        const widgetList = this.props.dashboardData?.[this.props.currentDashboard]?.['widgetlist'] ?
-            this.props.dashboardData?.[this.props.currentDashboard]['widgetlist'] : {}
+    const widgetMenuPropsObj: widgetMenuProps = {
+        updateWidgetSetup: updateWidgetSetup,
+        widgetSetup: widgetSetup,
+    }
 
-        const globalStockList = this.props.dashboardData?.[p.currentDashboard]?.globalstocklist ? this.props.dashboardData?.[p.currentDashboard].globalstocklist : {}
-        const dashboardID = this.props.dashboardData?.[this.props.currentDashboard]?.id ? this.props.dashboardData[this.props.currentDashboard].id : ''
+    const exchangeMenuProps: exchangeMenuProps = {
+        apiKey: apiKey,
+        finnHubQueue: finnHubQueue,
+        updateExchangeList: updateExchangeList,
+        exchangeList: exchangeList,
+    }
 
-        return (
-            <ThemeProvider theme={outerTheme}>
-                <BrowserRouter>
-                    <Switch>
-                        <Route path="/">
-                            <TopNav
-                                AccountMenu={this.state.accountMenu}
-                                AddNewWidgetContainer={this.AddNewWidgetContainer}
-                                apiFlag={this.state.apiFlag}
-                                backGroundMenu={this.state.backGroundMenu}
-                                finnHubQueue={this.state.finnHubQueue}
-                                lockWidgets={this.lockWidgets}
-                                login={this.state.login}
-                                logOut={this.logOut}
-                                logoutServer={this.logoutServer}
-                                menuList={this.props.menuList}
-                                newMenuContainer={this.newMenuContainer}
-                                saveDashboard={this.saveDashboard}
-                                showMenuColumn={this.state.showMenuColumn}
-                                showStockWidgets={this.state.showStockWidgets}
-                                toggleBackGroundMenu={this.toggleBackGroundMenu}
-                                toggleWidgetVisability={this.toggleWidgetVisability}
-                                updateAPIFlag={this.updateAPIFlag}
-                                widgetLockDown={this.state.widgetLockDown}
-                                widgetSetup={this.state.widgetSetup}
-                            />
-                            <WidgetController
-                                apiKey={this.props.apiKey}
-                                // apiAlias={this.state.apiAlias}
+    const templateMenuProp: templateMenuProps = {
+        apiKey: apiKey,
+        apiAlias: apiAlias,
+    }
+
+    const backGroundSelection: { [key: string]: React.ReactElement } = { //topnav menus.
+        manageAccount: React.createElement(AccountMenu, accountMenuPropsObj),
+        widgetMenu: React.createElement(WidgetMenu, widgetMenuPropsObj),
+        about: React.createElement(AboutMenu, { apiFlag: apiFlag }),
+        exchangeMenu: React.createElement(ExchangeMenu, exchangeMenuProps),
+        templates: React.createElement(TemplateMenu, templateMenuProp),
+    };
+
+    const backGroundMenu = () => {
+        return <div className="backgroundMenu">{backGroundSelection[backGroundMenuFlag]}</div>;
+    };
+
+    const widgetList = dashboardData?.[currentDashboard]?.['widgetlist'] ?
+        dashboardData?.[currentDashboard]['widgetlist'] : {}
+
+    const globalStockList = dashboardData?.[currentDashboard]?.globalstocklist ? dashboardData?.[currentDashboard].globalstocklist : {}
+    const dashboardID = dashboardData?.[currentDashboard]?.id ? dashboardData[currentDashboard].id : ''
+
+    return (
+        <ThemeProvider theme={outerTheme}>
+            <BrowserRouter>
+                <Switch>
+                    <Route path="/">
+                        <TopNav
+                            AccountMenu={accountMenu}
+                            AddNewWidgetContainer={AddNewWidgetContainer}
+                            apiFlag={apiFlag}
+                            backGroundMenu={backGroundMenuFlag}
+                            finnHubQueue={finnHubQueue}
+                            lockWidgets={LockWidgets}
+                            login={login}
+                            logOut={Logout}
+                            logoutServer={logoutServer}
+                            menuList={menuList}
+                            newMenuContainer={NewMenuContainer}
+                            saveDashboard={saveDashboard}
+                            showMenuColumn={showMenuColumn}
+                            showStockWidgets={showStockWidgets}
+                            toggleBackGroundMenu={toggleBackGroundMenu}
+                            toggleWidgetVisability={ToggleWidgetVisability}
+                            widgetLockDown={widgetLockDown}
+                            widgetSetup={widgetSetup}
+                            setAppState={setAppState}
+                        />
+                        {/* <WidgetController
+                                apiKey={apiKey}
+                                // apiAlias={apiAlias}
                                 changeWidgetName={this.changeWidgetName}
                                 copyDashboard={this.copyDashboard}
-                                currentDashboard={this.props.currentDashboard}
-                                dashboardData={this.props.dashboardData}
+                                currentDashboard={currentDashboard}
+                                dashboardData={dashboardData}
                                 dashboardID={dashboardID}
-                                defaultExchange={this.props.defaultExchange}
-                                exchangeList={this.props.exchangeList}
-                                finnHubQueue={this.state.finnHubQueue}
+                                defaultExchange={defaultExchange}
+                                exchangeList={exchangeList}
+                                finnHubQueue={finnHubQueue}
                                 globalStockList={globalStockList}
-                                loadSavedDashboard={this.loadSavedDashboard}
-                                login={this.state.login}
-                                menuList={this.props.menuList}
+                                login={login}
+                                menuList={menuList}
                                 moveWidget={this.moveWidget}
                                 newDashboard={this.newDashboard}
                                 processLogin={this.processLogin}
@@ -456,13 +513,12 @@ class App extends React.Component<AppProps, AppState> {
                                 setNewGlobalStockList={this.setNewGlobalStockList}
                                 setSecurityFocus={this.setSecurityFocus}
                                 setWidgetFocus={this.setWidgetFocus}
-                                showMenuColumn={this.state.showMenuColumn}
-                                showStockWidgets={this.state.showStockWidgets}
+                                showMenuColumn={showMenuColumn}
+                                showStockWidgets={showStockWidgets}
                                 snapWidget={this.snapWidget}
                                 syncGlobalStockList={this.syncGlobalStockList}
-                                targetSecurity={this.props.targetSecurity}
+                                targetSecurity={targetSecurity}
                                 toggleWidgetBody={this.toggleWidgetBody}
-                                updateAPIFlag={this.updateAPIFlag}
                                 updateAPIKey={this.updateAPIKey}
                                 updateDefaultExchange={this.updateDefaultExchange}
                                 updateGlobalStockList={this.updateGlobalStockList}
@@ -470,61 +526,23 @@ class App extends React.Component<AppProps, AppState> {
                                 updateWidgetFilters={this.updateWidgetFilters}
                                 updateWidgetStockList={this.updateWidgetStockList}
                                 uploadGlobalStockList={this.uploadGlobalStockList}
-                                widgetCopy={this.state.widgetCopy}
+                                widgetCopy={widgetCopy}
                                 widgetList={widgetList}
-                                widgetLockDown={this.state.widgetLockDown}
-                                zIndex={this.state.zIndex}
-                                rAddNewDashboard={this.props.rAddNewDashboard}
-                                rSetTargetDashboard={this.props.rSetTargetDashboard}
-                                rUpdateCurrentDashboard={this.props.rUpdateCurrentDashboard}
-                            />
-                            {loginScreen}
-                            {backGroundMenu()}
+                                widgetLockDown={widgetLockDown}
+                                zIndex={zIndex}
+                                rAddNewDashboard={rAddNewDashboard}
+                                rSetTargetDashboard={rSetTargetDashboard}
+                                rUpdateCurrentDashboard={rUpdateCurrentDashboard}
+                            /> */}
+                        {loginScreen}
+                        {backGroundMenu()}
 
-                        </Route>
-                    </Switch>
-                </BrowserRouter>
-            </ThemeProvider>
-        );
-    }
+                    </Route>
+                </Switch>
+            </BrowserRouter>
+        </ThemeProvider>
+    );
 }
 
-const mapStateToProps = (state: storeState) => ({
-    exchangeList: state.exchangeList.exchangeList,
-    dataModel: state.dataModel,
-    currentDashboard: state.currentDashboard,
-    targetSecurity: state.targetSecurity,
-    menuList: state.menuList,
-    dashboardData: state.dashboardData,
-    apiKey: state.apiKey,
-    apiAlias: state.apiAlias,
-    defaultExchange: state.defaultExchange
-});
-
-export default connect(mapStateToProps, {
-    tGetSymbolList,
-    tGetFinnhubData,
-    tGetMongoDB,
-    rBuildDataModel,
-    rResetUpdateFlag,
-    rSetTargetDashboard,
-    rSetUpdateStatus,
-    rUpdateExchangeList,
-    rDataModelLogout,
-    rExchangeDataLogout,
-    rExchangeListLogout,
-    rTargetDashboardLogout,
-    rRebuildTargetDashboardModel,
-    rRebuildTargetWidgetModel,
-    rUpdateQuotePriceStream,
-    rUpdateQuotePriceSetup,
-    rAddNewDashboard,
-    rUpdateCurrentDashboard,
-    rSetTargetSecurity,
-    rSetMenuList,
-    rSetDashboardData,
-    rSetApiKey,
-    rSetApiAlias,
-    rSetDefaultExchange,
-})(App);
+export default App;
 

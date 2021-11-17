@@ -1,6 +1,7 @@
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { useAppSelector, useAppDispatch } from '../../../hooks';
 // import { uniqueObjectnName } from './../../../appFunctions/stringFunctions'
+import { LoadSavedDashboard } from './../../../appFunctions/appImport/loadSavedDashboard'
 
 import { rUnmountWidget } from './../../../slices/sliceShowData'
 import { rRemoveDashboardDataModel } from './../../../slices/sliceDataModel'
@@ -122,7 +123,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                 const testDashboardName = dashboard.dashboardname
                 if (testDashboardName !== dashboardName) { //load non-deleted dashboard
                     console.log(1.1)
-                    p.loadSavedDashboard(testDashboardName);
+                    LoadSavedDashboard(testDashboardName, p.finnHubQueue);
                     break
                 }
             }
@@ -168,7 +169,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                             checked={currentDashboard === p.dashboardData?.[el]?.dashboardname} //
                             onChange={() => {
                                 unMountWidgets()
-                                p.loadSavedDashboard(p.dashboardData?.[el]?.dashboardname);
+                                LoadSavedDashboard(p.dashboardData?.[el]?.dashboardname, p.finnHubQueue);
                                 setInputText(dashboardData[el].dashboardname)
                             }}
                         />
@@ -267,13 +268,13 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
         saveDashboard: that.props.saveDashboard,
         newDashBoard: that.props.newDashboard,
         helpText: [helpText, 'DBM'],
-        loadSavedDashboard: that.props.loadSavedDashboard,
         rebuildDashboardState: that.props.rebuildDashboardState,
         refreshFinnhubAPIDataCurrentDashboard: that.props.refreshFinnhubAPIDataCurrentDashboard,
         removeDashboardFromState: that.props.removeDashboardFromState,
         rAddNewDashboard: that.props.rAddNewDashboard,
         rSetTargetDashboard: that.props.rSetTargetDashboard,
-        rUpdateCurrentDashboard: that.props.rUpdateCurrentDashboard
+        rUpdateCurrentDashboard: that.props.rUpdateCurrentDashboard,
+        finnHubQueue: that.props.finnHubQueue,
     };
     return propList;
 }

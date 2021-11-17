@@ -51,7 +51,6 @@ function WidgetController(p) {
                     exchangeList: p.exchangeList,
                     finnHubQueue: p.finnHubQueue,
                     // key: el.widgetID,
-                    loadSavedDashboard: p.loadSavedDashboard,
                     moveWidget: p.moveWidget,
                     refreshFinnhubAPIDataCurrentDashboard: p.refreshFinnhubAPIDataCurrentDashboard,
                     removeWidget: p.removeWidget,
@@ -64,7 +63,7 @@ function WidgetController(p) {
                     stateRef: el.widgetConfig,
                     targetSecurity: p.targetSecurity,
                     toggleWidgetBody: p.toggleWidgetBody,
-                    updateAPIFlag: p.updateAPIFlag,
+
                     updateDefaultExchange: p.updateDefaultExchange,
                     updateWidgetConfig: p.updateWidgetConfig,
                     widgetBodyProps: returnBodyProps({ props: p }, el.widgetType, el.widgetID),

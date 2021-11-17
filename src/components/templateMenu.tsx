@@ -5,6 +5,11 @@ interface checkObject {
     [key: string]: boolean
 }
 
+export interface templateMenuProps {
+    apiKey: string,
+    apiAlias: string,
+}
+
 export default function TemplateMenu(p: { [key: string]: any }, ref: any) {
 
     const [templateFlag, setTemplateFlag] = useState(true) //if true, retrieve template list.
@@ -141,10 +146,10 @@ export default function TemplateMenu(p: { [key: string]: any }, ref: any) {
     </>)
 }
 
-export function templateMenuProps(that, key = "templateMenu") {
-    let propList = {
-        apiKey: that.state.apiKey,
-        apiAlias: that.state.apiAlias
-    };
-    return propList;
-}
+// export function templateMenuProps(key = "templateMenu") {
+//     let propList = {
+//         apiKey: apiKey,
+//         apiAlias: apiAlias
+//     };
+//     return propList;
+// }

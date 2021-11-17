@@ -1,29 +1,14 @@
-import { AppState } from './../../App'
+import { AppState, setApp } from './../../App'
 
-export const toggleBackGroundMenu = function (menu: string) {
+export const toggleBackGroundMenu = function (menu: string, set: setApp) {
     if (menu === "") {
-        this.setState(() => {
-            const update: Partial<AppState> = {
-                backGroundMenu: menu,
-                showStockWidgets: 1,
-            }
-            return update
-        });
+        set.setBackGroundMenuFlag(menu)
+        set.setShowStockWidgets(1)
     } else if (this.state.backGroundMenu !== menu) {
-        this.setState(() => {
-            const update: Partial<AppState> = {
-                backGroundMenu: menu,
-                showStockWidgets: 0
-            }
-            return update
-        });
+        set.setBackGroundMenuFlag(menu)
+        set.setShowStockWidgets(0)
     } else {
-        this.setState(() => {
-            const update: Partial<AppState> = {
-                backGroundMenu: "",
-                showStockWidgets: 1
-            }
-            return update
-        });
+        set.setBackGroundMenuFlag('')
+        set.setShowStockWidgets(1)
     }
 }

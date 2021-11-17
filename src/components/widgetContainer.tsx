@@ -148,7 +148,6 @@ function WidgetContainer(p) {
         widgetProps['currentDashboard'] = p.currentDashboard
         widgetProps['searchText'] = searchText
         widgetProps['changeSearchText'] = changeSearchText
-        widgetProps['updateAPIFlag'] = p.updateAPIFlag
         widgetProps['widgetType'] = p.widgetList["widgetType"]
         widgetProps['config'] = p.widgetList.config
         widgetProps['finnHubQueue'] = p.finnHubQueue

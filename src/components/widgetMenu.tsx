@@ -1,11 +1,14 @@
 /* eslint-disable no-sparse-arrays */
 import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg'
+import { widgetSetup } from './../App'
 
-// interface widgetSetup {
-//     [key: string]: boolean
-// }
+export interface widgetMenuProps {
+    updateWidgetSetup: Function,
+    widgetSetup: widgetSetup,
+}
 
-export default function WidgetMenu(p: { [key: string]: any }, ref: any) {
+
+export default function WidgetMenu(p: widgetMenuProps, ref: any) {
 
     function check(el) {
         const key = el[0]
@@ -77,11 +80,4 @@ export default function WidgetMenu(p: { [key: string]: any }, ref: any) {
     )
 }
 
-export function widgetMenuProps(that) {
-    let propList = {
-        updateWidgetSetup: that.updateWidgetSetup,
-        widgetSetup: that.state.widgetSetup,
-    };
-    return propList;
-}
 

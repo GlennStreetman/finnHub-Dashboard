@@ -6,7 +6,7 @@ interface AccountMenu { //plug
     [key: string]: any
 }
 
-interface accountMenuProps2 {
+export interface accountMenuProps {
     finnHubQueue: finnHubQueue,
     apiKey: string,
     widgetKey: string,
@@ -15,6 +15,7 @@ interface accountMenuProps2 {
     toggleBackGroundMenu: Function,
     tGetSymbolList: Function,
     defaultExchange: string,
+    setAppState: Object,
 }
 
 interface accountMenuState {
@@ -41,8 +42,8 @@ interface payload {
     widgetSetup: widgetSetup | null
 }
 
-class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
-    constructor(props: accountMenuProps2) {
+class AccountMenu extends React.Component<accountMenuProps, accountMenuState> {
+    constructor(props: accountMenuProps) {
         super(props);
         this.state = {
             loginName: "",
@@ -198,7 +199,7 @@ class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
                                     <td>Active Exchanges: </td>
                                     <td>{this.props.exchangeList.toString()}</td>
                                     <td>
-                                        <button onClick={() => this.props.toggleBackGroundMenu("exchangeMenu")}>edit</button>
+                                        <button onClick={() => this.props.toggleBackGroundMenu("exchangeMenu", this.props.setAppState)}>edit</button>
                                     </td>
                                 </tr>
                                 <tr>
@@ -219,7 +220,7 @@ class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
                                     <td>Manage Widgets: </td>
                                     <td></td>
                                     <td>
-                                        <button onClick={() => this.props.toggleBackGroundMenu("widgetMenu")}>edit</button>
+                                        <button onClick={() => this.props.toggleBackGroundMenu("widgetMenu", this.props.setAppState)}>edit</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -261,19 +262,19 @@ class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
     }
 }
 
-export function accountMenuProps(that: any, key = "AccountMenu") {
-    let propList = {
-        finnHubQueue: that.state.finnHubQueue,
-        apiKey: that.state.apiKey,
-        widgetKey: key,
-        updateAPIKey: that.updateAPIKey,
-        exchangeList: that.state.exchangeList,
-        toggleBackGroundMenu: that.toggleBackGroundMenu,
-        tGetSymbolList: that.props.tGetSymbolList,
-        defaultExchange: that.state.defaultExchange,
+// export function accountMenuProps(finnHubQueueObj, apiKey, key = "AccountMenu", updateAPiKey) {
+//     let propList: any = {
+// finnHubQueue: finnHubQueueObj,
+// apiKey: apiKey,
+// widgetKey: key,
+// updateAPIKey: updateAPIKey,
+// exchangeList: exchangeList,
+// toggleBackGroundMenu: toggleBackGroundMenu,
+// tGetSymbolList: tGetSymbolList,
+// defaultExchange: defaultExchange,
 
-    };
-    return propList;
-}
+//     };
+//     return propList;
+// }
 
 export default AccountMenu;
