@@ -99,6 +99,7 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
                 updateWidgetFilters={p.updateWidgetFilters}
                 widgetKey={p.widgetKey}
                 widgetType={p.widgetType}
+                finnHubQueue={p.finnHubQueue}
             />
         </>
     }

@@ -1,7 +1,7 @@
 import produce from "immer"
 
 import { AppState, } from './../../App'
-import { sliceMenuList } from './../../slices/sliceMenuList'
+import { rSetMenuList, sliceMenuList } from './../../slices/sliceMenuList'
 import { sliceDashboardData, widgetList } from './../../slices/sliceDashboardData'
 import { uniqueObjectnName } from './../stringFunctions'
 

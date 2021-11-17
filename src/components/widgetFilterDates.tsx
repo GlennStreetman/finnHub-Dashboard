@@ -1,5 +1,8 @@
 import ToolTip from './toolTip.js'
 
+import { UpdateWidgetFilters } from "./../appFunctions/appImport/widgetLogic";
+import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
+
 interface props {
     start: string,
     end: string,
@@ -8,6 +11,7 @@ interface props {
     updateWidgetFilters: Function,
     widgetKey: string,
     widgetType: string,
+    finnHubQueue: finnHubQueue,
 }
 
 export default function WidgetFilterDates(p: props) {
@@ -26,7 +30,7 @@ export default function WidgetFilterDates(p: props) {
             const target = new Date(e.target.value).getTime();
             const offset = target - now
             const name = e.target.name;
-            p.updateWidgetFilters(p.widgetKey, { [name]: offset })
+            UpdateWidgetFilters(p.widgetKey, { [name]: offset }, p.finnHubQueue)
         }
     }
 

@@ -13,10 +13,9 @@ import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImpor
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
 import { logoutServer, Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
 import {
-    NewMenuContainer, AddNewWidgetContainer, LockWidgets,
-    ToggleWidgetVisability, ChangeWidgetName, RemoveWidget,
-    UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig,
-    toggleWidgetBody, setWidgetFocus, removeDashboardFromState
+    ChangeWidgetName, RemoveWidget,
+    UpdateWidgetStockList, UpdateWidgetConfig,
+    ToggleWidgetBody, SetWidgetFocus, RemoveDashboardFromState
 } from "./appFunctions/appImport/widgetLogic";
 import { NewDashboard, saveDashboard, copyDashboard }
     from "./appFunctions/appImport/setupDashboard";
@@ -280,7 +279,7 @@ function App() {
 
     useEffect(() => { //on login or data model update update dataset with finnHub data.
         if ((dataModel.created === 'true' && login === 1) || (dataModel.created === 'updated' && login === 1)) {
-            rResetUpdateFlag() //sets all dashboards status to updating in redux store.
+            dispatch(rResetUpdateFlag()) //sets all dashboards status to updating in redux store.
             refreshFinnhubAPIDataAll() //fetches finnhub api data, from mongo if avilable, else queues Finnhub.io api alls. When complete sets dashboard status ready.
         }
     }, [dataModel.created, login])
@@ -309,11 +308,11 @@ function App() {
                 console.log('invalid dashboard')
                 data.currentDashBoard = Object.keys(data.dashboardData)[0]
             }
-            rSetDashboardData(data.dashboardData)
-            rUpdateCurrentDashboard(data.currentDashBoard)
-            rSetMenuList(data.menuList)
-            rSetTargetDashboard({ targetDashboard: data.currentDashBoard }) //update target dashboard in redux dataModel
-            rBuildDataModel({ ...data, apiKey: apiKey })
+            dispatch(rSetDashboardData(data.dashboardData))
+            dispatch(rUpdateCurrentDashboard(data.currentDashBoard))
+            dispatch(rSetMenuList(data.menuList))
+            dispatch(rSetTargetDashboard({ targetDashboard: data.currentDashBoard })) //update target dashboard in redux dataModel
+            dispatch(rBuildDataModel({ ...data, apiKey: apiKey }))
             if (data.message === 'No saved dashboards') { return (true) } else { return (false) }
 
         } catch (error: any) {
@@ -334,18 +333,18 @@ function App() {
 
     const refreshFinnhubAPIDataCurrentDashboard = async function () { //queues all finnhub data to be refreshed for current dashboard.
         console.log('refresh finnhub data for current dashboard', currentDashboard)
-        await tGetMongoDB({ dashboard: dashboardData[currentDashboard].id })
+        await dispatch(tGetMongoDB({ dashboard: dashboardData[currentDashboard].id }))
         const payload: tgetFinnHubDataReq = {
             dashboardID: dashboardData[currentDashboard].id,
             widgetList: Object.keys(dashboardData[currentDashboard].widgetlist),
             finnHubQueue: finnHubQueue,
             rSetUpdateStatus: rSetUpdateStatus,
         }
-        tGetFinnhubData(payload)
+        dispatch(tGetFinnhubData(payload))
     }
 
     const refreshFinnhubAPIDataAll = async function () { //queues all finnhub data to be refreshes for all dashboards.
-        await tGetMongoDB()
+        await dispatch(tGetMongoDB())
         const targetDash: string[] = dashboardData?.[currentDashboard]?.widgetlist ? Object.keys(dashboardData?.[currentDashboard]?.widgetlist) : []
         for (const widget in targetDash) {
             const payload: tgetFinnHubDataReq = { //get data for default dashboard.
@@ -354,7 +353,7 @@ function App() {
                 finnHubQueue: finnHubQueue,
                 rSetUpdateStatus: rSetUpdateStatus,
             }
-            tGetFinnhubData(payload)
+            dispatch(tGetFinnhubData(payload))
         }
         const dashBoards: string[] = Object.keys(dashboardData) //get data for dashboards not being shown
         for (const dash of dashBoards) {
@@ -365,7 +364,7 @@ function App() {
                     finnHubQueue: finnHubQueue,
                     rSetUpdateStatus: rSetUpdateStatus,
                 }
-                await tGetFinnhubData(payload)
+                await dispatch(tGetFinnhubData(payload))
             }
         }
     }
@@ -376,7 +375,7 @@ function App() {
             dashboardData: dashboardData,
             targetDashboard: currentDashboard,
         }
-        rRebuildTargetDashboardModel(payload) //rebuilds redux.Model
+        dispatch(rRebuildTargetDashboardModel(payload)) //rebuilds redux.Model
         refreshFinnhubAPIDataCurrentDashboard() //queue refresh for all finhub data for this dashboard.
     }
 
@@ -386,15 +385,15 @@ function App() {
             return draftState
         })
 
-        rSetDashboardData(newDashboardObj)
+        dispatch(rSetDashboardData(newDashboardObj))
     }
 
     function updateAPIKey(newKey: string) {
-        rSetApiKey(newKey)
+        dispatch(rSetApiKey(newKey))
     }
 
     function setSecurityFocus(target: string) {
-        rSetTargetSecurity(target)
+        dispatch(rSetTargetSecurity(target))
         return true
         // this.setState({ targetSecurity: target }, () => { return true })
     }
@@ -468,21 +467,17 @@ function App() {
                     <Route path="/">
                         <TopNav
                             AccountMenu={accountMenu}
-                            AddNewWidgetContainer={AddNewWidgetContainer}
                             apiFlag={apiFlag}
                             backGroundMenu={backGroundMenuFlag}
                             finnHubQueue={finnHubQueue}
-                            lockWidgets={LockWidgets}
                             login={login}
                             logOut={Logout}
                             logoutServer={logoutServer}
                             menuList={menuList}
-                            newMenuContainer={NewMenuContainer}
                             saveDashboard={saveDashboard}
                             showMenuColumn={showMenuColumn}
                             showStockWidgets={showStockWidgets}
                             toggleBackGroundMenu={toggleBackGroundMenu}
-                            toggleWidgetVisability={ToggleWidgetVisability}
                             widgetLockDown={widgetLockDown}
                             widgetSetup={widgetSetup}
                             setAppState={setAppState}
@@ -523,7 +518,6 @@ function App() {
                                 updateDefaultExchange={this.updateDefaultExchange}
                                 updateGlobalStockList={this.updateGlobalStockList}
                                 updateWidgetConfig={this.updateWidgetConfig}
-                                updateWidgetFilters={this.updateWidgetFilters}
                                 updateWidgetStockList={this.updateWidgetStockList}
                                 uploadGlobalStockList={this.uploadGlobalStockList}
                                 widgetCopy={widgetCopy}

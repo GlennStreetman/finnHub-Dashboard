@@ -6,7 +6,6 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import CenterFocusStrongSharpIcon from '@material-ui/icons/CenterFocusStrongSharp';
 import CenterFocusWeakSharpIcon from '@material-ui/icons/CenterFocusWeakSharp';
-import { setWidgetFocus } from 'src/appFunctions/appImport/widgetLogic';
 
 const useStyles = makeStyles({
     root: {

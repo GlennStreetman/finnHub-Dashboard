@@ -2,6 +2,7 @@
 import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg'
 import { widgetSetup, setApp } from './../App'
 import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
+import { AddNewWidgetContainer } from "./../appFunctions/appImport/widgetLogic";
 
 import { sliceMenuList } from './../slices/sliceMenuList'
 import { filters } from './../slices/sliceDashboardData'
@@ -16,20 +17,16 @@ import LockOpenRoundedIcon from '@material-ui/icons/LockOpenRounded';
 
 interface topNavProps {
     AccountMenu: number,
-    AddNewWidgetContainer: Function,
     apiFlag: number,
     backGroundMenu: string,
     login: number,
     logOut: Function,
-    lockWidgets: Function,
     logoutServer: Function,
     menuList: sliceMenuList,
-    newMenuContainer: Function,
     showMenuColumn: boolean,
     showStockWidgets: number,
     saveDashboard: Function,
     toggleBackGroundMenu: Function,
-    toggleWidgetVisability: Function,
     widgetLockDown: number,
     widgetSetup: widgetSetup,
     finnHubQueue: finnHubQueue,
@@ -53,7 +50,7 @@ export default function TopNav(p: topNavProps) {
             let [a, b, c, d, e] = el
             if (isChecked(el) === true) {
                 return (<li key={a + 'li'} id='ddi'>
-                    <a key={a} data-testid={d} href="#r" onClick={() => { p.AddNewWidgetContainer(a, b, c, e); }}>
+                    <a key={a} data-testid={d} href="#r" onClick={() => { AddNewWidgetContainer(a, b, c, e, p.finnHubQueue); }}>
                         {d}
                     </a>
                 </li>)

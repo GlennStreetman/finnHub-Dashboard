@@ -6,6 +6,7 @@ import { storeState } from './../../../store'
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { convertCamelToProper } from './../../../appFunctions/stringFunctions'
+import { UpdateWidgetFilters } from "./../../../appFunctions/appImport/widgetLogic";
 
 //components
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
@@ -123,7 +124,7 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
     useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey, isInitialMount, p.config) //sets security focus in config. Used for redux.visable data and widget excel templating.
     useSearchMongoDb(p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
+    useStartingFilters(p.filters['startDate'], updateFilterMemo, UpdateWidgetFilters, p.widgetKey)
     useResetPagination(p.config.targetSecurity, setPagination)
 
     function changePagination(e) {
@@ -140,9 +141,10 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
                     end={end}
                     setStart={setStart}
                     setEnd={setEnd}
-                    updateWidgetFilters={p.updateWidgetFilters}
+                    updateWidgetFilters={UpdateWidgetFilters}
                     widgetKey={p.widgetKey}
                     widgetType={p.widgetType}
+                    finnHubQueue={p.finnHubQueue}
                 />
                 <WidgetRemoveSecurityTable
                     trackedStocks={p.trackedStocks}
@@ -228,7 +230,6 @@ export function EarningsCalendarProps(that, key = "newWidgetNameProps") {
         apiKey: that.props.apiKey,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         filters: that.props.widgetList[key]["filters"],
-        updateWidgetFilters: that.props.updateWidgetFilters,
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
         exchangeList: that.props.exchangeList,
