@@ -10,18 +10,18 @@ import { useAppDispatch, useAppSelector } from './hooks';
 
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
-import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
+// import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
 import { logoutServer, Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
-import {
-    ChangeWidgetName, RemoveWidget,
-    UpdateWidgetStockList, UpdateWidgetConfig,
-    ToggleWidgetBody, SetWidgetFocus, RemoveDashboardFromState
-} from "./appFunctions/appImport/widgetLogic";
+// import {
+//     ChangeWidgetName, RemoveWidget,
+//     UpdateWidgetStockList, UpdateWidgetConfig,
+//     ToggleWidgetBody, SetWidgetFocus, RemoveDashboardFromState
+// } from "./appFunctions/appImport/widgetLogic";
 import { NewDashboard, CopyDashboard } from "./appFunctions/appImport/setupDashboard";
 import { GetSavedDashBoards, GetSavedDashBoardsRes } from "./appFunctions/appImport/getSavedDashboards";
-import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
-import { updateGlobalStockList, setNewGlobalStockList } from "./appFunctions/appImport/updateGlobalStockList"
-import { syncGlobalStockList } from "./appFunctions/appImport/syncGlobalStockList"
+// import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
+// import { updateGlobalStockList, setNewGlobalStockList } from "./appFunctions/appImport/updateGlobalStockList"
+// import { syncGlobalStockList } from "./appFunctions/appImport/syncGlobalStockList"
 // import { toggleBackGroundMenu } from "./appFunctions/appImport/toggleBackGroundMenu"
 import { updateWidgetSetup } from "./appFunctions/appImport/updateWidgetSetup"
 
@@ -36,15 +36,15 @@ import WidgetMenu, { widgetMenuProps } from "./components/widgetMenu";
 // import EndPointMenu, { endPointProps } from "./widgets/Menu/GQLMenu/endPointMenu";
 import ExchangeMenu, { exchangeMenuProps } from "./components/exchangeMenu";
 import TemplateMenu, { templateMenuProps } from "./components/templateMenu";
-import { WidgetController } from "./components/widgetController";
+// import { WidgetController } from "./components/widgetController";
 
 //redux imports
-import { connect } from "react-redux";
-import { storeState } from './store'
+// import { connect } from "react-redux";
+// import { storeState } from './store'
 import { tGetSymbolList, rExchangeDataLogout } from "./slices/sliceExchangeData";
 import { rSetTargetDashboard, rTargetDashboardLogout } from "./slices/sliceShowData";
-import { rUpdateExchangeList, rExchangeListLogout } from "./slices/sliceExchangeList";
-import { rUpdateQuotePriceStream, rUpdateQuotePriceSetup } from "./slices/sliceQuotePrice";
+// import { rUpdateExchangeList, rExchangeListLogout } from "./slices/sliceExchangeList";
+// import { rUpdateQuotePriceStream, rUpdateQuotePriceSetup } from "./slices/sliceQuotePrice";
 import {
     rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus,
     sliceDataModel, rDataModelLogout, rRebuildTargetDashboardModel,
@@ -57,8 +57,8 @@ import { rSetTargetSecurity } from "./slices/sliceTargetSecurity";
 import { rSetMenuList, sliceMenuList } from "./slices/sliceMenuList";
 import { stockList, widget, sliceDashboardData, rSetDashboardData } from './slices/sliceDashboardData'
 import { rSetApiKey } from './slices/sliceAPiKey'
-import { rSetApiAlias } from './slices/sliceApiAlias'
-import { rSetDefaultExchange } from './slices/sliceDefaultExchange'
+// import { rSetApiAlias } from './slices/sliceApiAlias'
+// import { rSetDefaultExchange } from './slices/sliceDefaultExchange'
 
 export interface defaultGlobalStockList {
     [key: string]: any

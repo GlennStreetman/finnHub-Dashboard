@@ -172,14 +172,16 @@ export default function Login(p: loginProps) {
         0: () => {
             checkPassword(text0, text1)
                 .then((data) => {
+                    console.log(data)
                     if (data.status === 200) {
-                        CompleteLogin(p, data, setMessage)
+                        CompleteLogin(p.dispatch, data, p.finnHubQueue, p.setAppState)
+                        setMessage('')
                     } else {
                         setMessage(data.message)
                     }
                 })
                 .catch(() => {
-                    setMessage("No response from server. Check network connection.")
+                    setMessage("Problem logging in. Check network connection.")
                 })
         },
         1: () => {
