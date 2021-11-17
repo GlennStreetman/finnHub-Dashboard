@@ -125,6 +125,8 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
                     widgetKey={p.widgetKey}
                     widgetType={p.widgetType}
                     finnHubQueue={p.finnHubQueue}
+                    appState={p.appState}
+                    setAppState={p.setAppState}
                 />
                 <WidgetRemoveSecurityTable
                     trackedStocks={p.trackedStocks}
@@ -218,6 +220,8 @@ export function PriceSplitsProps(that, key = "newWidgetNameProps") {
         defaultExchange: that.props.defaultExchange,
         targetSecurity: that.props.targetSecurity,
         updateWidgetConfig: that.props.updateWidgetConfig,
+        appState: that.props.appState,
+        setAppState: that.props.setAppState,
     };
     return propList;
 }

@@ -1,19 +1,19 @@
-import { AppState, AppProps } from './../../App'
+// import { AppState, AppProps } from './../../App'
 import { reqObj } from './../../slices/sliceExchangeData'
+import { rSetDefaultExchange } from './../../slices/sliceDefaultExchange'
+import { tGetSymbolList } from './../../slices/sliceExchangeData'
 
-export const updateDefaultExchange = function (exchange: string, apiKey, getSymbol: boolean = false,) {
-    const s: AppState = this.state
-    const p: AppProps = this.props
+
+export const UpdateDefaultExchange = function (dispatch: Function, exchange: string, apiKey, finnHubQueue: any, getSymbol: boolean = false) {
     if (getSymbol === true) {
-        p.rSetDefaultExchange(exchange)
+        dispatch(rSetDefaultExchange(exchange))
         const tGetSymbolObj: reqObj = {
             exchange: exchange,
             apiKey: apiKey,
-            finnHubQueue: s.finnHubQueue,
+            finnHubQueue: finnHubQueue,
         }
-        this.props.tGetSymbolList(tGetSymbolObj)
+        dispatch(tGetSymbolList(tGetSymbolObj))
     } else {
-        const p: AppProps = this.props
-        p.rSetDefaultExchange(exchange)
+        dispatch(rSetDefaultExchange(exchange))
     }
 }

@@ -2,6 +2,7 @@ import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { useAppSelector, useAppDispatch } from '../../../hooks';
 // import { uniqueObjectnName } from './../../../appFunctions/stringFunctions'
 import { LoadSavedDashboard } from './../../../appFunctions/appImport/loadSavedDashboard'
+import { NewDashboard } from "./../../../appFunctions/appImport/setupDashboard";
 
 import { rUnmountWidget } from './../../../slices/sliceShowData'
 import { rRemoveDashboardDataModel } from './../../../slices/sliceDataModel'
@@ -130,7 +131,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
         } else if (dashboardName === currentDashboard && Object.keys(dashboardData).length === 1) {
             console.log(2)
             unMountWidgets() //removes widgets from redux visable data model.
-            p.newDashBoard('NEW', p.dashboardData)
+            NewDashboard('NEW', p.dashboardData, p.setAppState.setZIndex)
         }
         unMountDashboard(dashboardName) //removes dashboard from redux datamodel.
         p.removeDashboardFromState(dashboardName) //removes dashboard from App.state
@@ -238,7 +239,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                                     type="submit"
                                     value="New"
                                     onClick={() => {
-                                        p.newDashBoard(inputText, p.dashboardData);
+                                        NewDashboard(inputText, p.dashboardData, p.setAppState.setZIndex);
                                         p.rAddNewDashboard({ dashboardName: inputText })
                                         p.rSetTargetDashboard({ targetDashboard: inputText })
                                     }}
@@ -265,8 +266,6 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
         getSavedDashBoards: that.props.getSavedDashBoards,
         dashboardData: that.props.dashboardData,
         copyDashboard: that.props.copyDashboard,
-        saveDashboard: that.props.saveDashboard,
-        newDashBoard: that.props.newDashboard,
         helpText: [helpText, 'DBM'],
         rebuildDashboardState: that.props.rebuildDashboardState,
         refreshFinnhubAPIDataCurrentDashboard: that.props.refreshFinnhubAPIDataCurrentDashboard,
@@ -275,6 +274,7 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
         rSetTargetDashboard: that.props.rSetTargetDashboard,
         rUpdateCurrentDashboard: that.props.rUpdateCurrentDashboard,
         finnHubQueue: that.props.finnHubQueue,
+        setAppState: that.props.setAppState,
     };
     return propList;
 }

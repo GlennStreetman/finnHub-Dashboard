@@ -100,6 +100,8 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
                 widgetKey={p.widgetKey}
                 widgetType={p.widgetType}
                 finnHubQueue={p.finnHubQueue}
+                appState={p.appState}
+                setAppState={p.setAppState}
             />
         </>
     }
@@ -178,6 +180,8 @@ export function IPOCalendarProps(that, key = "newWidgetNameProps") {
         filters: that.props.widgetList[key]["filters"],
         updateWidgetFilters: that.props.updateWidgetFilters,
         widgetKey: key,
+        appState: that.props.appState,
+        setAppState: that.props.setAppState
     };
     return propList;
 }

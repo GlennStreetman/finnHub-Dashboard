@@ -1,6 +1,6 @@
 
 import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg'
-import { widgetSetup, setApp } from './../App'
+import { widgetSetup, setApp, AppState } from './../App'
 import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
 import { AddNewWidgetContainer } from "./../appFunctions/appImport/widgetLogic";
 
@@ -14,23 +14,19 @@ import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import InfoIcon from '@material-ui/icons/Info';
 import LockRoundedIcon from '@material-ui/icons/LockRounded';
 import LockOpenRoundedIcon from '@material-ui/icons/LockOpenRounded';
+import { ToggleBackGroundMenu } from "./../appFunctions/appImport/toggleBackGroundMenu"
+import { Logout } from './../appFunctions/appImport/appLogin'
 
 interface topNavProps {
-    AccountMenu: number,
-    apiFlag: number,
     backGroundMenu: string,
     login: number,
-    logOut: Function,
     logoutServer: Function,
-    menuList: sliceMenuList,
-    showMenuColumn: boolean,
     showStockWidgets: number,
-    saveDashboard: Function,
-    toggleBackGroundMenu: Function,
-    widgetLockDown: number,
     widgetSetup: widgetSetup,
     finnHubQueue: finnHubQueue,
     setAppState: setApp,
+    appState: AppState,
+    dispatch: Function,
 }
 
 export default function TopNav(p: topNavProps) {
@@ -50,7 +46,7 @@ export default function TopNav(p: topNavProps) {
             let [a, b, c, d, e] = el
             if (isChecked(el) === true) {
                 return (<li key={a + 'li'} id='ddi'>
-                    <a key={a} data-testid={d} href="#r" onClick={() => { AddNewWidgetContainer(a, b, c, e, p.finnHubQueue); }}>
+                    <a key={a} data-testid={d} href="#r" onClick={() => { AddNewWidgetContainer(a, b, c, e, p.finnHubQueue, p.appState, p.setAppState); }}>
                         {d}
                     </a>
                 </li>)
@@ -90,7 +86,7 @@ export default function TopNav(p: topNavProps) {
         } else { return <></> }
     }
 
-    return p.login === 1 ? (
+    return p.login === 2 ? (
         <AppBar position="static">
             <Toolbar >
                 <img src="logo2.png" alt="logo" />
@@ -102,29 +98,29 @@ export default function TopNav(p: topNavProps) {
                 <div className="navItemEnd">
                     <ul id='ddu' className="sub-menu">
                         <li id='toggleBackGroundMenuButton' className="navItem">
-                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('', p.setAppState) }}>
+                            <a href="#home" onClick={() => { ToggleBackGroundMenu('', p.appState, p.setAppState) }}>
                                 {p.backGroundMenu === '' ? " " : "Back to Dashboards"}
                             </a>
                         </li>
                         <li id='templatesButton' className="navItem">
-                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('templates', p.setAppState) }}>
+                            <a href="#home" onClick={() => { ToggleBackGroundMenu('templates', p.appState, p.setAppState) }}>
                                 <Tooltip title="Excel Templates" placement="bottom"><TableChartIcon /></Tooltip>
                             </a>
                         </li>
                         <li id='manageAccountButton' className="navItem">
-                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('manageAccount', p.setAppState) }}>
+                            <a href="#home" onClick={() => { ToggleBackGroundMenu('manageAccount', p.appState, p.setAppState) }}>
                                 <Tooltip title="Manage Account" placement="bottom"><AccountBoxIcon /></Tooltip>
                             </a>
                         </li>
                         <li id='aboutButton' className='navItem'>
-                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('about', p.setAppState) }}>
+                            <a href="#home" onClick={() => { ToggleBackGroundMenu('about', p.appState, p.setAppState) }}>
                                 <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>
                             </a>
                         </li>
                         <li id='LogButton' className='navItem'>
                             <a id='LogButtonLink' href="#home" onClick={async () => {
                                 await p.logoutServer()
-                                p.logOut()
+                                Logout(p.dispatch, p.setAppState)
                             }}>
                                 <Tooltip title="Logout" placement="bottom"><LockRoundedIcon /></Tooltip>
 
@@ -139,7 +135,7 @@ export default function TopNav(p: topNavProps) {
         <>
             <div className="topnav">
                 <div className='navItemEnd'>
-                    <a id='aboutButton' href="#home" onClick={() => { p.toggleBackGroundMenu('about', p.setAppState) }}>
+                    <a id='aboutButton' href="#home" onClick={() => { ToggleBackGroundMenu('about', p.appState, p.setAppState) }}>
                         {p.backGroundMenu === 'about' ?
                             <Tooltip title="Login" placement="bottom"><LockOpenRoundedIcon /></Tooltip> :
                             <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>}

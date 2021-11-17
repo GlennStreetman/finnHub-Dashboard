@@ -1,22 +1,30 @@
+import { AppState, setApp } from './../../../App'
+import { useAppDispatch, useAppSelector } from './../../../hooks';
 
+const useDispatch = useAppDispatch
+const useSelector = useAppSelector
 
-export const saveDashboard = async function (dashboardName: string) {
+export const SaveDashboard = async function (dashboardName: string, AppState: AppState, setApp: setApp) {
+
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const menuList = useSelector((state) => { return state.menuList })
     //saves current dashboard by name. Assigns new widget ids if using new name (copy function). Returns true on success.
     //throttled to save at most once every 5 seconds.
     const now = Date.now()
     if (this.state.enableDrag === true) {
         await new Promise(resolve => setTimeout(resolve, 1000));
-        return this.saveDashboard(dashboardName) //try again
-    } else if (this.state.saveDashboardFlag === false && now - this.state.saveDashboardThrottle > 5000) {
+        SaveDashboard(dashboardName, AppState, setApp) //try again
+    } else if (AppState.saveDashboardFlag === false && now - AppState.saveDashboardThrottle > 5000) {
         await new Promise(resolve => setTimeout(resolve, 5000));
-        this.setState({ saveDashboardFlag: false })
-        const globalStockList = this.props.dashboardData[this.props.currentDashboard].globalstocklist
+        setApp.setSaveDashboardFlag(false)
+        const globalStockList = dashboardData[currentDashboard].globalstocklist
         let status = await new Promise((res) => {
             const data = {
                 dashBoardName: dashboardName,
                 globalStockList: globalStockList,
-                widgetList: this.props.dashboardData[this.props.currentDashboard].widgetlist,
-                menuList: this.state.menuList,
+                widgetList: dashboardData[currentDashboard].widgetlist,
+                menuList: menuList,
             };
             const options = {
                 method: "POST",
@@ -34,12 +42,12 @@ export const saveDashboard = async function (dashboardName: string) {
                 })
         })
         return status
-    } else if (this.state.saveDashboardFlag === false && now - this.state.saveDashboardThrottle < 5000) {
+    } else if (AppState.saveDashboardFlag === false && now - AppState.saveDashboardThrottle < 5000) {
         //if not updating but flag not set to true, suspend save and try again after timer.
 
-        const waitPeriod = 5000 - (now - this.state.saveDashboardThrottle) > 0 ? 5000 - (now - this.state.saveDashboardThrottle) : 1000
+        const waitPeriod = 5000 - (now - AppState.saveDashboardThrottle) > 0 ? 5000 - (now - AppState.saveDashboardThrottle) : 1000
         await new Promise(resolve => setTimeout(resolve, waitPeriod));
-        return this.saveDashboard(dashboardName) //try again
+        return SaveDashboard(dashboardName, AppState, setApp) //try again
     } else { //save is already running suspend. 
         return new Promise(resolve => resolve(true))
     }

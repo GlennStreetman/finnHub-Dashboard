@@ -137,7 +137,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
 
     async function changeFrequencySelection(e) {
         const target = e.target.value;
-        await p.updateWidgetFilters(p.widgetKey, { frequency: target })
+        await p.updateWidgetFilters(p.widgetKey, { frequency: target }, p.finnHubQueue)
         p.updateWidgetConfig(p.widgetKey, {
             targetSecurity: p.config.targetSecurity,
             targetReport: p.config.targetReort,

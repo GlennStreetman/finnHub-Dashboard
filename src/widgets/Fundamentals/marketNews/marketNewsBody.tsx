@@ -76,7 +76,7 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
     useStartingFilters(p.filters['categorySelection'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
 
     function updateFilter(e) {
-        p.updateWidgetFilters(p.widgetKey, { categorySelection: e })
+        p.updateWidgetFilters(p.widgetKey, { categorySelection: e }, p.finnHubQueue)
     }
 
     function formatSourceName(source) {//clean up source names for news articles.

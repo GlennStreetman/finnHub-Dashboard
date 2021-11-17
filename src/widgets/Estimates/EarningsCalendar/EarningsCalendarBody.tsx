@@ -145,6 +145,8 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
                     widgetKey={p.widgetKey}
                     widgetType={p.widgetType}
                     finnHubQueue={p.finnHubQueue}
+                    appState={p.appState}
+                    setAppState={p.setAppState}
                 />
                 <WidgetRemoveSecurityTable
                     trackedStocks={p.trackedStocks}
@@ -235,6 +237,8 @@ export function EarningsCalendarProps(that, key = "newWidgetNameProps") {
         exchangeList: that.props.exchangeList,
         updateWidgetConfig: that.props.updateWidgetConfig,
         targetSecurity: that.props.targetSecurity,
+        appState: that.props.appState,
+        setAppState: that.props.setAppState,
     };
     return propList;
 }

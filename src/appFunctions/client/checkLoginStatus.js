@@ -1,15 +1,12 @@
-export const checkLoginStatus = function(processLogin, updateExchangeList, updateDefaultExchange, finnHubQueue){
-    // console.log('CHECKING LOGGIN STATUS')
-    fetch("/checkLogin")
-    .then((response) => response.json())
-    .then((data) => {
-        if (data.login === 1) {
-            processLogin(data.apiKey, 1, data.apiAlias, data.widgetsetup)
-            updateExchangeList(data.exchangelist)
-            updateDefaultExchange(data.defaultexchange, data.apiKey)
-            finnHubQueue.updateInterval(data.ratelimit)
-        } else {
-            console.log('FAILED LOGIN', data)
-        }
-    })
+
+export const CheckLoginStatus = async function(finnHubQueue){
+    console.log('CHECKING LOGGIN STATUS')
+    const response = await fetch("/checkLogin")
+    const data = await response.json()
+    if (data.login === 1) {
+        finnHubQueue.updateInterval(data.ratelimit)
+        return(data)
+    } else {
+        console.log('FAILED LOGIN', {login: 0})
+    }
 }

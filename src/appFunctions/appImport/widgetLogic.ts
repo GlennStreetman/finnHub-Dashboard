@@ -1,4 +1,6 @@
 import produce from "immer"
+
+import { AppState, setApp } from './../../App'
 import { reqBody } from '../../server/routes/mongoDB/setMongoConfig'
 import { rBuildDataModelPayload, rebuildTargetWidgetPayload, rBuildDataModel } from '../../slices/sliceDataModel'
 import { tgetFinnHubDataReq, tGetFinnhubData } from './../../thunks/thunkFetchFinnhub'
@@ -6,7 +8,7 @@ import { rSetDashboardData, widget, sliceDashboardData, widgetList, stockList, s
 import { sliceMenuList, rSetMenuList } from './../../slices/sliceMenuList'
 import { useAppDispatch, useAppSelector } from './../../hooks';
 import { finnHubQueue } from "./../../appFunctions/appImport/throttleQueueAPI";
-import { saveDashboard } from "./../../appFunctions/appImport/setupDashboard";
+import { SaveDashboard } from "./../../appFunctions/appImport/setupDashboard";
 
 
 import { rSetUpdateStatus, rRebuildTargetWidgetModel, } from "./../../slices/sliceDataModel";
@@ -23,7 +25,7 @@ function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
     }
 }
 
-export const AddNewWidgetContainer = function (widgetDescription: string, widgetHeader: string, widgetConfig: string, defaultFilters: Object = {}, finnHubQueue: finnHubQueue) {
+export const AddNewWidgetContainer = function (widgetDescription: string, widgetHeader: string, widgetConfig: string, defaultFilters: Object = {}, finnHubQueue: finnHubQueue, AppState: AppState, setApp: setApp) {
     // console.log("NEW WIDGET:", widgetDescription, widgetHeader, widgetConfig, defaultFilters)
 
     const dispatch = useDispatch(); //allows widget to run redux actions.
@@ -61,7 +63,7 @@ export const AddNewWidgetContainer = function (widgetDescription: string, widget
     })
 
     dispatch(rSetDashboardData(newDashboardData)) //add widget to dashboardDaata
-    saveDashboard(currentDash) //save dashboard to server
+    SaveDashboard(currentDash, AppState, setApp) //save dashboard to server
     const payload: rebuildTargetWidgetPayload = {
         apiKey: apiKey,
         dashboardData: newDashboardData,
@@ -110,7 +112,7 @@ export const ChangeWidgetName = function (stateRef: 'widgetList' | 'menuList', w
     }
 }
 
-export const RemoveWidget = async function (widgetID: string | number) {
+export const RemoveWidget = async function (widgetID: string | number, AppState: AppState, setApp: setApp) {
 
     const dispatch = useDispatch(); //allows widget to run redux actions.
     const dashboardData: sliceDashboardData = useSelector((state) => { return state.dashboardData })
@@ -122,11 +124,11 @@ export const RemoveWidget = async function (widgetID: string | number) {
     })
 
     dispatch(rSetDashboardData(newDashboardData))
-    saveDashboard(currentDashboard)
+    SaveDashboard(currentDashboard, AppState, setApp)
     return true
 }
 
-export const UpdateWidgetStockList = function (widgetId: number, symbol: string, stockObj: stock | Object = {}) {
+export const UpdateWidgetStockList = function (widgetId: number, symbol: string, stockObj: stock | Object = {}, AppState: AppState, setApp: setApp) {
     //adds if not present, else removes stock from widget specific stock list.
     const dispatch = useDispatch(); //allows widget to run redux actions.
     const dashboardData: sliceDashboardData = useSelector((state) => { return state.dashboardData })
@@ -161,7 +163,7 @@ export const UpdateWidgetStockList = function (widgetId: number, symbol: string,
             draftState[currentDashboard].widgetlist = newWidgetList
         })
         dispatch(rSetDashboardData(updatedDashBoard))
-        saveDashboard(currentDashboard)
+        SaveDashboard(currentDashboard, AppState, setApp)
         const payload: rBuildDataModelPayload = {
             apiKey: apiKey,
             dashboardData: updatedDashBoard
@@ -172,7 +174,7 @@ export const UpdateWidgetStockList = function (widgetId: number, symbol: string,
 }
 
 //widget filters change how data is queried from finnHub
-export const UpdateWidgetFilters = async function (widgetID: string, data: filters, finnHubQueue: finnHubQueue) {
+export const UpdateWidgetFilters = async function (widgetID: string, data: filters, finnHubQueue: finnHubQueue, AppState: AppState, setApp: setApp) {
 
     const dispatch = useDispatch(); //allows widget to run redux actions.
     const dashboardData: sliceDashboardData = useSelector((state) => { return state.dashboardData })
@@ -206,7 +208,7 @@ export const UpdateWidgetFilters = async function (widgetID: string, data: filte
                     rSetUpdateStatus: rSetUpdateStatus,
                 }
                 dispatch(tGetFinnhubData(getDataPayload))
-                saveDashboard(currentDashboard)
+                SaveDashboard(currentDashboard, AppState, setApp)
                 resolve(true)
             } else { console.log("Problem updating widget filters."); resolve(true) }
             // })
@@ -215,7 +217,7 @@ export const UpdateWidgetFilters = async function (widgetID: string, data: filte
 }
 
 //widget config changes how data is manipulated after being queried.
-export const UpdateWidgetConfig = function (widgetID: number, updateObj: config, enableDrag: boolean) { //replaces widget config object then saves changes to mongoDB & postgres.
+export const UpdateWidgetConfig = function (widgetID: number, updateObj: config, enableDrag: boolean, AppState: AppState, setApp: setApp) { //replaces widget config object then saves changes to mongoDB & postgres.
 
     const dispatch = useDispatch(); //allows widget to run redux actions.
     const dashboardData: sliceDashboardData = useSelector((state) => { return state.dashboardData })
@@ -228,7 +230,7 @@ export const UpdateWidgetConfig = function (widgetID: number, updateObj: config,
     })
     dispatch(rSetDashboardData(updatedDashboardData))
     if (enableDrag !== true) {
-        saveDashboard(currentDashboard)
+        SaveDashboard(currentDashboard, AppState, setApp)
         const updatedWidgetFilters = updatedDashboardData[currentDashboard].widgetlist[widgetID].config
         const postBody: reqBody = {
             widget: widgetID,

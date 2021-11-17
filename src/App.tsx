@@ -17,16 +17,12 @@ import {
     UpdateWidgetStockList, UpdateWidgetConfig,
     ToggleWidgetBody, SetWidgetFocus, RemoveDashboardFromState
 } from "./appFunctions/appImport/widgetLogic";
-import { NewDashboard, saveDashboard, copyDashboard }
-    from "./appFunctions/appImport/setupDashboard";
+import { NewDashboard, CopyDashboard } from "./appFunctions/appImport/setupDashboard";
 import { GetSavedDashBoards, GetSavedDashBoardsRes } from "./appFunctions/appImport/getSavedDashboards";
 import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
 import { updateGlobalStockList, setNewGlobalStockList } from "./appFunctions/appImport/updateGlobalStockList"
 import { syncGlobalStockList } from "./appFunctions/appImport/syncGlobalStockList"
-import { toggleBackGroundMenu } from "./appFunctions/appImport/toggleBackGroundMenu"
-
-import { updateExchangeList } from "./appFunctions/appImport/updateExchangeList"
-import { updateDefaultExchange } from "./appFunctions/appImport/updateDefaultExchange"
+// import { toggleBackGroundMenu } from "./appFunctions/appImport/toggleBackGroundMenu"
 import { updateWidgetSetup } from "./appFunctions/appImport/updateWidgetSetup"
 
 
@@ -231,6 +227,8 @@ function App() {
         zIndex: zIndex,
     }
 
+    console.log(appState)
+
     const setAppState: setApp = {
         setAccountMenu: setAccountMenu,
         setAboutMenu: setAboutMenu,
@@ -273,7 +271,7 @@ function App() {
 
     useEffect(() => { //create new dashboard if none exists. This should be moved server side. A dashboard should always be returned.
         if (dashboardData?.[currentDashboard] && !dashboardData?.[currentDashboard]?.id) {
-            NewDashboard(currentDashboard, dashboardData)
+            NewDashboard(currentDashboard, dashboardData, setZIndex)
         }
     }, [dashboardData, currentDashboard])
 
@@ -403,11 +401,10 @@ function App() {
     const loginScreen =
         login === 0 && backGroundMenuFlag === "" ? (
             <Login
-                processLogin={ProcessLogin}
                 queryData={quaryData}
-                updateExchangeList={updateExchangeList}
-                updateDefaultExchange={updateDefaultExchange}
                 finnHubQueue={finnHubQueue}
+                setAppState={setAppState}
+                dispatch={dispatch}
             />
         ) : (
             <></>
@@ -419,9 +416,9 @@ function App() {
         widgetKey: 'AccountMenu',
         updateAPIKey: updateAPIKey,
         exchangeList: exchangeList,
-        toggleBackGroundMenu: toggleBackGroundMenu,
         tGetSymbolList: tGetSymbolList,
         defaultExchange: defaultExchange,
+        AppState: appState,
         setAppState: setAppState,
     }
 
@@ -433,8 +430,8 @@ function App() {
     const exchangeMenuProps: exchangeMenuProps = {
         apiKey: apiKey,
         finnHubQueue: finnHubQueue,
-        updateExchangeList: updateExchangeList,
         exchangeList: exchangeList,
+        dispatch: dispatch,
     }
 
     const templateMenuProp: templateMenuProps = {
@@ -466,21 +463,15 @@ function App() {
                 <Switch>
                     <Route path="/">
                         <TopNav
-                            AccountMenu={accountMenu}
-                            apiFlag={apiFlag}
                             backGroundMenu={backGroundMenuFlag}
                             finnHubQueue={finnHubQueue}
                             login={login}
-                            logOut={Logout}
                             logoutServer={logoutServer}
-                            menuList={menuList}
-                            saveDashboard={saveDashboard}
-                            showMenuColumn={showMenuColumn}
                             showStockWidgets={showStockWidgets}
-                            toggleBackGroundMenu={toggleBackGroundMenu}
-                            widgetLockDown={widgetLockDown}
                             widgetSetup={widgetSetup}
                             setAppState={setAppState}
+                            appState={appState}
+                            dispatch={dispatch}
                         />
                         {/* <WidgetController
                                 apiKey={apiKey}
@@ -497,13 +488,10 @@ function App() {
                                 login={login}
                                 menuList={menuList}
                                 moveWidget={this.moveWidget}
-                                newDashboard={this.newDashboard}
-                                processLogin={this.processLogin}
                                 removeWidget={this.removeWidget}
                                 removeDashboardFromState={this.removeDashboardFromState}
                                 rebuildDashboardState={this.rebuildDashboardState}
                                 refreshFinnhubAPIDataCurrentDashboard={this.refreshFinnhubAPIDataCurrentDashboard}
-                                saveDashboard={this.saveDashboard}
                                 setDrag={this.setDrag}
                                 setNewGlobalStockList={this.setNewGlobalStockList}
                                 setSecurityFocus={this.setSecurityFocus}
@@ -515,7 +503,6 @@ function App() {
                                 targetSecurity={targetSecurity}
                                 toggleWidgetBody={this.toggleWidgetBody}
                                 updateAPIKey={this.updateAPIKey}
-                                updateDefaultExchange={this.updateDefaultExchange}
                                 updateGlobalStockList={this.updateGlobalStockList}
                                 updateWidgetConfig={this.updateWidgetConfig}
                                 updateWidgetStockList={this.updateWidgetStockList}
@@ -527,6 +514,8 @@ function App() {
                                 rAddNewDashboard={rAddNewDashboard}
                                 rSetTargetDashboard={rSetTargetDashboard}
                                 rUpdateCurrentDashboard={rUpdateCurrentDashboard}
+                                appState={appState}
+                                setAppState={setAppState}
                             /> */}
                         {loginScreen}
                         {backGroundMenu()}

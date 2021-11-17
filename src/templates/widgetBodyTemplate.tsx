@@ -110,7 +110,7 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
             const offset = target - now
             const name = e.target.name;
             console.log(name, e.target.value)
-            UpdateWidgetFilters(p.widgetKey, { [name]: offset }, p.finnHubQueue)
+            UpdateWidgetFilters(p.widgetKey, { [name]: offset }, p.finnHubQueue, p.appState, p.setAppState)
         }
     }
 
@@ -196,6 +196,8 @@ export function NewWidgetProps(that, key = "newWidgetNameProps") {
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
         targetSecurity: that.props.targetSecurity,
+        appState: that.props.appState,
+        setAppState: that.props.setAppState,
     };
     return propList;
 }

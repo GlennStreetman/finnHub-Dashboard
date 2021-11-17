@@ -210,6 +210,8 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
                     widgetKey={p.widgetKey}
                     widgetType={p.widgetType}
                     finnHubQueue={p.finnHubQueue}
+                    appState={p.appState}
+                    setAppState={p.setAppState}
                 />
                 <div>{Object.keys(p.trackedStocks).length > 0 ? editNewsListForm() : <></>}</div>
             </>
@@ -256,6 +258,8 @@ export function newsWidgetProps(that, key = "newWidgetNameProps") {
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
         targetSecurity: that.props.targetSecurity,
+        appState: that.props.appState,
+        setAppState: that.props.setAppState
     };
     return propList;
 }

@@ -193,7 +193,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     }
 
     function updateFilterResolution(e) {
-        p.updateWidgetFilters(p.widgetKey, { [e.target.name]: e.target.value })
+        p.updateWidgetFilters(p.widgetKey, { [e.target.name]: e.target.value }, p.finnHubQueue)
     }
 
     function displayCandleGraph() {
@@ -263,6 +263,8 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                                 widgetKey={p.widgetKey}
                                 widgetType={p.widgetType}
                                 finnHubQueue={p.finnHubQueue}
+                                appState={p.appState}
+                                setAppState={p.setAppState}
                             />
                             <table>
                                 <tbody>
@@ -307,6 +309,8 @@ export function candleWidgetProps(that, key = "Candles") {
         updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
         targetSecurity: that.props.targetSecurity,
+        appState: that.props.appState,
+        setAppState: that.props.setAppState,
     };
     return propList;
 }

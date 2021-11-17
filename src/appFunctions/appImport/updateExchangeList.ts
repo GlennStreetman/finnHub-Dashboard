@@ -1,18 +1,17 @@
 import { AppProps } from './../../App'
 import { rUpdateExchangeListPayload } from './../../slices/sliceExchangeList'
+import { rUpdateExchangeList } from './../../slices/sliceExchangeList'
 
-export const updateExchangeList = function (ex: string) {
-
-    const p: AppProps = this.props;
+export const UpdateExchangeList = function (dispatch: Function, ex: string | string[]) {
 
     if (typeof ex === "string") {
         const newList: string[] = ex.split(",");
         const payload: rUpdateExchangeListPayload = {
             exchangeList: newList,
         };
-        p.rUpdateExchangeList(payload);
+        dispatch(rUpdateExchangeList(payload));
     } else {
         const payload: Partial<AppProps> = { exchangeList: ex }
-        p.rUpdateExchangeList(payload);
+        dispatch(rUpdateExchangeList(payload));
     }
 }

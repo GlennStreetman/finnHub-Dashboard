@@ -3,12 +3,13 @@ import { useSelector, useDispatch } from 'react-redux';
 import { tGetSymbolList } from '../slices/sliceExchangeData'
 import { rUpdateExchangeList } from '../slices/sliceExchangeList'
 import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
+import { UpdateExchangeList } from './../appFunctions/appImport/updateExchangeList'
 
 export interface exchangeMenuProps {
     apiKey: string,
     finnHubQueue: finnHubQueue,
-    updateExchangeList: Function,
     exchangeList: string[],
+    dispatch: Function,
 }
 
 export default function ExchangeMenu(p: exchangeMenuProps) {
@@ -123,7 +124,7 @@ export default function ExchangeMenu(p: exchangeMenuProps) {
             .then((response) => response.json())
             .then((data) => {
                 // console.log("Exchange list updated.", data)
-                p.updateExchangeList(newExchangeList)
+                UpdateExchangeList(dispatch, newExchangeList)
             });
 
     }
@@ -166,8 +167,7 @@ export function exchangeMenuProps(that) {
     let propList = {
         apiKey: that.state.apiKey,
         finnHubQueue: that.state.finnHubQueue,
-        updateExchangeList: that.updateExchangeList,
-
+        dispatch: Function,
     };
     return propList;
 }

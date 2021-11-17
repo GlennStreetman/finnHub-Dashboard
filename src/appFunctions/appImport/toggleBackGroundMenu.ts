@@ -1,10 +1,10 @@
 import { AppState, setApp } from './../../App'
 
-export const toggleBackGroundMenu = function (menu: string, set: setApp) {
+export const ToggleBackGroundMenu = function (menu: string, appState: AppState, set: setApp) {
     if (menu === "") {
         set.setBackGroundMenuFlag(menu)
         set.setShowStockWidgets(1)
-    } else if (this.state.backGroundMenu !== menu) {
+    } else if (appState.backGroundMenuFlag !== menu) {
         set.setBackGroundMenuFlag(menu)
         set.setShowStockWidgets(0)
     } else {

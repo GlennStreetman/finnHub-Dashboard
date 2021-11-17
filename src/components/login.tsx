@@ -1,4 +1,5 @@
 import React from "react";
+import { setApp } from './../App'
 import { useState, useEffect } from "react";
 import { Redirect } from 'react-router-dom'
 import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
@@ -7,19 +8,21 @@ import { checkPassword } from "../appFunctions/client/checkPassword";
 import { forgotLogin } from "../appFunctions/client/forgotLogin";
 import { secretQuestion } from "../appFunctions/client/secretQuestion";
 import { newPW } from "../appFunctions/client/newPW";
-import { checkLoginStatus } from "../appFunctions/client/checkLoginStatus";
+import { CheckLoginStatus } from "../appFunctions/client/checkLoginStatus";
 import { registerAccount } from "../appFunctions/client/registerAccount";
-import { completeLogin } from "./componentFunctions/completeLogin"
+import { CompleteLogin } from "./componentFunctions/completeLogin"
+import { ProcessLogin } from './../appFunctions/appImport/appLogin'
+import { UpdateExchangeList } from './../appFunctions/appImport/updateExchangeList'
+import { UpdateDefaultExchange } from "./../appFunctions/appImport/updateDefaultExchange"
 
 import { styled } from '@material-ui/core/styles';
 import { Grid, Paper, Button, TextField, Box, Typography } from '@material-ui/core/';
 
 interface loginProps {
     queryData: any,
-    processLogin: Function,
-    updateExchangeList: Function,
-    updateDefaultExchange: Function,
     finnHubQueue: finnHubQueue,
+    setAppState: setApp,
+    dispatch: Function,
 }
 
 const MyPaper = styled(Paper)({ color: "#1d69ab", variant: "outlined", borderRadius: 20, padding: 25 });
@@ -111,7 +114,19 @@ export default function Login(p: loginProps) {
         }
     })
 
-    useEffect(() => { checkLoginStatus(p.processLogin, p.updateExchangeList, p.updateDefaultExchange, p.finnHubQueue) }, [])
+    useEffect(() => {
+        async function fetchLogin() {
+            console.log('start', p.finnHubQueue)
+            const loginInfo = await CheckLoginStatus(p.finnHubQueue)
+            console.log('loginInfo', loginInfo)
+            if (loginInfo?.login === 1) {
+                ProcessLogin(p.dispatch, loginInfo.apiKey, 1, loginInfo.apiAlias, loginInfo.widgetsetup, p.setAppState)
+                UpdateExchangeList(p.dispatch, loginInfo.exchangelist)
+                UpdateDefaultExchange(p.dispatch, loginInfo.defaultexchange, loginInfo.apiKey, p.finnHubQueue)
+            }
+        }
+        fetchLogin()
+    }, [])
 
     useEffect(() => { if (base === true) setBase(false) })
 
@@ -158,7 +173,7 @@ export default function Login(p: loginProps) {
             checkPassword(text0, text1)
                 .then((data) => {
                     if (data.status === 200) {
-                        completeLogin(p, data, setMessage)
+                        CompleteLogin(p, data, setMessage)
                     } else {
                         setMessage(data.message)
                     }
