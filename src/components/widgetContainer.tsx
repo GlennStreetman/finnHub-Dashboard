@@ -1,25 +1,56 @@
 import React from "react";
+import { useState, useEffect } from "react";
+
 import { widgetLookUp } from '../registers/widgetContainerReg.js'
 import { excelRegister, excelRegister_singleSecurity } from '../registers/excelButtonRegister'
+
 import ToolTip from './toolTip.js'
 import ErrorBoundary from './widgetErrorBoundary';
-import { useState, useEffect } from "react";
-import { useAppDispatch } from '../hooks';
+
+
 import { rUnmountWidget } from '../slices/sliceShowData'
 import { rRemoveWidgetDataModel } from '../slices/sliceDataModel'
+import { setApp, AppState } from './../App'
+import { widget, config } from './../slices/sliceDashboardData'
 
+import { tChangeWidgetName } from './../thunks/thunkChangeWidgetName'
+import { setDrag, moveWidget, snapWidget } from './../appFunctions/appImport/widgetGrid'
+import { RemoveWidget, ToggleWidgetBody } from './../appFunctions/appImport/widgetLogic'
+
+import { useAppDispatch, useAppSelector } from './../hooks';
+
+
+const useSelector = useAppSelector
+
+
+interface props {
+    key: string | number,
+    stateRef: string,
+    widgetKey: string | number,
+    widgetList: widget,
+    appState: AppState,
+    setAppState: setApp,
+    dispatch: Function,
+    widgetBodyProps: Function,
+}
 
 //creates widget container. Used by all widgets.
-function WidgetContainer(p) {
+function WidgetContainer(p: props) {
 
     const useDispatch = useAppDispatch
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
-    const [renderHeader, setRenderHeader] = useState()
+    const [renderHeader, setRenderHeader] = useState('')
     const [showEditPane, setShowEditPane] = useState(0) //0: Hide, 1: Show
     const [show, setShow] = useState('block') //block = visable, none = hidden
     const [searchText, setSearchText] = useState('')
     const widgetRef = React.createRef()
+
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const menuList = useSelector((state) => { return state.menuList })
+    const apiKey = useSelector((state) => { return state.apiKey })
+
 
     useEffect(() => {
         setRenderHeader(p.widgetList["widgetHeader"])
@@ -27,25 +58,25 @@ function WidgetContainer(p) {
 
     useEffect(() => {
         const visable = () => {
-            if (p.widgetList.column === 0 && p.showMenuColumn === false) {
+            if (p.widgetList.column === 0 && p.appState.showMenuColumn === false) {
                 return "none"
             }
-            else if (p.stateRef === "menuWidget" && p.showMenu === 0) {
+            else if (p.stateRef === "menuWidget" && p.appState[p.widgetList.widgetID] === 0) {
                 return "none"
-            } else if (p.showStockWidgets === 0) {
+            } else if (p.appState.showStockWidgets === 0) {
                 return "none"
             } else {
                 return "block"
             }
         }
         setShow(visable)
-    }, [p.showMenu, p.showStockWidgets, p.stateRef, p.showMenuColumn, p.widgetList.column])
+    }, [p.appState[p.widgetList.widgetID], p.appState.showStockWidgets, p.stateRef, p.appState.showMenuColumn, p.widgetList.column])
 
     // const visStatus = p.widgetList.column === 0 && p.showMenuColumn === false ? 'none' : 'block' //hide widget if showbody === false
 
     useEffect(() => {
         setShowEditPane(0)
-    }, [p.widgetLockDown])
+    }, [p.appState.widgetLockDown])
 
     function changeSearchText(text) {
         if (text !== '' && text !== undefined) {
@@ -65,9 +96,17 @@ function WidgetContainer(p) {
 
     function updateHeader(e) {//changes widget name.
         if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
-            p.changeWidgetName('widgetList', p.widgetKey, e.target.value);
+            dispatch(tChangeWidgetName({
+                stateRef: 'widgetList',
+                widgetID: p.widgetKey,
+                newName: e.target.value,
+            }));
         } else {
-            p.changeWidgetName('menuList', p.widgetKey, e.target.value);
+            dispatch(tChangeWidgetName({
+                stateRef: 'menuList',
+                widgetID: p.widgetKey,
+                newName: e.target.value
+            }));
         }
     }
 
@@ -91,8 +130,8 @@ function WidgetContainer(p) {
 
             xAxis = e.clientX + window.scrollX
             yAxis = e.clientY
-            p.setDrag(p.stateRef, p.widgetKey, widgetState.state)
-                .then((data) => {
+            setDrag(p.dispatch, p.stateRef, p.widgetKey, p.appState.widgetCopy, currentDashboard, menuList, dashboardData, p.setAppState)
+                .then(() => {
                     document.onmouseup = closeDragElement;
                     document.onmousemove = elementDrag;
                 })
@@ -108,7 +147,7 @@ function WidgetContainer(p) {
             let newX = xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5
             let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
             //copy widget state THEN move widget.
-            p.moveWidget(p.stateRef, p.widgetKey, newX, newY);
+            moveWidget(p.dispatch, p.stateRef, p.widgetKey, newX, newY, currentDashboard, menuList, dashboardData);
         }
 
         function closeDragElement(e) {
@@ -117,12 +156,12 @@ function WidgetContainer(p) {
             yAxis = e.clientY + window.scrollY;
             let newX = xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5
             let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
-            const snapWidget = () => {
-                p.snapWidget(p.widgetList['widgetConfig'], p.widgetKey, xAxis, yAxis)
+            const snapWidgetCallback = () => {
+                snapWidget(dispatch, p.widgetList['widgetConfig'], p.widgetKey, xAxis, yAxis, currentDashboard, menuList, dashboardData, p.appState, p.setAppState)
             }
             document.onmouseup = null;
             document.onmousemove = null;
-            p.moveWidget(p.stateRef, p.widgetKey, newX, newY, snapWidget);
+            moveWidget(p.dispatch, p.stateRef, p.widgetKey, newX, newY, currentDashboard, menuList, dashboardData, snapWidgetCallback);
 
         }
     }
@@ -144,17 +183,15 @@ function WidgetContainer(p) {
     let widgetProps = p.widgetBodyProps ? p.widgetBodyProps() : {}
     widgetProps["showEditPane"] = showEditPane;
     if (p.widgetKey !== "dashBoardMenu") {
-        widgetProps['updateDefaultExchange'] = p.updateDefaultExchange
-        widgetProps['currentDashboard'] = p.currentDashboard
+        widgetProps['currentDashboard'] = currentDashboard
         widgetProps['searchText'] = searchText
         widgetProps['changeSearchText'] = changeSearchText
         widgetProps['widgetType'] = p.widgetList["widgetType"]
         widgetProps['config'] = p.widgetList.config
-        widgetProps['finnHubQueue'] = p.finnHubQueue
-        widgetProps['dashboardID'] = p.dashboardID
+        widgetProps['finnHubQueue'] = p.appState.finnHubQueue
     }
-    if (p.widgetCopy) {
-        widgetProps['widgetCopy'] = p.widgetCopy
+    if (p.appState.widgetCopy) {
+        widgetProps['widgetCopy'] = p.appState.widgetCopy
     }
     const myRef = widgetRef
 
@@ -171,11 +208,10 @@ function WidgetContainer(p) {
             key={p.widgetKey + "container" + p.widgetList.column}
             id={p.widgetKey + "box"}
             style={divStyle}
-            // className="widgetBox"
             data-testid={`container-${p.widgetList.widgetType}`}
 
         >
-            {p.widgetLockDown === 0 ? (
+            {p.appState.widgetLockDown === 0 ? (
                 <div className={p.stateRef === 'menuWidget' ? "menuHeader" : "widgetHeader"}>
                     {showEditPane === 0 ? (
                         <>
@@ -188,7 +224,7 @@ function WidgetContainer(p) {
 
                     <button
                         className="widgetButtonHead"
-                        id={p.widgetList["widgetID"]}
+                        id={p.widgetList["widgetID"] + 'cat'}
                         onMouseOver={() => {
                             dragElement();
                         }}
@@ -198,7 +234,7 @@ function WidgetContainer(p) {
                     <>
                         <button
                             className="widgetButtonHead"
-                            onClick={() => { p.toggleWidgetBody(p.widgetKey, p.stateRef) }
+                            onClick={() => { ToggleWidgetBody(p.key, p.stateRef) }
                             }>
                             {p.widgetList.showBody !== false ? <i className="fa fa-caret-square-o-down" aria-hidden="true" /> : <i className="fa fa-caret-square-o-right" aria-hidden="true" />}
                         </button>
@@ -213,7 +249,7 @@ function WidgetContainer(p) {
             )}
 
             {p.widgetList.showBody !== false ? (
-                <div className='widgetBody' style={bodyVisable} key={p.widgetList.showBody}>
+                <div className='widgetBody' style={bodyVisable} key={p.widgetList.widgetID + 'cat'}>
 
                     <ErrorBoundary widgetType={p.widgetList["widgetType"]}>
                         {React.createElement(widgetLookUp[p.widgetList["widgetType"]], { ref: myRef, ...widgetProps })}
@@ -226,11 +262,11 @@ function WidgetContainer(p) {
                         <button
                             onClick={async () => {
                                 if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
-                                    p.removeWidget(p.widgetKey);
+                                    RemoveWidget(p.widgetKey, p.appState, p.setAppState);
                                     fetch(`/deleteFinnDashData?widgetID=${p.widgetKey}`)
                                     const payload = {
                                         widgetKey: p.widgetKey,
-                                        dashboardName: p.currentDashboard,
+                                        dashboardName: currentDashboard,
                                     }
                                     dispatch(rUnmountWidget(payload))
                                     dispatch(rRemoveWidgetDataModel(payload))
@@ -245,7 +281,7 @@ function WidgetContainer(p) {
                 {p.widgetList.showBody !== false && showEditPane !== 1 && (
 
                     excelRegister_singleSecurity[p.widgetList.widgetType] && ( //button returns data for target securities associated with widget.
-                        <button className='widgetButtonFoot' onClick={() => excelFunction(p.apiKey, p.currentDashboard, p.widgetList.widgetHeader, p.widgetList.config.targetSecurity, p.widgetList.config)}>
+                        <button className='widgetButtonFoot' onClick={() => excelFunction(apiKey, currentDashboard, p.widgetList.widgetHeader, p.widgetList.config.targetSecurity, p.widgetList.config)}>
                             <i className="fa fa-file-excel-o" aria-hidden="true" data-testid={`excelButton-${p.widgetList["widgetType"]}`}></i>
                         </button>
                     )
@@ -254,7 +290,7 @@ function WidgetContainer(p) {
                 {p.widgetList.showBody !== false && showEditPane !== 1 && (
 
                     excelRegister[p.widgetList.widgetType] && ( //button returns data for all securities associated with widget.
-                        <button className='widgetButtonFoot' onClick={() => excelFunction(p.apiKey, p.currentDashboard, p.widgetList.widgetHeader, false, p.widgetList.config)}>
+                        <button className='widgetButtonFoot' onClick={() => excelFunction(apiKey, currentDashboard, p.widgetList.widgetHeader, false, p.widgetList.config)}>
                             <i className="fa fa-list" aria-hidden="true" data-testid={`excelButton-${p.widgetList["widgetType"]}`}></i>
                         </button>
                     )

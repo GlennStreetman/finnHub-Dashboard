@@ -4,7 +4,7 @@ import { useAppDispatch, useAppSelector } from './../../../hooks';
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
-export const SaveDashboard = async function (dashboardName: string, AppState: AppState, setApp: setApp) {
+export const SaveDashboard = async function (dashboardName: string | number, AppState: AppState, setApp: setApp) {
 
     const dashboardData = useSelector((state) => { return state.dashboardData })
     const currentDashboard = useSelector((state) => { return state.currentDashboard })

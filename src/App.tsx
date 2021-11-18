@@ -13,7 +13,7 @@ import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImpor
 // import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
 import { logoutServer, Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
 // import {
-//     ChangeWidgetName, RemoveWidget,
+//      RemoveWidget,
 //     UpdateWidgetStockList, UpdateWidgetConfig,
 //     ToggleWidgetBody, SetWidgetFocus, RemoveDashboardFromState
 // } from "./appFunctions/appImport/widgetLogic";
@@ -36,7 +36,7 @@ import WidgetMenu, { widgetMenuProps } from "./components/widgetMenu";
 // import EndPointMenu, { endPointProps } from "./widgets/Menu/GQLMenu/endPointMenu";
 import ExchangeMenu, { exchangeMenuProps } from "./components/exchangeMenu";
 import TemplateMenu, { templateMenuProps } from "./components/templateMenu";
-// import { WidgetController } from "./components/widgetController";
+import { WidgetController } from "./components/widgetController";
 
 //redux imports
 // import { connect } from "react-redux";
@@ -226,8 +226,6 @@ function App() {
         widgetSetup: widgetSetup,
         zIndex: zIndex,
     }
-
-    console.log(appState)
 
     const setAppState: setApp = {
         setAccountMenu: setAccountMenu,
@@ -473,50 +471,11 @@ function App() {
                             appState={appState}
                             dispatch={dispatch}
                         />
-                        {/* <WidgetController
-                                apiKey={apiKey}
-                                // apiAlias={apiAlias}
-                                changeWidgetName={this.changeWidgetName}
-                                copyDashboard={this.copyDashboard}
-                                currentDashboard={currentDashboard}
-                                dashboardData={dashboardData}
-                                dashboardID={dashboardID}
-                                defaultExchange={defaultExchange}
-                                exchangeList={exchangeList}
-                                finnHubQueue={finnHubQueue}
-                                globalStockList={globalStockList}
-                                login={login}
-                                menuList={menuList}
-                                moveWidget={this.moveWidget}
-                                removeWidget={this.removeWidget}
-                                removeDashboardFromState={this.removeDashboardFromState}
-                                rebuildDashboardState={this.rebuildDashboardState}
-                                refreshFinnhubAPIDataCurrentDashboard={this.refreshFinnhubAPIDataCurrentDashboard}
-                                setDrag={this.setDrag}
-                                setNewGlobalStockList={this.setNewGlobalStockList}
-                                setSecurityFocus={this.setSecurityFocus}
-                                setWidgetFocus={this.setWidgetFocus}
-                                showMenuColumn={showMenuColumn}
-                                showStockWidgets={showStockWidgets}
-                                snapWidget={this.snapWidget}
-                                syncGlobalStockList={this.syncGlobalStockList}
-                                targetSecurity={targetSecurity}
-                                toggleWidgetBody={this.toggleWidgetBody}
-                                updateAPIKey={this.updateAPIKey}
-                                updateGlobalStockList={this.updateGlobalStockList}
-                                updateWidgetConfig={this.updateWidgetConfig}
-                                updateWidgetStockList={this.updateWidgetStockList}
-                                uploadGlobalStockList={this.uploadGlobalStockList}
-                                widgetCopy={widgetCopy}
-                                widgetList={widgetList}
-                                widgetLockDown={widgetLockDown}
-                                zIndex={zIndex}
-                                rAddNewDashboard={rAddNewDashboard}
-                                rSetTargetDashboard={rSetTargetDashboard}
-                                rUpdateCurrentDashboard={rUpdateCurrentDashboard}
-                                appState={appState}
-                                setAppState={setAppState}
-                            /> */}
+                        <WidgetController
+                            setAppState={setAppState}
+                            appState={appState}
+                            dispatch={dispatch}
+                        />
                         {loginScreen}
                         {backGroundMenu()}
 

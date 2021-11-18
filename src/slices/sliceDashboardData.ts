@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { tChangeWidgetName } from '../thunks/thunkChangeWidgetName'
 
 export interface stock {
     currency: string,
@@ -71,6 +72,26 @@ const dashboardData = createSlice({
             return state
         },
     },
+    extraReducers: {
+        [tChangeWidgetName.pending.toString()]: (state) => {
+            return state
+        },
+        [tChangeWidgetName.rejected.toString()]: (state, action) => {
+            console.log('failed to update widget name: ', action)
+            return state
+        },
+        [tChangeWidgetName.fulfilled.toString()]: (state, action) => {
+            try {
+                if (action.payload.rSetDashboardData) {
+                    let data = action.payload.rSetDashboardData
+                    state = data
+                }
+            } catch {
+                console.log('error updating widget name in redux.')
+            }
+
+        }
+    }
 })
 
 export const {

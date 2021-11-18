@@ -12,19 +12,20 @@ import apiKey from './slices/sliceAPiKey'
 import apiAlias from './slices/sliceApiAlias'
 import defaultExchange from './slices/sliceDefaultExchange'
 
+
 export interface storeState {
-    exchangeData: sliceExchangeData,
-    exchangeList: sliceExchangeList,
-    dataModel: sliceDataModel,
-    showData: sliceShowData,
-    quotePrice: sliceQuotePrice,
-    currentDashboard: string,
-    targetSecurity: string,
-    menuList: sliceMenuList,
-    dashboardData: sliceDashboardData,
     apiKey: string,
     apiAlias: string,
+    currentDashboard: string,
+    dataModel: sliceDataModel,
+    dashboardData: sliceDashboardData,
     defaultExchange: string,
+    exchangeData: sliceExchangeData,
+    exchangeList: sliceExchangeList,
+    menuList: sliceMenuList,
+    quotePrice: sliceQuotePrice,
+    showData: sliceShowData,
+    targetSecurity: string,
 }
 
 export const store = configureStore({

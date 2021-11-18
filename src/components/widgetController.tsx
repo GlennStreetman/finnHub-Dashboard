@@ -3,16 +3,34 @@ import { useState } from "react";
 import WidgetContainer from "./widgetContainer";
 import { returnBodyProps } from "../registers/widgetControllerReg.js"
 import useWindowDimensions from '../appFunctions/hooks/windowDimensions'
+// import { widget } from './../slices/sliceDashboardData'
+
+import { setApp, AppState } from './../App'
 
 import BottomNav from "./bottomNav";
 import { Grid } from '@material-ui/core/';
 
+import { useAppSelector } from './../hooks';
+const useSelector = useAppSelector
 
-function WidgetController(p) {
+interface props {
+    appState: AppState,
+    setAppState: setApp,
+    dispatch: Function,
+}
+
+function WidgetController(p: props) {
+
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const menuList = useSelector((state) => { return state.menuList })
+
+    const widgetList = dashboardData?.[currentDashboard]?.['widgetlist'] ?
+        dashboardData?.[currentDashboard]['widgetlist'] : {}
 
     const [focus, setFocus] = useState(0)
 
-    const bottomNav = p.login === 1 ? <BottomNav setFocus={setFocus} /> : <></>
+    const bottomNav = p.appState.login === 1 ? <BottomNav setFocus={setFocus} /> : <></>
 
     const { height, width } = useWindowDimensions()
     const columnLookup = [
@@ -43,45 +61,17 @@ function WidgetController(p) {
             widgetObjList.sort((a, b) => (a.columnOrder > b.columnOrder) ? 1 : -1) //sort into column order.
             const widgetGroup = widgetObjList.map((el) => { //for each widget, add props.
                 const thisWidgetProps: any = {
-                    apiKey: p.apiKey,
-                    changeWidgetName: p.changeWidgetName,
-                    currentDashboard: p.currentDashboard,
-                    dashboardID: p.dashboardID,
-                    enableDrag: p.enableDrag ? p.enableDrag : false,
-                    exchangeList: p.exchangeList,
-                    finnHubQueue: p.finnHubQueue,
-                    // key: el.widgetID,
-                    moveWidget: p.moveWidget,
-                    refreshFinnhubAPIDataCurrentDashboard: p.refreshFinnhubAPIDataCurrentDashboard,
-                    removeWidget: p.removeWidget,
-                    removeDashboardFromState: p.removeDashboardFromState,
-                    setDrag: p.setDrag,
-                    setSecurityFocus: p.setSecurityFocus,
-                    showMenuColumn: p.showMenuColumn,
-                    showStockWidgets: p.showStockWidgets,
-                    snapWidget: p.snapWidget,
+                    key: el.widgetId,
                     stateRef: el.widgetConfig,
-                    targetSecurity: p.targetSecurity,
-                    toggleWidgetBody: p.toggleWidgetBody,
-
-                    updateDefaultExchange: p.updateDefaultExchange,
-                    updateWidgetConfig: p.updateWidgetConfig,
-                    widgetBodyProps: returnBodyProps({ props: p }, el.widgetType, el.widgetID),
                     widgetKey: el.widgetID,
                     widgetList: el,
-                    widgetLockDown: p.widgetLockDown,
-                    zIndex: p.zIndex,
-                    rebuildDashboardState: p.rebuildDashboardState,
-                    rAddNewDashboard: p.rAddNewDashboard,
-                    rSetTargetDashboard: p.rSetTargetDashboard,
+                    appState: p.appState,
+                    setAppState: p.setAppState,
+                    dispatch: p.dispatch,
+                    widgetBodyProps: returnBodyProps({ props: p.appState }, el.widgetType, el.widgetID),
                 }
-                if (el.widgetConfig === 'menuWidget') {
-                    // thisWidgetProps['showMenu'] = '1'
-                    thisWidgetProps['setWidgetFocus'] = p.setWidgetFocus
-                    thisWidgetProps['rUpdateCurrentDashboard'] = p.rUpdateCurrentDashboard
-                }
-                if (p.widgetCopy?.widgetID === el.widgetID) {
-                    thisWidgetProps.widgetCopy = p.widgetCopy
+                if (p.appState.widgetCopy?.widgetID === el.widgetID) {
+                    thisWidgetProps.widgetCopy = p.appState.widgetCopy
                 }
                 const subComponent = React.createElement(WidgetContainer, thisWidgetProps)
                 return (
@@ -108,15 +98,15 @@ function WidgetController(p) {
         }
     }
 
-    const allWidgets = { ...p.widgetList, ...p.menuList }
-    const widgetGroups = Array.from({ length: columnCount }, (i, x) => { return [{ 'pass': x }] }) //pass is place holder in case column is empty.
+    const allWidgets = { ...widgetList, ...menuList }
+    const widgetGroups: any = Array.from({ length: columnCount }, (i, x) => { return [{ 'pass': x }] }) //pass is place holder in case column is empty.
 
     for (const w in allWidgets) { //puts widgets into columns
         const thisColumn = allWidgets[w]?.column
         if (thisColumn === 'drag') {
             widgetGroups[7] = []
             widgetGroups[7].push(allWidgets[w])
-        } else {
+        } else if (typeof thisColumn === 'number') {
             if (widgetGroups?.[thisColumn - focus]?.[0]?.['pass'] !== undefined) {
                 widgetGroups[thisColumn - focus] = []
             }
@@ -130,7 +120,7 @@ function WidgetController(p) {
         </Grid>
     })
 
-    return p.login === 1 ? (<>
+    return p.appState.login === 2 ? (<>
         <Grid container>
             {renderWidgetColumns}
         </Grid>

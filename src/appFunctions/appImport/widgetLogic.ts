@@ -16,7 +16,7 @@ import { rSetUpdateStatus, rRebuildTargetWidgetModel, } from "./../../slices/sli
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
-function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
+export function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
     const testName = iterator === 0 ? widgetName : widgetName + iterator
     if (nameList.includes(testName)) {
         return uniqueName(widgetName, nameList, iterator + 1)
@@ -81,36 +81,35 @@ export const AddNewWidgetContainer = function (widgetDescription: string, widget
 }
 
 
-export const ChangeWidgetName = function (stateRef: 'widgetList' | 'menuList', widgetID: string | number, newName: string) {
+// export const ChangeWidgetName = function (stateRef: 'widgetList' | 'menuList', widgetID: string | number, newName: string) {
 
-    const dispatch = useDispatch(); //allows widget to run redux actions.
-    const dashboardData = useSelector((state) => { return state.dashboardData })
-    const currentDashboard = useSelector((state) => { return state.currentDashboard })
-    const menuList = useSelector((state) => { return state.menuList })
+//     const dashboardData = useSelector((state) => { return state.dashboardData })
+//     const currentDashboard = useSelector((state) => { return state.currentDashboard })
+//     const menuList = useSelector((state) => { return state.menuList })
 
-    // console.log(stateRef, widgetID, newName)
-    const widgetList: widgetList = dashboardData[currentDashboard].widgetlist
-    const widgetIds = widgetList ? Object.keys(widgetList) : []
-    const widgetNameList = widgetIds.map((el) => widgetList[el].widgetHeader)
-    // console.log(stateRef, newName, widgetNameList)
-    const useName = uniqueName(newName, widgetNameList)
-    if (stateRef === 'menuList') {
-        const newWidgetList = produce(menuList, (draftState: sliceMenuList) => {
-            draftState[widgetID].widgetHeader = useName
-        })
-        dispatch(rSetMenuList(newWidgetList)) //update menulist
-    } else { //widgetList
-        const widgetGroup: widgetList = dashboardData[currentDashboard].widgetlist
-        const newWidgetList = produce(widgetGroup, (draftState: widgetList) => {
-            draftState[widgetID].widgetHeader = useName
-        })
-        const newDashboardData = produce(dashboardData, (draftState: sliceDashboardData) => {
-            draftState[currentDashboard].widgetlist = newWidgetList
-        })
+//     // console.log(stateRef, widgetID, newName)
+//     const widgetList: widgetList = dashboardData[currentDashboard].widgetlist
+//     const widgetIds = widgetList ? Object.keys(widgetList) : []
+//     const widgetNameList = widgetIds.map((el) => widgetList[el].widgetHeader)
+//     // console.log(stateRef, newName, widgetNameList)
+//     const useName = uniqueName(newName, widgetNameList)
+//     if (stateRef === 'menuList') {
+//         const newWidgetList = produce(menuList, (draftState: sliceMenuList) => {
+//             draftState[widgetID].widgetHeader = useName
+//         })
+//         dispatch(rSetMenuList(newWidgetList)) //update menulist
+//     } else { //widgetList
+//         const widgetGroup: widgetList = dashboardData[currentDashboard].widgetlist
+//         const newWidgetList = produce(widgetGroup, (draftState: widgetList) => {
+//             draftState[widgetID].widgetHeader = useName
+//         })
+//         const newDashboardData = produce(dashboardData, (draftState: sliceDashboardData) => {
+//             draftState[currentDashboard].widgetlist = newWidgetList
+//         })
 
-        dispatch(rSetDashboardData(newDashboardData))
-    }
-}
+//         dispatch(rSetDashboardData(newDashboardData))
+//     }
+// }
 
 export const RemoveWidget = async function (widgetID: string | number, AppState: AppState, setApp: setApp) {
 
@@ -266,7 +265,7 @@ export const SetWidgetFocus = function (newFocus: string) {
     dispatch(rSetDashboardData(updatedDashboardData))
 }
 
-export const ToggleWidgetBody = function (widgetID: string, stateRef: 'menuWidget' | 'stockWidget') {
+export const ToggleWidgetBody = function (widgetID: string | number, stateRef: string) {
 
     const dispatch = useDispatch(); //allows widget to run redux actions.
     const dashboardData: sliceDashboardData = useSelector((state) => { return state.dashboardData })
