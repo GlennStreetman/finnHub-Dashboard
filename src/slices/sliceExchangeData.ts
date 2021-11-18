@@ -16,7 +16,7 @@ interface stockObj {
     [key: string]: stockNode
 }
 
-interface stockNode {
+export interface stockNode {
     currency: string,
     description: string,
     displaySymbol: string,

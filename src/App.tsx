@@ -10,6 +10,7 @@ import { useAppDispatch, useAppSelector } from './hooks';
 
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
+import { rebuildDashboardState } from './appFunctions/rebuildDashboardState'
 // import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
 import { logoutServer, Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
 // import {
@@ -263,7 +264,7 @@ function App() {
     useEffect(() => { //process login. This should be moved into login function.
         if (login === 1) {
             setLogin(2)
-            rebuildDashboardState()
+            rebuildDashboardState(dispatch, apiKey)
         }
     }, [login])
 
@@ -279,53 +280,6 @@ function App() {
             refreshFinnhubAPIDataAll() //fetches finnhub api data, from mongo if avilable, else queues Finnhub.io api alls. When complete sets dashboard status ready.
         }
     }, [dataModel.created, login])
-
-    // useEffect(()=>{                   MOVE INTO SNACK BAR!
-
-    //     if ( //if apikey not setup show about menu
-    //         (apiKey === '' && s.apiFlag === 0 && s.login === 1) ||
-    //         (apiKey === null && s.apiFlag === 0 && s.login === 1)
-    //     ) {
-    //         this.setState({
-    //             apiFlag: 1,
-    //             aboutMenu: 0,
-    //             showStockWidgets: 0,
-    //         }, () => { this.toggleBackGroundMenu('about') })
-    //     }
-    // }, [])
-
-    // useEffect(()=>{}, [])
-
-    const rebuildDashboardState = async function () { //fetches dashboard data, then updates dashboardData, then builds redux model.
-        // console.log('running rebuild')
-        try {
-            const data: GetSavedDashBoardsRes = await GetSavedDashBoards()
-            if ((data.dashboardData[data.currentDashBoard] === undefined && Object.keys(data.dashboardData))) { //if invalid current dashboard returned
-                console.log('invalid dashboard')
-                data.currentDashBoard = Object.keys(data.dashboardData)[0]
-            }
-            dispatch(rSetDashboardData(data.dashboardData))
-            dispatch(rUpdateCurrentDashboard(data.currentDashBoard))
-            dispatch(rSetMenuList(data.menuList))
-            dispatch(rSetTargetDashboard({ targetDashboard: data.currentDashBoard })) //update target dashboard in redux dataModel
-            dispatch(rBuildDataModel({ ...data, apiKey: apiKey }))
-            if (data.message === 'No saved dashboards') { return (true) } else { return (false) }
-
-        } catch (error: any) {
-            console.error("Failed to recover dashboards", error);
-            return false
-        }
-    }
-
-    // const globalStockList = dashboardData?.[p.currentDashboard]?.globalstocklist ? dashboardData?.[p.currentDashboard].globalstocklist : false
-    // if ((globalStockList && globalStockList !== prevProps.dashboardData?.[prevProps.currentDashboard]?.globalstocklist && s.login === 1)) { //price data for watchlist, including socket data.
-    //     LoadTickerSocket(this, prevState, prevProps, globalStockList, s.socket, apiKey, UpdateTickerSockets);
-    // }
-
-    // const globalKeys = globalStockList ? Object.keys(globalStockList) : []
-    // if (targetSecurity === '' && globalKeys.length > 0) {
-    //     rSetTargetSecurity(globalKeys[0])
-    // }
 
     const refreshFinnhubAPIDataCurrentDashboard = async function () { //queues all finnhub data to be refreshed for current dashboard.
         console.log('refresh finnhub data for current dashboard', currentDashboard)
@@ -388,13 +342,6 @@ function App() {
         dispatch(rSetApiKey(newKey))
     }
 
-    function setSecurityFocus(target: string) {
-        dispatch(rSetTargetSecurity(target))
-        return true
-        // this.setState({ targetSecurity: target }, () => { return true })
-    }
-
-
     const quaryData = queryString.parse(window.location.search);
     const loginScreen =
         login === 0 && backGroundMenuFlag === "" ? (
@@ -448,12 +395,6 @@ function App() {
     const backGroundMenu = () => {
         return <div className="backgroundMenu">{backGroundSelection[backGroundMenuFlag]}</div>;
     };
-
-    const widgetList = dashboardData?.[currentDashboard]?.['widgetlist'] ?
-        dashboardData?.[currentDashboard]['widgetlist'] : {}
-
-    const globalStockList = dashboardData?.[currentDashboard]?.globalstocklist ? dashboardData?.[currentDashboard].globalstocklist : {}
-    const dashboardID = dashboardData?.[currentDashboard]?.id ? dashboardData[currentDashboard].id : ''
 
     return (
         <ThemeProvider theme={outerTheme}>

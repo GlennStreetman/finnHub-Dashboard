@@ -15,7 +15,6 @@ import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 import WidgetFocus from '../../../components/widgetFocus'
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
-// import { dStock } from './../../../appFunctions/formatStockSymbols'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector

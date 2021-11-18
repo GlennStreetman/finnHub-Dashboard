@@ -9,19 +9,36 @@ import ToolTip from '../../../components/toolTip.js'
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { dStock } from '../../../appFunctions/formatStockSymbols'
 
-function WatchListMenu(p: { [key: string]: any }, ref: any) {
+import { widgetProps } from './../../../components/widgetContainer'
+
+import { SetWidgetFocus } from "../../../appFunctions/appImport/widgetLogic";
+import { rSetTargetSecurity } from "../../../slices/sliceTargetSecurity";
+import { updateGlobalStockList } from "../../../appFunctions/appImport/updateGlobalStockList"
+import { syncGlobalStockList } from "../../../appFunctions/appImport/syncGlobalStockList"
+
+function WatchListMenu(p: widgetProps, ref: any) {
 
     const useDispatch = useAppDispatch
     const useSelector = useAppSelector
 
     const startingUploadList: string[] = []
-
     const [uploadList, setUploadList] = useState(startingUploadList)
     const inputReference = useRef<HTMLInputElement>(null);
     const dispatch = useDispatch(); //allows widget to run redux actions
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
         return state.quotePrice.quote
     })
+
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const apiAlias = useSelector((state) => { return state.apiAlias })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const dataModel = useSelector((state) => { return state.dataModel })
+    const menuList = useSelector((state) => { return state.menuList })
+    const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
+    const defaultExchange = useSelector((state) => { return state.defaultExchange })
+    const targetSecurity = useSelector((state) => { return state.targetSecurity })
+    const globalStockList = dashboardData?.[currentDashboard]?.globalstocklist ? dashboardData[currentDashboard].globalstocklist : []
 
     useImperativeHandle(ref, () => (
         //used to copy widgets when being dragged. example: if widget body renders time series data into chart, copy chart data.
@@ -32,16 +49,16 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
     ))
 
     useEffect(() => {
-        if (Object.keys(p.globalStockList).length !== 0) {
-            for (const stock in p.globalStockList) {
+        if (Object.keys(globalStockList).length !== 0) {
+            for (const stock in globalStockList) {
                 dispatch(tgetQuotePrices({
-                    stock: p.globalStockList[stock],
-                    apiKey: p.apiKey,
-                    throttle: p.finnHubQueue
+                    stock: globalStockList[stock],
+                    apiKey: apiKey,
+                    throttle: p.appState.finnHubQueue
                 }))
             }
         }
-    }, [p.globalStockList, p.apiKey, p.finnHubQueue, dispatch])
+    }, [globalStockList, apiKey, p.appState.finnHubQueue, dispatch])
 
     function returnKey(key) {
         const retVal = key !== undefined ? key["currentPrice"] : "noDat"
@@ -51,7 +68,7 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
     function renderWatchedStocks() {
 
         // const p = this.props
-        const g = p.globalStockList;
+        const g = globalStockList;
         if (g && Object.keys(g) !== undefined) {
             const stockListKey = Object.keys(g).map((el) => (
                 <tr key={el + "row"}>
@@ -60,10 +77,10 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
                             <td className='centerTE'><input
                                 type="radio"
                                 key={el + 'radio'}
-                                checked={p.targetSecurity === g[el].key}
+                                checked={targetSecurity === g[el].key}
                                 onChange={() => {
-                                    p.setWidgetFocus(g[el].key)
-                                    p.setSecurityFocus(g[el].key)
+                                    SetWidgetFocus(dispatch, dashboardData, currentDashboard, g[el].key)
+                                    dispatch(rSetTargetSecurity(g[el].key))
                                 }} /></td>
                             <td className="rightTEFade" key={el + "prc" + returnKey(rShowData[el])}>
                                 {rShowData[el] ? (
@@ -77,7 +94,7 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
                                 )}
                             </td>
                             <td className='centerTE' key={el + "symb"}>
-                                {dStock(g[el], p.exchangeList)}
+                                {dStock(g[el], exchangeList)}
                             </td>
                             <td className="leftTE" key={el + 'desc'}>
                                 {g[el].description}
@@ -92,7 +109,7 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
                                 <button
                                     key={el + "clck"}
                                     onClick={(e) => {
-                                        p.updateGlobalStockList(e, el);
+                                        updateGlobalStockList(e, el, g[el], dashboardData, currentDashboard);
                                     }}
                                 >
                                     <i className="fa fa-times" aria-hidden="true"></i>
@@ -183,7 +200,10 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
                                     <ToolTip textFragment={syncText} hintName='sw' />
                                 </td>
                                 <td>
-                                    <button className="ui button" onClick={() => { p.syncGlobalStockList() }}>
+                                    <button className="ui button" onClick={() => {
+                                        syncGlobalStockList(dispatch, dashboardData, currentDashboard, apiKey, p.appState.finnHubQueue, p.appState, p.setAppState)
+                                    }
+                                    }>
                                         Sync
                                     </button>
                                 </td>
@@ -228,8 +248,8 @@ function WatchListMenu(p: { [key: string]: any }, ref: any) {
                 <CsvUpload
                     uploadList={uploadList}
                     resetUploadList={resetUploadList}
-                    setNewGlobalStockList={p.setNewGlobalStockList}
-                    uploadGlobalStockList={p.uploadGlobalStockList}
+                // setNewGlobalStockList={p.setNewGlobalStockList}
+                // uploadGlobalStockList={p.uploadGlobalStockList}
                 />
             )}
         </>
@@ -245,22 +265,7 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
     </>
 
     let propList = {
-        apiKey: that.props.apiKey,
-        globalStockList: that.props.globalStockList,
-        setNewGlobalStockList: that.props.setNewGlobalStockList,
-        updateGlobalStockList: that.props.updateGlobalStockList,
-        updateWidgetStockList: that.props.updateWidgetStockList,
-        widgetKey: key,
-        exchangeList: that.props.exchangeList,
-        defaultExchange: that.props.defaultExchange,
-        updateDefaultExchange: that.props.updateDefaultExchange,
-        uploadGlobalStockList: that.props.uploadGlobalStockList,
         helpText: [helpText, 'WLM'],
-        refreshFinnhubAPIDataCurrentDashboard: that.props.refreshFinnhubAPIDataCurrentDashboard,
-        syncGlobalStockList: that.props.syncGlobalStockList,
-        setSecurityFocus: that.props.setSecurityFocus,
-        targetSecurity: that.props.targetSecurity,
-        setWidgetFocus: that.props.setWidgetFocus,
     };
     return propList;
 }

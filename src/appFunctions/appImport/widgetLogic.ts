@@ -142,13 +142,6 @@ export const UpdateWidgetStockList = function (widgetId: number, symbol: string,
             if (Object.keys(trackingSymbolList).indexOf(symbol) === -1) {
                 //add
                 let newStock: stock = { ...stockObj } as stock
-                newStock['dStock'] = function (ex: string) {
-                    if (ex.length === 1) {
-                        return (this.symbol)
-                    } else {
-                        return (this.key)
-                    }
-                }
                 trackingSymbolList[symbol] = newStock
                 draftState[widgetId]["trackedStocks"] = trackingSymbolList;
             } else {
@@ -249,11 +242,7 @@ export const UpdateWidgetConfig = function (widgetID: number, updateObj: config,
     }
 }
 
-export const SetWidgetFocus = function (newFocus: string) {
-
-    const dispatch = useDispatch(); //allows widget to run redux actions.
-    const dashboardData: sliceDashboardData = useSelector((state) => { return state.dashboardData })
-    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+export const SetWidgetFocus = function (dispatch: Function, dashboardData: sliceDashboardData, currentDashboard: string, newFocus: string) {
 
     const updatedDashboardData = produce(dashboardData, (draftState: sliceDashboardData) => {
         const wList = draftState[currentDashboard].widgetlist

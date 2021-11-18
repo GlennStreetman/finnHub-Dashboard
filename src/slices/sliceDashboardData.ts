@@ -3,9 +3,8 @@ import { tChangeWidgetName } from '../thunks/thunkChangeWidgetName'
 
 export interface stock {
     currency: string,
-    dStock: Function,
     description: string,
-    displaySymbol: string,
+    // displaySymbol: string,
     exchange: string,
     figi: string,
     key: string,

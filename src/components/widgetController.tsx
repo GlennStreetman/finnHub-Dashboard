@@ -42,7 +42,7 @@ function WidgetController(p: props) {
         [2400, 99999999, 6] //2
     ]
     // const columnCount = width / 400 < 1 ? 1 :  width / 400 > 6 ? 6 : Math.round(width / 400)
-    const columnCount = function (): number {
+    const columnSetup = function (): number {
         // @ts-ignore
         let ret: number = columnLookup.reduce((acc, el) => {
             if (width > el[0] && width < el[1]) {
@@ -54,6 +54,10 @@ function WidgetController(p: props) {
         return (ret)
     }()
 
+    const columnCount = columnSetup[2]
+
+    console.log('columnCount', columnCount)
+
     const widgetWidth = Math.round((width / columnCount) - 5)
 
     function renderWidgetGroup(widgetObjList) {
@@ -61,7 +65,6 @@ function WidgetController(p: props) {
             widgetObjList.sort((a, b) => (a.columnOrder > b.columnOrder) ? 1 : -1) //sort into column order.
             const widgetGroup = widgetObjList.map((el) => { //for each widget, add props.
                 const thisWidgetProps: any = {
-                    key: el.widgetId,
                     stateRef: el.widgetConfig,
                     widgetKey: el.widgetID,
                     widgetList: el,
@@ -100,7 +103,7 @@ function WidgetController(p: props) {
 
     const allWidgets = { ...widgetList, ...menuList }
     const widgetGroups: any = Array.from({ length: columnCount }, (i, x) => { return [{ 'pass': x }] }) //pass is place holder in case column is empty.
-
+    console.log('allWidgets', widgetGroups, columnCount)
     for (const w in allWidgets) { //puts widgets into columns
         const thisColumn = allWidgets[w]?.column
         if (thisColumn === 'drag') {

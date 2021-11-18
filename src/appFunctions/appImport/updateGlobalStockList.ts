@@ -3,20 +3,15 @@ import { StockObj } from './../../types'
 import produce from "immer"
 import { sliceDashboardData } from 'src/slices/sliceDashboardData'
 
-export const updateGlobalStockList = async function (event: Event, stockRef: string, stockObj: StockObj | Object = {}) {
+export const updateGlobalStockList = async function (event: any, stockRef: string, stockObj: StockObj, dashboardData: sliceDashboardData, currentDashboard: string) {
     //Adds/removes a single stock from global stock list and updates current dashboard. if no stock object passed, remove from global stock list, else add.
     // console.log('updating global', stockObj)
-    const globalStockList = this.props.dashboardData[this.props.currentDashboard].globalstocklist
+    const newStockObj = stockObj
+
+    const globalStockList = dashboardData[currentDashboard].globalstocklist
     const currentStockObj = { ...globalStockList };
     if (currentStockObj[stockRef] === undefined) {
-        currentStockObj[stockRef] = { ...stockObj };
-        currentStockObj[stockRef]["dStock"] = function (ex: string) {
-            if (ex.length === 1) {
-                return this.symbol;
-            } else {
-                return this.key;
-            }
-        };
+        currentStockObj[stockRef] = newStockObj
     } else {
         delete currentStockObj[stockRef];
     }

@@ -22,9 +22,31 @@ import { useAppDispatch, useAppSelector } from './../hooks';
 
 const useSelector = useAppSelector
 
+export interface widgetProps extends widgetState {
+    stateRef: string,
+    widgetKey: string | number,
+    widgetList: widget,
+    appState: AppState,
+    setAppState: setApp,
+    dispatch: Function,
+    widgetBodyProps: Function,
+    changeSearchText: Function,
+    addProps: any,
+}
+
+interface widgetState {
+    renderHeader: string,
+    showEditPane: number,
+    show: string,
+    searchText: string,
+    ref: any,
+    setRenderHeader: Function,
+    setShowEditPane: Function,
+    setShow: Function,
+    setSearchText: Function,
+}
 
 interface props {
-    key: string | number,
     stateRef: string,
     widgetKey: string | number,
     widgetList: widget,
@@ -50,6 +72,18 @@ function WidgetContainer(p: props) {
     const currentDashboard = useSelector((state) => { return state.currentDashboard })
     const menuList = useSelector((state) => { return state.menuList })
     const apiKey = useSelector((state) => { return state.apiKey })
+
+    const widgetState: widgetState = {
+        renderHeader: renderHeader,
+        showEditPane: showEditPane,
+        show: show,
+        searchText: searchText,
+        ref: widgetRef,
+        setRenderHeader: setRenderHeader,
+        setShowEditPane: setShowEditPane,
+        setShow: setShow,
+        setSearchText: setSearchText,
+    }
 
 
     useEffect(() => {
@@ -180,20 +214,16 @@ function WidgetContainer(p: props) {
         compStyle['top'] = p.widgetList["yAxis"]
         compStyle['left'] = p.widgetList["xAxis"]
     }
-    let widgetProps = p.widgetBodyProps ? p.widgetBodyProps() : {}
-    widgetProps["showEditPane"] = showEditPane;
-    if (p.widgetKey !== "dashBoardMenu") {
-        widgetProps['currentDashboard'] = currentDashboard
-        widgetProps['searchText'] = searchText
-        widgetProps['changeSearchText'] = changeSearchText
-        widgetProps['widgetType'] = p.widgetList["widgetType"]
-        widgetProps['config'] = p.widgetList.config
-        widgetProps['finnHubQueue'] = p.appState.finnHubQueue
+
+    const addProps = p.widgetBodyProps ? p.widgetBodyProps() : {} //help text, and any other pieces of state passed up from widget body.
+    let widgetProps: widgetProps = {
+        ...widgetState,
+        ...p,
+        changeSearchText: changeSearchText,
+        addProps: addProps
     }
-    if (p.appState.widgetCopy) {
-        widgetProps['widgetCopy'] = p.appState.widgetCopy
-    }
-    const myRef = widgetRef
+
+
 
     const divStyle = {
         overflow: 'hidden',
@@ -234,7 +264,7 @@ function WidgetContainer(p: props) {
                     <>
                         <button
                             className="widgetButtonHead"
-                            onClick={() => { ToggleWidgetBody(p.key, p.stateRef) }
+                            onClick={() => { ToggleWidgetBody(p.widgetKey, p.stateRef) }
                             }>
                             {p.widgetList.showBody !== false ? <i className="fa fa-caret-square-o-down" aria-hidden="true" /> : <i className="fa fa-caret-square-o-right" aria-hidden="true" />}
                         </button>
@@ -252,7 +282,7 @@ function WidgetContainer(p: props) {
                 <div className='widgetBody' style={bodyVisable} key={p.widgetList.widgetID + 'cat'}>
 
                     <ErrorBoundary widgetType={p.widgetList["widgetType"]}>
-                        {React.createElement(widgetLookUp[p.widgetList["widgetType"]], { ref: myRef, ...widgetProps })}
+                        {React.createElement(widgetLookUp[p.widgetList["widgetType"]], widgetProps)}
                     </ErrorBoundary>
                 </div>) : (<></>)}
 
@@ -304,3 +334,18 @@ function WidgetContainer(p: props) {
 export default WidgetContainer;
 
 
+
+
+
+    // if (p.widgetKey !== "dashBoardMenu") {
+    // widgetProps['currentDashboard'] = currentDashboard
+    // widgetProps['searchText'] = searchText
+    // widgetProps['changeSearchText'] = changeSearchText
+    // widgetProps['widgetType'] = p.widgetList["widgetType"]
+    // widgetProps['config'] = p.widgetList.config
+    // widgetProps['finnHubQueue'] = p.appState.finnHubQueue
+    // }
+    // if (p.appState.widgetCopy) {
+    //     widgetProps['widgetCopy'] = p.appState.widgetCopy
+    // }
+    // const myRef = widgetRef

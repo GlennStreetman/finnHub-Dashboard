@@ -15,7 +15,7 @@ const reNoUndefined = new RegExp('^((?!undefined).)*$')
 
 export interface StockObj {
     currency: string,
-    dStock: Function,
+    // dStock: Function,
     description: string,
     exchange: string, //can type check using reExchange
     figi: string,
