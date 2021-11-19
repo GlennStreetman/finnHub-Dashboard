@@ -4,7 +4,7 @@ import { dashBoardData } from 'src/App'
 
 import { useAppDispatch } from './../../../hooks';
 import { rUnmountWidget } from './../../../slices/sliceShowData'
-import { rRemoveDashboardDataModel, rRenameModelName } from './../../../slices/sliceDataModel'
+import { rRemoveDashboardDataModel, rRenameModelName, rAddNewDashboard } from './../../../slices/sliceDataModel'
 import { rSetTargetDashboard } from './../../../slices/sliceShowData'
 
 interface props {
@@ -20,7 +20,7 @@ interface props {
     rebuildDashboardState: Function,
     refreshFinnhubAPIDataCurrentDashboard: Function,
     removeDashboardFromState: Function,
-    rAddNewDashboard: Function,
+    // rAddNewDashboard: Function,
     showEditPane: number,
     renameDashboard: Function,
 }
@@ -258,7 +258,7 @@ function DashBoardMenu(p: props, ref: any) {
                                     value="New"
                                     onClick={() => {
                                         p.newDashBoard(inputText, p.dashBoardData);
-                                        p.rAddNewDashboard({ dashboardName: inputText })
+                                        dispatch(rAddNewDashboard({ dashboardName: inputText }))
                                         dispatch(rSetTargetDashboard({ targetDashboard: inputText }))
                                     }}
                                 />
@@ -293,7 +293,6 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
         rebuildDashboardState: that.props.rebuildDashboardState,
         refreshFinnhubAPIDataCurrentDashboard: that.props.refreshFinnhubAPIDataCurrentDashboard,
         removeDashboardFromState: that.props.removeDashboardFromState,
-        rAddNewDashboard: that.props.rAddNewDashboard,
         renameDashboard: that.props.renameDashboard,
     };
     return propList;
