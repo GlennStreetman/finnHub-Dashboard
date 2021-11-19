@@ -1,9 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { widgetDict } from '../registers/endPointsReg'
-import { tGetFinnhubData, resObj } from '../thunks/thunkFetchFinnhub'
+import { tGetFinnhubData } from '../thunks/thunkFetchFinnhub'
 import { tGetMongoDB, getMongoRes } from '../thunks/thunkGetMongoDB'
-import { sliceDashboardData } from './..//slices/sliceDashboardData'
+import { filters, sliceDashboardData } from './..//slices/sliceDashboardData'
 import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB'
+import { tUpdateWidgetFilters } from 'src/thunks/thunkUpdateWidgetFilters'
 
 interface dataStatus {
     [key: number]: number, //dashboard data setup status: count of open api requests.
@@ -56,7 +57,7 @@ export interface rBuildDataModelPayload {
 
 export interface rebuildTargetWidgetPayload {
     apiKey: string,
-    dashboardData: sliceDashboardData,
+    filters: filters,
     targetDashboard: string,
     targetWidget: string,
 }
@@ -165,37 +166,22 @@ const dataModel = createSlice({
             }
             state.dataSet[dashboardName] = newDashboardModel
         },
-        rRebuildTargetWidgetModel: (state: sliceDataModel, action) => {
+        rRebuildTargetWidgetModel: (state: sliceDataModel, action) => { //rebuilds api strings for each widget after filter update.
             const ap: rebuildTargetWidgetPayload = action.payload
-            const apD: sliceDashboardData = ap.dashboardData
+            // const apD: sliceDashboardData = ap.dashboardData
             const dashboardName: string = ap.targetDashboard
             const w: string = ap.targetWidget //widget name
+            const filters = ap.filters
+            const apiKey = ap.apiKey
 
-            const targetWidget = apD?.[dashboardName].widgetlist[w]
-            const stockUpdate = {}
-            if (w !== null && w !== 'null') {
+            const targetWidget = state[dashboardName].widgetlist[w]
+
+            Object.keys(targetWidget).forEach((el) => {
                 const endPoint: string = targetWidget.widgetType
-                const filters: Object = targetWidget.filters
-                const widgetDescription: string = targetWidget.widgetHeader
-                const widgetType: string = targetWidget.widgetType
-                const config: Object = targetWidget.config
                 const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
-                const trackedStocks = targetWidget.trackedStocks
-                const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, ap.apiKey)
-                delete endPointData.undefined
-
-                for (const stock in endPointData) {
-                    stockUpdate[`${stock}`] = {
-                        apiString: endPointData[stock],
-                        widgetName: widgetDescription,
-                        dashboard: dashboardName,
-                        widgetType: widgetType,
-                        config: config,
-                    }
-                }
-            }
-            state.dataSet[dashboardName][w] = stockUpdate
-
+                targetWidget[el].apiString = endPointFunction(el, filters, apiKey)
+                targetWidget[el].updated = Date.now()
+            })
         },
         rResetUpdateFlag: (state: sliceDataModel) => {
             state.created = 'true'
@@ -237,7 +223,7 @@ const dataModel = createSlice({
             console.log('2. failed to retrieve stock data for: ', action)
         },
         [tGetFinnhubData.fulfilled.toString()]: (state: sliceDataModel, action) => {
-            const ap: resObj = action.payload
+            const ap = action.payload
             for (const x in ap) {
                 const db = ap[x].dashboard
                 const widget = ap[x].widget
@@ -290,6 +276,31 @@ const dataModel = createSlice({
                     if (state.dataSet?.[dashboard]?.[widget]?.[security]) state.dataSet[dashboard][widget][security].updated = -1
                 }
             }
+        },
+        [tUpdateWidgetFilters.pending.toString()]: (state, action) => {
+            // console.log('1. Getting stock data!')
+            // return {...state}
+        },
+        [tUpdateWidgetFilters.rejected.toString()]: (state, action) => {
+            console.log('2. failed to update filter model: ', action)
+            // return {...state}
+        },
+        [tUpdateWidgetFilters.fulfilled.toString()]: (state, action) => {
+            const ap: rebuildTargetWidgetPayload = action.payload
+            // const apD: sliceDashboardData = ap.dashboardData
+            const dashboardName: string = ap.targetDashboard
+            const w: string = ap.targetWidget //widget name
+            const filters = ap.filters
+            const apiKey = ap.apiKey
+
+            const targetWidget = state[dashboardName].widgetlist[w]
+
+            Object.keys(targetWidget).forEach((el) => {
+                const endPoint: string = targetWidget.widgetType
+                const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
+                targetWidget[el].apiString = endPointFunction(el, filters, apiKey)
+                targetWidget[el].updated = Date.now()
+            })
         },
     }
 })

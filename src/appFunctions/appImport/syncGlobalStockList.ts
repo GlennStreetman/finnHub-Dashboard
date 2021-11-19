@@ -35,10 +35,9 @@ export const syncGlobalStockList = async function (dispatch: Function, dashboard
 
     await dispatch(tGetMongoDB({ dashboard: dashboardData[currentDashboard].id }))
     const payload2: tgetFinnHubDataReq = {
-        dashboardID: dashboardData[currentDashboard].id,
+        currentDashboard: currentDashboard,
         widgetList: Object.keys(dashboardData[currentDashboard].widgetlist),
         finnHubQueue: finnHubQueue,
-        rSetUpdateStatus: rSetUpdateStatus,
     }
     dispatch(tGetFinnhubData(payload2))
     SaveDashboard(currentDashboard, appState, setAppState) //saves dashboard setup to server

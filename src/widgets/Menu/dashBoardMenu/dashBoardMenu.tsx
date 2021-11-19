@@ -140,7 +140,7 @@ function DashBoardMenu(p: widgetProps, ref: any) {
             NewDashboard('NEW', dashboardData, p.setAppState.setZIndex)
         }
         unMountDashboard(dashboardName) //removes dashboard from redux datamodel.
-        RemoveDashboardFromState(dashboardName) //removes dashboard from App.state
+        RemoveDashboardFromState(dispatch, dashboardName, dashboardData) //removes dashboard from App.state
     }
 
     let savedDashBoards = Object.keys({ ...dashboardData }).map((el) => (

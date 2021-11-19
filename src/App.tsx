@@ -4,62 +4,31 @@ import { BrowserRouter, Route, Switch } from "react-router-dom";
 import queryString from "query-string";
 import produce from 'immer'
 import { createTheme, ThemeProvider } from '@material-ui/core/styles'
-
 import { useAppDispatch, useAppSelector } from './hooks';
-
 
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
 import { rebuildDashboardState } from './appFunctions/rebuildDashboardState'
-// import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
-import { logoutServer, Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
-// import {
-//      RemoveWidget,
-//     UpdateWidgetStockList, UpdateWidgetConfig,
-//     ToggleWidgetBody, SetWidgetFocus, RemoveDashboardFromState
-// } from "./appFunctions/appImport/widgetLogic";
-import { NewDashboard, CopyDashboard } from "./appFunctions/appImport/setupDashboard";
-import { GetSavedDashBoards, GetSavedDashBoardsRes } from "./appFunctions/appImport/getSavedDashboards";
-// import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
-// import { updateGlobalStockList, setNewGlobalStockList } from "./appFunctions/appImport/updateGlobalStockList"
-// import { syncGlobalStockList } from "./appFunctions/appImport/syncGlobalStockList"
-// import { toggleBackGroundMenu } from "./appFunctions/appImport/toggleBackGroundMenu"
+import { logoutServer } from "./appFunctions/appImport/appLogin"; //, Logout, ProcessLogin
+import { NewDashboard } from "./appFunctions/appImport/setupDashboard"; //CopyDashboard
 import { updateWidgetSetup } from "./appFunctions/appImport/updateWidgetSetup"
-
 
 //component imports
 import TopNav from "./components/topNav";
-// import BottomNav from "./components/bottomNav";
 import Login from "./components/login";
 import AboutMenu from "./components/AboutMenu";
 import AccountMenu, { accountMenuProps } from "./components/accountMenu";
 import WidgetMenu, { widgetMenuProps } from "./components/widgetMenu";
-// import EndPointMenu, { endPointProps } from "./widgets/Menu/GQLMenu/endPointMenu";
 import ExchangeMenu, { exchangeMenuProps } from "./components/exchangeMenu";
 import TemplateMenu, { templateMenuProps } from "./components/templateMenu";
 import { WidgetController } from "./components/widgetController";
-
-//redux imports
-// import { connect } from "react-redux";
-// import { storeState } from './store'
-import { tGetSymbolList, rExchangeDataLogout } from "./slices/sliceExchangeData";
-import { rSetTargetDashboard, rTargetDashboardLogout } from "./slices/sliceShowData";
-// import { rUpdateExchangeList, rExchangeListLogout } from "./slices/sliceExchangeList";
-// import { rUpdateQuotePriceStream, rUpdateQuotePriceSetup } from "./slices/sliceQuotePrice";
-import {
-    rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus,
-    sliceDataModel, rDataModelLogout, rRebuildTargetDashboardModel,
-    rRebuildTargetWidgetModel, rAddNewDashboard
-} from "./slices/sliceDataModel";
+import { tGetSymbolList } from "./slices/sliceExchangeData"; //, rExchangeDataLogout
+import { rResetUpdateFlag, rSetUpdateStatus, sliceDataModel } from "./slices/sliceDataModel"; //, rDataModelLogout, rRebuildTargetDashboardModel, rAddNewDashboard, rBuildDataModel
 import { tGetFinnhubData, tgetFinnHubDataReq } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
-import { rUpdateCurrentDashboard } from './slices/sliceCurrentDashboard'
-import { rSetTargetSecurity } from "./slices/sliceTargetSecurity";
-import { rSetMenuList, sliceMenuList } from "./slices/sliceMenuList";
+import { sliceMenuList } from "./slices/sliceMenuList"; //rSetMenuList,
 import { stockList, widget, sliceDashboardData, rSetDashboardData } from './slices/sliceDashboardData'
 import { rSetApiKey } from './slices/sliceAPiKey'
-// import { rSetApiAlias } from './slices/sliceApiAlias'
-// import { rSetDefaultExchange } from './slices/sliceDefaultExchange'
 
 export interface defaultGlobalStockList {
     [key: string]: any
@@ -256,7 +225,7 @@ function App() {
     const dashboardData = useSelector((state) => { return state.dashboardData })
     const currentDashboard = useSelector((state) => { return state.currentDashboard })
     const dataModel = useSelector((state) => { return state.dataModel })
-    const menuList = useSelector((state) => { return state.menuList })
+    // const menuList = useSelector((state) => { return state.menuList })
     const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
     const defaultExchange = useSelector((state) => { return state.defaultExchange })
 
@@ -285,10 +254,9 @@ function App() {
         console.log('refresh finnhub data for current dashboard', currentDashboard)
         await dispatch(tGetMongoDB({ dashboard: dashboardData[currentDashboard].id }))
         const payload: tgetFinnHubDataReq = {
-            dashboardID: dashboardData[currentDashboard].id,
+            currentDashboard: currentDashboard,
             widgetList: Object.keys(dashboardData[currentDashboard].widgetlist),
             finnHubQueue: finnHubQueue,
-            rSetUpdateStatus: rSetUpdateStatus,
         }
         dispatch(tGetFinnhubData(payload))
     }
@@ -298,10 +266,9 @@ function App() {
         const targetDash: string[] = dashboardData?.[currentDashboard]?.widgetlist ? Object.keys(dashboardData?.[currentDashboard]?.widgetlist) : []
         for (const widget in targetDash) {
             const payload: tgetFinnHubDataReq = { //get data for default dashboard.
-                dashboardID: dashboardData[currentDashboard].id,
+                currentDashboard: currentDashboard,
                 widgetList: [targetDash[widget]],
                 finnHubQueue: finnHubQueue,
-                rSetUpdateStatus: rSetUpdateStatus,
             }
             dispatch(tGetFinnhubData(payload))
         }
@@ -309,24 +276,13 @@ function App() {
         for (const dash of dashBoards) {
             if (dash !== currentDashboard) {
                 const payload: tgetFinnHubDataReq = { //run in background, do not await.
-                    dashboardID: dashboardData[dash].id,
+                    currentDashboard: currentDashboard,
                     widgetList: Object.keys(dashboardData[dash].widgetlist),
                     finnHubQueue: finnHubQueue,
-                    rSetUpdateStatus: rSetUpdateStatus,
                 }
                 await dispatch(tGetFinnhubData(payload))
             }
         }
-    }
-
-    function rebuildVisableDashboard() {
-        const payload = {
-            apiKey: apiKey,
-            dashboardData: dashboardData,
-            targetDashboard: currentDashboard,
-        }
-        dispatch(rRebuildTargetDashboardModel(payload)) //rebuilds redux.Model
-        refreshFinnhubAPIDataCurrentDashboard() //queue refresh for all finhub data for this dashboard.
     }
 
     function uploadGlobalStockList(newStockObj: stockList) {
@@ -429,3 +385,26 @@ function App() {
 
 export default App;
 
+// import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
+// import {
+//      RemoveWidget,
+//     UpdateWidgetStockList, UpdateWidgetConfig,
+//     ToggleWidgetBody, SetWidgetFocus, RemoveDashboardFromState
+// } from "./appFunctions/appImport/widgetLogic";
+// import { GetSavedDashBoards, GetSavedDashBoardsRes } from "./appFunctions/appImport/getSavedDashboards";
+// import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
+// import { updateGlobalStockList, setNewGlobalStockList } from "./appFunctions/appImport/updateGlobalStockList"
+// import { syncGlobalStockList } from "./appFunctions/appImport/syncGlobalStockList"
+// import { toggleBackGroundMenu } from "./appFunctions/appImport/toggleBackGroundMenu"
+// import { rSetTargetDashboard, rTargetDashboardLogout } from "./slices/sliceShowData";
+// import { rUpdateExchangeList, rExchangeListLogout } from "./slices/sliceExchangeList";
+// import { rUpdateQuotePriceStream, rUpdateQuotePriceSetup } from "./slices/sliceQuotePrice";
+//redux imports
+// import { connect } from "react-redux";
+// import { storeState } from './store'
+// import EndPointMenu, { endPointProps } from "./widgets/Menu/GQLMenu/endPointMenu";
+// import BottomNav from "./components/bottomNav";
+// import { rUpdateCurrentDashboard } from './slices/sliceCurrentDashboard'
+// import { rSetTargetSecurity } from "./slices/sliceTargetSecurity";
+// import { rSetApiAlias } from './slices/sliceApiAlias'
+// import { rSetDefaultExchange } from './slices/sliceDefaultExchange'

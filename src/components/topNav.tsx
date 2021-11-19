@@ -17,6 +17,11 @@ import LockOpenRoundedIcon from '@material-ui/icons/LockOpenRounded';
 import { ToggleBackGroundMenu } from "./../appFunctions/appImport/toggleBackGroundMenu"
 import { Logout } from './../appFunctions/appImport/appLogin'
 
+import { useAppDispatch, useAppSelector } from './../hooks';
+
+const useDispatch = useAppDispatch
+const useSelector = useAppSelector
+
 interface topNavProps {
     backGroundMenu: string,
     login: number,
@@ -30,6 +35,11 @@ interface topNavProps {
 }
 
 export default function TopNav(p: topNavProps) {
+
+    const dispatch = useDispatch(); //allows widget to run redux actions.
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
 
     function isChecked(el: [string, string, string, string, filters | undefined, string]) {
         if (p.widgetSetup[el[0]] !== undefined) {
@@ -46,7 +56,7 @@ export default function TopNav(p: topNavProps) {
             let [a, b, c, d, e] = el
             if (isChecked(el) === true) {
                 return (<li key={a + 'li'} id='ddi'>
-                    <a key={a} data-testid={d} href="#r" onClick={() => { AddNewWidgetContainer(a, b, c, e, p.finnHubQueue, p.appState, p.setAppState); }}>
+                    <a key={a} data-testid={d} href="#r" onClick={() => { AddNewWidgetContainer(dispatch, a, b, c, e, p.finnHubQueue, p.appState, p.setAppState, dashboardData, currentDashboard, apiKey); }}>
                         {d}
                     </a>
                 </li>)

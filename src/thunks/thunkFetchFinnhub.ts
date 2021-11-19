@@ -1,14 +1,14 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import { finnHub, throttleResObj as queResObj, finnHubQueue, throttleApiReqObj } from "../appFunctions/appImport/throttleQueueAPI";
+// import { rSetUpdateStatus } from 'src/slices/sliceDataModel'
 
 //Receives list of widgets and checks stale dates in slice/datamodel to see if updates are needed.
 //If data is not fresh dispatch finnHub api request to throttleQueue.
 //Returns finnhub data to mongoDB AND updates slice/ShowData.
 export interface tgetFinnHubDataReq {
-    dashboardID: number,
+    currentDashboard: string,
     widgetList: string[],
     finnHubQueue: finnHubQueue,
-    rSetUpdateStatus: Function,
     forceUpdate?: boolean, //set to true to force update of all requests.
 }
 
@@ -20,10 +20,10 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
     'GetFinnhubData',
     (req: tgetFinnHubDataReq, thunkAPI: any) => { //{dashboard: string, widgetList: []} //receives list of widgets from a dashboard to update.
 
-        const currentDashboard = thunkAPI.getState().currentDashboard
+        const dashboardId = thunkAPI.getState().currentDashboard.dashboardID
 
         const finnQueue = req.finnHubQueue
-        const dataModel = thunkAPI.getState().dataModel.dataSet[currentDashboard] //finnHubData
+        const dataModel = thunkAPI.getState().dataModel.dataSet[req.currentDashboard] //finnHubData
         const getWidgets = req.widgetList
         let requestList: Promise<any>[] = []
         for (const w of getWidgets) { //for each widget ID
@@ -32,12 +32,12 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
             for (const s in thisWidget) { //for each security
                 const reqObj: throttleApiReqObj = {
                     ...thisWidget[s],
-                    dashboardID: req.dashboardID,
-                    dashboard: currentDashboard,
+                    dashboardID: dashboardId,
+                    dashboard: req.currentDashboard,
                     widget: w,
                     security: s,
                     config: thisWidget[s].config,
-                    rSetUpdateStatus: req.rSetUpdateStatus,
+                    // rSetUpdateStatus: rSetUpdateStatus,
                 }
                 if (
                     (reqObj.updated === undefined) ||
@@ -48,7 +48,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                     countQueue = countQueue + 1
                 }
             }
-            req.rSetUpdateStatus({ [currentDashboard]: countQueue })
+            // rSetUpdateStatus({ [req.currentDashboard]: countQueue })
         }
         return Promise.all(requestList)
             .then((res) => {

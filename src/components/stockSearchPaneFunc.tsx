@@ -17,6 +17,7 @@ const useSelector = useAppSelector
 export function StockSearchPane(p: widgetProps) {
 
     const dispatch = useDispatch(); //allows widget to run redux actions
+    const apiString = useSelector((state) => { return state.apiKey })
     const defaultExchange = useSelector((state) => { return state.defaultExchange })
     const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
     const exchangeData = useSelector((state) => { return state.exchangeData.e.data })
@@ -63,7 +64,7 @@ export function StockSearchPane(p: widgetProps) {
                     if (widgetKey === 'watchListMenu' && stockObj) {
                         updateGlobalStockList(e, stockKey, stockObj, dashboardData, currentDashboard);
                     } else if (typeof p.widgetKey === 'number' && stockObj) { //Not menu widget. Menus named, widgets numbered.
-                        UpdateWidgetStockList(p.widgetKey, stockKey, stockObj, p.appState, p.setAppState);
+                        UpdateWidgetStockList(dispatch, p.widgetKey, stockKey, stockObj, p.appState, p.setAppState, dashboardData, currentDashboard, apiString);
                     } else {
                         console.log(`invalid stock selection:`, p.searchText);
                     }
@@ -102,21 +103,6 @@ export function StockSearchPane(p: widgetProps) {
         </div>
     );
 }
-
-// const mapStateToProps = (state, ownProps) => {
-
-//     const p = ownProps
-//     const thisExchange = state.exchangeData.e?.data
-//     const inputSymbol = p.searchText.slice(0, p.searchText.indexOf(":"))
-//     const updateStock = thisExchange !== undefined ? thisExchange[inputSymbol] : {}
-//     const currentExchange = state.exchangeData.e.ex
-//     return {
-//         rUpdateStock: updateStock,
-//         currentExchange: currentExchange,
-//     }
-// }
-
-// export default connect(mapStateToProps, { tGetSymbolList })(StockSearchPane);
 
 export function searchPaneProps(p) {
     const propList = {

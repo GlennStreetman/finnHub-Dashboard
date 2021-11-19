@@ -25,10 +25,9 @@ export const useSearchMongoDb = function (
                     if (Object.values(res.payload)[0] === '') { //if no payload returned get new finnhub data.
 
                         const payload: tgetFinnHubDataReq = {
-                            dashboardID: dashboardID,
+                            currentDashboard: res.dashboard,
                             widgetList: [widgetKey],
                             finnHubQueue: finnHubQueue,
-                            rSetUpdateStatus: rSetUpdateStatus,
                             forceUpdate: true
                         }
                         dispatch(tGetFinnhubData(payload))

@@ -4,6 +4,11 @@ import { AppState, setApp } from './../App'
 import { UpdateWidgetFilters } from "./../appFunctions/appImport/widgetLogic";
 import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
 
+import { useAppDispatch, useAppSelector } from './../hooks';
+
+const useDispatch = useAppDispatch
+const useSelector = useAppSelector
+
 interface props {
     start: string,
     end: string,
@@ -19,6 +24,11 @@ interface props {
 
 export default function WidgetFilterDates(p: props) {
 
+    const dispatch = useDispatch(); //allows widget to run redux actions.
+    // const apiKey = useSelector((state) => { return state.apiKey })
+    // const dashboardData = useSelector((state) => { return state.dashboardData })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+
     function updateStartDate(e) {
         p.setStart(e.target.value)
     }
@@ -33,7 +43,7 @@ export default function WidgetFilterDates(p: props) {
             const target = new Date(e.target.value).getTime();
             const offset = target - now
             const name = e.target.name;
-            UpdateWidgetFilters(p.widgetKey, { [name]: offset }, p.finnHubQueue, p.appState, p.setAppState)
+            UpdateWidgetFilters(dispatch, currentDashboard, p.widgetKey, { [name]: offset }, p.finnHubQueue, p.appState, p.setAppState)
         }
     }
 

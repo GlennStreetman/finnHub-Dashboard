@@ -31,10 +31,9 @@ export const LoadSavedDashboard = function (target: string, finnHubQueue) {
 
         await tGetMongoDB({ dashboard: dashboardData[currentDashboard].id })
         const finnHubPayload: tgetFinnHubDataReq = {
-            dashboardID: dashboardData[currentDashboard].id,
+            currentDashboard: currentDashboard,
             widgetList: Object.keys(dashboardData[currentDashboard].widgetlist),
             finnHubQueue: finnHubQueue,
-            rSetUpdateStatus: rSetUpdateStatus,
         }
         await tGetFinnhubData(finnHubPayload)
     }

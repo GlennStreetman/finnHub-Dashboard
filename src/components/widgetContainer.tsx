@@ -264,7 +264,7 @@ function WidgetContainer(p: props) {
                     <>
                         <button
                             className="widgetButtonHead"
-                            onClick={() => { ToggleWidgetBody(p.widgetKey, p.stateRef) }
+                            onClick={() => { ToggleWidgetBody(dispatch, p.widgetKey, p.stateRef, dashboardData, currentDashboard, menuList) }
                             }>
                             {p.widgetList.showBody !== false ? <i className="fa fa-caret-square-o-down" aria-hidden="true" /> : <i className="fa fa-caret-square-o-right" aria-hidden="true" />}
                         </button>
@@ -292,7 +292,7 @@ function WidgetContainer(p: props) {
                         <button
                             onClick={async () => {
                                 if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
-                                    RemoveWidget(p.widgetKey, p.appState, p.setAppState);
+                                    RemoveWidget(dispatch, p.widgetKey, p.appState, p.setAppState, dashboardData, currentDashboard);
                                     fetch(`/deleteFinnDashData?widgetID=${p.widgetKey}`)
                                     const payload = {
                                         widgetKey: p.widgetKey,

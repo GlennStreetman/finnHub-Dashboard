@@ -18,23 +18,6 @@ import { dStock } from './../appFunctions/formatStockSymbols'
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
-// interface FinnHubAPIData { //rename
-//     //defined shape of data returns by finnHub
-// }
-
-// interface FinnHubAPIDataArray {
-//     [index: number]: FinnHubAPIData
-// }
-
-// interface filters { //Any paramas not related to stock used by finnHub endpoint.
-//     //remove if not needed, else define
-//     description: string,
-//     endDate: number,
-//     startDate: number,
-//     //additional filters...
-// }
-
-//RENAME FUNCTION
 function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
 
@@ -66,6 +49,7 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
     const [start, setStart] = useState(startingStartDate()) //REMOVE IF FILTERS NOT NEEDED
     const [end, setEnd] = useState(startingEndDate()) //REMOVE IF FILTERS NOT NEEDED
     const dispatch = useDispatch(); //allows widget to run redux actions.
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
         if (state.dataModel !== undefined &&
@@ -94,6 +78,7 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, UpdateWidgetFilters, p.widgetKey)
 
+
     function updateStartDate(e) { //remove if filters not needed
         setStart(e.target.value)
     }
@@ -110,7 +95,7 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
             const offset = target - now
             const name = e.target.name;
             console.log(name, e.target.value)
-            UpdateWidgetFilters(p.widgetKey, { [name]: offset }, p.finnHubQueue, p.appState, p.setAppState)
+            UpdateWidgetFilters(dispatch, currentDashboard, p.widgetKey, { [name]: offset }, p.finnHubQueue, p.appState, p.setAppState)
         }
     }
 
@@ -201,4 +186,3 @@ export function NewWidgetProps(that, key = "newWidgetNameProps") {
     };
     return propList;
 }
-
