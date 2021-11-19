@@ -1,9 +1,8 @@
 
 import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg'
-import { menuList, widgetSetup, filters } from './../App'
-import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
+import { widgetSetup, filters } from './../App'
 
-import { AppBar, Toolbar, Button, Tooltip } from '@material-ui/core/';
+import { AppBar, Toolbar, Tooltip } from '@material-ui/core/';
 import WidgetsIcon from '@material-ui/icons/Widgets';
 import TableChartIcon from '@material-ui/icons/TableChart';
 import AccountBoxIcon from '@material-ui/icons/AccountBox';
@@ -12,26 +11,15 @@ import LockRoundedIcon from '@material-ui/icons/LockRounded';
 import LockOpenRoundedIcon from '@material-ui/icons/LockOpenRounded';
 
 interface topNavProps {
-    AccountMenu: number,
     AddNewWidgetContainer: Function,
-    apiFlag: number,
     backGroundMenu: string,
-    currentDashBoard: string,
     login: number,
     logOut: Function,
-    lockWidgets: Function,
     logoutServer: Function,
-    menuList: menuList,
-    newMenuContainer: Function,
-    showMenuColumn: boolean,
     showStockWidgets: number,
-    saveDashboard: Function,
     toggleBackGroundMenu: Function,
-    toggleWidgetVisability: Function,
-    updateAPIFlag: Function,
-    widgetLockDown: number,
     widgetSetup: widgetSetup,
-    finnHubQueue: finnHubQueue,
+
 }
 
 export default function TopNav(p: topNavProps) {

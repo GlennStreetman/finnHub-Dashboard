@@ -495,25 +495,13 @@ class App extends React.Component<AppProps, AppState> {
                     <Switch>
                         <Route path="/">
                             <TopNav
-                                AccountMenu={this.state.accountMenu}
                                 AddNewWidgetContainer={this.AddNewWidgetContainer}
-                                apiFlag={this.state.apiFlag}
                                 backGroundMenu={this.state.backGroundMenu}
-                                currentDashBoard={this.state.currentDashBoard}
-                                finnHubQueue={this.state.finnHubQueue}
-                                lockWidgets={this.lockWidgets}
                                 login={this.state.login}
                                 logOut={this.logOut}
                                 logoutServer={this.logoutServer}
-                                menuList={this.state.menuList}
-                                newMenuContainer={this.newMenuContainer}
-                                saveDashboard={this.saveDashboard}
-                                showMenuColumn={this.state.showMenuColumn}
                                 showStockWidgets={this.state.showStockWidgets}
                                 toggleBackGroundMenu={this.toggleBackGroundMenu}
-                                toggleWidgetVisability={this.toggleWidgetVisability}
-                                updateAPIFlag={this.updateAPIFlag}
-                                widgetLockDown={this.state.widgetLockDown}
                                 widgetSetup={this.state.widgetSetup}
                             />
                             <WidgetController
