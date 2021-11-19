@@ -112,7 +112,7 @@ function WidgetController(p){
     };
 
     const topPlaceHolder = {
-        margin: "30px",
+        margin: "5px",
     }
 
     return p.login === 1 ? (
