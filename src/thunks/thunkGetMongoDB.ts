@@ -24,7 +24,7 @@ interface tgetMongoDBReq {
 
 export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
     'tgetMongoDb',
-    async (reqObj: tgetMongoDBReq | false = false) => {
+    (reqObj: tgetMongoDBReq | false = false) => {
         try {
             let fetchString = '/getFinnDashDataMongo'
             if (reqObj) { //build request string with filters.
@@ -32,26 +32,28 @@ export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
                 if (reqObj.dashboard) fetchString = `${fetchString}dashboardID=${reqObj.dashboard}`
                 if (reqObj.widget) fetchString = `${fetchString}&widget=${reqObj.widget}`
             }
-            const getData = await fetch(fetchString)
-            const freshData = await getData.json()
-            const resObj: getMongoRes = {}
-            for (const x in freshData.resList) {
-                const mongo = freshData.resList[x]
-                resObj[mongo.key] = {
-                    updated: mongo.retrieved,
-                    stale: mongo.stale,
-                    data: mongo.data,
-                    key: mongo.key,
-                    dashboard: mongo.dashboard,
-                    widget: mongo.widget,
-                    security: mongo.security,
-                    widgetType: mongo.widgetType
-                }
-            }
-            return (resObj)
+            const getData = fetch(fetchString)
+                .then(res => res.json())
+                .then(freshData => {
+                    const resObj: getMongoRes = {}
+                    for (const x in freshData.resList) {
+                        const mongo = freshData.resList[x]
+                        resObj[mongo.key] = {
+                            updated: mongo.retrieved,
+                            stale: mongo.stale,
+                            data: mongo.data,
+                            key: mongo.key,
+                            dashboard: mongo.dashboard,
+                            widget: mongo.widget,
+                            security: mongo.security,
+                            widgetType: mongo.widgetType
+                        }
+                    }
+                    return resObj
+                })
+            return (getData) //return promise from thunk
 
         } catch (err) {
-            console.log('Error retrieving mongoDB', err)
-            return ('Problem retrieving mongo data')
+            console.log('tgetMongoDb: Error retrieving mongoDB', err)
         }
     })

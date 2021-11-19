@@ -180,13 +180,11 @@ export interface AppState {
     apiAlias: string,
     backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
     currentDashBoard: string, //dashboard being displayed
-    // dashBoardMenu: number, //1 = show, 0 = hide
     dashBoardData: dashBoardData, //All saved dashboards
     defaultExchange: string,
     enableDrag: boolean,
     exchangeList: string[], //list of all exchanges activated under account management.
     finnHubQueue: finnHubQueue,
-    // globalStockList: defaultGlobalStockList, //default stocks for new widgets.
     login: number, //login state. 0 logged out, 1 logged in.
     loadStartingDashBoard: number, //flag switches to 1 after attemping to load default dashboard.
     showMenuColumn: boolean, //true shows column 0
@@ -196,9 +194,7 @@ export interface AppState {
     socket: any, //socket connection for streaming stock data.+
     socketUpdate: number,
     showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
-    // streamingPriceData: streamingPriceData, //data shared between some widgets and watchlist menu. Updated by socket data.
     targetSecurity: string, //target security for widgets. Update changes widget focus.
-    // watchListMenu: number, //1 = show, 0 = hide
     widgetCopy: widget | null, //copy of state of widget being dragged.
     widgetLockDown: number, //1 removes buttons from all widgets.
     widgetSetup: widgetSetup, //activates premium api routes.
@@ -235,12 +231,10 @@ class App extends React.Component<AppProps, AppState> {
             apiAlias: "",
             backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
             currentDashBoard: "", //dashboard being displayed
-            // dashBoardMenu: 1, //1 = show, 0 = hide
             dashBoardData: {}, //All saved dashboards
             defaultExchange: "US",
             exchangeList: ["US"], //list of all exchanges activated under account management.
             finnHubQueue: createFunctionQueueObject(1, 1000, true),
-            // globalStockList: defaultGlobalStockList, //default stocks for new widgets.
             login: 0, //login state. 0 logged out, 1 logged in.
             loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
             showMenuColumn: true, //true shows column 0
@@ -252,7 +246,6 @@ class App extends React.Component<AppProps, AppState> {
             socketUpdate: Date.now(),
             showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
             targetSecurity: '', //target security for widgets. Update changes widget focus.
-            // watchListMenu: 1, //1 = show, 0 = hide
             widgetCopy: null, //copy of state of widget being dragged.
             widgetLockDown: 0, //1 removes buttons from all widgets.
             widgetSetup: {},//activates premium api routes.

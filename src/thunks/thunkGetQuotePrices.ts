@@ -11,17 +11,9 @@ interface tGetQuotePricesReq {
     throttle: finnHubQueue
 }
 
-// export function getQuotePrices(reqObj: tGetQuotePricesReq){
-//     const globalStockList = reqObj.globalStockList
-//     if (Object.keys(globalStockList).length !== 0) {
-//         for (const stock in globalStockList) {
-//             tgetQuotePrices(stock, reqObj.apiKey, reqObj.throttle)
-//         }
-// }
-
 export const tgetQuotePrices = createAsyncThunk( //{dashboard, [securityList]}
     'tGetQuotePrices',
-    async (reqObj: tGetQuotePricesReq, thunkAPI: any) => { //{list of securities}
+    (reqObj: tGetQuotePricesReq, thunkAPI: any) => { //{list of securities}
 
         const stockObj = reqObj.stock
         const apiKey = reqObj.apiKey
@@ -29,8 +21,6 @@ export const tgetQuotePrices = createAsyncThunk( //{dashboard, [securityList]}
 
         const rQuote = thunkAPI.getState().quotePrice.quote
 
-        // if (Object.keys(globalStockList).length !== 0) {
-        // for (const stock in globalStockList) {
         if (!rQuote[stockObj.key]) {
             if (stockObj !== undefined && apiKey !== undefined && stockObj.exchange === 'US') {
                 const stockSymbol = stockObj.symbol
@@ -45,20 +35,25 @@ export const tgetQuotePrices = createAsyncThunk( //{dashboard, [securityList]}
                     security: stockSymbol,
                     rSetUpdateStatus: (a) => { }
                 }
-                const data: any = await finnHub(throttle, reqObj)
+
+                const res: any = finnHub(throttle, reqObj)
+                    .then((data: any) => {
+                        if (data.error === 429) { //run again, api rate limit exceeded.
+                            return tgetQuotePrices({
+                                stock: stockObj,
+                                apiKey: apiKey,
+                                throttle: throttle
+                            })
+                        } else {
+                            let payload = [stockObj.key, data?.data?.c] //tuple
+                            return payload
+                        }
+
+                    })
                     .catch(error => {
                         console.log('tGetQuotePrices error:', error.message)
                     });
-                if (data.error === 429) { //run again, api rate limit exceeded.
-                    tgetQuotePrices({
-                        stock: stockObj,
-                        apiKey: apiKey,
-                        throttle: throttle
-                    })
-                } else {
-                    let payload = [stockObj.key, data?.data?.c] //tuple
-                    return payload
-                }
+                return res
             }
         }
     })

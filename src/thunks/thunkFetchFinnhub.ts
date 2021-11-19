@@ -48,7 +48,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
             }
             req.rSetUpdateStatus({ [req.targetDashBoard]: countQueue })
         }
-        return Promise.all(requestList)
+        return Promise.all(requestList) //return value for thunk
             .then((res) => {
                 const resObj: resObj = {}
                 for (const resStock of res) {

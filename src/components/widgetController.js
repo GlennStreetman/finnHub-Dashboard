@@ -93,7 +93,6 @@ function WidgetController(p){
         }
     }
     
-    // if (p.showMenuColumn === false) widgetGroups.shift()
     const renderWidgetColumns = Object.keys(widgetGroups).map((el) => {
         return <div key={el+"divkey"} style={{padding: "1px",}}>
             {renderWidgetGroup(widgetGroups[el])}
