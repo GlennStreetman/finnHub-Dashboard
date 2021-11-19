@@ -73,7 +73,7 @@ const showData = createSlice({
         rUnmountWidget: (state, action) => {
             const ap: rUnmountWidgetPayload = action.payload
             delete state?.dataSet?.[ap.widgetKey]
-        }
+        },
     },
     extraReducers: {
         [tGetFinnhubData.pending.toString()]: (state, action) => {

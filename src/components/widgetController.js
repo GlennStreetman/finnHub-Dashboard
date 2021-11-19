@@ -48,6 +48,7 @@ function WidgetController(p){
                 thisWidgetProps['menuWidgetToggle'] = p.menuWidgetToggle
                 thisWidgetProps['showMenu'] = p[el.widgetID]  
                 thisWidgetProps['setWidgetFocus'] = p.setWidgetFocus
+                thisWidgetProps['renameDashboard'] = p.renameDashboard
             }
             if (p.widgetCopy?.widgetID === el.widgetID){
                 thisWidgetProps.widgetCopy = p.widgetCopy

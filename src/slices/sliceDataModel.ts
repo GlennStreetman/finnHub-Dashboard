@@ -228,6 +228,12 @@ const dataModel = createSlice({
             const ap: rAddDashboardPayload = action.payload
             const targetDashboard = ap.dashboardName
             state.dataSet[targetDashboard] = {}
+        },
+        rRenameModelName(state: sliceDataModel, action) {
+            const ap = action.payload
+            const dataSet = state.dataSet
+            dataSet[ap.newName] = dataSet[ap.oldName]
+            delete dataSet[ap.oldName]
         }
     },
     extraReducers: {
@@ -303,6 +309,7 @@ export const {
     rRemoveWidgetDataModel,
     rRebuildTargetDashboardModel,
     rRebuildTargetWidgetModel,
-    rAddNewDashboard
+    rAddNewDashboard,
+    rRenameModelName,
 } = dataModel.actions
 export default dataModel.reducer

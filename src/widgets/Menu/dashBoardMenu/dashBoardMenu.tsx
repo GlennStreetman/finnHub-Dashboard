@@ -1,12 +1,31 @@
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { useAppSelector } from '../../../hooks';
-// import { uniqueObjectnName } from './../../../appFunctions/stringFunctions'
+import { dashBoardData } from 'src/App'
 
 import { useAppDispatch } from './../../../hooks';
 import { rUnmountWidget } from './../../../slices/sliceShowData'
-import { rRemoveDashboardDataModel } from './../../../slices/sliceDataModel'
+import { rRemoveDashboardDataModel, rRenameModelName } from './../../../slices/sliceDataModel'
+import { rSetTargetDashboard } from './../../../slices/sliceShowData'
 
-function DashBoardMenu(p: { [key: string]: any }, ref: any) {
+interface props {
+    getSavedDashBoards: Function,
+    dashBoardData: dashBoardData,
+    copyDashboard: Function,
+    currentDashBoard: string,
+    saveDashboard: Function,
+    newDashBoard: Function,
+    helpText: string,
+    loadSavedDashboard: Function,
+    updateDashBoards: Function,
+    rebuildDashboardState: Function,
+    refreshFinnhubAPIDataCurrentDashboard: Function,
+    removeDashboardFromState: Function,
+    rAddNewDashboard: Function,
+    showEditPane: number,
+    renameDashboard: Function,
+}
+
+function DashBoardMenu(p: props, ref: any) {
 
     const useDispatch = useAppDispatch
     const dispatch = useDispatch(); //allows widget to run redux actions.
@@ -23,6 +42,8 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
             return (dashboardStatus)
         }
     })
+
+    const showCurrentDashboard = useSelector((state) => { return state.showData.targetDashboard })
 
     useImperativeHandle(ref, () => (
         //used to copy widgets when being dragged. example: if widget body renders time series data into chart, copy chart data.
@@ -56,11 +77,15 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
     }
 
     async function postNameChange(e) {
+
         if (!p.dashBoardData[e.target.value]) {
+            const oldName = dashBoardData[e.target.id].dashboardname
+            const newName = e.target.value.toUpperCase()
+
             const data: any = {
                 dbID: dashBoardData[e.target.id].id,
-                oldName: dashBoardData[e.target.id].dashboardname,
-                newName: e.target.value.toUpperCase()
+                oldName: oldName,
+                newName: newName
             }
 
             const options = {
@@ -68,10 +93,13 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(data),
             };
-            await fetch('/renameDashboard', options)
-            await fetch('/renameDashboardMongo', options)
-
-            p.rebuildDashboardState()
+            fetch('/renameDashboard', options)
+            fetch('/renameDashboardMongo', options)
+            p.renameDashboard(oldName, newName)
+            if (showCurrentDashboard === oldName) dispatch(rSetTargetDashboard({ targetDashboard: newName }))
+            dispatch(rRenameModelName({ oldName: oldName, newName: newName }))
+            //if so, update showdata.targetDashboard, appState.currentDashboard, 
+            //update dataModel.dataSet.[newname]
         }
     }
 
@@ -231,7 +259,7 @@ function DashBoardMenu(p: { [key: string]: any }, ref: any) {
                                     onClick={() => {
                                         p.newDashBoard(inputText, p.dashBoardData);
                                         p.rAddNewDashboard({ dashboardName: inputText })
-                                        p.rSetTargetDashboard({ targetDashboard: inputText })
+                                        dispatch(rSetTargetDashboard({ targetDashboard: inputText }))
                                     }}
                                 />
                             </td>
@@ -266,7 +294,7 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
         refreshFinnhubAPIDataCurrentDashboard: that.props.refreshFinnhubAPIDataCurrentDashboard,
         removeDashboardFromState: that.props.removeDashboardFromState,
         rAddNewDashboard: that.props.rAddNewDashboard,
-        rSetTargetDashboard: that.props.rSetTargetDashboard,
+        renameDashboard: that.props.renameDashboard,
     };
     return propList;
 }

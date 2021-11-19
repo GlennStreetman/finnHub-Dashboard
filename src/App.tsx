@@ -303,6 +303,7 @@ class App extends React.Component<AppProps, AppState> {
         this.removeDashboardFromState = removeDashboardFromState.bind(this)
         this.removeWidget = RemoveWidget.bind(this)
         this.rebuildVisableDashboard = this.rebuildVisableDashboard.bind(this) //rebuilds dashboard in redux state.dataModel
+        this.renameDashboard = this.renameDashboard.bind(this)
     }
 
     componentDidUpdate(prevProps: AppProps, prevState: AppState) {
@@ -391,6 +392,19 @@ class App extends React.Component<AppProps, AppState> {
                 await p.tGetFinnhubData(payload)
             }
         }
+    }
+
+    renameDashboard(oldName, newName) {
+        const updateObj = {}
+        if (this.state.currentDashBoard === oldName) updateObj['currentDashBoard'] = newName
+        const renamed = produce(this.state.dashBoardData, (draftState: dashBoardData) => {
+            draftState[newName] = draftState[oldName]
+            draftState[newName].dashboardname = newName
+            delete draftState[oldName]
+            return draftState
+        })
+        updateObj['dashBoardData'] = renamed
+        this.setState(updateObj)
     }
 
     async rebuildDashboardState() { //fetches dashboard data, then updates s.dashBoardData, then builds redux model.
@@ -548,6 +562,7 @@ class App extends React.Component<AppProps, AppState> {
                                 zIndex={this.state.zIndex}
                                 rAddNewDashboard={this.props.rAddNewDashboard}
                                 rSetTargetDashboard={this.props.rSetTargetDashboard}
+                                renameDashboard={this.renameDashboard}
                             />
                             {loginScreen}
                             {backGroundMenu()}
