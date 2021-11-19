@@ -4,6 +4,7 @@ import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB'
 import { tGetFinnhubData, resObj } from '../thunks/thunkFetchFinnhub'
 // import { findByString, mergeByString } from './../appFunctions/stringFunctions'
 import { widgetReducers } from '../registers/dataReducerReg'
+import { tGetSavedDashboards } from '../thunks/thunkGetSavedDashboards'
 
 //data = {keys : data objects}
 //key should be widget reference.
@@ -50,7 +51,6 @@ const showData = createSlice({
             //payload {key: string, {...widget-ex-stck: {empty obj}}}
             const ap: rBuildVisableDataPayload = action.payload
             const key: string = ap.key
-            state.dataSet[key] = {}
             state.dataSet[key] = {}
             for (const security in ap.securityList) {
                 const thisSecurity: string = ap.securityList[security]
@@ -166,6 +166,10 @@ const showData = createSlice({
                     }
                 }
             }
+        },
+        [tGetSavedDashboards.fulfilled.toString()]: (state, action) => {
+            const target = action.payload.currentDashBoard
+            state.targetDashboard = target
         },
     }
 })

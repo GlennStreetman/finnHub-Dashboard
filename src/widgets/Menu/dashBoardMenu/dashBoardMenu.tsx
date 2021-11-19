@@ -1,28 +1,26 @@
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { useAppSelector } from '../../../hooks';
-import { dashBoardData } from 'src/App'
+import { dashBoardData, menuList } from 'src/App'
 
 import { useAppDispatch } from './../../../hooks';
 import { rUnmountWidget } from './../../../slices/sliceShowData'
 import { rRemoveDashboardDataModel, rRenameModelName, rAddNewDashboard } from './../../../slices/sliceDataModel'
 import { rSetTargetDashboard } from './../../../slices/sliceShowData'
+import { tCopyDashboard } from "src/thunks/thunkCopyDashboard";
+import { tGetSavedDashboards } from 'src/thunks/thunkGetSavedDashboards'
 
 interface props {
-    getSavedDashBoards: Function,
     dashBoardData: dashBoardData,
-    copyDashboard: Function,
     currentDashBoard: string,
-    saveDashboard: Function,
     newDashBoard: Function,
     helpText: string,
     loadSavedDashboard: Function,
-    updateDashBoards: Function,
-    rebuildDashboardState: Function,
-    refreshFinnhubAPIDataCurrentDashboard: Function,
     removeDashboardFromState: Function,
-    // rAddNewDashboard: Function,
     showEditPane: number,
     renameDashboard: Function,
+    updateAppState: Function,
+    apiKey: string,
+    menuList: menuList
 }
 
 function DashBoardMenu(p: props, ref: any) {
@@ -106,8 +104,14 @@ function DashBoardMenu(p: props, ref: any) {
     async function copyDashboardFunction(dashboardName) {
         unMountWidgets() //removes visable data from redux.state.showData
         if (dashboardName !== '' && dashboardName !== undefined) {
-            await p.copyDashboard(dashboardName)
-            await p.rebuildDashboardState()
+            await dispatch(tCopyDashboard({ copyName: dashboardName, dashboardData: p.dashBoardData, menuList: p.menuList }))
+            const data: any = await dispatch(tGetSavedDashboards({ apiKey: p.apiKey })).unwrap()
+            const payload = {
+                dashBoardData: data.dashBoardData,
+                currentDashBoard: data.currentDashBoard,
+                menuList: data.menuList!,
+            }
+            p.updateAppState(payload)
         } else {
             setInputText('Enter Name')
         }
@@ -281,19 +285,16 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
     </>
 
     let propList = {
-        getSavedDashBoards: that.props.getSavedDashBoards,
         dashBoardData: that.props.dashBoardData,
-        copyDashboard: that.props.copyDashboard,
         currentDashBoard: that.props.currentDashBoard,
-        saveDashboard: that.props.saveDashboard,
         newDashBoard: that.props.newDashboard,
         helpText: [helpText, 'DBM'],
         loadSavedDashboard: that.props.loadSavedDashboard,
-        updateDashBoards: that.props.updateDashBoards,
-        rebuildDashboardState: that.props.rebuildDashboardState,
-        refreshFinnhubAPIDataCurrentDashboard: that.props.refreshFinnhubAPIDataCurrentDashboard,
         removeDashboardFromState: that.props.removeDashboardFromState,
         renameDashboard: that.props.renameDashboard,
+        menuList: that.props.menuList,
+        updateAppState: that.props.updateAppState,
+        apiKey: that.props.apiKey
     };
     return propList;
 }

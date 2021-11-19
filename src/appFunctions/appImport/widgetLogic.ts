@@ -155,7 +155,6 @@ export const RemoveWidget = async function (stateRef: 'widgetList' | 'menuList',
         this.saveDashboard(this.state.currentDashBoard)
         return true
     });
-    // this.rebuildDashboardState()
 
 }
 

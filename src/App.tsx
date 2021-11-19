@@ -14,9 +14,9 @@ import {
     UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig,
     toggleWidgetBody, setWidgetFocus, removeDashboardFromState
 } from "./appFunctions/appImport/widgetLogic";
-import { NewDashboard, saveDashboard, copyDashboard }
+import { NewDashboard, saveDashboard }
     from "./appFunctions/appImport/setupDashboard";
-import { GetSavedDashBoards, GetSavedDashBoardsRes } from "./appFunctions/appImport/getSavedDashboards";
+import { GetSavedDashBoards } from "./appFunctions/appImport/getSavedDashboards";
 import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
 import { updateGlobalStockList, setNewGlobalStockList } from "./appFunctions/appImport/updateGlobalStockList"
 import { syncGlobalStockList } from "./appFunctions/appImport/syncGlobalStockList"
@@ -55,6 +55,7 @@ import {
 } from "./slices/sliceDataModel";
 import { tGetFinnhubData, tgetFinnHubDataReq } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
+import { tGetSavedDashboards, tGetSavedDashBoardsRes } from './thunks/thunkGetSavedDashboards'
 
 export interface stock {
     currency: string,
@@ -168,6 +169,7 @@ export interface AppProps {
     rRebuildTargetWidgetModel: Function,
     rUpdateQuotePriceStream: Function,
     rUpdateQuotePriceSetup: Function,
+    tGetSavedDashboards: Function,
 }
 
 export interface AppState {
@@ -274,7 +276,8 @@ class App extends React.Component<AppProps, AppState> {
         this.newDashboard = NewDashboard.bind(this);
         this.getSavedDashBoards = GetSavedDashBoards.bind(this);
         this.saveDashboard = saveDashboard.bind(this);
-        this.copyDashboard = copyDashboard.bind(this)
+        this.updateAppState = this.updateAppState.bind(this)
+
 
         //app logic for MOVING widgets and snapping them into location.
         this.setDrag = SetDrag.bind(this);
@@ -348,6 +351,12 @@ class App extends React.Component<AppProps, AppState> {
         }
     }
 
+    updateAppState(updateObj) {
+        return new Promise((resolve) => {
+            this.setState(updateObj, () => resolve(true))
+        })
+    }
+
     async refreshFinnhubAPIDataCurrentDashboard() { //queues all finnhub data to be refreshed for current dashboard.
         console.log('refresh finnhub data for current dashboard', this.state.currentDashBoard)
         const s: AppState = this.state;
@@ -409,19 +418,15 @@ class App extends React.Component<AppProps, AppState> {
     async rebuildDashboardState() { //fetches dashboard data, then updates s.dashBoardData, then builds redux model.
         // console.log('running rebuild')
         try {
-            const data: GetSavedDashBoardsRes = await this.getSavedDashBoards()
-            if ((data.dashBoardData[data.currentDashBoard] === undefined && Object.keys(data.dashBoardData))) { //if invalid current dashboard returned
-                data.currentDashBoard = Object.keys(data.dashBoardData)[0]
-            }
+            const data: tGetSavedDashBoardsRes = await this.props.tGetSavedDashboards({ apiKey: this.state.apiKey }).unwrap()
             const payload = {
                 dashBoardData: data.dashBoardData,
                 currentDashBoard: data.currentDashBoard,
-                // globalStockList: data.dashBoardData[data.currentDashBoard].globalstocklist,
                 menuList: data.menuList!,
             }
             this.setState(payload, () => {
-                this.props.rSetTargetDashboard({ targetDashboard: data.currentDashBoard }) //update target dashboard in redux dataModel
-                this.props.rBuildDataModel({ ...data, apiKey: this.state.apiKey })
+                // this.props.rSetTargetDashboard({ targetDashboard: data.currentDashBoard }) //update target dashboard in redux dataModel
+                // this.props.rBuildDataModel({ ...data, apiKey: this.state.apiKey })
                 return true
             })
 
@@ -434,7 +439,7 @@ class App extends React.Component<AppProps, AppState> {
     rebuildVisableDashboard() {
         const payload = {
             apiKey: this.state.apiKey,
-            dashBoardData: this.state.dashBoardData,
+            dashBoardData: this.state.dashBoardData[this.state.currentDashBoard],
             targetDashboard: this.state.currentDashBoard,
         }
         this.props.rRebuildTargetDashboardModel(payload) //rebuilds redux.Model
@@ -515,14 +520,12 @@ class App extends React.Component<AppProps, AppState> {
                                 apiAlias={this.state.apiAlias}
                                 availableStocks={this.state.availableStocks}
                                 changeWidgetName={this.changeWidgetName}
-                                copyDashboard={this.copyDashboard}
                                 currentDashBoard={this.state.currentDashBoard}
                                 dashBoardData={this.state.dashBoardData}
                                 dashboardID={dashboardID}
                                 defaultExchange={this.state.defaultExchange}
                                 exchangeList={this.state.exchangeList}
                                 finnHubQueue={this.state.finnHubQueue}
-                                getSavedDashBoards={this.getSavedDashBoards}
                                 globalStockList={globalStockList}
                                 loadSavedDashboard={this.loadSavedDashboard}
                                 login={this.state.login}
@@ -561,6 +564,7 @@ class App extends React.Component<AppProps, AppState> {
                                 zIndex={this.state.zIndex}
                                 rSetTargetDashboard={this.props.rSetTargetDashboard}
                                 renameDashboard={this.renameDashboard}
+                                updateAppState={this.updateAppState}
                             />
                             {loginScreen}
                             {backGroundMenu()}
@@ -595,5 +599,6 @@ export default connect(mapStateToProps, {
     rRebuildTargetWidgetModel,
     rUpdateQuotePriceStream,
     rUpdateQuotePriceSetup,
+    tGetSavedDashboards,
 })(App);
 
