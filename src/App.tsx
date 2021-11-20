@@ -297,11 +297,9 @@ class App extends React.Component<AppProps, AppState> {
         this.setSecurityFocus = this.setSecurityFocus.bind(this) //Sets target security for all widgets that have security dropdown selector 
         this.updateWidgetSetup = updateWidgetSetup.bind(this) //saves current dashboard to postgres.
         this.rebuildDashboardState = this.rebuildDashboardState.bind(this) //sets s.dashboardData. Used to build dataModel in redux
-        this.refreshFinnhubAPIDataAll = this.refreshFinnhubAPIDataAll.bind(this) //For All Dashboards: gets data from mongo if available, else queues updates with finnhub.io
         this.refreshFinnhubAPIDataCurrentDashboard = this.refreshFinnhubAPIDataCurrentDashboard.bind(this)
         this.removeWidget = RemoveWidget.bind(this)
         this.rebuildVisableDashboard = this.rebuildVisableDashboard.bind(this) //rebuilds dashboard in redux state.dataModel
-        this.renameDashboard = this.renameDashboard.bind(this)
     }
 
     componentDidUpdate(prevProps: AppProps, prevState: AppState) {
@@ -362,65 +360,45 @@ class App extends React.Component<AppProps, AppState> {
         await p.tGetFinnhubData(payload)
     }
 
-    async refreshFinnhubAPIDataAll() { //queues all finnhub data to be refreshes for all dashboards.
-        const s: AppState = this.state;
-        const p: AppProps = this.props;
-        await p.tGetMongoDB()
-        const targetDash: string[] = s.dashBoardData?.[s.currentDashBoard]?.widgetlist ? Object.keys(s.dashBoardData?.[s.currentDashBoard]?.widgetlist) : []
-        console.log('target dash', targetDash, s.dashBoardData)
-        for (const widget in targetDash) {
-            const payload: tgetFinnHubDataReq = { //get data for default dashboard.
-                dashboardID: s.dashBoardData[s.currentDashBoard].id,
-                targetDashBoard: s.currentDashBoard,
-                widgetList: [targetDash[widget]],
-                finnHubQueue: s.finnHubQueue,
-                rSetUpdateStatus: p.rSetUpdateStatus,
-            }
-            console.log('payload: ', payload)
-            p.tGetFinnhubData(payload)
-        }
-        const dashBoards: string[] = Object.keys(s.dashBoardData) //get data for dashboards not being shown
-        for (const dash of dashBoards) {
-            if (dash !== s.currentDashBoard) {
-                const payload: tgetFinnHubDataReq = { //run in background, do not await.
-                    dashboardID: s.dashBoardData[dash].id,
-                    targetDashBoard: dash,
-                    widgetList: Object.keys(s.dashBoardData[dash].widgetlist),
-                    finnHubQueue: s.finnHubQueue,
-                    rSetUpdateStatus: p.rSetUpdateStatus,
-                }
-                await p.tGetFinnhubData(payload)
-            }
-        }
-    }
-
-    renameDashboard(oldName, newName) {
-        const updateObj = {}
-        if (this.state.currentDashBoard === oldName) updateObj['currentDashBoard'] = newName
-        const renamed = produce(this.state.dashBoardData, (draftState: dashBoardData) => {
-            draftState[newName] = draftState[oldName]
-            draftState[newName].dashboardname = newName
-            delete draftState[oldName]
-            return draftState
-        })
-        updateObj['dashBoardData'] = renamed
-        this.setState(updateObj)
-    }
-
     async rebuildDashboardState() { //fetches dashboard data, then updates s.dashBoardData, then builds redux model.
-        // console.log('running rebuild')
         try {
             const data = await this.props.tGetSavedDashboards({ apiKey: this.state.apiKey }).unwrap()
             console.log('rebuildData', data.currentDashBoard)
             const payload = {
                 dashBoardData: data.dashBoardData,
-                currentDashBoard: data.currentDashBoard.dashboardname,
+                currentDashBoard: data.currentDashBoard,
                 menuList: data.menuList!,
             }
-            this.setState(payload, () => {
+            this.setState(payload, async () => {
                 this.props.rResetUpdateFlag() //sets all dashboards status to updating in redux store.
-                this.refreshFinnhubAPIDataAll() //fetches finnhub api data, from mongo if avilable, else queues Finnhub.io api alls. When complete sets dashboard status ready.
-                return true
+
+                const s: AppState = this.state;
+                const p: AppProps = this.props;
+                await p.tGetMongoDB()
+                const targetDash: string[] = s.dashBoardData?.[s.currentDashBoard]?.widgetlist ? Object.keys(s.dashBoardData?.[s.currentDashBoard]?.widgetlist) : []
+                for (const widget in targetDash) {
+                    const payload: tgetFinnHubDataReq = { //get data for default dashboard.
+                        dashboardID: s.dashBoardData[s.currentDashBoard].id,
+                        targetDashBoard: s.currentDashBoard,
+                        widgetList: [targetDash[widget]],
+                        finnHubQueue: s.finnHubQueue,
+                        rSetUpdateStatus: p.rSetUpdateStatus,
+                    }
+                    p.tGetFinnhubData(payload)
+                }
+                const dashBoards: string[] = Object.keys(s.dashBoardData) //get data for dashboards not being shown
+                for (const dash of dashBoards) {
+                    if (dash !== s.currentDashBoard) {
+                        const payload: tgetFinnHubDataReq = { //run in background, do not await.
+                            dashboardID: s.dashBoardData[dash].id,
+                            targetDashBoard: dash,
+                            widgetList: Object.keys(s.dashBoardData[dash].widgetlist),
+                            finnHubQueue: s.finnHubQueue,
+                            rSetUpdateStatus: p.rSetUpdateStatus,
+                        }
+                        await p.tGetFinnhubData(payload)
+                    }
+                }
             })
 
 
@@ -554,7 +532,6 @@ class App extends React.Component<AppProps, AppState> {
                                 widgetLockDown={this.state.widgetLockDown}
                                 zIndex={this.state.zIndex}
                                 rSetTargetDashboard={this.props.rSetTargetDashboard}
-                                renameDashboard={this.renameDashboard}
                                 updateAppState={this.updateAppState}
                             />
                             {loginScreen}

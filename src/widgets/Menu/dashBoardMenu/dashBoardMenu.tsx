@@ -21,7 +21,6 @@ interface props {
     currentDashBoard: string,
     helpText: string,
     showEditPane: number,
-    renameDashboard: Function,
     updateAppState: Function,
     apiKey: string,
     menuList: menuList,
@@ -122,6 +121,19 @@ function DashBoardMenu(p: props, ref: any) {
         setNewNames(updateNewNames)
     }
 
+    function renameDashboard(oldName, newName) {
+        const updateObj = {}
+        if (p.currentDashBoard === oldName) updateObj['currentDashBoard'] = newName
+        const renamed = produce(this.state.dashBoardData, (draftState: dashBoardData) => {
+            draftState[newName] = draftState[oldName]
+            draftState[newName].dashboardname = newName
+            delete draftState[oldName]
+            return draftState
+        })
+        updateObj['dashBoardData'] = renamed
+        p.updateAppState(updateObj)
+    }
+
     async function postNameChange(e) {
 
         if (!p.dashBoardData[e.target.value]) {
@@ -141,7 +153,7 @@ function DashBoardMenu(p: props, ref: any) {
             };
             fetch('/renameDashboard', options)
             fetch('/renameDashboardMongo', options)
-            p.renameDashboard(oldName, newName)
+            renameDashboard(oldName, newName)
             if (showCurrentDashboard === oldName) dispatch(rSetTargetDashboard({ targetDashboard: newName }))
             dispatch(rRenameModelName({ oldName: oldName, newName: newName }))
             //if so, update showdata.targetDashboard, appState.currentDashboard, 
@@ -339,7 +351,6 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
         dashBoardData: that.props.dashBoardData,
         currentDashBoard: that.props.currentDashBoard,
         helpText: [helpText, 'DBM'],
-        renameDashboard: that.props.renameDashboard,
         menuList: that.props.menuList,
         updateAppState: that.props.updateAppState,
         apiKey: that.props.apiKey,
