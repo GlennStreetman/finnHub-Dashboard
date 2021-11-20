@@ -1,26 +1,30 @@
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { useAppSelector } from '../../../hooks';
 import { dashBoardData, menuList } from 'src/App'
+import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 import { useAppDispatch } from './../../../hooks';
 import { rUnmountWidget } from './../../../slices/sliceShowData'
 import { rRemoveDashboardDataModel, rRenameModelName, rAddNewDashboard } from './../../../slices/sliceDataModel'
-import { rSetTargetDashboard } from './../../../slices/sliceShowData'
+import { rSetTargetDashboard, rSetTargetDashboardPayload } from './../../../slices/sliceShowData'
 import { tCopyDashboard } from "src/thunks/thunkCopyDashboard";
 import { tGetSavedDashboards } from 'src/thunks/thunkGetSavedDashboards'
+import { uniqueObjectnName } from 'src/appFunctions/stringFunctions'
+import { tGetMongoDB } from 'src/thunks/thunkGetMongoDB'
+import { tGetFinnhubData, tgetFinnHubDataReq } from 'src/thunks/thunkFetchFinnhub'
+import { rSetUpdateStatus } from 'src/slices/sliceDataModel'
 
 interface props {
     dashBoardData: dashBoardData,
     currentDashBoard: string,
-    newDashBoard: Function,
     helpText: string,
-    loadSavedDashboard: Function,
     removeDashboardFromState: Function,
     showEditPane: number,
     renameDashboard: Function,
     updateAppState: Function,
     apiKey: string,
-    menuList: menuList
+    menuList: menuList,
+    finnHubQueue: finnHubQueue,
 }
 
 function DashBoardMenu(p: props, ref: any) {
@@ -61,6 +65,49 @@ function DashBoardMenu(p: props, ref: any) {
         setNewNames(returnObj)
     }, [p.dashBoardData])
 
+    async function newDashboard(newName, dashboardData, menuList) {
+        console.log('creating new dashboard')
+        const testname = newName ? newName : 'DASHBOARD'
+        const uniqueName = uniqueObjectnName(testname, dashboardData)
+
+        const data = {
+            dashBoardName: uniqueName,
+            globalStockList: {},
+            widgetList: {},
+            menuList: menuList,
+        };
+        const options = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(data),
+        };
+
+        await fetch("/dashBoard", options) //posts that data to be saved.
+        const newData: any = await dispatch(tGetSavedDashboards({ apiKey: p.apiKey })).unwrap()
+        const payload = {
+            dashBoardData: newData.dashBoardData,
+            currentDashBoard: newData.currentDashBoard,
+            menuList: newData.menuList!,
+        }
+        p.updateAppState(payload)
+    }
+
+    async function loadSavedDashboard(widgetName: string) {
+        dispatch(rSetTargetDashboard({ targetDashboard: widgetName }))
+        await p.updateAppState({
+            currentDashBoard: widgetName,
+            targetSecurity: Object.keys(p.dashBoardData[widgetName].globalstocklist)[0],
+        })
+        await dispatch(tGetMongoDB({ dashboard: p.dashBoardData[p.currentDashBoard].id }))
+        const finnHubPayload: tgetFinnHubDataReq = {
+            dashboardID: p.dashBoardData[p.currentDashBoard].id,
+            targetDashBoard: p.currentDashBoard,
+            widgetList: Object.keys(p.dashBoardData[p.currentDashBoard].widgetlist),
+            finnHubQueue: p.finnHubQueue,
+            rSetUpdateStatus: rSetUpdateStatus,
+        }
+        dispatch(tGetFinnhubData(finnHubPayload))
+    }
 
     function handleChange(e) {
         const newName = e.target.value
@@ -147,13 +194,13 @@ function DashBoardMenu(p: props, ref: any) {
                 const dashboard = p.dashBoardData[Object.keys(dashBoardData)[x]]
                 const testDashboardName = dashboard.dashboardname
                 if (testDashboardName !== dashboardName) { //load non-deleted dashboard
-                    p.loadSavedDashboard(testDashboardName);
+                    loadSavedDashboard(testDashboardName);
                     break
                 }
             }
         } else if (dashboardName === p.currentDashBoard && Object.keys(dashBoardData).length === 1) {
             unMountWidgets() //removes widgets from redux visable data model.
-            p.newDashBoard('NEW', p.dashBoardData)
+            newDashboard('NEW', p.dashBoardData, p.menuList)
         }
         unMountDashboard(dashboardName) //removes dashboard from redux datamodel.
         p.removeDashboardFromState(dashboardName) //removes dashboard from App.state
@@ -192,7 +239,7 @@ function DashBoardMenu(p: props, ref: any) {
                             checked={p.currentDashBoard === p.dashBoardData?.[el]?.dashboardname} //
                             onChange={() => {
                                 unMountWidgets()
-                                p.loadSavedDashboard(p.dashBoardData?.[el]?.dashboardname);
+                                loadSavedDashboard(p.dashBoardData?.[el]?.dashboardname);
                                 setInputText(dashBoardData[el].dashboardname)
                             }}
                         />
@@ -261,7 +308,7 @@ function DashBoardMenu(p: props, ref: any) {
                                     type="submit"
                                     value="New"
                                     onClick={() => {
-                                        p.newDashBoard(inputText, p.dashBoardData);
+                                        newDashboard(inputText, p.dashBoardData, p.menuList);
                                         dispatch(rAddNewDashboard({ dashboardName: inputText }))
                                         dispatch(rSetTargetDashboard({ targetDashboard: inputText }))
                                     }}
@@ -287,14 +334,13 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
     let propList = {
         dashBoardData: that.props.dashBoardData,
         currentDashBoard: that.props.currentDashBoard,
-        newDashBoard: that.props.newDashboard,
         helpText: [helpText, 'DBM'],
-        loadSavedDashboard: that.props.loadSavedDashboard,
         removeDashboardFromState: that.props.removeDashboardFromState,
         renameDashboard: that.props.renameDashboard,
         menuList: that.props.menuList,
         updateAppState: that.props.updateAppState,
-        apiKey: that.props.apiKey
+        apiKey: that.props.apiKey,
+        finnHubQueue: that.props.finnHubQueue,
     };
     return propList;
 }

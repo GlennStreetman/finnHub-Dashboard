@@ -14,7 +14,7 @@ import {
     UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig,
     toggleWidgetBody, setWidgetFocus, removeDashboardFromState
 } from "./appFunctions/appImport/widgetLogic";
-import { NewDashboard, saveDashboard }
+import { saveDashboard }
     from "./appFunctions/appImport/setupDashboard";
 import { GetSavedDashBoards } from "./appFunctions/appImport/getSavedDashboards";
 import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
@@ -25,7 +25,6 @@ import { updateAPIFlag } from "./appFunctions/appImport/updateAPIFlag"
 import { updateExchangeList } from "./appFunctions/appImport/updateExchangeList"
 import { updateDefaultExchange } from "./appFunctions/appImport/updateDefaultExchange"
 import { updateDashBoards } from "./appFunctions/appImport/updateDashBoards"
-import { loadSavedDashboard } from "./appFunctions/appImport/loadSavedDashboard"
 import { updateWidgetSetup } from "./appFunctions/appImport/updateWidgetSetup"
 import { MenuWidgetToggle } from "./appFunctions/appImport/menuWidgetToggle"
 
@@ -273,7 +272,6 @@ class App extends React.Component<AppProps, AppState> {
         this.menuWidgetToggle = MenuWidgetToggle.bind(this)
 
         //App logic for setting up dashboards.
-        this.newDashboard = NewDashboard.bind(this);
         this.getSavedDashBoards = GetSavedDashBoards.bind(this);
         this.saveDashboard = saveDashboard.bind(this);
         this.updateAppState = this.updateAppState.bind(this)
@@ -296,7 +294,6 @@ class App extends React.Component<AppProps, AppState> {
         this.syncGlobalStockList = syncGlobalStockList.bind(this); //pushes global stock list to all widgets.
         this.toggleBackGroundMenu = toggleBackGroundMenu.bind(this); //hides widgets and shows menu from topbar.
         this.updateDashBoards = updateDashBoards.bind(this) //when dashboard menu saves or deletes a dashboard, runs to upddate state.
-        this.loadSavedDashboard = loadSavedDashboard.bind(this) // loads a dashboard
         this.setSecurityFocus = this.setSecurityFocus.bind(this) //Sets target security for all widgets that have security dropdown selector 
         this.updateWidgetSetup = updateWidgetSetup.bind(this) //saves current dashboard to postgres.
         this.rebuildDashboardState = this.rebuildDashboardState.bind(this) //sets s.dashboardData. Used to build dataModel in redux
@@ -309,21 +306,15 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     componentDidUpdate(prevProps: AppProps, prevState: AppState) {
-        const s: AppState = this.state;
-        const p: AppProps = this.props;
-        if (s.login === 1 && prevState.login === 0) { //on login build dashboard state, then use state to build redux dataModel.
+
+        if (this.state.login === 1 && prevState.login === 0) { //on login build dashboard state, then use state to build redux dataModel.
+            console.log('rebuilding state')
             this.rebuildDashboardState()
         }
 
-        if ((prevProps.dataModel.created === 'false' && p.dataModel.created === 'true' && s.login === 1) ||
-            (p.dataModel.created === 'updated' && s.login === 1)) {//on login or data model update update dataset with finnHub data.
-            p.rResetUpdateFlag() //sets all dashboards status to updating in redux store.
-            this.refreshFinnhubAPIDataAll() //fetches finnhub api data, from mongo if avilable, else queues Finnhub.io api alls. When complete sets dashboard status ready.
-        }
-
         if ( //if apikey not setup show about menu
-            (s.apiKey === '' && s.apiFlag === 0 && s.login === 1) ||
-            (s.apiKey === null && s.apiFlag === 0 && s.login === 1)
+            (this.state.apiKey === '' && this.state.apiFlag === 0 && this.state.login === 1) ||
+            (this.state.apiKey === null && this.state.apiFlag === 0 && this.state.login === 1)
         ) {
             this.setState({
                 apiFlag: 1,
@@ -332,9 +323,9 @@ class App extends React.Component<AppProps, AppState> {
             }, () => { this.toggleBackGroundMenu('about') })
         }
 
-        const globalStockList = s.dashBoardData?.[s.currentDashBoard]?.globalstocklist ? s.dashBoardData?.[s.currentDashBoard].globalstocklist : false
-        if ((globalStockList && globalStockList !== prevState.dashBoardData?.[prevState.currentDashBoard]?.globalstocklist && s.login === 1)) { //price data for watchlist, including socket data.
-            LoadTickerSocket(this, prevState, globalStockList, s.socket, s.apiKey, UpdateTickerSockets);
+        const globalStockList = this.state.dashBoardData?.[this.state.currentDashBoard]?.globalstocklist ? this.state.dashBoardData?.[this.state.currentDashBoard].globalstocklist : false
+        if ((globalStockList && globalStockList !== prevState.dashBoardData?.[prevState.currentDashBoard]?.globalstocklist && this.state.login === 1)) { //price data for watchlist, including socket data.
+            LoadTickerSocket(this, prevState, globalStockList, this.state.socket, this.state.apiKey, UpdateTickerSockets);
         }
 
         const globalKeys = globalStockList ? Object.keys(globalStockList) : []
@@ -377,6 +368,7 @@ class App extends React.Component<AppProps, AppState> {
         const p: AppProps = this.props;
         await p.tGetMongoDB()
         const targetDash: string[] = s.dashBoardData?.[s.currentDashBoard]?.widgetlist ? Object.keys(s.dashBoardData?.[s.currentDashBoard]?.widgetlist) : []
+        console.log('target dash', targetDash, s.dashBoardData)
         for (const widget in targetDash) {
             const payload: tgetFinnHubDataReq = { //get data for default dashboard.
                 dashboardID: s.dashBoardData[s.currentDashBoard].id,
@@ -385,6 +377,7 @@ class App extends React.Component<AppProps, AppState> {
                 finnHubQueue: s.finnHubQueue,
                 rSetUpdateStatus: p.rSetUpdateStatus,
             }
+            console.log('payload: ', payload)
             p.tGetFinnhubData(payload)
         }
         const dashBoards: string[] = Object.keys(s.dashBoardData) //get data for dashboards not being shown
@@ -418,15 +411,16 @@ class App extends React.Component<AppProps, AppState> {
     async rebuildDashboardState() { //fetches dashboard data, then updates s.dashBoardData, then builds redux model.
         // console.log('running rebuild')
         try {
-            const data: tGetSavedDashBoardsRes = await this.props.tGetSavedDashboards({ apiKey: this.state.apiKey }).unwrap()
+            const data = await this.props.tGetSavedDashboards({ apiKey: this.state.apiKey }).unwrap()
+            console.log('rebuildData', data.currentDashBoard)
             const payload = {
                 dashBoardData: data.dashBoardData,
-                currentDashBoard: data.currentDashBoard,
+                currentDashBoard: data.currentDashBoard.dashboardname,
                 menuList: data.menuList!,
             }
             this.setState(payload, () => {
-                // this.props.rSetTargetDashboard({ targetDashboard: data.currentDashBoard }) //update target dashboard in redux dataModel
-                // this.props.rBuildDataModel({ ...data, apiKey: this.state.apiKey })
+                this.props.rResetUpdateFlag() //sets all dashboards status to updating in redux store.
+                this.refreshFinnhubAPIDataAll() //fetches finnhub api data, from mongo if avilable, else queues Finnhub.io api alls. When complete sets dashboard status ready.
                 return true
             })
 
@@ -527,7 +521,7 @@ class App extends React.Component<AppProps, AppState> {
                                 exchangeList={this.state.exchangeList}
                                 finnHubQueue={this.state.finnHubQueue}
                                 globalStockList={globalStockList}
-                                loadSavedDashboard={this.loadSavedDashboard}
+
                                 login={this.state.login}
                                 menuList={this.state.menuList}
                                 menuWidgetToggle={this.menuWidgetToggle}
@@ -536,7 +530,6 @@ class App extends React.Component<AppProps, AppState> {
                                 processLogin={this.processLogin}
                                 removeWidget={this.removeWidget}
                                 removeDashboardFromState={this.removeDashboardFromState}
-                                rebuildDashboardState={this.rebuildDashboardState}
                                 refreshFinnhubAPIDataCurrentDashboard={this.refreshFinnhubAPIDataCurrentDashboard}
                                 saveDashboard={this.saveDashboard}
                                 setDrag={this.setDrag}
