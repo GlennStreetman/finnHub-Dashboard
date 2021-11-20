@@ -10,28 +10,50 @@ import InfoIcon from '@material-ui/icons/Info';
 import LockRoundedIcon from '@material-ui/icons/LockRounded';
 import LockOpenRoundedIcon from '@material-ui/icons/LockOpenRounded';
 
+import { useAppDispatch } from 'src/hooks';
+
+import { rDataModelLogout } from "src/slices/sliceDataModel"
+import { rExchangeDataLogout } from "src/slices/sliceExchangeData";
+import { rExchangeListLogout } from "src/slices/sliceExchangeList";
+import { rTargetDashboardLogout } from "src/slices/sliceShowData";
+
+
+
 interface topNavProps {
     AddNewWidgetContainer: Function,
     backGroundMenu: string,
     login: number,
-    logOut: Function,
     logoutServer: Function,
     showStockWidgets: number,
     toggleBackGroundMenu: Function,
     widgetSetup: widgetSetup,
-
+    updateAppState: Function,
+    baseState: Object,
 }
 
-export default function TopNav(p: topNavProps) {
+
+function TopNav(p: topNavProps) {
+
+    const useDispatch = useAppDispatch
+    const dispatch = useDispatch(); //allows widget to run redux actions.
 
     function isChecked(el: [string, string, string, string, filters | undefined, string]) {
-        if (p.widgetSetup[el[0]] !== undefined) {
+        if (p.widgetSetup?.[el[0]] !== undefined) {
             return p.widgetSetup[el[0]]
-        } else if (p.widgetSetup[el[0]] === undefined && el[5] === 'Free') {
+        } else if (p.widgetSetup?.[el[0]] === undefined && el[5] === 'Free') {
             return true
         } else {
             return false
         }
+    }
+
+    async function logout() {
+        await fetch("/logOut") //ignore result, continue logout process.
+        dispatch(rDataModelLogout());
+        dispatch(rExchangeDataLogout());
+        dispatch(rExchangeListLogout());
+        dispatch(rTargetDashboardLogout());
+        p.updateAppState(p.baseState)
     }
 
     function dropDownList(dropList: [string, string, string, string, filters | undefined, string][]) {
@@ -112,8 +134,7 @@ export default function TopNav(p: topNavProps) {
                         </li>
                         <li id='LogButton' className='navItem'>
                             <a id='LogButtonLink' href="#home" onClick={async () => {
-                                await p.logoutServer()
-                                p.logOut()
+                                logout()
                             }}>
                                 <Tooltip title="Logout" placement="bottom"><LockRoundedIcon /></Tooltip>
 
@@ -138,3 +159,5 @@ export default function TopNav(p: topNavProps) {
         </>
     );
 }
+
+export default TopNav

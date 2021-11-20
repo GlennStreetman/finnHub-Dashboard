@@ -1,4 +1,5 @@
 import React from "react";
+import { widgetSetup } from 'src/App'
 import { useState, useEffect } from "react";
 import { Redirect } from 'react-router-dom'
 import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
@@ -7,7 +8,6 @@ import { checkPassword } from "../appFunctions/client/checkPassword";
 import { forgotLogin } from "../appFunctions/client/forgotLogin";
 import { secretQuestion } from "../appFunctions/client/secretQuestion";
 import { newPW } from "../appFunctions/client/newPW";
-import { checkLoginStatus } from "../appFunctions/client/checkLoginStatus";
 import { registerAccount } from "../appFunctions/client/registerAccount";
 
 import { styled } from '@material-ui/core/styles';
@@ -15,7 +15,6 @@ import { Grid, Paper, Button, TextField, Box, Typography } from '@material-ui/co
 
 interface loginProps {
     queryData: any,
-    processLogin: Function,
     updateExchangeList: Function,
     updateAppState: Function,
     finnHubQueue: finnHubQueue,
@@ -110,7 +109,28 @@ export default function Login(p: loginProps) {
         }
     })
 
-    useEffect(() => { checkLoginStatus(p.processLogin, p.updateExchangeList, p.finnHubQueue, p.updateAppState) }, [])
+    useEffect(() => { //check login status on page refresh.
+        fetch("/checkLogin")
+            .then((response) => response.json())
+            .then((data) => {
+                if (data.login === 1) {
+                    console.log('data', data)
+                    const parseSetup: widgetSetup = JSON.parse(data.widgetsetup)
+
+                    p.updateExchangeList(data.exchangelist)
+                    p.updateAppState({
+                        login: 1,
+                        apiKey: data.apiKey,
+                        apiAlias: data.apiAlias,
+                        widgetSetup: parseSetup,
+                        defaultExchange: data.defaultexchange
+                    })
+                    p.finnHubQueue.updateInterval(data.ratelimit)
+                } else {
+                    // console.log('FAILED LOGIN', data)
+                }
+            })
+    }, [])
 
     useEffect(() => { if (base === true) setBase(false) })
 
@@ -158,9 +178,15 @@ export default function Login(p: loginProps) {
                 .then((data) => {
                     if (data.status === 200) {
                         setMessage("")
-                        p.processLogin(data["key"], data["login"], data['apiAlias'], data['widgetsetup']);
+                        const parseSetup: widgetSetup = JSON.parse(data.widgetsetup)
+                        p.updateAppState({
+                            login: 1,
+                            apiKey: data.apiKey,
+                            apiAlias: data.apiAlias,
+                            widgetSetup: parseSetup,
+                            defaultExchange: data.defaultexchange
+                        })
                         p.updateExchangeList(data.exchangelist)
-                        p.updateAppState({ defaultExchange: data.defaultexchange })
                         p.finnHubQueue.updateInterval(data['ratelimit'])
                     } else {
                         setMessage(data.message)

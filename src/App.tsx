@@ -1,13 +1,11 @@
 import React from "react";
 import { BrowserRouter, Route, Switch } from "react-router-dom";
 import queryString from "query-string";
-import produce from 'immer'
 import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
-import { logoutServer, Logout, ProcessLogin } from "./appFunctions/appImport/appLogin";
 import {
     NewMenuContainer, AddNewWidgetContainer, LockWidgets,
     ToggleWidgetVisability, ChangeWidgetName, RemoveWidget,
@@ -32,7 +30,6 @@ import Login from "./components/login";
 import AboutMenu from "./components/AboutMenu";
 import AccountMenu, { accountMenuProps } from "./components/accountMenu";
 import WidgetMenu, { widgetMenuProps } from "./components/widgetMenu";
-// import EndPointMenu, { endPointProps } from "./widgets/Menu/GQLMenu/endPointMenu";
 import ExchangeMenu, { exchangeMenuProps } from "./components/exchangeMenu";
 import TemplateMenu, { templateMenuProps } from "./components/templateMenu";
 import { WidgetController } from "./components/widgetController";
@@ -251,9 +248,6 @@ class App extends React.Component<AppProps, AppState> {
 
         this.baseState = this.state; //used to reset state upon logout.
         //login state logic.
-        this.logOut = Logout.bind(this);
-        this.logoutServer = logoutServer.bind(this)
-        this.processLogin = ProcessLogin.bind(this);
 
         //app logic for creating/removing, modifying, populating widgets.
         this.newMenuContainer = NewMenuContainer.bind(this);
@@ -412,7 +406,6 @@ class App extends React.Component<AppProps, AppState> {
         const loginScreen =
             this.state.login === 0 && this.state.backGroundMenu === "" ? (
                 <Login
-                    processLogin={this.processLogin}
                     queryData={quaryData}
                     updateExchangeList={this.updateExchangeList}
                     finnHubQueue={this.state.finnHubQueue}
@@ -450,11 +443,12 @@ class App extends React.Component<AppProps, AppState> {
                                 AddNewWidgetContainer={this.AddNewWidgetContainer}
                                 backGroundMenu={this.state.backGroundMenu}
                                 login={this.state.login}
-                                logOut={this.logOut}
                                 logoutServer={this.logoutServer}
                                 showStockWidgets={this.state.showStockWidgets}
                                 toggleBackGroundMenu={this.toggleBackGroundMenu}
                                 widgetSetup={this.state.widgetSetup}
+                                updateAppState={this.updateAppState}
+                                baseState={this.baseState}
                             />
                             <WidgetController
                                 apiKey={this.state.apiKey}
@@ -472,7 +466,6 @@ class App extends React.Component<AppProps, AppState> {
                                 menuWidgetToggle={this.menuWidgetToggle}
                                 moveWidget={this.moveWidget}
                                 newDashboard={this.newDashboard}
-                                processLogin={this.processLogin}
                                 removeWidget={this.removeWidget}
                                 saveDashboard={this.saveDashboard}
                                 setDrag={this.setDrag}

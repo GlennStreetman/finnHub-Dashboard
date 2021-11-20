@@ -43,17 +43,6 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
     const apiToggle = p.apiAlias ? p.apiAlias : p.apiKey
     const defaultQuery = `{dashboardList(key: "${apiToggle}") {dashboard}}`
 
-    // function changeDashboardSelection(e) {
-    //     const target = e.target.value;
-    //     setTargetDashboard(target)
-    // }
-
-    // const dashboardOptionList = Object.keys(p.dashBoardData).map((el) =>
-    //     <option key={el + "db"} value={el}>
-    //         {el}
-    //     </option>
-    // )
-
     function changeSecurityFocus(e) {
         const target = e.target.value;
         setSecurityFocus(target)
