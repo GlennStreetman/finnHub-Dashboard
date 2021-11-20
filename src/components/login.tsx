@@ -9,7 +9,6 @@ import { secretQuestion } from "../appFunctions/client/secretQuestion";
 import { newPW } from "../appFunctions/client/newPW";
 import { checkLoginStatus } from "../appFunctions/client/checkLoginStatus";
 import { registerAccount } from "../appFunctions/client/registerAccount";
-import { completeLogin } from "./componentFunctions/completeLogin"
 
 import { styled } from '@material-ui/core/styles';
 import { Grid, Paper, Button, TextField, Box, Typography } from '@material-ui/core/';
@@ -18,7 +17,7 @@ interface loginProps {
     queryData: any,
     processLogin: Function,
     updateExchangeList: Function,
-    updateDefaultExchange: Function,
+    updateAppState: Function,
     finnHubQueue: finnHubQueue,
 }
 
@@ -111,7 +110,7 @@ export default function Login(p: loginProps) {
         }
     })
 
-    useEffect(() => { checkLoginStatus(p.processLogin, p.updateExchangeList, p.updateDefaultExchange, p.finnHubQueue) }, [])
+    useEffect(() => { checkLoginStatus(p.processLogin, p.updateExchangeList, p.finnHubQueue, p.updateAppState) }, [])
 
     useEffect(() => { if (base === true) setBase(false) })
 
@@ -158,7 +157,11 @@ export default function Login(p: loginProps) {
             checkPassword(text0, text1)
                 .then((data) => {
                     if (data.status === 200) {
-                        completeLogin(p, data, setMessage)
+                        setMessage("")
+                        p.processLogin(data["key"], data["login"], data['apiAlias'], data['widgetsetup']);
+                        p.updateExchangeList(data.exchangelist)
+                        p.updateAppState({ defaultExchange: data.defaultexchange })
+                        p.finnHubQueue.updateInterval(data['ratelimit'])
                     } else {
                         setMessage(data.message)
                     }

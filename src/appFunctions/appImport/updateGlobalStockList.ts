@@ -2,58 +2,43 @@ import { AppState, dashBoardData } from './../../App'
 import { StockObj } from './../../types'
 import produce from "immer"
 
-export const updateGlobalStockList = async function (event: Event, stockRef: string, stockObj: StockObj | Object = {}) {
+export const updateGlobalStockList = async function (stockRef: string, dashBoardData, currentDashBoard: string, updateAppState: Function, stockObj: StockObj | Object = {},) {
     //Adds/removes a single stock from global stock list and updates current dashboard. if no stock object passed, remove from global stock list, else add.
     // console.log('updating global', stockObj)
-    const globalStockList = this.state.dashBoardData[this.state.currentDashBoard].globalstocklist
+    const globalStockList = dashBoardData[currentDashBoard].globalstocklist
     const currentStockObj = { ...globalStockList };
     if (currentStockObj[stockRef] === undefined) {
         currentStockObj[stockRef] = { ...stockObj };
-        currentStockObj[stockRef]["dStock"] = function (ex: string) {
-            if (ex.length === 1) {
-                return this.symbol;
-            } else {
-                return this.key;
-            }
-        };
     } else {
         delete currentStockObj[stockRef];
     }
 
-    const oldState: AppState = this.state;
-    const dbData = oldState.dashBoardData
-    let updateCurrentDashboard: dashBoardData = produce(dbData, (draftState: dashBoardData) => {
-        draftState[this.state.currentDashBoard].globalstocklist = currentStockObj
+    let updateCurrentDashboard = produce(dashBoardData, (draftState: dashBoardData) => {
+        draftState[currentDashBoard].globalstocklist = currentStockObj
     })
 
-
-    const payload: Partial<AppState> = {
+    const payload = {
         dashBoardData: updateCurrentDashboard
     }
-    this.setState(payload, () => {
-        this.saveDashboard(this.state.currentDashBoard)
-    });
-
-    event instanceof Event === true && event.preventDefault();
+    await updateAppState(payload)
+    // event instanceof Event === true && event.preventDefault();
+    return true
 }
 
-export const setNewGlobalStockList = function (replacementGlobalList) {
-    //replaces global stock list with new global stock list. Updates state.dashboardData[]currentDash].globalStockList. Saves changes, sets new focus.
-    console.log('replaceing global stock list.')
-    const oldState: AppState = this.state;
-    const dbData = oldState.dashBoardData
-    let updateCurrentDashboard: dashBoardData = produce(dbData, (draftState: dashBoardData) => {
-        draftState[this.state.currentDashBoard].globalstocklist = replacementGlobalList
+export const setNewGlobalStockList = async function (replacementGlobalList, currentDashboard, dashboardData, updateAppState) {
+    //replaces global stock list with new global stock list.
+    const dbData = dashboardData
+    let updateCurrentDashboard = produce(dbData, (draftState: dashBoardData) => {
+        draftState[currentDashboard].globalstocklist = replacementGlobalList
     })
 
     const newFocus = replacementGlobalList[Object.keys(replacementGlobalList)[0]] ? replacementGlobalList[Object.keys(replacementGlobalList)[0]].key : ''
 
-    const payload: Partial<AppState> = {
+    const payload = {
         dashBoardData: updateCurrentDashboard,
         targetSecurity: newFocus,
     }
 
-    this.setState(payload, () => {
-        this.saveDashboard(this.state.currentDashBoard)
-    })
+    await updateAppState(payload)
+    return true
 }

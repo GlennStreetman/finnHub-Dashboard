@@ -1,14 +1,18 @@
 import React, { PureComponent } from 'react'
 import { connect } from "react-redux";
+import {setNewGlobalStockList} from 'src/appFunctions/appImport/updateGlobalStockList'
 
 class CsvUpload extends PureComponent {
     
     componentDidMount(){
 
-        const p = this.props
-        // p.uploadGlobalStockList(p.rUpdateObj)
-        p.setNewGlobalStockList(p.rUpdateObj)
-        p.resetUploadList()       
+        const that = this
+        async function runComponent() {
+            await setNewGlobalStockList(that.props.rUpdateObj, that.props.currentDashboard, that.props.dashboardData, that.props.updateAppState)
+            that.props.resetUploadList()
+            that.props.saveDashboard(that.props.currentDashboard)
+        }      
+        runComponent()
     }
     
     render() {

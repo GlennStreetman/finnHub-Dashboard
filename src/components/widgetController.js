@@ -18,10 +18,8 @@ function WidgetController(p){
                 finnHubQueue: p.finnHubQueue,
                 key: el.widgetId,
                 moveWidget: p.moveWidget,
-                refreshFinnhubAPIDataCurrentDashboard: p.refreshFinnhubAPIDataCurrentDashboard,
                 removeWidget: p.removeWidget,
                 setDrag: p.setDrag,
-                setSecurityFocus: p.setSecurityFocus,
                 showMenuColumn: p.showMenuColumn,
                 showStockWidgets: p.showStockWidgets,
                 snapWidget: p.snapWidget,
@@ -29,7 +27,6 @@ function WidgetController(p){
                 targetSecurity: p.targetSecurity,
                 toggleWidgetBody: p.toggleWidgetBody,
                 updateAPIFlag: p.updateAPIFlag,
-                updateDefaultExchange: p.updateDefaultExchange,
                 updateDashBoards: p.updateDashBoards,
                 updateWidgetConfig: p.updateWidgetConfig,
                 widgetBodyProps: returnBodyProps({props: p}, el.widgetType, el.widgetID),
@@ -44,7 +41,7 @@ function WidgetController(p){
             if (el.widgetConfig === 'menuWidget') {
                 thisWidgetProps['menuWidgetToggle'] = p.menuWidgetToggle
                 thisWidgetProps['showMenu'] = p[el.widgetID]  
-                thisWidgetProps['setWidgetFocus'] = p.setWidgetFocus
+                thisWidgetProps['rebuildVisableDashboard'] = p.rebuildVisableDashboard
             }
             if (p.widgetCopy?.widgetID === el.widgetID){
                 thisWidgetProps.widgetCopy = p.widgetCopy

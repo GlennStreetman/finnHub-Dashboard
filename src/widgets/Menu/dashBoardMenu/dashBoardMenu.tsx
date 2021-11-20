@@ -8,7 +8,7 @@ import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 import { useAppDispatch } from './../../../hooks';
 import { rUnmountWidget } from './../../../slices/sliceShowData'
 import { rRemoveDashboardDataModel, rRenameModelName, rAddNewDashboard } from './../../../slices/sliceDataModel'
-import { rSetTargetDashboard, rSetTargetDashboardPayload } from './../../../slices/sliceShowData'
+import { rSetTargetDashboard } from './../../../slices/sliceShowData'
 import { tCopyDashboard } from "src/thunks/thunkCopyDashboard";
 import { tGetSavedDashboards } from 'src/thunks/thunkGetSavedDashboards'
 import { uniqueObjectnName } from 'src/appFunctions/stringFunctions'

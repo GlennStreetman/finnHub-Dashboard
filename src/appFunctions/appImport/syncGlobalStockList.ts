@@ -2,14 +2,13 @@ import produce from "immer"
 
 import { AppState, dashBoardData } from './../../App'
 
-export const syncGlobalStockList = async function () {
+export const syncGlobalStockList = async function (dashBoardData: dashBoardData, currentDashBoard: string, updateAppState: Function) {
     //sets current dashboards widgets security list to match global list. Drops data from mongo.
-    const globalStockList = this.state.dashBoardData[this.state.currentDashBoard].globalstocklist
+    const globalStockList = dashBoardData[currentDashBoard].globalstocklist
     const newFocus = globalStockList && Object.keys(globalStockList)[0] ? Object.keys(globalStockList)[0] : ''
-    const oldState: AppState = this.state;
-    const oldWidgetList = oldState.dashBoardData
-    const updatedWidgetList: dashBoardData = await produce(oldWidgetList, (draftState: dashBoardData) => {
-        const widgetList = draftState[this.state.currentDashBoard].widgetlist
+
+    const updatedWidgetList: dashBoardData = await produce(dashBoardData, (draftState: dashBoardData) => {
+        const widgetList = draftState[currentDashBoard].widgetlist
         for (const w in widgetList) {
             if (widgetList[w].widgetConfig === 'stockWidget') {
                 widgetList[w]["trackedStocks"] = { ...globalStockList };
@@ -17,14 +16,11 @@ export const syncGlobalStockList = async function () {
             }
         }
     })
-
-    this.setState({
+    await updateAppState({
         dashBoardData: updatedWidgetList,
         targetSecurity: newFocus,
-    }, async () => {
-        console.log('Dashboard setup')
-        this.rebuildVisableDashboard()
-        this.saveDashboard(this.state.currentDashBoard) //saves dashboard setup to server
-        return true
-    });
+    })
+    console.log('Dashboard setup')
+    return true
+
 }

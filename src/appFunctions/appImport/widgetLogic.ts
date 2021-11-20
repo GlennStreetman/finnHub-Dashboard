@@ -284,19 +284,6 @@ export const updateWidgetConfig = function (widgetID: number, updateObj: config)
     })
 }
 
-export const setWidgetFocus = function (newFocus: string) {
-    const s: AppState = this.state
-    const updatedDashboardData: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
-        const wList = draftState[s.currentDashBoard].widgetlist
-        for (const x in wList) {
-            const widget = wList[x]
-            if (widget.trackedStocks[newFocus]) widget.config['targetSecurity'] = newFocus
-        }
-    })
-    const payload: Partial<AppState> = { dashBoardData: updatedDashboardData }
-    this.setState(payload)
-}
-
 export const ToggleWidgetVisability = function toggleWidgetVisability() {
     const s: AppState = this.state
     const payload: Partial<AppState> = { showStockWidgets: s.showStockWidgets === 0 ? 1 : 0 }
