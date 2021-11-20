@@ -12,7 +12,7 @@ import {
     NewMenuContainer, AddNewWidgetContainer, LockWidgets,
     ToggleWidgetVisability, ChangeWidgetName, RemoveWidget,
     UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig,
-    toggleWidgetBody, setWidgetFocus, removeDashboardFromState
+    toggleWidgetBody, setWidgetFocus
 } from "./appFunctions/appImport/widgetLogic";
 import { saveDashboard }
     from "./appFunctions/appImport/setupDashboard";
@@ -299,7 +299,6 @@ class App extends React.Component<AppProps, AppState> {
         this.rebuildDashboardState = this.rebuildDashboardState.bind(this) //sets s.dashboardData. Used to build dataModel in redux
         this.refreshFinnhubAPIDataAll = this.refreshFinnhubAPIDataAll.bind(this) //For All Dashboards: gets data from mongo if available, else queues updates with finnhub.io
         this.refreshFinnhubAPIDataCurrentDashboard = this.refreshFinnhubAPIDataCurrentDashboard.bind(this)
-        this.removeDashboardFromState = removeDashboardFromState.bind(this)
         this.removeWidget = RemoveWidget.bind(this)
         this.rebuildVisableDashboard = this.rebuildVisableDashboard.bind(this) //rebuilds dashboard in redux state.dataModel
         this.renameDashboard = this.renameDashboard.bind(this)
@@ -529,7 +528,6 @@ class App extends React.Component<AppProps, AppState> {
                                 newDashboard={this.newDashboard}
                                 processLogin={this.processLogin}
                                 removeWidget={this.removeWidget}
-                                removeDashboardFromState={this.removeDashboardFromState}
                                 refreshFinnhubAPIDataCurrentDashboard={this.refreshFinnhubAPIDataCurrentDashboard}
                                 saveDashboard={this.saveDashboard}
                                 setDrag={this.setDrag}

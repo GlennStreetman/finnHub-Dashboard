@@ -20,7 +20,6 @@ function WidgetController(p){
                 moveWidget: p.moveWidget,
                 refreshFinnhubAPIDataCurrentDashboard: p.refreshFinnhubAPIDataCurrentDashboard,
                 removeWidget: p.removeWidget,
-                removeDashboardFromState: p.removeDashboardFromState,
                 setDrag: p.setDrag,
                 setSecurityFocus: p.setSecurityFocus,
                 showMenuColumn: p.showMenuColumn,

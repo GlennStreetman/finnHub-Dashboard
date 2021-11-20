@@ -320,12 +320,3 @@ export const toggleWidgetBody = function (widgetID: string, stateRef: 'menuWidge
     }
 
 }
-
-export const removeDashboardFromState = function (widgetName) {
-    const s: AppState = this.state
-    const updatedWidget: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
-        delete draftState[widgetName]
-    })
-    this.setState({ dashBoardData: updatedWidget })
-
-}

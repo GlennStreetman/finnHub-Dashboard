@@ -1,3 +1,5 @@
+import produce from 'immer'
+
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { useAppSelector } from '../../../hooks';
 import { dashBoardData, menuList } from 'src/App'
@@ -18,7 +20,6 @@ interface props {
     dashBoardData: dashBoardData,
     currentDashBoard: string,
     helpText: string,
-    removeDashboardFromState: Function,
     showEditPane: number,
     renameDashboard: Function,
     updateAppState: Function,
@@ -203,7 +204,10 @@ function DashBoardMenu(p: props, ref: any) {
             newDashboard('NEW', p.dashBoardData, p.menuList)
         }
         unMountDashboard(dashboardName) //removes dashboard from redux datamodel.
-        p.removeDashboardFromState(dashboardName) //removes dashboard from App.state
+        const updateState: dashBoardData = produce(p.dashBoardData, (draftState: dashBoardData) => {
+            delete draftState[dashboardName]
+        })
+        p.updateAppState({ dashBoardData: updateState })
     }
 
     let dashBoardData = p.dashBoardData;
@@ -335,7 +339,6 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
         dashBoardData: that.props.dashBoardData,
         currentDashBoard: that.props.currentDashBoard,
         helpText: [helpText, 'DBM'],
-        removeDashboardFromState: that.props.removeDashboardFromState,
         renameDashboard: that.props.renameDashboard,
         menuList: that.props.menuList,
         updateAppState: that.props.updateAppState,
