@@ -122,11 +122,6 @@ export const RemoveWidget = async function (stateRef: 'widgetList' | 'menuList',
 
 }
 
-export const LockWidgets = function (toggle: number) {
-    const payload: Partial<AppState> = { widgetLockDown: toggle }
-    this.setState(payload)
-}
-
 export const UpdateWidgetStockList = function updateWidgetStockList(widgetId: number, symbol: string, stockObj: stock | Object = {}) {
     //adds if not present, else removes stock from widget specific stock list.
     const s: AppState = this.state
@@ -248,26 +243,17 @@ export const updateWidgetConfig = function (widgetID: number, updateObj: config)
     })
 }
 
-export const ToggleWidgetVisability = function toggleWidgetVisability() {
-    const s: AppState = this.state
-    const payload: Partial<AppState> = { showStockWidgets: s.showStockWidgets === 0 ? 1 : 0 }
-    this.setState(payload)
-}
-
-export const toggleWidgetBody = function (widgetID: string, stateRef: 'menuWidget' | 'stockWidget') {
-    const s: AppState = this.state
-    console.log(widgetID, stateRef)
+export const toggleWidgetBody = function (widgetID: string, stateRef: 'menuWidget' | 'stockWidget', dashBoardData: dashBoardData, menuList: menuList, currentDashBoard: string) {
     if (stateRef === 'stockWidget') {
-        const updatedWidget: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
-            draftState[s.currentDashBoard].widgetlist[widgetID].showBody = !draftState[s.currentDashBoard].widgetlist[widgetID].showBody
+        const updatedWidget: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
+            draftState[currentDashBoard].widgetlist[widgetID].showBody = !draftState[currentDashBoard].widgetlist[widgetID].showBody
         })
-        this.setState({ dashBoardData: updatedWidget })
+        return ({ dashBoardData: updatedWidget })
     } else {
-        const updatedWidget: menuList = produce(s.menuList, (draftState: menuList) => {
+        const updatedWidget: menuList = produce(menuList, (draftState: menuList) => {
             draftState[widgetID].showBody = draftState[widgetID].showBody !== undefined ? !draftState[widgetID].showBody : false
         })
-        console.log()
-        this.setState({ menuList: updatedWidget })
+        return ({ menuList: updatedWidget })
     }
 
 }

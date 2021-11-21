@@ -7,7 +7,7 @@ import { useState, useEffect } from "react";
 import { useAppDispatch } from './../hooks';
 import { rUnmountWidget } from './../slices/sliceShowData'
 import { rRemoveWidgetDataModel } from './../slices/sliceDataModel'
-import { ChangeWidgetName } from 'src/appFunctions/appImport/widgetLogic'
+import { ChangeWidgetName, toggleWidgetBody } from 'src/appFunctions/appImport/widgetLogic'
 
 
 //creates widget container. Used by all widgets.
@@ -192,7 +192,11 @@ function WidgetContainer(p) {
             <>
                 <button  
                     className="widgetButtonHead" 
-                    onClick={() => {p.toggleWidgetBody(p.widgetKey, p.stateRef)}
+                    onClick={() => {
+                        const toggled = toggleWidgetBody(p.widgetKey, p.stateRef, p.dashboardData, p.menuList, p.currentDashBoard)
+                        p.updateAppState(toggled)
+                        p.saveDashboard()
+                    }
                 }>
                 {p.widgetList.showBody !== false ? <i className="fa fa-caret-square-o-down" aria-hidden="true" /> : <i className="fa fa-caret-square-o-right" aria-hidden="true" />}
                 </button>                                                                                               

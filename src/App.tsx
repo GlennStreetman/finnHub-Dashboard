@@ -6,15 +6,10 @@ import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
-import {
-    LockWidgets, ToggleWidgetVisability, RemoveWidget,
-    UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig,
-    toggleWidgetBody
-} from "./appFunctions/appImport/widgetLogic";
+import { RemoveWidget, UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig } from "./appFunctions/appImport/widgetLogic";
 import { saveDashboard } from "./appFunctions/appImport/setupDashboard";
 import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
 
-import { updateExchangeList } from "./appFunctions/appImport/updateExchangeList"
 import { updateDashBoards } from "./appFunctions/appImport/updateDashBoards"
 import { updateWidgetSetup } from "./appFunctions/appImport/updateWidgetSetup"
 import { MenuWidgetToggle } from "./appFunctions/appImport/menuWidgetToggle"
@@ -35,7 +30,7 @@ import { connect } from "react-redux";
 import { storeState } from './store'
 import { tGetSymbolList, rExchangeDataLogout } from "./slices/sliceExchangeData";
 import { rSetTargetDashboard, rTargetDashboardLogout } from "./slices/sliceShowData";
-import { rUpdateExchangeList, rExchangeListLogout } from "./slices/sliceExchangeList";
+import { rExchangeListLogout } from "./slices/sliceExchangeList";
 import { rUpdateQuotePriceStream, rUpdateQuotePriceSetup } from "./slices/sliceQuotePrice";
 import {
     rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus,
@@ -150,7 +145,6 @@ export interface AppProps {
     rResetUpdateFlag: Function,
     rSetTargetDashboard: Function,
     rSetUpdateStatus: Function,
-    rUpdateExchangeList: Function,
     rDataModelLogout: Function,
     rExchangeDataLogout: Function,
     rExchangeListLogout: Function,
@@ -246,12 +240,9 @@ class App extends React.Component<AppProps, AppState> {
         //login state logic.
 
         //app logic for creating/removing, modifying, populating widgets.
-        this.lockWidgets = LockWidgets.bind(this);
         this.updateWidgetFilters = UpdateWidgetFilters.bind(this);
         this.updateWidgetStockList = UpdateWidgetStockList.bind(this);
-        this.toggleWidgetVisability = ToggleWidgetVisability.bind(this);
         this.updateWidgetConfig = updateWidgetConfig.bind(this);
-        this.toggleWidgetBody = toggleWidgetBody.bind(this)
         this.menuWidgetToggle = MenuWidgetToggle.bind(this)
 
         //App logic for setting up dashboards.
@@ -266,7 +257,6 @@ class App extends React.Component<AppProps, AppState> {
         this.snapOrder = SnapOrder.bind(this);
 
         //update and apply state, in module.
-        this.updateExchangeList = updateExchangeList.bind(this);
         this.updateDashBoards = updateDashBoards.bind(this) //when dashboard menu saves or deletes a dashboard, runs to upddate state.
         this.updateWidgetSetup = updateWidgetSetup.bind(this) //saves current dashboard to postgres.
         this.rebuildDashboardState = this.rebuildDashboardState.bind(this) //sets s.dashboardData. Used to build dataModel in redux
@@ -392,7 +382,6 @@ class App extends React.Component<AppProps, AppState> {
             this.state.login === 0 && this.state.backGroundMenu === "" ? (
                 <Login
                     queryData={quaryData}
-                    updateExchangeList={this.updateExchangeList}
                     finnHubQueue={this.state.finnHubQueue}
                     updateAppState={this.updateAppState}
                 />
@@ -459,7 +448,6 @@ class App extends React.Component<AppProps, AppState> {
                                 showStockWidgets={this.state.showStockWidgets}
                                 snapWidget={this.snapWidget}
                                 targetSecurity={this.state.targetSecurity}
-                                toggleWidgetBody={this.toggleWidgetBody}
                                 updateDashBoards={this.updateDashBoards}
                                 updateWidgetConfig={this.updateWidgetConfig}
                                 updateWidgetFilters={this.updateWidgetFilters}
@@ -496,7 +484,6 @@ export default connect(mapStateToProps, {
     rResetUpdateFlag,
     rSetTargetDashboard,
     rSetUpdateStatus,
-    rUpdateExchangeList,
     rDataModelLogout,
     rExchangeDataLogout,
     rExchangeListLogout,

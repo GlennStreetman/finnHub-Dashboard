@@ -25,7 +25,6 @@ function WidgetController(p){
                 snapWidget: p.snapWidget,
                 stateRef: el.widgetConfig,
                 targetSecurity: p.targetSecurity,
-                toggleWidgetBody: p.toggleWidgetBody,
                 updateDashBoards: p.updateDashBoards,
                 updateWidgetConfig: p.updateWidgetConfig,
                 widgetBodyProps: returnBodyProps({props: p}, el.widgetType, el.widgetID),
@@ -37,6 +36,7 @@ function WidgetController(p){
                 rSetTargetDashboard: p.rSetTargetDashboard,
                 updateAppState: p.updateAppState,
                 saveDashboard: p.saveDashboard,
+                menuList: p.menuList
             }
             if (el.widgetConfig === 'menuWidget') {
                 thisWidgetProps['menuWidgetToggle'] = p.menuWidgetToggle

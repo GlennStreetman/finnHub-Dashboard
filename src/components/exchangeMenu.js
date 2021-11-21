@@ -115,7 +115,7 @@ function changeExchange(ex){
         .then((response) => response.json())
         .then((data) => {
             // console.log("Exchange list updated.", data)
-            p.updateExchangeList(newExchangeList)   
+            p.updateAppState({ exchangeList: newExchangeList })   
         });
 
     }
@@ -158,8 +158,7 @@ export function exchangeMenuProps(that) {
     let propList = {
         apiKey: that.state.apiKey,
         finnHubQueue: that.state.finnHubQueue,
-        updateExchangeList: that.updateExchangeList,
-
+        updateAppState: that.updateAppState,
     };
     return propList;
 }
