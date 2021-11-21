@@ -7,17 +7,13 @@ import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
 import {
-    NewMenuContainer, AddNewWidgetContainer, LockWidgets,
-    ToggleWidgetVisability, ChangeWidgetName, RemoveWidget,
+    LockWidgets, ToggleWidgetVisability, RemoveWidget,
     UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig,
     toggleWidgetBody
 } from "./appFunctions/appImport/widgetLogic";
-import { saveDashboard }
-    from "./appFunctions/appImport/setupDashboard";
-import { GetSavedDashBoards } from "./appFunctions/appImport/getSavedDashboards";
+import { saveDashboard } from "./appFunctions/appImport/setupDashboard";
 import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
-import { toggleBackGroundMenu } from "./appFunctions/appImport/toggleBackGroundMenu"
-import { updateAPIFlag } from "./appFunctions/appImport/updateAPIFlag"
+
 import { updateExchangeList } from "./appFunctions/appImport/updateExchangeList"
 import { updateDashBoards } from "./appFunctions/appImport/updateDashBoards"
 import { updateWidgetSetup } from "./appFunctions/appImport/updateWidgetSetup"
@@ -250,9 +246,6 @@ class App extends React.Component<AppProps, AppState> {
         //login state logic.
 
         //app logic for creating/removing, modifying, populating widgets.
-        this.newMenuContainer = NewMenuContainer.bind(this);
-        this.AddNewWidgetContainer = AddNewWidgetContainer.bind(this);
-        this.changeWidgetName = ChangeWidgetName.bind(this);
         this.lockWidgets = LockWidgets.bind(this);
         this.updateWidgetFilters = UpdateWidgetFilters.bind(this);
         this.updateWidgetStockList = UpdateWidgetStockList.bind(this);
@@ -262,8 +255,7 @@ class App extends React.Component<AppProps, AppState> {
         this.menuWidgetToggle = MenuWidgetToggle.bind(this)
 
         //App logic for setting up dashboards.
-        this.getSavedDashBoards = GetSavedDashBoards.bind(this);
-        this.saveDashboard = saveDashboard.bind(this);
+        this.saveDashboard = saveDashboard.bind(this); //this will probable be last function to be unbound, not from this file.
         this.updateAppState = this.updateAppState.bind(this)
 
 
@@ -274,10 +266,7 @@ class App extends React.Component<AppProps, AppState> {
         this.snapOrder = SnapOrder.bind(this);
 
         //update and apply state, in module.
-        this.updateAPIKey = this.updateAPIKey.bind(this);
-        this.updateAPIFlag = updateAPIFlag.bind(this);
         this.updateExchangeList = updateExchangeList.bind(this);
-        this.toggleBackGroundMenu = toggleBackGroundMenu.bind(this); //hides widgets and shows menu from topbar.
         this.updateDashBoards = updateDashBoards.bind(this) //when dashboard menu saves or deletes a dashboard, runs to upddate state.
         this.updateWidgetSetup = updateWidgetSetup.bind(this) //saves current dashboard to postgres.
         this.rebuildDashboardState = this.rebuildDashboardState.bind(this) //sets s.dashboardData. Used to build dataModel in redux
@@ -300,7 +289,8 @@ class App extends React.Component<AppProps, AppState> {
                 apiFlag: 1,
                 aboutMenu: 0,
                 showStockWidgets: 0,
-            }, () => { this.toggleBackGroundMenu('about') })
+                backGroundMenu: 'about',
+            })
         }
 
         const globalStockList = this.state.dashBoardData?.[this.state.currentDashBoard]?.globalstocklist ? this.state.dashBoardData?.[this.state.currentDashBoard].globalstocklist : false
@@ -395,13 +385,8 @@ class App extends React.Component<AppProps, AppState> {
         await p.tGetFinnhubData(payload2)
     }
 
-    updateAPIKey(newKey: string) {
-        this.setState({ apiKey: newKey });
-    }
-
     render() {
         const s: AppState = this.state
-        // const menuWidgetToggle = MenuWidgetToggle(this);
         const quaryData = queryString.parse(window.location.search);
         const loginScreen =
             this.state.login === 0 && this.state.backGroundMenu === "" ? (
@@ -440,21 +425,22 @@ class App extends React.Component<AppProps, AppState> {
                     <Switch>
                         <Route path="/">
                             <TopNav
-                                AddNewWidgetContainer={this.AddNewWidgetContainer}
                                 backGroundMenu={this.state.backGroundMenu}
                                 login={this.state.login}
-                                logoutServer={this.logoutServer}
                                 showStockWidgets={this.state.showStockWidgets}
-                                toggleBackGroundMenu={this.toggleBackGroundMenu}
                                 widgetSetup={this.state.widgetSetup}
                                 updateAppState={this.updateAppState}
                                 baseState={this.baseState}
+                                dashboardData={this.state.dashBoardData}
+                                currentDashboard={this.state.currentDashBoard}
+                                saveDashboard={this.saveDashboard}
+                                apiKey={this.state.apiKey}
+                                finnHubQueue={this.state.finnHubQueue}
                             />
                             <WidgetController
                                 apiKey={this.state.apiKey}
                                 apiAlias={this.state.apiAlias}
                                 availableStocks={this.state.availableStocks}
-                                changeWidgetName={this.changeWidgetName}
                                 currentDashBoard={this.state.currentDashBoard}
                                 dashBoardData={this.state.dashBoardData}
                                 dashboardID={dashboardID}
@@ -474,8 +460,6 @@ class App extends React.Component<AppProps, AppState> {
                                 snapWidget={this.snapWidget}
                                 targetSecurity={this.state.targetSecurity}
                                 toggleWidgetBody={this.toggleWidgetBody}
-                                updateAPIFlag={this.updateAPIFlag}
-                                updateAPIKey={this.updateAPIKey}
                                 updateDashBoards={this.updateDashBoards}
                                 updateWidgetConfig={this.updateWidgetConfig}
                                 updateWidgetFilters={this.updateWidgetFilters}

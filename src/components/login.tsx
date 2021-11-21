@@ -114,9 +114,7 @@ export default function Login(p: loginProps) {
             .then((response) => response.json())
             .then((data) => {
                 if (data.login === 1) {
-                    console.log('data', data)
                     const parseSetup: widgetSetup = JSON.parse(data.widgetsetup)
-
                     p.updateExchangeList(data.exchangelist)
                     p.updateAppState({
                         login: 1,

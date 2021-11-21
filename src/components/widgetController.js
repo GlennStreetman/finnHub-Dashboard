@@ -10,8 +10,8 @@ function WidgetController(p){
             const widgetGroup = widgetObjList.map((el) => { //for each widget, add props.
             const thisWidgetProps = {
                 apiKey: p.apiKey,
-                changeWidgetName: p.changeWidgetName,
                 currentDashBoard: p.currentDashBoard,
+                dashboardData: p.dashBoardData,
                 dashboardID: p.dashboardID,
                 enableDrag: p.enableDrag,
                 exchangeList: p.exchangeList,
@@ -26,7 +26,6 @@ function WidgetController(p){
                 stateRef: el.widgetConfig,
                 targetSecurity: p.targetSecurity,
                 toggleWidgetBody: p.toggleWidgetBody,
-                updateAPIFlag: p.updateAPIFlag,
                 updateDashBoards: p.updateDashBoards,
                 updateWidgetConfig: p.updateWidgetConfig,
                 widgetBodyProps: returnBodyProps({props: p}, el.widgetType, el.widgetID),
@@ -37,6 +36,7 @@ function WidgetController(p){
                 rAddNewDashboard: p.rAddNewDashboard,
                 rSetTargetDashboard: p.rSetTargetDashboard,
                 updateAppState: p.updateAppState,
+                saveDashboard: p.saveDashboard,
             }
             if (el.widgetConfig === 'menuWidget') {
                 thisWidgetProps['menuWidgetToggle'] = p.menuWidgetToggle

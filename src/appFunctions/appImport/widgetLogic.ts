@@ -1,8 +1,9 @@
 import produce from "immer"
 import { reqBody } from '../../server/routes/mongoDB/setMongoConfig'
-import { AppState, AppProps, menuList, widget, dashBoardData, widgetList, stockList, stock, filters, config } from './../../App'
+import { AppState, AppProps, menuList, widget, widgetList, stockList, stock, filters, config, dashBoardData } from 'src/App'
 import { rBuildDataModelPayload, rebuildTargetWidgetPayload } from '../../slices/sliceDataModel'
 import { tgetFinnHubDataReq } from './../../thunks/thunkFetchFinnhub'
+import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
     const testName = iterator === 0 ? widgetName : widgetName + iterator
@@ -13,40 +14,39 @@ function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
     }
 }
 
-export const NewMenuContainer = function newMenuContainer(widgetDescription: string, widgetHeader: string, widgetConfig: string) {
-    const s: AppState = this.state
-    const widgetName = widgetDescription;
-    const menuList: menuList = s.menuList
+// export const NewMenuContainer = function newMenuContainer(widgetDescription: string, widgetHeader: string, widgetConfig: string, menuList: menuList, updateAppState) {
 
-    let newMenuList = produce(menuList, (draftState: menuList) => {
-        draftState[widgetName] = {
-            column: 0,
-            columnOrder: -1,
-            widgetID: widgetName,
-            widgetType: widgetDescription,
-            widgetHeader: widgetHeader,
-            xAxis: "5rem",
-            yAxis: "5rem",
-            widgetConfig: widgetConfig,
-            showBody: true,
-        };
-    });
-    const payload: Partial<AppState> = { menuList: newMenuList }
-    this.setState(payload);
-}
+//     let newMenuList = produce(menuList, (draftState: menuList) => {
+//         draftState[widgetDescription] = {
+//             column: 0,
+//             columnOrder: -1,
+//             widgetID: widgetDescription,
+//             widgetType: widgetDescription,
+//             widgetHeader: widgetHeader,
+//             xAxis: "5rem",
+//             yAxis: "5rem",
+//             widgetConfig: widgetConfig,
+//             showBody: true,
+//         };
+//     });
+//     const payload: Partial<AppState> = { menuList: newMenuList }
+//     updateAppState(payload);
+// }
 
-export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescription: string, widgetHeader: string, widgetConfig: string, defaultFilters: Object = {}) {
+export const CreateNewWidgetContainer = function (
+    widgetDescription: string,
+    widgetHeader: string,
+    widgetConfig: string,
+    defaultFilters: Object = {},
+    dashBoardData: dashBoardData,
+    currentDashboard: string,
+) {
     //receives info for new widget. Returns updated widgetlist & dashboard data
-    // console.log("NEW WIDGET:", widgetDescription, widgetHeader, widgetConfig, defaultFilters)
-    const s: AppState = this.state
-    const currentDashboard = s.currentDashBoard
     const widgetName: string = new Date().getTime().toString();
-    const widgetStockList = s.dashBoardData[currentDashboard].globalstocklist
-
-    const widgetList = this.state.dashBoardData[this.state.currentDashBoard].widgetlist
+    const widgetStockList = dashBoardData[currentDashboard].globalstocklist
+    const widgetList = dashBoardData[currentDashboard].widgetlist
     const widgetIds = widgetList ? Object.keys(widgetList) : []
     const widgetNameList = widgetIds.map((el) => widgetList[el].widgetHeader)
-    // console.log(stateRef, newName, widgetNameList)
     const useName = uniqueName(widgetHeader, widgetNameList)
 
     const newWidget: widget = {
@@ -64,75 +64,39 @@ export const AddNewWidgetContainer = function AddNewWidgetContainer(widgetDescri
         yAxis: 20, //prev 5 rem
     };
 
-    const currentDashBoard: string = s.currentDashBoard
-    const newDashBoardData: dashBoardData = produce(s.dashBoardData, (draftState) => {
-        draftState[currentDashBoard].widgetlist[widgetName] = newWidget
+    const newDashBoardData: dashBoardData = produce(dashBoardData, (draftState) => {
+        draftState[currentDashboard].widgetlist[widgetName] = newWidget
     })
 
-    const payload: Partial<AppState> = {
-        // widgetList: newWidgetList,
-        dashBoardData: newDashBoardData,
-    }
-    this.setState(payload, () => {
-        this.saveDashboard(s.currentDashBoard)
-        // let completeFunction = function () {
-        //     return new Promise((res) => { res(true) })
-        // }
-        const payload: rebuildTargetWidgetPayload = {
-            apiKey: s.apiKey,
-            dashBoardData: newDashBoardData,
-            targetDashboard: currentDashboard,
-            targetWidget: `${widgetName}`,
-        }
-        this.props.rRebuildTargetWidgetModel(payload)
-        let updatePayload: tgetFinnHubDataReq = {
-            dashboardID: s.dashBoardData[s.currentDashBoard].id,
-            targetDashBoard: currentDashboard,
-            widgetList: [`${widgetName}`],
-            finnHubQueue: s.finnHubQueue,
-            rSetUpdateStatus: this.props.rSetUpdateStatus,
-        }
-        this.props.tGetFinnhubData(updatePayload)
-    });
-
-
+    return ([newDashBoardData, widgetName])
 }
 
 
-export const ChangeWidgetName = function (stateRef: 'widgetList' | 'menuList', widgetID: string | number, newName: string) {
-    // console.log(stateRef, widgetID, newName)
-    const widgetList = this.state.dashBoardData[this.state.currentDashBoard].widgetlist
+export const ChangeWidgetName = function (widgetID: string | number, newName: string, dashBoardData: dashBoardData, currentDashBoard: string,) {
+
+    const widgetList = dashBoardData[currentDashBoard].widgetlist
     const widgetIds = widgetList ? Object.keys(widgetList) : []
     const widgetNameList = widgetIds.map((el) => widgetList[el].widgetHeader)
-    // console.log(stateRef, newName, widgetNameList)
+
     const useName = uniqueName(newName, widgetNameList)
-    if (stateRef === 'menuList') {
-        const s: AppState = this.state
-        const widgetGroup: menuList = s[stateRef]
-        const newWidgetList: menuList = produce(widgetGroup, (draftState) => {
-            draftState[widgetID].widgetHeader = useName
-        })
-        const payload: Partial<AppState> = {
-            [stateRef]: newWidgetList,
-        }
-        this.setState(payload);
-    } else {
-        const s: AppState = this.state
-        const widgetGroup: widgetList = s.dashBoardData[s.currentDashBoard].widgetlist
-        const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
-            draftState[widgetID].widgetHeader = useName
-        })
-        const newDashboardData: dashBoardData = produce(s.dashBoardData, (draftState) => {
-            draftState[s.currentDashBoard].widgetlist = newWidgetList
-        })
-        const payload: Partial<AppState> = {
-            'dashBoardData': newDashboardData,
-        }
-        this.setState(payload, () => {
-            this.saveDashboard(this.state.currentDashBoard)
-        });
+
+    const widgetGroup: widgetList = dashBoardData[currentDashBoard].widgetlist
+    const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
+        draftState[widgetID].widgetHeader = useName
+    })
+    const newDashboardData: dashBoardData = produce(dashBoardData, (draftState) => {
+        draftState[currentDashBoard].widgetlist = newWidgetList
+    })
+    const payload: Partial<AppState> = {
+        'dashBoardData': newDashboardData,
     }
+    return payload
+    // this.setState(payload, () => {
+    //     this.saveDashboard(this.state.currentDashBoard)
+    // });
+    // }
 }
+
 
 export const RemoveWidget = async function (stateRef: 'widgetList' | 'menuList', widgetID: string | number) {
 

@@ -1,6 +1,7 @@
 import React from "react";
 import { widgetSetup } from './../App'
 import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
+import { toggleBackGroundMenu } from 'src/appFunctions/appImport/toggleBackGroundMenu'
 
 interface AccountMenu { //plug
     [key: string]: any
@@ -10,11 +11,11 @@ interface accountMenuProps2 {
     finnHubQueue: finnHubQueue,
     apiKey: string,
     widgetKey: string,
-    updateAPIKey: Function,
     exchangeList: string[],
-    toggleBackGroundMenu: Function,
     tGetSymbolList: Function,
     defaultExchange: string,
+    updateAppState: Function,
+    backgroundMenu: string,
 }
 
 interface accountMenuState {
@@ -113,7 +114,7 @@ class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
         };
         if (changeField === "apikey") {
             console.log('updating apikey')
-            this.props.updateAPIKey(newValue)
+            this.props.updateAppState({ apiKey: newValue })
         }
         if (changeField === 'ratelimit') {
             this.props.finnHubQueue.updateInterval(newValue)
@@ -198,7 +199,7 @@ class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
                                     <td>Active Exchanges: </td>
                                     <td>{this.props.exchangeList.toString()}</td>
                                     <td>
-                                        <button onClick={() => this.props.toggleBackGroundMenu("exchangeMenu")}>edit</button>
+                                        <button onClick={() => toggleBackGroundMenu("exchangeMenu", this.props.updateAppState, this.props.backgroundMenu)}>edit</button>
                                     </td>
                                 </tr>
                                 <tr>
@@ -219,7 +220,7 @@ class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
                                     <td>Manage Widgets: </td>
                                     <td></td>
                                     <td>
-                                        <button onClick={() => this.props.toggleBackGroundMenu("widgetMenu")}>edit</button>
+                                        <button onClick={() => toggleBackGroundMenu("widgetMenu", this.props.updateAppState, this.props.backgroundMenu)}>edit</button>
                                     </td>
                                 </tr>
                             </tbody>
@@ -266,12 +267,11 @@ export function accountMenuProps(that: any, key = "AccountMenu") {
         finnHubQueue: that.state.finnHubQueue,
         apiKey: that.state.apiKey,
         widgetKey: key,
-        updateAPIKey: that.updateAPIKey,
+        updateAppState: that.updateAppState,
         exchangeList: that.state.exchangeList,
-        toggleBackGroundMenu: that.toggleBackGroundMenu,
         tGetSymbolList: that.props.tGetSymbolList,
         defaultExchange: that.state.defaultExchange,
-
+        backgroundMenu: that.state.backgroundMenu,
     };
     return propList;
 }

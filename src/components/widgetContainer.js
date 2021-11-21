@@ -7,6 +7,7 @@ import { useState, useEffect } from "react";
 import { useAppDispatch } from './../hooks';
 import { rUnmountWidget } from './../slices/sliceShowData'
 import { rRemoveWidgetDataModel } from './../slices/sliceDataModel'
+import { ChangeWidgetName } from 'src/appFunctions/appImport/widgetLogic'
 
 
 //creates widget container. Used by all widgets.
@@ -64,10 +65,10 @@ function WidgetContainer(p) {
     }
 
     function updateHeader(e) {//changes widget name.
-        if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
-            p.changeWidgetName('widgetList', p.widgetKey, e.target.value);
-        } else{
-            p.changeWidgetName('menuList', p.widgetKey, e.target.value);
+        if (p.stateRef === "stockWidget") {
+            const newDashboard = ChangeWidgetName(p.widgetKey, e.target.value, p.dashboardData, p.currentDashBoard);
+            p.updateAppState(newDashboard)
+            p.saveDashboard(p.currentDashBoard)
         }
     }
 
@@ -150,7 +151,6 @@ function WidgetContainer(p) {
         widgetProps['currentDashBoard'] = p.currentDashBoard
         widgetProps['searchText'] = searchText
         widgetProps['changeSearchText'] = changeSearchText
-        widgetProps['updateAPIFlag'] = p.updateAPIFlag
         widgetProps['widgetType'] = p.widgetList["widgetType"]
         widgetProps['config'] = p.widgetList.config
         widgetProps['updateDashBoards'] = p.updateDashBoards

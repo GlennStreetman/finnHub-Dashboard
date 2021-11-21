@@ -1,6 +1,7 @@
 
 import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg'
-import { widgetSetup, filters } from './../App'
+import { widgetSetup, filters, dashBoardData } from 'src/App'
+import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 import { AppBar, Toolbar, Tooltip } from '@material-ui/core/';
 import WidgetsIcon from '@material-ui/icons/Widgets';
@@ -9,28 +10,31 @@ import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import InfoIcon from '@material-ui/icons/Info';
 import LockRoundedIcon from '@material-ui/icons/LockRounded';
 import LockOpenRoundedIcon from '@material-ui/icons/LockOpenRounded';
+import { CreateNewWidgetContainer } from 'src/appFunctions/appImport/widgetLogic';
 
 import { useAppDispatch } from 'src/hooks';
 
-import { rDataModelLogout } from "src/slices/sliceDataModel"
+import { rDataModelLogout, rSetUpdateStatus, rRebuildTargetWidgetModel } from "src/slices/sliceDataModel"
 import { rExchangeDataLogout } from "src/slices/sliceExchangeData";
 import { rExchangeListLogout } from "src/slices/sliceExchangeList";
 import { rTargetDashboardLogout } from "src/slices/sliceShowData";
+import { tGetFinnhubData } from "src/thunks/thunkFetchFinnhub";
 
-
+import { toggleBackGroundMenu } from 'src/appFunctions/appImport/toggleBackGroundMenu'
 
 interface topNavProps {
-    AddNewWidgetContainer: Function,
     backGroundMenu: string,
     login: number,
-    logoutServer: Function,
     showStockWidgets: number,
-    toggleBackGroundMenu: Function,
     widgetSetup: widgetSetup,
     updateAppState: Function,
     baseState: Object,
+    dashboardData: dashBoardData,
+    currentDashboard: string,
+    saveDashboard: Function,
+    apiKey: string,
+    finnHubQueue: finnHubQueue,
 }
-
 
 function TopNav(p: topNavProps) {
 
@@ -61,7 +65,29 @@ function TopNav(p: topNavProps) {
             let [a, b, c, d, e] = el
             if (isChecked(el) === true) {
                 return (<li key={a + 'li'} id='ddi'>
-                    <a key={a} data-testid={d} href="#r" onClick={() => { p.AddNewWidgetContainer(a, b, c, e); }}>
+                    <a key={a} data-testid={d} href="#r" onClick={async () => {
+                        const [newDash, widgetName] = CreateNewWidgetContainer(a, b, c, e, p.dashboardData, p.currentDashboard);
+                        console.log('newDash', newDash)
+                        await p.updateAppState({ dashBoardData: newDash })
+                        p.saveDashboard(p.currentDashboard)
+                        const payload = {
+                            apiKey: p.apiKey,
+                            dashBoardData: newDash,
+                            targetDashboard: p.currentDashboard,
+                            targetWidget: widgetName,
+                        }
+                        console.log('payload', payload)
+                        dispatch(rRebuildTargetWidgetModel(payload))
+                        let updatePayload = {
+                            dashboardID: newDash[p.currentDashboard].id,
+                            targetDashBoard: p.currentDashboard,
+                            widgetList: [`${widgetName}`],
+                            finnHubQueue: p.finnHubQueue,
+                            rSetUpdateStatus: rSetUpdateStatus,
+                        }
+                        console.log('updatePayload', updatePayload)
+                        dispatch(tGetFinnhubData(updatePayload))
+                    }}>
                         {d}
                     </a>
                 </li>)
@@ -113,22 +139,22 @@ function TopNav(p: topNavProps) {
                 <div className="navItemEnd">
                     <ul id='ddu' className="sub-menu">
                         <li id='toggleBackGroundMenuButton' className="navItem">
-                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('') }}>
+                            <a href="#home" onClick={() => { toggleBackGroundMenu('', p.updateAppState, p.backGroundMenu) }}>
                                 {p.backGroundMenu === '' ? " " : "Back to Dashboards"}
                             </a>
                         </li>
                         <li id='templatesButton' className="navItem">
-                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('templates') }}>
+                            <a href="#home" onClick={() => { toggleBackGroundMenu('templates', p.updateAppState, p.backGroundMenu) }}>
                                 <Tooltip title="Excel Templates" placement="bottom"><TableChartIcon /></Tooltip>
                             </a>
                         </li>
                         <li id='manageAccountButton' className="navItem">
-                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('manageAccount') }}>
+                            <a href="#home" onClick={() => { toggleBackGroundMenu('manageAccount', p.updateAppState, p.backGroundMenu) }}>
                                 <Tooltip title="Manage Account" placement="bottom"><AccountBoxIcon /></Tooltip>
                             </a>
                         </li>
                         <li id='aboutButton' className='navItem'>
-                            <a href="#home" onClick={() => { p.toggleBackGroundMenu('about') }}>
+                            <a href="#home" onClick={() => { toggleBackGroundMenu('about', p.updateAppState, p.backGroundMenu) }}>
                                 <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>
                             </a>
                         </li>
@@ -149,7 +175,7 @@ function TopNav(p: topNavProps) {
         <>
             <div className="topnav">
                 <div className='navItemEnd'>
-                    <a id='aboutButton' href="#home" onClick={() => { p.toggleBackGroundMenu('about') }}>
+                    <a id='aboutButton' href="#home" onClick={() => { toggleBackGroundMenu('about', p.updateAppState, p.backGroundMenu) }}>
                         {p.backGroundMenu === 'about' ?
                             <Tooltip title="Login" placement="bottom"><LockOpenRoundedIcon /></Tooltip> :
                             <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>}
