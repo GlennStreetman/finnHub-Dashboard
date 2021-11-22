@@ -133,8 +133,6 @@ function WidgetContainer(p) {
         }
     }
 
-
-    
     const bodyVisable = {
         display: show,
     }
@@ -155,14 +153,6 @@ function WidgetContainer(p) {
     } 
     if (p.widgetCopy) {
     widgetProps['widgetCopy'] = p.widgetCopy
-    }
-
-    const divStyle = {
-        overflow: 'hidden',
-        border: '2px solid black',
-        borderRadius: '10px',
-        backgroundColor: 'white',
-        width: 'auto',
     }
 
     const compStyle = {

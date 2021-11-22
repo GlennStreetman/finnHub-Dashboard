@@ -1,7 +1,7 @@
 import produce from "immer"
 import { AppState, widget, menu, menuList, widgetList, dashBoardData } from './../../App'
 
-export const SetDrag = function setDrag(stateRef: 'menuWidget' | 'widgetList', widgetId: string | number, widgetCopy: widget) {
+export const SetDrag = function (stateRef: 'menuWidget' | 'widgetList', widgetId: string | number, widgetCopy: widget) {
     const s: AppState = this.state
     const ref = stateRef === "menuWidget" ? "menuList" : "dashBoardData";
     let updatedWidgetLocation
@@ -29,7 +29,7 @@ export const SetDrag = function setDrag(stateRef: 'menuWidget' | 'widgetList', w
     })
 }
 
-export const MoveWidget = function moveWidget(stateRef: 'menuWidget' | 'widgetList', widgetId: string | number, xxAxis: number, yyAxis: number, thisCallBack = () => { }) {
+export const MoveWidget = function (stateRef: 'menuWidget' | 'widgetList', widgetId: string | number, xxAxis: number, yyAxis: number, thisCallBack = () => { }) {
     const s: AppState = this.state
     const ref = stateRef === "menuWidget" ? "menuList" : "dashBoardData";
     let updatedWidgetLocation
@@ -57,7 +57,7 @@ export const MoveWidget = function moveWidget(stateRef: 'menuWidget' | 'widgetLi
     }, thisCallBack());
 }
 
-export const SnapOrder = function snapOrder(widget: string, column: number, yyAxis: number, wType: string) {
+export const SnapOrder = function (widget: string, column: number, yyAxis: number, wType: string) {
     const s: AppState = this.state
     const draft: Partial<AppState> = {
         menuList: s.menuList,
@@ -126,7 +126,7 @@ export const SnapOrder = function snapOrder(widget: string, column: number, yyAx
     this.setState(payload, () => { return true })
 }
 
-export const SnapWidget = async function snapWidget(stateRef: 'menuWidget' | 'widgetList', widgetId: string, xxAxis: number, yyAxis: number, widgetWidth: number) {
+export const SnapWidget = async function (stateRef: 'menuWidget' | 'widgetList', widgetId: string, xxAxis: number, yyAxis: number, widgetWidth: number) {
     //snaps widget to desired location mouse up. If stateRef = menuwidget it should always snap to column 0.
     const s: AppState = this.state
     let column: number = stateRef !== 'menuWidget' ? Math.floor(xxAxis / widgetWidth) : 0 //base column calc

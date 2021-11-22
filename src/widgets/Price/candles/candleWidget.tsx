@@ -148,7 +148,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                 }
 
                 const options: Object = {
-                    width: 400,
+                    // width: 400,
                     height: 200,
                     theme: "light2", // "light1", "light2", "dark1", "dark2"
                     animationEnabled: true,
