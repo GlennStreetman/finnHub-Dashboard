@@ -1,5 +1,5 @@
 
-import { BottomNavigation, BottomNavigationAction, Icon } from '@material-ui/core/';
+import { BottomNavigation, BottomNavigationAction } from '@material-ui/core/';
 import { useState } from "react";
 
 import { makeStyles } from '@material-ui/core/styles';
@@ -17,8 +17,7 @@ const useStyles = makeStyles({
 });
 
 interface props {
-    menuWidgetToggle: Function,
-    showMenuColumn: boolean,
+    setFocus: Function,
 }
 
 export default function BottomNav(p: props) {
@@ -31,14 +30,18 @@ export default function BottomNav(p: props) {
 
     return (
         <BottomNavigation value={column} onChange={handleChange} className={classes.root}>
-            <BottomNavigationAction label="Menus" value="0" icon={<CenterFocusStrongSharpIcon />} onClick={() => { if (p.showMenuColumn === false) p.menuWidgetToggle(true) }} />
-            <BottomNavigationAction label="Column 1" value="1" icon={<CenterFocusWeakSharpIcon />} onClick={() => { if (p.showMenuColumn === true) p.menuWidgetToggle(false) }} />
-            <BottomNavigationAction label="Column 2" value="2" icon={<CenterFocusWeakSharpIcon />} onClick={() => { if (p.showMenuColumn === true) p.menuWidgetToggle(false) }} />
-            <BottomNavigationAction label="Column 3" value="3" icon={<CenterFocusWeakSharpIcon />} onClick={() => { if (p.showMenuColumn === true) p.menuWidgetToggle(false) }} />
-            <BottomNavigationAction label="Column 4" value="4" icon={<CenterFocusWeakSharpIcon />} onClick={() => { if (p.showMenuColumn === true) p.menuWidgetToggle(false) }} />
+            <BottomNavigationAction label="Menus" value="0" icon={<CenterFocusStrongSharpIcon />} onClick={() => { p.setFocus(0) }} />
+            <BottomNavigationAction label="Column 1" value="1" icon={<CenterFocusWeakSharpIcon />} onClick={() => { p.setFocus(1) }} />
+            <BottomNavigationAction label="Column 2" value="2" icon={<CenterFocusWeakSharpIcon />} onClick={() => { p.setFocus(2) }} />
+            <BottomNavigationAction label="Column 3" value="3" icon={<CenterFocusWeakSharpIcon />} onClick={() => { p.setFocus(3) }} />
+            <BottomNavigationAction label="Column 4" value="4" icon={<CenterFocusWeakSharpIcon />} onClick={() => { p.setFocus(4) }} />
         </BottomNavigation>
     );
 }
 
-
+// if (p.showMenuColumn === false) p.menuWidgetToggle(true) 
+// if (p.showMenuColumn === true)  p.menuWidgetToggle(false)
+// if (p.showMenuColumn === true)  p.menuWidgetToggle(false)
+// if (p.showMenuColumn === true)  p.menuWidgetToggle(false)
+// if (p.showMenuColumn === true)  p.menuWidgetToggle(false)
 

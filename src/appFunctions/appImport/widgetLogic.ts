@@ -1,7 +1,7 @@
 import produce from "immer"
 import { reqBody } from '../../server/routes/mongoDB/setMongoConfig'
 import { AppState, AppProps, menuList, widget, widgetList, stockList, stock, filters, config, dashBoardData } from 'src/App'
-import { rBuildDataModelPayload, rebuildTargetWidgetPayload } from '../../slices/sliceDataModel'
+import { rBuildDataModelPayload } from '../../slices/sliceDataModel'
 import { tgetFinnHubDataReq } from './../../thunks/thunkFetchFinnhub'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
@@ -91,34 +91,21 @@ export const ChangeWidgetName = function (widgetID: string | number, newName: st
         'dashBoardData': newDashboardData,
     }
     return payload
-    // this.setState(payload, () => {
-    //     this.saveDashboard(this.state.currentDashBoard)
-    // });
-    // }
 }
 
 
-export const RemoveWidget = async function (stateRef: 'widgetList' | 'menuList', widgetID: string | number) {
+export const RemoveWidget = async function (widgetID: string | number, dashboardData: dashBoardData, currentDashboard: string) {
 
-    const widgetGroup: widgetList | menuList = this.state[stateRef]
-    const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
-        delete draftState[widgetID]
-    })
-
-    let dashBoardData: dashBoardData = this.state.dashBoardData
-    const newDashboardData: dashBoardData = produce(dashBoardData, (draftState) => {
-        let thisWidgetList = draftState[this.state.currentDashBoard].widgetlist
+    console.log(widgetID, dashboardData, currentDashboard)
+    const newDashboardData: dashBoardData = produce(dashboardData, (draftState) => {
+        let thisWidgetList = draftState[currentDashboard].widgetlist
         delete thisWidgetList[widgetID]
     })
 
     const payload: Partial<AppState> = {
-        [stateRef]: newWidgetList,
         dashBoardData: newDashboardData,
     }
-    this.setState(payload, () => {
-        this.saveDashboard(this.state.currentDashBoard)
-        return true
-    });
+    return payload
 
 }
 

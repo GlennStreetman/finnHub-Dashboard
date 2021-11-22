@@ -8,6 +8,7 @@ import { useAppDispatch } from './../hooks';
 import { rUnmountWidget } from './../slices/sliceShowData'
 import { rRemoveWidgetDataModel } from './../slices/sliceDataModel'
 import { ChangeWidgetName, toggleWidgetBody } from 'src/appFunctions/appImport/widgetLogic'
+import {RemoveWidget} from 'src/appFunctions/appImport/widgetLogic'
 
 
 //creates widget container. Used by all widgets.
@@ -86,7 +87,8 @@ function WidgetContainer(p) {
 
         document.getElementById(p.widgetList["widgetID"]).onmousedown = dragMouseDown;
         // let widgetWidth = document.getElementById(p.widgetKey + "box").clientWidth;
-        let widgetWidth = 200
+        let widgetWidth = p.widgetWidth
+        let widgetCenter = widgetWidth / 2
 
         function dragMouseDown(e) {
         // console.log('start drag')
@@ -109,7 +111,7 @@ function WidgetContainer(p) {
         xAxis = e.clientX + window.scrollX;
         yAxis = e.clientY + window.scrollY;
         
-        let newX = xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5
+        let newX = xAxis - widgetCenter + 25 >= 5 ? xAxis - widgetCenter + 25 : 5
         let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
         //copy widget state THEN move widget.
         p.moveWidget(p.stateRef, p.widgetKey, newX, newY);
@@ -122,7 +124,7 @@ function WidgetContainer(p) {
         let newX = xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5
         let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
         const snapWidget = () => {
-            p.snapWidget(p.widgetList['widgetConfig'], p.widgetKey, xAxis, yAxis)
+            p.snapWidget(p.widgetList['widgetConfig'], p.widgetKey, xAxis, yAxis, widgetWidth)
         }
         document.onmouseup = null;
         document.onmousemove = null;
@@ -131,21 +133,16 @@ function WidgetContainer(p) {
         }
     }
 
-    const compStyle = {
-        display: show
-        };
+
     
     const bodyVisable = {
         display: show,
     }
     const excelFunction = excelRegister[p.widgetList.widgetType]
 
-    if (p.widgetList.column === 'drag'){ 
-    compStyle['position'] = 'absolute'
-    compStyle['top'] = p.widgetList["yAxis"]
-    compStyle['left'] = p.widgetList["xAxis"] 
-    } 
+
     let widgetProps = p.widgetBodyProps ? p.widgetBodyProps() : {}
+
     widgetProps["showEditPane"] = showEditPane;
     if (p.widgetKey !== "dashBoardMenu") {
         widgetProps['currentDashBoard'] = p.currentDashBoard
@@ -153,14 +150,37 @@ function WidgetContainer(p) {
         widgetProps['changeSearchText'] = changeSearchText
         widgetProps['widgetType'] = p.widgetList["widgetType"]
         widgetProps['config'] = p.widgetList.config
-        widgetProps['updateDashBoards'] = p.updateDashBoards
         widgetProps['finnHubQueue'] = p.finnHubQueue
         widgetProps['dashboardID'] = p.dashboardID
     } 
     if (p.widgetCopy) {
     widgetProps['widgetCopy'] = p.widgetCopy
     }
-    const myRef = widgetRef
+
+    const divStyle = {
+        overflow: 'hidden',
+        border: '2px solid black',
+        borderRadius: '10px',
+        backgroundColor: 'white',
+        width: 'auto',
+    }
+
+    const compStyle = {
+        display: show,
+        overflow: 'hidden',
+        border: '2px solid black',
+        borderRadius: '10px',
+        backgroundColor: 'white',
+        width: 'auto'
+    };
+
+    if (p.widgetList.column === 'drag'){ 
+        compStyle['position'] = 'absolute'
+        compStyle['top'] = p.widgetList["yAxis"]
+        compStyle['left'] = p.widgetList["xAxis"]
+        compStyle['width'] = p.widgetWidth
+    } 
+
     return (
     <div 
         key={p.widgetKey + "container" + p.widgetList.column} 
@@ -213,7 +233,7 @@ function WidgetContainer(p) {
         <div className='widgetBody' style={bodyVisable} key={p.showBody}>
 
         <ErrorBoundary widgetType={p.widgetList["widgetType"]}>
-        {React.createElement(widgetLookUp[p.widgetList["widgetType"]], {ref: myRef, ...widgetProps })}
+        {React.createElement(widgetLookUp[p.widgetList["widgetType"]], {ref: widgetRef, ...widgetProps })}
         </ErrorBoundary> 
         </div> ) : (<></>)}
 
@@ -223,8 +243,11 @@ function WidgetContainer(p) {
                 <button
                 onClick={async () => {
                     if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
-                        p.removeWidget("dashBoardData", p.widgetKey);
-                        fetch(`/deleteFinnDashData?widgetID=${p.widgetKey}`)
+                        const updateWidgets = await RemoveWidget( p.widgetKey, p.dashboardData, p.currentDashBoard);
+                        console.log('updateWidgets', updateWidgets)
+                        await p.updateAppState(updateWidgets)
+                        p.saveDashboard(p.currentDashBoard) //saved updated dashboard to postgres.
+                        fetch(`/deleteFinnDashData?widgetID=${p.widgetKey}`) //delete from mongo.
                         const payload = {
                             widgetKey: p.widgetKey,
                             dashboardName: p.currentDashBoard,

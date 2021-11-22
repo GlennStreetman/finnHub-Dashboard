@@ -1,18 +1,23 @@
 /* eslint-disable no-sparse-arrays */
 import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg'
+import { widgetSetup } from 'src/App'
+import { updateWidgetSetup } from 'src/appFunctions/appImport/updateWidgetSetup'
 
-// interface widgetSetup {
-//     [key: string]: boolean
-// }
+interface props {
+    widgetSetup: widgetSetup,
+    updateAppState: Function,
+}
 
-export default function WidgetMenu(p: { [key: string]: any }, ref: any) {
+export default function WidgetMenu(p: props) {
 
     function check(el) {
         const key = el[0]
         const updateObj = {
             [key]: !isChecked(el)
         }
-        p.updateWidgetSetup(updateObj)
+        const newDash = updateWidgetSetup(updateObj, p.widgetSetup)
+        p.updateAppState({ widgetSetup: newDash })
+
     }
 
     function isChecked(el) {
@@ -79,8 +84,8 @@ export default function WidgetMenu(p: { [key: string]: any }, ref: any) {
 
 export function widgetMenuProps(that) {
     let propList = {
-        updateWidgetSetup: that.updateWidgetSetup,
         widgetSetup: that.state.widgetSetup,
+        updateAppState: that.updateAppState,
     };
     return propList;
 }

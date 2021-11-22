@@ -126,10 +126,10 @@ export const SnapOrder = function snapOrder(widget: string, column: number, yyAx
     this.setState(payload, () => { return true })
 }
 
-export const SnapWidget = async function snapWidget(stateRef: 'menuWidget' | 'widgetList', widgetId: string, xxAxis: number, yyAxis: number) {
+export const SnapWidget = async function snapWidget(stateRef: 'menuWidget' | 'widgetList', widgetId: string, xxAxis: number, yyAxis: number, widgetWidth: number) {
     //snaps widget to desired location mouse up. If stateRef = menuwidget it should always snap to column 0.
     const s: AppState = this.state
-    let column: number = stateRef !== 'menuWidget' ? Math.floor(xxAxis / 400) : 0 //base column calc
+    let column: number = stateRef !== 'menuWidget' ? Math.floor(xxAxis / widgetWidth) : 0 //base column calc
     if (stateRef !== 'menuWidget' && s.showMenuColumn === false) column = column + 1 //add 1 if menu column is hidden.
 
     await this.snapOrder(widgetId, column, yyAxis, stateRef)

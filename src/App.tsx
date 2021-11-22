@@ -6,17 +6,13 @@ import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
-import { RemoveWidget, UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig } from "./appFunctions/appImport/widgetLogic";
+import { UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig } from "./appFunctions/appImport/widgetLogic";
 import { saveDashboard } from "./appFunctions/appImport/setupDashboard";
 import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
 
-import { updateDashBoards } from "./appFunctions/appImport/updateDashBoards"
-import { updateWidgetSetup } from "./appFunctions/appImport/updateWidgetSetup"
-import { MenuWidgetToggle } from "./appFunctions/appImport/menuWidgetToggle"
 
 //component imports
 import TopNav from "./components/topNav";
-import BottomNav from "./components/bottomNav";
 import Login from "./components/login";
 import AboutMenu from "./components/AboutMenu";
 import AccountMenu, { accountMenuProps } from "./components/accountMenu";
@@ -41,149 +37,6 @@ import { tGetFinnhubData, tgetFinnHubDataReq } from "./thunks/thunkFetchFinnhub"
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 import { tGetSavedDashboards } from './thunks/thunkGetSavedDashboards'
 
-export interface stock {
-    currency: string,
-    dStock: Function,
-    description: string,
-    displaySymbol: string,
-    exchange: string,
-    figi: string,
-    key: string,
-    mic: string,
-    symbol: string,
-    type: string,
-}
-
-export interface stockList {
-    [key: string]: stock
-}
-
-export interface globalStockList {
-    [key: string]: stock
-}
-
-export interface filters { //unique to each widget, not required
-    [key: string]: any
-}
-
-export interface config { //unique to each widget, not required
-    [key: string]: any
-}
-
-export interface widget {
-    column: string | number, //can be set to drag.
-    columnOrder: number,
-    config: config,
-    filters: filters,
-    showBody: boolean,
-    trackedStocks: stockList,
-    widgetConfig: string,
-    widgetHeader: string,
-    widgetID: string | number,
-    widgetType: string,
-    xAxis: number,
-    yAxis: number,
-}
-
-export interface widgetList {
-    [key: string]: widget
-}
-
-export interface dashboard {
-    dashboardname: string,
-    globalstocklist: globalStockList,
-    id: number,
-    widgetlist: widgetList
-}
-
-export interface dashBoardData {
-    [key: string]: dashboard,
-}
-
-export interface defaultGlobalStockList {
-    [key: string]: any
-}
-
-export interface menu {
-    column: number,
-    columnOrder: number,
-    widgetConfig: string,
-    widgetHeader: string,
-    widgetID: string,
-    widgetType: string,
-    xAxis: string,
-    yAxis: string,
-    showBody: boolean,
-}
-
-export interface menuList {
-    [key: string]: menu
-}
-
-export interface priceObj {
-    currentPrice: number
-}
-
-// export interface streamingPriceData {
-//     [key: string]: priceObj
-// }
-
-export interface widgetSetup {
-    [key: string]: boolean
-}
-
-interface App { [key: string]: any }
-
-export interface AppProps {
-    rExchangeList: string[],
-    dataModel: sliceDataModel,
-    tGetSymbolList: Function,
-    tGetFinnhubData: Function,
-    tGetMongoDB: Function,
-    rBuildDataModel: Function,
-    rRebuildTargetDashboardModel: Function,
-    rResetUpdateFlag: Function,
-    rSetTargetDashboard: Function,
-    rSetUpdateStatus: Function,
-    rDataModelLogout: Function,
-    rExchangeDataLogout: Function,
-    rExchangeListLogout: Function,
-    rTargetDashboardLogout: Function,
-    rRebuildTargetWidgetModel: Function,
-    rUpdateQuotePriceStream: Function,
-    rUpdateQuotePriceSetup: Function,
-    tGetSavedDashboards: Function,
-}
-
-export interface AppState {
-    accountMenu: number,
-    availableStocks: any,
-    aboutMenu: number,
-    apiFlag: number, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
-    apiKey: string, //API key retrieved from login database.
-    apiAlias: string,
-    backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
-    currentDashBoard: string, //dashboard being displayed
-    dashBoardData: dashBoardData, //All saved dashboards
-    defaultExchange: string,
-    enableDrag: boolean,
-    exchangeList: string[], //list of all exchanges activated under account management.
-    finnHubQueue: finnHubQueue,
-    login: number, //login state. 0 logged out, 1 logged in.
-    loadStartingDashBoard: number, //flag switches to 1 after attemping to load default dashboard.
-    showMenuColumn: boolean, //true shows column 0
-    menuList: menuList, //lists of all menu widgets.
-    saveDashboardThrottle: number, //delay timer for saving dashboard.
-    saveDashboardFlag: boolean, //sets to true when a save starts.
-    socket: any, //socket connection for streaming stock data.+
-    socketUpdate: number,
-    showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
-    targetSecurity: string, //target security for widgets. Update changes widget focus.
-    widgetCopy: widget | null, //copy of state of widget being dragged.
-    widgetLockDown: number, //1 removes buttons from all widgets.
-    widgetSetup: widgetSetup, //activates premium api routes.
-    zIndex: string[], //list widgets. Index location sets zIndex
-}
 
 const outerTheme = createTheme({
     palette: {
@@ -193,12 +46,22 @@ const outerTheme = createTheme({
             // dark: '#002884',
             // contrastText: '#fff',
         },
+
         //   secondary: {
         //     light: '#ff7961',
         //     main: '#f44336',
         //     dark: '#ba000d',
         //     contrastText: '#000',
         //   },
+    },
+    breakpoints: {
+        values: {
+            xs: 400, //12
+            sm: 800, //6
+            md: 1200, //4
+            lg: 1600, //3
+            xl: 2400, //2
+        },
     },
 });
 
@@ -243,12 +106,10 @@ class App extends React.Component<AppProps, AppState> {
         this.updateWidgetFilters = UpdateWidgetFilters.bind(this);
         this.updateWidgetStockList = UpdateWidgetStockList.bind(this);
         this.updateWidgetConfig = updateWidgetConfig.bind(this);
-        this.menuWidgetToggle = MenuWidgetToggle.bind(this)
 
         //App logic for setting up dashboards.
         this.saveDashboard = saveDashboard.bind(this); //this will probable be last function to be unbound, not from this file.
         this.updateAppState = this.updateAppState.bind(this)
-
 
         //app logic for MOVING widgets and snapping them into location.
         this.setDrag = SetDrag.bind(this);
@@ -257,10 +118,7 @@ class App extends React.Component<AppProps, AppState> {
         this.snapOrder = SnapOrder.bind(this);
 
         //update and apply state, in module.
-        this.updateDashBoards = updateDashBoards.bind(this) //when dashboard menu saves or deletes a dashboard, runs to upddate state.
-        this.updateWidgetSetup = updateWidgetSetup.bind(this) //saves current dashboard to postgres.
         this.rebuildDashboardState = this.rebuildDashboardState.bind(this) //sets s.dashboardData. Used to build dataModel in redux
-        this.removeWidget = RemoveWidget.bind(this)
         this.rebuildVisableDashboard = this.rebuildVisableDashboard.bind(this) //rebuilds dashboard in redux state.dataModel
     }
 
@@ -406,7 +264,7 @@ class App extends React.Component<AppProps, AppState> {
             this.state.dashBoardData?.[this.state.currentDashBoard]['widgetlist'] : {}
 
         const dashboardID = this.state.dashBoardData?.[this.state.currentDashBoard]?.id ? this.state.dashBoardData[this.state.currentDashBoard].id : ''
-        const bottomNav = this.state.login === 1 ? <BottomNav menuWidgetToggle={this.menuWidgetToggle} showMenuColumn={this.state.showMenuColumn} /> : <></>
+        // const bottomNav = this.state.login === 1 ? <BottomNav showMenuColumn={this.state.showMenuColumn} /> : <></>
 
         return (
             <ThemeProvider theme={outerTheme}>
@@ -438,17 +296,14 @@ class App extends React.Component<AppProps, AppState> {
                                 finnHubQueue={this.state.finnHubQueue}
                                 login={this.state.login}
                                 menuList={this.state.menuList}
-                                menuWidgetToggle={this.menuWidgetToggle}
                                 moveWidget={this.moveWidget}
                                 newDashboard={this.newDashboard}
-                                removeWidget={this.removeWidget}
                                 saveDashboard={this.saveDashboard}
                                 setDrag={this.setDrag}
                                 showMenuColumn={this.state.showMenuColumn}
                                 showStockWidgets={this.state.showStockWidgets}
                                 snapWidget={this.snapWidget}
                                 targetSecurity={this.state.targetSecurity}
-                                updateDashBoards={this.updateDashBoards}
                                 updateWidgetConfig={this.updateWidgetConfig}
                                 updateWidgetFilters={this.updateWidgetFilters}
                                 updateWidgetStockList={this.updateWidgetStockList}
@@ -462,7 +317,7 @@ class App extends React.Component<AppProps, AppState> {
                             />
                             {loginScreen}
                             {backGroundMenu()}
-                            {bottomNav}
+                            {/* {bottomNav} */}
                         </Route>
                     </Switch>
                 </BrowserRouter>
@@ -495,3 +350,149 @@ export default connect(mapStateToProps, {
     tGetSavedDashboards,
 })(App);
 
+
+
+
+export interface stock {
+    currency: string,
+    dStock: Function,
+    description: string,
+    displaySymbol: string,
+    exchange: string,
+    figi: string,
+    key: string,
+    mic: string,
+    symbol: string,
+    type: string,
+}
+
+export interface stockList {
+    [key: string]: stock
+}
+
+export interface globalStockList {
+    [key: string]: stock
+}
+
+export interface filters { //unique to each widget, not required
+    [key: string]: any
+}
+
+export interface config { //unique to each widget, not required
+    [key: string]: any
+}
+
+export interface widget {
+    column: string | number, //can be set to drag.
+    columnOrder: number,
+    config: config,
+    filters: filters,
+    showBody: boolean,
+    trackedStocks: stockList,
+    widgetConfig: string,
+    widgetHeader: string,
+    widgetID: string | number,
+    widgetType: string,
+    xAxis: number,
+    yAxis: number,
+}
+
+export interface widgetList {
+    [key: string]: widget
+}
+
+export interface dashboard {
+    dashboardname: string,
+    globalstocklist: globalStockList,
+    id: number,
+    widgetlist: widgetList
+}
+
+export interface dashBoardData {
+    [key: string]: dashboard,
+}
+
+export interface defaultGlobalStockList {
+    [key: string]: any
+}
+
+export interface menu {
+    column: number,
+    columnOrder: number,
+    widgetConfig: string,
+    widgetHeader: string,
+    widgetID: string,
+    widgetType: string,
+    xAxis: string,
+    yAxis: string,
+    showBody: boolean,
+}
+
+export interface menuList {
+    [key: string]: menu
+}
+
+export interface priceObj {
+    currentPrice: number
+}
+
+// export interface streamingPriceData {
+//     [key: string]: priceObj
+// }
+
+export interface widgetSetup {
+    [key: string]: boolean
+}
+
+interface App { [key: string]: any }
+
+export interface AppProps {
+    rExchangeList: string[],
+    dataModel: sliceDataModel,
+    tGetSymbolList: Function,
+    tGetFinnhubData: Function,
+    tGetMongoDB: Function,
+    rBuildDataModel: Function,
+    rRebuildTargetDashboardModel: Function,
+    rResetUpdateFlag: Function,
+    rSetTargetDashboard: Function,
+    rSetUpdateStatus: Function,
+    rDataModelLogout: Function,
+    rExchangeDataLogout: Function,
+    rExchangeListLogout: Function,
+    rTargetDashboardLogout: Function,
+    rRebuildTargetWidgetModel: Function,
+    rUpdateQuotePriceStream: Function,
+    rUpdateQuotePriceSetup: Function,
+    tGetSavedDashboards: Function,
+}
+
+export interface AppState {
+    accountMenu: number,
+    availableStocks: any,
+    aboutMenu: number,
+    apiFlag: number, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
+    apiKey: string, //API key retrieved from login database.
+    apiAlias: string,
+    backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
+    currentDashBoard: string, //dashboard being displayed
+    dashBoardData: dashBoardData, //All saved dashboards
+    defaultExchange: string,
+    enableDrag: boolean,
+    exchangeList: string[], //list of all exchanges activated under account management.
+    finnHubQueue: finnHubQueue,
+    login: number, //login state. 0 logged out, 1 logged in.
+    loadStartingDashBoard: number, //flag switches to 1 after attemping to load default dashboard.
+    showMenuColumn: boolean, //true shows column 0
+    menuList: menuList, //lists of all menu widgets.
+    saveDashboardThrottle: number, //delay timer for saving dashboard.
+    saveDashboardFlag: boolean, //sets to true when a save starts.
+    socket: any, //socket connection for streaming stock data.+
+    socketUpdate: number,
+    showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
+    targetSecurity: string, //target security for widgets. Update changes widget focus.
+    widgetCopy: widget | null, //copy of state of widget being dragged.
+    widgetLockDown: number, //1 removes buttons from all widgets.
+    widgetSetup: widgetSetup, //activates premium api routes.
+    zIndex: string[], //list widgets. Index location sets zIndex
+}
