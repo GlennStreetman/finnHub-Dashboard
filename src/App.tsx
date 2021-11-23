@@ -8,7 +8,6 @@ import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImpor
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
 import { UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig } from "./appFunctions/appImport/widgetLogic";
 import { saveDashboard } from "./appFunctions/appImport/setupDashboard";
-import { SetDrag, MoveWidget, SnapOrder, SnapWidget } from "./appFunctions/appImport/widgetGrid";
 
 
 //component imports
@@ -110,12 +109,6 @@ class App extends React.Component<AppProps, AppState> {
         //App logic for setting up dashboards.
         this.saveDashboard = saveDashboard.bind(this); //this will probable be last function to be unbound, not from this file.
         this.updateAppState = this.updateAppState.bind(this)
-
-        //app logic for MOVING widgets and snapping them into location.
-        this.setDrag = SetDrag.bind(this);
-        this.moveWidget = MoveWidget.bind(this);
-        this.snapWidget = SnapWidget.bind(this);
-        this.snapOrder = SnapOrder.bind(this);
 
         //update and apply state, in module.
         this.rebuildDashboardState = this.rebuildDashboardState.bind(this) //sets s.dashboardData. Used to build dataModel in redux
@@ -292,17 +285,15 @@ class App extends React.Component<AppProps, AppState> {
                                 dashBoardData={this.state.dashBoardData}
                                 dashboardID={dashboardID}
                                 defaultExchange={this.state.defaultExchange}
+                                enableDrag={this.state.enableDrag}
                                 exchangeList={this.state.exchangeList}
                                 finnHubQueue={this.state.finnHubQueue}
                                 login={this.state.login}
                                 menuList={this.state.menuList}
-                                moveWidget={this.moveWidget}
                                 newDashboard={this.newDashboard}
                                 saveDashboard={this.saveDashboard}
-                                setDrag={this.setDrag}
                                 showMenuColumn={this.state.showMenuColumn}
                                 showStockWidgets={this.state.showStockWidgets}
-                                snapWidget={this.snapWidget}
                                 targetSecurity={this.state.targetSecurity}
                                 updateWidgetConfig={this.updateWidgetConfig}
                                 updateWidgetFilters={this.updateWidgetFilters}
@@ -417,7 +408,7 @@ export interface defaultGlobalStockList {
 }
 
 export interface menu {
-    column: number,
+    column: number | string,
     columnOrder: number,
     widgetConfig: string,
     widgetHeader: string,

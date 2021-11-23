@@ -10,7 +10,7 @@ import { Grid } from '@material-ui/core/';
 function WidgetController(p) {
 
     const [focus, setFocus] = useState(0) //sets left most column focus for widgets. 0 shows menu column on far left. 
-    const bottomNav = p.login === 1 ? <BottomNav setFocus={setFocus} /> : <></>
+
 
     const widgetList = p.dashBoardData?.[p.currentDashBoard] ?
         p.dashBoardData[p.currentDashBoard].widgetlist : {}
@@ -38,10 +38,11 @@ function WidgetController(p) {
 
     const columnCount = columnSetup[2]
     const widgetWidth = Math.round(width / columnCount)
+    const bottomNav = p.login === 1 ? <BottomNav setFocus={setFocus} columnCount={columnCount} /> : <></>
 
     // console.log('widgetWidth', width, columnCount, widgetWidth)
 
-    function renderWidgetGroup(widgetObjList) {
+    function renderWidgetColumn(widgetObjList) {
         if (widgetObjList !== undefined && widgetObjList[0]['pass'] === undefined) {
             widgetObjList.sort((a, b) => (a.columnOrder > b.columnOrder) ? 1 : -1) //sort into column order.
             const widgetGroup = widgetObjList.map((el) => { //for each widget, add props.
@@ -54,8 +55,6 @@ function WidgetController(p) {
                     exchangeList: p.exchangeList,
                     finnHubQueue: p.finnHubQueue,
                     key: el.widgetId,
-                    moveWidget: p.moveWidget,
-                    setDrag: p.setDrag,
                     showMenuColumn: p.showMenuColumn,
                     showStockWidgets: p.showStockWidgets,
                     snapWidget: p.snapWidget,
@@ -73,6 +72,7 @@ function WidgetController(p) {
                     saveDashboard: p.saveDashboard,
                     menuList: p.menuList,
                     widgetWidth: widgetWidth,
+                    focus: focus,
                 }
                 if (el.widgetConfig === 'menuWidget') {
                     thisWidgetProps['showMenu'] = p[el.widgetID]
@@ -107,25 +107,30 @@ function WidgetController(p) {
         }
     }
 
+    //this is derived state. Should this be in useEffect?
+    const allWidgetColumns = Array.from({ length: 7 }, (i, x) => { return [{ 'pass': x }] }) //creates 7 columns, 6 possible snap locations, 1 drag column.
     const allWidgets = { ...widgetList, ...p.menuList }
-    const widgetGroups = Array.from({ length: columnCount }, (i, x) => { return [{ 'pass': x }] }) //creates 32 columns
 
     for (const w in allWidgets) { //puts widgets into columns
         const thisColumn = allWidgets[w]?.column
         if (thisColumn === 'drag') {
-            widgetGroups[7] = []
-            widgetGroups[7].push(allWidgets[w])
+            allWidgetColumns[6] = []
+            allWidgetColumns[6].push(allWidgets[w])
         } else {
-            if (widgetGroups?.[thisColumn]?.[0]?.['pass'] !== undefined) {
-                widgetGroups[thisColumn] = []
+            if (allWidgetColumns?.[thisColumn]?.[0]?.['pass'] !== undefined) {
+                allWidgetColumns[thisColumn] = []
             }
-            if (widgetGroups?.[thisColumn - focus]) widgetGroups?.[thisColumn - focus].push(allWidgets[w])
+            allWidgetColumns?.[thisColumn].push(allWidgets[w]) //if (allWidgetColumns?.[thisColumn - focus])
         }
     }
 
-    const renderWidgetColumns = Object.keys(widgetGroups).map((el) => {
+    const displayColumns = allWidgetColumns.slice(focus, columnCount) //display in grid
+    const dragColumn = allWidgetColumns[6] //display widget current being dragged to new location.
+    // console.log('all', allWidgetColumns, 'display', displayColumns, 'drag', dragColumn)
+
+    const renderWidgetColumns = Object.keys(displayColumns).map((el) => {
         return <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={el + "divkey"} >
-            {renderWidgetGroup(widgetGroups[el])}
+            {renderWidgetColumn(displayColumns[el])}
         </Grid>
     })
 
@@ -133,6 +138,7 @@ function WidgetController(p) {
         <Grid container>
             {renderWidgetColumns}
         </Grid>
+        {renderWidgetColumn(dragColumn)}
         {bottomNav}
     </>
     ) : (

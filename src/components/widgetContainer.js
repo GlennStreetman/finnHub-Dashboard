@@ -1,6 +1,6 @@
 import React from "react";
-import {widgetLookUp} from '../registers/widgetContainerReg.js'
-import {excelRegister, excelRegister_singleSecurity} from '../registers/excelButtonRegister'
+import { widgetLookUp } from '../registers/widgetContainerReg.js'
+import { excelRegister, excelRegister_singleSecurity } from '../registers/excelButtonRegister'
 import ToolTip from './../components/toolTip.js'
 import ErrorBoundary from './widgetErrorBoundary';
 import { useState, useEffect } from "react";
@@ -8,7 +8,8 @@ import { useAppDispatch } from './../hooks';
 import { rUnmountWidget } from './../slices/sliceShowData'
 import { rRemoveWidgetDataModel } from './../slices/sliceDataModel'
 import { ChangeWidgetName, toggleWidgetBody } from 'src/appFunctions/appImport/widgetLogic'
-import {RemoveWidget} from 'src/appFunctions/appImport/widgetLogic'
+import { RemoveWidget } from 'src/appFunctions/appImport/widgetLogic'
+import { setDrag, moveWidget, SnapWidget } from 'src/appFunctions/appImport/widgetGrid'
 
 
 //creates widget container. Used by all widgets.
@@ -75,10 +76,6 @@ function WidgetContainer(p) {
 
     function dragElement() {
 
-        // const widgetState = widgetRef.current;
-        // if (widgetState.state === undefined) {widgetState.state = {}}
-        // widgetState.state.widgetID = p.widgetList.widgetID
-
         const widgetState = widgetRef?.current ? widgetRef.current : {state: {}}
         if (widgetState && widgetState?.state === undefined) {widgetState.state = {}}
         widgetState.state.widgetID = p.widgetList.widgetID
@@ -90,46 +87,50 @@ function WidgetContainer(p) {
         let widgetWidth = p.widgetWidth
         let widgetCenter = widgetWidth / 2
 
-        function dragMouseDown(e) {
-        // console.log('start drag')
-        e = e || window.event;
-        e.preventDefault();
+        async function dragMouseDown(e) {
+            // console.log('start drag')
+            e = e || window.event;
+            e.preventDefault();
 
-        xAxis = e.clientX + window.scrollX
-        yAxis = e.clientY 
-        p.setDrag(p.stateRef, p.widgetKey, widgetState.state)
-        .then((data)=>{
+            xAxis = e.clientX + window.scrollX
+            yAxis = e.clientY 
+            const newDrag = await setDrag(p.stateRef, p.currentDashBoard, p.dashboardData, p.menuList, p.widgetKey, widgetState.state)
+            await p.updateAppState(newDrag)
             document.onmouseup = closeDragElement;
             document.onmousemove = elementDrag;
-        })
         }
 
-        function elementDrag(e) {
-        e = e || window.event;
-        e.preventDefault();
+        async function elementDrag(e) {
+            e = e || window.event;
+            e.preventDefault();
 
-        xAxis = e.clientX + window.scrollX;
-        yAxis = e.clientY + window.scrollY;
-        
-        let newX = xAxis - widgetCenter + 25 >= 5 ? xAxis - widgetCenter + 25 : 5
-        let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
-        //copy widget state THEN move widget.
-        p.moveWidget(p.stateRef, p.widgetKey, newX, newY);
+            xAxis = e.clientX + window.scrollX;
+            yAxis = e.clientY + window.scrollY;
+            
+            let newX = xAxis - widgetCenter + 25 >= 5 ? xAxis - widgetCenter + 25 : 5
+            let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
+            //copy widget state THEN move widget.
+            const payload = moveWidget(p.stateRef, p.dashboardData, p.menuList, p.currentDashBoard, p.widgetKey, newX, newY);
+            // if (p.enableDrag === true) {
+            p.updateAppState(payload) 
+            // }
         }
 
-        function closeDragElement(e) {
-        // stop moving when mouse button is released:
-        xAxis = e.clientX + window.scrollX;
-        yAxis = e.clientY + window.scrollY;
-        let newX = xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5
-        let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
-        const snapWidget = () => {
-            p.snapWidget(p.widgetList['widgetConfig'], p.widgetKey, xAxis, yAxis, widgetWidth)
-        }
-        document.onmouseup = null;
-        document.onmousemove = null;
-        p.moveWidget(p.stateRef, p.widgetKey, newX, newY, snapWidget);
-
+        async function closeDragElement(e) {
+            console.log('close')
+            // stop moving when mouse button is released:
+            xAxis = e.clientX + window.scrollX;
+            yAxis = e.clientY + window.scrollY;
+            let newX = xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5
+            let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
+            document.onmouseup = null;
+            document.onmousemove = null;
+            const payload = moveWidget(p.stateRef,  p.dashboardData, p.menuList, p.currentDashBoard, p.widgetKey, newX, newY);
+            await p.updateAppState(payload) 
+            const snapPayload = await SnapWidget(p.widgetList['widgetConfig'], p.widgetKey, xAxis, yAxis, widgetWidth, p.focus, p.dashboardData, p.menuList, p.currentDashBoard)
+            await p.updateAppState(snapPayload)
+            p.saveDashboard(p.currentDashBoard)
+            
         }
     }
 

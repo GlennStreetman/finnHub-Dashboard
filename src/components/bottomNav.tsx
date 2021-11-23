@@ -5,7 +5,7 @@ import { useState } from "react";
 import { makeStyles } from '@material-ui/core/styles';
 
 import CenterFocusStrongSharpIcon from '@material-ui/icons/CenterFocusStrongSharp';
-import CenterFocusWeakSharpIcon from '@material-ui/icons/CenterFocusWeakSharp';
+// import CenterFocusWeakSharpIcon from '@material-ui/icons/CenterFocusWeakSharp';
 
 const useStyles = makeStyles({
     root: {
@@ -18,6 +18,7 @@ const useStyles = makeStyles({
 
 interface props {
     setFocus: Function,
+    columnCount: number,
 }
 
 export default function BottomNav(p: props) {
@@ -28,13 +29,17 @@ export default function BottomNav(p: props) {
         setColumn(newValue);
     };
 
+    const bottomNavCount = 7 - p.columnCount
+
+    const navButtons = [...Array(bottomNavCount).keys()].map((el) => {
+        const label = el === 0 ? 'Menus' : `Column${el}`
+        return (<BottomNavigationAction key={'k' + el} label={label} value="0" icon={<CenterFocusStrongSharpIcon />} onClick={() => { p.setFocus(el) }} />)
+    })
+
+
     return (
         <BottomNavigation value={column} onChange={handleChange} className={classes.root}>
-            <BottomNavigationAction label="Menus" value="0" icon={<CenterFocusStrongSharpIcon />} onClick={() => { p.setFocus(0) }} />
-            <BottomNavigationAction label="Column 1" value="1" icon={<CenterFocusWeakSharpIcon />} onClick={() => { p.setFocus(1) }} />
-            <BottomNavigationAction label="Column 2" value="2" icon={<CenterFocusWeakSharpIcon />} onClick={() => { p.setFocus(2) }} />
-            <BottomNavigationAction label="Column 3" value="3" icon={<CenterFocusWeakSharpIcon />} onClick={() => { p.setFocus(3) }} />
-            <BottomNavigationAction label="Column 4" value="4" icon={<CenterFocusWeakSharpIcon />} onClick={() => { p.setFocus(4) }} />
+            {navButtons}
         </BottomNavigation>
     );
 }
