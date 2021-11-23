@@ -384,8 +384,8 @@ export interface widget {
     widgetHeader: string,
     widgetID: string | number,
     widgetType: string,
-    xAxis: number,
-    yAxis: number,
+    xAxis: number | string,
+    yAxis: number | string,
 }
 
 export interface widgetList {
@@ -414,8 +414,8 @@ export interface menu {
     widgetHeader: string,
     widgetID: string,
     widgetType: string,
-    xAxis: string,
-    yAxis: string,
+    xAxis: number | string,
+    yAxis: number | string,
     showBody: boolean,
 }
 

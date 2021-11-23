@@ -38,7 +38,7 @@ export const setDrag = function (stateRef: 'menuWidget' | 'stockWidget', current
     }
 }
 
-function moveStockWidget(dashBoardData: dashBoardData, currentDashBoard: string, widgetId: string, xxAxis: string, yyAxis: string) {
+function moveStockWidget(dashBoardData: dashBoardData, currentDashBoard: string, widgetId: string, xxAxis: number, yyAxis: number) {
     console.log('moveStockWidget')
     const updatedWidgetLocation = produce(dashBoardData, (draftState: menuList | widgetList) => {
         draftState[currentDashBoard]['widgetlist'][widgetId]["xAxis"] = xxAxis;
@@ -48,7 +48,7 @@ function moveStockWidget(dashBoardData: dashBoardData, currentDashBoard: string,
     return updatedWidgetLocation
 }
 
-function moveMenu(menuList: menuList, widgetId: string | number, xxAxis: string, yyAxis: string) {
+function moveMenu(menuList: menuList, widgetId: string | number, xxAxis: number, yyAxis: number) {
     const updatedWidgetLocation = produce(menuList, (draftState: menuList) => {
         draftState[widgetId]["xAxis"] = xxAxis;
         draftState[widgetId]["yAxis"] = yyAxis;
@@ -63,8 +63,8 @@ export function moveWidget(
     menuList: menuList,
     currentDashBoard: string,
     widgetId: string,
-    xxAxis: string,
-    yyAxis: string,
+    xxAxis: number,
+    yyAxis: number,
 ) {
 
     if (stateRef === 'stockWidget') {
