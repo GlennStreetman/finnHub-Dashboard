@@ -185,8 +185,11 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
             <WidgetRemoveSecurityTable
                 trackedStocks={p.trackedStocks}
                 widgetKey={p.widgetKey}
-                updateWidgetStockList={p.updateWidgetStockList}
                 exchangeList={p.exchangeList}
+                dashBoardData={p.dashBoardData}
+                currentDashboard={p.currentDashboard}
+                updateAppState={p.updateAppState}
+                apiKey={p.apiKey}
             />
         );
         return securityList;
@@ -303,9 +306,10 @@ export function candleWidgetProps(that, key = "Candles") {
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         updateWidgetFilters: that.props.updateWidgetFilters,
         updateWidgetConfig: that.props.updateWidgetConfig,
-        updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
         targetSecurity: that.props.targetSecurity,
+        dashBoardData: that.props.dashBoardData,
+        currentDashBoard: that.props.currentDashBoard,
     };
     return propList;
 }

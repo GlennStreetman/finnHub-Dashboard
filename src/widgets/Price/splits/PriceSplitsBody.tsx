@@ -128,8 +128,11 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
                 <WidgetRemoveSecurityTable
                     trackedStocks={p.trackedStocks}
                     widgetKey={p.widgetKey}
-                    updateWidgetStockList={p.updateWidgetStockList}
                     exchangeList={p.exchangeList}
+                    dashBoardData={p.dashBoardData}
+                    currentDashboard={p.currentDashboard}
+                    updateAppState={p.updateAppState}
+                    apiKey={p.apiKey}
                 />
             </>
         );
@@ -211,7 +214,6 @@ export function PriceSplitsProps(that, key = "newWidgetNameProps") {
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         filters: that.props.widgetList[key]["filters"],
         updateWidgetFilters: that.props.updateWidgetFilters,
-        updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
         exchangeList: that.props.exchangeList,
         defaultExchange: that.props.defaultExchange,

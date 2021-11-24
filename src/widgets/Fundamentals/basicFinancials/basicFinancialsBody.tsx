@@ -14,6 +14,9 @@ import { useSearchMongoDb } from '../../widgetHooks/useSearchMongoDB'
 
 import { dStock } from './../../../appFunctions/formatStockSymbols'
 
+import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
+import { rBuildDataModel } from 'src/slices/sliceDataModel'
+
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
@@ -469,9 +472,25 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     function updateWidgetList(stock) {
         if (stock.indexOf(":") > 0) {
             const stockSymbole = stock.slice(0, stock.indexOf(":"));
-            p.updateWidgetStockList(p.widgetKey, stockSymbole);
+            const update = UpdateWidgetStockList(p.widgetKey, stockSymbole, p.dashBoardData, p.currentDashBoard);
+            p.updateAppState(update)
+                .then(() => {
+                    const payload = {
+                        apiKey: p.apiKey,
+                        dashBoardData: p.dashBoardData
+                    }
+                    dispatch(rBuildDataModel(payload))
+                })
         } else {
-            p.updateWidgetStockList(p.widgetKey, stock);
+            const update = UpdateWidgetStockList(p.widgetKey, stock, p.dashBoardData, p.currentDashBoard);
+            p.updateAppState(update)
+                .then(() => {
+                    const payload = {
+                        apiKey: p.apiKey,
+                        dashBoardData: p.dashBoardData
+                    }
+                    dispatch(rBuildDataModel(payload))
+                })
         }
     }
 
@@ -627,8 +646,9 @@ export function metricsProps(that, key = "newWidgetNameProps") {
         targetSecurity: that.props.targetSecurity,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         updateWidgetConfig: that.props.updateWidgetConfig,
-        updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
+        dashBoardData: that.props.dashBoardData,
+        currentDashBoard: that.props.currentDashBoard
     };
     return propList;
 }

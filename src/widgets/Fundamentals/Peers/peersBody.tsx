@@ -87,8 +87,11 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
             <WidgetRemoveSecurityTable
                 trackedStocks={p.trackedStocks}
                 widgetKey={p.widgetKey}
-                updateWidgetStockList={p.updateWidgetStockList}
                 exchangeList={p.exchangeList}
+                dashBoardData={p.dashBoardData}
+                currentDashboard={p.currentDashboard}
+                updateAppState={p.updateAppState}
+                apiKey={p.apiKey}
             />
 
         );
@@ -151,9 +154,10 @@ export function peersProps(that, key = "newWidgetNameProps") {
         targetSecurity: that.props.targetSecurity,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         updateWidgetConfig: that.props.updateWidgetConfig,
-        updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
-        finnHubQueue: that.props.finnHubQueue
+        finnHubQueue: that.props.finnHubQueue,
+        dashBoardData: that.props.dashBoardData,
+        currentDashBoard: that.props.currentDashBoard,
     };
     return propList;
 }

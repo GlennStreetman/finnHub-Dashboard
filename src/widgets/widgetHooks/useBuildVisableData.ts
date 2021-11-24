@@ -11,9 +11,8 @@ export const useBuildVisableData = function (
     useEffect(() => {//On mount, build visable data. On update, if change in target stock, rebuild visable data.
         if (isInitialMount.current === true && widgetCopy === widgetKey) { //on Mount, do not rebuild if widget copy.
             isInitialMount.current = false;
-            // console.log('widget copy true')
         } else {
-            // console.log('building visable data')
+            console.log('building visable data', widgetKey)
             if (isInitialMount.current === true) { isInitialMount.current = false }
             const payload: object = {
                 key: widgetKey,

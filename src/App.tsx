@@ -6,7 +6,7 @@ import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
-import { UpdateWidgetFilters, UpdateWidgetStockList, updateWidgetConfig } from "./appFunctions/appImport/widgetLogic";
+import { UpdateWidgetFilters, updateWidgetConfig } from "./appFunctions/appImport/widgetLogic";
 import { saveDashboard } from "./appFunctions/appImport/setupDashboard";
 
 
@@ -103,7 +103,6 @@ class App extends React.Component<AppProps, AppState> {
 
         //app logic for creating/removing, modifying, populating widgets.
         this.updateWidgetFilters = UpdateWidgetFilters.bind(this);
-        this.updateWidgetStockList = UpdateWidgetStockList.bind(this);
         this.updateWidgetConfig = updateWidgetConfig.bind(this);
 
         //App logic for setting up dashboards.
@@ -162,7 +161,18 @@ class App extends React.Component<AppProps, AppState> {
     async rebuildDashboardState() { //fetches dashboard data, then updates s.dashBoardData, then builds redux model.
         try {
             const data = await this.props.tGetSavedDashboards({ apiKey: this.state.apiKey }).unwrap()
-            console.log('rebuildData', data.currentDashBoard)
+
+            // const widgetlist = data.dashBoardData[data.currentDashBoard].widgetlist
+            // Object.keys(widgetlist).forEach((el)=>{
+            //     const payload: object = {
+            //         key: el,
+            //         securityList: targetSecurityList
+            //     }
+            //     dispatch(rBuildVisableData(payload))
+            // })
+
+
+
             const payload = {
                 dashBoardData: data.dashBoardData,
                 currentDashBoard: data.currentDashBoard,
@@ -297,7 +307,6 @@ class App extends React.Component<AppProps, AppState> {
                                 targetSecurity={this.state.targetSecurity}
                                 updateWidgetConfig={this.updateWidgetConfig}
                                 updateWidgetFilters={this.updateWidgetFilters}
-                                updateWidgetStockList={this.updateWidgetStockList}
                                 widgetCopy={this.state.widgetCopy}
                                 widgetList={widgetList}
                                 widgetLockDown={this.state.widgetLockDown}
@@ -426,10 +435,6 @@ export interface menuList {
 export interface priceObj {
     currentPrice: number
 }
-
-// export interface streamingPriceData {
-//     [key: string]: priceObj
-// }
 
 export interface widgetSetup {
     [key: string]: boolean

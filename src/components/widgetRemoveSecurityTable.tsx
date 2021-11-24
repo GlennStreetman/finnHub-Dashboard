@@ -1,15 +1,25 @@
 import React, { ReactElement } from 'react'
 import { dStock } from '../appFunctions/formatStockSymbols'
 import { stockList } from '../App'
+import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
+import { dashBoardData } from 'src/App'
+import { rBuildDataModel } from 'src/slices/sliceDataModel'
+
+import { useAppDispatch } from 'src/hooks';
+const useDispatch = useAppDispatch
 
 interface Props {
     trackedStocks: stockList,
-    widgetKey: string,
-    updateWidgetStockList: Function,
+    widgetKey: number,
     exchangeList: string[],
+    dashBoardData: dashBoardData,
+    currentDashboard: string,
+    updateAppState: Function,
+    apiKey: string,
 }
 
 export default function WidgetRemoveSecurityTable(p: Props): ReactElement {
+    const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const stockList = Object.keys(p.trackedStocks);
     const stockListRows = stockList.map((el) =>
@@ -19,7 +29,16 @@ export default function WidgetRemoveSecurityTable(p: Props): ReactElement {
                     data-testid={`remove-${el}`}
                     key={el + "button"}
                     onClick={() => {
-                        p.updateWidgetStockList(p.widgetKey, el);
+                        const update = UpdateWidgetStockList(p.widgetKey, el, p.dashBoardData, p.currentDashboard);
+                        p.updateAppState(update)
+                            .then(() => {
+                                const payload = {
+                                    apiKey: p.apiKey,
+                                    dashBoardData: p.dashBoardData
+                                }
+                                dispatch(rBuildDataModel(payload))
+                            })
+
                     }}
                 >
                     <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>

@@ -147,8 +147,11 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
                 <WidgetRemoveSecurityTable
                     trackedStocks={p.trackedStocks}
                     widgetKey={p.widgetKey}
-                    updateWidgetStockList={p.updateWidgetStockList}
                     exchangeList={p.exchangeList}
+                    dashBoardData={p.dashBoardData}
+                    currentDashboard={p.currentDashBoard}
+                    updateAppState={p.updateAppState}
+                    apiKey={p.apiKey}
                 />
             </>
         );
@@ -229,11 +232,12 @@ export function EarningsCalendarProps(that, key = "newWidgetNameProps") {
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         filters: that.props.widgetList[key]["filters"],
         updateWidgetFilters: that.props.updateWidgetFilters,
-        updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
         exchangeList: that.props.exchangeList,
         updateWidgetConfig: that.props.updateWidgetConfig,
         targetSecurity: that.props.targetSecurity,
+        currentDashBoard: that.props.currentDashBoard,
+        dashBoardData: that.props.dashBoardData,
     };
     return propList;
 }
@@ -243,4 +247,5 @@ export const EarningsCalendarFilters: filters = { //IF widget uses filters remem
     endDate: 604800 * 1000 * 52,  //1 year forward. Limited to 1 year on free version.
     description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.',
 }
+
 

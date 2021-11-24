@@ -58,8 +58,11 @@ function PriceTargetBody(p: { [key: string]: any }, ref: any) {
             <WidgetRemoveSecurityTable
                 trackedStocks={p.trackedStocks}
                 widgetKey={p.widgetKey}
-                updateWidgetStockList={p.updateWidgetStockList}
                 exchangeList={p.exchangeList}
+                dashBoardData={p.dashBoardData}
+                currentDashboard={p.currentDashboard}
+                updateAppState={p.updateAppState}
+                apiKey={p.apiKey}
             />
         );
         return stockTable
@@ -124,10 +127,11 @@ export function priceTargetProps(that, key = "newWidgetNameProps") {
         exchangeList: that.props.exchangeList,
         filters: that.props.widgetList[key]["filters"],
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        updateWidgetStockList: that.props.updateWidgetStockList,
         updateWidgetConfig: that.props.updateWidgetConfig,
         widgetKey: key,
         targetSecurity: that.props.targetSecurity,
+        dashBoardData: that.props.dashBoardData,
+        currentDashBoard: that.props.currentDashBoard
     };
     return propList;
 }

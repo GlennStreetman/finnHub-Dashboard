@@ -13,6 +13,9 @@ import StockSearchPane, { searchPaneProps } from "../components/stockSearchPaneF
 
 import { dStock } from './../appFunctions/formatStockSymbols'
 
+import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
+import { rBuildDataModel } from 'src/slices/sliceDataModel'
+
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
@@ -124,7 +127,16 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
                         data-testid={`remove-${el}`}
                         key={el + "button"}
                         onClick={() => {
-                            p.updateWidgetStockList(p.widgetKey, el);
+                            const update = UpdateWidgetStockList(p.widgetKey, el, p.dashBoardData, p.currentDashBoard);
+                            p.updateAppState(update)
+                                .then(() => {
+                                    const payload = {
+                                        apiKey: p.apiKey,
+                                        dashBoardData: p.dashBoardData
+                                    }
+                                    dispatch(rBuildDataModel(payload))
+                                })
+
                         }}
                     >
                         <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
@@ -192,7 +204,6 @@ export function NewWidgetProps(that, key = "newWidgetNameProps") {
         filters: that.props.widgetList[key]["filters"],
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         updateWidgetFilters: that.props.updateWidgetFilters,
-        updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
         targetSecurity: that.props.targetSecurity,
     };

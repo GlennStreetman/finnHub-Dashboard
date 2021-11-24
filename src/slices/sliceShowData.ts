@@ -46,7 +46,7 @@ const showData = createSlice({
     name: 'showData',
     initialState,
     reducers: {
-        rBuildVisableData: (state, action) => {
+        rBuildVisableData: (state, action) => { //runs on load dashboard(all), syncFocusAll(all), syncFocusWidget(widget)
             //adds new key that is populated by data later.
             //payload {key: string, {...widget-ex-stck: {empty obj}}}
             const ap: rBuildVisableDataPayload = action.payload

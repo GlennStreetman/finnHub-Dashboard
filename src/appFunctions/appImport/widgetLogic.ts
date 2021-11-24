@@ -1,9 +1,7 @@
 import produce from "immer"
 import { reqBody } from '../../server/routes/mongoDB/setMongoConfig'
 import { AppState, AppProps, menuList, widget, widgetList, stockList, stock, filters, config, dashBoardData } from 'src/App'
-import { rBuildDataModelPayload } from '../../slices/sliceDataModel'
 import { tgetFinnHubDataReq } from './../../thunks/thunkFetchFinnhub'
-import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
     const testName = iterator === 0 ? widgetName : widgetName + iterator
@@ -13,25 +11,6 @@ function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
         return testName
     }
 }
-
-// export const NewMenuContainer = function newMenuContainer(widgetDescription: string, widgetHeader: string, widgetConfig: string, menuList: menuList, updateAppState) {
-
-//     let newMenuList = produce(menuList, (draftState: menuList) => {
-//         draftState[widgetDescription] = {
-//             column: 0,
-//             columnOrder: -1,
-//             widgetID: widgetDescription,
-//             widgetType: widgetDescription,
-//             widgetHeader: widgetHeader,
-//             xAxis: "5rem",
-//             yAxis: "5rem",
-//             widgetConfig: widgetConfig,
-//             showBody: true,
-//         };
-//     });
-//     const payload: Partial<AppState> = { menuList: newMenuList }
-//     updateAppState(payload);
-// }
 
 export const CreateNewWidgetContainer = function (
     widgetDescription: string,
@@ -109,24 +88,16 @@ export const RemoveWidget = async function (widgetID: string | number, dashboard
 
 }
 
-export const UpdateWidgetStockList = function updateWidgetStockList(widgetId: number, symbol: string, stockObj: stock | Object = {}) {
+export const UpdateWidgetStockList = function (widgetId: number, symbol: string, dashBoardData: dashBoardData, currentDashboard: string, stockObj: stock | Object = {}) {
     //adds if not present, else removes stock from widget specific stock list.
-    const s: AppState = this.state
     if (isNaN(widgetId) === false) {
 
-        const newWidgetList = produce(s.dashBoardData[s.currentDashBoard].widgetlist, (draftState: widgetList) => {
+        const newWidgetList = produce(dashBoardData[currentDashboard].widgetlist, (draftState: widgetList) => {
             const trackingSymbolList: stockList = draftState[widgetId]["trackedStocks"]; //copy target widgets stock object
 
             if (Object.keys(trackingSymbolList).indexOf(symbol) === -1) {
                 //add
                 let newStock: stock = { ...stockObj } as stock
-                newStock['dStock'] = function (ex: string) {
-                    if (ex.length === 1) {
-                        return (this.symbol)
-                    } else {
-                        return (this.key)
-                    }
-                }
                 trackingSymbolList[symbol] = newStock
                 draftState[widgetId]["trackedStocks"] = trackingSymbolList;
             } else {
@@ -136,21 +107,22 @@ export const UpdateWidgetStockList = function updateWidgetStockList(widgetId: nu
             }
         })
 
-        const updatedDashBoard: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
-            draftState[s.currentDashBoard].widgetlist = newWidgetList
+        const updatedDashBoard: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
+            draftState[currentDashboard].widgetlist = newWidgetList
         })
         const payload: Partial<AppState> = {
             dashBoardData: updatedDashBoard,
         }
-        this.setState(payload, () => {
-            this.saveDashboard(this.state.currentDashBoard)
+        return payload
+        // this.setState(payload, () => {
+        //     this.saveDashboard(this.state.currentDashBoard)
 
-            const payload: rBuildDataModelPayload = {
-                apiKey: this.state.apiKey,
-                dashBoardData: this.state.dashBoardData
-            }
-            this.props.rBuildDataModel(payload)
-        });
+        //     const payload: rBuildDataModelPayload = {
+        //         apiKey: this.state.apiKey,
+        //         dashBoardData: this.state.dashBoardData
+        //     }
+        //     this.props.rBuildDataModel(payload)
+        // });
     }
 }
 

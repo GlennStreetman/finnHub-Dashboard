@@ -113,8 +113,11 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
             <WidgetRemoveSecurityTable
                 trackedStocks={p.trackedStocks}
                 widgetKey={p.widgetKey}
-                updateWidgetStockList={p.updateWidgetStockList}
                 exchangeList={p.exchangeList}
+                dashBoardData={p.dashBoardData}
+                currentDashboard={p.currentDashboard}
+                updateAppState={p.updateAppState}
+                apiKey={p.apiKey}
             />
         );
         return <>{stockListTable}</>;
@@ -258,10 +261,10 @@ export function financialsAsReportedProps(that, key = "newWidgetNameProps") {
         targetSecurity: that.props.targetSecurity,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         updateWidgetFilters: that.props.updateWidgetFilters,
-        updateWidgetStockList: that.props.updateWidgetStockList,
         updateWidgetConfig: that.props.updateWidgetConfig,
         widgetKey: key,
-        widgetHeader: that.props.widgetList[key].widgetHeader
+        widgetHeader: that.props.widgetList[key].widgetHeader,
+        dashBoardData: that.props.dashBoardData,
     };
     return propList;
 }

@@ -12,6 +12,8 @@ import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 import { dStock } from './../../../appFunctions/formatStockSymbols'
+import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
+import { rBuildDataModel } from 'src/slices/sliceDataModel'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -55,7 +57,7 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
         }
     }
 
-    const startingWidgetCoptyRef = () => {
+    const startingWidgetCopyRef = () => {
         if (isInitialMount.current === true) {
             if (p.widgetCopy !== undefined && p.widgetCopy.widgetID !== null) {
                 return p.widgetCopy.widgetID
@@ -64,7 +66,7 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
     }
 
     const [stockData, setStockData] = useState(startingstockData())
-    const [widgetCopy] = useState(startingWidgetCoptyRef())
+    const [widgetCopy] = useState(startingWidgetCopyRef())
 
     const dispatch = useDispatch()
 
@@ -129,46 +131,17 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
     }
 
     function renderSearchPane() {
-        // const stockList = Object.keys(p.trackedStocks);
-        // const stockListRows = stockList.map((el) =>
-        //     <tr key={el + "container"}>
-        //         <td className="centerTE" key={el + "buttonC"}>
-        //             <button
-        //                 data-testid={`remove-${el}`}
-        //                 key={el + "button"}
-        //                 onClick={() => {
-        //                     p.updateWidgetStockList(p.widgetKey, el);
-        //                 }}
-        //             >
-        //                 <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
-        //             </button>
-        //         </td>
-        //         <td className='centerTE' key={el + "name"}>{dStock(p.trackedStocks[el], p.exchangeList)}</td>
-        //         <td className='leftTE'>{p.trackedStocks[el].description}</td>
-        //     </tr>
-        // )
 
         let searchForm = (
             <WidgetRemoveSecurityTable
                 trackedStocks={p.trackedStocks}
                 widgetKey={p.widgetKey}
-                updateWidgetStockList={p.updateWidgetStockList}
                 exchangeList={p.exchangeList}
+                dashBoardData={p.dashBoardData}
+                currentDashboard={p.currentDashboard}
+                updateAppState={p.updateAppState}
+                apiKey={p.apiKey}
             />
-            // <>
-            //     <div className='scrollableDiv'>
-            //         <table className='dataTable'>
-            //             <thead>
-            //                 <tr>
-            //                     <td>Remove</td>
-            //                     <td>Symbol</td>
-            //                     <td>Name</td>
-            //                 </tr>
-            //             </thead>
-            //             <tbody>{stockListRows}</tbody>
-            //         </table>
-            //     </div>
-            // </>
         );
         return searchForm
     }
@@ -217,7 +190,15 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
                             <button
                                 key={el + "button"}
                                 onClick={() => {
-                                    p.updateWidgetStockList(p.widgetKey, el);
+                                    const update = UpdateWidgetStockList(p.widgetKey, el, p.dashBoardData, p.currentDashBoard);
+                                    p.updateAppState(update)
+                                        .then(() => {
+                                            const payload = {
+                                                apiKey: p.apiKey,
+                                                dashBoardData: p.dashBoardData
+                                            }
+                                            dispatch(rBuildDataModel(payload))
+                                        })
                                 }}
                             >
                                 <i className="fa fa-times" aria-hidden="true"></i>
@@ -286,10 +267,11 @@ export function quoteBodyProps(that, key = "Quote") {
     let propList = {
         apiKey: that.props.apiKey,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        updateWidgetStockList: that.props.updateWidgetStockList,
         widgetKey: key,
         exchangeList: that.props.exchangeList,
         defaultExchange: that.props.defaultExchange,
+        dashBoardData: that.props.dashBoardData,
+        currentDashBoard: that.props.currentDashBoard,
     };
     return propList;
 }
