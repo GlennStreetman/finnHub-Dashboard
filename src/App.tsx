@@ -6,7 +6,7 @@ import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
-import { UpdateWidgetFilters, updateWidgetConfig } from "./appFunctions/appImport/widgetLogic";
+import { updateWidgetConfig } from "./appFunctions/appImport/widgetLogic";
 import { saveDashboard } from "./appFunctions/appImport/setupDashboard";
 
 
@@ -102,7 +102,6 @@ class App extends React.Component<AppProps, AppState> {
         //login state logic.
 
         //app logic for creating/removing, modifying, populating widgets.
-        this.updateWidgetFilters = UpdateWidgetFilters.bind(this);
         this.updateWidgetConfig = updateWidgetConfig.bind(this);
 
         //App logic for setting up dashboards.
@@ -306,7 +305,6 @@ class App extends React.Component<AppProps, AppState> {
                                 showStockWidgets={this.state.showStockWidgets}
                                 targetSecurity={this.state.targetSecurity}
                                 updateWidgetConfig={this.updateWidgetConfig}
-                                updateWidgetFilters={this.updateWidgetFilters}
                                 widgetCopy={this.state.widgetCopy}
                                 widgetList={widgetList}
                                 widgetLockDown={this.state.widgetLockDown}

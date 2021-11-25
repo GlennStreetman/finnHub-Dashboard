@@ -1,16 +1,29 @@
 import ToolTip from './toolTip.js'
+import { dashBoardData } from 'src/App'
+import { UpdateWidgetFilters } from 'src/appFunctions/appImport/widgetLogic'
+import { useAppDispatch, useAppSelector } from 'src/hooks';
+import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 interface props {
     start: string,
     end: string,
     setStart: Function,
     setEnd: Function,
-    updateWidgetFilters: Function,
     widgetKey: string,
     widgetType: string,
+    dashBoardData: dashBoardData,
+    currentDashBoard: string,
+    apiKey: string,
+    finnHubQueue: finnHubQueue,
+    updateAppState: Function,
+    saveDashboard: Function,
 }
 
+const useDispatch = useAppDispatch
+
 export default function WidgetFilterDates(p: props) {
+
+    const dispatch = useDispatch();
 
     function updateStartDate(e) {
         p.setStart(e.target.value)
@@ -26,7 +39,7 @@ export default function WidgetFilterDates(p: props) {
             const target = new Date(e.target.value).getTime();
             const offset = target - now
             const name = e.target.name;
-            p.updateWidgetFilters(p.widgetKey, { [name]: offset })
+            UpdateWidgetFilters(p.widgetKey, { [name]: offset }, p.dashBoardData, p.currentDashBoard, p.updateAppState, dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
         }
     }
 

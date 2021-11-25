@@ -14,6 +14,7 @@ import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
 import WidgetFocus from '../../../components/widgetFocus'
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import { UpdateWidgetFilters } from 'src/appFunctions/appImport/widgetLogic'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -140,7 +141,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
 
     async function changeFrequencySelection(e) {
         const target = e.target.value;
-        await p.updateWidgetFilters(p.widgetKey, { frequency: target })
+        await UpdateWidgetFilters(p.widgetKey, { frequency: target }, p.dashBoardData, p.currentDashBoard, p.updateAppState, dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
         p.updateWidgetConfig(p.widgetKey, {
             targetSecurity: p.config.targetSecurity,
             targetReport: p.config.targetReort,
@@ -260,7 +261,6 @@ export function financialsAsReportedProps(that, key = "newWidgetNameProps") {
         filters: that.props.widgetList[key]["filters"],
         targetSecurity: that.props.targetSecurity,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        updateWidgetFilters: that.props.updateWidgetFilters,
         updateWidgetConfig: that.props.updateWidgetConfig,
         widgetKey: key,
         widgetHeader: that.props.widgetList[key].widgetHeader,

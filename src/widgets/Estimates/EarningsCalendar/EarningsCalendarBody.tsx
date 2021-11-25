@@ -123,7 +123,7 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
     useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey, isInitialMount, p.config) //sets security focus in config. Used for redux.visable data and widget excel templating.
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
+    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
     useResetPagination(p.config.targetSecurity, setPagination)
 
     function changePagination(e) {
@@ -140,9 +140,14 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
                     end={end}
                     setStart={setStart}
                     setEnd={setEnd}
-                    updateWidgetFilters={p.updateWidgetFilters}
                     widgetKey={p.widgetKey}
                     widgetType={p.widgetType}
+                    dashBoardData={p.dashBoardData}
+                    currentDashBoard={p.currentDashBoard}
+                    apiKey={p.apiKey}
+                    finnHubQueue={p.finnHubQueue}
+                    updateAppState={p.updateAppState}
+                    saveDashboard={p.saveDashBoard}
                 />
                 <WidgetRemoveSecurityTable
                     trackedStocks={p.trackedStocks}
@@ -231,7 +236,7 @@ export function EarningsCalendarProps(that, key = "newWidgetNameProps") {
         apiKey: that.props.apiKey,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         filters: that.props.widgetList[key]["filters"],
-        updateWidgetFilters: that.props.updateWidgetFilters,
+
         widgetKey: key,
         exchangeList: that.props.exchangeList,
         updateWidgetConfig: that.props.updateWidgetConfig,

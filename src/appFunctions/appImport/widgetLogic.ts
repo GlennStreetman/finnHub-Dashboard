@@ -1,7 +1,10 @@
 import produce from "immer"
 import { reqBody } from '../../server/routes/mongoDB/setMongoConfig'
-import { AppState, AppProps, menuList, widget, widgetList, stockList, stock, filters, config, dashBoardData } from 'src/App'
-import { tgetFinnHubDataReq } from './../../thunks/thunkFetchFinnhub'
+import { AppState, menuList, widget, widgetList, stockList, stock, filters, config, dashBoardData } from 'src/App'
+import { rRebuildTargetWidgetModel } from 'src/slices/sliceDataModel'
+import { tGetFinnhubData } from 'src/thunks/thunkFetchFinnhub'
+import { rSetUpdateStatus } from 'src/slices/sliceDataModel'
+import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
     const testName = iterator === 0 ? widgetName : widgetName + iterator
@@ -127,46 +130,51 @@ export const UpdateWidgetStockList = function (widgetId: number, symbol: string,
 }
 
 //widget filters change how data is queried from finnHub
-export const UpdateWidgetFilters = async function (widgetID: string, data: filters) {
-    return new Promise((resolve, reject) => {
-        try {
-            const s: AppState = this.state
-            const p: AppProps = this.props
+export const UpdateWidgetFilters = async function (
+    widgetID: string | number,
+    data: filters,
+    dashBoardData: dashBoardData,
+    currentDashBoard: string,
+    updateAppState: Function,
+    dispatch: Function,
+    apiKey: string,
+    finnHubQueue: finnHubQueue,
+    saveDashboard: Function,
 
-            const newDashBoardData: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
-                draftState[s.currentDashBoard].widgetlist[widgetID].filters = {
-                    ...draftState[s.currentDashBoard].widgetlist[widgetID].filters,
-                    ...data
-                }
-            })
-            const payload: Partial<AppState> = {
-                dashBoardData: newDashBoardData,
+) {
+    try {
+        const newDashBoardData: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
+            draftState[currentDashBoard].widgetlist[widgetID].filters = {
+                ...draftState[currentDashBoard].widgetlist[widgetID].filters,
+                ...data
             }
-            this.setState(payload, async () => {
-                //delete records from mongoDB then rebuild dataset.
-                let res = await fetch(`/deleteFinnDashData?widgetID=${widgetID}`)
-                if (res.status === 200) {
-                    p.rRebuildTargetWidgetModel({ //rebuild data model (removes stale dates)
-                        apiKey: this.state.apiKey,
-                        dashBoardData: this.state.dashBoardData,
-                        targetDashboard: this.state.currentDashBoard,
-                        targetWidget: widgetID,
-                    })
-                    //remove visable data?
-                    const getDataPayload: tgetFinnHubDataReq = {//fetch fresh data
-                        dashboardID: s.dashBoardData[s.currentDashBoard].id,
-                        targetDashBoard: s.currentDashBoard,
-                        widgetList: [widgetID],
-                        finnHubQueue: s.finnHubQueue,
-                        rSetUpdateStatus: p.rSetUpdateStatus,
-                    }
-                    p.tGetFinnhubData(getDataPayload)
-                    this.saveDashboard(this.state.currentDashBoard)
-                    resolve(true)
-                } else { console.log("Problem updating widget filters."); resolve(true) }
-            })
-        } catch { console.log("Problem updating widget filters."); resolve(true) }
-    })
+        })
+        const payload: Partial<AppState> = {
+            dashBoardData: newDashBoardData,
+        }
+
+        updateAppState(payload).then(() => {
+            // delete records from mongoDB then rebuild dataset.
+            fetch(`/deleteFinnDashData?widgetID=${widgetID}`)
+
+            dispatch(rRebuildTargetWidgetModel({ //rebuild data model (removes stale dates)
+                apiKey: apiKey,
+                dashBoardData: dashBoardData,
+                targetDashboard: currentDashBoard,
+                targetWidget: widgetID,
+            }))
+            //remove visable data?
+            dispatch(tGetFinnhubData({//fetch fresh data
+                dashboardID: dashBoardData[currentDashBoard].id,
+                targetDashBoard: currentDashBoard,
+                widgetList: [widgetID],
+                finnHubQueue: finnHubQueue,
+                rSetUpdateStatus: rSetUpdateStatus,
+            }))
+            saveDashboard(currentDashBoard)
+        })
+    } catch { console.log("Problem updating widget filters."); return false }
+
 }
 
 //widget config changes how data is manipulated after being queried.

@@ -16,6 +16,8 @@ import { dStock } from './../appFunctions/formatStockSymbols'
 import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
 import { rBuildDataModel } from 'src/slices/sliceDataModel'
 
+import { UpdateWidgetFilters } from 'src/appFunctions/appImport/widgetLogic'
+
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
@@ -93,7 +95,7 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
     useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey, isInitialMount, p.config) //sets security focus in config. Used for redux.visable data and widget excel templating.
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
+    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
 
     function updateStartDate(e) { //remove if filters not needed
         setStart(e.target.value)
@@ -111,7 +113,7 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
             const offset = target - now
             const name = e.target.name;
             console.log(name, e.target.value)
-            p.updateWidgetFilters(p.widgetKey, { [name]: offset })
+            UpdateWidgetFilters(p.widgetKey, { [name]: offset }, p.dashBoardData, p.currentDashBoard, p.updateAppState, dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
         }
     }
 
@@ -203,7 +205,6 @@ export function NewWidgetProps(that, key = "newWidgetNameProps") {
         exchangeList: that.props.exchangeList,
         filters: that.props.widgetList[key]["filters"],
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        updateWidgetFilters: that.props.updateWidgetFilters,
         widgetKey: key,
         targetSecurity: that.props.targetSecurity,
     };

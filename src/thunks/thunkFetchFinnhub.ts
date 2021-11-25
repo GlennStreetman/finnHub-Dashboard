@@ -7,7 +7,7 @@ import { finnHub, throttleResObj as queResObj, finnHubQueue, throttleApiReqObj }
 export interface tgetFinnHubDataReq {
     dashboardID: number,
     targetDashBoard: string,
-    widgetList: string[],
+    widgetList: any[], //should be string or number.
     finnHubQueue: finnHubQueue,
     rSetUpdateStatus: Function,
     forceUpdate?: boolean, //set to true to force update of all requests.

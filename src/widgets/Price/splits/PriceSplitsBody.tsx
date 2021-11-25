@@ -13,6 +13,7 @@ import WidgetFocus from '../../../components/widgetFocus'
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 import WidgetFilterDates from '../../../components/widgetFilterDates'
+import { UpdateWidgetFilters } from 'src/appFunctions/appImport/widgetLogic'
 
 
 const useDispatch = useAppDispatch
@@ -96,19 +97,19 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
 
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
+    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
     useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey, isInitialMount, p.config) //sets security focus in config. Used for redux.visable data and widget excel templating.	
 
-    useEffect((filters: filters = p.filters, update: Function = p.updateWidgetFilters, key: number = p.widgetKey) => {
+    useEffect((filters: filters = p.filters, key: number = p.widgetKey) => {
         if (filters['startDate'] === undefined) { //if filters not saved to props
             const filterUpdate = {
                 startDate: start,
                 endDate: end,
                 Description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
             }
-            update(key, filterUpdate)
+            UpdateWidgetFilters(key, filterUpdate, p.dashBoardData, p.currentDashBoard, p.updateAppState, dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
         }
-    }, [p.filters, p.updateWidgetFilters, p.widgetKey, start, end])
+    }, [p.filters, p.widgetKey, start, end])
 
 
 
@@ -121,9 +122,14 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
                     end={end}
                     setStart={setStart}
                     setEnd={setEnd}
-                    updateWidgetFilters={p.updateWidgetFilters}
                     widgetKey={p.widgetKey}
                     widgetType={p.widgetType}
+                    dashBoardData={p.dashBoardData}
+                    currentDashBoard={p.currentDashBoard}
+                    apiKey={p.apiKey}
+                    finnHubQueue={p.finnHubQueue}
+                    updateAppState={p.updateAppState}
+                    saveDashboard={p.saveDashBoard}
                 />
                 <WidgetRemoveSecurityTable
                     trackedStocks={p.trackedStocks}
@@ -213,7 +219,6 @@ export function PriceSplitsProps(that, key = "newWidgetNameProps") {
         apiKey: that.props.apiKey,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         filters: that.props.widgetList[key]["filters"],
-        updateWidgetFilters: that.props.updateWidgetFilters,
         widgetKey: key,
         exchangeList: that.props.exchangeList,
         defaultExchange: that.props.defaultExchange,

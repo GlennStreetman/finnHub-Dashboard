@@ -18,6 +18,7 @@ import WidgetFocus from '../../../components/widgetFocus'
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 
+import { UpdateWidgetFilters } from 'src/appFunctions/appImport/widgetLogic'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -119,7 +120,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey, isInitialMount, p.config) //sets security focus in config. Used for redux.visable data and widget excel templating.	
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.updateWidgetFilters, p.widgetKey)
+    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
 
     interface ChartNode {
         x: Date,
@@ -196,7 +197,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     }
 
     function updateFilterResolution(e) {
-        p.updateWidgetFilters(p.widgetKey, { [e.target.name]: e.target.value })
+        UpdateWidgetFilters(p.widgetKey, { [e.target.name]: e.target.value }, p.dashBoardData, p.currentDashBoard, p.updateAppState, dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
     }
 
     function displayCandleGraph() {
@@ -262,9 +263,14 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                                 end={end}
                                 setStart={setStart}
                                 setEnd={setEnd}
-                                updateWidgetFilters={p.updateWidgetFilters}
                                 widgetKey={p.widgetKey}
                                 widgetType={p.widgetType}
+                                dashBoardData={p.dashBoardData}
+                                currentDashBoard={p.currentDashBoard}
+                                apiKey={p.apiKey}
+                                finnHubQueue={p.finnHubQueue}
+                                updateAppState={p.updateAppState}
+                                saveDashboard={p.saveDashBoard}
                             />
                             <table>
                                 <tbody>
@@ -304,7 +310,6 @@ export function candleWidgetProps(that, key = "Candles") {
         exchangeList: that.props.exchangeList,
         filters: that.props.widgetList[key]["filters"],
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        updateWidgetFilters: that.props.updateWidgetFilters,
         updateWidgetConfig: that.props.updateWidgetConfig,
         widgetKey: key,
         targetSecurity: that.props.targetSecurity,
