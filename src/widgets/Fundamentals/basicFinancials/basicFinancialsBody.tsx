@@ -17,6 +17,8 @@ import { dStock } from './../../../appFunctions/formatStockSymbols'
 import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
 import { rBuildDataModel } from 'src/slices/sliceDataModel'
 
+import { updateWidgetConfig } from 'src/appFunctions/appImport/widgetLogic'
+
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
 
@@ -102,10 +104,17 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
     useEffect(() => { //set default series 
         if (seriesList.length > 0 && !p.config.targetSeries) {
-            const updateWidgetConf = p.updateWidgetConfig
-            updateWidgetConf(p.widgetKey, { ...p.config, ...{ targetSeries: seriesList[0], } })
+            updateWidgetConfig(
+                p.widgetKey,
+                { ...p.config, ...{ targetSeries: seriesList[0], } },
+                p.dashBoardData,
+                p.currentDashBoard,
+                p.enableDrag,
+                p.saveDashboard,
+                p.updateAppState
+            )
         }
-    }, [seriesList, p.updateWidgetConfig, p.config.targetSeries, p.widgetKey, p.config])
+    }, [seriesList, p.config.targetSeries, p.widgetKey, p.config])
 
     useEffect(() => { //build config setup
         let stockList = Object.keys(p.trackedStocks)
@@ -154,14 +163,21 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         //Setup default metric source if none selected.
         if (!p.config.targetSecurity) {
             const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
-            updateWidgetConfig(key, {
-                targetSecurity: newSource,
-                metricSelection: [],
-                seriesSelection: [],
-                toggleMode: 'metrics',
-            })
+            updateWidgetConfig(key,
+                {
+                    targetSecurity: newSource,
+                    metricSelection: [],
+                    seriesSelection: [],
+                    toggleMode: 'metrics',
+                },
+                p.dashBoardData,
+                p.currentDashBoard,
+                p.enableDrag,
+                p.saveDashboard,
+                p.updateAppState
+            )
         }
-    }, [p.updateWidgetConfig, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
+    }, [p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
 
     useEffect(() => { //on update to redux data, update widget stock data, as long as data passes typeguard.
         const newData: FinnHubAPIDataArray = {}
@@ -190,20 +206,40 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
     }, [p.config.toggleMode, p.config.targetSecurity, p.config.metricSelection, p.config.seriesSelection, dispatch, p.trackedStocks, p.widgetKey, p.dashboardID])
 
     function setTargetSeries(el) {
-        p.updateWidgetConfig(p.widgetKey, { ...p.config, ...{ targetSeries: el, } })
+        updateWidgetConfig(
+            p.widgetKey,
+            { ...p.config, ...{ targetSeries: el, } },
+            p.dashBoardData,
+            p.currentDashBoard,
+            p.enableDrag,
+            p.saveDashboard,
+            p.updateAppState
+        )
     }
 
 
     function setToggleMode(el) {
-        p.updateWidgetConfig(p.widgetKey, {
-            ...p.config, ...{ toggleMode: el, }
-        })
+        updateWidgetConfig(
+            p.widgetKey,
+            { ...p.config, ...{ toggleMode: el, } },
+            p.dashBoardData,
+            p.currentDashBoard,
+            p.enableDrag,
+            p.saveDashboard,
+            p.updateAppState
+        )
     }
 
     function changeSource(el) {
-        p.updateWidgetConfig(p.widgetKey, {
-            ...p.config, ...{ targetSecurity: el, }
-        })
+        updateWidgetConfig(
+            p.widgetKey,
+            { ...p.config, ...{ targetSecurity: el, } },
+            p.dashBoardData,
+            p.currentDashBoard,
+            p.enableDrag,
+            p.saveDashboard,
+            p.updateAppState
+        )
     }
 
     function changeOrder(indexRef, change, update) {
@@ -213,9 +249,15 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         orderMetricSelection[indexRef] = moveTo
         orderMetricSelection[indexRef + change] = moveFrom
         if (indexRef + change >= 0 && indexRef + change < p.config[update].length) {
-            p.updateWidgetConfig(p.widgetKey, {
-                ...p.config, ...{ [update]: orderMetricSelection }
-            })
+            updateWidgetConfig(
+                p.widgetKey,
+                { ...p.config, ...{ [update]: orderMetricSelection } },
+                p.dashBoardData,
+                p.currentDashBoard,
+                p.enableDrag,
+                p.saveDashboard,
+                p.updateAppState
+            )
         }
     }
 
@@ -229,11 +271,27 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         if (p.config.metricSelection.indexOf(metric) < 0) {
             let newSelection = p.config.metricSelection.slice()
             newSelection.push(metric)
-            p.updateWidgetConfig(p.widgetKey, { ...p.config, ...{ metricSelection: newSelection } })
+            p.updateWidgetConfig(
+                p.widgetKey,
+                { ...p.config, ...{ metricSelection: newSelection } },
+                p.dashBoardData,
+                p.currentDashBoard,
+                p.enableDrag,
+                p.saveDashboard,
+                p.updateAppState
+            )
         } else {
             let newSelection = p.config.metricSelection.slice()
             newSelection.splice(newSelection.indexOf(metric), 1)
-            p.updateWidgetConfig(p.widgetKey, { ...p.config, ...{ metricSelection: newSelection } })
+            updateWidgetConfig(
+                p.widgetKey,
+                { ...p.config, ...{ metricSelection: newSelection } },
+                p.dashBoardData,
+                p.currentDashBoard,
+                p.enableDrag,
+                p.saveDashboard,
+                p.updateAppState
+            )
         }
     }
 
@@ -241,11 +299,27 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
         if (p.config.seriesSelection.indexOf(series) < 0) {
             let newSelection = p.config.seriesSelection.slice()
             newSelection.push(series)
-            p.updateWidgetConfig(p.widgetKey, { ...p.config, ...{ seriesSelection: newSelection } })
+            updateWidgetConfig(
+                p.widgetKey,
+                { ...p.config, ...{ seriesSelection: newSelection } },
+                p.dashBoardData,
+                p.currentDashBoard,
+                p.enableDrag,
+                p.saveDashboard,
+                p.updateAppState
+            )
         } else {
             let newSelection = p.config.seriesSelection.slice()
             newSelection.splice(newSelection.indexOf(series), 1)
-            p.updateWidgetConfig(p.widgetKey, { ...p.config, ...{ seriesSelection: newSelection } })
+            updateWidgetConfig(
+                p.widgetKey,
+                { ...p.config, ...{ seriesSelection: newSelection } },
+                p.dashBoardData,
+                p.currentDashBoard,
+                p.enableDrag,
+                p.saveDashboard,
+                p.updateAppState
+            )
         }
     }
 
@@ -536,9 +610,15 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
 
     function changeStockSelection(e) { //DELETE IF no target stock
         const target = e.target.value;
-        p.updateWidgetConfig(p.widgetKey, {
-            ...p.config, ...{ targetSecurity: target, }
-        })
+        updateWidgetConfig(
+            p.widgetKey,
+            { ...p.config, ...{ targetSecurity: target, } },
+            p.dashBoardData,
+            p.currentDashBoard,
+            p.enableDrag,
+            p.saveDashboard,
+            p.updateAppState
+        )
     }
 
     function changeSeriesSelection(e) {

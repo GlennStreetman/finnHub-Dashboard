@@ -1,16 +1,21 @@
 import React, { ReactElement } from 'react'
 import { dStock } from '../appFunctions/formatStockSymbols'
 import { stockList, config } from '../App'
+import { updateWidgetConfig } from 'src/appFunctions/appImport/widgetLogic'
+import { dashBoardData } from 'src/App'
 
 interface props {
     widgetType: string,
-    updateWidgetConfig: Function,
-    widgetKey: string,
+    widgetKey: number,
     trackedStocks: stockList,
     exchangeList: string[],
     config: config,
-
     callback?: Function | false //any additional logic that needs to be run on change to focus. Reset pagination?
+    dashBoardData: dashBoardData
+    currentDashBoard: string,
+    enableDrag: boolean,
+    saveDashboard: Function,
+    updateAppState: Function,
 }
 
 export default function WidgetFocus(p: props): ReactElement {
@@ -18,9 +23,15 @@ export default function WidgetFocus(p: props): ReactElement {
 
     function changeStockSelection(e) {
         const target = e.target.value;
-        p.updateWidgetConfig(p.widgetKey, {
-            ...p.config, ...{ targetSecurity: target }
-        })
+        updateWidgetConfig(
+            p.widgetKey,
+            { ...p.config, ...{ targetSecurity: target } },
+            p.dashBoardData,
+            p.currentDashBoard,
+            p.enableDrag,
+            p.saveDashboard,
+            p.updateAppState
+        )
         if (p.callback) { p.callback() }
     }
 

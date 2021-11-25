@@ -15,6 +15,7 @@ import WidgetFocus from '../../../components/widgetFocus'
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 import { UpdateWidgetFilters } from 'src/appFunctions/appImport/widgetLogic'
+import { updateWidgetConfig } from 'src/appFunctions/appImport/widgetLogic'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -68,7 +69,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     }, [p?.config?.targetSecurity])
 
     useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey, isInitialMount, p.config) //sets security focus in config. Used for redux.visable data and widget excel templating.	
+    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, p.saveDashboard, p.updateAppState) //sets security focus in config. Used for redux.visable data and widget excel templating.	
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
@@ -76,37 +77,51 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         key: number = p.widgetKey,
         trackedStock = p.trackedStocks,
         keyList: string[] = Object.keys(p.trackedStocks),
-        updateWidgetConfig: Function = p.updateWidgetConfig
     ) => {
         if (!p.config.targetSecurity) {
             const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
-            updateWidgetConfig(key, {
-                targetSecurity: newSource,
-                targetReport: 'bs',
-                pagination: 0,
-                year: rShowData ? rShowData[0]?.year : '',
-                quarter: rShowData ? rShowData[0]?.quarter : ''
-            })
+            updateWidgetConfig(
+                key,
+                {
+                    targetSecurity: newSource,
+                    targetReport: 'bs',
+                    pagination: 0,
+                    year: rShowData ? rShowData[0]?.year : '',
+                    quarter: rShowData ? rShowData[0]?.quarter : ''
+                },
+                p.dashBoardData,
+                p.currentDashBoard,
+                p.enableDrag,
+                p.saveDashboard,
+                p.updateAppState
+            )
         }
-    }, [p.updateWidgetConfig, rShowData, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
+    }, [rShowData, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
 
     useEffect(( //on change to pagination set config year and quarter.
         key: number = p.widgetKey,
-        updateWidgetConfig: Function = p.updateWidgetConfig,
+
         trackedStock = p.trackedStocks,
         keyList: string[] = Object.keys(p.trackedStocks),
     ) => {
         const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
         if (!p.config.quarter || p.config.year) {
-            updateWidgetConfig(key, {
+            updateWidgetConfig(
+                key, {
                 targetSecurity: p.config.targetSecurity ? p.config.targetSecurity : newSource,
                 targetReport: p.config.targetReport ? p.config.targetReport : 'bs',
                 year: rShowData ? rShowData[p.config.pagination]?.year : '',
                 quarter: rShowData ? rShowData[p.config.pagination]?.quarter : '',
                 pagination: p.config.pagination ? p.config.pagination : 0
-            })
+            },
+                p.dashBoardData,
+                p.currentDashBoard,
+                p.enableDrag,
+                p.saveDashboard,
+                p.updateAppState
+            )
         }
-    }, [p.updateWidgetConfig, rShowData, p.widgetKey, p.config.year, p.config.pagination, p.config.targetReport, p.config.targetSecurity, p.trackedStocks, p.config.quarter])
+    }, [rShowData, p.widgetKey, p.config.year, p.config.pagination, p.config.targetReport, p.config.targetSecurity, p.trackedStocks, p.config.quarter])
 
     function renderSearchPane() {
 
@@ -128,13 +143,20 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         const target = e.target.value;
         const key = `${p.widgetKey}-${p?.config?.targetSecurity}`
 
-        p.updateWidgetConfig(p.widgetKey, {
+        updateWidgetConfig(
+            p.widgetKey, {
             targetSecurity: p.config.targetSecurity,
             targetReport: target,
             year: p.config.year,
             quarter: p.config.quarter,
             pagination: p.config.pagination
-        })
+        },
+            p.dashBoardData,
+            p.currentDashBoard,
+            p.enableDrag,
+            p.saveDashboard,
+            p.updateAppState
+        )
         const tSearchMongoDBObj: tSearchMongoDBReq = { searchList: [key], dashboardID: p.dashboardID }
         dispatch(tSearchMongoDB(tSearchMongoDBObj))
     }
@@ -142,25 +164,41 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     async function changeFrequencySelection(e) {
         const target = e.target.value;
         await UpdateWidgetFilters(p.widgetKey, { frequency: target }, p.dashBoardData, p.currentDashBoard, p.updateAppState, dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
-        p.updateWidgetConfig(p.widgetKey, {
-            targetSecurity: p.config.targetSecurity,
-            targetReport: p.config.targetReort,
-            year: p.config.year,
-            quarter: p.config.quarter,
-            pagination: 0,
-        })
+        updateWidgetConfig(
+            p.widgetKey,
+            {
+                targetSecurity: p.config.targetSecurity,
+                targetReport: p.config.targetReort,
+                year: p.config.year,
+                quarter: p.config.quarter,
+                pagination: 0,
+            },
+            p.dashBoardData,
+            p.currentDashBoard,
+            p.enableDrag,
+            p.saveDashboard,
+            p.updateAppState
+        )
     }
 
     function changeIncrememnt(e) {
         const newPagination = p.config.pagination + e;
         if (newPagination > -1 && rShowData && newPagination <= Object.keys(rShowData).length - 1) {
-            p.updateWidgetConfig(p.widgetKey, {
-                targetSecurity: p.config.targetSecurity,
-                targetReport: p.config.targetReport,
-                pagination: newPagination,
-                year: rShowData[newPagination]['year'],
-                quarter: rShowData[newPagination]['quarter'],
-            })
+            updateWidgetConfig(
+                p.widgetKey,
+                {
+                    targetSecurity: p.config.targetSecurity,
+                    targetReport: p.config.targetReport,
+                    pagination: newPagination,
+                    year: rShowData[newPagination]['year'],
+                    quarter: rShowData[newPagination]['quarter'],
+                },
+                p.dashBoardData,
+                p.currentDashBoard,
+                p.enableDrag,
+                p.saveDashboard,
+                p.updateAppState
+            )
         }
     }
 
@@ -197,11 +235,15 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
             <>
                 <WidgetFocus
                     widgetType={p.widgetType}
-                    updateWidgetConfig={p.updateWidgetConfig}
                     widgetKey={p.widgetKey}
                     trackedStocks={p.trackedStocks}
                     exchangeList={p.exchangeList}
                     config={p.config}
+                    dashBoardData={p.dashBoardData}
+                    currentDashBoard={p.currentDashBoard}
+                    enableDrag={p.enableDrag}
+                    saveDashboard={p.saveDashboard}
+                    updateAppState={p.updateAppState}
                 />
                 <select data-testid='frequencySelectionm' className="btn" value={p.filters.frequency} onChange={changeFrequencySelection}>
                     {frequencySeleciton}
@@ -261,7 +303,6 @@ export function financialsAsReportedProps(that, key = "newWidgetNameProps") {
         filters: that.props.widgetList[key]["filters"],
         targetSecurity: that.props.targetSecurity,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        updateWidgetConfig: that.props.updateWidgetConfig,
         widgetKey: key,
         widgetHeader: that.props.widgetList[key].widgetHeader,
         dashBoardData: that.props.dashBoardData,

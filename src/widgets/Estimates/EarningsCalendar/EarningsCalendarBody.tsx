@@ -120,7 +120,7 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
 
 
     useDragCopy(ref, { pagination: pagination, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey, isInitialMount, p.config) //sets security focus in config. Used for redux.visable data and widget excel templating.
+    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, p.saveDashboard, p.updateAppState) //sets security focus in config. Used for redux.visable data and widget excel templating.
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
@@ -182,12 +182,15 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
                 <div id='earningsCalendarBody'>
                     <WidgetFocus
                         widgetType={p.widgetType}
-                        updateWidgetConfig={p.updateWidgetConfig}
                         widgetKey={p.widgetKey}
                         trackedStocks={p.trackedStocks}
                         exchangeList={p.exchangeList}
                         config={p.config}
-
+                        dashBoardData={p.dashBoardData}
+                        currentDashBoard={p.currentDashBoard}
+                        enableDrag={p.enableDrag}
+                        saveDashboard={p.saveDashboard}
+                        updateAppState={p.updateAppState}
                     />
                     <button data-testid="pageBackward" onClick={() => changePagination(-1)}>
                         <i className="fa fa-backward" aria-hidden="true"></i>
@@ -236,10 +239,8 @@ export function EarningsCalendarProps(that, key = "newWidgetNameProps") {
         apiKey: that.props.apiKey,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
         filters: that.props.widgetList[key]["filters"],
-
         widgetKey: key,
         exchangeList: that.props.exchangeList,
-        updateWidgetConfig: that.props.updateWidgetConfig,
         targetSecurity: that.props.targetSecurity,
         currentDashBoard: that.props.currentDashBoard,
         dashBoardData: that.props.dashBoardData,

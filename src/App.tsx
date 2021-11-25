@@ -6,7 +6,6 @@ import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
-import { updateWidgetConfig } from "./appFunctions/appImport/widgetLogic";
 import { saveDashboard } from "./appFunctions/appImport/setupDashboard";
 
 
@@ -100,9 +99,6 @@ class App extends React.Component<AppProps, AppState> {
 
         this.baseState = this.state; //used to reset state upon logout.
         //login state logic.
-
-        //app logic for creating/removing, modifying, populating widgets.
-        this.updateWidgetConfig = updateWidgetConfig.bind(this);
 
         //App logic for setting up dashboards.
         this.saveDashboard = saveDashboard.bind(this); //this will probable be last function to be unbound, not from this file.
@@ -304,7 +300,6 @@ class App extends React.Component<AppProps, AppState> {
                                 showMenuColumn={this.state.showMenuColumn}
                                 showStockWidgets={this.state.showStockWidgets}
                                 targetSecurity={this.state.targetSecurity}
-                                updateWidgetConfig={this.updateWidgetConfig}
                                 widgetCopy={this.state.widgetCopy}
                                 widgetList={widgetList}
                                 widgetLockDown={this.state.widgetLockDown}

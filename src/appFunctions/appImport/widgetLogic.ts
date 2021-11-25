@@ -178,36 +178,34 @@ export const UpdateWidgetFilters = async function (
 }
 
 //widget config changes how data is manipulated after being queried.
-export const updateWidgetConfig = function (widgetID: number, updateObj: config) { //replaces widget config object then saves changes to mongoDB & postgres.
+export const updateWidgetConfig = async function (widgetID: number, updateObj: config, dashBoardData: dashBoardData, currentDashBoard: string, enableDrag: boolean, saveDashboard: Function, updateAppState: Function) { //replaces widget config object then saves changes to mongoDB & postgres.
     //config changes used by mongoDB during excel templating.
     // console.log('setting up config', widgetID, updateObj)
-    const s: AppState = this.state
-    const updatedDashboardData: dashBoardData = produce(s.dashBoardData, (draftState: dashBoardData) => {
-        const oldConfig = draftState[s.currentDashBoard].widgetlist[widgetID].config
-        draftState[s.currentDashBoard].widgetlist[widgetID].config = { ...oldConfig, ...updateObj }
+    const updatedDashboardData: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
+        const oldConfig = draftState[currentDashBoard].widgetlist[widgetID].config
+        draftState[currentDashBoard].widgetlist[widgetID].config = { ...oldConfig, ...updateObj }
     })
     const payload: Partial<AppState> = { dashBoardData: updatedDashboardData }
-    this.setState(payload, () => {
-        if (this.state.enableDrag !== true) {
-            this.saveDashboard(this.state.currentDashBoard)
-            const updatedWidgetFilters = updatedDashboardData[s.currentDashBoard].widgetlist[widgetID].config
-            const postBody: reqBody = {
-                widget: widgetID,
-                config: updatedWidgetFilters,
-            }
-            const options = {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(postBody),
-            };
-
-            fetch("/updateGQLConfig", options)
-                .then((response) => { return response.json() })
-                .then(() => {
-                    // console.log('finndash widget config updated in mongoDB.')
-                })
+    await updateAppState(payload)
+    if (enableDrag !== true) {
+        saveDashboard(currentDashBoard)
+        const updatedWidgetFilters = updatedDashboardData[currentDashBoard].widgetlist[widgetID].config
+        const postBody: reqBody = {
+            widget: widgetID,
+            config: updatedWidgetFilters,
         }
-    })
+        const options = {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(postBody),
+        };
+
+        fetch("/updateGQLConfig", options)
+        // .then((response) => { return response.json() })
+        // .then(() => {
+        //     // console.log('finndash widget config updated in mongoDB.')
+        // })
+    }
 }
 
 export const toggleWidgetBody = function (widgetID: string, stateRef: 'menuWidget' | 'stockWidget', dashBoardData: dashBoardData, menuList: menuList, currentDashBoard: string) {

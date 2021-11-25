@@ -17,6 +17,7 @@ import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
 import { rBuildDataModel } from 'src/slices/sliceDataModel'
 
 import { UpdateWidgetFilters } from 'src/appFunctions/appImport/widgetLogic'
+import { updateWidgetConfig } from 'src/appFunctions/appImport/widgetLogic'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -92,7 +93,7 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
     }, [start, end])
 
     useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useUpdateFocus(p.targetSecurity, p.updateWidgetConfig, p.widgetKey, isInitialMount, p.config) //sets security focus in config. Used for redux.visable data and widget excel templating.
+    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, p.saveDashboard, p.updateAppState) //sets security focus in config. Used for redux.visable data and widget excel templating.
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
@@ -168,9 +169,15 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
 
     function changeStockSelection(e) { //DELETE IF no target stock
         const target = e.target.value;
-        p.updateWidgetConfig(p.widgetKey, {
-            targetSecurity: target,
-        })
+        updateWidgetConfig(
+            p.widgetKey,
+            { targetSecurity: target, },
+            p.dashBoardData,
+            p.currentDashBoard,
+            p.enableDrag,
+            p.saveDashboard,
+            p.updateAppState,
+        )
         //if any configs need to be reset add logic here. Pagination?
     }
 

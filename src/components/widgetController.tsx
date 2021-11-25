@@ -60,7 +60,6 @@ function WidgetController(p) {
                     snapWidget: p.snapWidget,
                     stateRef: el.widgetConfig,
                     targetSecurity: p.targetSecurity,
-                    updateWidgetConfig: p.updateWidgetConfig,
                     widgetBodyProps: returnBodyProps({ props: p }, el.widgetType, el.widgetID),
                     widgetKey: el.widgetID,
                     widgetList: el,

@@ -1,19 +1,32 @@
 import { useEffect } from "react";
+import { updateWidgetConfig } from 'src/appFunctions/appImport/widgetLogic'
+import { dashBoardData } from 'src/App'
 
 
 export const useUpdateFocus = function ( //on update to p.targetFocus update p.config.targetSecurity
 
     newFocus: string, //p.targetSecurity
-    updateWidgetConfig: Function, //p.updateWidgetConfig
     key: number, // p.widgetKey, 
-    isInitialMount: any, //p.config.targetSecurity
     config: any,
+    dashBoardData: dashBoardData,
+    currentDashBoard: string,
+    enableDrag: boolean,
+    saveDashboard: Function,
+    updateAppState: Function,
 ) {
 
     useEffect(() => { //Setup default metric source if none selected or not in list of target stocks
         if (newFocus && newFocus !== '' && config.targetSecurity !== newFocus) { // && sInitialMount.current !== true 
             const payload = { targetSecurity: newFocus }
-            updateWidgetConfig(key, payload)
+            updateWidgetConfig(
+                key,
+                payload,
+                dashBoardData,
+                currentDashBoard,
+                enableDrag,
+                saveDashboard,
+                updateAppState
+            )
         }
-    }, [newFocus, key, updateWidgetConfig]) //targetSecurity
+    }, [newFocus, key]) //targetSecurity
 }
