@@ -4,6 +4,8 @@ import { stockList } from '../App'
 import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
 import { dashBoardData } from 'src/App'
 import { rBuildDataModel } from 'src/slices/sliceDataModel'
+import { rSetDashboardData } from 'src/slices/sliceDashboardData'
+
 
 import { useAppDispatch } from 'src/hooks';
 const useDispatch = useAppDispatch
@@ -30,15 +32,12 @@ export default function WidgetRemoveSecurityTable(p: Props): ReactElement {
                     key={el + "button"}
                     onClick={() => {
                         const update = UpdateWidgetStockList(p.widgetKey, el, p.dashBoardData, p.currentDashboard);
-                        p.updateAppState(update)
-                            .then(() => {
-                                const payload = {
-                                    apiKey: p.apiKey,
-                                    dashBoardData: p.dashBoardData
-                                }
-                                dispatch(rBuildDataModel(payload))
-                            })
-
+                        dispatch(rSetDashboardData(update))
+                        const payload = {
+                            apiKey: p.apiKey,
+                            dashBoardData: update
+                        }
+                        dispatch(rBuildDataModel(payload))
                     }}
                 >
                     <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>

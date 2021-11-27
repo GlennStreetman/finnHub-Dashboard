@@ -19,7 +19,7 @@ export const saveDashboard = async function (dashboardName: string) {
                         dashBoardName: dashboardName,
                         globalStockList: this.state.dashBoardData[this.props.currentDashboard].globalstocklist,
                         widgetList: this.state.dashBoardData[this.props.currentDashboard].widgetlist,
-                        menuList: this.state.menuList,
+                        menuList: this.props.menuList,
                     };
                     const options = {
                         method: "POST",

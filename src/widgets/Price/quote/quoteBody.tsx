@@ -13,6 +13,7 @@ import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityT
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 import { dStock } from './../../../appFunctions/formatStockSymbols'
 import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
+import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 import { rBuildDataModel } from 'src/slices/sliceDataModel'
 
 const useDispatch = useAppDispatch
@@ -191,14 +192,13 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
                                 key={el + "button"}
                                 onClick={() => {
                                     const update = UpdateWidgetStockList(p.widgetKey, el, p.dashBoardData, p.currentDashBoard);
-                                    p.updateAppState(update)
-                                        .then(() => {
-                                            const payload = {
-                                                apiKey: p.apiKey,
-                                                dashBoardData: p.dashBoardData
-                                            }
-                                            dispatch(rBuildDataModel(payload))
-                                        })
+                                    dispatch(rSetDashboardData(update))
+                                    const payload = {
+                                        apiKey: p.apiKey,
+                                        dashBoardData: update
+                                    }
+                                    dispatch(rBuildDataModel(payload))
+
                                 }}
                             >
                                 <i className="fa fa-times" aria-hidden="true"></i>

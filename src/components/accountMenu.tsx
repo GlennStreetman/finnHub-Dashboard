@@ -29,7 +29,6 @@ interface accountMenuProps2 {
 interface accountMenuState {
     loginName: string,
     email: string,
-    // apiKey: string,
     webHook: string,
     editToggle: number,
     editField: string,
@@ -268,7 +267,9 @@ class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
 
 const mapStateToProps = (state: storeState) => ({
     apiKey: state.apiKey,
-    apiAlias: state.apiAlias
+    apiAlias: state.apiAlias,
+    exchangeList: state.exchangeList.exchangeList,
+    defaultExchange: state.defaultExchange,
 });
 
 export function accountMenuProps(that: any, key = "AccountMenu") {
@@ -276,9 +277,7 @@ export function accountMenuProps(that: any, key = "AccountMenu") {
         finnHubQueue: that.state.finnHubQueue,
         widgetKey: key,
         updateAppState: that.updateAppState,
-        exchangeList: that.state.exchangeList,
         tGetSymbolList: that.props.tGetSymbolList,
-        defaultExchange: that.state.defaultExchange,
         backgroundMenu: that.state.backgroundMenu,
     };
     return propList;

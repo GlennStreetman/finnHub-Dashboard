@@ -19,7 +19,7 @@ import { rExchangeDataLogout } from "src/slices/sliceExchangeData";
 import { rExchangeListLogout } from "src/slices/sliceExchangeList";
 import { rTargetDashboardLogout } from "src/slices/sliceShowData";
 import { tGetFinnhubData } from "src/thunks/thunkFetchFinnhub";
-
+import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 import { toggleBackGroundMenu } from 'src/appFunctions/appImport/toggleBackGroundMenu'
 
 interface topNavProps {
@@ -68,7 +68,7 @@ function TopNav(p: topNavProps) {
                     <a key={a} data-testid={d} href="#r" onClick={async () => {
                         const [newDash, widgetName] = CreateNewWidgetContainer(a, b, c, e, p.dashboardData, p.currentDashboard);
                         console.log('newDash', newDash)
-                        await p.updateAppState({ dashBoardData: newDash })
+                        dispatch(rSetDashboardData(newDash))
                         p.saveDashboard(p.currentDashboard)
                         const payload = {
                             apiKey: p.apiKey,

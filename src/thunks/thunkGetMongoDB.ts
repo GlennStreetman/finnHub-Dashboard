@@ -36,6 +36,7 @@ export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
             return new Promise((async (resolve: any) => {
                 const getData = await fetch(fetchString)
                 const freshData = await getData.json()
+
                 const resObj: getMongoRes = {}
                 for (const x in freshData.resList) {
                     const mongo = freshData.resList[x]
@@ -50,6 +51,7 @@ export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
                         widgetType: mongo.widgetType
                     }
                 }
+                console.log('tGetMongoDB', reqObj, '---', freshData, '--s--', resObj)
                 resolve(resObj)
             }))
 

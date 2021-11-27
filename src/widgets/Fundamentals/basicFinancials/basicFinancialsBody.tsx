@@ -16,6 +16,7 @@ import { dStock } from './../../../appFunctions/formatStockSymbols'
 
 import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
 import { rBuildDataModel } from 'src/slices/sliceDataModel'
+import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 
 import { updateWidgetConfig } from 'src/appFunctions/appImport/widgetLogic'
 
@@ -111,7 +112,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 p.currentDashBoard,
                 p.enableDrag,
                 p.saveDashboard,
-                p.updateAppState
+                dispatch,
             )
         }
     }, [seriesList, p.config.targetSeries, p.widgetKey, p.config])
@@ -174,7 +175,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 p.currentDashBoard,
                 p.enableDrag,
                 p.saveDashboard,
-                p.updateAppState
+                dispatch,
             )
         }
     }, [p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
@@ -213,7 +214,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             p.currentDashBoard,
             p.enableDrag,
             p.saveDashboard,
-            p.updateAppState
+            dispatch,
         )
     }
 
@@ -226,7 +227,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             p.currentDashBoard,
             p.enableDrag,
             p.saveDashboard,
-            p.updateAppState
+            dispatch,
         )
     }
 
@@ -238,7 +239,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             p.currentDashBoard,
             p.enableDrag,
             p.saveDashboard,
-            p.updateAppState
+            dispatch,
         )
     }
 
@@ -256,7 +257,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 p.currentDashBoard,
                 p.enableDrag,
                 p.saveDashboard,
-                p.updateAppState
+                dispatch,
             )
         }
     }
@@ -278,7 +279,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 p.currentDashBoard,
                 p.enableDrag,
                 p.saveDashboard,
-                p.updateAppState
+                dispatch,
             )
         } else {
             let newSelection = p.config.metricSelection.slice()
@@ -290,7 +291,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 p.currentDashBoard,
                 p.enableDrag,
                 p.saveDashboard,
-                p.updateAppState
+                dispatch,
             )
         }
     }
@@ -306,7 +307,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 p.currentDashBoard,
                 p.enableDrag,
                 p.saveDashboard,
-                p.updateAppState
+                dispatch,
             )
         } else {
             let newSelection = p.config.seriesSelection.slice()
@@ -318,7 +319,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 p.currentDashBoard,
                 p.enableDrag,
                 p.saveDashboard,
-                p.updateAppState
+                dispatch,
             )
         }
     }
@@ -557,14 +558,12 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 })
         } else {
             const update = UpdateWidgetStockList(p.widgetKey, stock, p.dashBoardData, p.currentDashBoard);
-            p.updateAppState(update)
-                .then(() => {
-                    const payload = {
-                        apiKey: p.apiKey,
-                        dashBoardData: p.dashBoardData
-                    }
-                    dispatch(rBuildDataModel(payload))
-                })
+            dispatch(rSetDashboardData(update))
+            const payload = {
+                apiKey: p.apiKey,
+                dashBoardData: p.dashBoardData
+            }
+            dispatch(rBuildDataModel(payload))
         }
     }
 
@@ -617,7 +616,7 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             p.currentDashBoard,
             p.enableDrag,
             p.saveDashboard,
-            p.updateAppState
+            dispatch,
         )
     }
 
@@ -725,7 +724,6 @@ export function metricsProps(that, key = "newWidgetNameProps") {
         filters: that.props.widgetList[key]["filters"],
         targetSecurity: that.props.targetSecurity,
         trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        updateWidgetConfig: that.props.updateWidgetConfig,
         widgetKey: key,
         dashBoardData: that.props.dashBoardData,
         currentDashBoard: that.props.currentDashBoard

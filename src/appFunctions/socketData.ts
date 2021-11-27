@@ -58,7 +58,7 @@ function UpdateTickerSockets(context: any, socket: any, apiKey: string, globalSt
 function LoadTickerSocket(context: any, prevState: AppState, prevProps: AppProps, globalStockList: globalStockList, socket: any, apiKey: string, updateTickerSockets: Function) {
     const that = context
     //    /console.log('SOCKET', apiKey)
-    if (globalStockList !== prevState.dashBoardData?.[prevProps.currentDashboard]?.globalstocklist && apiKey !== "" && apiKey) {
+    if (globalStockList !== prevProps.dashboardData?.[prevProps.currentDashboard]?.globalstocklist && apiKey !== "" && apiKey) {
         if (socket === '' && apiKey !== undefined && apiKey !== '' && apiKey.indexOf('sandbox') === -1) {
             socket = new WebSocket(`wss://ws.finnhub.io?token=${apiKey}`)
         }

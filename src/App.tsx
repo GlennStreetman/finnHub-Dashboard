@@ -35,6 +35,8 @@ import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 import { tGetSavedDashboards } from './thunks/thunkGetSavedDashboards'
 import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
 import { rUpdateCurrentDashboard } from 'src/slices/sliceCurrentDashboard'
+import { rSetMenuList, sliceMenuList } from 'src/slices/sliceMenuList'
+import { rSetDashboardData, sliceDashboardData } from 'src/slices/sliceDashboardData'
 
 
 
@@ -74,11 +76,9 @@ class App extends React.Component<AppProps, AppState> {
             aboutMenu: 0,
             apiFlag: 0, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
             backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
-            dashBoardData: {}, //All saved dashboards
             finnHubQueue: createFunctionQueueObject(1, 1000, true),
             login: 0, //login state. 0 logged out, 1 logged in.
             showMenuColumn: true, //true shows column 0
-            menuList: {}, //lists of all menu widgets.
             enableDrag: false,
             saveDashboardThrottle: Date.now(),
             saveDashboardFlag: false,
@@ -98,7 +98,7 @@ class App extends React.Component<AppProps, AppState> {
         this.updateAppState = this.updateAppState.bind(this)
 
         //update and apply state, in module.
-        this.rebuildDashboardState = this.rebuildDashboardState.bind(this) //sets s.dashboardData. Used to build dataModel in redux
+        this.rebuildDashboardState = this.rebuildDashboardState.bind(this) //sets p.dashboardData. Used to build dataModel in redux
         this.rebuildVisableDashboard = this.rebuildVisableDashboard.bind(this) //rebuilds dashboard in redux state.dataModel
     }
 
@@ -121,8 +121,8 @@ class App extends React.Component<AppProps, AppState> {
             })
         }
 
-        const globalStockList = this.state.dashBoardData?.[this.props.currentDashboard]?.globalstocklist ? this.state.dashBoardData?.[this.props.currentDashboard].globalstocklist : false
-        if ((globalStockList && globalStockList !== prevState.dashBoardData?.[prevProps.currentDashboard]?.globalstocklist && this.state.login === 1)) { //price data for watchlist, including socket data.
+        const globalStockList = this.props.dashboardData?.[this.props.currentDashboard]?.globalstocklist ? this.props.dashboardData?.[this.props.currentDashboard].globalstocklist : false
+        if ((globalStockList && globalStockList !== prevProps.dashboardData?.[prevProps.currentDashboard]?.globalstocklist && this.state.login === 1)) { //price data for watchlist, including socket data.
             LoadTickerSocket(this, prevState, prevProps, globalStockList, this.state.socket, this.props.apiKey, UpdateTickerSockets);
         }
 
@@ -144,46 +144,42 @@ class App extends React.Component<AppProps, AppState> {
         })
     }
 
-    async rebuildDashboardState() { //fetches dashboard data, then updates s.dashBoardData, then builds redux model.
+    async rebuildDashboardState() { //fetches dashboard data, then updates p.dashboardData, then builds redux model.
         try {
             const data = await this.props.tGetSavedDashboards({ apiKey: this.props.apiKey }).unwrap()
 
-            const payload = {
-                dashBoardData: data.dashBoardData,
-                menuList: data.menuList!,
-            }
             this.props.rUpdateCurrentDashboard(data.currentDashBoard)
-            this.setState(payload, async () => {
-                this.props.rResetUpdateFlag() //sets all dashboards status to updating in redux store.
+            this.props.rSetMenuList(data.menuList)
+            this.props.rSetDashboardData(data.dashBoardData)
+            this.props.rResetUpdateFlag() //sets all dashboards status to updating in redux store.
 
-                const s: AppState = this.state;
-                const p: AppProps = this.props;
-                await p.tGetMongoDB()
-                const targetDash: string[] = s.dashBoardData?.[p.currentDashboard]?.widgetlist ? Object.keys(s.dashBoardData?.[p.currentDashboard]?.widgetlist) : []
-                for (const widget in targetDash) {
-                    const payload: tgetFinnHubDataReq = { //get data for default dashboard.
-                        dashboardID: s.dashBoardData[p.currentDashboard].id,
-                        targetDashBoard: p.currentDashboard,
-                        widgetList: [targetDash[widget]],
+            const s: AppState = this.state;
+            const p: AppProps = this.props;
+            await p.tGetMongoDB()
+            const targetDash: string[] = p.dashboardData?.[p.currentDashboard]?.widgetlist ? Object.keys(p.dashboardData?.[p.currentDashboard]?.widgetlist) : []
+            for (const widget in targetDash) {
+                const payload: tgetFinnHubDataReq = { //get data for default dashboard.
+                    dashboardID: p.dashboardData[p.currentDashboard].id,
+                    targetDashBoard: p.currentDashboard,
+                    widgetList: [targetDash[widget]],
+                    finnHubQueue: s.finnHubQueue,
+                    rSetUpdateStatus: p.rSetUpdateStatus,
+                }
+                p.tGetFinnhubData(payload)
+            }
+            const dashBoards: string[] = Object.keys(p.dashboardData) //get data for dashboards not being shown
+            for (const dash of dashBoards) {
+                if (dash !== p.currentDashboard) {
+                    const payload: tgetFinnHubDataReq = { //run in background, do not await.
+                        dashboardID: p.dashboardData[dash].id,
+                        targetDashBoard: dash,
+                        widgetList: Object.keys(p.dashboardData[dash].widgetlist),
                         finnHubQueue: s.finnHubQueue,
                         rSetUpdateStatus: p.rSetUpdateStatus,
                     }
-                    p.tGetFinnhubData(payload)
+                    await p.tGetFinnhubData(payload)
                 }
-                const dashBoards: string[] = Object.keys(s.dashBoardData) //get data for dashboards not being shown
-                for (const dash of dashBoards) {
-                    if (dash !== p.currentDashboard) {
-                        const payload: tgetFinnHubDataReq = { //run in background, do not await.
-                            dashboardID: s.dashBoardData[dash].id,
-                            targetDashBoard: dash,
-                            widgetList: Object.keys(s.dashBoardData[dash].widgetlist),
-                            finnHubQueue: s.finnHubQueue,
-                            rSetUpdateStatus: p.rSetUpdateStatus,
-                        }
-                        await p.tGetFinnhubData(payload)
-                    }
-                }
-            })
+            }
 
         } catch (error: any) {
             console.error("Failed to recover dashboards");
@@ -193,17 +189,17 @@ class App extends React.Component<AppProps, AppState> {
     async rebuildVisableDashboard() {
         const payload = {
             apiKey: this.props.apiKey,
-            dashBoardData: this.state.dashBoardData[this.props.currentDashboard],
+            dashBoardData: this.props.dashboardData[this.props.currentDashboard],
             targetDashboard: this.props.currentDashboard,
         }
         this.props.rRebuildTargetDashboardModel(payload) //rebuilds redux.Model
         const s: AppState = this.state;
         const p: AppProps = this.props;
-        await p.tGetMongoDB({ dashboard: s.dashBoardData[p.currentDashboard].id })
+        await p.tGetMongoDB({ dashboard: p.dashboardData[p.currentDashboard].id })
         const payload2: tgetFinnHubDataReq = {
-            dashboardID: s.dashBoardData[p.currentDashboard].id,
+            dashboardID: p.dashboardData[p.currentDashboard].id,
             targetDashBoard: p.currentDashboard,
-            widgetList: Object.keys(s.dashBoardData[p.currentDashboard].widgetlist),
+            widgetList: Object.keys(p.dashboardData[p.currentDashboard].widgetlist),
             finnHubQueue: s.finnHubQueue,
             rSetUpdateStatus: p.rSetUpdateStatus,
         }
@@ -237,10 +233,10 @@ class App extends React.Component<AppProps, AppState> {
             return <div className="backgroundMenu">{backGroundSelection[s.backGroundMenu]}</div>;
         };
 
-        const widgetList = this.state.dashBoardData?.[this.props.currentDashboard]?.['widgetlist'] ?
-            this.state.dashBoardData?.[this.props.currentDashboard]['widgetlist'] : {}
+        const widgetList = this.props.dashboardData?.[this.props.currentDashboard]?.['widgetlist'] ?
+            this.props.dashboardData?.[this.props.currentDashboard]['widgetlist'] : {}
 
-        const dashboardID = this.state.dashBoardData?.[this.props.currentDashboard]?.id ? this.state.dashBoardData[this.props.currentDashboard].id : ''
+        const dashboardID = this.props.dashboardData?.[this.props.currentDashboard]?.id ? this.props.dashboardData[this.props.currentDashboard].id : ''
         // const bottomNav = this.state.login === 1 ? <BottomNav showMenuColumn={this.state.showMenuColumn} /> : <></>
 
         return (
@@ -255,7 +251,7 @@ class App extends React.Component<AppProps, AppState> {
                                 widgetSetup={this.state.widgetSetup}
                                 updateAppState={this.updateAppState}
                                 baseState={this.baseState}
-                                dashboardData={this.state.dashBoardData}
+                                dashboardData={this.props.dashboardData}
                                 currentDashboard={this.props.currentDashboard}
                                 saveDashboard={this.saveDashboard}
                                 apiKey={this.props.apiKey}
@@ -265,14 +261,14 @@ class App extends React.Component<AppProps, AppState> {
                                 apiKey={this.props.apiKey}
                                 apiAlias={this.props.apiAlias}
                                 currentDashBoard={this.props.currentDashboard}
-                                dashBoardData={this.state.dashBoardData}
+                                dashBoardData={this.props.dashboardData}
                                 dashboardID={dashboardID}
                                 defaultExchange={this.props.defaultExchange}
                                 enableDrag={this.state.enableDrag}
                                 exchangeList={this.props.exchangeList}
                                 finnHubQueue={this.state.finnHubQueue}
                                 login={this.state.login}
-                                menuList={this.state.menuList}
+                                menuList={this.props.menuList}
                                 newDashboard={this.newDashboard}
                                 saveDashboard={this.saveDashboard}
                                 showMenuColumn={this.state.showMenuColumn}
@@ -303,7 +299,9 @@ const mapStateToProps = (state: storeState) => ({
     apiAlias: state.apiAlias,
     defaultExchange: state.defaultExchange,
     targetSecurity: state.targetSecurity,
-    currentDashboard: state.currentDashboard
+    currentDashboard: state.currentDashboard,
+    menuList: state.menuList,
+    dashboardData: state.dashboardData
 });
 
 export default connect(mapStateToProps, {
@@ -325,6 +323,8 @@ export default connect(mapStateToProps, {
     tGetSavedDashboards,
     rSetTargetSecurity,
     rUpdateCurrentDashboard,
+    rSetMenuList,
+    rSetDashboardData
 })(App);
 
 
@@ -332,7 +332,6 @@ export default connect(mapStateToProps, {
 
 export interface stock {
     currency: string,
-    dStock: Function,
     description: string,
     displaySymbol: string,
     exchange: string,
@@ -423,10 +422,12 @@ export interface AppProps {
     apiKey: string,
     apiAlias: string,
     currentDashboard: string,
+    dashboardData: sliceDashboardData,
     exchangeList: string[],
     targetSecurity: string,
     dataModel: sliceDataModel,
     defaultExchange: string,
+    menuList: sliceMenuList,
     tGetSymbolList: Function,
     tGetFinnhubData: Function,
     tGetMongoDB: Function,
@@ -445,6 +446,8 @@ export interface AppProps {
     tGetSavedDashboards: Function,
     rSetTargetSecurity: Function,
     rUpdateCurrentDashboard: Function,
+    rSetMenuList: Function,
+    rSetDashboardData: Function,
 }
 
 export interface AppState {
@@ -452,12 +455,11 @@ export interface AppState {
     aboutMenu: number,
     apiFlag: number, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
     backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
-    dashBoardData: dashBoardData, //All saved dashboards
+    // dashBoardData: dashBoardData, //All saved dashboards
     enableDrag: boolean,
     finnHubQueue: finnHubQueue,
     login: number, //login state. 0 logged out, 1 logged in.
     showMenuColumn: boolean, //true shows column 0
-    menuList: menuList, //lists of all menu widgets.
     saveDashboardThrottle: number, //delay timer for saving dashboard.
     saveDashboardFlag: boolean, //sets to true when a save starts.
     socket: any, //socket connection for streaming stock data.+

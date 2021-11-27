@@ -7,9 +7,12 @@ import { useState, useEffect } from "react";
 import { useAppDispatch } from '../hooks';
 import { rUnmountWidget } from '../slices/sliceShowData'
 import { rRemoveWidgetDataModel } from '../slices/sliceDataModel'
-import { ChangeWidgetName, toggleWidgetBody } from 'src/appFunctions/appImport/widgetLogic'
+import { toggleWidgetBody } from 'src/appFunctions/appImport/widgetLogic'
 import { RemoveWidget } from 'src/appFunctions/appImport/widgetLogic'
-import { setDrag, moveWidget, SnapWidget } from 'src/appFunctions/appImport/widgetGrid'
+import { setDragWidget, setDragMenu, moveWidget, SnapWidget } from 'src/appFunctions/appImport/widgetGrid'
+import { rSetMenuList } from 'src/slices/sliceMenuList'
+import { tChangeWidgetName } from 'src/thunks/thunkChangeWidgetName'
+import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 
 
 //creates widget container. Used by all widgets.
@@ -60,10 +63,13 @@ function WidgetContainer(p) {
         setRenderHeader(e.target.value)
     }
 
-    function updateHeader(e) {//changes widget name.
+    async function updateHeader(e) {//changes widget name.
         if (p.stateRef === "stockWidget") {
-            const newDashboard = ChangeWidgetName(p.widgetKey, e.target.value, p.dashboardData, p.currentDashBoard);
-            p.updateAppState(newDashboard)
+            await dispatch(tChangeWidgetName({
+                stateRef: 'widgetList',
+                widgetID: p.widgetKey,
+                newName: e.target.value,
+            }))
             p.saveDashboard(p.currentDashBoard)
         }
     }
@@ -88,8 +94,17 @@ function WidgetContainer(p) {
 
             xAxis = e.clientX + window.scrollX
             yAxis = e.clientY
-            const newDrag = await setDrag(p.stateRef, p.currentDashBoard, p.dashboardData, p.menuList, p.widgetKey, widgetState.state)
-            await p.updateAppState(newDrag)
+            if (p.stateRef === 'stockWidget') {
+                const [newDrag, widgets] = await setDragWidget(p.currentDashBoard, p.dashboardData, p.widgetKey, widgetState.state)
+                await p.updateAppState(newDrag)
+                dispatch(rSetDashboardData(widgets))
+            } else {
+                const [payload, menu] = await setDragMenu(p.menuList, p.widgetKey, widgetState.state)
+                await p.updateAppState(payload)
+                dispatch(rSetMenuList(menu))
+            }
+
+
             document.onmouseup = closeDragElement;
             document.onmousemove = elementDrag;
         }
@@ -121,8 +136,10 @@ function WidgetContainer(p) {
             document.onmousemove = null;
             const payload = moveWidget(p.stateRef, p.dashboardData, p.menuList, p.currentDashBoard, p.widgetKey, newX, newY);
             await p.updateAppState(payload)
-            const snapPayload = await SnapWidget(p.widgetList['widgetConfig'], p.widgetKey, xAxis, yAxis, widgetWidth, p.focus, p.dashboardData, p.menuList, p.currentDashBoard)
+            const [snapPayload, dashboard, menu] = await SnapWidget(p.widgetList['widgetConfig'], p.widgetKey, xAxis, yAxis, widgetWidth, p.focus, p.dashboardData, p.menuList, p.currentDashBoard)
             await p.updateAppState(snapPayload)
+            dispatch(rSetDashboardData(dashboard))
+            dispatch(rSetMenuList(menu))
             p.saveDashboard(p.currentDashBoard)
 
         }
@@ -225,7 +242,7 @@ function WidgetContainer(p) {
                             onClick={async () => {
                                 if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
                                     const updateWidgets = await RemoveWidget(p.widgetKey, p.dashboardData, p.currentDashBoard);
-                                    console.log('updateWidgets', updateWidgets)
+                                    dispatch(rSetDashboardData(updateWidgets))
                                     await p.updateAppState(updateWidgets)
                                     p.saveDashboard(p.currentDashBoard) //saved updated dashboard to postgres.
                                     fetch(`/deleteFinnDashData?widgetID=${p.widgetKey}`) //delete from mongo.

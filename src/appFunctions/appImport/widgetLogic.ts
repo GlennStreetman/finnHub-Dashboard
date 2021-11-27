@@ -5,6 +5,7 @@ import { rRebuildTargetWidgetModel } from 'src/slices/sliceDataModel'
 import { tGetFinnhubData } from 'src/thunks/thunkFetchFinnhub'
 import { rSetUpdateStatus } from 'src/slices/sliceDataModel'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
+import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 
 function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
     const testName = iterator === 0 ? widgetName : widgetName + iterator
@@ -53,29 +54,6 @@ export const CreateNewWidgetContainer = function (
     return ([newDashBoardData, widgetName])
 }
 
-
-export const ChangeWidgetName = function (widgetID: string | number, newName: string, dashBoardData: dashBoardData, currentDashboard: string,) {
-
-    const widgetList = dashBoardData[currentDashboard].widgetlist
-    const widgetIds = widgetList ? Object.keys(widgetList) : []
-    const widgetNameList = widgetIds.map((el) => widgetList[el].widgetHeader)
-
-    const useName = uniqueName(newName, widgetNameList)
-
-    const widgetGroup: widgetList = dashBoardData[currentDashboard].widgetlist
-    const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
-        draftState[widgetID].widgetHeader = useName
-    })
-    const newDashboardData: dashBoardData = produce(dashBoardData, (draftState) => {
-        draftState[currentDashboard].widgetlist = newWidgetList
-    })
-    const payload: Partial<AppState> = {
-        'dashBoardData': newDashboardData,
-    }
-    return payload
-}
-
-
 export const RemoveWidget = async function (widgetID: string | number, dashboardData: dashBoardData, currentDashboard: string) {
 
     console.log(widgetID, dashboardData, currentDashboard)
@@ -84,14 +62,16 @@ export const RemoveWidget = async function (widgetID: string | number, dashboard
         delete thisWidgetList[widgetID]
     })
 
-    const payload: Partial<AppState> = {
-        dashBoardData: newDashboardData,
-    }
-    return payload
-
+    return newDashboardData
 }
 
-export const UpdateWidgetStockList = function (widgetId: number, symbol: string, dashBoardData: dashBoardData, currentDashboard: string, stockObj: stock | Object = {}) {
+export const UpdateWidgetStockList = function (
+    widgetId: number,
+    symbol: string,
+    dashBoardData:
+        dashBoardData,
+    currentDashboard: string,
+    stockObj: stock | Object = {}) {
     //adds if not present, else removes stock from widget specific stock list.
     if (isNaN(widgetId) === false) {
 
@@ -113,10 +93,7 @@ export const UpdateWidgetStockList = function (widgetId: number, symbol: string,
         const updatedDashBoard: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
             draftState[currentDashboard].widgetlist = newWidgetList
         })
-        const payload: Partial<AppState> = {
-            dashBoardData: updatedDashBoard,
-        }
-        return payload
+        return updatedDashBoard
     }
 }
 
@@ -140,44 +117,46 @@ export const UpdateWidgetFilters = async function (
                 ...data
             }
         })
-        const payload: Partial<AppState> = {
-            dashBoardData: newDashBoardData,
-        }
 
-        updateAppState(payload).then(() => {
-            // delete records from mongoDB then rebuild dataset.
-            fetch(`/deleteFinnDashData?widgetID=${widgetID}`)
-
-            dispatch(rRebuildTargetWidgetModel({ //rebuild data model (removes stale dates)
-                apiKey: apiKey,
-                dashBoardData: dashBoardData,
-                targetDashboard: currentDashboard,
-                targetWidget: widgetID,
-            }))
-            //remove visable data?
-            dispatch(tGetFinnhubData({//fetch fresh data
-                dashboardID: dashBoardData[currentDashboard].id,
-                targetDashBoard: currentDashboard,
-                widgetList: [widgetID],
-                finnHubQueue: finnHubQueue,
-                rSetUpdateStatus: rSetUpdateStatus,
-            }))
-            saveDashboard(currentDashboard)
-        })
+        dispatch(rSetDashboardData(newDashBoardData))
+        fetch(`/deleteFinnDashData?widgetID=${widgetID}`)
+        dispatch(rRebuildTargetWidgetModel({ //rebuild data model (removes stale dates)
+            apiKey: apiKey,
+            dashBoardData: dashBoardData,
+            targetDashboard: currentDashboard,
+            targetWidget: widgetID,
+        }))
+        //remove visable data?
+        dispatch(tGetFinnhubData({//fetch fresh data
+            dashboardID: dashBoardData[currentDashboard].id,
+            targetDashBoard: currentDashboard,
+            widgetList: [widgetID],
+            finnHubQueue: finnHubQueue,
+            rSetUpdateStatus: rSetUpdateStatus,
+        }))
+        saveDashboard(currentDashboard)
     } catch { console.log("Problem updating widget filters."); return false }
 
 }
 
 //widget config changes how data is manipulated after being queried.
-export const updateWidgetConfig = async function (widgetID: number, updateObj: config, dashBoardData: dashBoardData, currentDashboard: string, enableDrag: boolean, saveDashboard: Function, updateAppState: Function) { //replaces widget config object then saves changes to mongoDB & postgres.
+export const updateWidgetConfig = async function (
+    widgetID: number,
+    updateObj: config,
+    dashBoardData: dashBoardData,
+    currentDashboard: string,
+    enableDrag: boolean,
+    saveDashboard: Function,
+    dispatch: Function) { //replaces widget config object then saves changes to mongoDB & postgres.
     //config changes used by mongoDB during excel templating.
     // console.log('setting up config', widgetID, updateObj)
     const updatedDashboardData: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
         const oldConfig = draftState[currentDashboard].widgetlist[widgetID].config
         draftState[currentDashboard].widgetlist[widgetID].config = { ...oldConfig, ...updateObj }
     })
-    const payload: Partial<AppState> = { dashBoardData: updatedDashboardData }
-    await updateAppState(payload)
+    dispatch(rSetDashboardData(updatedDashboardData))
+    // const payload: Partial<AppState> = { dashBoardData: updatedDashboardData }
+    // await updateAppState(payload)
     if (enableDrag !== true) {
         saveDashboard(currentDashboard)
         const updatedWidgetFilters = updatedDashboardData[currentDashboard].widgetlist[widgetID].config
@@ -192,10 +171,6 @@ export const updateWidgetConfig = async function (widgetID: number, updateObj: c
         };
 
         fetch("/updateGQLConfig", options)
-        // .then((response) => { return response.json() })
-        // .then(() => {
-        //     // console.log('finndash widget config updated in mongoDB.')
-        // })
     }
 }
 

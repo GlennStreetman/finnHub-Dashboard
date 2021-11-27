@@ -15,6 +15,8 @@ import { dStock } from './../appFunctions/formatStockSymbols'
 
 import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
 import { rBuildDataModel } from 'src/slices/sliceDataModel'
+import { rSetDashboardData } from 'src/slices/sliceDashboardData'
+
 
 import { UpdateWidgetFilters } from 'src/appFunctions/appImport/widgetLogic'
 import { updateWidgetConfig } from 'src/appFunctions/appImport/widgetLogic'
@@ -131,15 +133,12 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
                         key={el + "button"}
                         onClick={() => {
                             const update = UpdateWidgetStockList(p.widgetKey, el, p.dashBoardData, p.currentDashBoard);
-                            p.updateAppState(update)
-                                .then(() => {
-                                    const payload = {
-                                        apiKey: p.apiKey,
-                                        dashBoardData: p.dashBoardData
-                                    }
-                                    dispatch(rBuildDataModel(payload))
-                                })
-
+                            dispatch(rSetDashboardData(update))
+                            const payload = {
+                                apiKey: p.apiKey,
+                                dashBoardData: update
+                            }
+                            dispatch(rBuildDataModel(payload))
                         }}
                     >
                         <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
@@ -176,7 +175,7 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
             p.currentDashBoard,
             p.enableDrag,
             p.saveDashboard,
-            p.updateAppState,
+            dispatch,
         )
         //if any configs need to be reset add logic here. Pagination?
     }

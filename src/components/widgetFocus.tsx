@@ -3,6 +3,7 @@ import { dStock } from '../appFunctions/formatStockSymbols'
 import { stockList, config } from '../App'
 import { updateWidgetConfig } from 'src/appFunctions/appImport/widgetLogic'
 import { dashBoardData } from 'src/App'
+import { useAppDispatch } from '../hooks';
 
 interface props {
     widgetType: string,
@@ -20,7 +21,7 @@ interface props {
 
 export default function WidgetFocus(p: props): ReactElement {
     //selector that sets widgets security focus. Used with widgets that display a single security at a time.
-
+    const dispatch = useAppDispatch(); //allows widget to run redux actions.
     function changeStockSelection(e) {
         const target = e.target.value;
         updateWidgetConfig(
@@ -30,7 +31,7 @@ export default function WidgetFocus(p: props): ReactElement {
             p.currentDashBoard,
             p.enableDrag,
             p.saveDashboard,
-            p.updateAppState
+            dispatch,
         )
         if (p.callback) { p.callback() }
     }

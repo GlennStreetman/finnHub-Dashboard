@@ -10,6 +10,7 @@ import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
 import { dashBoardData } from 'src/App'
 import { rBuildDataModel } from 'src/slices/sliceDataModel'
 import { useAppDispatch } from 'src/hooks';
+import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 
 const useDispatch = useAppDispatch
 //compnoent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
@@ -35,13 +36,6 @@ interface props {
 function StockSearchPane(p: props) {
 
     const dispatch = useDispatch(); //allows widget to run redux actions.
-
-    // useEffect(() => {
-    //     if (p.defaultExchange !== p.currentExchange) {
-    //         tGetSymbolList({ exchange: p.defaultExchange, apiKey: p.apiKey, finnHubQueue: p.finnHubQueue })
-    //     }
-    // }, [])
-
 
     function handleChange(e) {
 
@@ -89,14 +83,12 @@ function StockSearchPane(p: props) {
                         const thisStock = p.rUpdateStock
                         const stockKey = thisStock.key
                         const update = UpdateWidgetStockList(widgetKey, stockKey, p.dashBoardData, p.currentDashboard, thisStock);
-                        p.updateAppState(update)
-                            .then(() => {
-                                const payload = {
-                                    apiKey: p.apiKey,
-                                    dashBoardData: p.dashBoardData
-                                }
-                                dispatch(rBuildDataModel(payload))
-                            })
+                        dispatch(rSetDashboardData(update))
+                        const payload = {
+                            apiKey: p.apiKey,
+                            dashBoardData: update
+                        }
+                        dispatch(rBuildDataModel(payload))
 
                     } else {
                         console.log(`invalid stock selection:`, p.rUpdateStock, p.searchText);

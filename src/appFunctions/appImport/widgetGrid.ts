@@ -1,41 +1,30 @@
 import produce from "immer"
 import { AppState, widget, menu, menuList, widgetList, dashBoardData } from './../../App'
 
-const setDragWidget = function (currentDashboard: string, dashBoardData: dashBoardData, widgetId: string | number, widgetCopy: widget) {
-    const updatedWidgetLocation = produce(dashBoardData, (draftState: menuList | widgetList) => {
+export const setDragWidget = function (currentDashboard: string, dashBoardData: dashBoardData, widgetId: string | number, widgetCopy: widget) {
+    const updatedWidgetLocation = produce(dashBoardData, (draftState: dashBoardData) => {
         draftState[currentDashboard]['widgetlist'][widgetId]['column'] = 'drag'
     })
 
-    return new Promise((resolve) => {
-        const payload: Partial<AppState> = {
-            enableDrag: true,
-            dashBoardData: updatedWidgetLocation,
-            widgetCopy: widgetCopy
-        }
-        resolve(payload)
-    })
+    const payload: Partial<AppState> = {
+        enableDrag: true,
+        widgetCopy: widgetCopy
+    }
+    return ([payload, updatedWidgetLocation])
+
 }
 
-const setDragMenu = function (menuList: menuList, widgetId: string | number, widgetCopy: widget) {
-    const updatedWidgetLocation = produce(menuList, (draftState: menuList | widgetList) => {
+export const setDragMenu = function (menuList: menuList, widgetId: string | number, widgetCopy: widget) {
+    const updatedWidgetLocation = produce(menuList, (draftState: menuList) => {
         draftState[widgetId]['column'] = 'drag'
     })
-    return new Promise((resolve) => {
-        const payload: Partial<AppState> = {
-            enableDrag: true,
-            menuList: updatedWidgetLocation,
-            widgetCopy: widgetCopy
-        }
-        resolve(payload)
-    })
-}
 
-export const setDrag = function (stateRef: 'menuWidget' | 'stockWidget', currentDashboard: string, dashBoardData: dashBoardData, menuList: menuList, widgetId: string | number, widgetCopy: widget) {
-    if (stateRef === 'stockWidget') {
-        return setDragWidget(currentDashboard, dashBoardData, widgetId, widgetCopy)
-    } else {
-        return setDragMenu(menuList, widgetId, widgetCopy)
+    const payload: Partial<AppState> = {
+        enableDrag: true,
+        widgetCopy: widgetCopy
     }
+    return [payload, updatedWidgetLocation]
+
 }
 
 function moveStockWidget(dashBoardData: dashBoardData, currentDashboard: string, widgetId: string, xxAxis: number, yyAxis: number) {
@@ -86,11 +75,11 @@ export const SnapOrder = function (
     menuList: menuList,
     currentDashboard: string,
 ) {
-    const draft: Partial<AppState> = {
+    const draft = {
         menuList: menuList,
         dashBoardData: dashBoardData
     }
-    const newWidgetLists: Partial<AppState> = produce(draft, (draftState: Partial<AppState>) => {
+    const newWidgetLists = produce(draft, (draftState) => {
         const thisWidgetList = draftState?.dashBoardData?.[currentDashboard]?.widgetlist
         let allWidgets: (menu | widget)[] = [...Object.values(draftState.menuList!) as menu[], ...Object.values(thisWidgetList!) as widget[]]
         allWidgets = allWidgets.filter(w => (w['column'] === column ? true : false))
@@ -137,20 +126,18 @@ export const SnapOrder = function (
             newMenu[widgetId].columnOrder = insertionPoint
         }
     })
-    const newMenu: menuList = produce(newWidgetLists, (draft: Partial<AppState>) => {
+    const newMenu: menuList = produce(newWidgetLists, (draft) => {
         const updatedMenu: menuList = draft.menuList!
         return updatedMenu
     })
-    const newWidget: dashBoardData = produce(newWidgetLists, (draft: Partial<AppState>) => {
+    const newWidget: dashBoardData = produce(newWidgetLists, (draft) => {
         const updatedWidgetList: dashBoardData = draft.dashBoardData!
         return updatedWidgetList
     })
     const payload: Partial<AppState> = {
         enableDrag: false,
-        menuList: newMenu,
-        dashBoardData: newWidget,
     }
-    return payload
+    return [payload, newWidget, newMenu]
 }
 
 export const SnapWidget = async function (
