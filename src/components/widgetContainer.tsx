@@ -44,12 +44,6 @@ function WidgetContainer(p) {
         setShow(visable)
     }, [p.showMenu, p.showStockWidgets, p.stateRef, p.showMenuColumn, p.widgetList.column])
 
-    // const visStatus = p.widgetList.column === 0 && p.showMenuColumn === false ? 'none' : 'block' //hide widget if showbody === false
-
-    useEffect(() => {
-        setShowEditPane(0)
-    }, [p.widgetLockDown])
-
     function changeSearchText(text) {
         if (text !== '' && text !== undefined) {
             setSearchText(text)
@@ -180,46 +174,42 @@ function WidgetContainer(p) {
             className="widgetBox"
             data-testid={`container-${p.widgetList.widgetType}`}
         >
-            {p.widgetLockDown === 0 ? (
-                <div className={p.stateRef === 'menuWidget' ? "menuHeader" : "widgetHeader"}>
-                    {showEditPane === 0 ? (
-                        <>
-                            {widgetProps['helpText'] !== undefined && <ToolTip textFragment={widgetProps['helpText'][0]} hintName={widgetProps['helpText'][1]} />}
-                            {renderHeader}
-                        </>
-                    ) : (
-                        <input data-testid={`rename-${p.widgetList["widgetType"]}`} type="text" id={p.widgetKey + "HeaderValue"} value={renderHeader} onChange={trackUpdate} onBlur={updateHeader} />
-                    )}
+            <div className={p.stateRef === 'menuWidget' ? "menuHeader" : "widgetHeader"}>
+                {showEditPane === 0 ? (
+                    <>
+                        {widgetProps['helpText'] !== undefined && <ToolTip textFragment={widgetProps['helpText'][0]} hintName={widgetProps['helpText'][1]} />}
+                        {renderHeader}
+                    </>
+                ) : (
+                    <input data-testid={`rename-${p.widgetList["widgetType"]}`} type="text" id={p.widgetKey + "HeaderValue"} value={renderHeader} onChange={trackUpdate} onBlur={updateHeader} />
+                )}
 
+                <button
+                    className="widgetButtonHead"
+                    id={p.widgetList["widgetID"]}
+                    onMouseOver={() => {
+                        dragElement();
+                    }}
+                >
+                    <i className="fa fa-arrows" aria-hidden="true"></i>
+                </button>
+                <>
                     <button
                         className="widgetButtonHead"
-                        id={p.widgetList["widgetID"]}
-                        onMouseOver={() => {
-                            dragElement();
-                        }}
-                    >
-                        <i className="fa fa-arrows" aria-hidden="true"></i>
+                        onClick={() => {
+                            const toggled = toggleWidgetBody(p.widgetKey, p.stateRef, p.dashboardData, p.menuList, p.currentDashBoard)
+                            p.updateAppState(toggled)
+                            p.saveDashboard()
+                        }
+                        }>
+                        {p.widgetList.showBody !== false ? <i className="fa fa-caret-square-o-down" aria-hidden="true" /> : <i className="fa fa-caret-square-o-right" aria-hidden="true" />}
                     </button>
-                    <>
-                        <button
-                            className="widgetButtonHead"
-                            onClick={() => {
-                                const toggled = toggleWidgetBody(p.widgetKey, p.stateRef, p.dashboardData, p.menuList, p.currentDashBoard)
-                                p.updateAppState(toggled)
-                                p.saveDashboard()
-                            }
-                            }>
-                            {p.widgetList.showBody !== false ? <i className="fa fa-caret-square-o-down" aria-hidden="true" /> : <i className="fa fa-caret-square-o-right" aria-hidden="true" />}
-                        </button>
 
-                        <button data-testid={`editPaneButton-${p.widgetList["widgetType"]}`} className="widgetButtonHead" onClick={() => { showPane(setShowEditPane, -1) }}>
-                            <i className="fa fa-pencil-square-o" aria-hidden="true" />
-                        </button>
-                    </>
-                </div>
-            ) : (
-                <div className="widgetHeader">{renderHeader}</div>
-            )}
+                    <button data-testid={`editPaneButton-${p.widgetList["widgetType"]}`} className="widgetButtonHead" onClick={() => { showPane(setShowEditPane, -1) }}>
+                        <i className="fa fa-pencil-square-o" aria-hidden="true" />
+                    </button>
+                </>
+            </div>
             {p.widgetList.showBody !== false ? (
                 <div className='widgetBody' style={bodyVisable} key={p.showBody}>
 

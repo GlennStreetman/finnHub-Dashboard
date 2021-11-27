@@ -2,6 +2,10 @@ import React from "react";
 import { widgetSetup } from './../App'
 import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
 import { toggleBackGroundMenu } from 'src/appFunctions/appImport/toggleBackGroundMenu'
+import { rSetApiKey } from 'src/slices/sliceAPIKey'
+import { rSetApiAlias } from 'src/slices/sliceAPIAlias'
+import { connect } from "react-redux";
+import { storeState } from 'src/store'
 
 interface AccountMenu { //plug
     [key: string]: any
@@ -10,35 +14,36 @@ interface AccountMenu { //plug
 interface accountMenuProps2 {
     finnHubQueue: finnHubQueue,
     apiKey: string,
+    apiAlias: string,
     widgetKey: string,
     exchangeList: string[],
     tGetSymbolList: Function,
     defaultExchange: string,
     updateAppState: Function,
     backgroundMenu: string,
+    rSetApiKey: Function,
+    rSetApiAlias: Function,
+
 }
 
 interface accountMenuState {
     loginName: string,
     email: string,
-    apiKey: string,
+    // apiKey: string,
     webHook: string,
     editToggle: number,
     editField: string,
     inputText: string,
     serverMessage: string,
     rateLimit: number,
-    apiAlias: string,
     widgetSetup: widgetSetup | null
 }
 
 interface payload {
     loginName: string,
     email: string,
-    apiKey: string,
     webHook: string,
     rateLimit: number,
-    apiAlias: string,
     widgetSetup: widgetSetup | null
 }
 
@@ -48,14 +53,13 @@ class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
         this.state = {
             loginName: "",
             email: "",
-            apiKey: "",
+            // apiKey: "",
             webHook: "",
             editToggle: 0,
             editField: "",
             inputText: "",
             serverMessage: "",
             rateLimit: 0,
-            apiAlias: "", //used with graphQL Endpoint
             widgetSetup: null,
         };
         this.baseState = { mounted: true }
@@ -88,12 +92,12 @@ class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
                     const payload: payload = {
                         loginName: dataSet["loginname"],
                         email: dataSet["email"],
-                        apiKey: dataSet["apikey"],
                         webHook: dataSet["webhook"],
                         rateLimit: rateLimit,
-                        apiAlias: dataSet["apialias"],
                         widgetSetup: widgetSetup,
                     }
+                    this.props.rSetApiAlias(dataSet["apialias"])
+                    this.props.rSetApiKey(dataSet["apikey"])
                     this.setState(payload)
                 }
             })
@@ -183,7 +187,7 @@ class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
                                 </tr>
                                 <tr>
                                     <td>apiKey:</td>
-                                    <td>{this.state.apiKey}</td>
+                                    <td>{this.props.apiKey}</td>
                                     <td>
                                         <button onClick={() => this.showEditPane("apikey")}>edit</button>
                                     </td>
@@ -211,7 +215,7 @@ class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
                                 </tr>
                                 <tr>
                                     <td>API Alias: </td>
-                                    <td>{this.state.apiAlias}</td>
+                                    <td>{this.props.apiAlias}</td>
                                     <td>
                                         <button onClick={() => this.showEditPane("apialias")}>edit</button>
                                     </td>
@@ -262,10 +266,14 @@ class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
     }
 }
 
+const mapStateToProps = (state: storeState) => ({
+    apiKey: state.apiKey,
+    apiAlias: state.apiAlias
+});
+
 export function accountMenuProps(that: any, key = "AccountMenu") {
     let propList = {
         finnHubQueue: that.state.finnHubQueue,
-        apiKey: that.state.apiKey,
         widgetKey: key,
         updateAppState: that.updateAppState,
         exchangeList: that.state.exchangeList,
@@ -276,4 +284,4 @@ export function accountMenuProps(that: any, key = "AccountMenu") {
     return propList;
 }
 
-export default AccountMenu;
+export default connect(mapStateToProps, { rSetApiKey, rSetApiAlias })(AccountMenu);

@@ -49,3 +49,9 @@ export const saveDashboard = async function (dashboardName: string) {
         return new Promise(resolve => resolve(true))
     }
 }
+
+//enableDrag
+//saveDashboardThrottle
+//saveDashboardFlag
+//dashBoardData
+//currentDashBoard

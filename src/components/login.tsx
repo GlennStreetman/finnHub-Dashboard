@@ -11,6 +11,8 @@ import { secretQuestion } from "../appFunctions/client/secretQuestion";
 import { newPW } from "../appFunctions/client/newPW";
 import { registerAccount } from "../appFunctions/client/registerAccount";
 import { rUpdateExchangeList } from 'src/slices/sliceExchangeList'
+import { rSetApiKey } from 'src/slices/sliceAPIKey'
+import { rSetApiAlias } from 'src/slices/sliceAPIAlias'
 
 
 import { styled } from '@material-ui/core/styles';
@@ -124,11 +126,11 @@ export default function Login(p: loginProps) {
                     const newList: string[] = data.exchangelist.split(",");
                     p.updateAppState({
                         login: 1,
-                        apiKey: data.apiKey,
-                        apiAlias: data.apiAlias,
                         widgetSetup: parseSetup,
                         defaultExchange: data.defaultexchange
                     })
+                    dispatch(rSetApiKey(data.apiKey))
+                    dispatch(rSetApiAlias(data.apiAlias))
                     dispatch(rUpdateExchangeList({ exchangeList: newList }))
                     p.finnHubQueue.updateInterval(data.ratelimit)
                 } else {
@@ -187,12 +189,12 @@ export default function Login(p: loginProps) {
                         const newList: string[] = data.exchangelist.split(",");
                         p.updateAppState({
                             login: 1,
-                            apiKey: data.apiKey,
-                            apiAlias: data.apiAlias,
                             widgetSetup: parseSetup,
                             defaultExchange: data.defaultexchange,
                             exchangeList: newList,
                         })
+                        dispatch(rSetApiKey(data.apiKey))
+                        dispatch(rSetApiAlias(data.apiAlias))
                         dispatch(rUpdateExchangeList({ exchangeList: newList }))
                         p.finnHubQueue.updateInterval(data['ratelimit'])
                     } else {

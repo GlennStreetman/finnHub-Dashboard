@@ -8,7 +8,6 @@ import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImpor
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
 import { saveDashboard } from "./appFunctions/appImport/setupDashboard";
 
-
 //component imports
 import TopNav from "./components/topNav";
 import Login from "./components/login";
@@ -34,6 +33,7 @@ import {
 import { tGetFinnhubData, tgetFinnHubDataReq } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 import { tGetSavedDashboards } from './thunks/thunkGetSavedDashboards'
+
 
 
 const outerTheme = createTheme({
@@ -69,11 +69,10 @@ class App extends React.Component<AppProps, AppState> {
 
         this.state = {
             accountMenu: 0,
-            availableStocks: [],
             aboutMenu: 0,
             apiFlag: 0, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
-            apiKey: "", //API key retrieved from login database.
-            apiAlias: "",
+            // apiKey: "", //API key retrieved from login database.
+            // apiAlias: "",
             backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
             currentDashBoard: "", //dashboard being displayed
             dashBoardData: {}, //All saved dashboards
@@ -92,7 +91,7 @@ class App extends React.Component<AppProps, AppState> {
             showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
             targetSecurity: '', //target security for widgets. Update changes widget focus.
             widgetCopy: null, //copy of state of widget being dragged.
-            widgetLockDown: 0, //1 removes buttons from all widgets.
+
             widgetSetup: {},//activates premium api routes.
             zIndex: [], //list widgets. Index location sets zIndex
         };
@@ -117,8 +116,8 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         if ( //if apikey not setup show about menu
-            (this.state.apiKey === '' && this.state.apiFlag === 0 && this.state.login === 1) ||
-            (this.state.apiKey === null && this.state.apiFlag === 0 && this.state.login === 1)
+            (this.props.apiKey === '' && this.state.apiFlag === 0 && this.state.login === 1) ||
+            (this.props.apiKey === null && this.state.apiFlag === 0 && this.state.login === 1)
         ) {
             this.setState({
                 apiFlag: 1,
@@ -130,7 +129,7 @@ class App extends React.Component<AppProps, AppState> {
 
         const globalStockList = this.state.dashBoardData?.[this.state.currentDashBoard]?.globalstocklist ? this.state.dashBoardData?.[this.state.currentDashBoard].globalstocklist : false
         if ((globalStockList && globalStockList !== prevState.dashBoardData?.[prevState.currentDashBoard]?.globalstocklist && this.state.login === 1)) { //price data for watchlist, including socket data.
-            LoadTickerSocket(this, prevState, globalStockList, this.state.socket, this.state.apiKey, UpdateTickerSockets);
+            LoadTickerSocket(this, prevState, globalStockList, this.state.socket, this.props.apiKey, UpdateTickerSockets);
         }
 
         const globalKeys = globalStockList ? Object.keys(globalStockList) : []
@@ -155,7 +154,7 @@ class App extends React.Component<AppProps, AppState> {
 
     async rebuildDashboardState() { //fetches dashboard data, then updates s.dashBoardData, then builds redux model.
         try {
-            const data = await this.props.tGetSavedDashboards({ apiKey: this.state.apiKey }).unwrap()
+            const data = await this.props.tGetSavedDashboards({ apiKey: this.props.apiKey }).unwrap()
 
             // const widgetlist = data.dashBoardData[data.currentDashBoard].widgetlist
             // Object.keys(widgetlist).forEach((el)=>{
@@ -213,7 +212,7 @@ class App extends React.Component<AppProps, AppState> {
 
     async rebuildVisableDashboard() {
         const payload = {
-            apiKey: this.state.apiKey,
+            apiKey: this.props.apiKey,
             dashBoardData: this.state.dashBoardData[this.state.currentDashBoard],
             targetDashboard: this.state.currentDashBoard,
         }
@@ -279,13 +278,12 @@ class App extends React.Component<AppProps, AppState> {
                                 dashboardData={this.state.dashBoardData}
                                 currentDashboard={this.state.currentDashBoard}
                                 saveDashboard={this.saveDashboard}
-                                apiKey={this.state.apiKey}
+                                apiKey={this.props.apiKey}
                                 finnHubQueue={this.state.finnHubQueue}
                             />
                             <WidgetController
-                                apiKey={this.state.apiKey}
-                                apiAlias={this.state.apiAlias}
-                                availableStocks={this.state.availableStocks}
+                                apiKey={this.props.apiKey}
+                                apiAlias={this.props.apiAlias}
                                 currentDashBoard={this.state.currentDashBoard}
                                 dashBoardData={this.state.dashBoardData}
                                 dashboardID={dashboardID}
@@ -302,7 +300,7 @@ class App extends React.Component<AppProps, AppState> {
                                 targetSecurity={this.state.targetSecurity}
                                 widgetCopy={this.state.widgetCopy}
                                 widgetList={widgetList}
-                                widgetLockDown={this.state.widgetLockDown}
+
                                 zIndex={this.state.zIndex}
                                 rSetTargetDashboard={this.props.rSetTargetDashboard}
                                 updateAppState={this.updateAppState}
@@ -322,6 +320,8 @@ class App extends React.Component<AppProps, AppState> {
 const mapStateToProps = (state: storeState) => ({
     rExchangeList: state.exchangeList.exchangeList,
     dataModel: state.dataModel,
+    apiKey: state.apiKey,
+    apiAlias: state.apiAlias,
 });
 
 export default connect(mapStateToProps, {
@@ -436,6 +436,8 @@ export interface widgetSetup {
 interface App { [key: string]: any }
 
 export interface AppProps {
+    apiKey: string,
+    apiAlias: string,
     rExchangeList: string[],
     dataModel: sliceDataModel,
     tGetSymbolList: Function,
@@ -458,11 +460,8 @@ export interface AppProps {
 
 export interface AppState {
     accountMenu: number,
-    availableStocks: any,
     aboutMenu: number,
     apiFlag: number, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
-    apiKey: string, //API key retrieved from login database.
-    apiAlias: string,
     backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
     currentDashBoard: string, //dashboard being displayed
     dashBoardData: dashBoardData, //All saved dashboards
@@ -481,7 +480,7 @@ export interface AppState {
     showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
     targetSecurity: string, //target security for widgets. Update changes widget focus.
     widgetCopy: widget | null, //copy of state of widget being dragged.
-    widgetLockDown: number, //1 removes buttons from all widgets.
+
     widgetSetup: widgetSetup, //activates premium api routes.
     zIndex: string[], //list widgets. Index location sets zIndex
 }
