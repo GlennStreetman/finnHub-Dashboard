@@ -67,7 +67,6 @@ function WidgetController(p) {
                     rAddNewDashboard: p.rAddNewDashboard,
                     rSetTargetDashboard: p.rSetTargetDashboard,
                     updateAppState: p.updateAppState,
-                    saveDashboard: p.saveDashboard,
                     menuList: p.menuList,
                     widgetWidth: widgetWidth,
                     focus: focus,

@@ -69,7 +69,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     }, [p?.config?.targetSecurity])
 
     useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, p.saveDashboard, p.updateAppState) //sets security focus in config. Used for redux.visable data and widget excel templating.	
+    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, p.updateAppState) //sets security focus in config. Used for redux.visable data and widget excel templating.	
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
@@ -92,7 +92,6 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                 p.dashBoardData,
                 p.currentDashBoard,
                 p.enableDrag,
-                p.saveDashboard,
                 p.updateAppState
             )
         }
@@ -117,7 +116,6 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                 p.dashBoardData,
                 p.currentDashBoard,
                 p.enableDrag,
-                p.saveDashboard,
                 p.updateAppState
             )
         }
@@ -153,7 +151,6 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
             p.dashBoardData,
             p.currentDashBoard,
             p.enableDrag,
-            p.saveDashboard,
             p.updateAppState
         )
         const tSearchMongoDBObj: tSearchMongoDBReq = { searchList: [key], dashboardID: p.dashboardID }
@@ -162,7 +159,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
 
     async function changeFrequencySelection(e) {
         const target = e.target.value;
-        await UpdateWidgetFilters(p.widgetKey, { frequency: target }, p.dashBoardData, p.currentDashBoard, p.updateAppState, dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
+        await UpdateWidgetFilters(p.widgetKey, { frequency: target }, p.dashBoardData, p.currentDashBoard, dispatch, p.apiKey, p.finnHubQueue)
         updateWidgetConfig(
             p.widgetKey,
             {
@@ -175,7 +172,6 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
             p.dashBoardData,
             p.currentDashBoard,
             p.enableDrag,
-            p.saveDashboard,
             p.updateAppState
         )
     }
@@ -195,7 +191,6 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                 p.dashBoardData,
                 p.currentDashBoard,
                 p.enableDrag,
-                p.saveDashboard,
                 p.updateAppState
             )
         }
@@ -241,7 +236,6 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                     dashBoardData={p.dashBoardData}
                     currentDashBoard={p.currentDashBoard}
                     enableDrag={p.enableDrag}
-                    saveDashboard={p.saveDashboard}
                 />
                 <select data-testid='frequencySelectionm' className="btn" value={p.filters.frequency} onChange={changeFrequencySelection}>
                     {frequencySeleciton}

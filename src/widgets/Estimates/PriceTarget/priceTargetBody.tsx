@@ -48,7 +48,7 @@ function PriceTargetBody(p: { [key: string]: any }, ref: any) {
     }, [p?.config?.targetSecurity])
 
     useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing 
-    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, p.saveDashboard, p.updateAppState) //sets security focus in config. Used for redux.visable data and widget excel templating.
+    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, p.updateAppState) //sets security focus in config. Used for redux.visable data and widget excel templating.
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
@@ -86,7 +86,6 @@ function PriceTargetBody(p: { [key: string]: any }, ref: any) {
                 dashBoardData={p.dashBoardData}
                 currentDashBoard={p.currentDashBoard}
                 enableDrag={p.enableDrag}
-                saveDashboard={p.saveDashboard}
             />
             <div className='scrollableDiv'>
                 <table className='dataTable'>

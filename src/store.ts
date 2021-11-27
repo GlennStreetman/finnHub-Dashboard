@@ -11,6 +11,8 @@ import targetSecurity from 'src/slices/sliceTargetSecurity'
 import currentDashboard from 'src/slices/sliceCurrentDashboard'
 import menuList, { sliceMenuList } from './slices/sliceMenuList'
 import dashboardData, { sliceDashboardData } from './slices/sliceDashboardData'
+// import saveDashboardFlag from './slices/sliceSaveDashboardFlag'
+// import saveDashboardThrottle from './slices/sliceSaveDashboardThrottle'
 
 
 export interface storeState {

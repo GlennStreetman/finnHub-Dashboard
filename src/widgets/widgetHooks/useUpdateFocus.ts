@@ -11,7 +11,6 @@ export const useUpdateFocus = function ( //on update to p.targetFocus update p.c
     dashBoardData: dashBoardData,
     currentDashBoard: string,
     enableDrag: boolean,
-    saveDashboard: Function,
     updateAppState: Function,
 ) {
 
@@ -24,7 +23,6 @@ export const useUpdateFocus = function ( //on update to p.targetFocus update p.c
                 dashBoardData,
                 currentDashBoard,
                 enableDrag,
-                saveDashboard,
                 updateAppState
             )
         }

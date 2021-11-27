@@ -16,6 +16,8 @@ import { syncGlobalStockList } from 'src/appFunctions/appImport/syncGlobalStockL
 
 import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
 import { rSetDashboardData } from 'src/slices/sliceDashboardData'
+import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
+
 
 interface props {
     showEditPane: number,
@@ -28,7 +30,6 @@ interface props {
     finnHubQueue: finnHubQueue,
     targetSecurity: string,
     updateAppState: Function,
-    saveDashboard: Function,
     rebuildVisableDashboard: Function,
 }
 
@@ -132,7 +133,8 @@ function WatchListMenu(p: props, ref: any) {
                                         e.preventDefault()
                                         const newDash = await updateGlobalStockList(el, p.dashBoardData, p.currentDashBoard, p.updateAppState);
                                         dispatch(rSetDashboardData(newDash))
-                                        p.saveDashboard(p.currentDashBoard)
+                                        dispatch(tSaveDashboard({ dashboardName: p.currentDashBoard }))
+
                                     }}
                                 >
                                     <i className="fa fa-times" aria-hidden="true"></i>
@@ -228,7 +230,8 @@ function WatchListMenu(p: props, ref: any) {
                                         dispatch(rSetDashboardData(newDashboard))
                                         dispatch(rSetTargetSecurity(focus))
                                         p.rebuildVisableDashboard()
-                                        p.saveDashboard(p.currentDashBoard) //saves dashboard setup to server
+                                        dispatch(tSaveDashboard({ dashboardName: p.currentDashBoard }))
+
                                     }}>
                                         Sync
                                     </button>
@@ -276,7 +279,6 @@ function WatchListMenu(p: props, ref: any) {
                     resetUploadList={resetUploadList}
                     currentDashboard={p.currentDashBoard}
                     dashboardData={p.dashBoardData}
-                    saveDashboard={p.saveDashboard}
                     rSetTargetSecurity={rSetTargetSecurity}
                     rSetDashboardData={rSetDashboardData}
                     dispatch={dispatch}
@@ -305,7 +307,6 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
         targetSecurity: that.props.targetSecurity,
         finnHubQueue: that.props.finnHubQueue,
         updateAppState: that.props.updateAppState,
-        saveDashboard: that.props.saveDashboard,
         rebuildVisableDashboard: that.props.rebuildVisableDashboard,
     };
     return propList;

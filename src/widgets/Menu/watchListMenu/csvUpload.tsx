@@ -2,6 +2,8 @@ import React, { PureComponent } from 'react'
 import { connect } from "react-redux";
 import { setNewGlobalStockList } from 'src/appFunctions/appImport/updateGlobalStockList'
 import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
+import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
+
 
 
 class CsvUpload extends PureComponent {
@@ -13,7 +15,7 @@ class CsvUpload extends PureComponent {
             this.props.dispatch(this.props.rSetDashboardData(dashboardData))
             this.props.dispatch(this.props.rSetTargetSecurity(focus))
             this.props.resetUploadList()
-            this.props.saveDashboard(this.props.currentDashboard)
+            this.props.tSaveDashboard(this.props.currentDashboard)
         }
         runComponent()
     }
@@ -39,4 +41,4 @@ const mapStateToProps = (state, ownProps) => {
     }
     return { rUpdateObj: updateObj }
 }
-export default connect(mapStateToProps, { rSetTargetSecurity })(CsvUpload);
+export default connect(mapStateToProps, { rSetTargetSecurity, tSaveDashboard })(CsvUpload);

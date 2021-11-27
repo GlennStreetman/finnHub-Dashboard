@@ -95,10 +95,10 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
     }, [start, end])
 
     useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, p.saveDashboard, p.updateAppState) //sets security focus in config. Used for redux.visable data and widget excel templating.
+    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, p.updateAppState) //sets security focus in config. Used for redux.visable data and widget excel templating.
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
+    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue)
 
     function updateStartDate(e) { //remove if filters not needed
         setStart(e.target.value)
@@ -116,7 +116,7 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
             const offset = target - now
             const name = e.target.name;
             console.log(name, e.target.value)
-            UpdateWidgetFilters(p.widgetKey, { [name]: offset }, p.dashBoardData, p.currentDashBoard, p.updateAppState, dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
+            UpdateWidgetFilters(p.widgetKey, { [name]: offset }, p.dashBoardData, p.currentDashBoard, dispatch, p.apiKey, p.finnHubQueue)
         }
     }
 
@@ -174,7 +174,6 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
             p.dashBoardData,
             p.currentDashBoard,
             p.enableDrag,
-            p.saveDashboard,
             dispatch,
         )
         //if any configs need to be reset add logic here. Pagination?

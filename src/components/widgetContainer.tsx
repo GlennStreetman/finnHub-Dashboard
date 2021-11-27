@@ -13,6 +13,7 @@ import { setDragWidget, setDragMenu, moveWidget, SnapWidget } from 'src/appFunct
 import { rSetMenuList } from 'src/slices/sliceMenuList'
 import { tChangeWidgetName } from 'src/thunks/thunkChangeWidgetName'
 import { rSetDashboardData } from 'src/slices/sliceDashboardData'
+import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 
 
 //creates widget container. Used by all widgets.
@@ -70,7 +71,7 @@ function WidgetContainer(p) {
                 widgetID: p.widgetKey,
                 newName: e.target.value,
             }))
-            p.saveDashboard(p.currentDashBoard)
+            dispatch(tSaveDashboard({ dashboardName: p.currentDashBoard }))
         }
     }
 
@@ -142,7 +143,7 @@ function WidgetContainer(p) {
             await p.updateAppState(snapPayload)
             dispatch(rSetDashboardData(dashboard))
             dispatch(rSetMenuList(menu))
-            p.saveDashboard(p.currentDashBoard)
+            dispatch(tSaveDashboard({ dashboardName: p.currentDashBoard }))
 
         }
     }
@@ -218,7 +219,7 @@ function WidgetContainer(p) {
                         onClick={() => {
                             const toggled = toggleWidgetBody(p.widgetKey, p.stateRef, p.dashboardData, p.menuList, p.currentDashBoard)
                             p.updateAppState(toggled)
-                            p.saveDashboard()
+                            dispatch(tSaveDashboard({ dashboardName: p.currentDashboard }))
                         }
                         }>
                         {p.widgetList.showBody !== false ? <i className="fa fa-caret-square-o-down" aria-hidden="true" /> : <i className="fa fa-caret-square-o-right" aria-hidden="true" />}
@@ -245,7 +246,7 @@ function WidgetContainer(p) {
                                 if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
                                     const updateWidgets = await RemoveWidget(p.widgetKey, p.dashboardData, p.currentDashBoard);
                                     dispatch(rSetDashboardData(updateWidgets))
-                                    p.saveDashboard(p.currentDashBoard) //saved updated dashboard to postgres.
+                                    dispatch(tSaveDashboard({ dashboardName: p.currentDashboard }))
                                     fetch(`/deleteFinnDashData?widgetID=${p.widgetKey}`) //delete from mongo.
                                     const payload = {
                                         widgetKey: p.widgetKey,

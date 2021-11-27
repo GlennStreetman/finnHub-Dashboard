@@ -6,6 +6,7 @@ import { tGetFinnhubData } from 'src/thunks/thunkFetchFinnhub'
 import { rSetUpdateStatus } from 'src/slices/sliceDataModel'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 import { rSetDashboardData } from 'src/slices/sliceDashboardData'
+import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 
 function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
     const testName = iterator === 0 ? widgetName : widgetName + iterator
@@ -103,12 +104,9 @@ export const UpdateWidgetFilters = async function (
     data: filters,
     dashBoardData: dashBoardData,
     currentDashboard: string,
-    updateAppState: Function,
     dispatch: Function,
     apiKey: string,
     finnHubQueue: finnHubQueue,
-    saveDashboard: Function,
-
 ) {
     try {
         const newDashBoardData: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
@@ -134,7 +132,7 @@ export const UpdateWidgetFilters = async function (
             finnHubQueue: finnHubQueue,
             rSetUpdateStatus: rSetUpdateStatus,
         }))
-        saveDashboard(currentDashboard)
+        dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
     } catch { console.log("Problem updating widget filters."); return false }
 
 }
@@ -146,7 +144,6 @@ export const updateWidgetConfig = async function (
     dashBoardData: dashBoardData,
     currentDashboard: string,
     enableDrag: boolean,
-    saveDashboard: Function,
     dispatch: Function) { //replaces widget config object then saves changes to mongoDB & postgres.
     //config changes used by mongoDB during excel templating.
     // console.log('setting up config', widgetID, updateObj)
@@ -158,7 +155,7 @@ export const updateWidgetConfig = async function (
     // const payload: Partial<AppState> = { dashBoardData: updatedDashboardData }
     // await updateAppState(payload)
     if (enableDrag !== true) {
-        saveDashboard(currentDashboard)
+        dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
         const updatedWidgetFilters = updatedDashboardData[currentDashboard].widgetlist[widgetID].config
         const postBody: reqBody = {
             widget: widgetID,

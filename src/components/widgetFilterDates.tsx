@@ -16,7 +16,7 @@ interface props {
     apiKey: string,
     finnHubQueue: finnHubQueue,
     updateAppState: Function,
-    saveDashboard: Function,
+
 }
 
 const useDispatch = useAppDispatch
@@ -39,7 +39,7 @@ export default function WidgetFilterDates(p: props) {
             const target = new Date(e.target.value).getTime();
             const offset = target - now
             const name = e.target.name;
-            UpdateWidgetFilters(p.widgetKey, { [name]: offset }, p.dashBoardData, p.currentDashBoard, p.updateAppState, dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
+            UpdateWidgetFilters(p.widgetKey, { [name]: offset }, p.dashBoardData, p.currentDashBoard, dispatch, p.apiKey, p.finnHubQueue)
         }
     }
 

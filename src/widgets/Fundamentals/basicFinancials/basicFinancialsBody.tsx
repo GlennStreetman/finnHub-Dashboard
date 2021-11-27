@@ -111,7 +111,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 p.dashBoardData,
                 p.currentDashBoard,
                 p.enableDrag,
-                p.saveDashboard,
                 dispatch,
             )
         }
@@ -174,7 +173,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 p.dashBoardData,
                 p.currentDashBoard,
                 p.enableDrag,
-                p.saveDashboard,
                 dispatch,
             )
         }
@@ -213,7 +211,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             p.dashBoardData,
             p.currentDashBoard,
             p.enableDrag,
-            p.saveDashboard,
             dispatch,
         )
     }
@@ -226,7 +223,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             p.dashBoardData,
             p.currentDashBoard,
             p.enableDrag,
-            p.saveDashboard,
             dispatch,
         )
     }
@@ -238,7 +234,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             p.dashBoardData,
             p.currentDashBoard,
             p.enableDrag,
-            p.saveDashboard,
             dispatch,
         )
     }
@@ -256,7 +251,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 p.dashBoardData,
                 p.currentDashBoard,
                 p.enableDrag,
-                p.saveDashboard,
                 dispatch,
             )
         }
@@ -278,7 +272,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 p.dashBoardData,
                 p.currentDashBoard,
                 p.enableDrag,
-                p.saveDashboard,
                 dispatch,
             )
         } else {
@@ -290,7 +283,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 p.dashBoardData,
                 p.currentDashBoard,
                 p.enableDrag,
-                p.saveDashboard,
                 dispatch,
             )
         }
@@ -306,7 +298,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 p.dashBoardData,
                 p.currentDashBoard,
                 p.enableDrag,
-                p.saveDashboard,
                 dispatch,
             )
         } else {
@@ -318,7 +309,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
                 p.dashBoardData,
                 p.currentDashBoard,
                 p.enableDrag,
-                p.saveDashboard,
                 dispatch,
             )
         }
@@ -615,7 +605,6 @@ function FundamentalsBasicFinancials(p: { [key: string]: any }, ref: any) {
             p.dashBoardData,
             p.currentDashBoard,
             p.enableDrag,
-            p.saveDashboard,
             dispatch,
         )
     }

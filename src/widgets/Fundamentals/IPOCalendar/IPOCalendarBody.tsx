@@ -87,7 +87,7 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
     useDragCopy(ref, { paginationInt: paginationInt, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
+    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue)
 
     function renderSearchPane() {
         return <>
@@ -103,7 +103,6 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
                 apiKey={p.apiKey}
                 finnHubQueue={p.finnHubQueue}
                 updateAppState={p.updateAppState}
-                saveDashboard={p.saveDashBoard}
             />
         </>
     }

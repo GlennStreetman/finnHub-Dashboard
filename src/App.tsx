@@ -6,7 +6,7 @@ import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
 import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
-import { saveDashboard } from "./appFunctions/appImport/setupDashboard";
+
 
 //component imports
 import TopNav from "./components/topNav";
@@ -94,7 +94,6 @@ class App extends React.Component<AppProps, AppState> {
         //login state logic.
 
         //App logic for setting up dashboards.
-        this.saveDashboard = saveDashboard.bind(this); //this will probable be last function to be unbound, not from this file.
         this.updateAppState = this.updateAppState.bind(this)
 
         //update and apply state, in module.
@@ -253,7 +252,6 @@ class App extends React.Component<AppProps, AppState> {
                                 baseState={this.baseState}
                                 dashboardData={this.props.dashboardData}
                                 currentDashboard={this.props.currentDashboard}
-                                saveDashboard={this.saveDashboard}
                                 apiKey={this.props.apiKey}
                                 finnHubQueue={this.state.finnHubQueue}
                             />
@@ -270,7 +268,6 @@ class App extends React.Component<AppProps, AppState> {
                                 login={this.state.login}
                                 menuList={this.props.menuList}
                                 newDashboard={this.newDashboard}
-                                saveDashboard={this.saveDashboard}
                                 showMenuColumn={this.state.showMenuColumn}
                                 showStockWidgets={this.state.showStockWidgets}
                                 targetSecurity={this.props.targetSecurity}

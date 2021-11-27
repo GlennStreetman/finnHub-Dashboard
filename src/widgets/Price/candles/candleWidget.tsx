@@ -118,10 +118,10 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     }, [p?.config?.targetSecurity])
 
     useDragCopy(ref, { chartData: chartData, options: options, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, p.saveDashboard, p.updateAppState) //sets security focus in config. Used for redux.visable data and widget excel templating.	
+    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, p.updateAppState) //sets security focus in config. Used for redux.visable data and widget excel templating.	
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
+    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue)
 
     interface ChartNode {
         x: Date,
@@ -198,7 +198,7 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
     }
 
     function updateFilterResolution(e) {
-        UpdateWidgetFilters(p.widgetKey, { [e.target.name]: e.target.value }, p.dashBoardData, p.currentDashBoard, p.updateAppState, dispatch, p.apiKey, p.finnHubQueue, p.saveDashboard)
+        UpdateWidgetFilters(p.widgetKey, { [e.target.name]: e.target.value }, p.dashBoardData, p.currentDashBoard, dispatch, p.apiKey, p.finnHubQueue)
     }
 
     function displayCandleGraph() {
@@ -227,7 +227,6 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                         dashBoardData={p.dashBoardData}
                         currentDashBoard={p.currentDashBoard}
                         enableDrag={p.enableDrag}
-                        saveDashboard={p.saveDashboard}
                     />
                 </div>
                 <div data-testid={`${resText} Price Candles: ${p.config.targetSecurity}`} className="graphDiv">
@@ -275,7 +274,6 @@ function PriceCandles(p: { [key: string]: any }, ref: any) {
                                 apiKey={p.apiKey}
                                 finnHubQueue={p.finnHubQueue}
                                 updateAppState={p.updateAppState}
-                                saveDashboard={p.saveDashBoard}
                             />
                             <table>
                                 <tbody>

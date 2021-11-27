@@ -15,7 +15,6 @@ interface props {
     dashBoardData: dashBoardData
     currentDashBoard: string,
     enableDrag: boolean,
-    saveDashboard: Function,
 }
 
 export default function WidgetFocus(p: props): ReactElement {
@@ -29,7 +28,6 @@ export default function WidgetFocus(p: props): ReactElement {
             p.dashBoardData,
             p.currentDashBoard,
             p.enableDrag,
-            p.saveDashboard,
             dispatch,
         )
         if (p.callback) { p.callback() }

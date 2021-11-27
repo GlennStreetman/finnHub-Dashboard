@@ -21,6 +21,7 @@ import { rTargetDashboardLogout } from "src/slices/sliceShowData";
 import { tGetFinnhubData } from "src/thunks/thunkFetchFinnhub";
 import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 import { toggleBackGroundMenu } from 'src/appFunctions/appImport/toggleBackGroundMenu'
+import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 
 interface topNavProps {
     backGroundMenu: string,
@@ -31,7 +32,7 @@ interface topNavProps {
     baseState: Object,
     dashboardData: dashBoardData,
     currentDashboard: string,
-    saveDashboard: Function,
+
     apiKey: string,
     finnHubQueue: finnHubQueue,
 }
@@ -69,7 +70,7 @@ function TopNav(p: topNavProps) {
                         const [newDash, widgetName] = CreateNewWidgetContainer(a, b, c, e, p.dashboardData, p.currentDashboard);
                         console.log('newDash', newDash)
                         dispatch(rSetDashboardData(newDash))
-                        p.saveDashboard(p.currentDashboard)
+                        dispatch(tSaveDashboard({ dashboardName: p.currentDashboard }))
                         const payload = {
                             apiKey: p.apiKey,
                             dashBoardData: newDash,
