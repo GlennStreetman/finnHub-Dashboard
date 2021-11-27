@@ -71,16 +71,11 @@ class App extends React.Component<AppProps, AppState> {
             accountMenu: 0,
             aboutMenu: 0,
             apiFlag: 0, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
-            // apiKey: "", //API key retrieved from login database.
-            // apiAlias: "",
             backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
             currentDashBoard: "", //dashboard being displayed
             dashBoardData: {}, //All saved dashboards
-            defaultExchange: "US",
-            exchangeList: ["US"], //list of all exchanges activated under account management.
             finnHubQueue: createFunctionQueueObject(1, 1000, true),
             login: 0, //login state. 0 logged out, 1 logged in.
-            loadStartingDashBoard: 0, //flag switches to 1 after attemping to load default dashboard.
             showMenuColumn: true, //true shows column 0
             menuList: {}, //lists of all menu widgets.
             enableDrag: false,
@@ -91,7 +86,6 @@ class App extends React.Component<AppProps, AppState> {
             showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
             targetSecurity: '', //target security for widgets. Update changes widget focus.
             widgetCopy: null, //copy of state of widget being dragged.
-
             widgetSetup: {},//activates premium api routes.
             zIndex: [], //list widgets. Index location sets zIndex
         };
@@ -287,9 +281,9 @@ class App extends React.Component<AppProps, AppState> {
                                 currentDashBoard={this.state.currentDashBoard}
                                 dashBoardData={this.state.dashBoardData}
                                 dashboardID={dashboardID}
-                                defaultExchange={this.state.defaultExchange}
+                                defaultExchange={this.props.defaultExchange}
                                 enableDrag={this.state.enableDrag}
-                                exchangeList={this.state.exchangeList}
+                                exchangeList={this.props.exchangeList}
                                 finnHubQueue={this.state.finnHubQueue}
                                 login={this.state.login}
                                 menuList={this.state.menuList}
@@ -318,10 +312,11 @@ class App extends React.Component<AppProps, AppState> {
 }
 
 const mapStateToProps = (state: storeState) => ({
-    rExchangeList: state.exchangeList.exchangeList,
+    exchangeList: state.exchangeList.exchangeList,
     dataModel: state.dataModel,
     apiKey: state.apiKey,
     apiAlias: state.apiAlias,
+    defaultExchange: state.defaultExchange
 });
 
 export default connect(mapStateToProps, {
@@ -438,8 +433,9 @@ interface App { [key: string]: any }
 export interface AppProps {
     apiKey: string,
     apiAlias: string,
-    rExchangeList: string[],
+    exchangeList: string[],
     dataModel: sliceDataModel,
+    defaultExchange: string,
     tGetSymbolList: Function,
     tGetFinnhubData: Function,
     tGetMongoDB: Function,
@@ -465,12 +461,12 @@ export interface AppState {
     backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
     currentDashBoard: string, //dashboard being displayed
     dashBoardData: dashBoardData, //All saved dashboards
-    defaultExchange: string,
+    // defaultExchange: string,
     enableDrag: boolean,
-    exchangeList: string[], //list of all exchanges activated under account management.
+    // exchangeList: string[], //list of all exchanges activated under account management.
     finnHubQueue: finnHubQueue,
     login: number, //login state. 0 logged out, 1 logged in.
-    loadStartingDashBoard: number, //flag switches to 1 after attemping to load default dashboard.
+
     showMenuColumn: boolean, //true shows column 0
     menuList: menuList, //lists of all menu widgets.
     saveDashboardThrottle: number, //delay timer for saving dashboard.
@@ -480,7 +476,6 @@ export interface AppState {
     showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
     targetSecurity: string, //target security for widgets. Update changes widget focus.
     widgetCopy: widget | null, //copy of state of widget being dragged.
-
     widgetSetup: widgetSetup, //activates premium api routes.
     zIndex: string[], //list widgets. Index location sets zIndex
 }

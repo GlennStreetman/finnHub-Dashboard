@@ -13,6 +13,7 @@ import { registerAccount } from "../appFunctions/client/registerAccount";
 import { rUpdateExchangeList } from 'src/slices/sliceExchangeList'
 import { rSetApiKey } from 'src/slices/sliceAPIKey'
 import { rSetApiAlias } from 'src/slices/sliceAPIAlias'
+import { rSetDefaultExchange } from "src/slices/sliceDefaultExchange";
 
 
 import { styled } from '@material-ui/core/styles';
@@ -127,8 +128,8 @@ export default function Login(p: loginProps) {
                     p.updateAppState({
                         login: 1,
                         widgetSetup: parseSetup,
-                        defaultExchange: data.defaultexchange
                     })
+                    dispatch(rSetDefaultExchange(data.defaultexchange))
                     dispatch(rSetApiKey(data.apiKey))
                     dispatch(rSetApiAlias(data.apiAlias))
                     dispatch(rUpdateExchangeList({ exchangeList: newList }))
@@ -190,9 +191,9 @@ export default function Login(p: loginProps) {
                         p.updateAppState({
                             login: 1,
                             widgetSetup: parseSetup,
-                            defaultExchange: data.defaultexchange,
                             exchangeList: newList,
                         })
+                        dispatch(rSetDefaultExchange(data.defaultexchange))
                         dispatch(rSetApiKey(data.apiKey))
                         dispatch(rSetApiAlias(data.apiAlias))
                         dispatch(rUpdateExchangeList({ exchangeList: newList }))
