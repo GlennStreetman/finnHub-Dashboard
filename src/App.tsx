@@ -80,14 +80,11 @@ class App extends React.Component<AppProps, AppState> {
             login: 0, //login state. 0 logged out, 1 logged in.
             showMenuColumn: true, //true shows column 0
             enableDrag: false,
-            saveDashboardThrottle: Date.now(),
-            saveDashboardFlag: false,
             socket: "", //socket connection for streaming stock data.
             socketUpdate: Date.now(),
             showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
             widgetCopy: null, //copy of state of widget being dragged.
             widgetSetup: {},//activates premium api routes.
-            zIndex: [], //list widgets. Index location sets zIndex
         };
 
         this.baseState = this.state; //used to reset state upon logout.
@@ -273,7 +270,6 @@ class App extends React.Component<AppProps, AppState> {
                                 targetSecurity={this.props.targetSecurity}
                                 widgetCopy={this.state.widgetCopy}
                                 widgetList={widgetList}
-                                zIndex={this.state.zIndex}
                                 rSetTargetDashboard={this.props.rSetTargetDashboard}
                                 updateAppState={this.updateAppState}
                                 rebuildVisableDashboard={this.rebuildVisableDashboard}
@@ -452,17 +448,13 @@ export interface AppState {
     aboutMenu: number,
     apiFlag: number, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
     backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
-    // dashBoardData: dashBoardData, //All saved dashboards
     enableDrag: boolean,
     finnHubQueue: finnHubQueue,
     login: number, //login state. 0 logged out, 1 logged in.
     showMenuColumn: boolean, //true shows column 0
-    saveDashboardThrottle: number, //delay timer for saving dashboard.
-    saveDashboardFlag: boolean, //sets to true when a save starts.
     socket: any, //socket connection for streaming stock data.+
     socketUpdate: number,
     showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
     widgetCopy: widget | null, //copy of state of widget being dragged.
     widgetSetup: widgetSetup, //activates premium api routes.
-    zIndex: string[], //list widgets. Index location sets zIndex
 }

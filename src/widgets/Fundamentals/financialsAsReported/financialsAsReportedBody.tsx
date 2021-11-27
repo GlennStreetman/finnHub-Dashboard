@@ -69,7 +69,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
     }, [p?.config?.targetSecurity])
 
     useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, p.updateAppState) //sets security focus in config. Used for redux.visable data and widget excel templating.	
+    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.	
     useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
@@ -92,7 +92,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                 p.dashBoardData,
                 p.currentDashBoard,
                 p.enableDrag,
-                p.updateAppState
+                dispatch
             )
         }
     }, [rShowData, p.widgetKey, p.trackedStocks, p.apiKey, p.config.targetSecurity])
@@ -106,17 +106,18 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         const newSource: string = keyList.length > 0 ? trackedStock[keyList[0]].key : ''
         if (!p.config.quarter || p.config.year) {
             updateWidgetConfig(
-                key, {
-                targetSecurity: p.config.targetSecurity ? p.config.targetSecurity : newSource,
-                targetReport: p.config.targetReport ? p.config.targetReport : 'bs',
-                year: rShowData ? rShowData[p.config.pagination]?.year : '',
-                quarter: rShowData ? rShowData[p.config.pagination]?.quarter : '',
-                pagination: p.config.pagination ? p.config.pagination : 0
-            },
+                key,
+                {
+                    targetSecurity: p.config.targetSecurity ? p.config.targetSecurity : newSource,
+                    targetReport: p.config.targetReport ? p.config.targetReport : 'bs',
+                    year: rShowData ? rShowData[p.config.pagination]?.year : '',
+                    quarter: rShowData ? rShowData[p.config.pagination]?.quarter : '',
+                    pagination: p.config.pagination ? p.config.pagination : 0
+                },
                 p.dashBoardData,
                 p.currentDashBoard,
                 p.enableDrag,
-                p.updateAppState
+                dispatch,
             )
         }
     }, [rShowData, p.widgetKey, p.config.year, p.config.pagination, p.config.targetReport, p.config.targetSecurity, p.trackedStocks, p.config.quarter])
@@ -141,17 +142,18 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
         const key = `${p.widgetKey}-${p?.config?.targetSecurity}`
 
         updateWidgetConfig(
-            p.widgetKey, {
-            targetSecurity: p.config.targetSecurity,
-            targetReport: target,
-            year: p.config.year,
-            quarter: p.config.quarter,
-            pagination: p.config.pagination
-        },
+            p.widgetKey,
+            {
+                targetSecurity: p.config.targetSecurity,
+                targetReport: target,
+                year: p.config.year,
+                quarter: p.config.quarter,
+                pagination: p.config.pagination
+            },
             p.dashBoardData,
             p.currentDashBoard,
             p.enableDrag,
-            p.updateAppState
+            dispatch
         )
         const tSearchMongoDBObj: tSearchMongoDBReq = { searchList: [key], dashboardID: p.dashboardID }
         dispatch(tSearchMongoDB(tSearchMongoDBObj))
@@ -172,7 +174,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
             p.dashBoardData,
             p.currentDashBoard,
             p.enableDrag,
-            p.updateAppState
+            dispatch
         )
     }
 
@@ -191,7 +193,7 @@ function FundamentalsFinancialsAsReported(p: { [key: string]: any }, ref: any) {
                 p.dashBoardData,
                 p.currentDashBoard,
                 p.enableDrag,
-                p.updateAppState
+                dispatch
             )
         }
     }

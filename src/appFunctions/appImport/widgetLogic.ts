@@ -1,6 +1,6 @@
 import produce from "immer"
 import { reqBody } from '../../server/routes/mongoDB/setMongoConfig'
-import { AppState, menuList, widget, widgetList, stockList, stock, filters, config, dashBoardData } from 'src/App'
+import { menuList, widget, widgetList, stockList, stock, filters, config, dashBoardData } from 'src/App'
 import { rRebuildTargetWidgetModel } from 'src/slices/sliceDataModel'
 import { tGetFinnhubData } from 'src/thunks/thunkFetchFinnhub'
 import { rSetUpdateStatus } from 'src/slices/sliceDataModel'

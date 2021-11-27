@@ -11,7 +11,7 @@ export const useUpdateFocus = function ( //on update to p.targetFocus update p.c
     dashBoardData: dashBoardData,
     currentDashBoard: string,
     enableDrag: boolean,
-    updateAppState: Function,
+    dispatch: Function,
 ) {
 
     useEffect(() => { //Setup default metric source if none selected or not in list of target stocks
@@ -23,7 +23,7 @@ export const useUpdateFocus = function ( //on update to p.targetFocus update p.c
                 dashBoardData,
                 currentDashBoard,
                 enableDrag,
-                updateAppState
+                dispatch,
             )
         }
     }, [newFocus, key]) //targetSecurity

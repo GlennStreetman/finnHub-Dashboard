@@ -63,7 +63,6 @@ function WidgetController(p) {
                     widgetBodyProps: returnBodyProps({ props: p }, el.widgetType, el.widgetID),
                     widgetKey: el.widgetID,
                     widgetList: el,
-                    zIndex: p.zIndex,
                     rAddNewDashboard: p.rAddNewDashboard,
                     rSetTargetDashboard: p.rSetTargetDashboard,
                     updateAppState: p.updateAppState,

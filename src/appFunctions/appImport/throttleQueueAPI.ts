@@ -153,6 +153,7 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                     }
                 })
                 .then((data: any) => {
+                    console.log('dataFInnhub:', data)
                     if (reqObj.rSetUpdateStatus) reqObj.rSetUpdateStatus({ [reqObj.dashboard]: -1 })
                     if (data.status === 429) {
                         const resObj: throttleResObj = {
