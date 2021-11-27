@@ -34,6 +34,7 @@ import { tGetFinnhubData, tgetFinnHubDataReq } from "./thunks/thunkFetchFinnhub"
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 import { tGetSavedDashboards } from './thunks/thunkGetSavedDashboards'
 import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
+import { rUpdateCurrentDashboard } from 'src/slices/sliceCurrentDashboard'
 
 
 
@@ -73,7 +74,6 @@ class App extends React.Component<AppProps, AppState> {
             aboutMenu: 0,
             apiFlag: 0, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
             backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
-            currentDashBoard: "", //dashboard being displayed
             dashBoardData: {}, //All saved dashboards
             finnHubQueue: createFunctionQueueObject(1, 1000, true),
             login: 0, //login state. 0 logged out, 1 logged in.
@@ -121,9 +121,9 @@ class App extends React.Component<AppProps, AppState> {
             })
         }
 
-        const globalStockList = this.state.dashBoardData?.[this.state.currentDashBoard]?.globalstocklist ? this.state.dashBoardData?.[this.state.currentDashBoard].globalstocklist : false
-        if ((globalStockList && globalStockList !== prevState.dashBoardData?.[prevState.currentDashBoard]?.globalstocklist && this.state.login === 1)) { //price data for watchlist, including socket data.
-            LoadTickerSocket(this, prevState, globalStockList, this.state.socket, this.props.apiKey, UpdateTickerSockets);
+        const globalStockList = this.state.dashBoardData?.[this.props.currentDashboard]?.globalstocklist ? this.state.dashBoardData?.[this.props.currentDashboard].globalstocklist : false
+        if ((globalStockList && globalStockList !== prevState.dashBoardData?.[prevProps.currentDashboard]?.globalstocklist && this.state.login === 1)) { //price data for watchlist, including socket data.
+            LoadTickerSocket(this, prevState, prevProps, globalStockList, this.state.socket, this.props.apiKey, UpdateTickerSockets);
         }
 
         const globalKeys = globalStockList ? Object.keys(globalStockList) : []
@@ -150,20 +150,20 @@ class App extends React.Component<AppProps, AppState> {
 
             const payload = {
                 dashBoardData: data.dashBoardData,
-                currentDashBoard: data.currentDashBoard,
                 menuList: data.menuList!,
             }
+            this.props.rUpdateCurrentDashboard(data.currentDashBoard)
             this.setState(payload, async () => {
                 this.props.rResetUpdateFlag() //sets all dashboards status to updating in redux store.
 
                 const s: AppState = this.state;
                 const p: AppProps = this.props;
                 await p.tGetMongoDB()
-                const targetDash: string[] = s.dashBoardData?.[s.currentDashBoard]?.widgetlist ? Object.keys(s.dashBoardData?.[s.currentDashBoard]?.widgetlist) : []
+                const targetDash: string[] = s.dashBoardData?.[p.currentDashboard]?.widgetlist ? Object.keys(s.dashBoardData?.[p.currentDashboard]?.widgetlist) : []
                 for (const widget in targetDash) {
                     const payload: tgetFinnHubDataReq = { //get data for default dashboard.
-                        dashboardID: s.dashBoardData[s.currentDashBoard].id,
-                        targetDashBoard: s.currentDashBoard,
+                        dashboardID: s.dashBoardData[p.currentDashboard].id,
+                        targetDashBoard: p.currentDashboard,
                         widgetList: [targetDash[widget]],
                         finnHubQueue: s.finnHubQueue,
                         rSetUpdateStatus: p.rSetUpdateStatus,
@@ -172,7 +172,7 @@ class App extends React.Component<AppProps, AppState> {
                 }
                 const dashBoards: string[] = Object.keys(s.dashBoardData) //get data for dashboards not being shown
                 for (const dash of dashBoards) {
-                    if (dash !== s.currentDashBoard) {
+                    if (dash !== p.currentDashboard) {
                         const payload: tgetFinnHubDataReq = { //run in background, do not await.
                             dashboardID: s.dashBoardData[dash].id,
                             targetDashBoard: dash,
@@ -185,7 +185,6 @@ class App extends React.Component<AppProps, AppState> {
                 }
             })
 
-
         } catch (error: any) {
             console.error("Failed to recover dashboards");
         }
@@ -194,17 +193,17 @@ class App extends React.Component<AppProps, AppState> {
     async rebuildVisableDashboard() {
         const payload = {
             apiKey: this.props.apiKey,
-            dashBoardData: this.state.dashBoardData[this.state.currentDashBoard],
-            targetDashboard: this.state.currentDashBoard,
+            dashBoardData: this.state.dashBoardData[this.props.currentDashboard],
+            targetDashboard: this.props.currentDashboard,
         }
         this.props.rRebuildTargetDashboardModel(payload) //rebuilds redux.Model
         const s: AppState = this.state;
         const p: AppProps = this.props;
-        await p.tGetMongoDB({ dashboard: s.dashBoardData[s.currentDashBoard].id })
+        await p.tGetMongoDB({ dashboard: s.dashBoardData[p.currentDashboard].id })
         const payload2: tgetFinnHubDataReq = {
-            dashboardID: s.dashBoardData[s.currentDashBoard].id,
-            targetDashBoard: s.currentDashBoard,
-            widgetList: Object.keys(s.dashBoardData[s.currentDashBoard].widgetlist),
+            dashboardID: s.dashBoardData[p.currentDashboard].id,
+            targetDashBoard: p.currentDashboard,
+            widgetList: Object.keys(s.dashBoardData[p.currentDashboard].widgetlist),
             finnHubQueue: s.finnHubQueue,
             rSetUpdateStatus: p.rSetUpdateStatus,
         }
@@ -238,10 +237,10 @@ class App extends React.Component<AppProps, AppState> {
             return <div className="backgroundMenu">{backGroundSelection[s.backGroundMenu]}</div>;
         };
 
-        const widgetList = this.state.dashBoardData?.[this.state.currentDashBoard]?.['widgetlist'] ?
-            this.state.dashBoardData?.[this.state.currentDashBoard]['widgetlist'] : {}
+        const widgetList = this.state.dashBoardData?.[this.props.currentDashboard]?.['widgetlist'] ?
+            this.state.dashBoardData?.[this.props.currentDashboard]['widgetlist'] : {}
 
-        const dashboardID = this.state.dashBoardData?.[this.state.currentDashBoard]?.id ? this.state.dashBoardData[this.state.currentDashBoard].id : ''
+        const dashboardID = this.state.dashBoardData?.[this.props.currentDashboard]?.id ? this.state.dashBoardData[this.props.currentDashboard].id : ''
         // const bottomNav = this.state.login === 1 ? <BottomNav showMenuColumn={this.state.showMenuColumn} /> : <></>
 
         return (
@@ -257,7 +256,7 @@ class App extends React.Component<AppProps, AppState> {
                                 updateAppState={this.updateAppState}
                                 baseState={this.baseState}
                                 dashboardData={this.state.dashBoardData}
-                                currentDashboard={this.state.currentDashBoard}
+                                currentDashboard={this.props.currentDashboard}
                                 saveDashboard={this.saveDashboard}
                                 apiKey={this.props.apiKey}
                                 finnHubQueue={this.state.finnHubQueue}
@@ -265,7 +264,7 @@ class App extends React.Component<AppProps, AppState> {
                             <WidgetController
                                 apiKey={this.props.apiKey}
                                 apiAlias={this.props.apiAlias}
-                                currentDashBoard={this.state.currentDashBoard}
+                                currentDashBoard={this.props.currentDashboard}
                                 dashBoardData={this.state.dashBoardData}
                                 dashboardID={dashboardID}
                                 defaultExchange={this.props.defaultExchange}
@@ -304,6 +303,7 @@ const mapStateToProps = (state: storeState) => ({
     apiAlias: state.apiAlias,
     defaultExchange: state.defaultExchange,
     targetSecurity: state.targetSecurity,
+    currentDashboard: state.currentDashboard
 });
 
 export default connect(mapStateToProps, {
@@ -324,6 +324,7 @@ export default connect(mapStateToProps, {
     rUpdateQuotePriceSetup,
     tGetSavedDashboards,
     rSetTargetSecurity,
+    rUpdateCurrentDashboard,
 })(App);
 
 
@@ -421,6 +422,7 @@ interface App { [key: string]: any }
 export interface AppProps {
     apiKey: string,
     apiAlias: string,
+    currentDashboard: string,
     exchangeList: string[],
     targetSecurity: string,
     dataModel: sliceDataModel,
@@ -442,6 +444,7 @@ export interface AppProps {
     rUpdateQuotePriceSetup: Function,
     tGetSavedDashboards: Function,
     rSetTargetSecurity: Function,
+    rUpdateCurrentDashboard: Function,
 }
 
 export interface AppState {
@@ -449,7 +452,6 @@ export interface AppState {
     aboutMenu: number,
     apiFlag: number, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
     backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
-    currentDashBoard: string, //dashboard being displayed
     dashBoardData: dashBoardData, //All saved dashboards
     enableDrag: boolean,
     finnHubQueue: finnHubQueue,
@@ -461,7 +463,6 @@ export interface AppState {
     socket: any, //socket connection for streaming stock data.+
     socketUpdate: number,
     showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
-    // targetSecurity: string, //target security for widgets. Update changes widget focus.
     widgetCopy: widget | null, //copy of state of widget being dragged.
     widgetSetup: widgetSetup, //activates premium api routes.
     zIndex: string[], //list widgets. Index location sets zIndex

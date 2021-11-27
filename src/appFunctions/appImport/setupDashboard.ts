@@ -17,8 +17,8 @@ export const saveDashboard = async function (dashboardName: string) {
                 if (this.state.login === 1) {
                     const data = {
                         dashBoardName: dashboardName,
-                        globalStockList: this.state.dashBoardData[this.state.currentDashBoard].globalstocklist,
-                        widgetList: this.state.dashBoardData[this.state.currentDashBoard].widgetlist,
+                        globalStockList: this.state.dashBoardData[this.props.currentDashboard].globalstocklist,
+                        widgetList: this.state.dashBoardData[this.props.currentDashboard].widgetlist,
                         menuList: this.state.menuList,
                     };
                     const options = {
@@ -49,9 +49,3 @@ export const saveDashboard = async function (dashboardName: string) {
         return new Promise(resolve => resolve(true))
     }
 }
-
-//enableDrag
-//saveDashboardThrottle
-//saveDashboardFlag
-//dashBoardData
-//currentDashBoard

@@ -1,9 +1,9 @@
 import produce from "immer"
 import { AppState, widget, menu, menuList, widgetList, dashBoardData } from './../../App'
 
-const setDragWidget = function (currentDashBoard: string, dashBoardData: dashBoardData, widgetId: string | number, widgetCopy: widget) {
+const setDragWidget = function (currentDashboard: string, dashBoardData: dashBoardData, widgetId: string | number, widgetCopy: widget) {
     const updatedWidgetLocation = produce(dashBoardData, (draftState: menuList | widgetList) => {
-        draftState[currentDashBoard]['widgetlist'][widgetId]['column'] = 'drag'
+        draftState[currentDashboard]['widgetlist'][widgetId]['column'] = 'drag'
     })
 
     return new Promise((resolve) => {
@@ -30,20 +30,20 @@ const setDragMenu = function (menuList: menuList, widgetId: string | number, wid
     })
 }
 
-export const setDrag = function (stateRef: 'menuWidget' | 'stockWidget', currentDashBoard: string, dashBoardData: dashBoardData, menuList: menuList, widgetId: string | number, widgetCopy: widget) {
+export const setDrag = function (stateRef: 'menuWidget' | 'stockWidget', currentDashboard: string, dashBoardData: dashBoardData, menuList: menuList, widgetId: string | number, widgetCopy: widget) {
     if (stateRef === 'stockWidget') {
-        return setDragWidget(currentDashBoard, dashBoardData, widgetId, widgetCopy)
+        return setDragWidget(currentDashboard, dashBoardData, widgetId, widgetCopy)
     } else {
         return setDragMenu(menuList, widgetId, widgetCopy)
     }
 }
 
-function moveStockWidget(dashBoardData: dashBoardData, currentDashBoard: string, widgetId: string, xxAxis: number, yyAxis: number) {
+function moveStockWidget(dashBoardData: dashBoardData, currentDashboard: string, widgetId: string, xxAxis: number, yyAxis: number) {
     console.log('moveStockWidget')
     const updatedWidgetLocation = produce(dashBoardData, (draftState: menuList | widgetList) => {
-        draftState[currentDashBoard]['widgetlist'][widgetId]["xAxis"] = xxAxis;
-        draftState[currentDashBoard]['widgetlist'][widgetId]["yAxis"] = yyAxis;
-        draftState[currentDashBoard]['widgetlist'][widgetId]["column"] = 'drag';
+        draftState[currentDashboard]['widgetlist'][widgetId]["xAxis"] = xxAxis;
+        draftState[currentDashboard]['widgetlist'][widgetId]["yAxis"] = yyAxis;
+        draftState[currentDashboard]['widgetlist'][widgetId]["column"] = 'drag';
     })
     return updatedWidgetLocation
 }
@@ -61,14 +61,14 @@ export function moveWidget(
     stateRef: 'menuWidget' | 'stockWidget',
     dashBoardData: dashBoardData,
     menuList: menuList,
-    currentDashBoard: string,
+    currentDashboard: string,
     widgetId: string,
     xxAxis: number,
     yyAxis: number,
 ) {
 
     if (stateRef === 'stockWidget') {
-        const payload = moveStockWidget(dashBoardData, currentDashBoard, widgetId, xxAxis, yyAxis)
+        const payload = moveStockWidget(dashBoardData, currentDashboard, widgetId, xxAxis, yyAxis)
         return ({ dashBoardData: payload })
     } else {
         const payload = moveMenu(menuList, widgetId, xxAxis, yyAxis)
@@ -84,14 +84,14 @@ export const SnapOrder = function (
     wType: string,
     dashBoardData: dashBoardData,
     menuList: menuList,
-    currentDashBoard: string,
+    currentDashboard: string,
 ) {
     const draft: Partial<AppState> = {
         menuList: menuList,
         dashBoardData: dashBoardData
     }
     const newWidgetLists: Partial<AppState> = produce(draft, (draftState: Partial<AppState>) => {
-        const thisWidgetList = draftState?.dashBoardData?.[currentDashBoard]?.widgetlist
+        const thisWidgetList = draftState?.dashBoardData?.[currentDashboard]?.widgetlist
         let allWidgets: (menu | widget)[] = [...Object.values(draftState.menuList!) as menu[], ...Object.values(thisWidgetList!) as widget[]]
         allWidgets = allWidgets.filter(w => (w['column'] === column ? true : false))
         allWidgets = allWidgets.sort((a, b) => (a.columnOrder > b.columnOrder) ? 1 : -1)
@@ -162,15 +162,12 @@ export const SnapWidget = async function (
     focus: number,
     dashBoardData: dashBoardData,
     menuList: menuList,
-    currentDashBoard: string,
+    currentDashboard: string,
 
 ) {
     //snaps widget to desired location mouse up. If stateRef = menuwidget it should always snap to column 0.
     let column: number = stateRef !== 'menuWidget' ? Math.floor(xxAxis / widgetWidth) + focus : 0 //base column calc
 
-    return SnapOrder(widgetId, column, yyAxis, stateRef, dashBoardData, menuList, currentDashBoard)
+    return SnapOrder(widgetId, column, yyAxis, stateRef, dashBoardData, menuList, currentDashboard)
 
 }
-
-//setState
-//this.saveDashboard(this.state.currentDashBoard)

@@ -54,20 +54,20 @@ export const CreateNewWidgetContainer = function (
 }
 
 
-export const ChangeWidgetName = function (widgetID: string | number, newName: string, dashBoardData: dashBoardData, currentDashBoard: string,) {
+export const ChangeWidgetName = function (widgetID: string | number, newName: string, dashBoardData: dashBoardData, currentDashboard: string,) {
 
-    const widgetList = dashBoardData[currentDashBoard].widgetlist
+    const widgetList = dashBoardData[currentDashboard].widgetlist
     const widgetIds = widgetList ? Object.keys(widgetList) : []
     const widgetNameList = widgetIds.map((el) => widgetList[el].widgetHeader)
 
     const useName = uniqueName(newName, widgetNameList)
 
-    const widgetGroup: widgetList = dashBoardData[currentDashBoard].widgetlist
+    const widgetGroup: widgetList = dashBoardData[currentDashboard].widgetlist
     const newWidgetList: widgetList | menuList = produce(widgetGroup, (draftState) => {
         draftState[widgetID].widgetHeader = useName
     })
     const newDashboardData: dashBoardData = produce(dashBoardData, (draftState) => {
-        draftState[currentDashBoard].widgetlist = newWidgetList
+        draftState[currentDashboard].widgetlist = newWidgetList
     })
     const payload: Partial<AppState> = {
         'dashBoardData': newDashboardData,
@@ -117,15 +117,6 @@ export const UpdateWidgetStockList = function (widgetId: number, symbol: string,
             dashBoardData: updatedDashBoard,
         }
         return payload
-        // this.setState(payload, () => {
-        //     this.saveDashboard(this.state.currentDashBoard)
-
-        //     const payload: rBuildDataModelPayload = {
-        //         apiKey: this.state.apiKey,
-        //         dashBoardData: this.state.dashBoardData
-        //     }
-        //     this.props.rBuildDataModel(payload)
-        // });
     }
 }
 
@@ -134,7 +125,7 @@ export const UpdateWidgetFilters = async function (
     widgetID: string | number,
     data: filters,
     dashBoardData: dashBoardData,
-    currentDashBoard: string,
+    currentDashboard: string,
     updateAppState: Function,
     dispatch: Function,
     apiKey: string,
@@ -144,8 +135,8 @@ export const UpdateWidgetFilters = async function (
 ) {
     try {
         const newDashBoardData: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
-            draftState[currentDashBoard].widgetlist[widgetID].filters = {
-                ...draftState[currentDashBoard].widgetlist[widgetID].filters,
+            draftState[currentDashboard].widgetlist[widgetID].filters = {
+                ...draftState[currentDashboard].widgetlist[widgetID].filters,
                 ...data
             }
         })
@@ -160,36 +151,36 @@ export const UpdateWidgetFilters = async function (
             dispatch(rRebuildTargetWidgetModel({ //rebuild data model (removes stale dates)
                 apiKey: apiKey,
                 dashBoardData: dashBoardData,
-                targetDashboard: currentDashBoard,
+                targetDashboard: currentDashboard,
                 targetWidget: widgetID,
             }))
             //remove visable data?
             dispatch(tGetFinnhubData({//fetch fresh data
-                dashboardID: dashBoardData[currentDashBoard].id,
-                targetDashBoard: currentDashBoard,
+                dashboardID: dashBoardData[currentDashboard].id,
+                targetDashBoard: currentDashboard,
                 widgetList: [widgetID],
                 finnHubQueue: finnHubQueue,
                 rSetUpdateStatus: rSetUpdateStatus,
             }))
-            saveDashboard(currentDashBoard)
+            saveDashboard(currentDashboard)
         })
     } catch { console.log("Problem updating widget filters."); return false }
 
 }
 
 //widget config changes how data is manipulated after being queried.
-export const updateWidgetConfig = async function (widgetID: number, updateObj: config, dashBoardData: dashBoardData, currentDashBoard: string, enableDrag: boolean, saveDashboard: Function, updateAppState: Function) { //replaces widget config object then saves changes to mongoDB & postgres.
+export const updateWidgetConfig = async function (widgetID: number, updateObj: config, dashBoardData: dashBoardData, currentDashboard: string, enableDrag: boolean, saveDashboard: Function, updateAppState: Function) { //replaces widget config object then saves changes to mongoDB & postgres.
     //config changes used by mongoDB during excel templating.
     // console.log('setting up config', widgetID, updateObj)
     const updatedDashboardData: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
-        const oldConfig = draftState[currentDashBoard].widgetlist[widgetID].config
-        draftState[currentDashBoard].widgetlist[widgetID].config = { ...oldConfig, ...updateObj }
+        const oldConfig = draftState[currentDashboard].widgetlist[widgetID].config
+        draftState[currentDashboard].widgetlist[widgetID].config = { ...oldConfig, ...updateObj }
     })
     const payload: Partial<AppState> = { dashBoardData: updatedDashboardData }
     await updateAppState(payload)
     if (enableDrag !== true) {
-        saveDashboard(currentDashBoard)
-        const updatedWidgetFilters = updatedDashboardData[currentDashBoard].widgetlist[widgetID].config
+        saveDashboard(currentDashboard)
+        const updatedWidgetFilters = updatedDashboardData[currentDashboard].widgetlist[widgetID].config
         const postBody: reqBody = {
             widget: widgetID,
             config: updatedWidgetFilters,
@@ -208,10 +199,10 @@ export const updateWidgetConfig = async function (widgetID: number, updateObj: c
     }
 }
 
-export const toggleWidgetBody = function (widgetID: string, stateRef: 'menuWidget' | 'stockWidget', dashBoardData: dashBoardData, menuList: menuList, currentDashBoard: string) {
+export const toggleWidgetBody = function (widgetID: string, stateRef: 'menuWidget' | 'stockWidget', dashBoardData: dashBoardData, menuList: menuList, currentDashboard: string) {
     if (stateRef === 'stockWidget') {
         const updatedWidget: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
-            draftState[currentDashBoard].widgetlist[widgetID].showBody = !draftState[currentDashBoard].widgetlist[widgetID].showBody
+            draftState[currentDashboard].widgetlist[widgetID].showBody = !draftState[currentDashboard].widgetlist[widgetID].showBody
         })
         return ({ dashBoardData: updatedWidget })
     } else {

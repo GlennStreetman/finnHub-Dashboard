@@ -8,6 +8,7 @@ import apiKey from 'src/slices/sliceAPIKey'
 import apiAlias from 'src/slices/sliceAPIAlias'
 import defaultExchange from 'src/slices/sliceDefaultExchange'
 import targetSecurity from 'src/slices/sliceTargetSecurity'
+import currentDashboard from 'src/slices/sliceCurrentDashboard'
 
 export interface storeState {
   exchangeData: sliceExchangeData,
@@ -19,6 +20,7 @@ export interface storeState {
   apiAlias: string,
   defaultExchange: string,
   targetSecurity: string,
+  currentDashboard: string,
 }
 
 export const store = configureStore({
@@ -32,6 +34,7 @@ export const store = configureStore({
     'apiAlias': apiAlias,
     'defaultExchange': defaultExchange,
     'targetSecurity': targetSecurity,
+    'currentDashboard': currentDashboard,
   },
   middleware: () =>
     getDefaultMiddleware({
