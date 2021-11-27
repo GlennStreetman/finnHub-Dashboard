@@ -14,6 +14,8 @@ import { dStock } from '../../../appFunctions/formatStockSymbols'
 import { updateGlobalStockList } from 'src/appFunctions/appImport/updateGlobalStockList'
 import { syncGlobalStockList } from 'src/appFunctions/appImport/syncGlobalStockList'
 
+import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
+
 interface props {
     showEditPane: number,
     dashBoardData: dashBoardData,
@@ -80,8 +82,8 @@ function WatchListMenu(p: props, ref: any) {
         })
         p.updateAppState({
             dashBoardData: updatedDashboardData,
-            targetSecurity: key
         })
+        dispatch(rSetTargetSecurity(key))
     }
 
     function renderWatchedStocks() {
@@ -220,7 +222,8 @@ function WatchListMenu(p: props, ref: any) {
                                 </td>
                                 <td>
                                     <button className="ui button" onClick={async () => {
-                                        await syncGlobalStockList(p.dashBoardData, p.currentDashBoard, p.updateAppState)
+                                        const focus = await syncGlobalStockList(p.dashBoardData, p.currentDashBoard, p.updateAppState)
+                                        dispatch(rSetTargetSecurity(focus))
                                         p.rebuildVisableDashboard()
                                         p.saveDashboard(p.currentDashBoard) //saves dashboard setup to server
                                     }}>
@@ -295,7 +298,6 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
         defaultExchange: that.props.defaultExchange,
         helpText: [helpText, 'WLM'],
         targetSecurity: that.props.targetSecurity,
-
         finnHubQueue: that.props.finnHubQueue,
         updateAppState: that.props.updateAppState,
         saveDashboard: that.props.saveDashboard,

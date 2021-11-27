@@ -18,9 +18,8 @@ export const syncGlobalStockList = async function (dashBoardData: dashBoardData,
     })
     await updateAppState({
         dashBoardData: updatedWidgetList,
-        targetSecurity: newFocus,
     })
     console.log('Dashboard setup')
-    return true
+    return newFocus
 
 }

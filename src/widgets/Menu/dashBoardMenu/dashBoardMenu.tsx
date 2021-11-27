@@ -15,6 +15,9 @@ import { tGetMongoDB } from 'src/thunks/thunkGetMongoDB'
 import { tGetFinnhubData, tgetFinnHubDataReq } from 'src/thunks/thunkFetchFinnhub'
 import { rSetUpdateStatus } from 'src/slices/sliceDataModel'
 
+import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
+
+
 interface props {
     dashBoardData: dashBoardData,
     currentDashBoard: string,
@@ -95,8 +98,8 @@ function DashBoardMenu(p: props, ref: any) {
         dispatch(rSetTargetDashboard({ targetDashboard: widgetName }))
         await p.updateAppState({
             currentDashBoard: widgetName,
-            targetSecurity: Object.keys(p.dashBoardData[widgetName].globalstocklist)[0],
         })
+        dispatch(rSetTargetSecurity(Object.keys(p.dashBoardData[widgetName].globalstocklist)[0]))
         await dispatch(tGetMongoDB({ dashboard: p.dashBoardData[p.currentDashBoard].id }))
         const finnHubPayload: tgetFinnHubDataReq = {
             dashboardID: p.dashBoardData[p.currentDashBoard].id,

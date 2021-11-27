@@ -7,6 +7,7 @@ import quotePrice, { sliceQuotePrice } from './slices/sliceQuotePrice'
 import apiKey from 'src/slices/sliceAPIKey'
 import apiAlias from 'src/slices/sliceAPIAlias'
 import defaultExchange from 'src/slices/sliceDefaultExchange'
+import targetSecurity from 'src/slices/sliceTargetSecurity'
 
 export interface storeState {
   exchangeData: sliceExchangeData,
@@ -17,6 +18,7 @@ export interface storeState {
   apiKey: string,
   apiAlias: string,
   defaultExchange: string,
+  targetSecurity: string,
 }
 
 export const store = configureStore({
@@ -29,6 +31,7 @@ export const store = configureStore({
     'apiKey': apiKey,
     'apiAlias': apiAlias,
     'defaultExchange': defaultExchange,
+    'targetSecurity': targetSecurity,
   },
   middleware: () =>
     getDefaultMiddleware({

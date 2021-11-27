@@ -33,6 +33,7 @@ import {
 import { tGetFinnhubData, tgetFinnHubDataReq } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 import { tGetSavedDashboards } from './thunks/thunkGetSavedDashboards'
+import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
 
 
 
@@ -84,7 +85,6 @@ class App extends React.Component<AppProps, AppState> {
             socket: "", //socket connection for streaming stock data.
             socketUpdate: Date.now(),
             showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
-            targetSecurity: '', //target security for widgets. Update changes widget focus.
             widgetCopy: null, //copy of state of widget being dragged.
             widgetSetup: {},//activates premium api routes.
             zIndex: [], //list widgets. Index location sets zIndex
@@ -127,10 +127,8 @@ class App extends React.Component<AppProps, AppState> {
         }
 
         const globalKeys = globalStockList ? Object.keys(globalStockList) : []
-        if (this.state.targetSecurity === '' && globalKeys.length > 0) {
-            this.setState({
-                targetSecurity: globalKeys[0]
-            })
+        if (this.props.targetSecurity === '' && globalKeys.length > 0) {
+            this.props.rSetTargetSecurity(globalKeys[0])
         }
     }
 
@@ -149,17 +147,6 @@ class App extends React.Component<AppProps, AppState> {
     async rebuildDashboardState() { //fetches dashboard data, then updates s.dashBoardData, then builds redux model.
         try {
             const data = await this.props.tGetSavedDashboards({ apiKey: this.props.apiKey }).unwrap()
-
-            // const widgetlist = data.dashBoardData[data.currentDashBoard].widgetlist
-            // Object.keys(widgetlist).forEach((el)=>{
-            //     const payload: object = {
-            //         key: el,
-            //         securityList: targetSecurityList
-            //     }
-            //     dispatch(rBuildVisableData(payload))
-            // })
-
-
 
             const payload = {
                 dashBoardData: data.dashBoardData,
@@ -291,10 +278,9 @@ class App extends React.Component<AppProps, AppState> {
                                 saveDashboard={this.saveDashboard}
                                 showMenuColumn={this.state.showMenuColumn}
                                 showStockWidgets={this.state.showStockWidgets}
-                                targetSecurity={this.state.targetSecurity}
+                                targetSecurity={this.props.targetSecurity}
                                 widgetCopy={this.state.widgetCopy}
                                 widgetList={widgetList}
-
                                 zIndex={this.state.zIndex}
                                 rSetTargetDashboard={this.props.rSetTargetDashboard}
                                 updateAppState={this.updateAppState}
@@ -316,7 +302,8 @@ const mapStateToProps = (state: storeState) => ({
     dataModel: state.dataModel,
     apiKey: state.apiKey,
     apiAlias: state.apiAlias,
-    defaultExchange: state.defaultExchange
+    defaultExchange: state.defaultExchange,
+    targetSecurity: state.targetSecurity,
 });
 
 export default connect(mapStateToProps, {
@@ -336,6 +323,7 @@ export default connect(mapStateToProps, {
     rUpdateQuotePriceStream,
     rUpdateQuotePriceSetup,
     tGetSavedDashboards,
+    rSetTargetSecurity,
 })(App);
 
 
@@ -434,6 +422,7 @@ export interface AppProps {
     apiKey: string,
     apiAlias: string,
     exchangeList: string[],
+    targetSecurity: string,
     dataModel: sliceDataModel,
     defaultExchange: string,
     tGetSymbolList: Function,
@@ -452,6 +441,7 @@ export interface AppProps {
     rUpdateQuotePriceStream: Function,
     rUpdateQuotePriceSetup: Function,
     tGetSavedDashboards: Function,
+    rSetTargetSecurity: Function,
 }
 
 export interface AppState {
@@ -461,12 +451,9 @@ export interface AppState {
     backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
     currentDashBoard: string, //dashboard being displayed
     dashBoardData: dashBoardData, //All saved dashboards
-    // defaultExchange: string,
     enableDrag: boolean,
-    // exchangeList: string[], //list of all exchanges activated under account management.
     finnHubQueue: finnHubQueue,
     login: number, //login state. 0 logged out, 1 logged in.
-
     showMenuColumn: boolean, //true shows column 0
     menuList: menuList, //lists of all menu widgets.
     saveDashboardThrottle: number, //delay timer for saving dashboard.
@@ -474,7 +461,7 @@ export interface AppState {
     socket: any, //socket connection for streaming stock data.+
     socketUpdate: number,
     showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
-    targetSecurity: string, //target security for widgets. Update changes widget focus.
+    // targetSecurity: string, //target security for widgets. Update changes widget focus.
     widgetCopy: widget | null, //copy of state of widget being dragged.
     widgetSetup: widgetSetup, //activates premium api routes.
     zIndex: string[], //list widgets. Index location sets zIndex

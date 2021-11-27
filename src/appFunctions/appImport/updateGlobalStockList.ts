@@ -36,9 +36,8 @@ export const setNewGlobalStockList = async function (replacementGlobalList, curr
 
     const payload = {
         dashBoardData: updateCurrentDashboard,
-        targetSecurity: newFocus,
     }
 
     await updateAppState(payload)
-    return true
+    return newFocus
 }
