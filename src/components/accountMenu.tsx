@@ -117,7 +117,7 @@ class AccountMenu extends React.Component<accountMenuProps2, accountMenuState> {
         };
         if (changeField === "apikey") {
             console.log('updating apikey')
-            this.props.updateAppState({ apiKey: newValue })
+            this.props.rSetApiKey(newValue)
         }
         if (changeField === 'ratelimit') {
             this.props.finnHubQueue.updateInterval(newValue)

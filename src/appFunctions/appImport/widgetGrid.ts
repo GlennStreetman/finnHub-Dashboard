@@ -57,11 +57,9 @@ export function moveWidget(
 ) {
 
     if (stateRef === 'stockWidget') {
-        const payload = moveStockWidget(dashBoardData, currentDashboard, widgetId, xxAxis, yyAxis)
-        return ({ dashBoardData: payload })
+        return moveStockWidget(dashBoardData, currentDashboard, widgetId, xxAxis, yyAxis)
     } else {
-        const payload = moveMenu(menuList, widgetId, xxAxis, yyAxis)
-        return ({ menuList: payload })
+        return moveMenu(menuList, widgetId, xxAxis, yyAxis)
     }
 
 }

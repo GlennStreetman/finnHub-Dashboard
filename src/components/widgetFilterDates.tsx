@@ -1,7 +1,7 @@
 import ToolTip from './toolTip.js'
 import { dashBoardData } from 'src/App'
 import { UpdateWidgetFilters } from 'src/appFunctions/appImport/widgetLogic'
-import { useAppDispatch, useAppSelector } from 'src/hooks';
+import { useAppDispatch } from 'src/hooks';
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 interface props {

@@ -1,8 +1,8 @@
-import { AppState, dashBoardData } from './../../App'
+import { dashBoardData } from './../../App'
 import { StockObj } from './../../types'
 import produce from "immer"
 
-export const updateGlobalStockList = async function (stockRef: string, dashBoardData, currentDashboard: string, updateAppState: Function, stockObj: StockObj | Object = {},) {
+export const updateGlobalStockList = function (stockRef: string, dashBoardData, currentDashboard: string, stockObj: StockObj | Object = {},) {
     //Adds/removes a single stock from global stock list and updates current dashboard. if no stock object passed, remove from global stock list, else add.
     // console.log('updating global', stockObj)
     const globalStockList = dashBoardData[currentDashboard].globalstocklist
@@ -17,12 +17,8 @@ export const updateGlobalStockList = async function (stockRef: string, dashBoard
         draftState[currentDashboard].globalstocklist = currentStockObj
     })
 
-    const payload = {
-        dashBoardData: updateCurrentDashboard
-    }
-    await updateAppState(payload)
     // event instanceof Event === true && event.preventDefault();
-    return true
+    return updateCurrentDashboard
 }
 
 export const setNewGlobalStockList = async function (replacementGlobalList, currentDashboard, dashboardData, updateAppState) {
@@ -34,10 +30,5 @@ export const setNewGlobalStockList = async function (replacementGlobalList, curr
 
     const newFocus = replacementGlobalList[Object.keys(replacementGlobalList)[0]] ? replacementGlobalList[Object.keys(replacementGlobalList)[0]].key : ''
 
-    const payload = {
-        dashBoardData: updateCurrentDashboard,
-    }
-
-    await updateAppState(payload)
-    return newFocus
+    return [newFocus, updateCurrentDashboard]
 }

@@ -137,7 +137,6 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
                 exchangeList={p.exchangeList}
                 dashBoardData={p.dashBoardData}
                 currentDashboard={p.currentDashboard}
-                updateAppState={p.updateAppState}
                 apiKey={p.apiKey}
             />
         );
@@ -192,7 +191,6 @@ function FundamentalsCompanyNews(p: { [key: string]: any }, ref: any) {
                         currentDashBoard={p.currentDashBoard}
                         enableDrag={p.enableDrag}
                         saveDashboard={p.saveDashboard}
-                        updateAppState={p.updateAppState}
                     />
                     <button data-testid='pageBackward' onClick={() => changeIncrememnt(-1)}>
                         <i className="fa fa-backward" aria-hidden="true"></i>

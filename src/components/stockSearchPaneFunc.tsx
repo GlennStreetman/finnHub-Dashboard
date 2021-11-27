@@ -11,6 +11,7 @@ import { dashBoardData } from 'src/App'
 import { rBuildDataModel } from 'src/slices/sliceDataModel'
 import { useAppDispatch } from 'src/hooks';
 import { rSetDashboardData } from 'src/slices/sliceDashboardData'
+import { updateGlobalStockList } from "src/appFunctions/appImport/updateGlobalStockList";
 
 const useDispatch = useAppDispatch
 //compnoent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
@@ -22,7 +23,6 @@ interface props {
     exchangeList: string[],
     finnHubQueue: finnHubQueue,
     searchText: string,
-    updateGlobalStockList: Function,
     widgetKey: string,
     widgetType: string,
     tGetSymbolList: Function,
@@ -77,7 +77,7 @@ function StockSearchPane(p: props) {
                         // console.log('ADDING SECURITY TO WIDGET: ', p.rUpdateStock)
                         const thisStock = p.rUpdateStock
                         const stockKey = thisStock.key
-                        p.updateGlobalStockList(e, stockKey, thisStock);
+                        updateGlobalStockList(stockKey, p.dashBoardData, p.currentDashboard)
                     } else if (typeof widgetKey === 'number' && p.rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
                         // console.log('ADDING SECURITY TO WIDGET: ', p.rUpdateStock)
                         const thisStock = p.rUpdateStock
@@ -151,7 +151,6 @@ export function searchPaneProps(p) {
         exchangeList: p.exchangeList,
         finnHubQueue: p.finnHubQueue,
         searchText: p.searchText,
-        updateGlobalStockList: p.updateGlobalStockList,
         widgetKey: p.widgetKey,
         widgetType: p.widgetType,
         updateAppState: p.updateAppState,

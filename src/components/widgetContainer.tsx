@@ -99,8 +99,8 @@ function WidgetContainer(p) {
                 await p.updateAppState(newDrag)
                 dispatch(rSetDashboardData(widgets))
             } else {
-                const [payload, menu] = await setDragMenu(p.menuList, p.widgetKey, widgetState.state)
-                await p.updateAppState(payload)
+                const [newDrag, menu] = await setDragMenu(p.menuList, p.widgetKey, widgetState.state)
+                await p.updateAppState(newDrag)
                 dispatch(rSetMenuList(menu))
             }
 
@@ -118,11 +118,13 @@ function WidgetContainer(p) {
 
             let newX = xAxis - widgetCenter + 25 >= 5 ? xAxis - widgetCenter + 25 : 5
             let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
-            //copy widget state THEN move widget.
-            const payload = moveWidget(p.stateRef, p.dashboardData, p.menuList, p.currentDashBoard, p.widgetKey, newX, newY);
-            // if (p.enableDrag === true) {
-            p.updateAppState(payload)
-            // }
+            if (p.stateRef === 'stockWidget') {
+                const payload = moveWidget(p.stateRef, p.dashboardData, p.menuList, p.currentDashBoard, p.widgetKey, newX, newY);
+                dispatch(rSetDashboardData(payload))
+            } else {
+                const payload = moveWidget(p.stateRef, p.dashboardData, p.menuList, p.currentDashBoard, p.widgetKey, newX, newY);
+                dispatch(rSetMenuList(payload))
+            }
         }
 
         async function closeDragElement(e) {
@@ -243,7 +245,6 @@ function WidgetContainer(p) {
                                 if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
                                     const updateWidgets = await RemoveWidget(p.widgetKey, p.dashboardData, p.currentDashBoard);
                                     dispatch(rSetDashboardData(updateWidgets))
-                                    await p.updateAppState(updateWidgets)
                                     p.saveDashboard(p.currentDashBoard) //saved updated dashboard to postgres.
                                     fetch(`/deleteFinnDashData?widgetID=${p.widgetKey}`) //delete from mongo.
                                     const payload = {

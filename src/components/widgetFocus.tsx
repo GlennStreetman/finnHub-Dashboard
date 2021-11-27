@@ -16,7 +16,6 @@ interface props {
     currentDashBoard: string,
     enableDrag: boolean,
     saveDashboard: Function,
-    updateAppState: Function,
 }
 
 export default function WidgetFocus(p: props): ReactElement {

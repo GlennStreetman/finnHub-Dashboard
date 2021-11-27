@@ -6,7 +6,7 @@ import { dashBoardData } from 'src/App'
 
 import Papa from 'papaparse'
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
-import CsvUpload from './csvUpload.js'
+import CsvUpload from './csvUpload'
 import ToolTip from '../../../components/toolTip.js'
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { dStock } from '../../../appFunctions/formatStockSymbols'
@@ -15,6 +15,7 @@ import { updateGlobalStockList } from 'src/appFunctions/appImport/updateGlobalSt
 import { syncGlobalStockList } from 'src/appFunctions/appImport/syncGlobalStockList'
 
 import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
+import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 
 interface props {
     showEditPane: number,
@@ -129,7 +130,8 @@ function WatchListMenu(p: props, ref: any) {
                                     key={el + "clck"}
                                     onClick={async (e) => {
                                         e.preventDefault()
-                                        await updateGlobalStockList(el, p.dashBoardData, p.currentDashBoard, p.updateAppState);
+                                        const newDash = await updateGlobalStockList(el, p.dashBoardData, p.currentDashBoard, p.updateAppState);
+                                        dispatch(rSetDashboardData(newDash))
                                         p.saveDashboard(p.currentDashBoard)
                                     }}
                                 >
@@ -222,7 +224,8 @@ function WatchListMenu(p: props, ref: any) {
                                 </td>
                                 <td>
                                     <button className="ui button" onClick={async () => {
-                                        const focus = await syncGlobalStockList(p.dashBoardData, p.currentDashBoard, p.updateAppState)
+                                        const [focus, newDashboard] = await syncGlobalStockList(p.dashBoardData, p.currentDashBoard)
+                                        dispatch(rSetDashboardData(newDashboard))
                                         dispatch(rSetTargetSecurity(focus))
                                         p.rebuildVisableDashboard()
                                         p.saveDashboard(p.currentDashBoard) //saves dashboard setup to server
@@ -273,8 +276,10 @@ function WatchListMenu(p: props, ref: any) {
                     resetUploadList={resetUploadList}
                     currentDashboard={p.currentDashBoard}
                     dashboardData={p.dashBoardData}
-                    updateAppState={p.updateAppState}
                     saveDashboard={p.saveDashboard}
+                    rSetTargetSecurity={rSetTargetSecurity}
+                    rSetDashboardData={rSetDashboardData}
+                    dispatch={dispatch}
                 />
             )}
         </>

@@ -140,7 +140,6 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
                 exchangeList={p.exchangeList}
                 dashBoardData={p.dashBoardData}
                 currentDashboard={p.currentDashboard}
-                updateAppState={p.updateAppState}
                 apiKey={p.apiKey}
             />
         );

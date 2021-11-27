@@ -60,7 +60,6 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
                 exchangeList={p.exchangeList}
                 dashBoardData={p.dashBoardData}
                 currentDashboard={p.currentDashboard}
-                updateAppState={p.updateAppState}
                 apiKey={p.apiKey}
             />
         );
@@ -92,7 +91,6 @@ function FundamentalsNewsSentiment(p: { [key: string]: any }, ref: any) {
                     currentDashBoard={p.currentDashBoard}
                     enableDrag={p.enableDrag}
                     saveDashboard={p.saveDashboard}
-                    updateAppState={p.updateAppState}
                 />
                 <br />
                 <table className='dataTable'>

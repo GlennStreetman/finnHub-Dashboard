@@ -16,7 +16,6 @@ interface Props {
     exchangeList: string[],
     dashBoardData: dashBoardData,
     currentDashboard: string,
-    updateAppState: Function,
     apiKey: string,
 }
 
