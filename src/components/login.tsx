@@ -1,25 +1,23 @@
-import React from "react";
-import { widgetSetup } from 'src/App'
 import { useState, useEffect } from "react";
 import { Redirect } from 'react-router-dom'
-import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
-import { useAppDispatch } from 'src/hooks';
 
+import { useAppDispatch } from 'src/hooks';
+import { widgetSetup } from 'src/App'
+import { styled } from '@material-ui/core/styles';
+import { Grid, Paper, Button, TextField, Box, Typography } from '@material-ui/core/';
+
+import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
 import { checkPassword } from "../appFunctions/client/checkPassword";
 import { forgotLogin } from "../appFunctions/client/forgotLogin";
 import { secretQuestion } from "../appFunctions/client/secretQuestion";
 import { newPW } from "../appFunctions/client/newPW";
 import { registerAccount } from "../appFunctions/client/registerAccount";
+
 import { rUpdateExchangeList } from 'src/slices/sliceExchangeList'
 import { rSetApiKey } from 'src/slices/sliceAPIKey'
 import { rSetApiAlias } from 'src/slices/sliceAPIAlias'
 import { rSetDefaultExchange } from "src/slices/sliceDefaultExchange";
-
-
-import { styled } from '@material-ui/core/styles';
-import { Grid, Paper, Button, TextField, Box, Typography } from '@material-ui/core/';
-
-const useDispatch = useAppDispatch
+import { tProcessLogin } from 'src/thunks/thunkProcessLogin'
 
 interface loginProps {
     queryData: any,
@@ -31,7 +29,7 @@ const MyPaper = styled(Paper)({ color: "#1d69ab", variant: "outlined", borderRad
 
 export default function Login(p: loginProps) {
 
-    const dispatch = useDispatch(); //allows widget to run redux actions.
+    const dispatch = useAppDispatch(); //allows widget to run redux actions.
 
     const [showMenu, setShowMenu] = useState(0); //0 = login, 1 = recover, 2 = register, 3 = secret question, 4 reset password
     const [message, setMessage] = useState(""); //message from server
@@ -121,18 +119,22 @@ export default function Login(p: loginProps) {
     useEffect(() => { //check login status on page refresh.
         fetch("/checkLogin")
             .then((response) => response.json())
-            .then((data) => {
+            .then(async (data) => {
                 if (data.login === 1) {
                     const parseSetup: widgetSetup = JSON.parse(data.widgetsetup)
                     const newList: string[] = data.exchangelist.split(",");
+                    console.log('LOGIN DATA', data)
+                    await dispatch(tProcessLogin({
+                        defaultexchange: data.defaultexchange,
+                        apiKey: data.apiKey,
+                        apiAlias: data.apiAlias,
+                        exchangelist: newList
+                    }))
+
                     p.updateAppState({
                         login: 1,
                         widgetSetup: parseSetup,
                     })
-                    dispatch(rSetDefaultExchange(data.defaultexchange))
-                    dispatch(rSetApiKey(data.apiKey))
-                    dispatch(rSetApiAlias(data.apiAlias))
-                    dispatch(rUpdateExchangeList({ exchangeList: newList }))
                     p.finnHubQueue.updateInterval(data.ratelimit)
                 } else {
                     // console.log('FAILED LOGIN', data)
@@ -183,20 +185,24 @@ export default function Login(p: loginProps) {
     const submitFunctionLookup = {
         0: () => {
             checkPassword(text0, text1)
-                .then((data) => {
+                .then(async (data) => {
                     if (data.status === 200) {
                         setMessage("")
                         const parseSetup: widgetSetup = JSON.parse(data.widgetsetup) //ex string
                         const newList: string[] = data.exchangelist.split(",");
+                        console.log('LOGIN DATA', data)
+                        await dispatch(tProcessLogin({
+                            defaultexchange: data.defaultexchange,
+                            apiKey: data.key,
+                            apiAlias: data.apiAlias,
+                            exchangelist: newList
+                        }))
+
                         p.updateAppState({
                             login: 1,
                             widgetSetup: parseSetup,
                             exchangeList: newList,
                         })
-                        dispatch(rSetDefaultExchange(data.defaultexchange))
-                        dispatch(rSetApiKey(data.apiKey))
-                        dispatch(rSetApiAlias(data.apiAlias))
-                        dispatch(rUpdateExchangeList({ exchangeList: newList }))
                         p.finnHubQueue.updateInterval(data['ratelimit'])
                     } else {
                         setMessage(data.message)

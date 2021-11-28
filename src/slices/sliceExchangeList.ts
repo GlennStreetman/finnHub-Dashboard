@@ -1,4 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { tProcessLogin } from 'src/thunks/thunkProcessLogin'
+
 
 export interface sliceExchangeList {
     exchangeList: string[]
@@ -25,6 +27,14 @@ const exchangeList = createSlice({
             state.exchangeList = []
         }
     },
+    extraReducers: {
+        [tProcessLogin.fulfilled.toString()]: (state: sliceExchangeList, action) => {
+            const ap = action.payload
+            state.exchangeList = ap.exchangelist
+            return state
+        },
+    }
+
 })
 
 export const {

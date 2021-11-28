@@ -21,15 +21,8 @@ import { WidgetController } from "./components/widgetController";
 //redux imports
 import { connect } from "react-redux";
 import { storeState } from './store'
-import { tGetSymbolList, rExchangeDataLogout } from "./slices/sliceExchangeData";
-import { rSetTargetDashboard, rTargetDashboardLogout } from "./slices/sliceShowData";
-import { rExchangeListLogout } from "./slices/sliceExchangeList";
-import { rUpdateQuotePriceStream, rUpdateQuotePriceSetup } from "./slices/sliceQuotePrice";
-import {
-    rBuildDataModel, rResetUpdateFlag, rSetUpdateStatus,
-    sliceDataModel, rDataModelLogout, rRebuildTargetDashboardModel,
-    rRebuildTargetWidgetModel
-} from "./slices/sliceDataModel";
+import { rSetTargetDashboard } from "./slices/sliceShowData";
+import { rResetUpdateFlag, rSetUpdateStatus, sliceDataModel, rRebuildTargetDashboardModel } from "./slices/sliceDataModel";
 import { tGetFinnhubData, tgetFinnHubDataReq } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 import { tGetSavedDashboards } from './thunks/thunkGetSavedDashboards'
@@ -105,17 +98,17 @@ class App extends React.Component<AppProps, AppState> {
             this.rebuildDashboardState()
         }
 
-        if ( //if apikey not setup show about menu
-            (this.props.apiKey === '' && this.state.apiFlag === 0 && this.state.login === 1) ||
-            (this.props.apiKey === null && this.state.apiFlag === 0 && this.state.login === 1)
-        ) {
-            this.setState({
-                apiFlag: 1,
-                aboutMenu: 0,
-                showStockWidgets: 0,
-                backGroundMenu: 'about',
-            })
-        }
+        // if ( //if apikey not setup show about menu
+        //     (this.props.apiKey === '' && this.state.apiFlag === 0 && this.state.login === 1) ||
+        //     (this.props.apiKey === null && this.state.apiFlag === 0 && this.state.login === 1)
+        // ) {
+        //     this.setState({
+        //         apiFlag: 1,
+        //         aboutMenu: 0,
+        //         showStockWidgets: 0,
+        //         backGroundMenu: 'about',
+        //     })
+        // }
 
         const globalStockList = this.props.dashboardData?.[this.props.currentDashboard]?.globalstocklist ? this.props.dashboardData?.[this.props.currentDashboard].globalstocklist : false
         if ((globalStockList && globalStockList !== prevProps.dashboardData?.[prevProps.currentDashboard]?.globalstocklist && this.state.login === 1)) { //price data for watchlist, including socket data.
@@ -128,11 +121,11 @@ class App extends React.Component<AppProps, AppState> {
         }
     }
 
-    componentWillUnmount() {
-        if (this.state.socket !== "") {
-            this.state.socket.close();
-        }
-    }
+    // componentWillUnmount() {
+    //     if (this.state.socket !== "") {
+    //         this.state.socket.close();
+    //     }
+    // }
 
     updateAppState(updateObj) {
         return new Promise((resolve) => {
@@ -298,30 +291,18 @@ const mapStateToProps = (state: storeState) => ({
 });
 
 export default connect(mapStateToProps, {
-    tGetSymbolList,
     tGetFinnhubData,
     tGetMongoDB,
-    rBuildDataModel,
     rResetUpdateFlag,
     rSetTargetDashboard,
     rSetUpdateStatus,
-    rDataModelLogout,
-    rExchangeDataLogout,
-    rExchangeListLogout,
-    rTargetDashboardLogout,
     rRebuildTargetDashboardModel,
-    rRebuildTargetWidgetModel,
-    rUpdateQuotePriceStream,
-    rUpdateQuotePriceSetup,
     tGetSavedDashboards,
     rSetTargetSecurity,
     rUpdateCurrentDashboard,
     rSetMenuList,
     rSetDashboardData
 })(App);
-
-
-
 
 export interface stock {
     currency: string,
@@ -421,21 +402,12 @@ export interface AppProps {
     dataModel: sliceDataModel,
     defaultExchange: string,
     menuList: sliceMenuList,
-    tGetSymbolList: Function,
     tGetFinnhubData: Function,
     tGetMongoDB: Function,
-    rBuildDataModel: Function,
     rRebuildTargetDashboardModel: Function,
     rResetUpdateFlag: Function,
     rSetTargetDashboard: Function,
     rSetUpdateStatus: Function,
-    rDataModelLogout: Function,
-    rExchangeDataLogout: Function,
-    rExchangeListLogout: Function,
-    rTargetDashboardLogout: Function,
-    rRebuildTargetWidgetModel: Function,
-    rUpdateQuotePriceStream: Function,
-    rUpdateQuotePriceSetup: Function,
     tGetSavedDashboards: Function,
     rSetTargetSecurity: Function,
     rUpdateCurrentDashboard: Function,

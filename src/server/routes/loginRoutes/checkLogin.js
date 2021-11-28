@@ -10,15 +10,11 @@ router.get("/checkLogin", (req, res, next) => {
     const resData = { login: 0 };
     const uID = req.session["uID"];
     const apiKeysQuery = `
-        SELECT apikey, apialias, webhook, ratelimit, exchangelist, defaultexchange, widgetsetup
+        SELECT apikey, apialias, ratelimit, exchangelist, defaultexchange, widgetsetup
         FROM users
         WHERE id = ${uID}
     `;
-    // console.log(apiKeysQuery)
     const retrieveAPIKeys = () => {
-        // console.log("getting APIKeys");
-        // console.log(req.session);
-
         return new Promise((resolve, reject) => {
             db.query(apiKeysQuery, (err, rows) => {
                 if (err) {
@@ -37,7 +33,6 @@ router.get("/checkLogin", (req, res, next) => {
             });
         });
     };
-    // console.log("CHECK LOGIN SESSION", req.session)
     if (req.session.login === true) {
         retrieveAPIKeys()
         .then((data) => {
