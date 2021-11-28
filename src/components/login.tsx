@@ -123,7 +123,6 @@ export default function Login(p: loginProps) {
                 if (data.login === 1) {
                     const parseSetup: widgetSetup = JSON.parse(data.widgetsetup)
                     const newList: string[] = data.exchangelist.split(",");
-                    console.log('LOGIN DATA', data)
                     await dispatch(tProcessLogin({
                         defaultexchange: data.defaultexchange,
                         apiKey: data.apiKey,

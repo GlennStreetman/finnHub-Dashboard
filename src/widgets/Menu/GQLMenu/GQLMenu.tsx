@@ -1,32 +1,40 @@
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
-import { dashBoardData, globalStockList } from '../../../App'
-// import { findByLabelText } from "@testing-library/dom";
+import { useAppSelector } from 'src/hooks';
 
 interface endPointMenuProps {
-    apiAlias: string,
-    apiKey: string,
-    dashBoardData: dashBoardData,
-    currentDashBoard: string,
-    targetSecurity: string,
-    globalStockList: globalStockList,
 }
 
 function EndPointMenu(p: endPointMenuProps, ref: any) {
 
-    const [targetDashboard, setTargetDashboard] = useState(p.currentDashBoard ? p.currentDashBoard : '')
-    const [securityFocus, setSecurityFocus] = useState(p.targetSecurity ? p.targetSecurity : '')
+    const useSelector = useAppSelector
+    const apiAlias = useSelector((state) => { return state.apiAlias })
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const targetSecurity = useSelector((state) => { return state.targetSecurity })
+    const globalStockList = useSelector((state) => {     //finnhub data stored in redux
+        if (state.dashboardData?.[state.currentDashboard]) {
+            const globalStockList = state.dashboardData[state.currentDashboard].globalstocklist
+            return globalStockList
+        } else {
+            return ({})
+        }
+    })
+
+    const [targetDashboard, setTargetDashboard] = useState(currentDashboard ? currentDashboard : '')
+    const [securityFocus, setSecurityFocus] = useState(targetSecurity ? targetSecurity : '')
     const [toggleView, setToggleView] = useState('widget') //widget or security
 
     useImperativeHandle(ref, () => ({ state: {} }))
 
     useEffect(() => { //update security focus on change to target security
-        setSecurityFocus(p.targetSecurity)
-    }, [p.targetSecurity])
+        setSecurityFocus(targetSecurity)
+    }, [targetSecurity])
 
 
     useEffect(() => { //update dashboard on change to target dashboard
-        setTargetDashboard(p.currentDashBoard)
-    }, [p.currentDashBoard])
+        setTargetDashboard(currentDashboard)
+    }, [currentDashboard])
 
     const url = window.location
     let baseURL = url.protocol + "/" + url.host + "/" + url.pathname.split('/')[1] + 'graphQL';
@@ -40,14 +48,13 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
         endpointURL.replace('https:/', '')
 
 
-    const apiToggle = p.apiAlias ? p.apiAlias : p.apiKey
+    const apiToggle = apiAlias ? apiAlias : apiKey
     const defaultQuery = `{dashboardList(key: "${apiToggle}") {dashboard}}`
 
     function changeSecurityFocus(e) {
         const target = e.target.value;
         setSecurityFocus(target)
     }
-    const globalStockList = p.globalStockList ? p.globalStockList : {}
     const securityOptionsList = Object.keys(globalStockList).map((el) =>
         <option key={el + "sec"} value={el}>
             {el}
@@ -63,9 +70,9 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
         <><td>Widget</td><td>All</td><td>{securityFocus}</td></> :
         <><td>Widget</td><td>Data</td></>
 
-    const FocusDashboard = p.dashBoardData?.[targetDashboard]?.widgetlist ? p.dashBoardData[targetDashboard].widgetlist : {}
+    const FocusDashboard = dashboardData?.[targetDashboard]?.widgetlist ? dashboardData[targetDashboard].widgetlist : {}
     const showBodyWidget = Object.keys(FocusDashboard).map((el) => {
-        const apiToggle = p.apiAlias ? p.apiAlias : p.apiKey
+        const apiToggle = apiAlias ? apiAlias : apiKey
         const queryPropsAll = `(key: "${apiToggle}" dashboard: "${targetDashboard}" widget: "${FocusDashboard[el].widgetHeader}")`
         const queryPropsSecurity = `(key: "${apiToggle}" dashboard: "${targetDashboard}" widget: "${FocusDashboard[el].widgetHeader}" security: "${securityFocus}")`
         const returnValues = `dashboard, widgetType, widgetName, security, data`
@@ -92,7 +99,7 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
         )
     })
     const showBodySecurity = Object.keys(FocusDashboard).map((el) => {
-        const apiToggle = p.apiAlias ? p.apiAlias : p.apiKey
+        const apiToggle = apiAlias ? apiAlias : apiKey
         const queryPropsWidget = `(key: "${apiToggle}" dashboard: "${targetDashboard}" security: "${securityFocus}" widgetName: "${FocusDashboard[el].widgetHeader}")`
         const returnValues = `dashboard, widgetType, widgetName, data`
         const thisQuerySecurity = `{security ${queryPropsWidget} {${returnValues}}}`
@@ -143,12 +150,6 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
 
 export function gqlMenuProps(that, key = "AccountMenu") {
     let propList = {
-        dashBoardData: that.props.dashBoardData,
-        apiKey: that.props.apiKey,
-        apiAlias: that.props.apiAlias,
-        currentDashBoard: that.props.currentDashBoard,
-        targetSecurity: that.props.targetSecurity,
-        globalStockList: that.props.globalStockList
     };
     return propList;
 }

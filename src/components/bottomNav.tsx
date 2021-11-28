@@ -44,9 +44,3 @@ export default function BottomNav(p: props) {
     );
 }
 
-// if (p.showMenuColumn === false) p.menuWidgetToggle(true) 
-// if (p.showMenuColumn === true)  p.menuWidgetToggle(false)
-// if (p.showMenuColumn === true)  p.menuWidgetToggle(false)
-// if (p.showMenuColumn === true)  p.menuWidgetToggle(false)
-// if (p.showMenuColumn === true)  p.menuWidgetToggle(false)
-

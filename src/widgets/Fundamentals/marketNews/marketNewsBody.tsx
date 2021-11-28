@@ -1,5 +1,8 @@
 import * as React from "react"
 import { useState, forwardRef, useRef, useMemo } from "react";
+import { widget } from 'src/App'
+import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
+
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 
@@ -31,7 +34,22 @@ export interface FinnHubAPIDataArray {
     [index: number]: FinnHubAPIData
 }
 
-function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
+interface widgetProps {
+    config: any,
+    enableDrag: boolean,
+    filters: any,
+    finnHubQueue: finnHubQueue,
+    pagination: number,
+    showEditPane: number,
+    trackedStocks: any,
+    updateAppState: Function,
+    widgetCopy: any,
+    widgetKey: string | number,
+    widgetType: string,
+}
+
+
+function FundamentalsMarketNews(p: widgetProps, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
 
     const startingNewsIncrementor = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
@@ -42,14 +60,18 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
 
     const startingWidgetCoptyRef = () => {
         if (isInitialMount.current === true) {
-            if (p.widgetCopy !== undefined && p.widgetCopy.widgetID !== null) {
+            if (p.widgetCopy !== undefined && typeof p.widgetCopy.widgetID === 'number') {
                 return p.widgetCopy.widgetID
-            } else { return -1 }
-        }
+            } else { return 0 }
+        } else { return 0 }
     }
 
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [newsIncrementor, setNewsIncrementor] = useState(startingNewsIncrementor());
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : -1
 
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
@@ -73,12 +95,12 @@ function FundamentalsMarketNews(p: { [key: string]: any }, ref: any) {
     }, [])
 
     useDragCopy(ref, { newsIncrementor: newsIncrementor, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
+    useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['categorySelection'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue)
+    useStartingFilters(p.filters['categorySelection'], updateFilterMemo, p.widgetKey, dashboardData, currentDashboard, p.updateAppState, dispatch, apiKey, p.finnHubQueue)
 
     function updateFilter(e) {
-        UpdateWidgetFilters(p.widgetKey, { categorySelection: e }, p.dashBoardData, p.currentDashBoard, dispatch, p.apiKey, p.finnHubQueue)
+        UpdateWidgetFilters(p.widgetKey, { categorySelection: e }, dashboardData, currentDashboard, dispatch, apiKey, p.finnHubQueue)
     }
 
     function formatSourceName(source) {//clean up source names for news articles.
@@ -198,9 +220,9 @@ export default forwardRef(FundamentalsMarketNews)
 
 export function marketNewsProps(that, key = "newWidgetNameProps") {
     let propList = {
-        apiKey: that.props.apiKey,
-        filters: that.props.widgetList[key]["filters"],
-        widgetKey: key,
+        // apiKey: that.props.apiKey,
+        // filters: that.props.widgetList[key]["filters"],
+        // widgetKey: key,
     };
     return propList;
 }

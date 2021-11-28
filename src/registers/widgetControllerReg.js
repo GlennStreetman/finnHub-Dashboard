@@ -22,7 +22,7 @@ import { candleWidgetProps } from "../widgets/Price/candles/candleWidget";
 import { quoteBodyProps } from "../widgets/Price/quote/quoteBody";
 import {PriceSplitsProps} from "../widgets/Price/splits/PriceSplitsBody";
 
-export function returnBodyProps(that, key, ref = "pass") {
+export function returnExtraProps(that, key, ref = "pass") {
     let widgetBodyProps = {
         watchListMenu: () => watchListMenuProps(that, key),
         dashBoardMenu: () => dashBoardMenuProps(that, key),

@@ -6,7 +6,7 @@ import { dashBoardData } from 'src/App'
 export const useUpdateFocus = function ( //on update to p.targetFocus update p.config.targetSecurity
 
     newFocus: string, //p.targetSecurity
-    key: number, // p.widgetKey, 
+    key: string | number, // p.widgetKey, 
     config: any,
     dashBoardData: dashBoardData,
     currentDashBoard: string,

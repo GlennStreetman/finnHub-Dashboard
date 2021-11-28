@@ -9,10 +9,10 @@ interface props {
     end: string,
     setStart: Function,
     setEnd: Function,
-    widgetKey: string,
+    widgetKey: string | number,
     widgetType: string,
-    dashBoardData: dashBoardData,
-    currentDashBoard: string,
+    dashboardData: dashBoardData,
+    currentDashboard: string,
     apiKey: string,
     finnHubQueue: finnHubQueue,
     updateAppState: Function,
@@ -39,7 +39,7 @@ export default function WidgetFilterDates(p: props) {
             const target = new Date(e.target.value).getTime();
             const offset = target - now
             const name = e.target.name;
-            UpdateWidgetFilters(p.widgetKey, { [name]: offset }, p.dashBoardData, p.currentDashBoard, dispatch, p.apiKey, p.finnHubQueue)
+            UpdateWidgetFilters(p.widgetKey, { [name]: offset }, p.dashboardData, p.currentDashboard, dispatch, p.apiKey, p.finnHubQueue)
         }
     }
 

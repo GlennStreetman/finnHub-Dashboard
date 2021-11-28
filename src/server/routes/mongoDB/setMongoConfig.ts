@@ -4,7 +4,7 @@ import { getDB } from '../../db/mongoLocal.js'
 const router = express.Router();
 
 export interface reqBody {
-    widget: number,
+    widget: string | number,
     config: Object,
 }
 

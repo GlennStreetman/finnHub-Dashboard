@@ -141,32 +141,31 @@ class App extends React.Component<AppProps, AppState> {
             this.props.rSetMenuList(data.menuList)
             this.props.rSetDashboardData(data.dashBoardData)
             this.props.rResetUpdateFlag() //sets all dashboards status to updating in redux store.
+            //build Visable Data
+            await this.props.tGetMongoDB()
 
-            const s: AppState = this.state;
-            const p: AppProps = this.props;
-            await p.tGetMongoDB()
-            const targetDash: string[] = p.dashboardData?.[p.currentDashboard]?.widgetlist ? Object.keys(p.dashboardData?.[p.currentDashboard]?.widgetlist) : []
+            const targetDash: string[] = this.props.dashboardData?.[this.props.currentDashboard]?.widgetlist ? Object.keys(this.props.dashboardData?.[this.props.currentDashboard]?.widgetlist) : []
             for (const widget in targetDash) {
                 const payload: tgetFinnHubDataReq = { //get data for default dashboard.
-                    dashboardID: p.dashboardData[p.currentDashboard].id,
-                    targetDashBoard: p.currentDashboard,
+                    dashboardID: this.props.dashboardData[this.props.currentDashboard].id,
+                    targetDashBoard: this.props.currentDashboard,
                     widgetList: [targetDash[widget]],
-                    finnHubQueue: s.finnHubQueue,
-                    rSetUpdateStatus: p.rSetUpdateStatus,
+                    finnHubQueue: this.state.finnHubQueue,
+                    rSetUpdateStatus: this.props.rSetUpdateStatus,
                 }
-                p.tGetFinnhubData(payload)
+                this.props.tGetFinnhubData(payload)
             }
-            const dashBoards: string[] = Object.keys(p.dashboardData) //get data for dashboards not being shown
+            const dashBoards: string[] = Object.keys(this.props.dashboardData) //get data for dashboards not being shown
             for (const dash of dashBoards) {
-                if (dash !== p.currentDashboard) {
+                if (dash !== this.props.currentDashboard) {
                     const payload: tgetFinnHubDataReq = { //run in background, do not await.
-                        dashboardID: p.dashboardData[dash].id,
+                        dashboardID: this.props.dashboardData[dash].id,
                         targetDashBoard: dash,
-                        widgetList: Object.keys(p.dashboardData[dash].widgetlist),
-                        finnHubQueue: s.finnHubQueue,
-                        rSetUpdateStatus: p.rSetUpdateStatus,
+                        widgetList: Object.keys(this.props.dashboardData[dash].widgetlist),
+                        finnHubQueue: this.state.finnHubQueue,
+                        rSetUpdateStatus: this.props.rSetUpdateStatus,
                     }
-                    await p.tGetFinnhubData(payload)
+                    await this.props.tGetFinnhubData(payload)
                 }
             }
 
@@ -222,11 +221,11 @@ class App extends React.Component<AppProps, AppState> {
             return <div className="backgroundMenu">{backGroundSelection[s.backGroundMenu]}</div>;
         };
 
-        const widgetList = this.props.dashboardData?.[this.props.currentDashboard]?.['widgetlist'] ?
-            this.props.dashboardData?.[this.props.currentDashboard]['widgetlist'] : {}
+        // const widgetList = this.props.dashboardData?.[this.props.currentDashboard]?.['widgetlist'] ?
+        //     this.props.dashboardData?.[this.props.currentDashboard]['widgetlist'] : {}
 
-        const dashboardID = this.props.dashboardData?.[this.props.currentDashboard]?.id ? this.props.dashboardData[this.props.currentDashboard].id : ''
-        // const bottomNav = this.state.login === 1 ? <BottomNav showMenuColumn={this.state.showMenuColumn} /> : <></>
+        // const dashboardID = this.props.dashboardData?.[this.props.currentDashboard]?.id ? this.props.dashboardData[this.props.currentDashboard].id : ''
+        // // const bottomNav = this.state.login === 1 ? <BottomNav showMenuColumn={this.state.showMenuColumn} /> : <></>
 
         return (
             <ThemeProvider theme={outerTheme}>
@@ -246,24 +245,23 @@ class App extends React.Component<AppProps, AppState> {
                                 finnHubQueue={this.state.finnHubQueue}
                             />
                             <WidgetController
-                                apiKey={this.props.apiKey}
-                                apiAlias={this.props.apiAlias}
-                                currentDashBoard={this.props.currentDashboard}
-                                dashBoardData={this.props.dashboardData}
-                                dashboardID={dashboardID}
-                                defaultExchange={this.props.defaultExchange}
+                                // apiKey={this.props.apiKey}
+                                // apiAlias={this.props.apiAlias}
+                                // currentDashBoard={this.props.currentDashboard}
+                                // dashBoardData={this.props.dashboardData}
+                                // dashboardID={dashboardID}
+                                // defaultExchange={this.props.defaultExchange}
+                                // menuList={this.props.menuList}
+                                // targetSecurity={this.props.targetSecurity}
+                                // exchangeList={this.props.exchangeList}
+                                // widgetList={widgetList}
+
                                 enableDrag={this.state.enableDrag}
-                                exchangeList={this.props.exchangeList}
                                 finnHubQueue={this.state.finnHubQueue}
                                 login={this.state.login}
-                                menuList={this.props.menuList}
-                                newDashboard={this.newDashboard}
                                 showMenuColumn={this.state.showMenuColumn}
                                 showStockWidgets={this.state.showStockWidgets}
-                                targetSecurity={this.props.targetSecurity}
                                 widgetCopy={this.state.widgetCopy}
-                                widgetList={widgetList}
-                                rSetTargetDashboard={this.props.rSetTargetDashboard}
                                 updateAppState={this.updateAppState}
                                 rebuildVisableDashboard={this.rebuildVisableDashboard}
                             />

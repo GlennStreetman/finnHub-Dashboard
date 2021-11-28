@@ -51,7 +51,6 @@ export const tGetMongoDB = createAsyncThunk( //{endPoint, [securityList]}
                         widgetType: mongo.widgetType
                     }
                 }
-                console.log('tGetMongoDB', reqObj, '---', freshData, '--s--', resObj)
                 resolve(resObj)
             }))
 

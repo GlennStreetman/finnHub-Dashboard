@@ -5,20 +5,20 @@ import { finnHubQueue } from "./../../appFunctions/appImport/throttleQueueAPI"
 import { rSetUpdateStatus } from "./../../slices/sliceDataModel";
 
 import { tgetFinnHubDataReq } from './../../thunks/thunkFetchFinnhub'
+import { widget } from "src/slices/sliceDashboardData";
 //updates widgets config.targetSecurity for any widget that uses a target security.
 export const useSearchMongoDb = function (
     currentDashBoard: string, //string name of current dashboard, not id.
     finnHubQueue: finnHubQueue, //queue object
     targetSecurity: string, //p.config.targetSecurity
-    widgetKey: string, //p.widgetKey 
-    widgetCopy: string, //copy object
+    widgetKey: string | number, //p.widgetKey 
+    widgetCopy: number, //copy object
     dispatch: Function, //Dispatch()
     isInitialMount, //current = boolean
     dashboardID: number, //id for dashboard, not name.
 ) {
     useEffect(() => { //on change to targetSecurity rebuild data set.
-        if (isInitialMount.current === true && widgetCopy === widgetKey) {
-        } else if (targetSecurity && targetSecurity !== '' && isInitialMount.current !== true) {
+        if (targetSecurity && targetSecurity !== '' && isInitialMount.current !== true) {
             const target = `${widgetKey}-${targetSecurity}`
             const tSearchMongoDBObj: tSearchMongoDBReq = { searchList: [target], dashboardID: dashboardID }
             dispatch(tSearchMongoDB(tSearchMongoDBObj))

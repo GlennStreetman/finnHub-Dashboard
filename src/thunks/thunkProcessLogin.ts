@@ -10,8 +10,5 @@ interface tProcessLoginReq {
 export const tProcessLogin = createAsyncThunk(
     'tProcessLogin',
     (req: tProcessLoginReq, thunkAPI: any) => {
-
-        console.log('tProcessLogin', req)
-
         return req
     })

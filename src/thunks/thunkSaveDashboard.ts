@@ -1,12 +1,12 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 
-interface tSaveDashboard {
+interface tSaveDashboardReq {
     dashboardName: string,
 }
 
 export const tSaveDashboard = createAsyncThunk(
     'tSaveDashboard',
-    async (req: tSaveDashboard, thunkAPI: any) => {
+    async (req: tSaveDashboardReq, thunkAPI: any) => {
 
         const dashboardData = thunkAPI.getState().dashboardData
         const menuList = thunkAPI.getState().menuList

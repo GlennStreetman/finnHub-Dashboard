@@ -19,13 +19,13 @@ import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
 
 
 interface props {
-    dashBoardData: dashBoardData,
-    currentDashBoard: string,
+    // dashBoardData: dashBoardData,
+    // currentDashBoard: string,
     helpText: string,
     showEditPane: number,
     updateAppState: Function,
-    apiKey: string,
-    menuList: menuList,
+    // apiKey: string,
+    // menuList: menuList,
     finnHubQueue: finnHubQueue,
 }
 
@@ -48,6 +48,11 @@ function DashBoardMenu(p: props, ref: any) {
     })
 
     const showCurrentDashboard = useSelector((state) => { return state.showData.targetDashboard })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const menuList = useSelector((state) => { return state.menuList })
+
 
     useImperativeHandle(ref, () => (
         //used to copy widgets when being dragged. example: if widget body renders time series data into chart, copy chart data.
@@ -62,10 +67,10 @@ function DashBoardMenu(p: props, ref: any) {
 
     useEffect(() => {
         let returnObj = {}
-        let keyList = Object.keys(p.dashBoardData)
+        let keyList = Object.keys(dashboardData)
         for (const x in keyList) returnObj[keyList[x]] = keyList[x]
         setNewNames(returnObj)
-    }, [p.dashBoardData])
+    }, [dashboardData])
 
     async function newDashboard(newName, dashboardData, menuList) {
         console.log('creating new dashboard')
@@ -85,7 +90,7 @@ function DashBoardMenu(p: props, ref: any) {
         };
 
         await fetch("/dashBoard", options) //posts that data to be saved.
-        const newData: any = await dispatch(tGetSavedDashboards({ apiKey: p.apiKey })).unwrap()
+        const newData: any = await dispatch(tGetSavedDashboards({ apiKey: apiKey })).unwrap()
         const payload = {
             dashBoardData: newData.dashBoardData,
             currentDashBoard: newData.currentDashBoard,
@@ -99,12 +104,12 @@ function DashBoardMenu(p: props, ref: any) {
         await p.updateAppState({
             currentDashBoard: widgetName,
         })
-        dispatch(rSetTargetSecurity(Object.keys(p.dashBoardData[widgetName].globalstocklist)[0]))
-        await dispatch(tGetMongoDB({ dashboard: p.dashBoardData[p.currentDashBoard].id }))
+        dispatch(rSetTargetSecurity(Object.keys(dashboardData[widgetName].globalstocklist)[0]))
+        await dispatch(tGetMongoDB({ dashboard: dashboardData[currentDashboard].id }))
         const finnHubPayload: tgetFinnHubDataReq = {
-            dashboardID: p.dashBoardData[p.currentDashBoard].id,
-            targetDashBoard: p.currentDashBoard,
-            widgetList: Object.keys(p.dashBoardData[p.currentDashBoard].widgetlist),
+            dashboardID: dashboardData[currentDashboard].id,
+            targetDashBoard: currentDashboard,
+            widgetList: Object.keys(dashboardData[currentDashboard].widgetlist),
             finnHubQueue: p.finnHubQueue,
             rSetUpdateStatus: rSetUpdateStatus,
         }
@@ -125,7 +130,7 @@ function DashBoardMenu(p: props, ref: any) {
 
     function renameDashboard(oldName, newName) {
         const updateObj = {}
-        if (p.currentDashBoard === oldName) updateObj['currentDashBoard'] = newName
+        if (currentDashboard === oldName) updateObj['currentDashBoard'] = newName
         const renamed = produce(this.state.dashBoardData, (draftState: dashBoardData) => {
             draftState[newName] = draftState[oldName]
             draftState[newName].dashboardname = newName
@@ -138,7 +143,7 @@ function DashBoardMenu(p: props, ref: any) {
 
     async function postNameChange(e) {
 
-        if (!p.dashBoardData[e.target.value]) {
+        if (!dashboardData[e.target.value]) {
             const oldName = dashBoardData[e.target.id].dashboardname
             const newName = e.target.value.toUpperCase()
 
@@ -166,8 +171,8 @@ function DashBoardMenu(p: props, ref: any) {
     async function copyDashboardFunction(dashboardName) {
         unMountWidgets() //removes visable data from redux.state.showData
         if (dashboardName !== '' && dashboardName !== undefined) {
-            await dispatch(tCopyDashboard({ copyName: dashboardName, dashboardData: p.dashBoardData, menuList: p.menuList }))
-            const data: any = await dispatch(tGetSavedDashboards({ apiKey: p.apiKey })).unwrap()
+            await dispatch(tCopyDashboard({ copyName: dashboardName, dashboardData: dashboardData, menuList: menuList }))
+            const data: any = await dispatch(tGetSavedDashboards({ apiKey: apiKey })).unwrap()
             const payload = {
                 dashBoardData: data.dashBoardData,
                 currentDashBoard: data.currentDashBoard,
@@ -180,7 +185,7 @@ function DashBoardMenu(p: props, ref: any) {
     }
 
     function unMountWidgets() { //removes visable data from redux for dashboard.
-        const widdgetKeys = Object.keys(p.dashBoardData?.[p.currentDashBoard]?.widgetlist)
+        const widdgetKeys = Object.keys(dashboardData?.[currentDashboard]?.widgetlist)
         for (const x in widdgetKeys) {
             const widgetKey = widdgetKeys[x]
             const payload = {
@@ -200,31 +205,31 @@ function DashBoardMenu(p: props, ref: any) {
     async function deleteDashBoard(dashBoardId, dashboardName) {
         await fetch(`/deleteSavedDashboard?dashID=${dashBoardId}`) //delete from postgres
 
-        const deleteKeyList = Object.keys(p.dashBoardData[dashboardName]['widgetlist'])
+        const deleteKeyList = Object.keys(dashboardData[dashboardName]['widgetlist'])
         for (const x in deleteKeyList) fetch(`/deleteFinnDashData?widgetID=${deleteKeyList[x]}`) //drop data from mongo.
 
-        if (dashboardName === p.currentDashBoard && Object.keys(dashBoardData).length > 1) { //if shown dashboard is deleted.
+        if (dashboardName === currentDashboard && Object.keys(dashBoardData).length > 1) { //if shown dashboard is deleted.
             unMountWidgets()
             for (const x in Object.keys(dashBoardData)) {
-                const dashboard = p.dashBoardData[Object.keys(dashBoardData)[x]]
+                const dashboard = dashboardData[Object.keys(dashBoardData)[x]]
                 const testDashboardName = dashboard.dashboardname
                 if (testDashboardName !== dashboardName) { //load non-deleted dashboard
                     loadSavedDashboard(testDashboardName);
                     break
                 }
             }
-        } else if (dashboardName === p.currentDashBoard && Object.keys(dashBoardData).length === 1) {
+        } else if (dashboardName === currentDashboard && Object.keys(dashBoardData).length === 1) {
             unMountWidgets() //removes widgets from redux visable data model.
-            newDashboard('NEW', p.dashBoardData, p.menuList)
+            newDashboard('NEW', dashboardData, menuList)
         }
         unMountDashboard(dashboardName) //removes dashboard from redux datamodel.
-        const updateState: dashBoardData = produce(p.dashBoardData, (draftState: dashBoardData) => {
+        const updateState: dashBoardData = produce(dashboardData, (draftState: dashBoardData) => {
             delete draftState[dashboardName]
         })
         p.updateAppState({ dashBoardData: updateState })
     }
 
-    let dashBoardData = p.dashBoardData;
+    let dashBoardData = dashboardData;
     let savedDashBoards = Object.keys({ ...dashBoardData }).map((el) => (
         <tr key={dashBoardData[el].id + "tr"}>
             {p.showEditPane === 1 ? //if showing edit pane
@@ -254,10 +259,10 @@ function DashBoardMenu(p: props, ref: any) {
                         <input
                             type='radio'
                             key={el + 'radio'}
-                            checked={p.currentDashBoard === p.dashBoardData?.[el]?.dashboardname} //
+                            checked={currentDashboard === dashboardData?.[el]?.dashboardname} //
                             onChange={() => {
                                 unMountWidgets()
-                                loadSavedDashboard(p.dashBoardData?.[el]?.dashboardname);
+                                loadSavedDashboard(dashboardData?.[el]?.dashboardname);
                                 setInputText(dashBoardData[el].dashboardname)
                             }}
                         />
@@ -326,7 +331,7 @@ function DashBoardMenu(p: props, ref: any) {
                                     type="submit"
                                     value="New"
                                     onClick={() => {
-                                        newDashboard(inputText, p.dashBoardData, p.menuList);
+                                        newDashboard(inputText, dashboardData, menuList);
                                         dispatch(rAddNewDashboard({ dashboardName: inputText }))
                                         dispatch(rSetTargetDashboard({ targetDashboard: inputText }))
                                     }}
@@ -350,12 +355,12 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
     </>
 
     let propList = {
-        dashBoardData: that.props.dashBoardData,
-        currentDashBoard: that.props.currentDashBoard,
+        // dashBoardData: that.props.dashBoardData,
+        // currentDashBoard: that.props.currentDashBoard,
         helpText: [helpText, 'DBM'],
-        menuList: that.props.menuList,
+        // menuList: that.props.menuList,
         updateAppState: that.props.updateAppState,
-        apiKey: that.props.apiKey,
+        // apiKey: that.props.apiKey,
         finnHubQueue: that.props.finnHubQueue,
     };
     return propList;

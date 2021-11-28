@@ -1,5 +1,8 @@
 import * as React from "react"
 import { useState, forwardRef, useRef, useMemo } from "react";
+import { widget } from 'src/App'
+import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
+
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { RootState } from '../../../store'
@@ -21,7 +24,23 @@ export interface FinnHubAPIData {
     [key: number]: string
 }
 
-function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
+interface widgetProps {
+    config: any,
+    enableDrag: boolean,
+    filters: any,
+    finnHubQueue: finnHubQueue,
+    pagination: number,
+    showEditPane: number,
+    trackedStocks: any,
+    updateAppState: Function,
+    widgetCopy: any,
+    widgetKey: string | number,
+    widgetType: string,
+    defaultExchange: string,
+}
+
+
+function FundamentalsPeers(p: widgetProps, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
 
     const startingWidgetCoptyRef = () => {
@@ -29,12 +48,19 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
             if (p.widgetCopy !== undefined && p.widgetCopy.widgetID !== null) {
                 return p.widgetCopy.widgetID
             } else { return -1 }
-        }
+        } else { return -1 }
     }
 
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [updateExchange, setUpdateExchange] = useState(0)
     const dispatch = useDispatch(); //allows widget to run redux actions.
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const targetSecurity = useSelector((state) => { return state.targetSecurity })
+    const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
+    const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : -1
+
 
     const rShowData = useSelector((state: RootState) => { //REDUX Data associated with this widget.
         if (state.dataModel !== undefined &&
@@ -59,7 +85,7 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
         } else if (updateExchange === 0) {
             // console.log('updating exchange')
             setUpdateExchange(1)
-            dispatch(tGetSymbolList({ exchange: p.defaultExchange, apiKey: p.apiKey, finnHubQueue: p.finnHubQueue }))
+            dispatch(tGetSymbolList({ exchange: p.defaultExchange, apiKey: apiKey, finnHubQueue: p.finnHubQueue }))
         }
     })
 
@@ -68,8 +94,8 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
     }, [p?.config?.targetSecurity])
 
     useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.
-    useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
+    useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.
+    useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
     function getStockName(stock) {
@@ -87,10 +113,10 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
             <WidgetRemoveSecurityTable
                 trackedStocks={p.trackedStocks}
                 widgetKey={p.widgetKey}
-                exchangeList={p.exchangeList}
-                dashBoardData={p.dashBoardData}
-                currentDashboard={p.currentDashboard}
-                apiKey={p.apiKey}
+                exchangeList={exchangeList}
+                dashBoardData={dashboardData}
+                currentDashboard={currentDashboard}
+                apiKey={apiKey}
             />
 
         );
@@ -111,11 +137,11 @@ function FundamentalsPeers(p: { [key: string]: any }, ref: any) {
                 widgetType={p.widgetType}
                 widgetKey={p.widgetKey}
                 trackedStocks={p.trackedStocks}
-                exchangeList={p.exchangeList}
+                exchangeList={exchangeList}
                 config={p.config}
-                dashBoardData={p.dashBoardData}
+                dashBoardData={dashboardData}
                 enableDrag={p.enableDrag}
-                currentDashBoard={p.currentDashBoard}
+                currentDashboard={currentDashboard}
             />
             <div className='scrollableDiv'>
                 <table className='dataTable'>
@@ -149,17 +175,17 @@ export default forwardRef(FundamentalsPeers)
 
 export function peersProps(that, key = "newWidgetNameProps") {
     let propList = {
-        apiKey: that.props.apiKey,
-        defaultExchange: that.props.defaultExchange,
-        exchangeList: that.props.exchangeList,
-        filters: that.props.widgetList[key]["filters"],
-        targetSecurity: that.props.targetSecurity,
-        trackedStocks: that.props.widgetList[key]["trackedStocks"],
+        // apiKey: that.props.apiKey,
+        // defaultExchange: that.props.defaultExchange,
+        // exchangeList: that.props.exchangeList,
+        // filters: that.props.widgetList[key]["filters"],
+        // targetSecurity: that.props.targetSecurity,
+        // trackedStocks: that.props.widgetList[key]["trackedStocks"],
 
-        widgetKey: key,
-        finnHubQueue: that.props.finnHubQueue,
-        dashBoardData: that.props.dashBoardData,
-        currentDashBoard: that.props.currentDashBoard,
+        // widgetKey: key,
+        // finnHubQueue: that.props.finnHubQueue,
+        // dashBoardData: that.props.dashBoardData,
+        // currentDashBoard: that.props.currentDashBoard,
     };
     return propList;
 }

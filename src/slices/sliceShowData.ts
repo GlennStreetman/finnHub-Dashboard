@@ -51,10 +51,10 @@ const showData = createSlice({
             //payload {key: string, {...widget-ex-stck: {empty obj}}}
             const ap: rBuildVisableDataPayload = action.payload
             const key: string = ap.key
-            state.dataSet[key] = {}
+            if (!state.dataSet[key]) state.dataSet[key] = {}
             for (const security in ap.securityList) {
                 const thisSecurity: string = ap.securityList[security]
-                state.dataSet[key][thisSecurity] = {}
+                if (!state.dataSet[key][thisSecurity]) state.dataSet[key][thisSecurity] = {}
             }
             if (ap.dataFilters) {
                 for (const [sec, values] of Object.entries(ap.dataFilters)) {

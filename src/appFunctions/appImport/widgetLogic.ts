@@ -67,14 +67,13 @@ export const RemoveWidget = async function (widgetID: string | number, dashboard
 }
 
 export const UpdateWidgetStockList = function (
-    widgetId: number,
+    widgetId: string | number,
     symbol: string,
-    dashBoardData:
-        dashBoardData,
+    dashBoardData: dashBoardData,
     currentDashboard: string,
     stockObj: stock | Object = {}) {
     //adds if not present, else removes stock from widget specific stock list.
-    if (isNaN(widgetId) === false) {
+    if (typeof widgetId === 'number') {
 
         const newWidgetList = produce(dashBoardData[currentDashboard].widgetlist, (draftState: widgetList) => {
             const trackingSymbolList: stockList = draftState[widgetId]["trackedStocks"]; //copy target widgets stock object
@@ -139,21 +138,19 @@ export const UpdateWidgetFilters = async function (
 
 //widget config changes how data is manipulated after being queried.
 export const updateWidgetConfig = async function (
-    widgetID: number,
+    widgetID: string | number,
     updateObj: config,
     dashBoardData: dashBoardData,
     currentDashboard: string,
     enableDrag: boolean,
     dispatch: Function) { //replaces widget config object then saves changes to mongoDB & postgres.
-    //config changes used by mongoDB during excel templating.
-    // console.log('setting up config', widgetID, updateObj)
+
     const updatedDashboardData: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
         const oldConfig = draftState[currentDashboard].widgetlist[widgetID].config
         draftState[currentDashboard].widgetlist[widgetID].config = { ...oldConfig, ...updateObj }
     })
     dispatch(rSetDashboardData(updatedDashboardData))
-    // const payload: Partial<AppState> = { dashBoardData: updatedDashboardData }
-    // await updateAppState(payload)
+
     if (enableDrag !== true) {
         dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
         const updatedWidgetFilters = updatedDashboardData[currentDashboard].widgetlist[widgetID].config
@@ -176,12 +173,12 @@ export const toggleWidgetBody = function (widgetID: string, stateRef: 'menuWidge
         const updatedWidget: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
             draftState[currentDashboard].widgetlist[widgetID].showBody = !draftState[currentDashboard].widgetlist[widgetID].showBody
         })
-        return ({ dashBoardData: updatedWidget })
+        return (updatedWidget)
     } else {
         const updatedWidget: menuList = produce(menuList, (draftState: menuList) => {
             draftState[widgetID].showBody = draftState[widgetID].showBody !== undefined ? !draftState[widgetID].showBody : false
         })
-        return ({ menuList: updatedWidget })
+        return (updatedWidget)
     }
 
 }

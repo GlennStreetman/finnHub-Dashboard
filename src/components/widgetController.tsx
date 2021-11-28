@@ -1,19 +1,25 @@
 import React from "react";
 import { useState } from "react";
 import WidgetContainer from "./widgetContainer";
-import { returnBodyProps } from "../registers/widgetControllerReg.js"
+import { returnExtraProps } from "../registers/widgetControllerReg.js"
 import useWindowDimensions from '../appFunctions/hooks/windowDimensions'
 import BottomNav from "./bottomNav";
 
 import { Grid } from '@material-ui/core/';
 
+import { useAppSelector } from '../hooks';
+
+const useSelector = useAppSelector
+
+
 function WidgetController(p) {
 
     const [focus, setFocus] = useState(0) //sets left most column focus for widgets. 0 shows menu column on far left. 
 
-
-    const widgetList = p.dashBoardData?.[p.currentDashBoard] ?
-        p.dashBoardData[p.currentDashBoard].widgetlist : {}
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const menuList = useSelector((state) => { return state.menuList })
+    const widgetList = dashboardData?.[currentDashboard]?.['widgetlist'] ? dashboardData[currentDashboard]['widgetlist'] : {}
 
     const width = useWindowDimensions().width //also returns height
     const columnLookup = [
@@ -40,33 +46,21 @@ function WidgetController(p) {
     const widgetWidth = Math.round(width / columnCount)
     const bottomNav = p.login === 1 ? <BottomNav setFocus={setFocus} columnCount={columnCount} /> : <></>
 
-    // console.log('widgetWidth', width, columnCount, widgetWidth)
-
     function renderWidgetColumn(widgetObjList) {
         if (widgetObjList !== undefined && widgetObjList[0]['pass'] === undefined) {
             widgetObjList.sort((a, b) => (a.columnOrder > b.columnOrder) ? 1 : -1) //sort into column order.
             const widgetGroup = widgetObjList.map((el) => { //for each widget, add props.
                 const thisWidgetProps: any = {
-                    apiKey: p.apiKey,
-                    currentDashBoard: p.currentDashBoard,
-                    dashboardData: p.dashBoardData,
-                    dashboardID: p.dashboardID,
-                    enableDrag: p.enableDrag,
-                    exchangeList: p.exchangeList,
-                    finnHubQueue: p.finnHubQueue,
                     key: el.widgetId,
-                    showMenuColumn: p.showMenuColumn,
-                    showStockWidgets: p.showStockWidgets,
-                    snapWidget: p.snapWidget,
                     stateRef: el.widgetConfig,
-                    targetSecurity: p.targetSecurity,
-                    widgetBodyProps: returnBodyProps({ props: p }, el.widgetType, el.widgetID),
+                    widgetBodyProps: returnExtraProps({ props: p }, el.widgetType, el.widgetID),
                     widgetKey: el.widgetID,
                     widgetList: el,
-                    rAddNewDashboard: p.rAddNewDashboard,
-                    rSetTargetDashboard: p.rSetTargetDashboard,
+                    enableDrag: p.enableDrag,
+                    finnHubQueue: p.finnHubQueue,
+                    showMenuColumn: p.showMenuColumn,
+                    showStockWidgets: p.showStockWidgets,
                     updateAppState: p.updateAppState,
-                    menuList: p.menuList,
                     widgetWidth: widgetWidth,
                     focus: focus,
                 }
@@ -104,8 +98,8 @@ function WidgetController(p) {
     }
 
     //this is derived state. Should this be in useEffect?
-    const allWidgetColumns = Array.from({ length: 7 }, (i, x) => { return [{ 'pass': x }] }) //creates 7 columns, 6 possible snap locations, 1 drag column.
-    const allWidgets = { ...widgetList, ...p.menuList }
+    const allWidgetColumns: any[] = Array.from({ length: 7 }, (i, x) => { return [{ 'pass': x }] }) //creates 7 columns, 6 possible snap locations, 1 drag column.
+    const allWidgets = { ...widgetList, ...menuList }
 
     for (const w in allWidgets) { //puts widgets into columns
         const thisColumn = allWidgets[w]?.column

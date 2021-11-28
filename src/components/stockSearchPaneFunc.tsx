@@ -1,4 +1,4 @@
-import React from "react";
+
 import StockDataList from "./stockDataList";
 import { connect } from "react-redux";
 import ToolTip from './toolTip.js'
@@ -7,20 +7,17 @@ import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 import { stock } from 'src/App'
 import { reqObj } from 'src/slices/sliceExchangeData'
 import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
-import { dashBoardData } from 'src/App'
 import { rBuildDataModel } from 'src/slices/sliceDataModel'
-import { useAppDispatch } from 'src/hooks';
 import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 import { updateGlobalStockList } from "src/appFunctions/appImport/updateGlobalStockList";
+import { useAppDispatch, useAppSelector } from 'src/hooks';
 
 const useDispatch = useAppDispatch
+const useSelector = useAppSelector
 //compnoent used when searching for a stock via "Add stock to watchlist" on top bar or any widget searches.
 
 interface props {
-    apiKey: string,
     changeSearchText: Function,
-    defaultExchange: string,
-    exchangeList: string[],
     finnHubQueue: finnHubQueue,
     searchText: string,
     widgetKey: string,
@@ -29,17 +26,20 @@ interface props {
     currentExchange: String,
     rUpdateStock: stock,
     updateAppState: Function
-    dashBoardData: dashBoardData,
-    currentDashboard: string,
 }
 
 function StockSearchPane(p: props) {
 
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const defaultExchange = useSelector((state) => { return state.defaultExchange })
+    const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+
+
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     function handleChange(e) {
-
-        // console.log('changed to:', e.target.value)
         p.changeSearchText(e.target.value.toUpperCase())
     }
 
@@ -48,7 +48,7 @@ function StockSearchPane(p: props) {
         p.updateAppState({ defaultExchange: event.target.value })
         const tGetSymbolObj: reqObj = {
             exchange: event.target.value,
-            apiKey: p.apiKey,
+            apiKey: apiKey,
             finnHubQueue: p.finnHubQueue,
         }
         p.tGetSymbolList(tGetSymbolObj)
@@ -56,7 +56,7 @@ function StockSearchPane(p: props) {
     }
 
     let widgetKey = p.widgetKey;
-    const exchangeOptions = p.exchangeList.map((el) =>
+    const exchangeOptions = exchangeList.map((el) =>
         <option key={el} value={el}>{el}</option>
     )
     const helpText = <>
@@ -74,18 +74,16 @@ function StockSearchPane(p: props) {
                 onSubmit={(e) => { //submit stock to be added/removed from global & widget stocklist.
                     e.preventDefault();
                     if (p.rUpdateStock !== undefined && widgetKey === 'watchListMenu') {
-                        // console.log('ADDING SECURITY TO WIDGET: ', p.rUpdateStock)
                         const thisStock = p.rUpdateStock
                         const stockKey = thisStock.key
-                        updateGlobalStockList(stockKey, p.dashBoardData, p.currentDashboard)
+                        updateGlobalStockList(stockKey, dashboardData, currentDashboard)
                     } else if (typeof widgetKey === 'number' && p.rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
-                        // console.log('ADDING SECURITY TO WIDGET: ', p.rUpdateStock)
                         const thisStock = p.rUpdateStock
                         const stockKey = thisStock.key
-                        const update = UpdateWidgetStockList(widgetKey, stockKey, p.dashBoardData, p.currentDashboard, thisStock);
+                        const update = UpdateWidgetStockList(widgetKey, stockKey, dashboardData, currentDashboard, thisStock);
                         dispatch(rSetDashboardData(update))
                         const payload = {
-                            apiKey: p.apiKey,
+                            apiKey: apiKey,
                             dashBoardData: update
                         }
                         dispatch(rBuildDataModel(payload))
@@ -95,11 +93,11 @@ function StockSearchPane(p: props) {
                     }
                 }}
             >
-                <ToolTip textFragment={p.exchangeList.length > 1 ? helpText : helpText2} hintName='sspe2' />
-                {p.exchangeList.length > 1 && <>
+                <ToolTip textFragment={exchangeList.length > 1 ? helpText : helpText2} hintName='sspe2' />
+                {exchangeList.length > 1 && <>
                     {/* <ToolTip textFragment={helpText} hintName='sspe' /> */}
                     {/* <label htmlFor="exchangeList">Exchange:</label> */}
-                    <select value={p.defaultExchange} name='exchangeList' onChange={changeDefault}>
+                    <select value={defaultExchange} name='exchangeList' onChange={changeDefault}>
                         {exchangeOptions}
                     </select></>
                 }
@@ -118,7 +116,7 @@ function StockSearchPane(p: props) {
                 />
                 <datalist id={`${p.widgetKey}-dataList`} data-testid={`searchPaneOption-${p.widgetType}`} >
                     <StockDataList
-                        defaultExchange={p.defaultExchange}
+                        defaultExchange={defaultExchange}
                         inputText={p.searchText}
                     />
                 </datalist>
@@ -145,17 +143,12 @@ export default connect(mapStateToProps, { tGetSymbolList })(StockSearchPane);
 
 export function searchPaneProps(p) {
     const propList = {
-        apiKey: p.apiKey,
         changeSearchText: p.changeSearchText,
-        defaultExchange: p.defaultExchange,
-        exchangeList: p.exchangeList,
         finnHubQueue: p.finnHubQueue,
         searchText: p.searchText,
         widgetKey: p.widgetKey,
         widgetType: p.widgetType,
         updateAppState: p.updateAppState,
-        dashBoardData: p.dashBoardData,
-        currentDashboard: p.currentDashBoard,
     };
     return propList;
 }

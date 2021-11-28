@@ -1,5 +1,7 @@
 import * as React from "react"
 import { useState, forwardRef, useRef, useMemo } from "react";
+import { widget } from 'src/App'
+import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 import { createSelector } from 'reselect'
 import { storeState } from './../../../store'
@@ -52,16 +54,31 @@ interface filters {
     startDate: number,
 }
 
-function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
+interface widgetProps {
+    config: any,
+    enableDrag: boolean,
+    filters: filters,
+    finnHubQueue: finnHubQueue,
+    pagination: number,
+    showEditPane: number,
+    trackedStocks: any,
+    updateAppState: Function,
+    widgetCopy: widget,
+    widgetKey: string | number,
+    widgetType: string,
+}
 
+function EstimatesEarningsCalendar(p: widgetProps, ref: any) {
+
+    const dispatch = useDispatch(); //allows widget to run redux actions.
     const isInitialMount = useRef(true); //update to false after first render.
 
     const startingWidgetCoptyRef = () => {
         if (isInitialMount.current === true) {
-            if (p.widgetCopy !== undefined && p.widgetCopy.widgetID !== null) {
+            if (p.widgetCopy !== undefined && typeof p.widgetCopy.widgetID === 'number') {
                 return p.widgetCopy.widgetID
-            } else { return -1 }
-        }
+            } else { return 0 }
+        } else { return 0 }
     }
 
     const startingStartDate = () => { //save dates as offsets from now
@@ -82,7 +99,7 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
 
     const startingPagination = () => {
         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            return (p.widgetCopy.pagination)
+            return (p.widgetCopy.config.pagination)
         } else { return (0) }
     }
 
@@ -90,7 +107,13 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
     const [start, setStart] = useState(startingStartDate())
     const [end, setEnd] = useState(startingEndDate())
     const [pagination, setPagination] = useState(startingPagination())
-    const dispatch = useDispatch(); //allows widget to run redux actions.
+
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const targetSecurity = useSelector((state) => { return state.targetSecurity })
+    const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
+    const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : -1
 
     const showDataSelector = createSelector(
         (state: storeState) => state.showData.dataSet?.[p.widgetKey]?.[p.config.targetSecurity]?.['earningsCalendar'],
@@ -115,15 +138,15 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
     }, [start, end])
 
     const focusSecurityList = useMemo(() => { //remove if all securities should stay in focus.
+        console.log('new memo')
         return [p?.config?.targetSecurity]
     }, [p?.config?.targetSecurity])
 
-
     useDragCopy(ref, { pagination: pagination, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.
-    useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
+    useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.
+    useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue)
+    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, dashboardData, currentDashboard, p.updateAppState, dispatch, apiKey, p.finnHubQueue)
     useResetPagination(p.config.targetSecurity, setPagination)
 
     function changePagination(e) {
@@ -142,19 +165,19 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
                     setEnd={setEnd}
                     widgetKey={p.widgetKey}
                     widgetType={p.widgetType}
-                    dashBoardData={p.dashBoardData}
-                    currentDashBoard={p.currentDashBoard}
-                    apiKey={p.apiKey}
+                    dashboardData={dashboardData}
+                    currentDashboard={currentDashboard}
+                    apiKey={apiKey}
                     finnHubQueue={p.finnHubQueue}
                     updateAppState={p.updateAppState}
                 />
                 <WidgetRemoveSecurityTable
                     trackedStocks={p.trackedStocks}
                     widgetKey={p.widgetKey}
-                    exchangeList={p.exchangeList}
-                    dashBoardData={p.dashBoardData}
-                    currentDashboard={p.currentDashBoard}
-                    apiKey={p.apiKey}
+                    exchangeList={exchangeList}
+                    dashBoardData={dashboardData}
+                    currentDashboard={currentDashboard}
+                    apiKey={apiKey}
                 />
             </>
         );
@@ -182,10 +205,10 @@ function EstimatesEarningsCalendar(p: { [key: string]: any }, ref: any) {
                         widgetType={p.widgetType}
                         widgetKey={p.widgetKey}
                         trackedStocks={p.trackedStocks}
-                        exchangeList={p.exchangeList}
+                        exchangeList={exchangeList}
                         config={p.config}
-                        dashBoardData={p.dashBoardData}
-                        currentDashBoard={p.currentDashBoard}
+                        dashBoardData={dashboardData}
+                        currentDashboard={currentDashboard}
                         enableDrag={p.enableDrag}
                     />
                     <button data-testid="pageBackward" onClick={() => changePagination(-1)}>
@@ -232,14 +255,6 @@ export default forwardRef(EstimatesEarningsCalendar)
 
 export function EarningsCalendarProps(that, key = "newWidgetNameProps") {
     let propList = {
-        apiKey: that.props.apiKey,
-        trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        filters: that.props.widgetList[key]["filters"],
-        widgetKey: key,
-        exchangeList: that.props.exchangeList,
-        targetSecurity: that.props.targetSecurity,
-        currentDashBoard: that.props.currentDashBoard,
-        dashBoardData: that.props.dashBoardData,
     };
     return propList;
 }
@@ -249,5 +264,6 @@ export const EarningsCalendarFilters: filters = { //IF widget uses filters remem
     endDate: 604800 * 1000 * 52,  //1 year forward. Limited to 1 year on free version.
     description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.',
 }
+
 
 

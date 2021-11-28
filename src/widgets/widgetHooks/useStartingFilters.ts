@@ -5,7 +5,7 @@ import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 export const useStartingFilters = function (//sets default filters, if not setup.
 
-    checkValue: string, //filters['valueToCheck']
+    checkValue: string | number, //filters['valueToCheck']
     updateObj: Object,
     widgetID: string | number, //p.widgetKey
     dashBoardData: dashBoardData,

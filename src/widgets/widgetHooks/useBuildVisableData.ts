@@ -20,5 +20,5 @@ export const useBuildVisableData = function (
             }
             dispatch(rBuildVisableData(payload))
         }
-    }, [targetSecurityList, widgetKey, widgetCopy, dispatch, isInitialMount])
+    }, [])
 }

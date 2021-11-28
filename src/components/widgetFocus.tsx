@@ -7,13 +7,13 @@ import { useAppDispatch } from '../hooks';
 
 interface props {
     widgetType: string,
-    widgetKey: number,
+    widgetKey: string | number,
     trackedStocks: stockList,
     exchangeList: string[],
     config: config,
     callback?: Function | false //any additional logic that needs to be run on change to focus. Reset pagination?
     dashBoardData: dashBoardData
-    currentDashBoard: string,
+    currentDashboard: string,
     enableDrag: boolean,
 }
 
@@ -26,7 +26,7 @@ export default function WidgetFocus(p: props): ReactElement {
             p.widgetKey,
             { ...p.config, ...{ targetSecurity: target } },
             p.dashBoardData,
-            p.currentDashBoard,
+            p.currentDashboard,
             p.enableDrag,
             dispatch,
         )

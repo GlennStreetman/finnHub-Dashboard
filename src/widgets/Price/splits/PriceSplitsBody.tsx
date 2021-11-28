@@ -1,5 +1,8 @@
 import * as React from "react"
 import { useState, useEffect, forwardRef, useRef, useMemo } from "react";
+import { widget } from 'src/App'
+import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
+
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 
@@ -36,16 +39,32 @@ interface filters {
     startDate: number,
 }
 
-function PriceSplits(p: { [key: string]: any }, ref: any) {
+interface widgetProps {
+    config: any,
+    enableDrag: boolean,
+    filters: any,
+    finnHubQueue: finnHubQueue,
+    pagination: number,
+    showEditPane: number,
+    trackedStocks: any,
+    updateAppState: Function,
+    widgetCopy: any,
+    widgetKey: string | number,
+    widgetType: string,
+}
+
+
+function PriceSplits(p: widgetProps, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
 
     const startingWidgetCoptyRef = () => {
         if (isInitialMount.current === true) {
-            if (p.widgetCopy !== undefined && p.widgetCopy.widgetID !== null) {
+            if (p.widgetCopy !== undefined && typeof p.widgetCopy.widgetID === 'number') {
                 return p.widgetCopy.widgetID
-            } else { return -1 }
-        }
+            } else { return 0 }
+        } else { return 0 }
     }
+
 
     const startingStartDate = () => { //save dates as offsets from now
         const now = Date.now()
@@ -67,6 +86,13 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
     const [start, setStart] = useState(startingStartDate())
     const [end, setEnd] = useState(startingEndDate())
     const dispatch = useDispatch();
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const targetSecurity = useSelector((state) => { return state.targetSecurity })
+    const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
+    const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : -1
+
 
     interface rShowDat {
         [key: string]: any
@@ -95,19 +121,19 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
 
     useDragCopy(ref, {})//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
 
-    useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
+    useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue)
-    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.	
+    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, dashboardData, currentDashboard, p.updateAppState, dispatch, apiKey, p.finnHubQueue)
+    useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.	
 
-    useEffect((filters: filters = p.filters, key: number = p.widgetKey) => {
+    useEffect((filters: filters = p.filters, key: string | number = p.widgetKey) => {
         if (filters['startDate'] === undefined) { //if filters not saved to props
             const filterUpdate = {
                 startDate: start,
                 endDate: end,
                 Description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
             }
-            UpdateWidgetFilters(key, filterUpdate, p.dashBoardData, p.currentDashBoard, dispatch, p.apiKey, p.finnHubQueue)
+            UpdateWidgetFilters(key, filterUpdate, dashboardData, currentDashboard, dispatch, apiKey, p.finnHubQueue)
         }
     }, [p.filters, p.widgetKey, start, end])
 
@@ -124,19 +150,19 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
                     setEnd={setEnd}
                     widgetKey={p.widgetKey}
                     widgetType={p.widgetType}
-                    dashBoardData={p.dashBoardData}
-                    currentDashBoard={p.currentDashBoard}
-                    apiKey={p.apiKey}
+                    dashboardData={dashboardData}
+                    currentDashboard={currentDashboard}
+                    apiKey={apiKey}
                     finnHubQueue={p.finnHubQueue}
                     updateAppState={p.updateAppState}
                 />
                 <WidgetRemoveSecurityTable
                     trackedStocks={p.trackedStocks}
                     widgetKey={p.widgetKey}
-                    exchangeList={p.exchangeList}
-                    dashBoardData={p.dashBoardData}
-                    currentDashboard={p.currentDashboard}
-                    apiKey={p.apiKey}
+                    exchangeList={exchangeList}
+                    dashBoardData={dashboardData}
+                    currentDashboard={currentDashboard}
+                    apiKey={apiKey}
                 />
             </>
         );
@@ -170,10 +196,10 @@ function PriceSplits(p: { [key: string]: any }, ref: any) {
                             widgetType={p.widgetType}
                             widgetKey={p.widgetKey}
                             trackedStocks={p.trackedStocks}
-                            exchangeList={p.exchangeList}
+                            exchangeList={exchangeList}
                             config={p.config}
-                            dashBoardData={p.dashBoardData}
-                            currentDashBoard={p.currentDashBoard}
+                            dashBoardData={dashboardData}
+                            currentDashboard={currentDashboard}
                             enableDrag={p.enableDrag}
                         />
                         {rShowData?.message ? <>{rShowData.message}</> : <></>}
@@ -217,13 +243,13 @@ export default forwardRef(PriceSplits)
 
 export function PriceSplitsProps(that, key = "newWidgetNameProps") {
     let propList = {
-        apiKey: that.props.apiKey,
-        trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        filters: that.props.widgetList[key]["filters"],
-        widgetKey: key,
-        exchangeList: that.props.exchangeList,
-        defaultExchange: that.props.defaultExchange,
-        targetSecurity: that.props.targetSecurity,
+        // apiKey: that.props.apiKey,
+        // trackedStocks: that.props.widgetList[key]["trackedStocks"],
+        // filters: that.props.widgetList[key]["filters"],
+        // widgetKey: key,
+        // exchangeList: that.props.exchangeList,
+        // defaultExchange: that.props.defaultExchange,
+        // targetSecurity: that.props.targetSecurity,
     };
     return propList;
 }

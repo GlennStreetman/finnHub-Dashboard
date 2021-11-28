@@ -12,7 +12,7 @@ const useDispatch = useAppDispatch
 
 interface Props {
     trackedStocks: stockList,
-    widgetKey: number,
+    widgetKey: string | number,
     exchangeList: string[],
     dashBoardData: dashBoardData,
     currentDashboard: string,

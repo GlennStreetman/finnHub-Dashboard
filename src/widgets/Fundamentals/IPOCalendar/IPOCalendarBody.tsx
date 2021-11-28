@@ -1,5 +1,8 @@
 import * as React from "react"
 import { useState, forwardRef, useRef, useMemo } from "react";
+import { widget } from 'src/App'
+import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
+
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
@@ -24,7 +27,22 @@ export interface FinnHubAPIData {
     totalSharesValue: number,
 }
 
-function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
+interface widgetProps {
+    config: any,
+    enableDrag: boolean,
+    filters: any,
+    finnHubQueue: finnHubQueue,
+    pagination: number,
+    showEditPane: number,
+    trackedStocks: any,
+    updateAppState: Function,
+    widgetCopy: any,
+    widgetKey: string | number,
+    widgetType: string,
+}
+
+
+function FundamentalsIPOCalendar(p: widgetProps, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
 
     const startingPagination = () => { //REMOVE IF TARGET STOCK NOT NEEDED.
@@ -35,11 +53,12 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
 
     const startingWidgetCoptyRef = () => {
         if (isInitialMount.current === true) {
-            if (p.widgetCopy !== undefined && p.widgetCopy.widgetID !== null) {
+            if (p.widgetCopy !== undefined && typeof p.widgetCopy.widgetID === 'number') {
                 return p.widgetCopy.widgetID
-            } else { return -1 }
-        }
+            } else { return 0 }
+        } else { return 0 }
     }
+
 
     const startingStartDate = () => { //save dates as offsets from now
         const now = Date.now()
@@ -62,6 +81,13 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
     const [start, setStart] = useState(startingStartDate())
     const [end, setEnd] = useState(startingEndDate())
     const dispatch = useDispatch(); //allows widget to run redux actions.
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const targetSecurity = useSelector((state) => { return state.targetSecurity })
+    const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
+    const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : -1
+
 
     const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
         if (state.dataModel !== undefined &&
@@ -85,9 +111,9 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
     }, [])
 
     useDragCopy(ref, { paginationInt: paginationInt, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
+    useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, p.dashBoardData, p.currentDashBoard, p.updateAppState, p.dispatch, p.apiKey, p.finnHubQueue)
+    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, dashboardData, currentDashboard, p.updateAppState, dispatch, apiKey, p.finnHubQueue)
 
     function renderSearchPane() {
         return <>
@@ -98,9 +124,9 @@ function FundamentalsIPOCalendar(p: { [key: string]: any }, ref: any) {
                 setEnd={setEnd}
                 widgetKey={p.widgetKey}
                 widgetType={p.widgetType}
-                dashBoardData={p.dashBoardData}
-                currentDashBoard={p.currentDashBoard}
-                apiKey={p.apiKey}
+                dashboardData={dashboardData}
+                currentDashboard={currentDashboard}
+                apiKey={apiKey}
                 finnHubQueue={p.finnHubQueue}
                 updateAppState={p.updateAppState}
             />
@@ -177,9 +203,9 @@ export default forwardRef(FundamentalsIPOCalendar)
 
 export function IPOCalendarProps(that, key = "newWidgetNameProps") {
     let propList = {
-        apiKey: that.props.apiKey,
-        filters: that.props.widgetList[key]["filters"],
-        widgetKey: key,
+        // apiKey: that.props.apiKey,
+        // filters: that.props.widgetList[key]["filters"],
+        // widgetKey: key,
     };
     return propList;
 }

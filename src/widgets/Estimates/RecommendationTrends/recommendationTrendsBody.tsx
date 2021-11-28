@@ -1,6 +1,8 @@
 import * as React from "react"
 import { useState, useEffect, forwardRef, useRef, useMemo } from "react";
 import RecTrendChart from "./recTrendChart";
+import { widget } from 'src/App'
+import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 import { createSelector } from 'reselect'
 import { storeState } from './../../../store'
@@ -43,16 +45,31 @@ interface DataChartObject {
     strongBuy: object,
 }
 
-function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
+interface widgetProps {
+    config: any,
+    enableDrag: boolean,
+    filters: any,
+    finnHubQueue: finnHubQueue,
+    pagination: number,
+    showEditPane: number,
+    trackedStocks: any,
+    updateAppState: Function,
+    widgetCopy: widget,
+    widgetKey: string | number,
+    widgetType: string,
+}
+
+function EstimatesRecommendationTrends(p: widgetProps, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
 
     const startingWidgetCoptyRef = () => {
         if (isInitialMount.current === true) {
-            if (p.widgetCopy !== undefined && p.widgetCopy.widgetID !== null) {
+            if (p.widgetCopy !== undefined && typeof p.widgetCopy.widgetID === 'number') {
                 return p.widgetCopy.widgetID
-            } else { return -1 }
-        }
+            } else { return 0 }
+        } else { return 0 }
     }
+
 
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const [chartOptions, setchartOptions] = useState({})
@@ -76,9 +93,17 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
         return [p?.config?.targetSecurity]
     }, [p?.config?.targetSecurity])
 
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const targetSecurity = useSelector((state) => { return state.targetSecurity })
+    const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
+    const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : -1
+
+
     useDragCopy(ref, { chartOptions: chartOptions })// stockData: JSON.parse(JSON.stringify(stockData)),   useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.	
-    useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
+    useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.	
+    useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
     useEffect(() => {//create chart data
@@ -152,10 +177,10 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
             <WidgetRemoveSecurityTable
                 trackedStocks={p.trackedStocks}
                 widgetKey={p.widgetKey}
-                exchangeList={p.exchangeList}
-                dashBoardData={p.dashBoardData}
-                currentDashboard={p.currentDashboard}
-                apiKey={p.apiKey}
+                exchangeList={exchangeList}
+                dashBoardData={dashboardData}
+                currentDashboard={currentDashboard}
+                apiKey={apiKey}
             />
         );
         return stockTable
@@ -169,10 +194,10 @@ function EstimatesRecommendationTrends(p: { [key: string]: any }, ref: any) {
                         widgetType={p.widgetType}
                         widgetKey={p.widgetKey}
                         trackedStocks={p.trackedStocks}
-                        exchangeList={p.exchangeList}
+                        exchangeList={exchangeList}
                         config={p.config}
-                        dashBoardData={p.dashBoardData}
-                        currentDashBoard={p.currentDashBoard}
+                        dashBoardData={dashboardData}
+                        currentDashboard={currentDashboard}
                         enableDrag={p.enableDrag}
                     />
                 </div>
@@ -204,15 +229,15 @@ export default forwardRef(EstimatesRecommendationTrends)
 
 export function recommendationTrendsProps(that, key = "newWidgetNameProps") {
     let propList = {
-        apiKey: that.props.apiKey,
-        defaultExchange: that.props.defaultExchange,
-        exchangeList: that.props.exchangeList,
-        filters: that.props.widgetList[key]["filters"],
-        trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        widgetKey: key,
-        targetSecurity: that.props.targetSecurity,
-        dashBoardData: that.props.dashBoardData,
-        currentDashBoard: that.props.currentDashBoard
+        // apiKey: that.props.apiKey,
+        // defaultExchange: that.props.defaultExchange,
+        // exchangeList: that.props.exchangeList,
+        // filters: that.props.widgetList[key]["filters"],
+        // trackedStocks: that.props.widgetList[key]["trackedStocks"],
+        // widgetKey: key,
+        // targetSecurity: that.props.targetSecurity,
+        // dashBoardData: that.props.dashBoardData,
+        // currentDashBoard: that.props.currentDashBoard
     };
     return propList;
 }

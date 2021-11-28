@@ -4,7 +4,7 @@ import { excelRegister, excelRegister_singleSecurity } from '../registers/excelB
 import ToolTip from './toolTip.js'
 import ErrorBoundary from './widgetErrorBoundary';
 import { useState, useEffect } from "react";
-import { useAppDispatch } from '../hooks';
+import { useAppDispatch, useAppSelector } from '../hooks';
 import { rUnmountWidget } from '../slices/sliceShowData'
 import { rRemoveWidgetDataModel } from '../slices/sliceDataModel'
 import { toggleWidgetBody } from 'src/appFunctions/appImport/widgetLogic'
@@ -20,6 +20,7 @@ import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 function WidgetContainer(p) {
 
     const useDispatch = useAppDispatch
+    const useSelector = useAppSelector
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const [renderHeader, setRenderHeader] = useState()
@@ -27,6 +28,16 @@ function WidgetContainer(p) {
     const [show, setShow] = useState('block') //block = visable, none = hidden
     const [searchText, setSearchText] = useState('')
     const widgetRef = React.createRef()
+
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const menuList = useSelector((state) => { return state.menuList })
+
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const apiAlias = useSelector((state) => { return state.apiAlias })
+    const targetSecurity = useSelector((state) => { return state.targetSecurity })
+    const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
+    const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : ''
 
     useEffect(() => {
         setRenderHeader(p.widgetList["widgetHeader"])
@@ -71,7 +82,7 @@ function WidgetContainer(p) {
                 widgetID: p.widgetKey,
                 newName: e.target.value,
             }))
-            dispatch(tSaveDashboard({ dashboardName: p.currentDashBoard }))
+            dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
         }
     }
 
@@ -96,15 +107,14 @@ function WidgetContainer(p) {
             xAxis = e.clientX + window.scrollX
             yAxis = e.clientY
             if (p.stateRef === 'stockWidget') {
-                const [newDrag, widgets] = await setDragWidget(p.currentDashBoard, p.dashboardData, p.widgetKey, widgetState.state)
+                const [newDrag, widgets] = await setDragWidget(currentDashboard, dashboardData, p.widgetKey, widgetState.state)
                 await p.updateAppState(newDrag)
                 dispatch(rSetDashboardData(widgets))
             } else {
-                const [newDrag, menu] = await setDragMenu(p.menuList, p.widgetKey, widgetState.state)
+                const [newDrag, menu] = await setDragMenu(menuList, p.widgetKey, widgetState.state)
                 await p.updateAppState(newDrag)
                 dispatch(rSetMenuList(menu))
             }
-
 
             document.onmouseup = closeDragElement;
             document.onmousemove = elementDrag;
@@ -120,10 +130,10 @@ function WidgetContainer(p) {
             let newX = xAxis - widgetCenter + 25 >= 5 ? xAxis - widgetCenter + 25 : 5
             let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
             if (p.stateRef === 'stockWidget') {
-                const payload = moveWidget(p.stateRef, p.dashboardData, p.menuList, p.currentDashBoard, p.widgetKey, newX, newY);
+                const payload = moveWidget(p.stateRef, dashboardData, menuList, currentDashboard, p.widgetKey, newX, newY);
                 dispatch(rSetDashboardData(payload))
             } else {
-                const payload = moveWidget(p.stateRef, p.dashboardData, p.menuList, p.currentDashBoard, p.widgetKey, newX, newY);
+                const payload = moveWidget(p.stateRef, dashboardData, menuList, currentDashboard, p.widgetKey, newX, newY);
                 dispatch(rSetMenuList(payload))
             }
         }
@@ -137,13 +147,13 @@ function WidgetContainer(p) {
             let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
             document.onmouseup = null;
             document.onmousemove = null;
-            const payload = moveWidget(p.stateRef, p.dashboardData, p.menuList, p.currentDashBoard, p.widgetKey, newX, newY);
+            const payload = moveWidget(p.stateRef, dashboardData, menuList, currentDashboard, p.widgetKey, newX, newY);
             await p.updateAppState(payload)
-            const [snapPayload, dashboard, menu] = await SnapWidget(p.widgetList['widgetConfig'], p.widgetKey, xAxis, yAxis, widgetWidth, p.focus, p.dashboardData, p.menuList, p.currentDashBoard)
+            const [snapPayload, dashboard, menu] = await SnapWidget(p.widgetList['widgetConfig'], p.widgetKey, xAxis, yAxis, widgetWidth, p.focus, dashboardData, menuList, currentDashboard)
             await p.updateAppState(snapPayload)
             dispatch(rSetDashboardData(dashboard))
             dispatch(rSetMenuList(menu))
-            dispatch(tSaveDashboard({ dashboardName: p.currentDashBoard }))
+            dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
 
         }
     }
@@ -157,14 +167,17 @@ function WidgetContainer(p) {
     let widgetProps = p.widgetBodyProps ? p.widgetBodyProps() : {}
 
     widgetProps["showEditPane"] = showEditPane;
+    widgetProps['updateAppState'] = p.updateAppState;
+
     if (p.widgetKey !== "dashBoardMenu") {
-        widgetProps['currentDashBoard'] = p.currentDashBoard
         widgetProps['searchText'] = searchText
         widgetProps['changeSearchText'] = changeSearchText
         widgetProps['widgetType'] = p.widgetList["widgetType"]
         widgetProps['config'] = p.widgetList.config
         widgetProps['finnHubQueue'] = p.finnHubQueue
-        widgetProps['dashboardID'] = p.dashboardID
+        widgetProps['filters'] = p.widgetList["filters"]
+        widgetProps['trackedStocks'] = p.widgetList["trackedStocks"]
+        widgetProps['widgetKey'] = p.widgetKey
     }
     if (p.widgetCopy) {
         widgetProps['widgetCopy'] = p.widgetCopy
@@ -217,9 +230,14 @@ function WidgetContainer(p) {
                     <button
                         className="widgetButtonHead"
                         onClick={() => {
-                            const toggled = toggleWidgetBody(p.widgetKey, p.stateRef, p.dashboardData, p.menuList, p.currentDashBoard)
-                            p.updateAppState(toggled)
-                            dispatch(tSaveDashboard({ dashboardName: p.currentDashboard }))
+                            const toggled = toggleWidgetBody(p.widgetKey, p.stateRef, dashboardData, menuList, currentDashboard)
+                            if (p.stateRef === 'stockWidget') {
+                                dispatch(rSetDashboardData(toggled))
+                            } else {
+                                dispatch((rSetMenuList(toggled)))
+                            }
+                            console.log('save toggle', { dashboardName: currentDashboard })
+                            dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
                         }
                         }>
                         {p.widgetList.showBody !== false ? <i className="fa fa-caret-square-o-down" aria-hidden="true" /> : <i className="fa fa-caret-square-o-right" aria-hidden="true" />}
@@ -244,13 +262,13 @@ function WidgetContainer(p) {
                         <button
                             onClick={async () => {
                                 if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
-                                    const updateWidgets = await RemoveWidget(p.widgetKey, p.dashboardData, p.currentDashBoard);
+                                    const updateWidgets = await RemoveWidget(p.widgetKey, dashboardData, currentDashboard);
                                     dispatch(rSetDashboardData(updateWidgets))
-                                    dispatch(tSaveDashboard({ dashboardName: p.currentDashboard }))
+                                    dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
                                     fetch(`/deleteFinnDashData?widgetID=${p.widgetKey}`) //delete from mongo.
                                     const payload = {
                                         widgetKey: p.widgetKey,
-                                        dashboardName: p.currentDashBoard,
+                                        dashboardName: currentDashboard,
                                     }
                                     dispatch(rUnmountWidget(payload))
                                     dispatch(rRemoveWidgetDataModel(payload))
@@ -265,7 +283,7 @@ function WidgetContainer(p) {
                 {p.widgetList.showBody !== false && showEditPane !== 1 && (
 
                     excelRegister_singleSecurity[p.widgetList.widgetType] && ( //button returns data for target securities associated with widget.
-                        <button className='widgetButtonFoot' onClick={() => excelFunction(p.apiKey, p.currentDashBoard, p.widgetList.widgetHeader, p.widgetList.config.targetSecurity, p.widgetList.config)}>
+                        <button className='widgetButtonFoot' onClick={() => excelFunction(p.apiKey, currentDashboard, p.widgetList.widgetHeader, p.widgetList.config.targetSecurity, p.widgetList.config)}>
                             <i className="fa fa-file-excel-o" aria-hidden="true" data-testid={`excelButton-${p.widgetList["widgetType"]}`}></i>
                         </button>
                     )
@@ -274,7 +292,7 @@ function WidgetContainer(p) {
                 {p.widgetList.showBody !== false && showEditPane !== 1 && (
 
                     excelRegister[p.widgetList.widgetType] && ( //button returns data for all securities associated with widget.
-                        <button className='widgetButtonFoot' onClick={() => excelFunction(p.apiKey, p.currentDashBoard, p.widgetList.widgetHeader, false, p.widgetList.config)}>
+                        <button className='widgetButtonFoot' onClick={() => excelFunction(p.apiKey, currentDashboard, p.widgetList.widgetHeader, false, p.widgetList.config)}>
                             <i className="fa fa-list" aria-hidden="true" data-testid={`excelButton-${p.widgetList["widgetType"]}`}></i>
                         </button>
                     )

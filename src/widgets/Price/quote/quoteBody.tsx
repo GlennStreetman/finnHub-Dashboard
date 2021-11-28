@@ -1,5 +1,7 @@
 import React from "react";
 import { useState, useEffect, useMemo, forwardRef, useRef } from "react";
+import { widget } from 'src/App'
+import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
@@ -36,6 +38,21 @@ interface FinnHubQuoteDataRaw {
     t: number,
 }
 
+interface widgetProps {
+    config: any,
+    enableDrag: boolean,
+    filters: any,
+    finnHubQueue: finnHubQueue,
+    pagination: number,
+    showEditPane: number,
+    trackedStocks: any,
+    updateAppState: Function,
+    widgetCopy: any,
+    widgetKey: string | number,
+    widgetType: string,
+}
+
+
 export interface FinnHubQuoteObj {
     [key: string]: FinnHubQuoteDataFormated
 }
@@ -44,7 +61,7 @@ function isQuoteData(arg: any): arg is FinnHubQuoteDataRaw { //defined shape of 
     return arg.c !== undefined
 }
 
-function PriceQuote(p: { [key: string]: any }, ref: any) {
+function PriceQuote(p: widgetProps, ref: any) {
     const isInitialMount = useRef(true);
 
     const startingstockData = () => {
@@ -68,6 +85,13 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
 
     const [stockData, setStockData] = useState(startingstockData())
     const [widgetCopy] = useState(startingWidgetCopyRef())
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const targetSecurity = useSelector((state) => { return state.targetSecurity })
+    const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
+    const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : -1
+
 
     const dispatch = useDispatch()
 
@@ -90,9 +114,9 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
 
 
     useDragCopy(ref, { stockData: stockData, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useSearchMongoDb(p.currentDashBoard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, p.dashboardID) //on change to target security retrieve fresh data from mongoDB
+    useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useUpdateFocus(p.targetSecurity, p.widgetKey, p.config, p.dashBoardData, p.currentDashBoard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.
+    useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.
 
     useEffect(() => { //CREATE STOCK DATA
 
@@ -137,10 +161,10 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
             <WidgetRemoveSecurityTable
                 trackedStocks={p.trackedStocks}
                 widgetKey={p.widgetKey}
-                exchangeList={p.exchangeList}
-                dashBoardData={p.dashBoardData}
-                currentDashboard={p.currentDashboard}
-                apiKey={p.apiKey}
+                exchangeList={exchangeList}
+                dashBoardData={dashboardData}
+                currentDashboard={currentDashboard}
+                apiKey={apiKey}
             />
         );
         return searchForm
@@ -152,7 +176,7 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
         let stockDetailRow = widgetStockList.map((el) =>
             pd[el] ? (
                 <tr key={el + "st" + + pd[el]["currentPrice"]}>
-                    <td className='rightTE' key={el + "id"}>{dStock(p.trackedStocks[el], p.exchangeList)}: </td>
+                    <td className='rightTE' key={el + "id"}>{dStock(p.trackedStocks[el], exchangeList)}: </td>
                     <td className="rightTE" key={el + "prevClosePrice"}>
                         {pd[el]["prevClosePrice"].toLocaleString(undefined, {
                             minimumFractionDigits: 2,
@@ -190,10 +214,10 @@ function PriceQuote(p: { [key: string]: any }, ref: any) {
                             <button
                                 key={el + "button"}
                                 onClick={() => {
-                                    const update = UpdateWidgetStockList(p.widgetKey, el, p.dashBoardData, p.currentDashBoard);
+                                    const update = UpdateWidgetStockList(p.widgetKey, el, dashboardData, currentDashboard);
                                     dispatch(rSetDashboardData(update))
                                     const payload = {
-                                        apiKey: p.apiKey,
+                                        apiKey: apiKey,
                                         dashBoardData: update
                                     }
                                     dispatch(rBuildDataModel(payload))
@@ -264,13 +288,13 @@ export default forwardRef(PriceQuote)
 
 export function quoteBodyProps(that, key = "Quote") {
     let propList = {
-        apiKey: that.props.apiKey,
-        trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        widgetKey: key,
-        exchangeList: that.props.exchangeList,
-        defaultExchange: that.props.defaultExchange,
-        dashBoardData: that.props.dashBoardData,
-        currentDashBoard: that.props.currentDashBoard,
+        // apiKey: that.props.apiKey,
+        // trackedStocks: that.props.widgetList[key]["trackedStocks"],
+        // widgetKey: key,
+        // exchangeList: that.props.exchangeList,
+        // defaultExchange: that.props.defaultExchange,
+        // dashBoardData: that.props.dashBoardData,
+        // currentDashBoard: that.props.currentDashBoard,
     };
     return propList;
 }
