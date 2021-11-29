@@ -1,6 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { tChangeWidgetName } from '../thunks/thunkChangeWidgetName'
-import { tUpdateWidgetFilters } from '../thunks/thunkUpdateWidgetFilters'
+import { tChangeWidgetName } from 'src/thunks/thunkChangeWidgetName'
+import { tUpdateWidgetFilters } from 'src/thunks/thunkUpdateWidgetFilters'
+import { tSyncGlobalStocklist } from 'src/thunks/thunkSyncGlobalStockList'
 
 export interface stock {
     currency: string,
@@ -105,7 +106,11 @@ const dashboardData = createSlice({
             state[currentDashboard].widgetlist[widgetID][currentDashboard].filters = filters
 
         },
-
+        [tSyncGlobalStocklist.fulfilled.toString()]: (state, action) => {
+            const ap: sliceDashboardData = action.payload.dashboardData
+            state = ap
+            return state
+        },
     }
 })
 

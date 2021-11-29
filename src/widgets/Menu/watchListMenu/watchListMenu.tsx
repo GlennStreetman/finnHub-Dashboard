@@ -12,19 +12,20 @@ import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { dStock } from '../../../appFunctions/formatStockSymbols'
 
 import { updateGlobalStockList } from 'src/appFunctions/appImport/updateGlobalStockList'
-import { syncGlobalStockList } from 'src/appFunctions/appImport/syncGlobalStockList'
+import { newGlobalStockList } from 'src/appFunctions/appImport/syncGlobalStockList'
 
 import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
 import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
-
+import { tSyncGlobalStocklist } from 'src/thunks/thunkSyncGlobalStockList'
+import { tGetFinnhubData, tgetFinnHubDataReq } from "src/thunks/thunkFetchFinnhub";
+import { rSetUpdateStatus } from "src/slices/sliceDataModel";
 
 interface props {
     showEditPane: number,
     helpText: string,
     finnHubQueue: finnHubQueue,
     updateAppState: Function,
-    rebuildVisableDashboard: Function,
 }
 
 function WatchListMenu(p: props, ref: any) {
@@ -231,11 +232,23 @@ function WatchListMenu(p: props, ref: any) {
                                 </td>
                                 <td>
                                     <button className="ui button" onClick={async () => {
-                                        const [focus, newDashboard] = await syncGlobalStockList(dashboardData, currentDashboard)
-                                        dispatch(rSetDashboardData(newDashboard))
-                                        dispatch(rSetTargetSecurity(focus))
-                                        p.rebuildVisableDashboard()
+                                        const [focus, newDashboard] = await newGlobalStockList(dashboardData, currentDashboard)
+                                        console.log('HERE', focus)
+
+                                        await dispatch(tSyncGlobalStocklist({
+                                            dashboardData: newDashboard,
+                                            targetSecurity: focus,
+                                        }))
+
                                         dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
+                                        const payload: tgetFinnHubDataReq = {
+                                            dashboardID: dashboardData[currentDashboard].id,
+                                            targetDashBoard: currentDashboard,
+                                            widgetList: Object.keys(dashboardData[currentDashboard].widgetlist),
+                                            finnHubQueue: p.finnHubQueue,
+                                            rSetUpdateStatus: rSetUpdateStatus,
+                                        }
+                                        dispatch(tGetFinnhubData(payload))
 
                                     }}>
                                         Sync
@@ -306,7 +319,6 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
         helpText: [helpText, 'WLM'],
         finnHubQueue: that.props.finnHubQueue,
         updateAppState: that.props.updateAppState,
-        rebuildVisableDashboard: that.props.rebuildVisableDashboard,
     };
     return propList;
 }

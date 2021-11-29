@@ -1,7 +1,6 @@
 import React from "react";
 
 interface aboutMenuProps2 {
-    apiFlag: number,
 }
 
 class AboutMenu extends React.PureComponent<aboutMenuProps2> {
@@ -78,27 +77,17 @@ class AboutMenu extends React.PureComponent<aboutMenuProps2> {
                     </table>
 
                     <b>Getting Started:</b> <br />
-                    {this.props.apiFlag > 0 ? (
-                        <mark>
-                            1. Register for your free Finnhub.io API key:
-                            <a href="https://finnhub.io/register" target="_blank" rel="noopener noreferrer">
-                                FinnHub Register
-                            </a>
-                            <br />
-                            2. After registering for your Finnhub API key, login, then click Manage Account and update your API Key info.
-                            <br />
-                        </mark>
-                    ) : (
-                        <>
-                            1. Register for your free Finnhub.io API key:{" "}
-                            <a href="https://finnhub.io/register" target="_blank" rel="noopener noreferrer">
-                                FinnHub Register
-                            </a>
-                            <br />
-                            2. After registering for your Finnhub API key, login, then click Manage Account and update your API Key info.
-                            <br />
-                        </>
-                    )}
+
+                    <>
+                        1. Register for your free Finnhub.io API key:{" "}
+                        <a href="https://finnhub.io/register" target="_blank" rel="noopener noreferrer">
+                            FinnHub Register
+                        </a>
+                        <br />
+                        2. After registering for your Finnhub API key, login, then click Manage Account and update your API Key info.
+                        <br />
+                    </>
+
                     3. Once your API key is saved click 'add widget' to begin designing a new widget dashboard.
                     <br />
                     4. After your dashboard is setup remember to click "Show Dashboard Menu" and save your new dashboard before exiting.
@@ -122,7 +111,6 @@ class AboutMenu extends React.PureComponent<aboutMenuProps2> {
                     Created by Glenn Streetman. Contact: glennstreetman@gmail.com
                     <br />
                 </div >
-                {this.props.apiFlag > 0 ? <mark>Warning: Problem with API key.</mark> : <></>}
             </div >
         );
     }

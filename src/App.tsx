@@ -49,22 +49,16 @@ const outerTheme = createTheme({
     },
 });
 
+
+
 class App extends React.Component<AppProps, AppState> {
     constructor(props: AppProps) {
         super(props);
 
         this.state = {
-
-            // accountMenu: 0,
-            // aboutMenu: 0,
-            // backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
-            // showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
-
-            apiFlag: 0, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
             login: 0, //login state. 0 logged out, 1 logged in.
             navigate: null,
             finnHubQueue: createFunctionQueueObject(1, 1000, true),
-            // showMenuColumn: true, //true shows column 0
             enableDrag: false,
             socket: "", //socket connection for streaming stock data.
             socketUpdate: Date.now(),
@@ -72,10 +66,8 @@ class App extends React.Component<AppProps, AppState> {
             widgetSetup: {},//activates premium api routes.
         };
 
-        this.baseState = this.state; //used to reset state upon logout.
         this.updateAppState = this.updateAppState.bind(this)
-        this.rebuildDashboardState = this.rebuildDashboardState.bind(this) //sets p.dashboardData. Used to build dataModel in redux
-        this.rebuildVisableDashboard = this.rebuildVisableDashboard.bind(this) //rebuilds dashboard in redux state.dataModel
+        this.rebuildDashboardState = this.buildDashboardState.bind(this) //sets p.dashboardData. Used to build dataModel in redux
     }
 
     componentDidMount() {
@@ -119,17 +111,6 @@ class App extends React.Component<AppProps, AppState> {
                 navigate: null,
             })
         }
-        // if ( //if apikey not setup show about menu
-        //     (this.props.apiKey === '' && this.state.apiFlag === 0 && this.state.login === 1) ||
-        //     (this.props.apiKey === null && this.state.apiFlag === 0 && this.state.login === 1)
-        // ) {
-        //     this.setState({
-        //         apiFlag: 1,
-        //         aboutMenu: 0,
-        //         showStockWidgets: 0,
-        //         backGroundMenu: 'about',
-        //     })
-        // }
 
         const globalStockList = this.props.dashboardData?.[this.props.currentDashboard]?.globalstocklist ? this.props.dashboardData?.[this.props.currentDashboard].globalstocklist : false
         if ((globalStockList && globalStockList !== prevProps.dashboardData?.[prevProps.currentDashboard]?.globalstocklist && this.state.login === 1)) { //price data for watchlist, including socket data.
@@ -142,22 +123,15 @@ class App extends React.Component<AppProps, AppState> {
         }
     }
 
-    // componentWillUnmount() {
-    //     if (this.state.socket !== "") {
-    //         this.state.socket.close();
-    //     }
-    // }
-
     updateAppState(updateObj) {
         return new Promise((resolve) => {
             this.setState(updateObj, () => resolve(true))
         })
     }
 
-    async rebuildDashboardState() { //fetches dashboard data, then updates p.dashboardData, then builds redux model.
+    async buildDashboardState() { //fetches dashboard data, then updates p.dashboardData, then builds redux model.
         try {
             const data = await this.props.tGetSavedDashboards({ apiKey: this.props.apiKey }).unwrap()
-
             this.props.rUpdateCurrentDashboard(data.currentDashBoard)
             this.props.rSetMenuList(data.menuList)
             this.props.rSetDashboardData(data.dashBoardData)
@@ -194,26 +168,6 @@ class App extends React.Component<AppProps, AppState> {
         }
     }
 
-    async rebuildVisableDashboard() {
-        const payload = {
-            apiKey: this.props.apiKey,
-            dashBoardData: this.props.dashboardData[this.props.currentDashboard],
-            targetDashboard: this.props.currentDashboard,
-        }
-        this.props.rRebuildTargetDashboardModel(payload) //rebuilds redux.Model
-        const s: AppState = this.state;
-        const p: AppProps = this.props;
-        await p.tGetMongoDB({ dashboard: p.dashboardData[p.currentDashboard].id })
-        const payload2: tgetFinnHubDataReq = {
-            dashboardID: p.dashboardData[p.currentDashboard].id,
-            targetDashBoard: p.currentDashboard,
-            widgetList: Object.keys(p.dashboardData[p.currentDashboard].widgetlist),
-            finnHubQueue: s.finnHubQueue,
-            rSetUpdateStatus: p.rSetUpdateStatus,
-        }
-        await p.tGetFinnhubData(payload2)
-    }
-
     render() {
         const quaryData = queryString.parse(window.location.search);
 
@@ -237,7 +191,6 @@ class App extends React.Component<AppProps, AppState> {
             login={this.state.login}
             widgetCopy={this.state.widgetCopy}
             updateAppState={this.updateAppState}
-            rebuildVisableDashboard={this.rebuildVisableDashboard}
         />
 
         const topNav = <>
@@ -245,7 +198,6 @@ class App extends React.Component<AppProps, AppState> {
                 login={this.state.login}
                 widgetSetup={this.state.widgetSetup}
                 updateAppState={this.updateAppState}
-                baseState={this.baseState}
                 dashboardData={this.props.dashboardData}
                 currentDashboard={this.props.currentDashboard}
                 apiKey={this.props.apiKey}
@@ -263,7 +215,7 @@ class App extends React.Component<AppProps, AppState> {
                             <Route path="login" element={login} />
                             <Route path="manageAccount" element={React.createElement(AccountMenu, accountMenuProps(this))} />
                             <Route path="widgetMenu" element={React.createElement(WidgetMenu, widgetMenuProps(this))} />
-                            <Route path="about" element={React.createElement(AboutMenu, { apiFlag: this.state.apiFlag })} />
+                            <Route path="about" element={React.createElement(AboutMenu, {})} />
                             <Route path="exchangeMenu" element={React.createElement(ExchangeMenu, exchangeMenuProps(this))} />
                             <Route path="templates" element={React.createElement(TemplateMenu, templateMenuProps(this))} />
                         </Route>
@@ -419,7 +371,7 @@ export interface AppProps {
 export interface AppState {
     // accountMenu: number,
     // aboutMenu: number,
-    apiFlag: number, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
+    // apiFlag: number, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
     // backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
     enableDrag: boolean,
     finnHubQueue: finnHubQueue,

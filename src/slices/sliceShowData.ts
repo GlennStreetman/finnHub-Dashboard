@@ -2,12 +2,11 @@ import { createSlice } from '@reduxjs/toolkit';
 import { tGetMongoDB } from '../thunks/thunkGetMongoDB'
 import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB'
 import { tGetFinnhubData, resObj } from '../thunks/thunkFetchFinnhub'
-// import { findByString, mergeByString } from './../appFunctions/stringFunctions'
 import { widgetReducers } from '../registers/dataReducerReg'
 import { tGetSavedDashboards } from '../thunks/thunkGetSavedDashboards'
+import { tSyncGlobalStocklist } from 'src/thunks/thunkSyncGlobalStockList'
+import { stock } from 'src/App'
 
-//data = {keys : data objects}
-//key should be widget reference.
 
 interface DataNode {
     [key: string]: any
@@ -171,6 +170,27 @@ const showData = createSlice({
             const target = action.payload.currentDashBoard
             state.targetDashboard = target
         },
+        [tSyncGlobalStocklist.pending.toString()]: (state, action) => {
+            return state
+        },
+        [tSyncGlobalStocklist.fulfilled.toString()]: (state, action) => {
+            const newStockList: string[] = action.payload.globalStockList
+            const dataSet = state.dataSet
+
+            Object.values(dataSet).forEach((widget) => {
+                Object.keys(widget).forEach((stock) => { //delete stocks from each widget that are not included in new stock list.
+                    if (!Object.values(newStockList).includes(stock)) {
+                        console.log('deleting:', stock, 'from', widget)
+                        delete widget[stock]
+                    }
+                })
+
+                Object.values(newStockList).forEach((stock) => { //add new stocks to each widget, if not yet included.
+                    if (!widget[stock]) widget[stock] = {}
+                })
+            })
+            return state
+        }
     }
 })
 

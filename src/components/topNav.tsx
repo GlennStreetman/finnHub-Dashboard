@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 
 import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg'
 import { widgetSetup, filters, dashBoardData } from 'src/App'
-import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
+import { finnHubQueue, createFunctionQueueObject } from "src/appFunctions/appImport/throttleQueueAPI";
 
 import { AppBar, Toolbar, Tooltip } from '@material-ui/core/';
 import WidgetsIcon from '@material-ui/icons/Widgets';
@@ -28,7 +28,6 @@ interface topNavProps {
     login: number,
     widgetSetup: widgetSetup,
     updateAppState: Function,
-    baseState: Object,
     dashboardData: dashBoardData,
     currentDashboard: string,
     apiKey: string,
@@ -58,7 +57,16 @@ function TopNav(p: topNavProps) {
         dispatch(rExchangeDataLogout());
         dispatch(rExchangeListLogout());
         dispatch(rTargetDashboardLogout());
-        p.updateAppState(p.baseState)
+        p.updateAppState({
+            login: 0, //login state. 0 logged out, 1 logged in.
+            navigate: null,
+            finnHubQueue: createFunctionQueueObject(1, 1000, true),
+            enableDrag: false,
+            socket: "", //socket connection for streaming stock data.
+            socketUpdate: Date.now(),
+            widgetCopy: null, //copy of state of widget being dragged.
+            widgetSetup: {},//activates premium api routes.
+        })
         navigate('/login')
     }
 

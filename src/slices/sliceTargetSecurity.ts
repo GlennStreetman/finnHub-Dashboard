@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { tSyncGlobalStocklist } from 'src/thunks/thunkSyncGlobalStockList'
 
 const initialState: string = ""
 
@@ -12,6 +13,13 @@ const targetSecurity = createSlice({
             return state
         },
     },
+    extraReducers: {
+        [tSyncGlobalStocklist.fulfilled.toString()]: (state, action) => {
+            const ap: string = action.payload.targetSecurity
+            state = ap
+            return state
+        },
+    }
 })
 
 export const {

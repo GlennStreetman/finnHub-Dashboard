@@ -15,11 +15,8 @@ interface controllerProps {
     enableDrag: boolean,
     finnHubQueue: finnHubQueue,
     login: number,
-    // showMenuColumn: boolean,
-    // showStockWidgets: number,
     widgetCopy: widget | null,
     updateAppState: Function,
-    rebuildVisableDashboard: Function,
 }
 
 function WidgetController(p: controllerProps) {
@@ -73,9 +70,6 @@ function WidgetController(p: controllerProps) {
                     updateAppState: p.updateAppState,
                     widgetWidth: widgetWidth,
                     focus: focus,
-                }
-                if (el.widgetConfig === 'menuWidget') {
-                    thisWidgetProps['rebuildVisableDashboard'] = p.rebuildVisableDashboard
                 }
                 if (p.widgetCopy?.widgetID === el.widgetID) {
                     thisWidgetProps.widgetCopy = p.widgetCopy
