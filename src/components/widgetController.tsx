@@ -4,15 +4,25 @@ import WidgetContainer from "./widgetContainer";
 import { returnExtraProps } from "../registers/widgetControllerReg.js"
 import useWindowDimensions from '../appFunctions/hooks/windowDimensions'
 import BottomNav from "./bottomNav";
-
+import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
+import { widget } from 'src/App'
 import { Grid } from '@material-ui/core/';
-
 import { useAppSelector } from '../hooks';
 
 const useSelector = useAppSelector
 
+interface controllerProps {
+    enableDrag: boolean,
+    finnHubQueue: finnHubQueue,
+    login: number,
+    showMenuColumn: boolean,
+    showStockWidgets: number,
+    widgetCopy: widget | null,
+    updateAppState: Function,
+    rebuildVisableDashboard: Function,
+}
 
-function WidgetController(p) {
+function WidgetController(p: controllerProps) {
 
     const [focus, setFocus] = useState(0) //sets left most column focus for widgets. 0 shows menu column on far left. 
 
@@ -96,7 +106,6 @@ function WidgetController(p) {
         }
     }
 
-    //this is derived state. Should this be in useEffect?
     const allWidgetColumns: any[] = Array.from({ length: 7 }, (i, x) => { return [{ 'pass': x }] }) //creates 7 columns, 6 possible snap locations, 1 drag column.
     const allWidgets = { ...widgetList, ...menuList }
 
@@ -115,7 +124,6 @@ function WidgetController(p) {
 
     const displayColumns = allWidgetColumns.slice(focus, columnCount) //display in grid
     const dragColumn = allWidgetColumns[6] //display widget current being dragged to new location.
-    // console.log('all', allWidgetColumns, 'display', displayColumns, 'drag', dragColumn)
 
     const renderWidgetColumns = Object.keys(displayColumns).map((el) => {
         return <Grid item xs={12} sm={6} md={4} lg={3} xl={2} key={el + "divkey"} >

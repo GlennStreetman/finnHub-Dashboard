@@ -245,17 +245,6 @@ class App extends React.Component<AppProps, AppState> {
                                 finnHubQueue={this.state.finnHubQueue}
                             />
                             <WidgetController
-                                // apiKey={this.props.apiKey}
-                                // apiAlias={this.props.apiAlias}
-                                // currentDashBoard={this.props.currentDashboard}
-                                // dashBoardData={this.props.dashboardData}
-                                // dashboardID={dashboardID}
-                                // defaultExchange={this.props.defaultExchange}
-                                // menuList={this.props.menuList}
-                                // targetSecurity={this.props.targetSecurity}
-                                // exchangeList={this.props.exchangeList}
-                                // widgetList={widgetList}
-
                                 enableDrag={this.state.enableDrag}
                                 finnHubQueue={this.state.finnHubQueue}
                                 login={this.state.login}
