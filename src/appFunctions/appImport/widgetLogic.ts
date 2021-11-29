@@ -73,29 +73,27 @@ export const UpdateWidgetStockList = function (
     currentDashboard: string,
     stockObj: stock | Object = {}) {
     //adds if not present, else removes stock from widget specific stock list.
-    if (typeof widgetId === 'number') {
+    const newWidgetList = produce(dashBoardData[currentDashboard].widgetlist, (draftState: widgetList) => {
+        const trackingSymbolList: stockList = draftState[widgetId]["trackedStocks"]; //copy target widgets stock object
 
-        const newWidgetList = produce(dashBoardData[currentDashboard].widgetlist, (draftState: widgetList) => {
-            const trackingSymbolList: stockList = draftState[widgetId]["trackedStocks"]; //copy target widgets stock object
+        if (Object.keys(trackingSymbolList).indexOf(symbol) === -1) {
+            //add
+            let newStock: stock = { ...stockObj } as stock
+            trackingSymbolList[symbol] = newStock
+            draftState[widgetId]["trackedStocks"] = trackingSymbolList;
+        } else {
+            //remove stock from list
+            delete trackingSymbolList[symbol]
+            draftState[widgetId]["trackedStocks"] = trackingSymbolList
+        }
+    })
 
-            if (Object.keys(trackingSymbolList).indexOf(symbol) === -1) {
-                //add
-                let newStock: stock = { ...stockObj } as stock
-                trackingSymbolList[symbol] = newStock
-                draftState[widgetId]["trackedStocks"] = trackingSymbolList;
-            } else {
-                //remove stock from list
-                delete trackingSymbolList[symbol]
-                draftState[widgetId]["trackedStocks"] = trackingSymbolList
-            }
-        })
-
-        const updatedDashBoard: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
-            draftState[currentDashboard].widgetlist = newWidgetList
-        })
-        return updatedDashBoard
-    }
+    const updatedDashBoard: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
+        draftState[currentDashboard].widgetlist = newWidgetList
+    })
+    return updatedDashBoard
 }
+
 
 //widget filters change how data is queried from finnHub
 export const UpdateWidgetFilters = async function (

@@ -1,13 +1,12 @@
-import React, { ReactElement } from 'react'
 import { dStock } from '../appFunctions/formatStockSymbols'
 import { stockList } from '../App'
 import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
 import { dashBoardData } from 'src/App'
 import { rBuildDataModel } from 'src/slices/sliceDataModel'
 import { rSetDashboardData } from 'src/slices/sliceDashboardData'
-
-
 import { useAppDispatch } from 'src/hooks';
+import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
+
 const useDispatch = useAppDispatch
 
 interface Props {
@@ -19,7 +18,7 @@ interface Props {
     apiKey: string,
 }
 
-export default function WidgetRemoveSecurityTable(p: Props): ReactElement {
+export default function WidgetRemoveSecurityTable(p: Props) {
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const stockList = Object.keys(p.trackedStocks);
@@ -37,6 +36,7 @@ export default function WidgetRemoveSecurityTable(p: Props): ReactElement {
                             dashBoardData: update
                         }
                         dispatch(rBuildDataModel(payload))
+                        dispatch(tSaveDashboard({ dashboardName: p.currentDashboard }))
                     }}
                 >
                     <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>
