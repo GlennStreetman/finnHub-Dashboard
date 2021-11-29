@@ -1,6 +1,5 @@
 import * as React from "react"
 import { useState, forwardRef, useRef, useMemo } from "react";
-import { widget } from 'src/App'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 import { createSelector } from 'reselect'
@@ -63,7 +62,7 @@ interface widgetProps {
     showEditPane: number,
     trackedStocks: any,
     updateAppState: Function,
-    widgetCopy: widget,
+    widgetCopy: any,
     widgetKey: string | number,
     widgetType: string,
 }
@@ -73,7 +72,7 @@ function EstimatesEarningsCalendar(p: widgetProps, ref: any) {
     const dispatch = useDispatch(); //allows widget to run redux actions.
     const isInitialMount = useRef(true); //update to false after first render.
 
-    const startingWidgetCoptyRef = () => {
+    function startingWidgetCoptyRef() {
         if (isInitialMount.current === true) {
             if (p.widgetCopy !== undefined && typeof p.widgetCopy.widgetID === 'number') {
                 return p.widgetCopy.widgetID
@@ -81,7 +80,7 @@ function EstimatesEarningsCalendar(p: widgetProps, ref: any) {
         } else { return 0 }
     }
 
-    const startingStartDate = () => { //save dates as offsets from now
+    function startingStartDate() { //save dates as offsets from now
         const now = Date.now()
         const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000 * 52
         const startUnix = now + startUnixOffset
@@ -89,7 +88,7 @@ function EstimatesEarningsCalendar(p: widgetProps, ref: any) {
         return startDate
     }
 
-    const startingEndDate = () => { //save dates as offsets from now
+    function startingEndDate() { //save dates as offsets from now
         const now = Date.now()
         const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
         const endUnix = now + endUnixOffset
@@ -99,7 +98,7 @@ function EstimatesEarningsCalendar(p: widgetProps, ref: any) {
 
     const startingPagination = () => {
         if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-            return (p.widgetCopy.config.pagination)
+            return (p.widgetCopy.pagination)
         } else { return (0) }
     }
 
@@ -107,7 +106,6 @@ function EstimatesEarningsCalendar(p: widgetProps, ref: any) {
     const [start, setStart] = useState(startingStartDate())
     const [end, setEnd] = useState(startingEndDate())
     const [pagination, setPagination] = useState(startingPagination())
-
     const apiKey = useSelector((state) => { return state.apiKey })
     const currentDashboard = useSelector((state) => { return state.currentDashboard })
     const dashboardData = useSelector((state) => { return state.dashboardData })
@@ -115,8 +113,8 @@ function EstimatesEarningsCalendar(p: widgetProps, ref: any) {
     const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
     const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : -1
 
-    const showDataSelector = createSelector(
-        (state: storeState) => state.showData.dataSet?.[p.widgetKey]?.[p.config.targetSecurity]?.['earningsCalendar'],
+    const showDataSelector = createSelector((state: storeState) =>
+        state.showData.dataSet?.[p.widgetKey]?.[p.config.targetSecurity]?.['earningsCalendar'],
         returnValue => returnValue
     )
 
@@ -138,9 +136,9 @@ function EstimatesEarningsCalendar(p: widgetProps, ref: any) {
     }, [start, end])
 
     const focusSecurityList = useMemo(() => { //remove if all securities should stay in focus.
-        console.log('new memo')
+        console.log('new memo', p.config.targetSecurity)
         return [p?.config?.targetSecurity]
-    }, [p?.config?.targetSecurity])
+    }, [p.config.targetSecurity])
 
     useDragCopy(ref, { pagination: pagination, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.
@@ -151,7 +149,6 @@ function EstimatesEarningsCalendar(p: widgetProps, ref: any) {
 
     function changePagination(e) {
         const newIncrement = pagination + e;
-        // console.log('change pagination', newIncrement)
         if (newIncrement >= 0 && newIncrement < Object.keys(rShowData ? rShowData : { 1: 1 }).length) setPagination(newIncrement)
     }
 

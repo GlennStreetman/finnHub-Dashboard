@@ -168,7 +168,7 @@ export const updateWidgetConfig = async function (
     }
 }
 
-export const toggleWidgetBody = function (widgetID: string, stateRef: 'menuWidget' | 'stockWidget', dashBoardData: dashBoardData, menuList: menuList, currentDashboard: string) {
+export const toggleWidgetBody = function (widgetID: string | number, stateRef: 'menuWidget' | 'stockWidget' | 'marketWidget', dashBoardData: dashBoardData, menuList: menuList, currentDashboard: string) {
     if (stateRef === 'stockWidget') {
         const updatedWidget: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
             draftState[currentDashboard].widgetlist[widgetID].showBody = !draftState[currentDashboard].widgetlist[widgetID].showBody

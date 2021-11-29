@@ -14,10 +14,27 @@ import { rSetMenuList } from 'src/slices/sliceMenuList'
 import { tChangeWidgetName } from 'src/thunks/thunkChangeWidgetName'
 import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
+import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
+interface containerProps {
+    enableDrag: boolean,
+    finnHubQueue: finnHubQueue,
+    focus: number,
+    key: string,
+    rebuildVisableDashboard: Function,
+    showMenuColumn: boolean,
+    showStockWidgets: number,
+    stateRef: 'stockWidget' | 'menuWidget' | 'marketWidget',
+    updateAppState: Function,
+    widgetBodyProps: Function,
+    widgetKey: string | number,
+    widgetList: any,
+    widgetWidth: number,
+    widgetCopy: any,
+}
 
 //creates widget container. Used by all widgets.
-function WidgetContainer(p) {
+function WidgetContainer(p: containerProps) {
 
     const useDispatch = useAppDispatch
     const useSelector = useAppSelector
@@ -25,7 +42,6 @@ function WidgetContainer(p) {
 
     const [renderHeader, setRenderHeader] = useState()
     const [showEditPane, setShowEditPane] = useState(0) //0: Hide, 1: Show
-    const [show, setShow] = useState('block') //block = visable, none = hidden
     const [searchText, setSearchText] = useState('')
     const widgetRef = React.createRef()
 
@@ -34,30 +50,10 @@ function WidgetContainer(p) {
     const menuList = useSelector((state) => { return state.menuList })
 
     const apiKey = useSelector((state) => { return state.apiKey })
-    const apiAlias = useSelector((state) => { return state.apiAlias })
-    const targetSecurity = useSelector((state) => { return state.targetSecurity })
-    const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
-    const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : ''
 
     useEffect(() => {
         setRenderHeader(p.widgetList["widgetHeader"])
     }, [p.widgetList])
-
-    useEffect(() => {
-        const visable = () => {
-            if (p.widgetList.column === 0 && p.showMenuColumn === false) {
-                return "none"
-            }
-            else if (p.stateRef === "menuWidget" && p.showMenu === 0) {
-                return "none"
-            } else if (p.showStockWidgets === 0) {
-                return "none"
-            } else {
-                return "block"
-            }
-        }
-        setShow(visable)
-    }, [p.showMenu, p.showStockWidgets, p.stateRef, p.showMenuColumn, p.widgetList.column])
 
     function changeSearchText(text) {
         if (text !== '' && text !== undefined) {
@@ -95,12 +91,10 @@ function WidgetContainer(p) {
         let yAxis = 0;
         //@ts-ignore
         document.getElementById(p.widgetList["widgetID"]).onmousedown = dragMouseDown;
-        // let widgetWidth = document.getElementById(p.widgetKey + "box").clientWidth;
         let widgetWidth = p.widgetWidth
         let widgetCenter = widgetWidth / 2
 
         async function dragMouseDown(e) {
-            // console.log('start drag')
             e = e || window.event;
             e.preventDefault();
 
@@ -158,9 +152,6 @@ function WidgetContainer(p) {
         }
     }
 
-    const bodyVisable = {
-        display: show,
-    }
     const excelFunction = excelRegister[p.widgetList.widgetType]
 
 
@@ -184,7 +175,7 @@ function WidgetContainer(p) {
     }
 
     const compStyle = {
-        display: show,
+        display: 'block',
         overflow: 'hidden',
         border: '2px solid black',
         borderRadius: '10px',
@@ -196,7 +187,7 @@ function WidgetContainer(p) {
         compStyle['position'] = 'absolute'
         compStyle['top'] = p.widgetList["yAxis"]
         compStyle['left'] = p.widgetList["xAxis"]
-        compStyle['width'] = p.widgetWidth
+        compStyle['width'] = `${p.widgetWidth}`
     }
 
     return (
@@ -249,7 +240,7 @@ function WidgetContainer(p) {
                 </>
             </div>
             {p.widgetList.showBody !== false ? (
-                <div className='widgetBody' style={bodyVisable} key={p.showBody}>
+                <div className='widgetBody' >
 
                     <ErrorBoundary widgetType={p.widgetList["widgetType"]}>
                         {React.createElement(widgetLookUp[p.widgetList["widgetType"]], { ref: widgetRef, ...widgetProps })}
@@ -283,7 +274,8 @@ function WidgetContainer(p) {
                 {p.widgetList.showBody !== false && showEditPane !== 1 && (
 
                     excelRegister_singleSecurity[p.widgetList.widgetType] && ( //button returns data for target securities associated with widget.
-                        <button className='widgetButtonFoot' onClick={() => excelFunction(p.apiKey, currentDashboard, p.widgetList.widgetHeader, p.widgetList.config.targetSecurity, p.widgetList.config)}>
+
+                        <button className='widgetButtonFoot' onClick={() => excelFunction(apiKey, currentDashboard, p.widgetList.widgetHeader, p.widgetList.config.targetSecurity, p.widgetList.config)}>
                             <i className="fa fa-file-excel-o" aria-hidden="true" data-testid={`excelButton-${p.widgetList["widgetType"]}`}></i>
                         </button>
                     )
@@ -292,13 +284,13 @@ function WidgetContainer(p) {
                 {p.widgetList.showBody !== false && showEditPane !== 1 && (
 
                     excelRegister[p.widgetList.widgetType] && ( //button returns data for all securities associated with widget.
-                        <button className='widgetButtonFoot' onClick={() => excelFunction(p.apiKey, currentDashboard, p.widgetList.widgetHeader, false, p.widgetList.config)}>
+                        <button className='widgetButtonFoot' onClick={() => excelFunction(apiKey, currentDashboard, p.widgetList.widgetHeader, false, p.widgetList.config)}>
                             <i className="fa fa-list" aria-hidden="true" data-testid={`excelButton-${p.widgetList["widgetType"]}`}></i>
                         </button>
                     )
                 )}
             </div>
-        </div>
+        </div >
     );
 
 }

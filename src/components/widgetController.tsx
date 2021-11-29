@@ -65,7 +65,6 @@ function WidgetController(p) {
                     focus: focus,
                 }
                 if (el.widgetConfig === 'menuWidget') {
-                    thisWidgetProps['showMenu'] = p[el.widgetID]
                     thisWidgetProps['rebuildVisableDashboard'] = p.rebuildVisableDashboard
                 }
                 if (p.widgetCopy?.widgetID === el.widgetID) {
