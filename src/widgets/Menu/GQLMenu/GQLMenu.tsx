@@ -148,7 +148,7 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
     );
 }
 
-export function gqlMenuProps(that, key = "AccountMenu") {
+export function gqlMenuProps(that, key = "") {
     let propList = {
     };
     return propList;

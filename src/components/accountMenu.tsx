@@ -110,8 +110,6 @@ function AccountMenu(p: accountMenuProp) {
         'textAlign': 'center' as const
     }
 
-    //@ts-ignore
-    // const edit = editField
     return (
         <>
             {editToggle === 0 && (

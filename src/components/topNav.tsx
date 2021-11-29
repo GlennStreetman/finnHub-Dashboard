@@ -1,5 +1,5 @@
 
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg'
 import { widgetSetup, filters, dashBoardData } from 'src/App'
@@ -25,22 +25,19 @@ import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 
 interface topNavProps {
-    backGroundMenu: string,
     login: number,
-    showStockWidgets: number,
     widgetSetup: widgetSetup,
     updateAppState: Function,
     baseState: Object,
     dashboardData: dashBoardData,
     currentDashboard: string,
-
     apiKey: string,
     finnHubQueue: finnHubQueue,
 }
 
 function TopNav(p: topNavProps) {
     let navigate = useNavigate();
-
+    let location = useLocation();
     const useDispatch = useAppDispatch
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
@@ -113,7 +110,7 @@ function TopNav(p: topNavProps) {
     </>
 
     const showDashBoardButtons = () => {
-        if (p.showStockWidgets === 1) {
+        if (location.pathname === '/dashboard') {
             return (<>
                 <li id='ddi' className="menu-item-has-children">
                     <Tooltip title="Add Widget" placement="bottom">
@@ -142,7 +139,7 @@ function TopNav(p: topNavProps) {
                     <ul id='ddu' className="sub-menu">
                         <li id='toggleBackGroundMenuButton' className="navItem">
                             <a href="#home" onClick={() => { navigate('/dashboard') }}>
-                                {p.backGroundMenu === '' ? " " : "Back to Dashboards"}
+                                Dashboard
                             </a>
                         </li>
                         <li id='templatesButton' className="navItem">
@@ -178,7 +175,7 @@ function TopNav(p: topNavProps) {
             <div className="topnav">
                 <div className='navItemEnd'>
                     <a id='aboutButton' href="#home" onClick={() => { navigate('/about') }}>
-                        {p.backGroundMenu === 'about' ?
+                        {location.pathname === '/about' ?
                             <Tooltip title="Login" placement="bottom"><LockOpenRoundedIcon /></Tooltip> :
                             <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>}
                     </a>

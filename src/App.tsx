@@ -55,15 +55,16 @@ class App extends React.Component<AppProps, AppState> {
 
         this.state = {
 
-            accountMenu: 0,
-            aboutMenu: 0,
+            // accountMenu: 0,
+            // aboutMenu: 0,
+            // backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
+            // showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
+
             apiFlag: 0, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
-            backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
             login: 0, //login state. 0 logged out, 1 logged in.
-            showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
             navigate: null,
             finnHubQueue: createFunctionQueueObject(1, 1000, true),
-            showMenuColumn: true, //true shows column 0
+            // showMenuColumn: true, //true shows column 0
             enableDrag: false,
             socket: "", //socket connection for streaming stock data.
             socketUpdate: Date.now(),
@@ -215,28 +216,6 @@ class App extends React.Component<AppProps, AppState> {
 
     render() {
         const quaryData = queryString.parse(window.location.search);
-        // const loginScreen =
-        //     this.state.login === 0 && this.state.backGroundMenu === "" ? (
-        //         <Login
-        //             queryData={quaryData}
-        //             finnHubQueue={this.state.finnHubQueue}
-        //             updateAppState={this.updateAppState}
-        //         />
-        //     ) : (
-        //         <></>
-        //     );
-
-        // const backGroundSelection: { [key: string]: React.ReactElement } = { //topnav menus.
-        //     manageAccount: React.createElement(AccountMenu, accountMenuProps(this)),
-        //     widgetMenu: React.createElement(WidgetMenu, widgetMenuProps(this)),
-        //     about: React.createElement(AboutMenu, { apiFlag: this.state.apiFlag }),
-        //     exchangeMenu: React.createElement(ExchangeMenu, exchangeMenuProps(this)),
-        //     templates: React.createElement(TemplateMenu, templateMenuProps(this)),
-        // };
-
-        // const backGroundMenu = () => {
-        //     return <div className="backgroundMenu">{backGroundSelection[s.backGroundMenu]}</div>;
-        // };
 
         const navigate = () => {
             if (this.state.navigate !== null) {
@@ -256,8 +235,6 @@ class App extends React.Component<AppProps, AppState> {
             enableDrag={this.state.enableDrag}
             finnHubQueue={this.state.finnHubQueue}
             login={this.state.login}
-            showMenuColumn={this.state.showMenuColumn}
-            showStockWidgets={this.state.showStockWidgets}
             widgetCopy={this.state.widgetCopy}
             updateAppState={this.updateAppState}
             rebuildVisableDashboard={this.rebuildVisableDashboard}
@@ -265,9 +242,7 @@ class App extends React.Component<AppProps, AppState> {
 
         const topNav = <>
             <TopNav
-                backGroundMenu={this.state.backGroundMenu}
                 login={this.state.login}
-                showStockWidgets={this.state.showStockWidgets}
                 widgetSetup={this.state.widgetSetup}
                 updateAppState={this.updateAppState}
                 baseState={this.baseState}
@@ -442,17 +417,17 @@ export interface AppProps {
 }
 
 export interface AppState {
-    accountMenu: number,
-    aboutMenu: number,
+    // accountMenu: number,
+    // aboutMenu: number,
     apiFlag: number, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
-    backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
+    // backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
     enableDrag: boolean,
     finnHubQueue: finnHubQueue,
     login: number, //login state. 0 logged out, 1 logged in.
-    showMenuColumn: boolean, //true shows column 0
+    // showMenuColumn: boolean, //true shows column 0
     socket: any, //socket connection for streaming stock data.+
     socketUpdate: number,
-    showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
+    // showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
     widgetCopy: widget | null, //copy of state of widget being dragged.
     widgetSetup: widgetSetup, //activates premium api routes.
     navigate: string | null,
