@@ -1,12 +1,11 @@
 import React from "react";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate, Outlet } from "react-router-dom";
 import queryString from "query-string";
 import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
-import { UpdateTickerSockets, LoadTickerSocket } from "./appFunctions/socketData";
-
+import { LoadTickerSocket } from "./appFunctions/socketData";
 
 //component imports
 import TopNav from "./components/topNav";
@@ -30,24 +29,14 @@ import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
 import { rUpdateCurrentDashboard } from 'src/slices/sliceCurrentDashboard'
 import { rSetMenuList, sliceMenuList } from 'src/slices/sliceMenuList'
 import { rSetDashboardData, sliceDashboardData } from 'src/slices/sliceDashboardData'
-
-
+import { rUpdateQuotePriceStream } from 'src/slices/sliceQuotePrice'
+import { tProcessLogin } from 'src/thunks/thunkProcessLogin'
 
 const outerTheme = createTheme({
     palette: {
         primary: {
-            // light: '#757ce8',
             main: '#1d69ab',
-            // dark: '#002884',
-            // contrastText: '#fff',
         },
-
-        //   secondary: {
-        //     light: '#ff7961',
-        //     main: '#f44336',
-        //     dark: '#ba000d',
-        //     contrastText: '#000',
-        //   },
     },
     breakpoints: {
         values: {
@@ -65,30 +54,56 @@ class App extends React.Component<AppProps, AppState> {
         super(props);
 
         this.state = {
+
             accountMenu: 0,
             aboutMenu: 0,
             apiFlag: 0, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
             backGroundMenu: "", //reference to none widet info displayed when s.showWidget === 0
-            finnHubQueue: createFunctionQueueObject(1, 1000, true),
             login: 0, //login state. 0 logged out, 1 logged in.
+            showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
+            navigate: null,
+            finnHubQueue: createFunctionQueueObject(1, 1000, true),
             showMenuColumn: true, //true shows column 0
             enableDrag: false,
             socket: "", //socket connection for streaming stock data.
             socketUpdate: Date.now(),
-            showStockWidgets: 1, //0 hide dashboard, 1 show dashboard.
             widgetCopy: null, //copy of state of widget being dragged.
             widgetSetup: {},//activates premium api routes.
         };
 
         this.baseState = this.state; //used to reset state upon logout.
-        //login state logic.
-
-        //App logic for setting up dashboards.
         this.updateAppState = this.updateAppState.bind(this)
-
-        //update and apply state, in module.
         this.rebuildDashboardState = this.rebuildDashboardState.bind(this) //sets p.dashboardData. Used to build dataModel in redux
         this.rebuildVisableDashboard = this.rebuildVisableDashboard.bind(this) //rebuilds dashboard in redux state.dataModel
+    }
+
+    componentDidMount() {
+        fetch("/checkLogin")
+            .then((response) => response.json())
+            .then(async (data) => {
+                if (data.login === 1) {
+                    const parseSetup: widgetSetup = JSON.parse(data.widgetsetup)
+                    const newList: string[] = data.exchangelist.split(",");
+                    await this.props.tProcessLogin({
+                        defaultexchange: data.defaultexchange,
+                        apiKey: data.apiKey,
+                        apiAlias: data.apiAlias,
+                        exchangelist: newList
+                    })
+                    console.log('logged in')
+                    this.setState({
+                        login: 1,
+                        widgetSetup: parseSetup,
+                        navigate: 'dashboard'
+                    })
+                    this.state.finnHubQueue.updateInterval(data.ratelimit)
+                } else {
+                    console.log('not logged in')
+                    this.setState({
+                        navigate: 'login'
+                    })
+                }
+            })
     }
 
     componentDidUpdate(prevProps: AppProps, prevState: AppState) {
@@ -98,6 +113,11 @@ class App extends React.Component<AppProps, AppState> {
             this.rebuildDashboardState()
         }
 
+        if (this.state.navigate) {
+            this.setState({
+                navigate: null,
+            })
+        }
         // if ( //if apikey not setup show about menu
         //     (this.props.apiKey === '' && this.state.apiFlag === 0 && this.state.login === 1) ||
         //     (this.props.apiKey === null && this.state.apiFlag === 0 && this.state.login === 1)
@@ -112,7 +132,7 @@ class App extends React.Component<AppProps, AppState> {
 
         const globalStockList = this.props.dashboardData?.[this.props.currentDashboard]?.globalstocklist ? this.props.dashboardData?.[this.props.currentDashboard].globalstocklist : false
         if ((globalStockList && globalStockList !== prevProps.dashboardData?.[prevProps.currentDashboard]?.globalstocklist && this.state.login === 1)) { //price data for watchlist, including socket data.
-            LoadTickerSocket(this, prevState, prevProps, globalStockList, this.state.socket, this.props.apiKey, UpdateTickerSockets);
+            LoadTickerSocket(prevProps, globalStockList, this.state.socket, this.props.apiKey, this.state.socketUpdate, this.updateAppState, this.props.rUpdateQuotePriceStream);
         }
 
         const globalKeys = globalStockList ? Object.keys(globalStockList) : []
@@ -141,7 +161,6 @@ class App extends React.Component<AppProps, AppState> {
             this.props.rSetMenuList(data.menuList)
             this.props.rSetDashboardData(data.dashBoardData)
             this.props.rResetUpdateFlag() //sets all dashboards status to updating in redux store.
-            //build Visable Data
             await this.props.tGetMongoDB()
 
             const targetDash: string[] = this.props.dashboardData?.[this.props.currentDashboard]?.widgetlist ? Object.keys(this.props.dashboardData?.[this.props.currentDashboard]?.widgetlist) : []
@@ -195,70 +214,86 @@ class App extends React.Component<AppProps, AppState> {
     }
 
     render() {
-        const s: AppState = this.state
         const quaryData = queryString.parse(window.location.search);
-        const loginScreen =
-            this.state.login === 0 && this.state.backGroundMenu === "" ? (
-                <Login
-                    queryData={quaryData}
-                    finnHubQueue={this.state.finnHubQueue}
-                    updateAppState={this.updateAppState}
-                />
-            ) : (
-                <></>
-            );
+        // const loginScreen =
+        //     this.state.login === 0 && this.state.backGroundMenu === "" ? (
+        //         <Login
+        //             queryData={quaryData}
+        //             finnHubQueue={this.state.finnHubQueue}
+        //             updateAppState={this.updateAppState}
+        //         />
+        //     ) : (
+        //         <></>
+        //     );
 
-        const backGroundSelection: { [key: string]: React.ReactElement } = { //topnav menus.
-            // endPoint: React.createElement(EndPointMenu, endPointProps(this)),
-            manageAccount: React.createElement(AccountMenu, accountMenuProps(this)),
-            widgetMenu: React.createElement(WidgetMenu, widgetMenuProps(this)),
-            about: React.createElement(AboutMenu, { apiFlag: this.state.apiFlag }),
-            exchangeMenu: React.createElement(ExchangeMenu, exchangeMenuProps(this)),
-            templates: React.createElement(TemplateMenu, templateMenuProps(this)),
-        };
+        // const backGroundSelection: { [key: string]: React.ReactElement } = { //topnav menus.
+        //     manageAccount: React.createElement(AccountMenu, accountMenuProps(this)),
+        //     widgetMenu: React.createElement(WidgetMenu, widgetMenuProps(this)),
+        //     about: React.createElement(AboutMenu, { apiFlag: this.state.apiFlag }),
+        //     exchangeMenu: React.createElement(ExchangeMenu, exchangeMenuProps(this)),
+        //     templates: React.createElement(TemplateMenu, templateMenuProps(this)),
+        // };
 
-        const backGroundMenu = () => {
-            return <div className="backgroundMenu">{backGroundSelection[s.backGroundMenu]}</div>;
-        };
+        // const backGroundMenu = () => {
+        //     return <div className="backgroundMenu">{backGroundSelection[s.backGroundMenu]}</div>;
+        // };
 
-        // const widgetList = this.props.dashboardData?.[this.props.currentDashboard]?.['widgetlist'] ?
-        //     this.props.dashboardData?.[this.props.currentDashboard]['widgetlist'] : {}
+        const navigate = () => {
+            if (this.state.navigate !== null) {
+                return <Navigate to={this.state.navigate} />
+            } else {
+                return (<></>)
+            }
+        }
 
-        // const dashboardID = this.props.dashboardData?.[this.props.currentDashboard]?.id ? this.props.dashboardData[this.props.currentDashboard].id : ''
-        // // const bottomNav = this.state.login === 1 ? <BottomNav showMenuColumn={this.state.showMenuColumn} /> : <></>
+        const login = <Login
+            queryData={quaryData}
+            finnHubQueue={this.state.finnHubQueue}
+            updateAppState={this.updateAppState}
+        />
+
+        const dashboard = <WidgetController
+            enableDrag={this.state.enableDrag}
+            finnHubQueue={this.state.finnHubQueue}
+            login={this.state.login}
+            showMenuColumn={this.state.showMenuColumn}
+            showStockWidgets={this.state.showStockWidgets}
+            widgetCopy={this.state.widgetCopy}
+            updateAppState={this.updateAppState}
+            rebuildVisableDashboard={this.rebuildVisableDashboard}
+        />
+
+        const topNav = <>
+            <TopNav
+                backGroundMenu={this.state.backGroundMenu}
+                login={this.state.login}
+                showStockWidgets={this.state.showStockWidgets}
+                widgetSetup={this.state.widgetSetup}
+                updateAppState={this.updateAppState}
+                baseState={this.baseState}
+                dashboardData={this.props.dashboardData}
+                currentDashboard={this.props.currentDashboard}
+                apiKey={this.props.apiKey}
+                finnHubQueue={this.state.finnHubQueue}
+            />
+            <Outlet />
+        </>
 
         return (
             <ThemeProvider theme={outerTheme}>
                 <BrowserRouter>
-                    <Switch>
-                        <Route path="/">
-                            <TopNav
-                                backGroundMenu={this.state.backGroundMenu}
-                                login={this.state.login}
-                                showStockWidgets={this.state.showStockWidgets}
-                                widgetSetup={this.state.widgetSetup}
-                                updateAppState={this.updateAppState}
-                                baseState={this.baseState}
-                                dashboardData={this.props.dashboardData}
-                                currentDashboard={this.props.currentDashboard}
-                                apiKey={this.props.apiKey}
-                                finnHubQueue={this.state.finnHubQueue}
-                            />
-                            <WidgetController
-                                enableDrag={this.state.enableDrag}
-                                finnHubQueue={this.state.finnHubQueue}
-                                login={this.state.login}
-                                showMenuColumn={this.state.showMenuColumn}
-                                showStockWidgets={this.state.showStockWidgets}
-                                widgetCopy={this.state.widgetCopy}
-                                updateAppState={this.updateAppState}
-                                rebuildVisableDashboard={this.rebuildVisableDashboard}
-                            />
-                            {loginScreen}
-                            {backGroundMenu()}
-                            {/* {bottomNav} */}
+                    <Routes>
+                        <Route path="/" element={topNav}>
+                            <Route path="dashboard" element={dashboard} />
+                            <Route path="login" element={login} />
+                            <Route path="manageAccount" element={React.createElement(AccountMenu, accountMenuProps(this))} />
+                            <Route path="widgetMenu" element={React.createElement(WidgetMenu, widgetMenuProps(this))} />
+                            <Route path="about" element={React.createElement(AboutMenu, { apiFlag: this.state.apiFlag })} />
+                            <Route path="exchangeMenu" element={React.createElement(ExchangeMenu, exchangeMenuProps(this))} />
+                            <Route path="templates" element={React.createElement(TemplateMenu, templateMenuProps(this))} />
                         </Route>
-                    </Switch>
+                    </Routes>
+                    {navigate()}
                 </BrowserRouter>
             </ThemeProvider>
         );
@@ -288,7 +323,9 @@ export default connect(mapStateToProps, {
     rSetTargetSecurity,
     rUpdateCurrentDashboard,
     rSetMenuList,
-    rSetDashboardData
+    rSetDashboardData,
+    rUpdateQuotePriceStream,
+    tProcessLogin
 })(App);
 
 export interface stock {
@@ -400,6 +437,8 @@ export interface AppProps {
     rUpdateCurrentDashboard: Function,
     rSetMenuList: Function,
     rSetDashboardData: Function,
+    rUpdateQuotePriceStream: Function,
+    tProcessLogin: Function,
 }
 
 export interface AppState {
@@ -416,4 +455,5 @@ export interface AppState {
     showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
     widgetCopy: widget | null, //copy of state of widget being dragged.
     widgetSetup: widgetSetup, //activates premium api routes.
+    navigate: string | null,
 }

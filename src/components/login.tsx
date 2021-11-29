@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Redirect } from 'react-router-dom'
+// import { Redirect } from 'react-router-dom'
 
 import { useAppDispatch } from 'src/hooks';
 import { widgetSetup } from 'src/App'
@@ -12,11 +12,6 @@ import { forgotLogin } from "../appFunctions/client/forgotLogin";
 import { secretQuestion } from "../appFunctions/client/secretQuestion";
 import { newPW } from "../appFunctions/client/newPW";
 import { registerAccount } from "../appFunctions/client/registerAccount";
-
-import { rUpdateExchangeList } from 'src/slices/sliceExchangeList'
-import { rSetApiKey } from 'src/slices/sliceAPIKey'
-import { rSetApiAlias } from 'src/slices/sliceAPIAlias'
-import { rSetDefaultExchange } from "src/slices/sliceDefaultExchange";
 import { tProcessLogin } from 'src/thunks/thunkProcessLogin'
 
 interface loginProps {
@@ -115,32 +110,6 @@ export default function Login(p: loginProps) {
             setMessage(p.queryData.message.replaceAll("%", " "))
         }
     })
-
-    useEffect(() => { //check login status on page refresh.
-        fetch("/checkLogin")
-            .then((response) => response.json())
-            .then(async (data) => {
-                if (data.login === 1) {
-                    const parseSetup: widgetSetup = JSON.parse(data.widgetsetup)
-                    const newList: string[] = data.exchangelist.split(",");
-                    await dispatch(tProcessLogin({
-                        defaultexchange: data.defaultexchange,
-                        apiKey: data.apiKey,
-                        apiAlias: data.apiAlias,
-                        exchangelist: newList
-                    }))
-
-                    p.updateAppState({
-                        login: 1,
-                        widgetSetup: parseSetup,
-                    })
-                    p.finnHubQueue.updateInterval(data.ratelimit)
-                } else {
-                    // console.log('FAILED LOGIN', data)
-                }
-            })
-    }, [])
-
     useEffect(() => { if (base === true) setBase(false) })
 
     function emailIsValid(email) {
@@ -189,7 +158,6 @@ export default function Login(p: loginProps) {
                         setMessage("")
                         const parseSetup: widgetSetup = JSON.parse(data.widgetsetup) //ex string
                         const newList: string[] = data.exchangelist.split(",");
-                        console.log('LOGIN DATA', data)
                         await dispatch(tProcessLogin({
                             defaultexchange: data.defaultexchange,
                             apiKey: data.key,
@@ -201,6 +169,7 @@ export default function Login(p: loginProps) {
                             login: 1,
                             widgetSetup: parseSetup,
                             exchangeList: newList,
+                            navigate: 'dashboard'
                         })
                         p.finnHubQueue.updateInterval(data['ratelimit'])
                     } else {
@@ -227,7 +196,7 @@ export default function Login(p: loginProps) {
         2: () => {
             registerAccount(text0, text1, text2, text3, text4, text5, emailIsValid)
                 .then((data) => {
-                    console.log('data', data)
+                    // console.log('data', data)
                     if (data.message === 'Please review warnings') {
                         setMessage(data.message)
                         Object.keys(data).forEach((el) => {
@@ -266,7 +235,7 @@ export default function Login(p: loginProps) {
         4: () => {
             newPW(text0, text1)
                 .then((data) => {
-                    console.log("update login response: ", data.message)
+                    // console.log("update login response: ", data.message)
                     if (data.message === '' || data.message === true) {
                         setMessage("Password Updated. Please login with your new password")
                         clearText(0)
@@ -333,7 +302,7 @@ export default function Login(p: loginProps) {
         </div>
     )
 
-    const redirectTag = base === true ? <Redirect to="/?" /> : <></>
+    // const redirectTag = base === true ? <Redirect to="/?" /> : <></>
 
     return (<>
         <Grid container onKeyDown={(e) => handleEnterKeyPress(e, submitFunctionLookup[showMenu])}>
@@ -382,7 +351,7 @@ export default function Login(p: loginProps) {
 
         </Grid >
 
-        {redirectTag}
+        {/* {redirectTag} */}
     </>
     );
 

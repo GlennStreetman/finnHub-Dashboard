@@ -1,4 +1,6 @@
 
+import { useNavigate } from "react-router-dom";
+
 import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg'
 import { widgetSetup, filters, dashBoardData } from 'src/App'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
@@ -20,7 +22,6 @@ import { rExchangeListLogout } from "src/slices/sliceExchangeList";
 import { rTargetDashboardLogout } from "src/slices/sliceShowData";
 import { tGetFinnhubData } from "src/thunks/thunkFetchFinnhub";
 import { rSetDashboardData } from 'src/slices/sliceDashboardData'
-import { toggleBackGroundMenu } from 'src/appFunctions/appImport/toggleBackGroundMenu'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 
 interface topNavProps {
@@ -38,6 +39,7 @@ interface topNavProps {
 }
 
 function TopNav(p: topNavProps) {
+    let navigate = useNavigate();
 
     const useDispatch = useAppDispatch
     const dispatch = useDispatch(); //allows widget to run redux actions.
@@ -53,12 +55,14 @@ function TopNav(p: topNavProps) {
     }
 
     async function logout() {
+        console.log('logout')
         await fetch("/logOut") //ignore result, continue logout process.
         dispatch(rDataModelLogout());
         dispatch(rExchangeDataLogout());
         dispatch(rExchangeListLogout());
         dispatch(rTargetDashboardLogout());
         p.updateAppState(p.baseState)
+        navigate('/login')
     }
 
     function dropDownList(dropList: [string, string, string, string, filters | undefined, string][]) {
@@ -68,7 +72,6 @@ function TopNav(p: topNavProps) {
                 return (<li key={a + 'li'} id='ddi'>
                     <a key={a} data-testid={d} href="#r" onClick={async () => {
                         const [newDash, widgetName] = CreateNewWidgetContainer(a, b, c, e, p.dashboardData, p.currentDashboard);
-                        console.log('newDash', newDash)
                         dispatch(rSetDashboardData(newDash))
                         dispatch(tSaveDashboard({ dashboardName: p.currentDashboard }))
                         const payload = {
@@ -77,7 +80,6 @@ function TopNav(p: topNavProps) {
                             targetDashboard: p.currentDashboard,
                             targetWidget: widgetName,
                         }
-                        console.log('payload', payload)
                         dispatch(rRebuildTargetWidgetModel(payload))
                         let updatePayload = {
                             dashboardID: newDash[p.currentDashboard].id,
@@ -86,7 +88,6 @@ function TopNav(p: topNavProps) {
                             finnHubQueue: p.finnHubQueue,
                             rSetUpdateStatus: rSetUpdateStatus,
                         }
-                        console.log('updatePayload', updatePayload)
                         dispatch(tGetFinnhubData(updatePayload))
                     }}>
                         {d}
@@ -140,22 +141,22 @@ function TopNav(p: topNavProps) {
                 <div className="navItemEnd">
                     <ul id='ddu' className="sub-menu">
                         <li id='toggleBackGroundMenuButton' className="navItem">
-                            <a href="#home" onClick={() => { toggleBackGroundMenu('', p.updateAppState, p.backGroundMenu) }}>
+                            <a href="#home" onClick={() => { navigate('/dashboard') }}>
                                 {p.backGroundMenu === '' ? " " : "Back to Dashboards"}
                             </a>
                         </li>
                         <li id='templatesButton' className="navItem">
-                            <a href="#home" onClick={() => { toggleBackGroundMenu('templates', p.updateAppState, p.backGroundMenu) }}>
+                            <a href="#home" onClick={() => { navigate('/templates') }}>
                                 <Tooltip title="Excel Templates" placement="bottom"><TableChartIcon /></Tooltip>
                             </a>
                         </li>
                         <li id='manageAccountButton' className="navItem">
-                            <a href="#home" onClick={() => { toggleBackGroundMenu('manageAccount', p.updateAppState, p.backGroundMenu) }}>
+                            <a href="#home" onClick={() => { navigate('/manageAccount') }}>
                                 <Tooltip title="Manage Account" placement="bottom"><AccountBoxIcon /></Tooltip>
                             </a>
                         </li>
                         <li id='aboutButton' className='navItem'>
-                            <a href="#home" onClick={() => { toggleBackGroundMenu('about', p.updateAppState, p.backGroundMenu) }}>
+                            <a href="#home" onClick={() => { navigate('/about') }}>
                                 <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>
                             </a>
                         </li>
@@ -176,7 +177,7 @@ function TopNav(p: topNavProps) {
         <>
             <div className="topnav">
                 <div className='navItemEnd'>
-                    <a id='aboutButton' href="#home" onClick={() => { toggleBackGroundMenu('about', p.updateAppState, p.backGroundMenu) }}>
+                    <a id='aboutButton' href="#home" onClick={() => { navigate('/about') }}>
                         {p.backGroundMenu === 'about' ?
                             <Tooltip title="Login" placement="bottom"><LockOpenRoundedIcon /></Tooltip> :
                             <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>}
