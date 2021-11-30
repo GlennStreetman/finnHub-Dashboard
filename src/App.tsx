@@ -1,6 +1,5 @@
 import React from "react";
-import { useAppDispatch, useAppSelector } from 'src/hooks';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { BrowserRouter, Route, Routes, Navigate, Outlet } from "react-router-dom";
 import queryString from "query-string";
 import { createTheme, ThemeProvider } from '@material-ui/core/styles'
@@ -8,6 +7,7 @@ import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
 import { LoadTickerSocket } from "./appFunctions/socketData";
+import { useAppDispatch, useAppSelector } from 'src/hooks';
 
 //component imports
 import TopNav from "./components/topNav";
@@ -18,7 +18,7 @@ import WidgetMenu, { widgetMenuProps } from "./components/widgetMenu";
 import ExchangeMenu, { exchangeMenuProps } from "./components/exchangeMenu";
 import TemplateMenu from "./components/templateMenu";
 import { WidgetController } from "./components/widgetController";
-
+//redux
 import { rResetUpdateFlag, rSetUpdateStatus, } from "./slices/sliceDataModel"; //sliceDataModel, rRebuildTargetDashboardModel 
 import { tGetFinnhubData, tgetFinnHubDataReq } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
@@ -63,16 +63,18 @@ export default function App() {
     const [widgetCopy, setWidgetCopy] = useState(null) //copy of state of widget being dragged.
     const [widgetSetup, setWidgetSetup] = useState({}) //activates premium api routes.
 
-    const updateAppState = {
-        login: setLogin,
-        navigate: setNavigate,
-        finnHubQueue: setFinnHubQueue,
-        enableDrag: setEnableDrag,
-        socket: setSocket,
-        socketUpdate: setSocketUpdate,
-        widgetCopy: setWidgetCopy,
-        widgetSetup: setWidgetSetup,
-    }
+    const updateAppState = useMemo(() => {
+        return ({
+            login: setLogin,
+            navigate: setNavigate,
+            finnHubQueue: setFinnHubQueue,
+            enableDrag: setEnableDrag,
+            socket: setSocket,
+            socketUpdate: setSocketUpdate,
+            widgetCopy: setWidgetCopy,
+            widgetSetup: setWidgetSetup,
+        })
+    }, [])
 
     const appState = {
         login: login,
@@ -97,62 +99,6 @@ export default function App() {
             return ({})
         }
     })
-
-    useEffect(() => {
-        fetch("/checkLogin")
-            .then((response) => response.json())
-            .then(async (data) => {
-                if (data.login === 1) {
-                    const parseSetup: widgetSetup = JSON.parse(data.widgetsetup)
-                    const newList: string[] = data.exchangelist.split(",");
-                    await dispatch(tProcessLogin({
-                        defaultexchange: data.defaultexchange,
-                        apiKey: data.apiKey,
-                        apiAlias: data.apiAlias,
-                        exchangelist: newList
-                    }))
-                    setLogin(1)
-                    setWidgetSetup(parseSetup)
-                    setNavigate('dashboard')
-                    finnHubQueue.updateInterval(data.ratelimit)
-                } else {
-                    setNavigate('login')
-                }
-            })
-    }, [])
-
-    useEffect(() => {
-        if (login === 1) { //on login build dashboard state, then use state to build redux dataModel.
-            console.log('rebuilding state')
-            console.log('appState', appState)
-            buildDashboardState()
-        }
-    }, [login])
-
-    useEffect(() => {
-        if (navigate) { //on login build dashboard state, then use state to build redux dataModel.
-            setNavigate(null)
-        }
-    }, [navigate])
-
-    useEffect(() => {
-        if ((Object.keys(globalStockList).length > 0 && login === 1 && apiKey !== '')) { //price data for watchlist, including socket data.
-            LoadTickerSocket(globalStockList, socket, apiKey, socketUpdate, updateAppState, rUpdateQuotePriceStream, dispatch);
-        }
-    }, [globalStockList, login, apiKey, dispatch])
-
-    useEffect(() => {
-        const globalKeys = globalStockList ? Object.keys(globalStockList) : []
-        if (targetSecurity === '' && globalKeys.length > 0) {
-            dispatch(rSetTargetSecurity(globalKeys[0]))
-        }
-    }, [globalStockList, targetSecurity, dispatch])
-
-    // function updateAppState(updateObj) {
-    //     return new Promise((resolve) => {
-    //         setState(updateObj, () => resolve(true))
-    //     })
-    // }
 
     async function buildDashboardState() { //fetches dashboard data, then updates p.dashboardData, then builds redux model.
         try {
@@ -192,6 +138,56 @@ export default function App() {
             console.error("Failed to recover dashboards");
         }
     }
+
+    useEffect(() => {
+        fetch("/checkLogin")
+            .then((response) => response.json())
+            .then(async (data) => {
+                if (data.login === 1) {
+                    const parseSetup: widgetSetup = JSON.parse(data.widgetsetup)
+                    const newList: string[] = data.exchangelist.split(",");
+                    await dispatch(tProcessLogin({
+                        defaultexchange: data.defaultexchange,
+                        apiKey: data.apiKey,
+                        apiAlias: data.apiAlias,
+                        exchangelist: newList
+                    }))
+                    setLogin(1)
+                    setWidgetSetup(parseSetup)
+                    setNavigate('dashboard')
+                    finnHubQueue.updateInterval(data.ratelimit)
+                } else {
+                    setNavigate('login')
+                }
+            })
+    }, [])
+
+    useEffect(() => {
+        if (login === 1) { //on login build dashboard state, then use state to build redux dataModel.
+            buildDashboardState()
+        }
+    }, [login])
+
+    useEffect(() => {
+        if (navigate) { //on login build dashboard state, then use state to build redux dataModel.
+            setNavigate(null)
+        }
+    }, [navigate])
+
+    useEffect(() => {
+        if ((Object.keys(globalStockList).length > 0 && login === 1 && apiKey !== '')) { //price data for watchlist, including socket data.
+            LoadTickerSocket(globalStockList, socket, apiKey, socketUpdate, updateAppState, rUpdateQuotePriceStream, dispatch);
+        }
+    }, [globalStockList, login, apiKey, dispatch, socket, socketUpdate, updateAppState])
+
+    useEffect(() => {
+        const globalKeys = globalStockList ? Object.keys(globalStockList) : []
+        if (targetSecurity === '' && globalKeys.length > 0) {
+            dispatch(rSetTargetSecurity(globalKeys[0]))
+        }
+    }, [globalStockList, targetSecurity, dispatch])
+
+
 
     const quaryData = queryString.parse(window.location.search)
 
@@ -336,8 +332,6 @@ export interface priceObj {
 export interface widgetSetup {
     [key: string]: boolean
 }
-
-interface App { [key: string]: any }
 
 export interface AppState {
     enableDrag: boolean,

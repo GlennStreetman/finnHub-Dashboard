@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 
 import { useAppDispatch } from 'src/hooks';
 import { widgetSetup } from 'src/App'
@@ -25,7 +24,6 @@ const useDispatch = useAppDispatch
 const MyPaper = styled(Paper)({ color: "#1d69ab", variant: "outlined", borderRadius: 20, padding: 25 });
 
 export default function Login(p: loginProps) {
-    let navigate = useNavigate();
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const [showMenu, setShowMenu] = useState(0); //0 = login, 1 = recover, 2 = register, 3 = secret question, 4 reset password
@@ -45,7 +43,6 @@ export default function Login(p: loginProps) {
     const [warn4, setWarn4] = useState("");
     const [warn5, setWarn5] = useState("");
     const [warn6, setWarn6] = useState("");
-    const [base, setBase] = useState(false); //if true, redirect to '/'
 
     const textLookup = {
         text0: text0,
@@ -111,8 +108,7 @@ export default function Login(p: loginProps) {
         if (p.queryData.message !== '1' && p.queryData.message !== '2' && p.queryData.message) {
             setMessage(p.queryData.message.replaceAll("%", " "))
         }
-    })
-    useEffect(() => { if (base === true) setBase(false) })
+    }, [p.queryData.message])
 
     function emailIsValid(email) {
         return /\S+@\S+\.\S+/.test(email);
@@ -244,7 +240,6 @@ export default function Login(p: loginProps) {
                     if (data.message === '' || data.message === true) {
                         setMessage("Password Updated. Please login with your new password")
                         clearText(0)
-                        setBase(true)
                     } else {
                         setMessage("Problem updating password. Please restart process.")
                     }
@@ -307,8 +302,6 @@ export default function Login(p: loginProps) {
         </div>
     )
 
-    // const redirectTag = base === true ? <Redirect to="/?" /> : <></>
-
     return (<>
         <Grid container onKeyDown={(e) => handleEnterKeyPress(e, submitFunctionLookup[showMenu])}>
             <Grid item xs={1} sm={2} md={4} lg={4} xl={4} />
@@ -355,8 +348,6 @@ export default function Login(p: loginProps) {
             <Grid item xs={1} sm={2} md={4} lg={4} xl={4} />
 
         </Grid >
-
-        {/* {redirectTag} */}
     </>
     );
 }

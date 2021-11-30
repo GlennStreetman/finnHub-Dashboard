@@ -135,7 +135,6 @@ function EstimatesEarningsCalendar(p: widgetProps, ref: any) {
     }, [start, end])
 
     const focusSecurityList = useMemo(() => { //remove if all securities should stay in focus.
-        console.log('new memo', p.config.targetSecurity)
         return [p?.config?.targetSecurity]
     }, [p.config.targetSecurity])
 
