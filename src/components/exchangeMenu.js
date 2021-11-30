@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
 import { tGetSymbolList } from './../slices/sliceExchangeData'
 import { rUpdateExchangeList } from './../slices/sliceExchangeList'
+import { useAppDispatch, useAppSelector } from 'src/hooks';
+
+const useDispatch = useAppDispatch
+const useSelector = useAppSelector
 
 export default function ExchangeMenu(p) {
-    
     const dispatch = useDispatch()
+    const apiKey = useSelector((state) => { return state.apiKey })
     const rExchangeList = useSelector(state => state.exchangeList.exchangeList)
     const [allExchanges] = useState(() => {
         return {
@@ -92,7 +95,7 @@ function changeExchange(ex){
         if (rExchangeList.indexOf(newExchangeList[stock]) === -1){
             const newPayload = {
                 'exchange': newExchangeList[stock],
-                'apiKey': p.apiKey,
+                'apiKey': apiKey,
                 'finnHubQueue': p.finnHubQueue,
             }
             dispatch(tGetSymbolList(newPayload))
@@ -155,8 +158,7 @@ function changeExchange(ex){
 
 export function exchangeMenuProps(that) {
     let propList = {
-        apiKey: that.state.apiKey,
-        finnHubQueue: that.state.finnHubQueue,
+        finnHubQueue: that.finnHubQueue,
     };
     return propList;
 }

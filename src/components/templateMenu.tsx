@@ -1,11 +1,17 @@
-import * as React from "react"
+
 import { useState, useEffect, useRef } from "react";
+import { useAppSelector } from 'src/hooks';
+
+const useSelector = useAppSelector
 
 interface checkObject {
     [key: string]: boolean
 }
 
-export default function TemplateMenu(p: { [key: string]: any }, ref: any) {
+export default function TemplateMenu(p: 'pass', ref: any) {
+
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const apiAlias = useSelector((state) => { return state.apiAlias })
 
     const [templateFlag, setTemplateFlag] = useState(true) //if true, retrieve template list.
     const [templateList, setTemplateList] = useState([]) //list of templates that have previously been uploaded
@@ -80,11 +86,11 @@ export default function TemplateMenu(p: { [key: string]: any }, ref: any) {
     }
 
     function templateTable(tempList: string[][]) {
-        const apiKey = p.apiAlias ? p.apiAlias : p.apiKey
+        const keySwitch = apiAlias ? apiAlias : apiKey
         return tempList.map((el) => (
             <tr key={el[0] + 'tr'}>
                 <td key={el[0] + 'td1'}>{el[0]}</td>
-                <td key={el[0] + 'td2'}><a href='#template' onClick={(e) => { runTemplate(e, apiKey, el[1], el[0]) }}>{`/runTemplate?key=${apiKey}&template=${el[1]}&multi=${isChecked(el[0])}`}</a></td>
+                <td key={el[0] + 'td2'}><a href='#template' onClick={(e) => { runTemplate(e, keySwitch, el[1], el[0]) }}>{`/runTemplate?key=${keySwitch}&template=${el[1]}&multi=${isChecked(el[0])}`}</a></td>
                 <td key={el[0] + 'td3'}>
                     <input key={el[0] + 'mark'}
                         type="checkbox"
@@ -141,10 +147,8 @@ export default function TemplateMenu(p: { [key: string]: any }, ref: any) {
     </>)
 }
 
-export function templateMenuProps(that, key = "templateMenu") {
-    let propList = {
-        apiKey: that.state.apiKey,
-        apiAlias: that.state.apiAlias
-    };
-    return propList;
-}
+// export function templateMenuProps(that: AppState) {
+//     let propList = {
+//     };
+//     return propList;
+// }

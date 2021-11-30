@@ -1,7 +1,15 @@
-import { AppState, AppProps, globalStockList } from './../App'
+import { globalStockList } from './../App'
 import { rUpdarUpdateQuotePricePayload } from './../slices/sliceQuotePrice'
 
-function UpdateTickerSockets(socket: any, apiKey: string, globalStockList: globalStockList, socketUpdate: number, updateAppState: Function, rUpdateQuotePriceStream: Function) {
+function UpdateTickerSockets(
+    socket: any,
+    apiKey: string,
+    globalStockList: globalStockList,
+    socketUpdate: number,
+    updateAppState: Object,
+    rUpdateQuotePriceStream: Function,
+    dispatch: Function,
+) {
 
     //opens a series of socket connections to live stream stock prices
     //update limited to once every 3 seconds to have mercy on dom rendering.
@@ -39,8 +47,8 @@ function UpdateTickerSockets(socket: any, apiKey: string, globalStockList: globa
                         if (Date.now() - socketUpdate > 5000) { //throttle update rate.
                             // console.log('commiting socket data')
                             const newStamp = Date.now()
-                            updateAppState({ socketUpdate: newStamp })
-                            rUpdateQuotePriceStream(updatePaylaod)
+                            updateAppState[socketUpdate](newStamp)
+                            dispatch(rUpdateQuotePriceStream(updatePaylaod))
                         }
                     }
                 })
@@ -48,24 +56,25 @@ function UpdateTickerSockets(socket: any, apiKey: string, globalStockList: globa
                 console.log("problem setting up socket connections:", err)
             }
         }
-        const payload: Partial<AppState> = { socket: thisSocket }
-        updateAppState(payload)
+        // const payload: Partial<AppState> = { socket: thisSocket }
+        updateAppState[socket](thisSocket)
     }
 }
 
 function LoadTickerSocket(
-    prevProps: AppProps,
     globalStockList: globalStockList,
-    socket: any, apiKey:
-        string, socketUpdate: number,
-    updateAppState: Function,
+    socket: any,
+    apiKey: string,
+    socketUpdate: number,
+    updateAppState: Object,
     rUpdateQuotePriceStream: Function,
+    dispatch: Function
 ) { //convert in useEffect
-    if (globalStockList !== prevProps.dashboardData?.[prevProps.currentDashboard]?.globalstocklist && apiKey && apiKey !== "") {
+    if (apiKey && apiKey !== "") {
         if (socket === '' && apiKey !== undefined && apiKey !== '' && apiKey.indexOf('sandbox') === -1) {
             socket = new WebSocket(`wss://ws.finnhub.io?token=${apiKey}`)
         }
-        UpdateTickerSockets(socket, apiKey, globalStockList, socketUpdate, updateAppState, rUpdateQuotePriceStream)
+        UpdateTickerSockets(socket, apiKey, globalStockList, socketUpdate, updateAppState, rUpdateQuotePriceStream, dispatch)
     }
 }
 

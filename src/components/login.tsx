@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-// import { Redirect } from 'react-router-dom'
+import { useNavigate } from "react-router-dom";
 
 import { useAppDispatch } from 'src/hooks';
 import { widgetSetup } from 'src/App'
@@ -16,15 +16,17 @@ import { tProcessLogin } from 'src/thunks/thunkProcessLogin'
 
 interface loginProps {
     queryData: any,
-    updateAppState: Function,
+    updateAppState: Object,
     finnHubQueue: finnHubQueue,
 }
+
+const useDispatch = useAppDispatch
 
 const MyPaper = styled(Paper)({ color: "#1d69ab", variant: "outlined", borderRadius: 20, padding: 25 });
 
 export default function Login(p: loginProps) {
-
-    const dispatch = useAppDispatch(); //allows widget to run redux actions.
+    let navigate = useNavigate();
+    const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const [showMenu, setShowMenu] = useState(0); //0 = login, 1 = recover, 2 = register, 3 = secret question, 4 reset password
     const [message, setMessage] = useState(""); //message from server
@@ -154,29 +156,32 @@ export default function Login(p: loginProps) {
         0: () => {
             checkPassword(text0, text1)
                 .then(async (data) => {
+                    console.log('data', data)
                     if (data.status === 200) {
+                        console.log('200')
                         setMessage("")
                         const parseSetup: widgetSetup = JSON.parse(data.widgetsetup) //ex string
                         const newList: string[] = data.exchangelist.split(",");
+                        console.log('process login')
                         await dispatch(tProcessLogin({
                             defaultexchange: data.defaultexchange,
                             apiKey: data.key,
                             apiAlias: data.apiAlias,
                             exchangelist: newList
                         }))
-
-                        p.updateAppState({
-                            login: 1,
-                            widgetSetup: parseSetup,
-                            exchangeList: newList,
-                            navigate: 'dashboard'
-                        })
+                        console.log('process login complete')
+                        p.updateAppState['login'](1)
+                        p.updateAppState['navigate']('/dashboard')
+                        p.updateAppState['widgetSetup'](parseSetup)
                         p.finnHubQueue.updateInterval(data['ratelimit'])
+
                     } else {
+                        console.log('not awaiting')
                         setMessage(data.message)
                     }
                 })
-                .catch(() => {
+                .catch((err) => {
+                    console.log('problem', err)
                     setMessage("No response from server. Check network connection.")
                 })
         },
@@ -354,6 +359,5 @@ export default function Login(p: loginProps) {
         {/* {redirectTag} */}
     </>
     );
-
 }
 

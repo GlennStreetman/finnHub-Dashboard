@@ -27,7 +27,7 @@ import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 interface topNavProps {
     login: number,
     widgetSetup: widgetSetup,
-    updateAppState: Function,
+    updateAppState: Object,
     dashboardData: dashBoardData,
     currentDashboard: string,
     apiKey: string,
@@ -57,16 +57,16 @@ function TopNav(p: topNavProps) {
         dispatch(rExchangeDataLogout());
         dispatch(rExchangeListLogout());
         dispatch(rTargetDashboardLogout());
-        p.updateAppState({
-            login: 0, //login state. 0 logged out, 1 logged in.
-            navigate: null,
-            finnHubQueue: createFunctionQueueObject(1, 1000, true),
-            enableDrag: false,
-            socket: "", //socket connection for streaming stock data.
-            socketUpdate: Date.now(),
-            widgetCopy: null, //copy of state of widget being dragged.
-            widgetSetup: {},//activates premium api routes.
-        })
+        // p.updateAppState({
+        p.updateAppState['login'](0)
+        p.updateAppState['navigate'](null)
+        p.updateAppState['finnHubQueue'](createFunctionQueueObject(1, 1000, true))
+        p.updateAppState['enableDrag'](false)
+        p.updateAppState['socket']("")
+        p.updateAppState['socketUpdate'](Date.now())
+        p.updateAppState['widgetCopy'](null)
+        p.updateAppState['widgetSetup']({})
+        // })
         navigate('/login')
     }
 

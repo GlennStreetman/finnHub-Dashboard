@@ -1,3 +1,4 @@
+import { AppState } from 'src/App'
 import { useState, useEffect } from 'react';
 import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
 import { useNavigate } from "react-router-dom";
@@ -10,7 +11,7 @@ const useSelector = useAppSelector
 
 interface accountMenuProp {
     finnHubQueue: finnHubQueue,
-    updateAppState: Function,
+    updateAppState: Object,
 }
 
 function AccountMenu(p: accountMenuProp) {
@@ -204,9 +205,9 @@ function AccountMenu(p: accountMenuProp) {
     );
 }
 
-export function accountMenuProps(that: any, key = "AccountMenu") {
+export function accountMenuProps(that: AppState) {
     let propList = {
-        finnHubQueue: that.state.finnHubQueue,
+        finnHubQueue: that.finnHubQueue,
         updateAppState: that.updateAppState,
     };
     return propList;

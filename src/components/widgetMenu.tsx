@@ -5,7 +5,7 @@ import { updateWidgetSetup } from 'src/appFunctions/appImport/updateWidgetSetup'
 
 interface props {
     widgetSetup: widgetSetup,
-    updateAppState: Function,
+    updateAppState: Object,
 }
 
 export default function WidgetMenu(p: props) {
@@ -16,7 +16,7 @@ export default function WidgetMenu(p: props) {
             [key]: !isChecked(el)
         }
         const newDash = updateWidgetSetup(updateObj, p.widgetSetup)
-        p.updateAppState({ widgetSetup: newDash })
+        p.updateAppState['widgetSetup'](newDash)
 
     }
 
@@ -84,7 +84,7 @@ export default function WidgetMenu(p: props) {
 
 export function widgetMenuProps(that) {
     let propList = {
-        widgetSetup: that.state.widgetSetup,
+        widgetSetup: that.widgetSetup,
         updateAppState: that.updateAppState,
     };
     return propList;

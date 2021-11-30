@@ -1,4 +1,6 @@
 import React from "react";
+import { useAppDispatch, useAppSelector } from 'src/hooks';
+import { useState, useEffect } from "react";
 import { BrowserRouter, Route, Routes, Navigate, Outlet } from "react-router-dom";
 import queryString from "query-string";
 import { createTheme, ThemeProvider } from '@material-ui/core/styles'
@@ -14,21 +16,21 @@ import AboutMenu from "./components/AboutMenu";
 import AccountMenu, { accountMenuProps } from "./components/accountMenu";
 import WidgetMenu, { widgetMenuProps } from "./components/widgetMenu";
 import ExchangeMenu, { exchangeMenuProps } from "./components/exchangeMenu";
-import TemplateMenu, { templateMenuProps } from "./components/templateMenu";
+import TemplateMenu from "./components/templateMenu";
 import { WidgetController } from "./components/widgetController";
 
 //redux imports
-import { connect } from "react-redux";
-import { storeState } from './store'
-import { rSetTargetDashboard } from "./slices/sliceShowData";
-import { rResetUpdateFlag, rSetUpdateStatus, sliceDataModel, rRebuildTargetDashboardModel } from "./slices/sliceDataModel";
+// import { connect } from "react-redux";
+// import { storeState } from './store'
+// import { rSetTargetDashboard } from "./slices/sliceShowData";
+import { rResetUpdateFlag, rSetUpdateStatus, } from "./slices/sliceDataModel"; //sliceDataModel, rRebuildTargetDashboardModel 
 import { tGetFinnhubData, tgetFinnHubDataReq } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 import { tGetSavedDashboards } from './thunks/thunkGetSavedDashboards'
 import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
 import { rUpdateCurrentDashboard } from 'src/slices/sliceCurrentDashboard'
-import { rSetMenuList, sliceMenuList } from 'src/slices/sliceMenuList'
-import { rSetDashboardData, sliceDashboardData } from 'src/slices/sliceDashboardData'
+import { rSetMenuList, } from 'src/slices/sliceMenuList' //sliceMenuList
+import { rSetDashboardData, } from 'src/slices/sliceDashboardData' //sliceDashboardData
 import { rUpdateQuotePriceStream } from 'src/slices/sliceQuotePrice'
 import { tProcessLogin } from 'src/thunks/thunkProcessLogin'
 
@@ -49,117 +51,144 @@ const outerTheme = createTheme({
     },
 });
 
+const useDispatch = useAppDispatch
+const useSelector = useAppSelector
 
+export default function App() {
 
-class App extends React.Component<AppProps, AppState> {
-    constructor(props: AppProps) {
-        super(props);
+    const dispatch = useDispatch(); //allows widget to run redux actions.
 
-        this.state = {
-            login: 0, //login state. 0 logged out, 1 logged in.
-            navigate: null,
-            finnHubQueue: createFunctionQueueObject(1, 1000, true),
-            enableDrag: false,
-            socket: "", //socket connection for streaming stock data.
-            socketUpdate: Date.now(),
-            widgetCopy: null, //copy of state of widget being dragged.
-            widgetSetup: {},//activates premium api routes.
-        };
+    const [login, setLogin] = useState(0) //login state. 0 logged out, 1 logged in.
+    const [navigate, setNavigate] = useState<string | null>(null)
+    const [finnHubQueue, setFinnHubQueue] = useState(createFunctionQueueObject(1, 1000, true))
+    const [enableDrag, setEnableDrag] = useState(false)
+    const [socket, setSocket] = useState("") //socket connection for streaming stock data.
+    const [socketUpdate, setSocketUpdate] = useState(Date.now())
+    const [widgetCopy, setWidgetCopy] = useState(null) //copy of state of widget being dragged.
+    const [widgetSetup, setWidgetSetup] = useState({}) //activates premium api routes.
 
-        this.updateAppState = this.updateAppState.bind(this)
-        this.rebuildDashboardState = this.buildDashboardState.bind(this) //sets p.dashboardData. Used to build dataModel in redux
+    const updateAppState = {
+        login: setLogin,
+        navigate: setNavigate,
+        finnHubQueue: setFinnHubQueue,
+        enableDrag: setEnableDrag,
+        socket: setSocket,
+        socketUpdate: setSocketUpdate,
+        widgetCopy: setWidgetCopy,
+        widgetSetup: setWidgetSetup,
     }
 
-    componentDidMount() {
+    const appState = {
+        login: login,
+        navigate: navigate,
+        finnHubQueue: finnHubQueue,
+        enableDrag: enableDrag,
+        socket: socket,
+        socketUpdate: socketUpdate,
+        widgetCopy: widgetCopy,
+        widgetSetup: widgetSetup,
+        updateAppState: updateAppState,
+    }
+
+    const apiKey = useSelector((state) => { return state.apiKey })
+    const targetSecurity = useSelector((state) => { return state.targetSecurity })
+    const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
+    const globalStockList = useSelector((state) => {
+        if (state.dashboardData?.[state.currentDashboard]?.['globalstocklist']) {
+            return state.dashboardData[state.currentDashboard]['globalstocklist']
+        } else {
+            return ({})
+        }
+    })
+
+    useEffect(() => {
         fetch("/checkLogin")
             .then((response) => response.json())
             .then(async (data) => {
                 if (data.login === 1) {
                     const parseSetup: widgetSetup = JSON.parse(data.widgetsetup)
                     const newList: string[] = data.exchangelist.split(",");
-                    await this.props.tProcessLogin({
+                    await dispatch(tProcessLogin({
                         defaultexchange: data.defaultexchange,
                         apiKey: data.apiKey,
                         apiAlias: data.apiAlias,
                         exchangelist: newList
-                    })
-                    console.log('logged in')
-                    this.setState({
-                        login: 1,
-                        widgetSetup: parseSetup,
-                        navigate: 'dashboard'
-                    })
-                    this.state.finnHubQueue.updateInterval(data.ratelimit)
+                    }))
+                    setLogin(1)
+                    setWidgetSetup(parseSetup)
+                    setNavigate('dashboard')
+                    finnHubQueue.updateInterval(data.ratelimit)
                 } else {
-                    console.log('not logged in')
-                    this.setState({
-                        navigate: 'login'
-                    })
+                    setNavigate('login')
                 }
             })
-    }
+    }, [])
 
-    componentDidUpdate(prevProps: AppProps, prevState: AppState) {
-
-        if (this.state.login === 1 && prevState.login === 0) { //on login build dashboard state, then use state to build redux dataModel.
+    useEffect(() => {
+        if (login === 1) { //on login build dashboard state, then use state to build redux dataModel.
             console.log('rebuilding state')
-            this.rebuildDashboardState()
+            console.log('appState', appState)
+            buildDashboardState()
         }
+    }, [login])
 
-        if (this.state.navigate) {
-            this.setState({
-                navigate: null,
-            })
+    useEffect(() => {
+        if (navigate) { //on login build dashboard state, then use state to build redux dataModel.
+            setNavigate(null)
         }
+    }, [navigate])
 
-        const globalStockList = this.props.dashboardData?.[this.props.currentDashboard]?.globalstocklist ? this.props.dashboardData?.[this.props.currentDashboard].globalstocklist : false
-        if ((globalStockList && globalStockList !== prevProps.dashboardData?.[prevProps.currentDashboard]?.globalstocklist && this.state.login === 1)) { //price data for watchlist, including socket data.
-            LoadTickerSocket(prevProps, globalStockList, this.state.socket, this.props.apiKey, this.state.socketUpdate, this.updateAppState, this.props.rUpdateQuotePriceStream);
+    useEffect(() => {
+        if ((Object.keys(globalStockList).length > 0 && login === 1 && apiKey !== '')) { //price data for watchlist, including socket data.
+            LoadTickerSocket(globalStockList, socket, apiKey, socketUpdate, updateAppState, rUpdateQuotePriceStream, dispatch);
         }
+    }, [globalStockList, login, apiKey, dispatch])
 
+    useEffect(() => {
         const globalKeys = globalStockList ? Object.keys(globalStockList) : []
-        if (this.props.targetSecurity === '' && globalKeys.length > 0) {
-            this.props.rSetTargetSecurity(globalKeys[0])
+        if (targetSecurity === '' && globalKeys.length > 0) {
+            dispatch(rSetTargetSecurity(globalKeys[0]))
         }
-    }
+    }, [globalStockList, targetSecurity, dispatch])
 
-    updateAppState(updateObj) {
-        return new Promise((resolve) => {
-            this.setState(updateObj, () => resolve(true))
-        })
-    }
+    // function updateAppState(updateObj) {
+    //     return new Promise((resolve) => {
+    //         setState(updateObj, () => resolve(true))
+    //     })
+    // }
 
-    async buildDashboardState() { //fetches dashboard data, then updates p.dashboardData, then builds redux model.
+    async function buildDashboardState() { //fetches dashboard data, then updates p.dashboardData, then builds redux model.
         try {
-            const data = await this.props.tGetSavedDashboards({ apiKey: this.props.apiKey }).unwrap()
-            this.props.rUpdateCurrentDashboard(data.currentDashBoard)
-            this.props.rSetMenuList(data.menuList)
-            this.props.rSetDashboardData(data.dashBoardData)
-            this.props.rResetUpdateFlag() //sets all dashboards status to updating in redux store.
-            await this.props.tGetMongoDB()
+            const data: any = await dispatch(tGetSavedDashboards({ apiKey: apiKey })).unwrap()
+            rUpdateCurrentDashboard(data.currentDashBoard)
+            rSetMenuList(data.menuList)
+            rSetDashboardData(data.dashBoardData)
+            rResetUpdateFlag() //sets all dashboards status to updating in redux store.
+            await tGetMongoDB()
 
-            const targetDash: string[] = this.props.dashboardData?.[this.props.currentDashboard]?.widgetlist ? Object.keys(this.props.dashboardData?.[this.props.currentDashboard]?.widgetlist) : []
+            const targetDash: string[] = dashboardData?.[currentDashboard]?.widgetlist ? Object.keys(dashboardData?.[currentDashboard]?.widgetlist) : []
             for (const widget in targetDash) {
                 const payload: tgetFinnHubDataReq = { //get data for default dashboard.
-                    dashboardID: this.props.dashboardData[this.props.currentDashboard].id,
-                    targetDashBoard: this.props.currentDashboard,
+                    dashboardID: dashboardData[currentDashboard].id,
+                    targetDashBoard: currentDashboard,
                     widgetList: [targetDash[widget]],
-                    finnHubQueue: this.state.finnHubQueue,
-                    rSetUpdateStatus: this.props.rSetUpdateStatus,
+                    finnHubQueue: finnHubQueue,
+                    rSetUpdateStatus: rSetUpdateStatus,
                 }
-                this.props.tGetFinnhubData(payload)
+                tGetFinnhubData(payload)
             }
-            const dashBoards: string[] = Object.keys(this.props.dashboardData) //get data for dashboards not being shown
+            const dashBoards: string[] = Object.keys(dashboardData) //get data for dashboards not being shown
             for (const dash of dashBoards) {
-                if (dash !== this.props.currentDashboard) {
+                if (dash !== currentDashboard) {
                     const payload: tgetFinnHubDataReq = { //run in background, do not await.
-                        dashboardID: this.props.dashboardData[dash].id,
+                        dashboardID: dashboardData[dash].id,
                         targetDashBoard: dash,
-                        widgetList: Object.keys(this.props.dashboardData[dash].widgetlist),
-                        finnHubQueue: this.state.finnHubQueue,
-                        rSetUpdateStatus: this.props.rSetUpdateStatus,
+                        widgetList: Object.keys(dashboardData[dash].widgetlist),
+                        finnHubQueue: finnHubQueue,
+                        rSetUpdateStatus: rSetUpdateStatus,
                     }
-                    await this.props.tGetFinnhubData(payload)
+                    await tGetFinnhubData(payload)
                 }
             }
 
@@ -168,92 +197,91 @@ class App extends React.Component<AppProps, AppState> {
         }
     }
 
-    render() {
-        const quaryData = queryString.parse(window.location.search);
+    const quaryData = queryString.parse(window.location.search)
 
-        const navigate = () => {
-            if (this.state.navigate !== null) {
-                return <Navigate to={this.state.navigate} />
-            } else {
-                return (<></>)
-            }
+    const navigateComp = () => {
+        if (navigate !== null) {
+            return <Navigate to={navigate} />
+        } else {
+            return (<></>)
         }
-
-        const login = <Login
-            queryData={quaryData}
-            finnHubQueue={this.state.finnHubQueue}
-            updateAppState={this.updateAppState}
-        />
-
-        const dashboard = <WidgetController
-            enableDrag={this.state.enableDrag}
-            finnHubQueue={this.state.finnHubQueue}
-            login={this.state.login}
-            widgetCopy={this.state.widgetCopy}
-            updateAppState={this.updateAppState}
-        />
-
-        const topNav = <>
-            <TopNav
-                login={this.state.login}
-                widgetSetup={this.state.widgetSetup}
-                updateAppState={this.updateAppState}
-                dashboardData={this.props.dashboardData}
-                currentDashboard={this.props.currentDashboard}
-                apiKey={this.props.apiKey}
-                finnHubQueue={this.state.finnHubQueue}
-            />
-            <Outlet />
-        </>
-
-        return (
-            <ThemeProvider theme={outerTheme}>
-                <BrowserRouter>
-                    <Routes>
-                        <Route path="/" element={topNav}>
-                            <Route path="dashboard" element={dashboard} />
-                            <Route path="login" element={login} />
-                            <Route path="manageAccount" element={React.createElement(AccountMenu, accountMenuProps(this))} />
-                            <Route path="widgetMenu" element={React.createElement(WidgetMenu, widgetMenuProps(this))} />
-                            <Route path="about" element={React.createElement(AboutMenu, {})} />
-                            <Route path="exchangeMenu" element={React.createElement(ExchangeMenu, exchangeMenuProps(this))} />
-                            <Route path="templates" element={React.createElement(TemplateMenu, templateMenuProps(this))} />
-                        </Route>
-                    </Routes>
-                    {navigate()}
-                </BrowserRouter>
-            </ThemeProvider>
-        );
     }
+
+    const loginComp = <Login
+        queryData={quaryData}
+        finnHubQueue={finnHubQueue}
+        updateAppState={updateAppState}
+    />
+
+    const dashboard = <WidgetController
+        enableDrag={enableDrag}
+        finnHubQueue={finnHubQueue}
+        login={login}
+        widgetCopy={widgetCopy}
+        updateAppState={updateAppState}
+    />
+
+    const topNav = <>
+        <TopNav
+            login={login}
+            widgetSetup={widgetSetup}
+            updateAppState={updateAppState}
+            dashboardData={dashboardData}
+            currentDashboard={currentDashboard}
+            apiKey={apiKey}
+            finnHubQueue={finnHubQueue}
+        />
+        <Outlet />
+    </>
+
+    return (
+        <ThemeProvider theme={outerTheme}>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/" element={topNav}>
+                        {/*  */}
+                        <Route path="dashboard" element={<></>} />
+                        <Route path="login" element={loginComp} />
+                        <Route path="manageAccount" element={React.createElement(AccountMenu, accountMenuProps(appState))} />
+                        <Route path="widgetMenu" element={React.createElement(WidgetMenu, widgetMenuProps(appState))} />
+                        <Route path="about" element={React.createElement(AboutMenu, {})} />
+                        <Route path="exchangeMenu" element={React.createElement(ExchangeMenu, exchangeMenuProps(appState))} />
+                        <Route path="templates" element={React.createElement(TemplateMenu)} />
+                    </Route>
+                </Routes>
+                {navigateComp()}
+            </BrowserRouter>
+        </ThemeProvider>
+    );
 }
 
-const mapStateToProps = (state: storeState) => ({
-    exchangeList: state.exchangeList.exchangeList,
-    dataModel: state.dataModel,
-    apiKey: state.apiKey,
-    apiAlias: state.apiAlias,
-    defaultExchange: state.defaultExchange,
-    targetSecurity: state.targetSecurity,
-    currentDashboard: state.currentDashboard,
-    menuList: state.menuList,
-    dashboardData: state.dashboardData
-});
+// const mapStateToProps = (state: storeState) => ({
+//     exchangeList: state.exchangeList.exchangeList,
+//     dataModel: state.dataModel,
+//     apiKey: state.apiKey,
+//     apiAlias: state.apiAlias,
+//     defaultExchange: state.defaultExchange,
+//     targetSecurity: state.targetSecurity,
+//     currentDashboard: state.currentDashboard,
+//     menuList: state.menuList,
+//     dashboardData: state.dashboardData
+// });
 
-export default connect(mapStateToProps, {
-    tGetFinnhubData,
-    tGetMongoDB,
-    rResetUpdateFlag,
-    rSetTargetDashboard,
-    rSetUpdateStatus,
-    rRebuildTargetDashboardModel,
-    tGetSavedDashboards,
-    rSetTargetSecurity,
-    rUpdateCurrentDashboard,
-    rSetMenuList,
-    rSetDashboardData,
-    rUpdateQuotePriceStream,
-    tProcessLogin
-})(App);
+// export default connect(mapStateToProps, {
+//     tGetFinnhubData,
+//     tGetMongoDB,
+//     rResetUpdateFlag,
+//     rSetTargetDashboard,
+//     rSetUpdateStatus,
+//     rRebuildTargetDashboardModel,
+//     tGetSavedDashboards,
+//     rSetTargetSecurity,
+//     rUpdateCurrentDashboard,
+//     rSetMenuList,
+//     rSetDashboardData,
+//     rUpdateQuotePriceStream,
+//     tProcessLogin
+// })(App);
 
 export interface stock {
     currency: string,
@@ -343,44 +371,14 @@ export interface widgetSetup {
 
 interface App { [key: string]: any }
 
-export interface AppProps {
-    apiKey: string,
-    apiAlias: string,
-    currentDashboard: string,
-    dashboardData: sliceDashboardData,
-    exchangeList: string[],
-    targetSecurity: string,
-    dataModel: sliceDataModel,
-    defaultExchange: string,
-    menuList: sliceMenuList,
-    tGetFinnhubData: Function,
-    tGetMongoDB: Function,
-    rRebuildTargetDashboardModel: Function,
-    rResetUpdateFlag: Function,
-    rSetTargetDashboard: Function,
-    rSetUpdateStatus: Function,
-    tGetSavedDashboards: Function,
-    rSetTargetSecurity: Function,
-    rUpdateCurrentDashboard: Function,
-    rSetMenuList: Function,
-    rSetDashboardData: Function,
-    rUpdateQuotePriceStream: Function,
-    tProcessLogin: Function,
-}
-
 export interface AppState {
-    // accountMenu: number,
-    // aboutMenu: number,
-    // apiFlag: number, //set to 1 when retrieval of apiKey is needed, 2 if problem with API key.
-    // backGroundMenu: string, //reference to none widet info displayed when s.showWidget === 0
     enableDrag: boolean,
     finnHubQueue: finnHubQueue,
     login: number, //login state. 0 logged out, 1 logged in.
-    // showMenuColumn: boolean, //true shows column 0
     socket: any, //socket connection for streaming stock data.+
     socketUpdate: number,
-    // showStockWidgets: number, //0 hide dashboard, 1 show dashboard.
     widgetCopy: widget | null, //copy of state of widget being dragged.
     widgetSetup: widgetSetup, //activates premium api routes.
     navigate: string | null,
+    updateAppState: Object,
 }

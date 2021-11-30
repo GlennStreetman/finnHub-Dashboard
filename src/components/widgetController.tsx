@@ -16,7 +16,7 @@ interface controllerProps {
     finnHubQueue: finnHubQueue,
     login: number,
     widgetCopy: widget | null,
-    updateAppState: Function,
+    updateAppState: Object,
 }
 
 function WidgetController(p: controllerProps) {
