@@ -42,7 +42,6 @@ interface widgetProps {
     pagination: number,
     showEditPane: number,
     trackedStocks: any,
-    updateAppState: Function,
     widgetCopy: any,
     widgetKey: string | number,
     widgetType: string,
@@ -97,7 +96,7 @@ function FundamentalsMarketNews(p: widgetProps, ref: any) {
     useDragCopy(ref, { newsIncrementor: newsIncrementor, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['categorySelection'], updateFilterMemo, p.widgetKey, dashboardData, currentDashboard, p.updateAppState, dispatch, apiKey, p.finnHubQueue)
+    useStartingFilters(p.filters['categorySelection'], updateFilterMemo, p.widgetKey, dashboardData, currentDashboard, dispatch, apiKey, p.finnHubQueue)
 
     function updateFilter(e) {
         UpdateWidgetFilters(p.widgetKey, { categorySelection: e }, dashboardData, currentDashboard, dispatch, apiKey, p.finnHubQueue)

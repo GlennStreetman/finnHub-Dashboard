@@ -10,7 +10,6 @@ export const useStartingFilters = function (//sets default filters, if not setup
     widgetID: string | number, //p.widgetKey
     dashBoardData: dashBoardData,
     currentDashBoard: string,
-    updateAppState: Function,
     dispatch: Function,
     apiKey: string,
     finnHubQueue: finnHubQueue,

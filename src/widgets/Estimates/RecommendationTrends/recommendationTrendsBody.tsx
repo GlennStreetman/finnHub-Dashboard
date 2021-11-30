@@ -53,7 +53,6 @@ interface widgetProps {
     pagination: number,
     showEditPane: number,
     trackedStocks: any,
-    updateAppState: Function,
     widgetCopy: widget,
     widgetKey: string | number,
     widgetType: string,

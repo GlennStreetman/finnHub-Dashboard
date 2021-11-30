@@ -46,7 +46,6 @@ interface widgetProps {
     pagination: number,
     showEditPane: number,
     trackedStocks: any,
-    updateAppState: Function,
     widgetCopy: any,
     widgetKey: string | number,
     widgetType: string,
@@ -127,7 +126,7 @@ function FundamentalsCompanyNews(p: widgetProps, ref: any) {
     useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.
     useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, dashboardData, currentDashboard, p.updateAppState, dispatch, apiKey, p.finnHubQueue)
+    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, dashboardData, currentDashboard, dispatch, apiKey, p.finnHubQueue)
 
 
 
@@ -245,7 +244,6 @@ function FundamentalsCompanyNews(p: widgetProps, ref: any) {
                     currentDashboard={currentDashboard}
                     apiKey={apiKey}
                     finnHubQueue={p.finnHubQueue}
-                    updateAppState={p.updateAppState}
                 />
                 <div>{Object.keys(p.trackedStocks).length > 0 ? editNewsListForm() : <></>}</div>
             </>

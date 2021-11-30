@@ -11,7 +11,7 @@ class CsvUpload extends PureComponent {
     componentDidMount() {
 
         async function runComponent() {
-            const [focus, dashboardData] = await setNewGlobalStockList(this.props.rUpdateObj, this.props.currentDashboard, this.props.dashboardData, this.props.updateAppState)
+            const [focus, dashboardData] = await setNewGlobalStockList(this.props.rUpdateObj, this.props.currentDashboard, this.props.dashboardData)
             this.props.dispatch(this.props.rSetDashboardData(dashboardData))
             this.props.dispatch(this.props.rSetTargetSecurity(focus))
             this.props.resetUploadList()

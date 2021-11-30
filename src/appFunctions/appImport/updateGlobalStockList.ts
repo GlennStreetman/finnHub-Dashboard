@@ -21,7 +21,7 @@ export const updateGlobalStockList = function (stockRef: string, dashBoardData, 
     return updateCurrentDashboard
 }
 
-export const setNewGlobalStockList = async function (replacementGlobalList, currentDashboard, dashboardData, updateAppState) {
+export const setNewGlobalStockList = async function (replacementGlobalList, currentDashboard, dashboardData) {
     //replaces global stock list with new global stock list.
     const dbData = dashboardData
     let updateCurrentDashboard = produce(dbData, (draftState: dashBoardData) => {

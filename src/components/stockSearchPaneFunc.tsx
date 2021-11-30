@@ -45,7 +45,7 @@ function StockSearchPane(p: props) {
 
     function changeDefault(event) {
         event.preventDefault()
-        p.updateAppState({ defaultExchange: event.target.value })
+        p.updateAppState['defaultExchange'](event.target.value)
         const tGetSymbolObj: reqObj = {
             exchange: event.target.value,
             apiKey: apiKey,

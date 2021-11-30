@@ -2,7 +2,7 @@ import produce from 'immer'
 
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { useAppSelector, useAppDispatch } from '../../../hooks';
-import { dashBoardData, menuList } from 'src/App'
+import { dashBoardData } from 'src/App'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 import { rUnmountWidget } from './../../../slices/sliceShowData'
@@ -17,15 +17,13 @@ import { rSetUpdateStatus } from 'src/slices/sliceDataModel'
 
 import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
 
+import { rUpdateCurrentDashboard } from 'src/slices/sliceCurrentDashboard'
+import { rSetDashboardData } from 'src/slices/sliceDashboardData'
+import { rSetMenuList } from 'src/slices/sliceMenuList'
 
 interface props {
-    // dashBoardData: dashBoardData,
-    // currentDashBoard: string,
     helpText: string,
     showEditPane: number,
-    updateAppState: Function,
-    // apiKey: string,
-    // menuList: menuList,
     finnHubQueue: finnHubQueue,
 }
 
@@ -91,19 +89,14 @@ function DashBoardMenu(p: props, ref: any) {
 
         await fetch("/dashBoard", options) //posts that data to be saved.
         const newData: any = await dispatch(tGetSavedDashboards({ apiKey: apiKey })).unwrap()
-        const payload = {
-            dashBoardData: newData.dashBoardData,
-            currentDashBoard: newData.currentDashBoard,
-            menuList: newData.menuList!,
-        }
-        p.updateAppState(payload)
+        dispatch(rUpdateCurrentDashboard(newData.currentDashBoard))
+        dispatch(rSetDashboardData(newData.dashBoardData))
+        dispatch(rSetMenuList(menuList))
     }
 
     async function loadSavedDashboard(widgetName: string) {
         dispatch(rSetTargetDashboard({ targetDashboard: widgetName }))
-        await p.updateAppState({
-            currentDashBoard: widgetName,
-        })
+        dispatch(rUpdateCurrentDashboard(widgetName))
         dispatch(rSetTargetSecurity(Object.keys(dashboardData[widgetName].globalstocklist)[0]))
         await dispatch(tGetMongoDB({ dashboard: dashboardData[currentDashboard].id }))
         const finnHubPayload: tgetFinnHubDataReq = {
@@ -129,16 +122,15 @@ function DashBoardMenu(p: props, ref: any) {
     }
 
     function renameDashboard(oldName, newName) {
-        const updateObj = {}
-        if (currentDashboard === oldName) updateObj['currentDashBoard'] = newName
+        // const updateObj = {}
+        if (currentDashboard === oldName) dispatch(rUpdateCurrentDashboard(newName))//updateObj['currentDashBoard'] = newName
         const renamed = produce(this.state.dashBoardData, (draftState: dashBoardData) => {
             draftState[newName] = draftState[oldName]
             draftState[newName].dashboardname = newName
             delete draftState[oldName]
             return draftState
         })
-        updateObj['dashBoardData'] = renamed
-        p.updateAppState(updateObj)
+        dispatch(rSetDashboardData(renamed)) // updateObj['dashBoardData'] = renamed     
     }
 
     async function postNameChange(e) {
@@ -173,12 +165,9 @@ function DashBoardMenu(p: props, ref: any) {
         if (dashboardName !== '' && dashboardName !== undefined) {
             await dispatch(tCopyDashboard({ copyName: dashboardName, dashboardData: dashboardData, menuList: menuList }))
             const data: any = await dispatch(tGetSavedDashboards({ apiKey: apiKey })).unwrap()
-            const payload = {
-                dashBoardData: data.dashBoardData,
-                currentDashBoard: data.currentDashBoard,
-                menuList: data.menuList!,
-            }
-            p.updateAppState(payload)
+            dispatch(rUpdateCurrentDashboard(data.currentDashBoard))
+            dispatch(rSetDashboardData(data.dashBoardData))
+            dispatch(rSetMenuList(data.menuList))
         } else {
             setInputText('Enter Name')
         }
@@ -226,7 +215,7 @@ function DashBoardMenu(p: props, ref: any) {
         const updateState: dashBoardData = produce(dashboardData, (draftState: dashBoardData) => {
             delete draftState[dashboardName]
         })
-        p.updateAppState({ dashBoardData: updateState })
+        dispatch(rSetDashboardData(updateState))
     }
 
     let dashBoardData = dashboardData;
@@ -355,12 +344,7 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
     </>
 
     let propList = {
-        // dashBoardData: that.props.dashBoardData,
-        // currentDashBoard: that.props.currentDashBoard,
         helpText: [helpText, 'DBM'],
-        // menuList: that.props.menuList,
-        updateAppState: that.props.updateAppState,
-        // apiKey: that.props.apiKey,
         finnHubQueue: that.props.finnHubQueue,
     };
     return propList;

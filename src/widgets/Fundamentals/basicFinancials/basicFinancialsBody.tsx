@@ -50,7 +50,6 @@ interface widgetProps {
     pagination: number,
     showEditPane: number,
     trackedStocks: any,
-    updateAppState: Function,
     widgetCopy: any,
     widgetKey: string | number,
     widgetType: string,
@@ -564,14 +563,13 @@ function FundamentalsBasicFinancials(p: widgetProps, ref: any) {
         if (stock.indexOf(":") > 0) {
             const stockSymbole = stock.slice(0, stock.indexOf(":"));
             const update = UpdateWidgetStockList(p.widgetKey, stockSymbole, dashboardData, currentDashboard);
-            p.updateAppState(update)
-                .then(() => {
-                    const payload = {
-                        apiKey: apiKey,
-                        dashBoardData: dashboardData
-                    }
-                    dispatch(rBuildDataModel(payload))
-                })
+            dispatch(rSetDashboardData(update))
+            const payload = {
+                apiKey: apiKey,
+                dashBoardData: dashboardData
+            }
+            dispatch(rBuildDataModel(payload))
+
         } else {
             const update = UpdateWidgetStockList(p.widgetKey, stock, dashboardData, currentDashboard);
             dispatch(rSetDashboardData(update))

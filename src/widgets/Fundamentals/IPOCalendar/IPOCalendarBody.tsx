@@ -35,7 +35,6 @@ interface widgetProps {
     pagination: number,
     showEditPane: number,
     trackedStocks: any,
-    updateAppState: Function,
     widgetCopy: any,
     widgetKey: string | number,
     widgetType: string,
@@ -113,7 +112,7 @@ function FundamentalsIPOCalendar(p: widgetProps, ref: any) {
     useDragCopy(ref, { paginationInt: paginationInt, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, dashboardData, currentDashboard, p.updateAppState, dispatch, apiKey, p.finnHubQueue)
+    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, dashboardData, currentDashboard, dispatch, apiKey, p.finnHubQueue)
 
     function renderSearchPane() {
         return <>
@@ -128,7 +127,6 @@ function FundamentalsIPOCalendar(p: widgetProps, ref: any) {
                 currentDashboard={currentDashboard}
                 apiKey={apiKey}
                 finnHubQueue={p.finnHubQueue}
-                updateAppState={p.updateAppState}
             />
         </>
     }

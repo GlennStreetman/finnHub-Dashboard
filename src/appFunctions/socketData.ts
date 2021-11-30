@@ -47,7 +47,7 @@ function UpdateTickerSockets(
                         if (Date.now() - socketUpdate > 5000) { //throttle update rate.
                             // console.log('commiting socket data')
                             const newStamp = Date.now()
-                            updateAppState[socketUpdate](newStamp)
+                            updateAppState['socketUpdate'](newStamp)
                             dispatch(rUpdateQuotePriceStream(updatePaylaod))
                         }
                     }
@@ -56,8 +56,7 @@ function UpdateTickerSockets(
                 console.log("problem setting up socket connections:", err)
             }
         }
-        // const payload: Partial<AppState> = { socket: thisSocket }
-        updateAppState[socket](thisSocket)
+        updateAppState['socket'](thisSocket)
     }
 }
 

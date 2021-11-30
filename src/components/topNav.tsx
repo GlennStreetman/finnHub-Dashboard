@@ -57,7 +57,6 @@ function TopNav(p: topNavProps) {
         dispatch(rExchangeDataLogout());
         dispatch(rExchangeListLogout());
         dispatch(rTargetDashboardLogout());
-        // p.updateAppState({
         p.updateAppState['login'](0)
         p.updateAppState['navigate'](null)
         p.updateAppState['finnHubQueue'](createFunctionQueueObject(1, 1000, true))
@@ -66,7 +65,6 @@ function TopNav(p: topNavProps) {
         p.updateAppState['socketUpdate'](Date.now())
         p.updateAppState['widgetCopy'](null)
         p.updateAppState['widgetSetup']({})
-        // })
         navigate('/login')
     }
 

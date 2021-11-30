@@ -15,8 +15,6 @@ interface props {
     currentDashboard: string,
     apiKey: string,
     finnHubQueue: finnHubQueue,
-    updateAppState: Function,
-
 }
 
 const useDispatch = useAppDispatch

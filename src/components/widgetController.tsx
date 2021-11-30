@@ -65,8 +65,6 @@ function WidgetController(p: controllerProps) {
                     widgetList: el,
                     enableDrag: p.enableDrag,
                     finnHubQueue: p.finnHubQueue,
-                    // showMenuColumn: p.showMenuColumn,
-                    // showStockWidgets: p.showStockWidgets,
                     updateAppState: p.updateAppState,
                     widgetWidth: widgetWidth,
                     focus: focus,

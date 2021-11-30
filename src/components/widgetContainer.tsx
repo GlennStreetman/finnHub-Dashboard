@@ -9,12 +9,13 @@ import { rUnmountWidget } from '../slices/sliceShowData'
 import { rRemoveWidgetDataModel } from '../slices/sliceDataModel'
 import { toggleWidgetBody } from 'src/appFunctions/appImport/widgetLogic'
 import { RemoveWidget } from 'src/appFunctions/appImport/widgetLogic'
-import { setDragWidget, setDragMenu, moveWidget, SnapWidget } from 'src/appFunctions/appImport/widgetGrid'
+import { setDragWidget, setDragMenu, SnapWidget, moveStockWidget, moveMenu } from 'src/appFunctions/appImport/widgetGrid'
 import { rSetMenuList } from 'src/slices/sliceMenuList'
 import { tChangeWidgetName } from 'src/thunks/thunkChangeWidgetName'
 import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
+import { widget } from 'src/App'
 
 interface containerProps {
     enableDrag: boolean,
@@ -25,7 +26,7 @@ interface containerProps {
     updateAppState: Function,
     widgetBodyProps: Function,
     widgetKey: string | number,
-    widgetList: any,
+    widgetList: widget,
     widgetWidth: number,
     widgetCopy: any,
 }
@@ -37,7 +38,7 @@ function WidgetContainer(p: containerProps) {
     const useSelector = useAppSelector
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
-    const [renderHeader, setRenderHeader] = useState()
+    const [renderHeader, setRenderHeader] = useState<'menuWIdget' | 'widgetList' | string>('')
     const [showEditPane, setShowEditPane] = useState(0) //0: Hide, 1: Show
     const [searchText, setSearchText] = useState('')
     const widgetRef = React.createRef()
@@ -94,16 +95,17 @@ function WidgetContainer(p: containerProps) {
         async function dragMouseDown(e) {
             e = e || window.event;
             e.preventDefault();
-
             xAxis = e.clientX + window.scrollX
             yAxis = e.clientY
             if (p.stateRef === 'stockWidget') {
                 const [newDrag, widgets] = await setDragWidget(currentDashboard, dashboardData, p.widgetKey, widgetState.state)
-                await p.updateAppState(newDrag)
+                p.updateAppState['enableDrag'](true)
+                p.updateAppState['widgetCopy'](newDrag.widgetCopy)
                 dispatch(rSetDashboardData(widgets))
             } else {
                 const [newDrag, menu] = await setDragMenu(menuList, p.widgetKey, widgetState.state)
-                await p.updateAppState(newDrag)
+                p.updateAppState['enableDrag'](true)
+                p.updateAppState['widgetCopy'](newDrag.widgetCopy)
                 dispatch(rSetMenuList(menu))
             }
 
@@ -114,35 +116,42 @@ function WidgetContainer(p: containerProps) {
         async function elementDrag(e) {
             e = e || window.event;
             e.preventDefault();
-
             xAxis = e.clientX + window.scrollX;
             yAxis = e.clientY + window.scrollY;
 
             let newX = xAxis - widgetCenter + 25 >= 5 ? xAxis - widgetCenter + 25 : 5
             let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
             if (p.stateRef === 'stockWidget') {
-                const payload = moveWidget(p.stateRef, dashboardData, menuList, currentDashboard, p.widgetKey, newX, newY);
+                const payload = moveStockWidget(dashboardData, currentDashboard, p.widgetKey, newX, newY);
                 dispatch(rSetDashboardData(payload))
             } else {
-                const payload = moveWidget(p.stateRef, dashboardData, menuList, currentDashboard, p.widgetKey, newX, newY);
+                const payload = moveMenu(menuList, p.widgetKey, newX, newY);
                 dispatch(rSetMenuList(payload))
             }
         }
 
         async function closeDragElement(e) {
             // stop moving when mouse button is released:
-            xAxis = e.clientX + window.scrollX;
-            yAxis = e.clientY + window.scrollY;
-            let newX = xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5
-            let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
+            p.updateAppState['enableDrag'](false)
+            xAxis = e.clientX + window.scrollX; //pointer x location
+            yAxis = e.clientY + window.scrollY; //pointer y location
+            let dragX = xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5
+            let dragY = yAxis - 25 >= 60 ? yAxis - 25 : 60
             document.onmouseup = null;
             document.onmousemove = null;
-            const payload = moveWidget(p.stateRef, dashboardData, menuList, currentDashboard, p.widgetKey, newX, newY);
-            await p.updateAppState(payload)
-            const [snapPayload, dashboard, menu] = await SnapWidget(p.widgetList['widgetConfig'], p.widgetKey, xAxis, yAxis, widgetWidth, p.focus, dashboardData, menuList, currentDashboard)
-            await p.updateAppState(snapPayload)
-            dispatch(rSetDashboardData(dashboard))
-            dispatch(rSetMenuList(menu))
+
+            if (p.stateRef === 'stockWidget') {
+                const payload = moveStockWidget(dashboardData, currentDashboard, p.widgetKey, dragX, dragY);
+                const [dashboard, menu] = await SnapWidget(p.widgetList['widgetConfig'], p.widgetKey, xAxis, yAxis, widgetWidth, p.focus, payload, menuList, currentDashboard)
+                dispatch(rSetDashboardData(dashboard))
+                dispatch(rSetMenuList(menu))
+            } else {
+                const payload = moveMenu(menuList, p.widgetKey, dragX, dragY);
+                const [dashboard, menu] = await SnapWidget(p.widgetList['widgetConfig'], p.widgetKey, xAxis, yAxis, widgetWidth, p.focus, dashboardData, payload, currentDashboard)
+                dispatch(rSetDashboardData(dashboard))
+                dispatch(rSetMenuList(menu))
+            }
+
             dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
 
         }
@@ -150,8 +159,7 @@ function WidgetContainer(p: containerProps) {
 
     const excelFunction = excelRegister[p.widgetList.widgetType]
     let widgetProps = p.widgetBodyProps ? p.widgetBodyProps() : {}
-    widgetProps["showEditPane"] = showEditPane;
-    widgetProps['updateAppState'] = p.updateAppState;
+    widgetProps["showEditPane"] = showEditPane; //toggled widget body and edit pane.
     if (p.widgetKey !== "dashBoardMenu") {
         widgetProps['searchText'] = searchText
         widgetProps['changeSearchText'] = changeSearchText
@@ -202,7 +210,7 @@ function WidgetContainer(p: containerProps) {
 
                 <button
                     className="widgetButtonHead"
-                    id={p.widgetList["widgetID"]}
+                    id={`${p.widgetList["widgetID"]}`}
                     onMouseOver={() => {
                         dragElement();
                     }}

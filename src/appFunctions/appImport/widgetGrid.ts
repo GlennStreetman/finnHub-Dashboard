@@ -1,5 +1,5 @@
 import produce from "immer"
-import { AppState, widget, menu, menuList, widgetList, dashBoardData } from './../../App'
+import { AppState, widget, menu, menuList, widgetList, dashBoardData } from 'src/App'
 
 export const setDragWidget = function (currentDashboard: string, dashBoardData: dashBoardData, widgetId: string | number, widgetCopy: widget) {
     const updatedWidgetLocation = produce(dashBoardData, (draftState: dashBoardData) => {
@@ -7,7 +7,6 @@ export const setDragWidget = function (currentDashboard: string, dashBoardData: 
     })
 
     const payload: Partial<AppState> = {
-        enableDrag: true,
         widgetCopy: widgetCopy
     }
     return ([payload, updatedWidgetLocation])
@@ -20,16 +19,15 @@ export const setDragMenu = function (menuList: menuList, widgetId: string | numb
     })
 
     const payload: Partial<AppState> = {
-        enableDrag: true,
         widgetCopy: widgetCopy
     }
     return [payload, updatedWidgetLocation]
 
 }
 
-function moveStockWidget(dashBoardData: dashBoardData, currentDashboard: string, widgetId: string | number, xxAxis: number, yyAxis: number) {
+export function moveStockWidget(dashBoardData: dashBoardData, currentDashboard: string, widgetId: string | number, xxAxis: number, yyAxis: number) {
     console.log('moveStockWidget')
-    const updatedWidgetLocation = produce(dashBoardData, (draftState: menuList | widgetList) => {
+    const updatedWidgetLocation = produce(dashBoardData, (draftState: dashBoardData) => {
         draftState[currentDashboard]['widgetlist'][widgetId]["xAxis"] = xxAxis;
         draftState[currentDashboard]['widgetlist'][widgetId]["yAxis"] = yyAxis;
         draftState[currentDashboard]['widgetlist'][widgetId]["column"] = 'drag';
@@ -37,31 +35,13 @@ function moveStockWidget(dashBoardData: dashBoardData, currentDashboard: string,
     return updatedWidgetLocation
 }
 
-function moveMenu(menuList: menuList, widgetId: string | number, xxAxis: number, yyAxis: number) {
+export function moveMenu(menuList: menuList, widgetId: string | number, xxAxis: number, yyAxis: number) {
     const updatedWidgetLocation = produce(menuList, (draftState: menuList) => {
         draftState[widgetId]["xAxis"] = xxAxis;
         draftState[widgetId]["yAxis"] = yyAxis;
         draftState[widgetId]["column"] = 'drag';
     })
     return updatedWidgetLocation
-}
-
-export function moveWidget(
-    stateRef: 'menuWidget' | 'stockWidget' | 'marketWidget',
-    dashBoardData: dashBoardData,
-    menuList: menuList,
-    currentDashboard: string,
-    widgetId: string | number,
-    xxAxis: number,
-    yyAxis: number,
-) {
-
-    if (stateRef === 'stockWidget') {
-        return moveStockWidget(dashBoardData, currentDashboard, widgetId, xxAxis, yyAxis)
-    } else {
-        return moveMenu(menuList, widgetId, xxAxis, yyAxis)
-    }
-
 }
 
 export const SnapOrder = function (
@@ -132,14 +112,12 @@ export const SnapOrder = function (
         const updatedWidgetList: dashBoardData = draft.dashBoardData!
         return updatedWidgetList
     })
-    const payload: Partial<AppState> = {
-        enableDrag: false,
-    }
-    return [payload, newWidget, newMenu]
+
+    return [newWidget, newMenu]
 }
 
 export const SnapWidget = async function (
-    stateRef: 'menuWidget' | 'widgetList',
+    stateRef: any,
     widgetId: string | number,
     xxAxis: number,
     yyAxis: number,
@@ -151,8 +129,7 @@ export const SnapWidget = async function (
 
 ) {
     //snaps widget to desired location mouse up. If stateRef = menuwidget it should always snap to column 0.
-    let column: number = stateRef !== 'menuWidget' ? Math.floor(xxAxis / widgetWidth) + focus : 0 //base column calc
-
+    let column: number = stateRef !== 'menuWidget' ? Math.floor((xxAxis) / widgetWidth) + focus : 0 //base column calc
     return SnapOrder(widgetId, column, yyAxis, stateRef, dashBoardData, menuList, currentDashboard)
 
 }

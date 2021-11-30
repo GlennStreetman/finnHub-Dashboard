@@ -19,10 +19,6 @@ import ExchangeMenu, { exchangeMenuProps } from "./components/exchangeMenu";
 import TemplateMenu from "./components/templateMenu";
 import { WidgetController } from "./components/widgetController";
 
-//redux imports
-// import { connect } from "react-redux";
-// import { storeState } from './store'
-// import { rSetTargetDashboard } from "./slices/sliceShowData";
 import { rResetUpdateFlag, rSetUpdateStatus, } from "./slices/sliceDataModel"; //sliceDataModel, rRebuildTargetDashboardModel 
 import { tGetFinnhubData, tgetFinnHubDataReq } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
@@ -161,11 +157,11 @@ export default function App() {
     async function buildDashboardState() { //fetches dashboard data, then updates p.dashboardData, then builds redux model.
         try {
             const data: any = await dispatch(tGetSavedDashboards({ apiKey: apiKey })).unwrap()
-            rUpdateCurrentDashboard(data.currentDashBoard)
-            rSetMenuList(data.menuList)
-            rSetDashboardData(data.dashBoardData)
-            rResetUpdateFlag() //sets all dashboards status to updating in redux store.
-            await tGetMongoDB()
+            dispatch(rUpdateCurrentDashboard(data.currentDashBoard))
+            dispatch(rSetMenuList(data.menuList))
+            dispatch(rSetDashboardData(data.dashBoardData))
+            dispatch(rResetUpdateFlag()) //sets all dashboards status to updating in redux store.
+            await dispatch(tGetMongoDB())
 
             const targetDash: string[] = dashboardData?.[currentDashboard]?.widgetlist ? Object.keys(dashboardData?.[currentDashboard]?.widgetlist) : []
             for (const widget in targetDash) {
@@ -176,7 +172,7 @@ export default function App() {
                     finnHubQueue: finnHubQueue,
                     rSetUpdateStatus: rSetUpdateStatus,
                 }
-                tGetFinnhubData(payload)
+                dispatch(tGetFinnhubData(payload))
             }
             const dashBoards: string[] = Object.keys(dashboardData) //get data for dashboards not being shown
             for (const dash of dashBoards) {
@@ -188,7 +184,7 @@ export default function App() {
                         finnHubQueue: finnHubQueue,
                         rSetUpdateStatus: rSetUpdateStatus,
                     }
-                    await tGetFinnhubData(payload)
+                    await dispatch(tGetFinnhubData(payload))
                 }
             }
 
@@ -240,7 +236,7 @@ export default function App() {
                 <Routes>
                     <Route path="/" element={topNav}>
                         {/*  */}
-                        <Route path="dashboard" element={<></>} />
+                        <Route path="dashboard" element={dashboard} />
                         <Route path="login" element={loginComp} />
                         <Route path="manageAccount" element={React.createElement(AccountMenu, accountMenuProps(appState))} />
                         <Route path="widgetMenu" element={React.createElement(WidgetMenu, widgetMenuProps(appState))} />
@@ -254,34 +250,6 @@ export default function App() {
         </ThemeProvider>
     );
 }
-
-// const mapStateToProps = (state: storeState) => ({
-//     exchangeList: state.exchangeList.exchangeList,
-//     dataModel: state.dataModel,
-//     apiKey: state.apiKey,
-//     apiAlias: state.apiAlias,
-//     defaultExchange: state.defaultExchange,
-//     targetSecurity: state.targetSecurity,
-//     currentDashboard: state.currentDashboard,
-//     menuList: state.menuList,
-//     dashboardData: state.dashboardData
-// });
-
-// export default connect(mapStateToProps, {
-//     tGetFinnhubData,
-//     tGetMongoDB,
-//     rResetUpdateFlag,
-//     rSetTargetDashboard,
-//     rSetUpdateStatus,
-//     rRebuildTargetDashboardModel,
-//     tGetSavedDashboards,
-//     rSetTargetSecurity,
-//     rUpdateCurrentDashboard,
-//     rSetMenuList,
-//     rSetDashboardData,
-//     rUpdateQuotePriceStream,
-//     tProcessLogin
-// })(App);
 
 export interface stock {
     currency: string,

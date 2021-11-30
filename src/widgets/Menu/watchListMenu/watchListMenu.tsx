@@ -25,7 +25,6 @@ interface props {
     showEditPane: number,
     helpText: string,
     finnHubQueue: finnHubQueue,
-    updateAppState: Function,
 }
 
 function WatchListMenu(p: props, ref: any) {
@@ -88,9 +87,7 @@ function WatchListMenu(p: props, ref: any) {
                 if (widget.trackedStocks[key]) widget.config['targetSecurity'] = key
             }
         })
-        p.updateAppState({
-            dashBoardData: updatedDashboardData,
-        })
+        dispatch(rSetDashboardData(updatedDashboardData))
         dispatch(rSetTargetSecurity(key))
     }
 
@@ -137,7 +134,7 @@ function WatchListMenu(p: props, ref: any) {
                                     key={el + "clck"}
                                     onClick={async (e) => {
                                         e.preventDefault()
-                                        const newDash = await updateGlobalStockList(el, dashboardData, currentDashboard, p.updateAppState);
+                                        const newDash = await updateGlobalStockList(el, dashboardData, currentDashboard);
                                         dispatch(rSetDashboardData(newDash))
                                         dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
 
@@ -318,7 +315,6 @@ export function watchListMenuProps(that, key = "WatchListMenu") {
         showEditPane: that.props.showEditPane,
         helpText: [helpText, 'WLM'],
         finnHubQueue: that.props.finnHubQueue,
-        updateAppState: that.props.updateAppState,
     };
     return propList;
 }
