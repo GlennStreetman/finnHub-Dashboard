@@ -55,17 +55,6 @@ export const CreateNewWidgetContainer = function (
     return ([newDashBoardData, widgetName])
 }
 
-export const RemoveWidget = async function (widgetID: string | number, dashboardData: dashBoardData, currentDashboard: string) {
-
-    console.log(widgetID, dashboardData, currentDashboard)
-    const newDashboardData: dashBoardData = produce(dashboardData, (draftState) => {
-        let thisWidgetList = draftState[currentDashboard].widgetlist
-        delete thisWidgetList[widgetID]
-    })
-
-    return newDashboardData
-}
-
 export const UpdateWidgetStockList = function (
     widgetId: string | number,
     symbol: string,

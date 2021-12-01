@@ -83,8 +83,6 @@ function FundamentalsIPOCalendar(p: widgetProps, ref: any) {
     const apiKey = useSelector((state) => { return state.apiKey })
     const currentDashboard = useSelector((state) => { return state.currentDashboard })
     const dashboardData = useSelector((state) => { return state.dashboardData })
-    const targetSecurity = useSelector((state) => { return state.targetSecurity })
-    const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
     const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : -1
 
 

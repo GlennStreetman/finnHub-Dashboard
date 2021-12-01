@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { tChangeWidgetName } from 'src/thunks/thunkChangeWidgetName'
 import { tUpdateWidgetFilters } from 'src/thunks/thunkUpdateWidgetFilters'
 import { tSyncGlobalStocklist } from 'src/thunks/thunkSyncGlobalStockList'
@@ -61,6 +61,11 @@ export interface sliceDashboardData {
     [key: string]: dashboard,
 }
 
+export interface removeWidgetPayload {
+    widgetKey: string | number,
+    dashboardName: string,
+}
+
 const initialState: sliceDashboardData = {}
 
 const dashboardData = createSlice({
@@ -70,6 +75,12 @@ const dashboardData = createSlice({
         rSetDashboardData: (state: sliceDashboardData, action: any) => {
             const ap: sliceDashboardData = action.payload
             state = ap
+            return state
+        },
+        rRemoveWidget: (state: sliceDashboardData, action: PayloadAction<removeWidgetPayload>) => {
+            const ap = action.payload
+            console.log('removing', ap, state[ap.dashboardName], state[ap.dashboardName].widgetlist, state[ap.dashboardName].widgetlist[ap.widgetKey])
+            delete state[ap.dashboardName].widgetlist[ap.widgetKey]
             return state
         },
     },
@@ -116,5 +127,6 @@ const dashboardData = createSlice({
 
 export const {
     rSetDashboardData,
+    rRemoveWidget,
 } = dashboardData.actions
 export default dashboardData.reducer
