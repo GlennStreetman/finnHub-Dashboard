@@ -8,6 +8,7 @@ import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 import { updateGlobalStockList } from "src/appFunctions/appImport/updateGlobalStockList";
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { rSetDefaultExchange } from 'src/slices/sliceDefaultExchange'
+import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -66,9 +67,12 @@ function StockSearchPane(p: props) {
                 onSubmit={(e) => { //submit stock to be added/removed from global & widget stocklist.
                     e.preventDefault();
                     if (rUpdateStock !== undefined && widgetKey === 'watchListMenu') {
+                        console.log('update global')
                         const thisStock = rUpdateStock
                         const stockKey = thisStock.key
-                        updateGlobalStockList(stockKey, dashboardData, currentDashboard)
+                        const newGlobal = updateGlobalStockList(stockKey, dashboardData, currentDashboard, thisStock)
+                        dispatch(rSetDashboardData(newGlobal))
+                        dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
                     } else if (Number.isNaN(widgetKey) === false && rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
                         const thisStock = rUpdateStock
                         const stockKey = thisStock.key
@@ -79,7 +83,7 @@ function StockSearchPane(p: props) {
                             dashBoardData: update
                         }
                         dispatch(rBuildDataModel(payload))
-
+                        dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
                     } else {
                         console.log(`invalid stock selection:`, rUpdateStock, p.searchText, typeof widgetKey);
                     }
