@@ -4,8 +4,7 @@ import ToolTip from './toolTip.js'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
 import { rBuildDataModel } from 'src/slices/sliceDataModel'
-import { rSetDashboardData } from 'src/slices/sliceDashboardData'
-import { updateGlobalStockList } from "src/appFunctions/appImport/updateGlobalStockList";
+import { rSetDashboardData, rSetGlobalStockList } from 'src/slices/sliceDashboardData'
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { rSetDefaultExchange } from 'src/slices/sliceDefaultExchange'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
@@ -70,8 +69,12 @@ function StockSearchPane(p: props) {
                         console.log('update global')
                         const thisStock = rUpdateStock
                         const stockKey = thisStock.key
-                        const newGlobal = updateGlobalStockList(stockKey, dashboardData, currentDashboard, thisStock)
-                        dispatch(rSetDashboardData(newGlobal))
+                        dispatch(rSetGlobalStockList)
+                        dispatch(rSetGlobalStockList({
+                            stockRef: stockKey,
+                            currentDashboard: currentDashboard,
+                            stockObj: thisStock,
+                        }))
                         dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
                     } else if (Number.isNaN(widgetKey) === false && rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
                         const thisStock = rUpdateStock
@@ -133,15 +136,3 @@ export function searchPaneProps(p) {
     };
     return propList;
 }
-// const mapStateToProps = (state, ownProps) => {
-
-//     const p = ownProps
-//     const thisExchange = state.exchangeData.e?.data
-//     const inputSymbol = p.searchText.slice(0, p.searchText.indexOf(":"))
-//     const updateStock = thisExchange !== undefined ? thisExchange[inputSymbol] : {}
-//     const currentExchange = state.exchangeData.e.ex
-//     return {
-//         rUpdateStock: updateStock,
-//         currentExchange: currentExchange,
-//     }
-// }

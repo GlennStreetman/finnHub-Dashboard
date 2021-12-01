@@ -1,9 +1,8 @@
 import { useEffect } from "react";
-import { setNewGlobalStockList } from 'src/appFunctions/appImport/updateGlobalStockList'
 import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 import { useAppDispatch, useAppSelector } from 'src/hooks';
-import { rSetDashboardData } from 'src/slices/sliceDashboardData'
+import { rReplaceGlobalStocklist } from 'src/slices/sliceDashboardData'
 
 interface props {
     resetUploadList: Function,
@@ -35,8 +34,12 @@ export default function CsvUpload(p: props) {
 
     useEffect(() => {
         async function runComponent() {
-            const [focus, newDashboard] = await setNewGlobalStockList(rUpdateObj, currentDashboard, dashboardData)
-            dispatch(rSetDashboardData(newDashboard))
+            dispatch(rReplaceGlobalStocklist({
+                stockObj: rUpdateObj,
+                currentDashboard: currentDashboard,
+            }))
+            const focus = rUpdateObj[Object.keys(rUpdateObj)[0]] ? rUpdateObj[Object.keys(rUpdateObj)[0]].key : ''
+
             dispatch(rSetTargetSecurity(focus))
             p.resetUploadList()
             tSaveDashboard({ dashboardName: currentDashboard })
@@ -48,19 +51,3 @@ export default function CsvUpload(p: props) {
         <></>
     )
 }
-// const mapStateToProps = (state, ownProps) => {
-//     const p = ownProps
-//     const ul = p.uploadList
-//     const updateObj = {}
-//     console.log("MAPPING")
-//     for (const s in ul) { //stock in uploadlist
-//         const stock = ul[s]
-//         const exchange = stock.slice(0, stock.indexOf('-'))
-//         const updateStock = state.exchangeData.e.ex === exchange ? { ...state.exchangeData.e.data[stock] } : 'pass'
-//         if (updateStock !== 'pass') {
-//             updateObj[stock] = updateStock
-//         }
-//     }
-//     return { rUpdateObj: updateObj }
-// }
-// export default connect(mapStateToProps, { rSetTargetSecurity, tSaveDashboard })(CsvUpload);

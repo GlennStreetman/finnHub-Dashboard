@@ -11,11 +11,11 @@ import ToolTip from '../../../components/toolTip.js'
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { dStock } from '../../../appFunctions/formatStockSymbols'
 
-import { updateGlobalStockList } from 'src/appFunctions/appImport/updateGlobalStockList'
+// import { updateGlobalStockList } from 'src/appFunctions/appImport/updateGlobalStockList'
 import { newGlobalStockList } from 'src/appFunctions/appImport/syncGlobalStockList'
 
 import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
-import { rSetDashboardData } from 'src/slices/sliceDashboardData'
+import { rSetDashboardData, rSetGlobalStockList } from 'src/slices/sliceDashboardData'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 import { tSyncGlobalStocklist } from 'src/thunks/thunkSyncGlobalStockList'
 import { tGetFinnhubData, tgetFinnHubDataReq } from "src/thunks/thunkFetchFinnhub";
@@ -153,10 +153,12 @@ function WatchListMenu(p: props, ref: any) {
                                     key={el + "clck"}
                                     onClick={async (e) => {
                                         e.preventDefault()
-                                        const newDash = await updateGlobalStockList(el, dashboardData, currentDashboard);
-                                        dispatch(rSetDashboardData(newDash))
+                                        dispatch(rSetGlobalStockList({
+                                            stockRef: el,
+                                            currentDashboard: currentDashboard,
+                                            stockObj: false,
+                                        }))
                                         dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
-
                                     }}
                                 >
                                     <i className="fa fa-times" aria-hidden="true"></i>

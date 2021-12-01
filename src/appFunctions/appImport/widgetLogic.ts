@@ -5,7 +5,7 @@ import { rRebuildTargetWidgetModel } from 'src/slices/sliceDataModel'
 import { tGetFinnhubData } from 'src/thunks/thunkFetchFinnhub'
 import { rSetUpdateStatus } from 'src/slices/sliceDataModel'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
-import { rSetDashboardData } from 'src/slices/sliceDashboardData'
+import { rSetWidgetFilters, rSetWidgetConfig } from 'src/slices/sliceDashboardData'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 
 function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
@@ -95,14 +95,11 @@ export const UpdateWidgetFilters = async function (
     finnHubQueue: finnHubQueue,
 ) {
     try {
-        const newDashBoardData: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
-            draftState[currentDashboard].widgetlist[widgetID].filters = {
-                ...draftState[currentDashboard].widgetlist[widgetID].filters,
-                ...data
-            }
-        })
-
-        dispatch(rSetDashboardData(newDashBoardData))
+        dispatch(rSetWidgetFilters({
+            newFilters: data,
+            currentDashboard: currentDashboard,
+            widgetID: widgetID,
+        }))
         fetch(`/deleteFinnDashData?widgetID=${widgetID}`)
         dispatch(rRebuildTargetWidgetModel({ //rebuild data model (removes stale dates)
             apiKey: apiKey,
@@ -133,13 +130,17 @@ export const updateWidgetConfig = async function (
     enableDrag: boolean,
     dispatch: Function) { //replaces widget config object then saves changes to mongoDB & postgres.
 
-    const updatedDashboardData: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
-        const oldConfig = draftState[currentDashboard].widgetlist[widgetID].config
-        draftState[currentDashboard].widgetlist[widgetID].config = { ...oldConfig, ...updateObj }
-    })
-    dispatch(rSetDashboardData(updatedDashboardData))
+    dispatch(rSetWidgetConfig({
+        newConfig: updateObj,
+        currentDashboard: currentDashboard,
+        widgetID: widgetID,
+    }))
 
     if (enableDrag !== true) {
+        const updatedDashboardData: dashBoardData = produce(dashBoardData, (draftState: dashBoardData) => {
+            const oldConfig = draftState[currentDashboard].widgetlist[widgetID].config
+            draftState[currentDashboard].widgetlist[widgetID].config = { ...oldConfig, ...updateObj }
+        })
         dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
         const updatedWidgetFilters = updatedDashboardData[currentDashboard].widgetlist[widgetID].config
         const postBody: reqBody = {

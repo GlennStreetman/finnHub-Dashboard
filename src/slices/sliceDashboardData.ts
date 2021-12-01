@@ -66,6 +66,29 @@ export interface removeWidgetPayload {
     dashboardName: string,
 }
 
+export interface updateFilter {
+    newFilters: filters
+    currentDashboard: string,
+    widgetID: string | number,
+}
+
+export interface updateConfig {
+    newConfig: config
+    currentDashboard: string,
+    widgetID: string | number,
+}
+
+export interface updateGlobalStockList {
+    stockRef: string,
+    currentDashboard: string,
+    stockObj: stock | false,
+}
+
+export interface replaceGlobalList {
+    stockObj: stockList,
+    currentDashboard: string,
+}
+
 const initialState: sliceDashboardData = {}
 
 const dashboardData = createSlice({
@@ -83,6 +106,40 @@ const dashboardData = createSlice({
             delete state[ap.dashboardName].widgetlist[ap.widgetKey]
             return state
         },
+        rSetWidgetFilters: (state: sliceDashboardData, action: PayloadAction<updateFilter>) => { //filters are used for API pulls. UPdate here will trigger finnHub.io api calls.
+            const ap = action.payload
+            state[ap.currentDashboard].widgetlist[ap.widgetID].filters = {
+                ...state[ap.currentDashboard].widgetlist[ap.widgetID].filters,
+                ...ap.newFilters
+            }
+            return state
+        },
+        rSetWidgetConfig: (state: sliceDashboardData, action: PayloadAction<updateConfig>) => { //filters are used for API pulls. UPdate here will trigger finnHub.io api calls.
+            const ap = action.payload
+            state[ap.currentDashboard].widgetlist[ap.widgetID].config = {
+                ...state[ap.currentDashboard].widgetlist[ap.widgetID].config,
+                ...ap.newConfig
+            }
+            return state
+        },
+        rSetGlobalStockList: (state: sliceDashboardData, action: PayloadAction<updateGlobalStockList>) => { //add or remove a global stock.
+            const ap = action.payload
+            const globalStockList = state[ap.currentDashboard].globalstocklist
+
+            if (globalStockList[ap.stockRef] === undefined && ap.stockObj) {
+                globalStockList[ap.stockRef] = ap.stockObj
+            } else {
+                delete globalStockList[ap.stockRef];
+            }
+
+            return state
+        },
+        rReplaceGlobalStocklist: (state: sliceDashboardData, action: PayloadAction<replaceGlobalList>) => { //replace entire stock list.
+            const ap = action.payload
+            state[ap.currentDashboard].globalstocklist = ap.stockObj
+            return state
+        },
+
     },
     extraReducers: {
         [tChangeWidgetName.pending.toString()]: (state) => {
@@ -128,5 +185,9 @@ const dashboardData = createSlice({
 export const {
     rSetDashboardData,
     rRemoveWidget,
+    rSetWidgetFilters,
+    rSetWidgetConfig,
+    rSetGlobalStockList,
+    rReplaceGlobalStocklist,
 } = dashboardData.actions
 export default dashboardData.reducer
