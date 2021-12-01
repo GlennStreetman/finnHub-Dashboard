@@ -103,34 +103,39 @@ export default function App() {
     async function buildDashboardState() { //fetches dashboard data, then updates p.dashboardData, then builds redux model.
         try {
             const data: any = await dispatch(tGetSavedDashboards({ apiKey: apiKey })).unwrap()
-            dispatch(rUpdateCurrentDashboard(data.currentDashBoard))
-            dispatch(rSetMenuList(data.menuList))
-            dispatch(rSetDashboardData(data.dashBoardData))
-            dispatch(rResetUpdateFlag()) //sets all dashboards status to updating in redux store.
-            await dispatch(tGetMongoDB())
 
-            const targetDash: string[] = dashboardData?.[currentDashboard]?.widgetlist ? Object.keys(dashboardData?.[currentDashboard]?.widgetlist) : []
+            const lCurrentDash = data.currentDashBoard
+            const lDashboardData = data.dashBoardData
+
+            dispatch(rUpdateCurrentDashboard(lCurrentDash)) //set current dashboard
+            dispatch(rSetMenuList(data.menuList)) //build menu widgets
+            dispatch(rSetDashboardData(lDashboardData)) //build data model.
+            dispatch(rResetUpdateFlag()) //sets all dashboards status to updating in redux store.
+            await dispatch(tGetMongoDB()) //get cached data from mongo.
+            //For current dashboard: get data from finnhub, if not returned by mongo db.
+            const targetDash: string[] = lDashboardData?.[lCurrentDash]?.widgetlist ? Object.keys(lDashboardData?.[lCurrentDash]?.widgetlist) : []
             for (const widget in targetDash) {
-                const payload: tgetFinnHubDataReq = { //get data for default dashboard.
-                    dashboardID: dashboardData[currentDashboard].id,
-                    targetDashBoard: currentDashboard,
+                dispatch(tGetFinnhubData({ //get data for default dashboard.
+                    dashboardID: lDashboardData[lCurrentDash].id,
+                    targetDashBoard: lCurrentDash,
                     widgetList: [targetDash[widget]],
                     finnHubQueue: finnHubQueue,
                     rSetUpdateStatus: rSetUpdateStatus,
-                }
-                dispatch(tGetFinnhubData(payload))
+                    dispatch: dispatch,
+                }))
             }
-            const dashBoards: string[] = Object.keys(dashboardData) //get data for dashboards not being shown
+            //For dashboards not being displayed: get data from finnhub, if not returned by mongo db.
+            const dashBoards: string[] = Object.keys(lDashboardData) //get data for dashboards not being shown
             for (const dash of dashBoards) {
-                if (dash !== currentDashboard) {
-                    const payload: tgetFinnHubDataReq = { //run in background, do not await.
-                        dashboardID: dashboardData[dash].id,
+                if (dash !== lCurrentDash) {
+                    await dispatch(tGetFinnhubData({ //run in background, do not await.
+                        dashboardID: lDashboardData[dash].id,
                         targetDashBoard: dash,
-                        widgetList: Object.keys(dashboardData[dash].widgetlist),
+                        widgetList: Object.keys(lDashboardData[dash].widgetlist),
                         finnHubQueue: finnHubQueue,
                         rSetUpdateStatus: rSetUpdateStatus,
-                    }
-                    await dispatch(tGetFinnhubData(payload))
+                        dispatch: dispatch,
+                    }))
                 }
             }
 
@@ -169,7 +174,7 @@ export default function App() {
     }, [login])
 
     useEffect(() => {
-        if (navigate) { //on login build dashboard state, then use state to build redux dataModel.
+        if (navigate) {
             setNavigate(null)
         }
     }, [navigate])

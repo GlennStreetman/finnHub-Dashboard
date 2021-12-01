@@ -97,6 +97,7 @@ function changeExchange(ex){
                 'exchange': newExchangeList[stock],
                 'apiKey': apiKey,
                 'finnHubQueue': p.finnHubQueue,
+                'dispatch': dispatch,
             }
             dispatch(tGetSymbolList(newPayload))
         }

@@ -111,7 +111,6 @@ function EstimatesEarningsCalendar(p: widgetProps, ref: any) {
     const targetSecurity = useSelector((state) => { return state.targetSecurity })
     const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
     const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : -1
-
     const showDataSelector = createSelector((state: storeState) =>
         state.showData.dataSet?.[p.widgetKey]?.[p.config.targetSecurity]?.['earningsCalendar'],
         returnValue => returnValue

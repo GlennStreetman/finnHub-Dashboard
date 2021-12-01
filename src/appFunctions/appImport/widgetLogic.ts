@@ -128,6 +128,7 @@ export const UpdateWidgetFilters = async function (
             widgetList: [widgetID],
             finnHubQueue: finnHubQueue,
             rSetUpdateStatus: rSetUpdateStatus,
+            dispatch: dispatch,
         }))
         dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
     } catch { console.log("Problem updating widget filters."); return false }

@@ -31,7 +31,8 @@ export const useSearchMongoDb = function (
                             widgetList: [widgetKey],
                             finnHubQueue: finnHubQueue,
                             rSetUpdateStatus: rSetUpdateStatus,
-                            forceUpdate: true
+                            forceUpdate: true,
+                            dispatch: dispatch,
                         }
                         dispatch(tGetFinnhubData(payload))
                     }

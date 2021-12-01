@@ -105,6 +105,7 @@ function DashBoardMenu(p: props, ref: any) {
             widgetList: Object.keys(dashboardData[currentDashboard].widgetlist),
             finnHubQueue: p.finnHubQueue,
             rSetUpdateStatus: rSetUpdateStatus,
+            dispatch: dispatch,
         }
         dispatch(tGetFinnhubData(finnHubPayload))
     }

@@ -84,7 +84,7 @@ function FundamentalsPeers(p: widgetProps, ref: any) {
         } else if (updateExchange === 0) {
             // console.log('updating exchange')
             setUpdateExchange(1)
-            dispatch(tGetSymbolList({ exchange: p.defaultExchange, apiKey: apiKey, finnHubQueue: p.finnHubQueue }))
+            dispatch(tGetSymbolList({ exchange: p.defaultExchange, apiKey: apiKey, finnHubQueue: p.finnHubQueue, dispatch }))
         }
     })
 

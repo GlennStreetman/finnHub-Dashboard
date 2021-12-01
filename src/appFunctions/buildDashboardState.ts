@@ -23,6 +23,7 @@ export async function buildDashboardState(dispatch, apiKey, dashboardData, curre
                 widgetList: [targetDash[widget]],
                 finnHubQueue: finnHubQueue,
                 rSetUpdateStatus: rSetUpdateStatus,
+                dispatch: dispatch,
             }
             dispatch(tGetFinnhubData(payload))
         }
@@ -35,6 +36,7 @@ export async function buildDashboardState(dispatch, apiKey, dashboardData, curre
                     widgetList: Object.keys(dashboardData[dash].widgetlist),
                     finnHubQueue: finnHubQueue,
                     rSetUpdateStatus: rSetUpdateStatus,
+                    dispatch: dispatch,
                 }
                 await dispatch(tGetFinnhubData(payload))
             }

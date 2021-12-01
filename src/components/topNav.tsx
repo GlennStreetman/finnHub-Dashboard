@@ -90,6 +90,7 @@ function TopNav(p: topNavProps) {
                             widgetList: [`${widgetName}`],
                             finnHubQueue: p.finnHubQueue,
                             rSetUpdateStatus: rSetUpdateStatus,
+                            dispatch: dispatch,
                         }
                         dispatch(tGetFinnhubData(updatePayload))
                     }}>

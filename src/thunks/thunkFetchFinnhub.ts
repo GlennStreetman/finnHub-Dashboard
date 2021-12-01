@@ -11,6 +11,7 @@ export interface tgetFinnHubDataReq {
     finnHubQueue: finnHubQueue,
     rSetUpdateStatus: Function,
     forceUpdate?: boolean, //set to true to force update of all requests.
+    dispatch: Function,
 }
 
 export interface resObj {
@@ -36,6 +37,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                     security: s,
                     config: thisWidget[s].config,
                     rSetUpdateStatus: req.rSetUpdateStatus,
+                    dispatch: req.dispatch,
                 }
                 if (
                     (reqObj.updated === undefined) ||
@@ -46,7 +48,7 @@ export const tGetFinnhubData = createAsyncThunk( //{endPoint, [securityList]}
                     countQueue = countQueue + 1
                 }
             }
-            req.rSetUpdateStatus({ [req.targetDashBoard]: countQueue })
+            req.dispatch(req.rSetUpdateStatus({ [req.targetDashBoard]: countQueue }))
         }
         return Promise.all(requestList) //return value for thunk
             .then((res) => {

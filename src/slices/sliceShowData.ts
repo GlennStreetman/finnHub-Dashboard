@@ -5,8 +5,6 @@ import { tGetFinnhubData, resObj } from '../thunks/thunkFetchFinnhub'
 import { widgetReducers } from '../registers/dataReducerReg'
 import { tGetSavedDashboards } from '../thunks/thunkGetSavedDashboards'
 import { tSyncGlobalStocklist } from 'src/thunks/thunkSyncGlobalStockList'
-import { stock } from 'src/App'
-
 
 interface DataNode {
     [key: string]: any

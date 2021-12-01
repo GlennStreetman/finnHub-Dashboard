@@ -91,6 +91,7 @@ function AccountMenu(p: accountMenuProp) {
             exchange: defaultExchange,
             apiKey: newValue,
             finnHubQueue: p.finnHubQueue,
+            dispatch: dispatch,
         }))
     }
 

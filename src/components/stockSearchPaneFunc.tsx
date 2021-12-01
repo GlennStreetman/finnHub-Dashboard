@@ -50,6 +50,7 @@ function StockSearchPane(p: props) {
             exchange: event.target.value,
             apiKey: apiKey,
             finnHubQueue: p.finnHubQueue,
+            dispatch: dispatch,
         }
         p.tGetSymbolList(tGetSymbolObj)
 

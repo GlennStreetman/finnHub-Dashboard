@@ -33,7 +33,8 @@ export const tgetQuotePrices = createAsyncThunk( //{dashboard, [securityList]}
                     config: {},
                     widget: 'pass',
                     security: stockSymbol,
-                    rSetUpdateStatus: (a) => { }
+                    rSetUpdateStatus: false,
+                    dispatch: false,
                 }
 
                 const res: any = finnHub(throttle, reqObj)

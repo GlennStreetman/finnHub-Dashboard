@@ -5,6 +5,7 @@ export interface reqObj {
     exchange: string,
     apiKey: string,
     finnHubQueue: finnHubQueue,
+    dispatch: Function,
 }
 
 interface resObj {
@@ -45,7 +46,7 @@ const initialState: sliceExchangeData = {
 
 export const tGetSymbolList = createAsyncThunk(
     'newSymbolList',
-    (reqObj: reqObj, thunkAPI: any) => {
+    (reqObj: reqObj) => {
         const finnQueue = reqObj.finnHubQueue
         const apiString = `https://finnhub.io/api/v1/stock/symbol?exchange=${reqObj.exchange}&token=${reqObj.apiKey}`
         const thisReq: throttleApiReqObj = {
@@ -57,7 +58,8 @@ export const tGetSymbolList = createAsyncThunk(
             config: {},
             widget: 'pass',
             security: reqObj.exchange,
-            rSetUpdateStatus: (a) => { }
+            rSetUpdateStatus: (a) => { },
+            dispatch: reqObj.dispatch,
         }
 
         return finnHub(finnQueue, thisReq) //replace with usestate.
