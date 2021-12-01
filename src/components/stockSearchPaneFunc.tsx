@@ -69,7 +69,7 @@ function StockSearchPane(p: props) {
                         const thisStock = rUpdateStock
                         const stockKey = thisStock.key
                         updateGlobalStockList(stockKey, dashboardData, currentDashboard)
-                    } else if (typeof widgetKey === 'number' && rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
+                    } else if (Number.isNaN(widgetKey) === false && rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
                         const thisStock = rUpdateStock
                         const stockKey = thisStock.key
                         const update = UpdateWidgetStockList(widgetKey, stockKey, dashboardData, currentDashboard, thisStock);
@@ -81,7 +81,7 @@ function StockSearchPane(p: props) {
                         dispatch(rBuildDataModel(payload))
 
                     } else {
-                        console.log(`invalid stock selection:`, rUpdateStock, p.searchText);
+                        console.log(`invalid stock selection:`, rUpdateStock, p.searchText, typeof widgetKey);
                     }
                 }}
             >
