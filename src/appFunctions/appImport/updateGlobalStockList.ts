@@ -23,12 +23,12 @@ export const updateGlobalStockList = function (stockRef: string, dashBoardData, 
 
 export const setNewGlobalStockList = async function (replacementGlobalList, currentDashboard, dashboardData) {
     //replaces global stock list with new global stock list.
+    console.log('updating global list csv', replacementGlobalList, currentDashboard, dashboardData)
     const dbData = dashboardData
     let updateCurrentDashboard = produce(dbData, (draftState: dashBoardData) => {
         draftState[currentDashboard].globalstocklist = replacementGlobalList
     })
-
     const newFocus = replacementGlobalList[Object.keys(replacementGlobalList)[0]] ? replacementGlobalList[Object.keys(replacementGlobalList)[0]].key : ''
-
+    console.log('new dashboard', updateCurrentDashboard)
     return [newFocus, updateCurrentDashboard]
 }

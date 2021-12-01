@@ -1,5 +1,6 @@
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { useAppSelector } from 'src/hooks';
+import { Link } from "react-router-dom";
 
 interface endPointMenuProps {
 }
@@ -37,12 +38,13 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
     }, [currentDashboard])
 
     const url = window.location
-    let baseURL = url.protocol + "/" + url.host + "/" + url.pathname.split('/')[1] + 'graphQL';
+    let baseURL = url.protocol + "/" + url.host + "/graphQL";
+
     baseURL = baseURL.indexOf('localhost') >= 0 ?
         baseURL.replace('http:/localhost:3000', 'localhost:5000') : //makes redirect work in dev mode.
         baseURL.replace('https:/', '')
 
-    let endpointURL = url.protocol + "/" + url.host + "/" + url.pathname.split('/')[1] + 'qGraphQL';
+    let endpointURL = url.protocol + "/" + url.host + "/qGraphQL";
     endpointURL = endpointURL.indexOf('localhost') >= 0 ?
         endpointURL.replace('http:/localhost:3000', 'localhost:5000') : //makes redirect work in dev mode.
         endpointURL.replace('https:/', '')
@@ -84,15 +86,15 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
                 <td key={el + 'td1'}>{FocusDashboard[el].widgetHeader}</td>
                 <td key={el + 'td2'}>
                     <table><tbody><tr>
-                        <td><a href={`//${baseURL}?query=${thisQueryAll}`} target='_blank' rel="noreferrer">Web</a></td>
-                        <td><a href={`//${endpointURL}?query=${thisQueryAll}`} target='_blank' rel="noreferrer">API</a></td>
+                        <td><Link to={`//${baseURL}?query=${thisQueryAll}`} target='_blank' rel="noreferrer">Web</Link></td>
+                        <td><Link to={`//${endpointURL}?query=${thisQueryAll}`} target='_blank' rel="noreferrer">API</Link></td>
                     </tr></tbody></table>
                 </td>
 
                 <td key={el + 'td3'}>
                     <table><tbody><tr>
-                        <td><a href={`//${baseURL}?query=${thisQuerySecurity}`} target='_blank' rel="noreferrer">Web</a></td>
-                        <td><a href={`//${endpointURL}?query=${thisQuerySecurity}`} target='_blank' rel="noreferrer">API</a></td>
+                        <td><Link to={`//${baseURL}?query=${thisQuerySecurity}`} target='_blank' rel="noreferrer">Web</Link></td>
+                        <td><Link to={`//${endpointURL}?query=${thisQuerySecurity}`} target='_blank' rel="noreferrer">API</Link></td>
                     </tr></tbody></table>
                 </td>
             </tr>

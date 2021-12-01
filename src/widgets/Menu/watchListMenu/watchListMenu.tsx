@@ -312,11 +312,6 @@ function WatchListMenu(p: props, ref: any) {
                 <CsvUpload
                     uploadList={uploadList}
                     resetUploadList={resetUploadList}
-                    currentDashboard={currentDashboard}
-                    dashboardData={dashboardData}
-                    rSetTargetSecurity={rSetTargetSecurity}
-                    rSetDashboardData={rSetDashboardData}
-                    dispatch={dispatch}
                 />
             )}
         </>
