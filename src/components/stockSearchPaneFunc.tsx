@@ -2,9 +2,7 @@
 import StockDataList from "./stockDataList";
 import ToolTip from './toolTip.js'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
-import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
-import { rBuildDataModel } from 'src/slices/sliceDataModel'
-import { rSetDashboardData, rSetGlobalStockList } from 'src/slices/sliceDashboardData'
+import { rSetGlobalStockList, rSetWidgetStockList } from 'src/slices/sliceDashboardData'
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { rSetDefaultExchange } from 'src/slices/sliceDefaultExchange'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
@@ -23,10 +21,8 @@ interface props {
 
 function StockSearchPane(p: props) {
 
-    const apiKey = useSelector((state) => { return state.apiKey })
     const defaultExchange = useSelector((state) => { return state.defaultExchange })
     const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
-    const dashboardData = useSelector((state) => { return state.dashboardData })
     const currentDashboard = useSelector((state) => { return state.currentDashboard })
     const rUpdateStock = useSelector((state) => {
         const thisExchange = state.exchangeData.e?.data
@@ -79,13 +75,14 @@ function StockSearchPane(p: props) {
                     } else if (Number.isNaN(widgetKey) === false && rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
                         const thisStock = rUpdateStock
                         const stockKey = thisStock.key
-                        const update = UpdateWidgetStockList(widgetKey, stockKey, dashboardData, currentDashboard, thisStock);
-                        dispatch(rSetDashboardData(update))
-                        const payload = {
-                            apiKey: apiKey,
-                            dashBoardData: update
-                        }
-                        dispatch(rBuildDataModel(payload))
+
+                        dispatch(rSetWidgetStockList({
+                            widgetId: widgetKey,
+                            symbol: stockKey,
+                            currentDashboard: currentDashboard,
+                            stockObj: thisStock
+                        })) //consider updating data model on remove?
+
                         dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
                     } else {
                         console.log(`invalid stock selection:`, rUpdateStock, p.searchText, typeof widgetKey);
@@ -94,8 +91,6 @@ function StockSearchPane(p: props) {
             >
                 <ToolTip textFragment={exchangeList.length > 1 ? helpText : helpText2} hintName='sspe2' />
                 {exchangeList.length > 1 && <>
-                    {/* <ToolTip textFragment={helpText} hintName='sspe' /> */}
-                    {/* <label htmlFor="exchangeList">Exchange:</label> */}
                     <select value={defaultExchange} name='exchangeList' onChange={changeDefault}>
                         {exchangeOptions}
                     </select></>

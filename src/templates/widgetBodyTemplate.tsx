@@ -12,11 +12,7 @@ import { useUpdateFocus } from './../widgets/widgetHooks/useUpdateFocus'
 import StockSearchPane, { searchPaneProps } from "../components/stockSearchPaneFunc";
 
 import { dStock } from './../appFunctions/formatStockSymbols'
-
-import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
-import { rBuildDataModel } from 'src/slices/sliceDataModel'
-import { rSetDashboardData } from 'src/slices/sliceDashboardData'
-
+import { rSetWidgetStockList } from 'src/slices/sliceDashboardData'
 
 import { UpdateWidgetFilters } from 'src/appFunctions/appImport/widgetLogic'
 import { updateWidgetConfig } from 'src/appFunctions/appImport/widgetLogic'
@@ -132,13 +128,12 @@ function NewWidgetEndpointBody(p: { [key: string]: any }, ref: any) {
                         data-testid={`remove-${el}`}
                         key={el + "button"}
                         onClick={() => {
-                            const update = UpdateWidgetStockList(p.widgetKey, el, p.dashBoardData, p.currentDashBoard);
-                            dispatch(rSetDashboardData(update))
-                            const payload = {
-                                apiKey: p.apiKey,
-                                dashBoardData: update
-                            }
-                            dispatch(rBuildDataModel(payload))
+                            dispatch(rSetWidgetStockList({
+                                widgetId: p.widgetKey,
+                                symbol: el,
+                                currentDashboard: p.currentDashBoard,
+                                stockObj: false
+                            })) //consider updating data model on remove?
                         }}
                     >
                         <i className="fa fa-times" aria-hidden="true" key={el + "icon"}></i>

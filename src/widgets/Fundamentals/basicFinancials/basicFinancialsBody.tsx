@@ -17,9 +17,7 @@ import { useSearchMongoDb } from '../../widgetHooks/useSearchMongoDB'
 
 import { dStock } from './../../../appFunctions/formatStockSymbols'
 
-import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
-import { rBuildDataModel } from 'src/slices/sliceDataModel'
-import { rSetDashboardData } from 'src/slices/sliceDashboardData'
+import { rSetWidgetStockList } from 'src/slices/sliceDashboardData'
 
 import { updateWidgetConfig } from 'src/appFunctions/appImport/widgetLogic'
 
@@ -562,22 +560,19 @@ function FundamentalsBasicFinancials(p: widgetProps, ref: any) {
     function updateWidgetList(stock) {
         if (stock.indexOf(":") > 0) {
             const stockSymbole = stock.slice(0, stock.indexOf(":"));
-            const update = UpdateWidgetStockList(p.widgetKey, stockSymbole, dashboardData, currentDashboard);
-            dispatch(rSetDashboardData(update))
-            const payload = {
-                apiKey: apiKey,
-                dashBoardData: dashboardData
-            }
-            dispatch(rBuildDataModel(payload))
-
+            dispatch(rSetWidgetStockList({
+                widgetId: p.widgetKey,
+                symbol: stockSymbole,
+                currentDashboard: currentDashboard,
+                stockObj: false,
+            })) //consider updating data model on remove?
         } else {
-            const update = UpdateWidgetStockList(p.widgetKey, stock, dashboardData, currentDashboard);
-            dispatch(rSetDashboardData(update))
-            const payload = {
-                apiKey: apiKey,
-                dashBoardData: dashboardData
-            }
-            dispatch(rBuildDataModel(payload))
+            dispatch(rSetWidgetStockList({
+                widgetId: p.widgetKey,
+                symbol: stock,
+                currentDashboard: currentDashboard,
+                stockObj: false,
+            })) //consider updating data model on remove?
         }
     }
 

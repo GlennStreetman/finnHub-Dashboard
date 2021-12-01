@@ -14,9 +14,8 @@ import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
 import { dStock } from './../../../appFunctions/formatStockSymbols'
-import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
-import { rSetDashboardData } from 'src/slices/sliceDashboardData'
-import { rBuildDataModel } from 'src/slices/sliceDataModel'
+import { rSetWidgetStockList } from 'src/slices/sliceDashboardData'
+
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -213,14 +212,12 @@ function PriceQuote(p: widgetProps, ref: any) {
                             <button
                                 key={el + "button"}
                                 onClick={() => {
-                                    const update = UpdateWidgetStockList(p.widgetKey, el, dashboardData, currentDashboard);
-                                    dispatch(rSetDashboardData(update))
-                                    const payload = {
-                                        apiKey: apiKey,
-                                        dashBoardData: update
-                                    }
-                                    dispatch(rBuildDataModel(payload))
-
+                                    dispatch(rSetWidgetStockList({
+                                        widgetId: p.widgetKey,
+                                        symbol: el,
+                                        currentDashboard: currentDashboard,
+                                        stockObj: false
+                                    })) //consider updating data model on remove?
                                 }}
                             >
                                 <i className="fa fa-times" aria-hidden="true"></i>

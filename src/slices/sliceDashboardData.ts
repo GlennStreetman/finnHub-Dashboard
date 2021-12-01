@@ -89,6 +89,13 @@ export interface replaceGlobalList {
     currentDashboard: string,
 }
 
+export interface setWidgetStockList {
+    widgetId: string | number,
+    symbol: string,
+    currentDashboard: string,
+    stockObj: stock | false
+}
+
 const initialState: sliceDashboardData = {}
 
 const dashboardData = createSlice({
@@ -139,6 +146,16 @@ const dashboardData = createSlice({
             state[ap.currentDashboard].globalstocklist = ap.stockObj
             return state
         },
+        rSetWidgetStockList: (state: sliceDashboardData, action: PayloadAction<setWidgetStockList>) => {
+            const ap = action.payload
+            const trackedStocks: stockList = state[ap.currentDashboard].widgetlist[ap.widgetId]["trackedStocks"]; //copy target widgets stock object
+            if (Object.keys(trackedStocks).indexOf(ap.symbol) === -1 && ap.stockObj) { //add
+                trackedStocks[ap.symbol] = ap.stockObj
+            } else { //remove
+                delete trackedStocks[ap.symbol]
+            }
+            return state
+        }
 
     },
     extraReducers: {
@@ -189,5 +206,6 @@ export const {
     rSetWidgetConfig,
     rSetGlobalStockList,
     rReplaceGlobalStocklist,
+    rSetWidgetStockList,
 } = dashboardData.actions
 export default dashboardData.reducer

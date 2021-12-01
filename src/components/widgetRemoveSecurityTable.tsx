@@ -1,9 +1,7 @@
 import { dStock } from '../appFunctions/formatStockSymbols'
 import { stockList } from '../App'
-import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
 import { dashBoardData } from 'src/App'
-import { rBuildDataModel } from 'src/slices/sliceDataModel'
-import { rSetDashboardData } from 'src/slices/sliceDashboardData'
+import { rSetWidgetStockList } from 'src/slices/sliceDashboardData'
 import { useAppDispatch } from 'src/hooks';
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 
@@ -19,7 +17,7 @@ interface Props {
 }
 
 export default function WidgetRemoveSecurityTable(p: Props) {
-    const dispatch = useDispatch(); //allows widget to run redux actions.
+    const dispatch = useDispatch();
 
     const stockList = Object.keys(p.trackedStocks);
     const stockListRows = stockList.map((el) =>
@@ -29,13 +27,12 @@ export default function WidgetRemoveSecurityTable(p: Props) {
                     data-testid={`remove-${el}`}
                     key={el + "button"}
                     onClick={() => {
-                        const update = UpdateWidgetStockList(p.widgetKey, el, p.dashBoardData, p.currentDashboard);
-                        dispatch(rSetDashboardData(update))
-                        const payload = {
-                            apiKey: p.apiKey,
-                            dashBoardData: update
-                        }
-                        dispatch(rBuildDataModel(payload))
+                        dispatch(rSetWidgetStockList({
+                            widgetId: p.widgetKey,
+                            symbol: el,
+                            currentDashboard: p.currentDashboard,
+                            stockObj: false
+                        })) //consider updating data model on remove?
                         dispatch(tSaveDashboard({ dashboardName: p.currentDashboard }))
                     }}
                 >
