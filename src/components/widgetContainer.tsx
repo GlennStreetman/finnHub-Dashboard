@@ -38,7 +38,7 @@ function WidgetContainer(p: containerProps) {
     const useSelector = useAppSelector
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
-    const [renderHeader, setRenderHeader] = useState<'menuWIdget' | 'widgetList' | string>('')
+    const [renderHeader, setRenderHeader] = useState<'menuWIdget' | 'widgetList' | 'marketWidget' | string>('')
     const [showEditPane, setShowEditPane] = useState(0) //0: Hide, 1: Show
     const [searchText, setSearchText] = useState('')
     const widgetRef = React.createRef()
@@ -70,7 +70,7 @@ function WidgetContainer(p: containerProps) {
     }
 
     async function updateHeader(e) {//changes widget name.
-        if (p.stateRef === "stockWidget") {
+        if (p.stateRef !== "menuWidget") {
             await dispatch(tChangeWidgetName({
                 stateRef: 'widgetList',
                 widgetID: p.widgetKey,
@@ -97,7 +97,7 @@ function WidgetContainer(p: containerProps) {
             e.preventDefault();
             xAxis = e.clientX + window.scrollX
             yAxis = e.clientY
-            if (p.stateRef === 'stockWidget') {
+            if (p.stateRef !== 'menuWidget') {
                 const [newDrag, widgets] = await setDragWidget(currentDashboard, dashboardData, p.widgetKey, widgetState.state)
                 p.updateAppState['enableDrag'](true)
                 p.updateAppState['widgetCopy'](newDrag.widgetCopy)
@@ -121,7 +121,7 @@ function WidgetContainer(p: containerProps) {
 
             let newX = xAxis - widgetCenter + 25 >= 5 ? xAxis - widgetCenter + 25 : 5
             let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60
-            if (p.stateRef === 'stockWidget') {
+            if (p.stateRef !== 'menuWidget') {
                 const payload = moveStockWidget(dashboardData, currentDashboard, p.widgetKey, newX, newY);
                 dispatch(rSetDashboardData(payload))
             } else {
@@ -140,7 +140,7 @@ function WidgetContainer(p: containerProps) {
             document.onmouseup = null;
             document.onmousemove = null;
 
-            if (p.stateRef === 'stockWidget') {
+            if (p.stateRef !== 'menuWidget') {
                 const payload = moveStockWidget(dashboardData, currentDashboard, p.widgetKey, dragX, dragY);
                 const [dashboard, menu] = await SnapWidget(p.widgetList['widgetConfig'], p.widgetKey, xAxis, yAxis, widgetWidth, p.focus, payload, menuList, currentDashboard)
                 dispatch(rSetDashboardData(dashboard))
