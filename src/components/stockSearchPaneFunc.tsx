@@ -1,16 +1,13 @@
 
 import StockDataList from "./stockDataList";
-import { connect } from "react-redux";
 import ToolTip from './toolTip.js'
-import { tGetSymbolList } from "../slices/sliceExchangeData";
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
-import { stock } from 'src/App'
-import { reqObj } from 'src/slices/sliceExchangeData'
 import { UpdateWidgetStockList } from 'src/appFunctions/appImport/widgetLogic'
 import { rBuildDataModel } from 'src/slices/sliceDataModel'
 import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 import { updateGlobalStockList } from "src/appFunctions/appImport/updateGlobalStockList";
 import { useAppDispatch, useAppSelector } from 'src/hooks';
+import { rSetDefaultExchange } from 'src/slices/sliceDefaultExchange'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -22,10 +19,6 @@ interface props {
     searchText: string,
     widgetKey: string,
     widgetType: string,
-    tGetSymbolList: Function,
-    currentExchange: String,
-    rUpdateStock: stock,
-    updateAppState: Function
 }
 
 function StockSearchPane(p: props) {
@@ -35,8 +28,12 @@ function StockSearchPane(p: props) {
     const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
     const dashboardData = useSelector((state) => { return state.dashboardData })
     const currentDashboard = useSelector((state) => { return state.currentDashboard })
-
-
+    const rUpdateStock = useSelector((state) => {
+        const thisExchange = state.exchangeData.e?.data
+        const inputSymbol = p.searchText.slice(0, p.searchText.indexOf(":"))
+        const updateStock: any = thisExchange !== undefined ? thisExchange[inputSymbol] : {}
+        return updateStock
+    })
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     function handleChange(e) {
@@ -45,15 +42,9 @@ function StockSearchPane(p: props) {
 
     function changeDefault(event) {
         event.preventDefault()
-        p.updateAppState['defaultExchange'](event.target.value)
-        const tGetSymbolObj: reqObj = {
-            exchange: event.target.value,
-            apiKey: apiKey,
-            finnHubQueue: p.finnHubQueue,
-            dispatch: dispatch,
-        }
-        p.tGetSymbolList(tGetSymbolObj)
-
+        const newValue = event.target.value
+        console.log('newValue', newValue)
+        dispatch(rSetDefaultExchange(newValue))
     }
 
     let widgetKey = p.widgetKey;
@@ -74,12 +65,12 @@ function StockSearchPane(p: props) {
                 className="form-stack"
                 onSubmit={(e) => { //submit stock to be added/removed from global & widget stocklist.
                     e.preventDefault();
-                    if (p.rUpdateStock !== undefined && widgetKey === 'watchListMenu') {
-                        const thisStock = p.rUpdateStock
+                    if (rUpdateStock !== undefined && widgetKey === 'watchListMenu') {
+                        const thisStock = rUpdateStock
                         const stockKey = thisStock.key
                         updateGlobalStockList(stockKey, dashboardData, currentDashboard)
-                    } else if (typeof widgetKey === 'number' && p.rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
-                        const thisStock = p.rUpdateStock
+                    } else if (typeof widgetKey === 'number' && rUpdateStock !== undefined) { //Not menu widget. Menus named, widgets numbered.
+                        const thisStock = rUpdateStock
                         const stockKey = thisStock.key
                         const update = UpdateWidgetStockList(widgetKey, stockKey, dashboardData, currentDashboard, thisStock);
                         dispatch(rSetDashboardData(update))
@@ -90,7 +81,7 @@ function StockSearchPane(p: props) {
                         dispatch(rBuildDataModel(payload))
 
                     } else {
-                        console.log(`invalid stock selection:`, p.rUpdateStock, p.searchText);
+                        console.log(`invalid stock selection:`, rUpdateStock, p.searchText);
                     }
                 }}
             >
@@ -102,7 +93,6 @@ function StockSearchPane(p: props) {
                         {exchangeOptions}
                     </select></>
                 }
-
 
                 <label htmlFor="stockSearch">Security: </label>
                 <input size={18}
@@ -117,8 +107,8 @@ function StockSearchPane(p: props) {
                 />
                 <datalist id={`${p.widgetKey}-dataList`} data-testid={`searchPaneOption-${p.widgetType}`} >
                     <StockDataList
-                        defaultExchange={defaultExchange}
-                        inputText={p.searchText}
+                        searchText={p.searchText}
+                        finnHubQueue={p.finnHubQueue}
                     />
                 </datalist>
                 <input className="btn" type="submit" value="Submit" data-testid={`SubmitSecurity-${p.widgetType}`} />
@@ -127,20 +117,7 @@ function StockSearchPane(p: props) {
     );
 }
 
-const mapStateToProps = (state, ownProps) => {
-
-    const p = ownProps
-    const thisExchange = state.exchangeData.e?.data
-    const inputSymbol = p.searchText.slice(0, p.searchText.indexOf(":"))
-    const updateStock = thisExchange !== undefined ? thisExchange[inputSymbol] : {}
-    const currentExchange = state.exchangeData.e.ex
-    return {
-        rUpdateStock: updateStock,
-        currentExchange: currentExchange,
-    }
-}
-
-export default connect(mapStateToProps, { tGetSymbolList })(StockSearchPane);
+export default StockSearchPane;
 
 export function searchPaneProps(p) {
     const propList = {
@@ -149,7 +126,18 @@ export function searchPaneProps(p) {
         searchText: p.searchText,
         widgetKey: p.widgetKey,
         widgetType: p.widgetType,
-        updateAppState: p.updateAppState,
     };
     return propList;
 }
+// const mapStateToProps = (state, ownProps) => {
+
+//     const p = ownProps
+//     const thisExchange = state.exchangeData.e?.data
+//     const inputSymbol = p.searchText.slice(0, p.searchText.indexOf(":"))
+//     const updateStock = thisExchange !== undefined ? thisExchange[inputSymbol] : {}
+//     const currentExchange = state.exchangeData.e.ex
+//     return {
+//         rUpdateStock: updateStock,
+//         currentExchange: currentExchange,
+//     }
+// }

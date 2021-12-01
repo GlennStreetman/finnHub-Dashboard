@@ -1,12 +1,12 @@
 import * as React from "react"
-import { useState, forwardRef, useRef, useMemo } from "react";
+import { useState, forwardRef, useRef, useMemo, useEffect, } from "react";
 import { widget } from 'src/App'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 
 import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { RootState } from '../../../store'
-import { tGetSymbolList } from "./../../../slices/sliceExchangeData";
+import { tGetSymbolList, reqObj } from "./../../../slices/sliceExchangeData";
 
 import { useDragCopy } from './../../widgetHooks/useDragCopy'
 import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
@@ -35,7 +35,6 @@ interface widgetProps {
     widgetCopy: any,
     widgetKey: string | number,
     widgetType: string,
-    defaultExchange: string,
 }
 
 
@@ -51,7 +50,6 @@ function FundamentalsPeers(p: widgetProps, ref: any) {
     }
 
     const [widgetCopy] = useState(startingWidgetCoptyRef())
-    const [updateExchange, setUpdateExchange] = useState(0)
     const dispatch = useDispatch(); //allows widget to run redux actions.
     const apiKey = useSelector((state) => { return state.apiKey })
     const currentDashboard = useSelector((state) => { return state.currentDashboard })
@@ -59,7 +57,8 @@ function FundamentalsPeers(p: widgetProps, ref: any) {
     const targetSecurity = useSelector((state) => { return state.targetSecurity })
     const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
     const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : -1
-
+    const defaultExchange = useSelector((state) => { return state.defaultExchange })
+    const stockDataExchange = useSelector(state => state.exchangeData.e.ex)
 
     const rShowData = useSelector((state: RootState) => { //REDUX Data associated with this widget.
         if (state.dataModel !== undefined &&
@@ -71,22 +70,32 @@ function FundamentalsPeers(p: widgetProps, ref: any) {
     })
 
     const rExchange = useSelector((state: any) => {
-        if (state.exchangeData.e.ex === p.defaultExchange) {
-            const exchangeData: any = state.exchangeData.e.data
-            const widgetData = state.showData.dataSet[p.widgetKey] ? state?.showData?.dataSet?.[p.widgetKey]?.[p.config.targetSecurity] : {}
-            const lookupNames: Object = {}
-            for (const s in widgetData) {
-                const stockKey = `${p.defaultExchange}-${widgetData[s]}`
-                const name = exchangeData && exchangeData[stockKey] ? exchangeData[stockKey].description : ''
-                lookupNames[stockKey] = name
-            }
-            return (lookupNames)
-        } else if (updateExchange === 0) {
-            // console.log('updating exchange')
-            setUpdateExchange(1)
-            dispatch(tGetSymbolList({ exchange: p.defaultExchange, apiKey: apiKey, finnHubQueue: p.finnHubQueue, dispatch }))
+        const exchangeData: any = state.exchangeData.e.data
+        const widgetData = state.showData.dataSet[p.widgetKey] ? state?.showData?.dataSet?.[p.widgetKey]?.[p.config.targetSecurity] : {}
+        const lookupNames: Object = {}
+        for (const s in widgetData) {
+            const stockKey = `${defaultExchange}-${widgetData[s]}`
+            const name = exchangeData && exchangeData[stockKey] ? exchangeData[stockKey].description : ''
+            lookupNames[stockKey] = name
         }
+        return (lookupNames)
     })
+
+    useEffect(() => { //update exchange data if not updating, on user input.
+        if (
+            apiKey !== '' &&
+            defaultExchange !== stockDataExchange &&
+            stockDataExchange !== 'updating'
+        ) {
+            const tGetSymbolObj: reqObj = {
+                exchange: defaultExchange,
+                apiKey: apiKey,
+                finnHubQueue: p.finnHubQueue,
+                dispatch: dispatch,
+            }
+            dispatch(tGetSymbolList(tGetSymbolObj))
+        }
+    }, [apiKey, defaultExchange, stockDataExchange])
 
     const focusSecurityList = useMemo(() => { //remove if all securities should stay in focus.
         return [p?.config?.targetSecurity]
@@ -127,7 +136,7 @@ function FundamentalsPeers(p: widgetProps, ref: any) {
         const stockDataRows = Array.isArray(rShowData) ? rShowData.map((el) =>
             <tr key={el + "row"}>
                 <td key={el + "symbol"}>{el}</td>
-                <td key={el + "name"}>{getStockName(`${p.defaultExchange}-${el}`)}</td>
+                <td key={el + "name"}>{getStockName(`${defaultExchange}-${el}`)}</td>
             </tr>
         ) : []
 
@@ -174,17 +183,6 @@ export default forwardRef(FundamentalsPeers)
 
 export function peersProps(that, key = "newWidgetNameProps") {
     let propList = {
-        // apiKey: that.props.apiKey,
-        // defaultExchange: that.props.defaultExchange,
-        // exchangeList: that.props.exchangeList,
-        // filters: that.props.widgetList[key]["filters"],
-        // targetSecurity: that.props.targetSecurity,
-        // trackedStocks: that.props.widgetList[key]["trackedStocks"],
-
-        // widgetKey: key,
-        // finnHubQueue: that.props.finnHubQueue,
-        // dashBoardData: that.props.dashBoardData,
-        // currentDashBoard: that.props.currentDashBoard,
     };
     return propList;
 }

@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import { tGetSymbolList } from './../slices/sliceExchangeData'
 import { rUpdateExchangeList } from './../slices/sliceExchangeList'
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 
@@ -91,19 +90,6 @@ function changeExchange(ex){
 
     dispatch(rUpdateExchangeList(payload))
     
-    for (const stock in newExchangeList) {
-        if (rExchangeList.indexOf(newExchangeList[stock]) === -1){
-            const newPayload = {
-                'exchange': newExchangeList[stock],
-                'apiKey': apiKey,
-                'finnHubQueue': p.finnHubQueue,
-                'dispatch': dispatch,
-            }
-            dispatch(tGetSymbolList(newPayload))
-        }
-    }
-    
-
     const data = {
         field: "exchangelist",
         newValue: newExchangeList.toString().replace("'", ),

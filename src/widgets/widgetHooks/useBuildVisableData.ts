@@ -17,7 +17,6 @@ export const useBuildVisableData = function (
                 key: widgetKey,
                 securityList: targetSecurityList
             }
-            console.log('building visable data', widgetKey, payload)
             dispatch(rBuildVisableData(payload))
         }
     }, [isInitialMount, targetSecurityList, widgetKey, widgetCopy, dispatch])

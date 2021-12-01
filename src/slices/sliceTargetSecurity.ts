@@ -9,14 +9,14 @@ const targetSecurity = createSlice({
     reducers: {
         rSetTargetSecurity: (state: string, action: any) => {
             const ap: string = action.payload
-            state = ap
+            state = ap ? ap : ''
             return state
         },
     },
     extraReducers: {
         [tSyncGlobalStocklist.fulfilled.toString()]: (state, action) => {
             const ap: string = action.payload.targetSecurity
-            state = ap
+            state = ap ? ap : ''
             return state
         },
     }

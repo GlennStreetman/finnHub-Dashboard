@@ -20,6 +20,7 @@ import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 import { tSyncGlobalStocklist } from 'src/thunks/thunkSyncGlobalStockList'
 import { tGetFinnhubData, tgetFinnHubDataReq } from "src/thunks/thunkFetchFinnhub";
 import { rSetUpdateStatus } from "src/slices/sliceDataModel";
+import { reqObj, tGetSymbolList } from 'src/slices/sliceExchangeData'
 
 interface props {
     showEditPane: number,
@@ -42,6 +43,8 @@ function WatchListMenu(p: props, ref: any) {
     const dashboardData = useSelector((state) => { return state.dashboardData })
     const exchangeList = useSelector((state) => { return state.exchangeList })
     const targetSecurity = useSelector((state) => { return state.targetSecurity })
+    const stockDataExchange = useSelector(state => state.exchangeData.e.ex)
+    const defaultExchange = useSelector((state) => state.defaultExchange)
 
 
     const globalStockList = useSelector((state) => {     //finnhub data stored in redux
@@ -61,8 +64,24 @@ function WatchListMenu(p: props, ref: any) {
         }
     ))
 
-    useEffect(() => {
+    useEffect(() => { //update exchange data if not updating, on user input.
+        if (
+            apiKey !== '' &&
+            defaultExchange !== stockDataExchange &&
+            stockDataExchange !== 'updating' &&
+            p.showEditPane === 1
+        ) {
+            const tGetSymbolObj: reqObj = {
+                exchange: defaultExchange,
+                apiKey: apiKey,
+                finnHubQueue: p.finnHubQueue,
+                dispatch: dispatch,
+            }
+            dispatch(tGetSymbolList(tGetSymbolObj))
+        }
+    }, [apiKey, defaultExchange, stockDataExchange, p.showEditPane])
 
+    useEffect(() => { //get the quote prices for global stock list.
         if (Object.keys(globalStockList).length !== 0) {
             for (const stock in globalStockList) {
                 dispatch(tgetQuotePrices({

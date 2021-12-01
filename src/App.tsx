@@ -20,7 +20,7 @@ import TemplateMenu from "./components/templateMenu";
 import { WidgetController } from "./components/widgetController";
 //redux
 import { rResetUpdateFlag, rSetUpdateStatus, } from "./slices/sliceDataModel"; //sliceDataModel, rRebuildTargetDashboardModel 
-import { tGetFinnhubData, tgetFinnHubDataReq } from "./thunks/thunkFetchFinnhub";
+import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
 import { tGetMongoDB } from "./thunks/thunkGetMongoDB";
 import { tGetSavedDashboards } from './thunks/thunkGetSavedDashboards'
 import { rSetTargetSecurity } from 'src/slices/sliceTargetSecurity'
@@ -183,7 +183,7 @@ export default function App() {
         if ((Object.keys(globalStockList).length > 0 && login === 1 && apiKey !== '')) { //price data for watchlist, including socket data.
             LoadTickerSocket(globalStockList, socket, apiKey, socketUpdate, updateAppState, rUpdateQuotePriceStream, dispatch);
         }
-    }, [globalStockList, login, apiKey, dispatch, socket, socketUpdate, updateAppState])
+    }, [globalStockList, login])
 
     useEffect(() => {
         const globalKeys = globalStockList ? Object.keys(globalStockList) : []

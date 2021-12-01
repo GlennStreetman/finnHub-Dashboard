@@ -1,13 +1,13 @@
 import produce from 'immer'
 
 import { useState, useEffect, useImperativeHandle, forwardRef } from "react";
-import { useAppSelector, useAppDispatch } from '../../../hooks';
+import { useAppSelector, useAppDispatch } from 'src/hooks';
 import { dashBoardData } from 'src/App'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
-import { rUnmountWidget } from './../../../slices/sliceShowData'
-import { rRemoveDashboardDataModel, rRenameModelName, rAddNewDashboard } from './../../../slices/sliceDataModel'
-import { rSetTargetDashboard } from './../../../slices/sliceShowData'
+import { rUnmountWidget } from 'src/slices/sliceShowData'
+import { rRemoveDashboardDataModel, rRenameModelName, rAddNewDashboard } from 'src/slices/sliceDataModel'
+import { rSetTargetDashboard } from 'src/slices/sliceShowData'
 import { tCopyDashboard } from "src/thunks/thunkCopyDashboard";
 import { tGetSavedDashboards } from 'src/thunks/thunkGetSavedDashboards'
 import { uniqueObjectnName } from 'src/appFunctions/stringFunctions'
@@ -25,6 +25,7 @@ interface props {
     helpText: string,
     showEditPane: number,
     finnHubQueue: finnHubQueue,
+    updateAppState: Function,
 }
 
 function DashBoardMenu(p: props, ref: any) {
@@ -125,7 +126,7 @@ function DashBoardMenu(p: props, ref: any) {
     function renameDashboard(oldName, newName) {
         // const updateObj = {}
         if (currentDashboard === oldName) dispatch(rUpdateCurrentDashboard(newName))//updateObj['currentDashBoard'] = newName
-        const renamed = produce(this.state.dashBoardData, (draftState: dashBoardData) => {
+        const renamed = produce(dashboardData, (draftState: dashBoardData) => {
             draftState[newName] = draftState[oldName]
             draftState[newName].dashboardname = newName
             delete draftState[oldName]
@@ -175,7 +176,7 @@ function DashBoardMenu(p: props, ref: any) {
     }
 
     function unMountWidgets() { //removes visable data from redux for dashboard.
-        const widdgetKeys = Object.keys(dashboardData?.[currentDashboard]?.widgetlist)
+        const widdgetKeys = Object.keys(dashboardData[currentDashboard].widgetlist)
         for (const x in widdgetKeys) {
             const widgetKey = widdgetKeys[x]
             const payload = {
@@ -345,8 +346,6 @@ export function dashBoardMenuProps(that, key = "DashBoardMenu") {
     </>
 
     let propList = {
-        helpText: [helpText, 'DBM'],
-        finnHubQueue: that.props.finnHubQueue,
     };
     return propList;
 }

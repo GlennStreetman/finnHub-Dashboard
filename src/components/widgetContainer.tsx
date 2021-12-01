@@ -169,6 +169,7 @@ function WidgetContainer(p: containerProps) {
         widgetProps['filters'] = p.widgetList["filters"]
         widgetProps['trackedStocks'] = p.widgetList["trackedStocks"]
         widgetProps['widgetKey'] = p.widgetKey
+        widgetProps['updateAppState'] = p.updateAppState
     }
     if (p.widgetCopy) {
         widgetProps['widgetCopy'] = p.widgetCopy

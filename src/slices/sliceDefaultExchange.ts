@@ -9,7 +9,7 @@ const defaultExchange = createSlice({
     reducers: {
         rSetDefaultExchange: (state: string, action: any) => {
             const ap: string = action.payload
-            state = ap
+            state = ap ? ap : ''
             return state
         },
     },

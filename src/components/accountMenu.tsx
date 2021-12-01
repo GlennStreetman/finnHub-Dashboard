@@ -4,7 +4,6 @@ import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
 import { useNavigate } from "react-router-dom";
 import { rSetApiKey } from 'src/slices/sliceAPIKey'
 import { rSetApiAlias } from 'src/slices/sliceAPIAlias'
-import { tGetSymbolList } from 'src/slices/sliceExchangeData'
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 
 const useSelector = useAppSelector
@@ -87,12 +86,6 @@ function AccountMenu(p: accountMenuProp) {
                 setInputText("")
                 setServerMessage(data.message)
             });
-        if (changeField === 'apikey' && newValue !== '') dispatch(tGetSymbolList({
-            exchange: defaultExchange,
-            apiKey: newValue,
-            finnHubQueue: p.finnHubQueue,
-            dispatch: dispatch,
-        }))
     }
 
     function showEditPane(targetField: string) {

@@ -58,14 +58,14 @@ export const tGetSymbolList = createAsyncThunk(
             config: {},
             widget: 'pass',
             security: reqObj.exchange,
-            rSetUpdateStatus: (a) => { },
+            rSetUpdateStatus: false,
             dispatch: reqObj.dispatch,
         }
 
         return finnHub(finnQueue, thisReq) //replace with usestate.
             .then((data: any) => {
                 if (data.error === 429) { //add back into queue if 429
-                    tGetSymbolList(reqObj)
+                    reqObj.dispatch(tGetSymbolList(reqObj))
                     const resObj: resObj = {
                         'data': {},
                         'ex': reqObj.exchange,
@@ -105,10 +105,12 @@ const exchangeData = createSlice({
 
     extraReducers: {
         [tGetSymbolList.pending.toString()]: (state) => {
+            state.e.ex = 'updating'
             return state
         },
         [tGetSymbolList.rejected.toString()]: (state, action) => {
             console.log('failed to retrieve stock data for: ', action)
+            state.e.ex = ''
             return state
         },
         [tGetSymbolList.fulfilled.toString()]: (state, action) => {
