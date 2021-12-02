@@ -5,7 +5,7 @@ import { tGetMongoDB, getMongoRes } from '../thunks/thunkGetMongoDB'
 import { dashBoardData } from './../App'
 import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB'
 import { tGetSavedDashboards } from '../thunks/thunkGetSavedDashboards'
-
+import { tAddNewWidgetContainer } from 'src/thunks/thunkAddNewWidgetContainer'
 
 interface dataStatus {
     [key: number]: number, //dashboard data setup status: count of open api requests.
@@ -336,6 +336,38 @@ const dataModel = createSlice({
             const flag: boolean | string = state.created === 'false' ? 'true' : 'updated'
             state.created = flag
         },
+        [tAddNewWidgetContainer.fulfilled.toString()]: (state, action) => {
+            const newWidget = action.payload.newWidget
+            const targetDashboard = action.payload.currentDashboard
+            const widgetName = newWidget.widgetID
+            const apiKey = action.payload.apiKey
+
+            const dataModel = {}
+
+            const endPoint: string = newWidget.widgetType
+            const filters: Object = newWidget.filters
+            const widgetDescription: string = newWidget.widgetHeader
+            const widgetType: string = newWidget.widgetType
+            const config: Object = newWidget.config
+            const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
+            const trackedStocks = newWidget.trackedStocks
+            const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, apiKey)
+            delete endPointData.undefined
+
+            for (const stock in endPointData) {
+                dataModel[`${stock}`] = {
+                    apiString: endPointData[stock],
+                    widgetName: widgetDescription,
+                    dashboard: targetDashboard,
+                    widgetType: widgetType,
+                    config: config,
+                }
+            }
+
+            state.dataSet[targetDashboard][widgetName] = dataModel
+
+            return state
+        }
     }
 })
 

@@ -1,6 +1,6 @@
 import produce from "immer"
 import { reqBody } from '../../server/routes/mongoDB/setMongoConfig'
-import { menuList, widget, widgetList, stockList, stock, filters, config, dashBoardData } from 'src/App'
+import { menuList, filters, config, dashBoardData } from 'src/App'
 import { rRebuildTargetWidgetModel } from 'src/slices/sliceDataModel'
 import { tGetFinnhubData } from 'src/thunks/thunkFetchFinnhub'
 import { rSetUpdateStatus } from 'src/slices/sliceDataModel'
@@ -8,52 +8,6 @@ import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 import { rSetWidgetFilters, rSetWidgetConfig } from 'src/slices/sliceDashboardData'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 
-function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
-    const testName = iterator === 0 ? widgetName : widgetName + iterator
-    if (nameList.includes(testName)) {
-        return uniqueName(widgetName, nameList, iterator + 1)
-    } else {
-        return testName
-    }
-}
-
-export const CreateNewWidgetContainer = function (
-    widgetDescription: string,
-    widgetHeader: string,
-    widgetConfig: string,
-    defaultFilters: Object = {},
-    dashBoardData: dashBoardData,
-    currentDashboard: string,
-) {
-    //receives info for new widget. Returns updated widgetlist & dashboard data
-    const widgetName: string = new Date().getTime().toString();
-    const widgetStockList = dashBoardData[currentDashboard].globalstocklist
-    const widgetList = dashBoardData[currentDashboard].widgetlist
-    const widgetIds = widgetList ? Object.keys(widgetList) : []
-    const widgetNameList = widgetIds.map((el) => widgetList[el].widgetHeader)
-    const useName = uniqueName(widgetHeader, widgetNameList)
-
-    const newWidget: widget = {
-        column: 1,
-        columnOrder: -1,
-        config: {}, //used to save user setup for the widget that does not require new api request.
-        filters: defaultFilters, //used to save user setup that requires new api request.
-        showBody: true,
-        trackedStocks: widgetStockList,
-        widgetID: widgetName,
-        widgetType: widgetDescription,
-        widgetHeader: useName,
-        widgetConfig: widgetConfig, //reference to widget type. Menu or data widget.
-        xAxis: 20, //prev 5 rem
-        yAxis: 20, //prev 5 rem
-    };
-
-    const newDashBoardData: dashBoardData = produce(dashBoardData, (draftState) => {
-        draftState[currentDashboard].widgetlist[widgetName] = newWidget
-    })
-
-    return ([newDashBoardData, widgetName])
-}
 
 //widget filters change how data is queried from finnHub
 export const UpdateWidgetFilters = async function (

@@ -2,6 +2,16 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { tChangeWidgetName } from 'src/thunks/thunkChangeWidgetName'
 import { tUpdateWidgetFilters } from 'src/thunks/thunkUpdateWidgetFilters'
 import { tSyncGlobalStocklist } from 'src/thunks/thunkSyncGlobalStockList'
+import { tAddNewWidgetContainer } from 'src/thunks/thunkAddNewWidgetContainer'
+
+function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
+    const testName = iterator === 0 ? widgetName : widgetName + iterator
+    if (nameList.includes(testName)) {
+        return uniqueName(widgetName, nameList, iterator + 1)
+    } else {
+        return testName
+    }
+}
 
 export interface stock {
     currency: string,
@@ -96,6 +106,14 @@ export interface setWidgetStockList {
     stockObj: stock | false
 }
 
+export interface addWidget {
+    widgetDescription: string,
+    widgetHeader: string,
+    widgetConfig: string,
+    defaultFilters: Object,
+    currentDashboard: string,
+}
+
 const initialState: sliceDashboardData = {}
 
 const dashboardData = createSlice({
@@ -155,8 +173,36 @@ const dashboardData = createSlice({
                 delete trackedStocks[ap.symbol]
             }
             return state
-        }
+        },
+        rAddNewWidgetContainer: (state: sliceDashboardData, action: PayloadAction<addWidget>) => {
+            const ap = action.payload
 
+            const widgetName: string = new Date().getTime().toString();
+            const widgetStockList = state[ap.currentDashboard].globalstocklist
+            const widgetList = state[ap.currentDashboard].widgetlist
+            const widgetIds = widgetList ? Object.keys(widgetList) : []
+            const widgetNameList = widgetIds.map((el) => widgetList[el].widgetHeader)
+            const useName = uniqueName(ap.widgetHeader, widgetNameList)
+
+            const newWidget: widget = {
+                column: 1,
+                columnOrder: -1,
+                config: {}, //used to save user setup for the widget that does not require new api request.
+                filters: ap.defaultFilters, //used to save user setup that requires new api request.
+                showBody: true,
+                trackedStocks: widgetStockList,
+                widgetID: widgetName,
+                widgetType: ap.widgetDescription,
+                widgetHeader: useName,
+                widgetConfig: ap.widgetConfig, //reference to widget type. Menu or data widget.
+                xAxis: 20, //prev 5 rem
+                yAxis: 20, //prev 5 rem
+            };
+
+            state[ap.currentDashboard].widgetlist[widgetName] = newWidget
+
+            return state
+        }
     },
     extraReducers: {
         [tChangeWidgetName.pending.toString()]: (state) => {
@@ -196,6 +242,13 @@ const dashboardData = createSlice({
             state = ap
             return state
         },
+        [tAddNewWidgetContainer.fulfilled.toString()]: (state, action) => {
+            const newWidget = action.payload.newWidget
+            const currentDashboard = action.payload.currentDashboard
+            const widgetName = newWidget.widgetID
+            state[currentDashboard].widgetlist[widgetName] = newWidget
+            return state
+        }
     }
 })
 
@@ -207,5 +260,6 @@ export const {
     rSetGlobalStockList,
     rReplaceGlobalStocklist,
     rSetWidgetStockList,
+    rAddNewWidgetContainer,
 } = dashboardData.actions
 export default dashboardData.reducer

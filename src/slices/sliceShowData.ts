@@ -51,7 +51,7 @@ const showData = createSlice({
             if (!state.dataSet[key]) state.dataSet[key] = {}
             for (const security in ap.securityList) {
                 const thisSecurity: string = ap.securityList[security]
-                if (!state.dataSet[key][thisSecurity]) state.dataSet[key][thisSecurity] = {}
+                if (!state.dataSet[key][thisSecurity] && thisSecurity !== undefined) state.dataSet[key][thisSecurity] = {}
             }
             if (ap.dataFilters) {
                 for (const [sec, values] of Object.entries(ap.dataFilters)) {

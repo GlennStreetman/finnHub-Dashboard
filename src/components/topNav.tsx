@@ -12,17 +12,16 @@ import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import InfoIcon from '@material-ui/icons/Info';
 import LockRoundedIcon from '@material-ui/icons/LockRounded';
 import LockOpenRoundedIcon from '@material-ui/icons/LockOpenRounded';
-import { CreateNewWidgetContainer } from 'src/appFunctions/appImport/widgetLogic';
 
 import { useAppDispatch } from 'src/hooks';
 
-import { rDataModelLogout, rSetUpdateStatus, rRebuildTargetWidgetModel } from "src/slices/sliceDataModel"
+import { rDataModelLogout, rSetUpdateStatus } from "src/slices/sliceDataModel"
 import { rExchangeDataLogout } from "src/slices/sliceExchangeData";
 import { rExchangeListLogout } from "src/slices/sliceExchangeList";
 import { rTargetDashboardLogout } from "src/slices/sliceShowData";
 import { tGetFinnhubData } from "src/thunks/thunkFetchFinnhub";
-import { rSetDashboardData } from 'src/slices/sliceDashboardData'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
+import { tAddNewWidgetContainer } from 'src/thunks/thunkAddNewWidgetContainer'
 
 interface topNavProps {
     login: number,
@@ -70,29 +69,29 @@ function TopNav(p: topNavProps) {
 
     function dropDownList(dropList: [string, string, string, string, filters | undefined, string][]) {
         let newList = dropList.map((el) => {
-            let [a, b, c, d, e] = el
+            let [widgetDescription, widgetHeader, widgetConfig, d, defaultFilters] = el
             if (isChecked(el) === true) {
-                return (<li key={a + 'li'} id='ddi'>
-                    <a key={a} data-testid={d} href="#r" onClick={async () => {
-                        const [newDash, widgetName] = CreateNewWidgetContainer(a, b, c, e, p.dashboardData, p.currentDashboard);
-                        dispatch(rSetDashboardData(newDash))
-                        dispatch(tSaveDashboard({ dashboardName: p.currentDashboard }))
-                        const payload = {
-                            apiKey: p.apiKey,
-                            dashBoardData: newDash,
-                            targetDashboard: p.currentDashboard,
-                            targetWidget: widgetName,
-                        }
-                        dispatch(rRebuildTargetWidgetModel(payload))
-                        let updatePayload = {
-                            dashboardID: newDash[p.currentDashboard].id,
-                            targetDashBoard: p.currentDashboard,
-                            widgetList: [`${widgetName}`],
+                return (<li key={widgetDescription + 'li'} id='ddi'>
+                    <a key={widgetDescription} data-testid={d} href="#r" onClick={async () => {
+
+                        const thisDashboard = p.currentDashboard
+
+                        const newWidget = await dispatch(tAddNewWidgetContainer({
+                            widgetDescription: widgetDescription, //a
+                            widgetHeader: widgetHeader, //b
+                            widgetConfig: widgetConfig, //c
+                            defaultFilters: defaultFilters, //d
+                        })).unwrap()
+
+                        dispatch(tSaveDashboard({ dashboardName: thisDashboard }))
+                        dispatch(tGetFinnhubData({
+                            dashboardID: p.dashboardData[p.currentDashboard].id,
+                            targetDashBoard: thisDashboard,
+                            widgetList: [`${newWidget.newWidget.widgetID}`],
                             finnHubQueue: p.finnHubQueue,
                             rSetUpdateStatus: rSetUpdateStatus,
                             dispatch: dispatch,
-                        }
-                        dispatch(tGetFinnhubData(updatePayload))
+                        }))
                     }}>
                         {d}
                     </a>
