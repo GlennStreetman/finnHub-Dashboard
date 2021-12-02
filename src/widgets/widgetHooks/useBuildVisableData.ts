@@ -12,13 +12,13 @@ export const useBuildVisableData = function (
         if (isInitialMount.current === true && widgetCopy === widgetKey) { //on Mount, do not rebuild if widget copy.
             isInitialMount.current = false;
         } else {
-            if (isInitialMount.current === true && targetSecurityList[0] !== undefined) { isInitialMount.current = false }
+            if (isInitialMount.current === true) { isInitialMount.current = false }
             const payload: object = {
                 key: widgetKey,
                 securityList: targetSecurityList
             }
-            console.log('rBuildVisableData payload', targetSecurityList[0], payload)
-            dispatch(rBuildVisableData(payload))
+            // console.log('rBuildVisableData payload', targetSecurityList[0], payload)
+            if (targetSecurityList[0] !== undefined) dispatch(rBuildVisableData(payload))
         }
     }, [isInitialMount, targetSecurityList, widgetKey, widgetCopy, dispatch])
 }

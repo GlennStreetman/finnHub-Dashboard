@@ -15,11 +15,10 @@ import LockOpenRoundedIcon from '@material-ui/icons/LockOpenRounded';
 
 import { useAppDispatch } from 'src/hooks';
 
-import { rDataModelLogout, rSetUpdateStatus } from "src/slices/sliceDataModel"
+import { rDataModelLogout } from "src/slices/sliceDataModel"
 import { rExchangeDataLogout } from "src/slices/sliceExchangeData";
 import { rExchangeListLogout } from "src/slices/sliceExchangeList";
 import { rTargetDashboardLogout } from "src/slices/sliceShowData";
-import { tGetFinnhubData } from "src/thunks/thunkFetchFinnhub";
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 import { tAddNewWidgetContainer } from 'src/thunks/thunkAddNewWidgetContainer'
 
@@ -76,7 +75,7 @@ function TopNav(p: topNavProps) {
 
                         const thisDashboard = p.currentDashboard
 
-                        const newWidget = await dispatch(tAddNewWidgetContainer({
+                        await dispatch(tAddNewWidgetContainer({
                             widgetDescription: widgetDescription, //a
                             widgetHeader: widgetHeader, //b
                             widgetConfig: widgetConfig, //c
@@ -84,14 +83,6 @@ function TopNav(p: topNavProps) {
                         })).unwrap()
 
                         dispatch(tSaveDashboard({ dashboardName: thisDashboard }))
-                        dispatch(tGetFinnhubData({
-                            dashboardID: p.dashboardData[p.currentDashboard].id,
-                            targetDashBoard: thisDashboard,
-                            widgetList: [`${newWidget.newWidget.widgetID}`],
-                            finnHubQueue: p.finnHubQueue,
-                            rSetUpdateStatus: rSetUpdateStatus,
-                            dispatch: dispatch,
-                        }))
                     }}>
                         {d}
                     </a>
