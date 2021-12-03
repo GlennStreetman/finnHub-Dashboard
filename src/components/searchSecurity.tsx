@@ -35,10 +35,12 @@ const oneOffTheme = createTheme({
         },
         MuiFormLabel: {
             root: {
+                padding: '0px',
+                lineHeight: 0,
                 color: 'black',
                 '&$focused': {
                     color: 'black'
-                }
+                },
             },
         },
 
