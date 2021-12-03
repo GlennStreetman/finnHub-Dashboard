@@ -10,7 +10,7 @@ const useSelector = useAppSelector
 
 interface accountMenuProp {
     finnHubQueue: finnHubQueue,
-    updateAppState: Object,
+
 }
 
 function AccountMenu(p: accountMenuProp) {
@@ -28,7 +28,6 @@ function AccountMenu(p: accountMenuProp) {
 
     const apiKey = useSelector((state) => { return state.apiKey })
     const apiAlias = useSelector((state) => { return state.apiAlias })
-    const defaultExchange = useSelector((state) => { return state.defaultExchange })
     const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
 
     useEffect(() => {
@@ -202,7 +201,6 @@ function AccountMenu(p: accountMenuProp) {
 export function accountMenuProps(that: AppState) {
     let propList = {
         finnHubQueue: that.finnHubQueue,
-        updateAppState: that.updateAppState,
     };
     return propList;
 }

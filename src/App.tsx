@@ -45,6 +45,7 @@ const outerTheme = createTheme({
             xl: 2400, //2
         },
     },
+
 });
 
 const useDispatch = useAppDispatch

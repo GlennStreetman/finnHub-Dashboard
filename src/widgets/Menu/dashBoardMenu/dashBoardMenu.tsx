@@ -25,7 +25,6 @@ interface props {
     helpText: string,
     showEditPane: number,
     finnHubQueue: finnHubQueue,
-    updateAppState: Function,
 }
 
 function DashBoardMenu(p: props, ref: any) {
