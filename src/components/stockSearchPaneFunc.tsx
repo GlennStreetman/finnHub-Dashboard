@@ -1,6 +1,6 @@
 
 
-import ToolTip from './toolTip.js'
+// import ToolTip from './toolTip.js'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 import { rSetGlobalStockList, rSetWidgetStockList } from 'src/slices/sliceDashboardData'
 import { useAppDispatch, useAppSelector } from 'src/hooks';
@@ -10,6 +10,7 @@ import SecuritySearch from 'src/components/searchSecurity'
 import { Button, Box, Select, FormControl } from '@material-ui/core/';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import useWindowDimensions from 'src/appFunctions/hooks/windowDimensions'
+import Tooltip from '@material-ui/core/Tooltip'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -67,14 +68,11 @@ function StockSearchPane(p: props) {
                 flexDirection: 'row',
             },
             securitySearch: {
-                width: Math.round(widgetFraction * 7),
+                width: exchangeList.length > 1 ? Math.round(widgetFraction * 7.5) : Math.round(widgetFraction * 9.5), //7 or 9.5
                 marginRight: '10px',
                 backgroundColor: "white",
                 borderRadius: 10,
                 outlineRadius: 10,
-                // MuiInputLabel: {
-                //     color: "white"
-                // },
                 height: '35px',
             },
             exchange: {
@@ -121,12 +119,8 @@ function StockSearchPane(p: props) {
         <option key={el} value={el}>{el}</option>
     )
     const helpText = <>
-        Select Exchange to search. <br />
+        Select exchange to be used in "Add Security" search. <br />
         Click manage account to update exchange list.<br />
-        Enter stock name or symbol to search for stocks.
-    </>
-    const helpText2 = <>
-        Enter stock name or symbol to search for stocks. <br />
     </>
 
     const submit = function (e) { //submit stock to be added/removed from global & widget stocklist.
@@ -166,12 +160,16 @@ function StockSearchPane(p: props) {
             <FormControl
                 className={classes.formControl}
             >
-                <ToolTip textFragment={exchangeList.length > 1 ? helpText : helpText2} hintName='sspe2' />
-                {exchangeList.length > 1 && <>
-                    <Select variant="outlined" className={classes.exchange} value={defaultExchange} name='exchangeList' onChange={changeDefault}>
-                        {exchangeOptions}
-                    </Select></>
+                {/* hintName='sspe2' */}
+
+                {exchangeList.length > 1 &&
+                    <Tooltip title={helpText} >
+                        <Select variant="outlined" className={classes.exchange} value={defaultExchange} name='exchangeList' onChange={changeDefault}>
+                            {exchangeOptions}
+                        </Select>
+                    </Tooltip>
                 }
+
                 <SecuritySearch
                     searchText={p.searchText}
                     finnHubQueue={p.finnHubQueue}

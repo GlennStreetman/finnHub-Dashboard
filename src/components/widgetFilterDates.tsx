@@ -4,6 +4,13 @@ import { UpdateWidgetFilters } from 'src/appFunctions/appImport/widgetLogic'
 import { useAppDispatch } from 'src/hooks';
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
+import 'date-fns';
+import DateFnsUtils from '@date-io/date-fns';
+import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+import { createTheme, ThemeProvider } from '@material-ui/core/styles'
+import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import useWindowDimensions from 'src/appFunctions/hooks/windowDimensions'
+
 interface props {
     start: string,
     end: string,
@@ -17,85 +24,146 @@ interface props {
     finnHubQueue: finnHubQueue,
 }
 
+const filterTheme = createTheme({
+    overrides: {
+        MuiTextField: {
+            root: {
+                color: 'white',
+                width: '150px',
+                marginRight: '5px',
+                marginLeft: '5px',
+
+            },
+        },
+        MuiInputBase: {
+            root: {
+                color: 'white'
+
+            },
+        },
+        MuiFormLabel: {
+            root: {
+                color: 'white',
+                '&$focused': {
+                    color: 'white'
+                },
+            },
+        },
+
+        MuiFormHelperText: {
+            root: {
+                color: 'white'
+            }
+        }
+    }
+});
+
+
+
 const useDispatch = useAppDispatch
 
 export default function WidgetFilterDates(p: props) {
 
     const dispatch = useDispatch();
 
-    function updateStartDate(e) {
-        p.setStart(e.target.value)
+    const width = useWindowDimensions().width //also returns height
+    const columnLookup = [
+        [0, 400, 1],
+        [400, 800, 1], //12
+        [800, 1200, 2], //6
+        [1200, 1600, 3], //4
+        [1600, 2400, 4], //3
+        [2400, 99999999, 6] //2
+    ]
+
+    const columnSetup = function (): number[] {
+        let ret: number[] = columnLookup.reduce((acc, el) => {
+            if (width > el[0] && width <= el[1]) {
+                const newVal = el
+                acc = newVal
+                return (acc)
+            } else { return (acc) }
+        })
+        return (ret)
+    }()
+
+    const columns = columnSetup[2]
+
+    const widgetFraction = (width / columns - 20) / 12
+
+    function updateStartDate(date) {
+        p.setStart(date)
     }
 
-    function updateEndDate(e) {
-        p.setEnd(e.target.value)
+    function updateEndDate(date) {
+        p.setEnd(date)
     }
 
-    function updateFilter(e) {
-        if (isNaN(new Date(e.target.value).getTime()) === false) {
+    function updateFilter(date, filterName) {
+        console.log('updating filters', filterName)
+        if (isNaN(new Date(date).getTime()) === false) {
             const now = Date.now()
-            const target = new Date(e.target.value).getTime();
+            const target = new Date(date).getTime();
             const offset = target - now
-            const name = e.target.name;
-            UpdateWidgetFilters(p.widgetKey, { [name]: offset }, p.dashboardData, p.currentDashboard, dispatch, p.apiKey, p.finnHubQueue)
+            UpdateWidgetFilters(p.widgetKey, { [filterName]: offset }, p.dashboardData, p.currentDashboard, dispatch, p.apiKey, p.finnHubQueue)
         }
     }
 
-    const helpTextStart = <>
-        Finnhub API From date for this widget. <br />
-        See Finnhub.io/docs for more info.
-    </>
-    const helpTextEnd = <>
-        Finnhub API To date for this widget.<br />
-        See Finnhub.io/docs for more info.
-    </>
+    const useStyles = makeStyles((theme: Theme) =>
+        createStyles({
+            getTime: {
+                width: Math.round(widgetFraction * 5.5),
+            },
+        }))
+
+    const classes = useStyles();
+
+    const thisStyle = {
+        display: 'flex',
+        justifyContent: 'center',
+    }
 
     return (
-        <div className='stockSearch'>
-            <table className="filterTable">
-                <tbody>
-                    <tr>
-                        <td>
-                            <ToolTip textFragment={helpTextStart} hintName={`start-${p.widgetKey}`} />
-                        </td>
-                        <td style={{ color: 'white' }} className='rightTE'><label htmlFor="start">
-                            From date:</label>
-                        </td>
-                        <td className='centerTE'>
-                            <input
-                                data-testid={`fromDate-${p.widgetType}`}
-                                className="btn"
-                                id="start"
-                                type="date"
-                                name="startDate"
-                                onChange={updateStartDate}
-                                onBlur={updateFilter}
-                                value={p.start}
-                            />
-                        </td>
-                    </tr>
-                    <tr style={{ backgroundColor: 'inherit' }}>
-                        <td>
-                            <ToolTip textFragment={helpTextEnd} hintName={`end-${p.widgetKey}`} />
-                        </td>
-                        <td style={{ color: 'white' }} className='rightTE'>
-                            <label htmlFor="end">To date:</label>
-                        </td>
-                        <td className='centerTE'>
-                            <input
-                                data-testid={`toDate-${p.widgetType}`}
-                                className="btn"
-                                id="end"
-                                type="date"
-                                name="endDate"
-                                onChange={updateEndDate}
-                                onBlur={updateFilter}
-                                value={p.end}
-                            />
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+        <div style={thisStyle}>
+            <ThemeProvider theme={filterTheme}>
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    {/* <span> */}
+                    <KeyboardDatePicker
+                        className={classes.getTime}
+                        disableToolbar
+                        variant="inline"
+                        format="MM/dd/yyyy"
+                        margin="normal"
+                        id="date-picker-inline"
+                        label="Start Date:"
+                        value={p.start}
+                        onChange={updateStartDate}
+                        onBlur={(date) => { updateFilter(date, 'startDate') }}
+                        onAccept={(date) => { updateFilter(date, 'startDate') }}
+                        KeyboardButtonProps={{
+                            'aria-label': 'change date',
+                        }}
+                    />
+                    <KeyboardDatePicker
+                        className={classes.getTime}
+                        disableToolbar
+                        variant="inline"
+                        format="MM/dd/yyyy"
+                        margin="normal"
+                        id="date-picker-inline"
+                        label="End Date:"
+                        value={p.end}
+                        onChange={updateEndDate}
+                        onBlur={(date) => { updateFilter(date, 'endDate') }}
+                        onAccept={(date) => { updateFilter(date, 'startDate') }}
+                        KeyboardButtonProps={{
+                            'aria-label': 'change date',
+                        }}
+                    />
+                    {/* </span> */}
+                </MuiPickersUtilsProvider>
+
+            </ThemeProvider>
         </div>
     )
 }
