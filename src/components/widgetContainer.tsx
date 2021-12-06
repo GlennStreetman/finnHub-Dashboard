@@ -1,21 +1,23 @@
 import React from "react";
-import { widgetLookUp } from '../registers/widgetContainerReg.js'
-import { excelRegister, excelRegister_singleSecurity } from '../registers/excelButtonRegister'
+import { useState, useEffect } from "react";
+
 import ToolTip from './toolTip.js'
 import ErrorBoundary from './widgetErrorBoundary';
-import { useState, useEffect } from "react";
-import { useAppDispatch, useAppSelector } from '../hooks';
+import { useAppDispatch, useAppSelector } from 'src/hooks';
+import { widget } from 'src/App'
+import { widgetLookUp } from '../registers/widgetContainerReg.js'
+import { excelRegister, excelRegister_singleSecurity } from '../registers/excelButtonRegister'
+
 import { rUnmountWidget } from '../slices/sliceShowData'
 import { rRemoveWidgetDataModel } from '../slices/sliceDataModel'
-import { toggleWidgetBody } from 'src/appFunctions/appImport/widgetLogic'
-import { setDragWidget, setDragMenu, SnapWidget, moveStockWidget, moveMenu } from 'src/appFunctions/appImport/widgetGrid'
 import { rSetMenuList } from 'src/slices/sliceMenuList'
-import { tChangeWidgetName } from 'src/thunks/thunkChangeWidgetName'
 import { rSetDashboardData, rRemoveWidget, removeWidgetPayload } from 'src/slices/sliceDashboardData'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
-import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
-import { widget } from 'src/App'
+import { tChangeWidgetName } from 'src/thunks/thunkChangeWidgetName'
 
+import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
+import { toggleWidgetBody } from 'src/appFunctions/appImport/widgetLogic'
+import { setDragWidget, setDragMenu, SnapWidget, moveStockWidget, moveMenu } from 'src/appFunctions/appImport/widgetGrid'
 
 
 interface containerProps {

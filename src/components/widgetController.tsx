@@ -39,6 +39,7 @@ function WidgetController(p: controllerProps) {
         [2400, 99999999, 6] //2
     ]
 
+
     const columnSetup = function (): number[] {
         let ret: number[] = columnLookup.reduce((acc, el) => {
             if (width > el[0] && width <= el[1]) {
@@ -52,7 +53,7 @@ function WidgetController(p: controllerProps) {
 
     const columnCount = columnSetup[2]
     const widgetWidth = Math.round(width / columnCount)
-    const bottomNav = p.login === 1 ? <BottomNav setFocus={setFocus} columnCount={columnCount} /> : <></>
+    const bottomNav = p.login === 1 ? <BottomNav setFocus={setFocus} columnCount={columnCount} focus={focus} width={width} /> : <></>
 
     function renderWidgetColumn(widgetObjList) {
         if (widgetObjList !== undefined && widgetObjList[0]['pass'] === undefined) {
@@ -115,7 +116,7 @@ function WidgetController(p: controllerProps) {
         }
     }
 
-    const displayColumns = allWidgetColumns.slice(focus, columnCount) //display in grid
+    const displayColumns = allWidgetColumns.slice(focus, columnCount + focus) //display in grid
     const dragColumn = allWidgetColumns[6] //display widget current being dragged to new location.
 
     const renderWidgetColumns = Object.keys(displayColumns).map((el) => {
@@ -129,7 +130,9 @@ function WidgetController(p: controllerProps) {
             {renderWidgetColumns}
         </Grid>
         {renderWidgetColumn(dragColumn)}
+        <div style={{ height: '7vh' }} />
         {bottomNav}
+
     </>
     ) : (
         <>

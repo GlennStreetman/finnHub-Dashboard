@@ -12,6 +12,8 @@ import AccountBoxIcon from '@material-ui/icons/AccountBox';
 import InfoIcon from '@material-ui/icons/Info';
 import LockRoundedIcon from '@material-ui/icons/LockRounded';
 import LockOpenRoundedIcon from '@material-ui/icons/LockOpenRounded';
+import AppsIcon from '@material-ui/icons/Apps';
+
 
 import { useAppDispatch } from 'src/hooks';
 
@@ -21,6 +23,8 @@ import { rExchangeListLogout } from "src/slices/sliceExchangeList";
 import { rTargetDashboardLogout } from "src/slices/sliceShowData";
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 import { tAddNewWidgetContainer } from 'src/thunks/thunkAddNewWidgetContainer'
+
+import useWindowDimensions from '../appFunctions/hooks/windowDimensions'
 
 interface topNavProps {
     login: number,
@@ -37,6 +41,7 @@ function TopNav(p: topNavProps) {
     let location = useLocation();
     const useDispatch = useAppDispatch
     const dispatch = useDispatch(); //allows widget to run redux actions.
+    const width = useWindowDimensions().width //also returns height
 
     function isChecked(el: [string, string, string, string, filters | undefined, string]) {
         if (p.widgetSetup?.[el[0]] !== undefined) {
@@ -126,7 +131,7 @@ function TopNav(p: topNavProps) {
     return p.login === 1 ? (
         <AppBar position="static">
             <Toolbar >
-                <img src="logo2.png" alt="logo" />
+                {width > 600 ? <img src="logo2.png" alt="logo" /> : <></>}
                 <ul id='ddu' className="menu">
                     <li id='ddi'></li>
                     {showDashBoardButtons()}
@@ -134,34 +139,44 @@ function TopNav(p: topNavProps) {
 
                 <div className="navItemEnd">
                     <ul id='ddu' className="sub-menu">
-                        <li id='toggleBackGroundMenuButton' className="navItem">
-                            <a href="#home" onClick={() => { navigate('/dashboard') }}>
-                                Dashboard
-                            </a>
-                        </li>
-                        <li id='templatesButton' className="navItem">
-                            <a href="#home" onClick={() => { navigate('/templates') }}>
-                                <Tooltip title="Excel Templates" placement="bottom"><TableChartIcon /></Tooltip>
-                            </a>
-                        </li>
-                        <li id='manageAccountButton' className="navItem">
-                            <a href="#home" onClick={() => { navigate('/manageAccount') }}>
-                                <Tooltip title="Manage Account" placement="bottom"><AccountBoxIcon /></Tooltip>
-                            </a>
-                        </li>
-                        <li id='aboutButton' className='navItem'>
-                            <a href="#home" onClick={() => { navigate('/about') }}>
-                                <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>
-                            </a>
-                        </li>
+                        {location.pathname !== '/dashboard' ? (
+                            <li id='templatesButton' className="navItem">
+                                <a href="#home" onClick={() => { navigate('/dashboard') }}>
+                                    <Tooltip title="Show Dashboards" placement="bottom"><AppsIcon /></Tooltip>
+                                </a>
+                            </li>
+                        ) : <></>}
+
+                        {location.pathname !== '/templates' ? (
+                            <li id='templatesButton' className="navItem">
+                                <a href="#home" onClick={() => { navigate('/templates') }}>
+                                    <Tooltip title="Excel Templates" placement="bottom"><TableChartIcon /></Tooltip>
+                                </a>
+                            </li>
+                        ) : <></>}
+
+                        {location.pathname !== '/manageAccount' ? (
+                            <li id='manageAccountButton' className="navItem">
+                                <a href="#home" onClick={() => { navigate('/manageAccount') }}>
+                                    <Tooltip title="Manage Account" placement="bottom"><AccountBoxIcon /></Tooltip>
+                                </a>
+                            </li>
+                        ) : <></>}
+                        {location.pathname !== '/about' ? (
+                            <li id='aboutButton' className='navItem'>
+                                <a href="#home" onClick={() => { navigate('/about') }}>
+                                    <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>
+                                </a>
+                            </li>
+                        ) : <></>}
                         <li id='LogButton' className='navItem'>
                             <a id='LogButtonLink' href="#home" onClick={async () => {
                                 logout()
                             }}>
                                 <Tooltip title="Logout" placement="bottom"><LockRoundedIcon /></Tooltip>
-
                             </a>
                         </li>
+
                     </ul>
                 </div>
             </Toolbar>
