@@ -118,7 +118,7 @@ function TopNav(p: topNavProps) {
                 {/* <li id='ddi' className="menu-item-has-children"> */}
                 <Tooltip title="Add Widget" placement="bottom">
                     <Button data-testid="widgetsDropdown">
-                        <WidgetsIcon />
+                        <WidgetsIcon style={{ fill: 'white' }} />
                     </Button>
                 </Tooltip>
                 {/* {widgetDropDown} */}
@@ -144,7 +144,7 @@ function TopNav(p: topNavProps) {
                     {location.pathname !== '/dashboard' ? (
                         // <li id='templatesButton' className="navItem">
                         <Button onClick={() => { navigate('/dashboard') }}>
-                            <Tooltip title="Show Dashboards" placement="bottom"><AppsIcon /></Tooltip>
+                            <Tooltip title="Show Dashboards" placement="bottom"><AppsIcon style={{ fill: 'white' }} /></Tooltip>
                         </Button>
                         // </li>
                     ) : <></>}
@@ -152,7 +152,7 @@ function TopNav(p: topNavProps) {
                     {location.pathname !== '/templates' ? (
                         // <li id='templatesButton' className="navItem">
                         <Button onClick={() => { navigate('/templates') }}>
-                            <Tooltip title="Excel Templates" placement="bottom"><TableChartIcon /></Tooltip>
+                            <Tooltip title="Excel Templates" placement="bottom"><TableChartIcon style={{ fill: 'white' }} /></Tooltip>
                         </Button>
                         // </li>
                     ) : <></>}
@@ -160,20 +160,20 @@ function TopNav(p: topNavProps) {
                     {location.pathname !== '/manageAccount' ? (
                         // <li id='manageAccountButton' className="navItem">
                         <Button onClick={() => { navigate('/manageAccount') }}>
-                            <Tooltip title="Manage Account" placement="bottom"><AccountBoxIcon /></Tooltip>
+                            <Tooltip title="Manage Account" placement="bottom"><AccountBoxIcon style={{ fill: 'white' }} /></Tooltip>
                         </Button>
                         // </li>
                     ) : <></>}
                     {location.pathname !== '/about' ? (
                         // <li id='aboutButton' className='navItem'>
                         <Button onClick={() => { navigate('/about') }}>
-                            <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>
+                            <Tooltip title="About Finnhub" placement="bottom"><InfoIcon style={{ fill: 'white' }} /></Tooltip>
                         </Button>
                         // </li>
                     ) : <></>}
                     {/* <li id='LogButton' className='navItem'> */}
                     <Button id='LogButtonLink' onClick={async () => { logout() }}>
-                        <Tooltip title="Logout" placement="bottom"><LockRoundedIcon /></Tooltip>
+                        <Tooltip title="Logout" placement="bottom"><LockRoundedIcon style={{ fill: 'white' }} /></Tooltip>
                     </Button>
                     {/* </li> */}
 
@@ -188,10 +188,10 @@ function TopNav(p: topNavProps) {
                 <div className='navItemEnd'>
                     {location.pathname === '/about' ?
                         <Button id='aboutButton' onClick={() => { navigate('/login') }}>
-                            <Tooltip title="Login" placement="bottom"><LockOpenRoundedIcon /></Tooltip>
+                            <Tooltip title="Login" placement="bottom"><LockOpenRoundedIcon style={{ fill: 'white' }} /></Tooltip>
                         </Button> :
                         <Button id='aboutButton' onClick={() => { navigate('/about') }}>
-                            <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>
+                            <Tooltip title="About Finnhub" placement="bottom"><InfoIcon style={{ fill: 'white' }} /></Tooltip>
                         </Button>
                     }
                 </div>
