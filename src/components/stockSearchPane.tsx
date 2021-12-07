@@ -68,7 +68,7 @@ function StockSearchPane(p: props) {
                 flexDirection: 'row',
             },
             securitySearch: {
-                width: exchangeList.length > 1 ? Math.round(widgetFraction * 7.5) : Math.round(widgetFraction * 9.5), //7 or 9.5
+                width: exchangeList.length > 1 ? Math.round(widgetFraction * 7) : Math.round(widgetFraction * 9.5), //7 or 9.5
                 marginRight: '10px',
                 backgroundColor: "white",
                 borderRadius: 10,

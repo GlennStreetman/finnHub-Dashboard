@@ -13,6 +13,7 @@ import InfoIcon from '@material-ui/icons/Info';
 import LockRoundedIcon from '@material-ui/icons/LockRounded';
 import LockOpenRoundedIcon from '@material-ui/icons/LockOpenRounded';
 import AppsIcon from '@material-ui/icons/Apps';
+import Button from '@material-ui/core/Button';
 
 
 import { useAppDispatch } from 'src/hooks';
@@ -114,14 +115,14 @@ function TopNav(p: topNavProps) {
     const showDashBoardButtons = () => {
         if (location.pathname === '/dashboard') {
             return (<>
-                <li id='ddi' className="menu-item-has-children">
-                    <Tooltip title="Add Widget" placement="bottom">
-                        <a data-testid="widgetsDropdown" href="#contact">
-                            <WidgetsIcon />
-                        </a>
-                    </Tooltip>
-                    {widgetDropDown}
-                </li>
+                {/* <li id='ddi' className="menu-item-has-children"> */}
+                <Tooltip title="Add Widget" placement="bottom">
+                    <Button data-testid="widgetsDropdown">
+                        <WidgetsIcon />
+                    </Button>
+                </Tooltip>
+                {/* {widgetDropDown} */}
+                {/* </li> */}
 
             </>
             )
@@ -132,65 +133,67 @@ function TopNav(p: topNavProps) {
         <AppBar position="static">
             <Toolbar >
                 {width > 600 ? <img src="logo2.png" alt="logo" /> : <></>}
-                <ul id='ddu' className="menu">
+                {/* <ul id='ddu' className="menu">
                     <li id='ddi'></li>
-                    {showDashBoardButtons()}
-                </ul>
+
+                </ul> */}
 
                 <div className="navItemEnd">
-                    <ul id='ddu' className="sub-menu">
-                        {location.pathname !== '/dashboard' ? (
-                            <li id='templatesButton' className="navItem">
-                                <a href="#home" onClick={() => { navigate('/dashboard') }}>
-                                    <Tooltip title="Show Dashboards" placement="bottom"><AppsIcon /></Tooltip>
-                                </a>
-                            </li>
-                        ) : <></>}
+                    {/* <ul id='ddu' className="sub-menu"> */}
+                    {showDashBoardButtons()}
+                    {location.pathname !== '/dashboard' ? (
+                        // <li id='templatesButton' className="navItem">
+                        <Button onClick={() => { navigate('/dashboard') }}>
+                            <Tooltip title="Show Dashboards" placement="bottom"><AppsIcon /></Tooltip>
+                        </Button>
+                        // </li>
+                    ) : <></>}
 
-                        {location.pathname !== '/templates' ? (
-                            <li id='templatesButton' className="navItem">
-                                <a href="#home" onClick={() => { navigate('/templates') }}>
-                                    <Tooltip title="Excel Templates" placement="bottom"><TableChartIcon /></Tooltip>
-                                </a>
-                            </li>
-                        ) : <></>}
+                    {location.pathname !== '/templates' ? (
+                        // <li id='templatesButton' className="navItem">
+                        <Button onClick={() => { navigate('/templates') }}>
+                            <Tooltip title="Excel Templates" placement="bottom"><TableChartIcon /></Tooltip>
+                        </Button>
+                        // </li>
+                    ) : <></>}
 
-                        {location.pathname !== '/manageAccount' ? (
-                            <li id='manageAccountButton' className="navItem">
-                                <a href="#home" onClick={() => { navigate('/manageAccount') }}>
-                                    <Tooltip title="Manage Account" placement="bottom"><AccountBoxIcon /></Tooltip>
-                                </a>
-                            </li>
-                        ) : <></>}
-                        {location.pathname !== '/about' ? (
-                            <li id='aboutButton' className='navItem'>
-                                <a href="#home" onClick={() => { navigate('/about') }}>
-                                    <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>
-                                </a>
-                            </li>
-                        ) : <></>}
-                        <li id='LogButton' className='navItem'>
-                            <a id='LogButtonLink' href="#home" onClick={async () => {
-                                logout()
-                            }}>
-                                <Tooltip title="Logout" placement="bottom"><LockRoundedIcon /></Tooltip>
-                            </a>
-                        </li>
+                    {location.pathname !== '/manageAccount' ? (
+                        // <li id='manageAccountButton' className="navItem">
+                        <Button onClick={() => { navigate('/manageAccount') }}>
+                            <Tooltip title="Manage Account" placement="bottom"><AccountBoxIcon /></Tooltip>
+                        </Button>
+                        // </li>
+                    ) : <></>}
+                    {location.pathname !== '/about' ? (
+                        // <li id='aboutButton' className='navItem'>
+                        <Button onClick={() => { navigate('/about') }}>
+                            <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>
+                        </Button>
+                        // </li>
+                    ) : <></>}
+                    {/* <li id='LogButton' className='navItem'> */}
+                    <Button id='LogButtonLink' onClick={async () => { logout() }}>
+                        <Tooltip title="Logout" placement="bottom"><LockRoundedIcon /></Tooltip>
+                    </Button>
+                    {/* </li> */}
 
-                    </ul>
+                    {/* </ul> */}
                 </div>
             </Toolbar>
-        </AppBar>
+        </AppBar >
 
     ) : (
         <>
             <div className="topnav">
                 <div className='navItemEnd'>
-                    <a id='aboutButton' href="#home" onClick={() => { navigate('/about') }}>
-                        {location.pathname === '/about' ?
-                            <Tooltip title="Login" placement="bottom"><LockOpenRoundedIcon /></Tooltip> :
-                            <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>}
-                    </a>
+                    {location.pathname === '/about' ?
+                        <Button id='aboutButton' onClick={() => { navigate('/login') }}>
+                            <Tooltip title="Login" placement="bottom"><LockOpenRoundedIcon /></Tooltip>
+                        </Button> :
+                        <Button id='aboutButton' onClick={() => { navigate('/about') }}>
+                            <Tooltip title="About Finnhub" placement="bottom"><InfoIcon /></Tooltip>
+                        </Button>
+                    }
                 </div>
             </div>
         </>

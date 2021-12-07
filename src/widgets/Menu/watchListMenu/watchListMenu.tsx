@@ -5,7 +5,7 @@ import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 import { dashBoardData } from 'src/App'
 
 import Papa from 'papaparse'
-import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPane";
 import CsvUpload from './csvUpload'
 import ToolTip from '../../../components/toolTip.js'
 import { useAppDispatch, useAppSelector } from 'src/hooks';

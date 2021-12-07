@@ -10,7 +10,7 @@ import { storeState } from './../../../store'
 //widget components
 import WidgetFocus from '../../../components/widgetFocus'
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
-import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPane";
 
 //hooks
 import { useDragCopy } from './../../widgetHooks/useDragCopy'

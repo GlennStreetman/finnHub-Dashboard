@@ -12,7 +12,7 @@ import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
 import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
 
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
-import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPane";
 import { dStock } from './../../../appFunctions/formatStockSymbols'
 import { rSetWidgetStockList } from 'src/slices/sliceDashboardData'
 

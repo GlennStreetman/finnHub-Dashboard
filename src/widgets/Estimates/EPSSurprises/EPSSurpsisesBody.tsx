@@ -17,7 +17,7 @@ import { useBuildVisableData } from '../../widgetHooks/useBuildVisableData'
 import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
 
 //widget components
-import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPane";
 import WidgetFocus from '../../../components/widgetFocus'
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
 

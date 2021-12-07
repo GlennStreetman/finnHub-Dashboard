@@ -9,7 +9,7 @@ import { useSearchMongoDb } from './../widgets/widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from './../widgets/widgetHooks/useBuildVisableData'
 import { useStartingFilters } from './../widgets/widgetHooks/useStartingFilters'
 import { useUpdateFocus } from './../widgets/widgetHooks/useUpdateFocus'
-import StockSearchPane, { searchPaneProps } from "../components/stockSearchPaneFunc";
+import StockSearchPane, { searchPaneProps } from "../components/stockSearchPane";
 
 import { dStock } from './../appFunctions/formatStockSymbols'
 import { rSetWidgetStockList } from 'src/slices/sliceDashboardData'

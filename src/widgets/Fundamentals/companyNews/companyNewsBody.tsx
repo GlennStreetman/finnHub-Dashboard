@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '../../../hooks';
 //components
 import WidgetFocus from '../../../components/widgetFocus'
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
-import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPane";
 import WidgetFilterDates from '../../../components/widgetFilterDates'
 
 //hooks

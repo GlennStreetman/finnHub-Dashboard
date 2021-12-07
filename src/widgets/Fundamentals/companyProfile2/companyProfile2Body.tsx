@@ -7,7 +7,7 @@ import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 import WidgetFocus from '../../../components/widgetFocus'
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
-import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPane";
 
 import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
 

@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '../../../hooks';
 import { convertCamelToProper } from './../../../appFunctions/stringFunctions'
 
 //components
-import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPane";
 import WidgetFocus from '../../../components/widgetFocus'
 import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
 import WidgetFilterDates from '../../../components/widgetFilterDates'

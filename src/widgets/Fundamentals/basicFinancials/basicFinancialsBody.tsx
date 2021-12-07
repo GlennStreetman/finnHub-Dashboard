@@ -9,7 +9,7 @@ import { rBuildVisableData } from '../../../slices/sliceShowData'
 import { tSearchMongoDB, tSearchMongoDBReq } from '../../../thunks/thunkSearchMongoDB'
 import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
 
-import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPaneFunc";
+import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPane";
 import CreateTimeSeriesChart, { createOptions } from './createTimeSeriesChart'
 
 import { useDragCopy } from '../../widgetHooks/useDragCopy'
