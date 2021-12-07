@@ -7,10 +7,11 @@ import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { rSetDefaultExchange } from 'src/slices/sliceDefaultExchange'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 import SecuritySearch from 'src/components/searchSecurity'
-import { Button, Box, Select, FormControl } from '@material-ui/core/';
+import { Button, Container, Select, FormControl } from '@material-ui/core/';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import useWindowDimensions from 'src/appFunctions/hooks/windowDimensions'
 import Tooltip from '@material-ui/core/Tooltip'
+import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -89,8 +90,18 @@ function StockSearchPane(p: props) {
                 height: '35px',
             }
         }),
-
     );
+
+    const oneOffTheme = createTheme({
+        overrides: {
+            MuiSelect: {
+                iconOutlined: {
+                    right: '0px',
+                },
+            }
+        }
+    })
+
     const classes = useStyles();
 
     const dispatch = useDispatch(); //allows widget to run redux actions.
@@ -156,7 +167,7 @@ function StockSearchPane(p: props) {
 
     //className="stockSearch"
     return (
-        <Box data-testid={`stockSearchPane-${p.widgetType}`} style={{ backgroundColor: '#1d69ab' }}>
+        <div data-testid={`stockSearchPane-${p.widgetType}`} style={{ backgroundColor: '#1d69ab', display: 'flex', justifyContent: 'center' }}>
             <FormControl
                 className={classes.formControl}
             >
@@ -164,9 +175,12 @@ function StockSearchPane(p: props) {
 
                 {exchangeList.length > 1 &&
                     <Tooltip title={helpText} >
-                        <Select variant="outlined" className={classes.exchange} value={defaultExchange} name='exchangeList' onChange={changeDefault}>
-                            {exchangeOptions}
-                        </Select>
+                        <ThemeProvider theme={oneOffTheme}>
+                            <Select variant="outlined" className={classes.exchange} value={defaultExchange} name='exchangeList' onChange={changeDefault}>
+                                {exchangeOptions}
+                            </Select>
+                        </ThemeProvider>
+
                     </Tooltip>
                 }
 
@@ -180,7 +194,7 @@ function StockSearchPane(p: props) {
                 <Button className={classes.submit} variant='contained' data-testid={`SubmitSecurity-${p.widgetType}`} onClick={submit}>Submit</Button>
             </FormControl>
 
-        </Box>
+        </div>
     );
 }
 
