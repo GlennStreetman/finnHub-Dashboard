@@ -117,7 +117,7 @@ function TopNav(p: topNavProps) {
             return (<>
                 {/* <li id='ddi' className="menu-item-has-children"> */}
                 <Tooltip title="Add Widget" placement="bottom">
-                    <Button data-testid="widgetsDropdown">
+                    <Button onClick={() => { navigate('/manageWidgets') }} data-testid="widgetsDropdown">
                         <WidgetsIcon style={{ fill: 'white' }} />
                     </Button>
                 </Tooltip>

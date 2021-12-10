@@ -10,7 +10,7 @@ import SecuritySearch from 'src/components/searchSecurity'
 import { Button, Container, Select, FormControl } from '@material-ui/core/';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import useWindowDimensions from 'src/appFunctions/hooks/windowDimensions'
-import Tooltip from '@material-ui/core/Tooltip'
+// import Tooltip from '@material-ui/core/Tooltip'
 import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 
 const useDispatch = useAppDispatch
@@ -127,7 +127,7 @@ function StockSearchPane(p: props) {
 
     let widgetKey = p.widgetKey;
     const exchangeOptions = exchangeList.map((el) =>
-        <option key={el} value={el}>{el}</option>
+        <option key={el + 'ex'} value={el}>{el}</option>
     )
     const helpText = <>
         Select exchange to be used in "Add Security" search. <br />
@@ -174,14 +174,14 @@ function StockSearchPane(p: props) {
                 {/* hintName='sspe2' */}
 
                 {exchangeList.length > 1 &&
-                    <Tooltip title={helpText} >
-                        <ThemeProvider theme={oneOffTheme}>
-                            <Select variant="outlined" className={classes.exchange} value={defaultExchange} name='exchangeList' onChange={changeDefault}>
-                                {exchangeOptions}
-                            </Select>
-                        </ThemeProvider>
+                    // <Tooltip title={helpText} >
+                    <ThemeProvider theme={oneOffTheme}>
+                        <Select variant="outlined" className={classes.exchange} value={defaultExchange} name='exchangeList' onChange={changeDefault}>
+                            {exchangeOptions}
+                        </Select>
+                    </ThemeProvider>
 
-                    </Tooltip>
+                    // </Tooltip>
                 }
 
                 <SecuritySearch

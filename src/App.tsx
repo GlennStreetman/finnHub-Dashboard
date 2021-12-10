@@ -18,6 +18,7 @@ import WidgetMenu, { widgetMenuProps } from "./components/widgetMenu";
 import ExchangeMenu, { exchangeMenuProps } from "./components/exchangeMenu";
 import TemplateMenu from "./components/templateMenu";
 import { WidgetController } from "./components/widgetController";
+import ManageWidgets from 'src/components/manageWidgets'
 //redux
 import { rResetUpdateFlag, rSetUpdateStatus, } from "./slices/sliceDataModel"; //sliceDataModel, rRebuildTargetDashboardModel 
 import { tGetFinnhubData } from "./thunks/thunkFetchFinnhub";
@@ -245,6 +246,7 @@ export default function App() {
                         <Route path="about" element={React.createElement(AboutMenu, {})} />
                         <Route path="exchangeMenu" element={React.createElement(ExchangeMenu, exchangeMenuProps(appState))} />
                         <Route path="templates" element={React.createElement(TemplateMenu)} />
+                        <Route path="manageWidgets" element={React.createElement(ManageWidgets)} />
                     </Route>
                 </Routes>
                 {navigateComp()}
