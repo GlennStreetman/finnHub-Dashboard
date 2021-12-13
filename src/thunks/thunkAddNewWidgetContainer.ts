@@ -28,14 +28,17 @@ export const tAddNewWidgetContainer = createAsyncThunk(
 
         const widgetName: string = new Date().getTime().toString();
         const widgetStockList = dashboardData[currentDashboard].globalstocklist
-        const widgetList = dashboardData[currentDashboard].widgetlist
+        const widgetList: widget[] = dashboardData[currentDashboard].widgetlist
         const widgetIds = widgetList ? Object.keys(widgetList) : []
         const widgetNameList = widgetIds.map((el) => widgetList[el].widgetHeader)
         const useName = uniqueName(req.widgetHeader, widgetNameList)
+        const firstColumnCount = Object.entries(widgetList).reduce((acc, el) => {
+            if (el[1].column === 1) { acc = acc + 1; return acc } else { return acc }
+        }, 1)
 
         const newWidget: widget = {
             column: 1,
-            columnOrder: -1,
+            columnOrder: firstColumnCount - 1,
             config: {}, //used to save user setup for the widget that does not require new api request.
             filters: req.defaultFilters ? req.defaultFilters : {}, //used to save user setup that requires new api request.
             showBody: true,

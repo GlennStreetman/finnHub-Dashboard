@@ -12,19 +12,13 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 import Button from '@material-ui/core/Button';
 import { tAddNewWidgetContainer } from 'src/thunks/thunkAddNewWidgetContainer'
-import { filters } from 'src/App'
+import { filters, widget } from 'src/App'
 import { useAppDispatch } from 'src/hooks';
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
+import { rChangeWidgetColumnOrder } from 'src/slices/sliceDashboardData'
 
 import { makeStyles } from '@material-ui/core/styles';
 
-
-// import Card from '@material-ui/core/Card';
-// import CardActions from '@material-ui/core/CardActions';
-// import CardContent from '@material-ui/core/CardContent';
-// import Button from '@material-ui/core/Button';
-
-import { BottomNavigation, BottomNavigationAction } from '@material-ui/core/';
 
 // const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -106,7 +100,7 @@ function ManageWidgets() {
     const [widgetHeading, setWidgetHeading] = useState('Stock Estimates')
 
     const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
-        setToggle(newValue);
+        setToggle(toggle === 0 ? 1 : 0);
     };
 
     const handDashboardChange = (event: React.ChangeEvent<{ value: unknown }>) => {
@@ -117,8 +111,30 @@ function ManageWidgets() {
         setWidgetHeading(event.target.value as string);
     };
 
+    const handleColumnChange = (e: React.ChangeEvent<{ value: any }>, dashboard, widgetId) => {
+        dispatch(rChangeWidgetColumnOrder({
+            dashboard: dashboard,
+            widgetId: widgetId,
+            newPlacement: 0,
+            column: e.target.value
+        }))
+    };
+
+    const handleOrderChange = (e: React.ChangeEvent<{ value: any }>, dashboard, widgetId, column) => {
+        dispatch(rChangeWidgetColumnOrder({
+            dashboard: dashboard,
+            widgetId: widgetId,
+            newPlacement: e.target.value,
+            column: column
+        }))
+    };
+
     const dashboardSelections = dashboardList.map((el) =>
         <MenuItem value={el} key={el + 'dbSelection'}>{el}</MenuItem>
+    )
+
+    const columnSelections = [...Array(7).keys()].map((el) =>
+        <MenuItem value={el} key={el + 'columnSelections'}>{el}</MenuItem>
     )
 
     const widgetLookup = {
@@ -141,7 +157,7 @@ function ManageWidgets() {
 
     const widgetHeadings = Object.keys(widgetLookup).map((el) => <MenuItem value={el} key={el + 'headerSelect'}>{el}</MenuItem>)
 
-    const renderCards = () => {
+    const addWidgets = () => {
 
         if (dashboardData[currentDashboard]) {
             const currentSelection = widgetLookup[widgetHeading]
@@ -150,7 +166,6 @@ function ManageWidgets() {
                     .reduce((r, w) => {
                         if (el[0] === w['widgetType']) {
                             const newVal = r + 1
-                            console.log('match', newVal, r)
                             return (newVal)
                         }
                         else {
@@ -172,6 +187,69 @@ function ManageWidgets() {
             }
             ))
         }
+    }
+
+    const manageWidgetPlacement = () => {
+
+        if (dashboardData[currentDashboard]) {
+            const widgetList = Object.values(dashboardData[currentDashboard].widgetlist)
+            widgetList.sort((a, b) => {
+                if (a.column < b.column) {
+                    return -1
+                } else if (a.column > b.column) {
+                    return 1
+                } else {
+                    if (a.columnOrder < b.columnOrder) {
+                        return -1
+                    } else if (a.columnOrder > b.columnOrder) {
+                        return 1
+                    } else {
+                        return 0
+                    }
+                }
+            })
+            return widgetList.map((el) => {
+                const thisColumn = el.column
+                const reducerValue: widget[] = []
+                const columnWidgets = widgetList.reduce((r, w) => { //NUMBER OF WIDGETS IN COLUMN
+                    if (w.column === thisColumn) {
+                        r.push(w)
+                        return (r)
+                    } else {
+                        return (r)
+                    }
+                }, reducerValue)
+
+                const orderSelect = columnWidgets.map((el) =>
+                    <MenuItem value={el.columnOrder} key={el.widgetID + 'columnSelections'}>{el.columnOrder + 1}</MenuItem>
+                )
+
+                return (<Card raised={true} key={'card' + el.widgetHeader} >
+                    <CardContent>
+                        <Typography><b>{el.widgetHeader}:</b> {widgetDescriptions[el.widgetType]}</Typography>
+                        {/* @ts-ignore */}
+                        <div style={cardContainer}>
+                            <div style={cardStyle}><Typography>Column:</Typography>
+                                <Select
+                                    value={el.column}
+                                    onChange={(e) => handleColumnChange(e, currentDashboard, el.widgetID)}>
+                                    {columnSelections}
+                                </Select>
+                            </div>
+                            <div style={cardStyle}><Typography>Order:</Typography>
+                                <Select
+                                    value={el.columnOrder}
+                                    onChange={(e) => handleOrderChange(e, currentDashboard, el.widgetID, el.column)}>
+                                    {orderSelect}
+                                </Select>
+                            </div>
+
+                        </div>
+                    </CardContent>
+                </Card>)
+            }
+            )
+        } else { return (<></>) }
     }
 
     return (
@@ -209,19 +287,22 @@ function ManageWidgets() {
                     <FormHelperText>API Heading</FormHelperText>
                 </FormControl>
             </div>
+            {/* @ts-ignore */}
+            <div style={flexInline}>
 
-            {toggle === 0 ? <>
                 {/* @ts-ignore */}
-                <div style={flexInline}>
-                    {/* @ts-ignore */}
-                    <div style={cardColumn}>{renderCards()}</div>
+                <div style={cardColumn}>
+                    {toggle === 0 ? addWidgets() : manageWidgetPlacement()}
                 </div>
-                <div style={{ height: '75px' }}></div>
-            </> :
-                <></>}
-
+            </div>
+            <div style={{ height: '75px' }}></div>
         </div>
     )
 }
 
 export default ManageWidgets
+
+
+
+
+

@@ -114,6 +114,13 @@ export interface addWidget {
     currentDashboard: string,
 }
 
+export interface changeWidgetOrder {
+    dashboard: string,
+    widgetId: string | number,
+    newPlacement: number,
+    column: number,
+}
+
 const initialState: sliceDashboardData = {}
 
 const dashboardData = createSlice({
@@ -127,8 +134,36 @@ const dashboardData = createSlice({
         },
         rRemoveWidget: (state: sliceDashboardData, action: PayloadAction<removeWidgetPayload>) => {
             const ap = action.payload
-            console.log('removing', ap, state[ap.dashboardName], state[ap.dashboardName].widgetlist, state[ap.dashboardName].widgetlist[ap.widgetKey])
+            const widgetList = state[ap.dashboardName].widgetlist
+            const deleteColumn = state[ap.dashboardName].widgetlist[ap.widgetKey].column
             delete state[ap.dashboardName].widgetlist[ap.widgetKey]
+
+            const updateList: widget[] = []
+            const reOrderList = Object.values(widgetList).reduce((acc, w) => { //get list of widgets that need to be reordered, not includeing target widget
+                if (w.column === deleteColumn) {
+                    acc.push(w)
+                    return (acc)
+                } else {
+                    return (acc)
+                }
+            }, updateList)
+
+            reOrderList.sort((a, b) => { //sort widget list by columnOrder
+                if (a.columnOrder < b.columnOrder) {
+                    return -1
+                } else if (a.columnOrder > b.columnOrder) {
+                    return 1
+                } else {
+                    return 0
+                }
+            })
+
+            reOrderList.forEach((el, i) => { //reorder based on index locaiton of reOrderList
+                if (el.columnOrder !== i) {
+                    widgetList[el.widgetID].columnOrder = i
+                }
+            })
+
             return state
         },
         rSetWidgetFilters: (state: sliceDashboardData, action: PayloadAction<updateFilter>) => { //filters are used for API pulls. UPdate here will trigger finnHub.io api calls.
@@ -174,35 +209,41 @@ const dashboardData = createSlice({
             }
             return state
         },
-        rAddNewWidgetContainer: (state: sliceDashboardData, action: PayloadAction<addWidget>) => {
+        rChangeWidgetColumnOrder: (state: sliceDashboardData, action: PayloadAction<changeWidgetOrder>) => {
             const ap = action.payload
+            const widgetList = state[ap.dashboard].widgetlist
+            const targetWidget = widgetList[ap.widgetId]
+            if (targetWidget.column !== ap.column) targetWidget.column = ap.column
+            // const length = Object.keys(widgetList).length - 1
+            const updateList: widget[] = []
 
-            const widgetName: string = new Date().getTime().toString();
-            const widgetStockList = state[ap.currentDashboard].globalstocklist
-            const widgetList = state[ap.currentDashboard].widgetlist
-            const widgetIds = widgetList ? Object.keys(widgetList) : []
-            const widgetNameList = widgetIds.map((el) => widgetList[el].widgetHeader)
-            const useName = uniqueName(ap.widgetHeader, widgetNameList)
+            const reOrderList = Object.values(widgetList).reduce((acc, w) => { //get list of widgets that need to be reordered, not includeing target widget
+                if (w.column === ap.column && w.widgetID !== ap.widgetId) {
+                    acc.push(w)
+                    return (acc)
+                } else {
+                    return (acc)
+                }
+            }, updateList)
 
-            const newWidget: widget = {
-                column: 1,
-                columnOrder: -1,
-                config: {}, //used to save user setup for the widget that does not require new api request.
-                filters: ap.defaultFilters, //used to save user setup that requires new api request.
-                showBody: true,
-                trackedStocks: widgetStockList,
-                widgetID: widgetName,
-                widgetType: ap.widgetDescription,
-                widgetHeader: useName,
-                widgetConfig: ap.widgetConfig, //reference to widget type. Menu or data widget.
-                xAxis: 20, //prev 5 rem
-                yAxis: 20, //prev 5 rem
-            };
+            reOrderList.sort((a, b) => { //sort widget list by columnOrder
+                if (a.columnOrder < b.columnOrder) {
+                    return -1
+                } else if (a.columnOrder > b.columnOrder) {
+                    return 1
+                } else {
+                    return 0
+                }
+            })
+            reOrderList.splice(ap.newPlacement, 0, targetWidget) // add moved widget into list
+            reOrderList.forEach((el, i) => { //reorder based on index locaiton of reOrderList
+                if (el.columnOrder !== i) {
+                    widgetList[el.widgetID].columnOrder = i
+                }
+            })
 
-            state[ap.currentDashboard].widgetlist[widgetName] = newWidget
 
-            return state
-        }
+        },
     },
     extraReducers: {
         [tChangeWidgetName.pending.toString()]: (state) => {
@@ -260,6 +301,6 @@ export const {
     rSetGlobalStockList,
     rReplaceGlobalStocklist,
     rSetWidgetStockList,
-    rAddNewWidgetContainer,
+    rChangeWidgetColumnOrder,
 } = dashboardData.actions
 export default dashboardData.reducer

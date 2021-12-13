@@ -72,45 +72,6 @@ function TopNav(p: topNavProps) {
         navigate('/login')
     }
 
-    function dropDownList(dropList: [string, string, string, string, filters | undefined, string][]) {
-        let newList = dropList.map((el) => {
-            let [widgetDescription, widgetHeader, widgetConfig, d, defaultFilters] = el
-            if (isChecked(el) === true) {
-                return (<li key={widgetDescription + 'li'} id='ddi'>
-                    <a key={widgetDescription} data-testid={d} href="#r" onClick={async () => {
-
-                        const thisDashboard = p.currentDashboard
-
-                        await dispatch(tAddNewWidgetContainer({
-                            widgetDescription: widgetDescription, //a
-                            widgetHeader: widgetHeader, //b
-                            widgetConfig: widgetConfig, //c
-                            defaultFilters: defaultFilters, //d
-                        })).unwrap()
-
-                        dispatch(tSaveDashboard({ dashboardName: thisDashboard }))
-                    }}>
-                        {d}
-                    </a>
-                </li>)
-            } else return (false)
-        })
-        return <ul id='ddu' className='sub-menu'>{newList}</ul>
-    }
-
-    let widgetDropDown = <>
-        <ul id='ddu' className='sub-Menu' data-testid='widgetDropDown'>
-            <li id='ddi' className='menu-item-has-children'><a data-testid="estimatesDropdown" href='#1'>Estimate</a>
-                {dropDownList(estimateOptions)}
-            </li>
-            <li id='ddi' className='menu-item-has-children'><a data-testid="fundamentalsDropDown" href='#2'>Fundamentals</a>
-                {dropDownList(fundamentalsOptions)}
-            </li>
-            <li id='ddi' className='menu-item-has-children'><a data-testid="priceDropDown" href='#3'>Price Data</a>
-                {dropDownList(priceOptions)}
-            </li>
-        </ul>
-    </>
 
     const showDashBoardButtons = () => {
         if (location.pathname === '/dashboard') {
@@ -201,3 +162,44 @@ function TopNav(p: topNavProps) {
 }
 
 export default TopNav
+
+
+    // function dropDownList(dropList: [string, string, string, string, filters | undefined, string][]) {
+    //     let newList = dropList.map((el) => {
+    //         let [widgetDescription, widgetHeader, widgetConfig, d, defaultFilters] = el
+    //         if (isChecked(el) === true) {
+    //             return (<li key={widgetDescription + 'li'} id='ddi'>
+    //                 <a key={widgetDescription} data-testid={d} href="#r" onClick={async () => {
+
+    //                     const thisDashboard = p.currentDashboard
+
+    //                     await dispatch(tAddNewWidgetContainer({
+    //                         widgetDescription: widgetDescription, //a
+    //                         widgetHeader: widgetHeader, //b
+    //                         widgetConfig: widgetConfig, //c
+    //                         defaultFilters: defaultFilters, //d
+    //                     })).unwrap()
+
+    //                     dispatch(tSaveDashboard({ dashboardName: thisDashboard }))
+    //                 }}>
+    //                     {d}
+    //                 </a>
+    //             </li>)
+    //         } else return (false)
+    //     })
+    //     return <ul id='ddu' className='sub-menu'>{newList}</ul>
+    // }
+
+    // let widgetDropDown = <>
+    //     <ul id='ddu' className='sub-Menu' data-testid='widgetDropDown'>
+    //         <li id='ddi' className='menu-item-has-children'><a data-testid="estimatesDropdown" href='#1'>Estimate</a>
+    //             {dropDownList(estimateOptions)}
+    //         </li>
+    //         <li id='ddi' className='menu-item-has-children'><a data-testid="fundamentalsDropDown" href='#2'>Fundamentals</a>
+    //             {dropDownList(fundamentalsOptions)}
+    //         </li>
+    //         <li id='ddi' className='menu-item-has-children'><a data-testid="priceDropDown" href='#3'>Price Data</a>
+    //             {dropDownList(priceOptions)}
+    //         </li>
+    //     </ul>
+    // </>
