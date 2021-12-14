@@ -8,14 +8,10 @@ import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { Tooltip } from '@material-ui/core/';
 import { Button } from '@material-ui/core/';
 import TextField from '@material-ui/core/TextField';
-
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableRow from '@material-ui/core/TableRow';
 import { Grid, Paper, Box, Typography } from '@material-ui/core/';
 import { styled } from '@material-ui/core/styles';
+import IconButton from '@material-ui/core/IconButton';
+import SaveIcon from '@material-ui/icons/Save';
 
 const MyPaper = styled(Paper)({ color: "#1d69ab", variant: "outlined", borderRadius: 20, padding: 25 });
 
@@ -31,10 +27,14 @@ function AccountMenu(p: accountMenuProp) {
     let navigate = useNavigate();
     const dispatch = useAppDispatch(); //allows widget to run redux actions.
     const [email, setEmail] = useState("")
-    const [editField, setEditField] = useState("") //email, apiKey, apiAlias, apiRateLimit
-    const [editText, setEditText] = useState<string | number>("")
     const [serverMessage, setServerMessage] = useState("")
-    const [rateLimit, setRateLimit] = useState(0)
+    const [rateLimit, setRateLimit] = useState('1')
+
+    const [newEmail, setNewEmail] = useState("")
+    const [newApiKey, setNewApiKey] = useState("")
+    const [newApiAlias, setNewApiAlias] = useState("")
+    const [newRateLimit, setNewRateLimit] = useState("")
+
 
     const apiKey = useSelector((state) => { return state.apiKey })
     const apiAlias = useSelector((state) => { return state.apiAlias })
@@ -53,6 +53,10 @@ function AccountMenu(p: accountMenuProp) {
                 setRateLimit(rateLimit)
                 dispatch(rSetApiAlias(dataSet["apialias"]))
                 dispatch(rSetApiKey(dataSet["apikey"]))
+                setNewEmail(dataSet["email"])
+                setNewApiKey(dataSet["apikey"])
+                setNewApiAlias(dataSet["apialias"])
+                setNewRateLimit(rateLimit)
             })
             .catch((error) => {
                 console.error("Failed to retrieve user data" + error);
@@ -80,16 +84,8 @@ function AccountMenu(p: accountMenuProp) {
             .then((response) => response.json())
             .then((data) => {
                 getAccountData();
-                setEditField("")
-                setEditText("")
                 setServerMessage(data.message)
             });
-    }
-
-    function showEditPane(targetField: string, text: string | number) {
-        setEditField(targetField)
-        setEditText(text)
-        setServerMessage("")
     }
 
     const messageStyle = {
@@ -97,101 +93,66 @@ function AccountMenu(p: accountMenuProp) {
     }
 
     return (
-        <>
-            {/* <div style={divRoot}> */}
-            <Grid container justifyContent="center">
-                <Grid item sm={2} md={3} lg={4} xl={4} />
-                <Grid item xs={12} sm={8} md={6} lg={4} xl={4} >
-                    <Box pt={2}>
-                        <MyPaper elevation={6}>
-                            <Box component="span"><Typography>Manage Account</Typography></Box>
-                            <TableContainer>
-                                <Table size="small">
-                                    <TableBody>
-                                        <TableRow>
-                                            <TableCell>Email:</TableCell>
-                                            {editField === 'email' ? <TextField onChange={(e) => { setEditText(e.target.value) }} defaultValue={editText}>{editText}</TextField> : <td>{email}</td>}
-                                            <TableCell>
-                                                {editField === 'email' ?
-                                                    <Button variant="outlined" onClick={() => changeAccountData("email", editText)}>save</Button> :
-                                                    <Button variant="outlined" onClick={() => showEditPane("email", email)}>edit</Button>
-                                                }
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <Tooltip title="Get your API Key at finnhub.io/dashboard" placement="bottom">
-                                                <TableCell>apiKey:</TableCell>
-                                            </Tooltip>
-                                            {editField === 'apiKey' ? <TextField onChange={(e) => { setEditText(e.target.value) }} defaultValue={editText}>{editText}</TextField> :
-                                                <Tooltip title="Get your API Key at finnhub.io/dashboard" placement="bottom">
-                                                    <TableCell>{apiKey}</TableCell>
-                                                </Tooltip>
-                                            }
-                                            {editField === 'apiKey' ?
-                                                <TableCell><Button variant="outlined" onClick={() => changeAccountData("apikey", editText)}>save</Button></TableCell> :
-                                                <Tooltip title="Get your API Key at finnhub.io/dashboard" placement="bottom">
-                                                    <TableCell>
-                                                        <Button variant="outlined" onClick={() => showEditPane("apiKey", apiKey)}>edit</Button>
-                                                    </TableCell>
-                                                </Tooltip>
-                                            }
-                                        </TableRow>
-                                        <TableRow>
-                                            <Tooltip title="Alternate GraphQL APIKey" placement="bottom">
-                                                <TableCell>API Alias: </TableCell>
-                                            </Tooltip>
-                                            {editField === 'apiAlias' ? <TextField onChange={(e) => { setEditText(e.target.value) }} defaultValue={editText}>{editText}</TextField> :
-                                                <Tooltip title="Alternate GraphQL APIKey" placement="bottom">
-                                                    <TableCell>{apiAlias}</TableCell>
-                                                </Tooltip>
-                                            }
-                                            {editField === 'apiAlias' ?
-                                                <TableCell><Button variant="outlined" onClick={() => changeAccountData("apialias", editText)}>save</Button></TableCell> :
-                                                <Tooltip title="Alternate GraphQL APIKey" placement="bottom">
-                                                    <TableCell>
-                                                        <Button variant="outlined" onClick={() => showEditPane("apiAlias", apiAlias)}>edit</Button>
-                                                    </TableCell>
-                                                </Tooltip>
-                                            }
-                                        </TableRow>
-                                        <TableRow>
-                                            <Tooltip title="Limits the number of API calls per second. Leave at 1 per second unless you have a premium account with finnhub.io" placement="bottom">
-                                                <TableCell>API Rate Limit: </TableCell>
-                                            </Tooltip>
-                                            {editField === 'rateLimit' ? <TextField onChange={(e) => { setEditText(e.target.value) }} defaultValue={editText}>{editText}</TextField> :
-                                                <Tooltip title="Limits the number of API calls per second. Leave at 1 per second unless you have a premium account with finnhub.io" placement="bottom">
-                                                    <TableCell>{rateLimit} per second</TableCell>
-                                                </Tooltip>
-                                            }
-                                            {editField === 'rateLimit' ?
-                                                <TableCell><Button variant="outlined" onClick={() => changeAccountData("ratelimit", editText)}>save</Button></TableCell> :
-                                                <Tooltip title="Limits the number of API calls per second. Leave at 1 per second unless you have a premium account with finnhub.io" placement="bottom">
-                                                    <TableCell>
-                                                        <Button variant="outlined" onClick={() => showEditPane("rateLimit", rateLimit)}>edit</Button>
-                                                    </TableCell>
-                                                </Tooltip>
-                                            }
-                                        </TableRow>
-                                    </TableBody>
-                                </Table>
-                            </TableContainer>
-                            <div style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                gap: '5px'
-                            }}>
-                                <Button variant="outlined" onClick={() => navigate('/exchangeMenu')}>Manage Exchanges</Button>
-                                <Button variant="outlined" onClick={() => navigate('/widgetMenu')}>Manage Widgets</Button>
-                            </div>
-                            {serverMessage !== "" && (
-                                <div style={messageStyle}><b >{serverMessage}</b></div>
-                            )}
-                        </MyPaper>
-                    </Box>
-                </Grid>
-                <Grid item sm={2} md={3} lg={4} xl={4} />
+        <Grid container justifyContent="center">
+            <Grid item sm={2} md={3} lg={4} xl={4} />
+            <Grid item xs={12} sm={8} md={6} lg={4} xl={4} >
+                <Box pt={2}>
+                    <MyPaper elevation={6}>
+                        <Box alignItems='center' display='flex' justifyContent='center'><Typography variant="h6">Account Management</Typography></Box>
+
+                        <Box pt={1} alignItems='left' display='flex' justifyContent='left'>
+                            <TextField fullWidth label='Email' onChange={(e) => { setNewEmail(e.target.value) }} value={newEmail} />
+                            {newEmail !== email ?
+                                <IconButton onClick={() => changeAccountData("email", newEmail)}><SaveIcon /></IconButton> :
+                                <></>
+                            }
+                        </Box>
+
+                        <Box pt={1} alignItems='left' display='flex' justifyContent='left'>
+                            <Tooltip title="Get your API Key at finnhub.io/dashboard" placement="bottom">
+                                <TextField fullWidth label='API Key' onChange={(e) => { setNewApiKey(e.target.value) }} value={newApiKey} />
+                            </Tooltip>
+                            {newApiKey !== apiKey ?
+                                <IconButton onClick={() => changeAccountData("apikey", newApiKey)}><SaveIcon /></IconButton> :
+                                <></>
+                            }
+                        </Box>
+
+                        <Box pt={1} alignItems='left' display='flex' justifyContent='left'>
+                            <Tooltip title="Alternate GraphQL APIKey" placement="bottom">
+                                <TextField fullWidth label='API Alias' onChange={(e) => { setNewApiAlias(e.target.value) }} value={newApiAlias} />
+                            </Tooltip>
+                            {newApiAlias !== apiAlias ?
+                                <IconButton onClick={() => changeAccountData("apialias", newApiAlias)}><SaveIcon /></IconButton> :
+                                <></>
+                            }
+                        </Box>
+
+                        <Box pt={1} alignItems='left' display='flex' justifyContent='left'>
+                            <Tooltip title="Limits the number of API calls per second. Leave at 1 per second unless you have a premium account with finnhub.io" placement="bottom">
+                                <TextField fullWidth label="API Calls per second." onChange={(e) => { setNewRateLimit(e.target.value) }} value={newRateLimit} />
+                            </Tooltip>
+                            {newRateLimit !== rateLimit ?
+                                <IconButton onClick={() => changeAccountData("ratelimit", newRateLimit)}>
+                                    <SaveIcon />
+                                </IconButton> :
+                                <></>
+                            }
+                        </Box>
+
+                        <Box pt={1} alignItems='center' display='flex' justifyContent='center'>
+                            <Button color="primary" onClick={() => navigate('/exchangeMenu')}>Manage Exchanges</Button>
+                            <Button color="primary" onClick={() => navigate('/widgetMenu')}>Manage Widgets</Button>
+                        </Box>
+                        {serverMessage !== "" && (
+                            <div style={messageStyle}><b >{serverMessage}</b></div>
+                        )}
+                    </MyPaper>
+                </Box>
             </Grid>
-        </>
+            <Grid item sm={2} md={3} lg={4} xl={4} />
+        </Grid>
+
     );
 }
 

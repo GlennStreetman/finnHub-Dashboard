@@ -1,6 +1,6 @@
 
 /* eslint-disable no-sparse-arrays */
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg'
 import { widgetSetup } from 'src/App'
 import { updateWidgetSetup } from 'src/appFunctions/appImport/updateWidgetSetup'
@@ -16,28 +16,12 @@ import { Tooltip } from '@material-ui/core/';
 import IconButton from '@material-ui/core/IconButton';
 import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
+import { Grid, Box } from '@material-ui/core/';
 
 
 interface props {
     widgetSetup: widgetSetup,
     updateAppState: Object,
-}
-
-const divRoot = {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    padding: '15px',
-
-}
-
-const divOutline = {
-    border: '5px solid',
-    borderRadius: '10px',
-    backgroundColor: 'white',
-    padding: '5px',
-    borderColor: '#1d69ab',
-    maxWidth: '400px'
 }
 
 export default function WidgetMenu(p: props) {
@@ -86,15 +70,24 @@ export default function WidgetMenu(p: props) {
     }
 
     return (<>
-        <div style={divRoot}>
-            <div style={divOutline}>
+        <Grid container justifyContent="center">
+            <Grid item sm={2} md={3} lg={4} xl={4} />
+            <Grid item xs={12} sm={8} md={6} lg={4} xl={4} >
                 <TableContainer>
-                    <Table size="small" stickyHeader aria-label="sticky table" >
+                    <Table size="small" stickyHeader aria-label="Widget activation Menu" >
                         <TableHead>
                             <TableRow>
-                                <TableCell>Widget Name</TableCell>
-                                <Tooltip title="Premium widgets are only available for the paid API tiers at finnhub.io" placement="bottom"><TableCell>Free/Premium</TableCell></Tooltip>
-                                <TableCell>Activate</TableCell>
+                                <TableCell>
+                                    Name
+                                </TableCell>
+                                <Tooltip title="Premium widgets are only available for the paid API tiers at finnhub.io" placement="bottom">
+                                    <TableCell>
+                                        Tier
+                                    </TableCell>
+                                </Tooltip>
+                                <TableCell>
+                                    Activate
+                                </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -106,7 +99,6 @@ export default function WidgetMenu(p: props) {
                                 </TableCell>
                                 <TableCell></TableCell>
                                 <TableCell></TableCell>
-                                <TableCell></TableCell>
                             </TableRow>
                             {openEstimates ? widgetMenuRows(estimateOptions) : <></>}
                             <TableRow>
@@ -115,7 +107,6 @@ export default function WidgetMenu(p: props) {
                                         <b>Fundamentals</b>{openFundamentals ? <KeyboardArrowUpIcon /> : <KeyboardArrowDownIcon />}
                                     </IconButton>
                                 </TableCell>
-                                <TableCell></TableCell>
                                 <TableCell></TableCell>
                             </TableRow>
                             {openFundamentals ? widgetMenuRows(fundamentalsOptions) : <></>}
@@ -128,18 +119,18 @@ export default function WidgetMenu(p: props) {
                                     </TableCell>
                                 </TableCell>
                                 <TableCell></TableCell>
-                                <TableCell></TableCell>
                             </TableRow>
                             {openPrice ? widgetMenuRows(priceOptions) : <></>}
                         </TableBody>
                     </Table>
                 </TableContainer>
-            </div>
-        </div>
-        <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-        }}><Button variant='contained' onClick={() => { navigate('/manageAccount') }}>Back</Button></div>
+            </Grid>
+            <Grid item sm={2} md={3} lg={4} xl={4} />
+        </Grid>
+
+        <Box pt={1} alignItems='center' display='flex' justifyContent='center'>
+            <Button color="primary" onClick={() => navigate('/manageAccount')}>Back</Button>
+        </Box>
     </>
     )
 }

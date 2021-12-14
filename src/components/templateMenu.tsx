@@ -142,7 +142,8 @@ export default function TemplateMenu(p: 'pass', ref: any) {
             <Grid item xs={12} sm={8} md={6} lg={4} xl={4} >
                 <Box pt={2}>
                     <MyPaper elevation={6}>
-                        <Box component="span"><Typography>Manage Excel Templates:</Typography></Box>
+                        <Box alignItems='center' display='flex' justifyContent='center'><Typography variant="h6">Manage Excel Templates:</Typography></Box>
+
                         <TableContainer>
                             <Table size="small">
                                 <TableHead>
@@ -164,9 +165,14 @@ export default function TemplateMenu(p: 'pass', ref: any) {
                             gap: '5px'
                         }}>
                             <input type="file" hidden ref={inputReference} onChange={uploadNewTemplate} />
-                            <Button variant="outlined" onClick={fileUploadAction}>
-                                Upload New Template
-                            </Button>
+
+
+
+                            <Box pt={1} alignItems='center' display='flex' justifyContent='center'>
+                                <Button color="primary" onClick={fileUploadAction}>
+                                    Upload New Template
+                                </Button>
+                            </Box>
                         </div>
                     </MyPaper>
                 </Box>

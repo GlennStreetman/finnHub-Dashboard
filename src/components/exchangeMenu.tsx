@@ -9,28 +9,11 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
-import { Button } from '@material-ui/core/';
 import { useNavigate } from "react-router-dom";
+import { Grid, Paper, Box, Typography, Button } from '@material-ui/core/';
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
-
-const divRoot = {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    padding: '15px',
-
-}
-
-const divOutline = {
-    border: '5px solid',
-    borderRadius: '10px',
-    backgroundColor: 'white',
-    padding: '5px',
-    borderColor: '#1d69ab',
-    maxWidth: '400px'
-}
 
 export default function ExchangeMenu(p) {
     const navigate = useNavigate();
@@ -163,10 +146,11 @@ export default function ExchangeMenu(p) {
     }
 
     return (<>
-        <div style={divRoot}>
-            <div style={divOutline}>
-                <TableContainer >
-                    <Table size="small" stickyHeader aria-label="sticky table">
+        <Grid container justifyContent="center">
+            <Grid item sm={2} md={3} lg={4} xl={4} />
+            <Grid item xs={12} sm={8} md={6} lg={4} xl={4} >
+                <TableContainer>
+                    <Table size="small" stickyHeader aria-label="Exchange Menu">
                         <TableHead>
                             <TableRow>
                                 <TableCell>Short</TableCell>
@@ -188,12 +172,13 @@ export default function ExchangeMenu(p) {
                         onRowsPerPageChange={handleChangeRowsPerPage}
                     />
                 </TableContainer>
-            </div>
-        </div>
-        <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-        }}><Button variant='contained' onClick={() => { navigate('/manageAccount') }}>Back</Button></div>
+            </Grid>
+            <Grid item sm={2} md={3} lg={4} xl={4} />
+        </Grid>
+
+        <Box pt={1} alignItems='center' display='flex' justifyContent='center'>
+            <Button color="primary" onClick={() => navigate('/manageAccount')}>Back</Button>
+        </Box>
     </>
     )
 }
