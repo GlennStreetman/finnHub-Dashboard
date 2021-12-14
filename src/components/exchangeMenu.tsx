@@ -37,7 +37,7 @@ export default function ExchangeMenu(p) {
     const dispatch = useDispatch()
     const rExchangeList = useSelector(state => state.exchangeList.exchangeList)
     const [page, setPage] = useState(0)
-    const [rowsPerPage, setRowsPerPage] = React.useState(10);
+    const [rowsPerPage, setRowsPerPage] = useState(10);
 
     const handleChangePage = (event, newPage) => {
         setPage(newPage);
@@ -157,7 +157,6 @@ export default function ExchangeMenu(p) {
                         type="checkbox"
                         onChange={() => changeExchange(el[0])}
                         checked={rExchangeList.indexOf(el[0]) >= 0} />
-
                 </TableCell>
             </TableRow>
         )
