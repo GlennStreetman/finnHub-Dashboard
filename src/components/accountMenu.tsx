@@ -5,6 +5,8 @@ import { useNavigate } from "react-router-dom";
 import { rSetApiKey } from 'src/slices/sliceAPIKey'
 import { rSetApiAlias } from 'src/slices/sliceAPIAlias'
 import { useAppDispatch, useAppSelector } from 'src/hooks';
+import { Tooltip } from '@material-ui/core/';
+import { Button } from '@material-ui/core/';
 
 const useSelector = useAppSelector
 
@@ -14,6 +16,7 @@ interface accountMenuProp {
 }
 
 function AccountMenu(p: accountMenuProp) {
+
     let navigate = useNavigate();
     const dispatch = useAppDispatch(); //allows widget to run redux actions.
 
@@ -93,12 +96,20 @@ function AccountMenu(p: accountMenuProp) {
         setServerMessage("")
     }
 
+    const divRoot = {
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        padding: '10px',
+    }
+
     const divOutline = {
         border: '5px solid',
         borderRadius: '10px',
         backgroundColor: 'white',
         padding: '5px',
         borderColor: '#1d69ab',
+        maxWidth: '400px'
     }
     const messageStyle = {
         'textAlign': 'center' as const
@@ -106,66 +117,74 @@ function AccountMenu(p: accountMenuProp) {
 
     return (
         <>
-            {editToggle === 0 && (
-                <div style={divOutline}>
-                    <b>Account Data:</b>
-                    <table>
-                        <tbody>
-                            <tr>
-                                <td>Login:</td>
-                                <td>{loginName}</td>
-                                <td>
-                                    <button onClick={() => showEditPane("loginname")}>edit</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Email:</td>
-                                <td>{email}</td>
-                                <td>
-                                    <button onClick={() => showEditPane("email")}>edit</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>apiKey:</td>
-                                <td>{apiKey}</td>
-                                <td>
-                                    <button onClick={() => showEditPane("apikey")}>edit</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Active Exchanges: </td>
-                                <td>{exchangeList.toString()}</td>
-                                <td>
-                                    <button onClick={() => navigate('/exchangeMenu')}>edit</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>API Rate Limit: </td>
-                                <td>{rateLimit}</td>
-                                <td>
-                                    <button onClick={() => showEditPane("ratelimit")}>edit</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>API Alias: </td>
-                                <td>{apiAlias}</td>
-                                <td>
-                                    <button onClick={() => showEditPane("apialias")}>edit</button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>Manage Widgets: </td>
-                                <td></td>
-                                <td>
-                                    <button onClick={() => navigate('/widgetMenu')}>edit</button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    {serverMessage !== "" && (
-                        <div style={messageStyle}><b >{serverMessage}</b></div>
-                    )}
-                </div>
+            {editToggle === 0 && (<>
+                <div style={divRoot}>
+                    <div style={divOutline}>
+                        <b>User: {loginName}</b>
+                        <table>
+                            <tbody>
+
+                                <tr>
+                                    <td>Email:</td>
+                                    <td>{email}</td>
+                                    <td>
+                                        <Button variant="outlined" onClick={() => showEditPane("email")}>edit</Button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <Tooltip title="Get your API Key at finnhub.io/dashboard" placement="bottom">
+                                        <td>apiKey:</td>
+                                    </Tooltip>
+                                    <Tooltip title="Get your API Key at finnhub.io/dashboard" placement="bottom">
+                                        <td>{apiKey}</td>
+                                    </Tooltip>
+                                    <Tooltip title="Get your API Key at finnhub.io/dashboard" placement="bottom">
+                                        <td>
+                                            <Button variant="outlined" onClick={() => showEditPane("apikey")}>edit</Button>
+                                        </td>
+                                    </Tooltip>
+                                </tr>
+                                <tr>
+                                    <Tooltip title="Alternate GraphQL APIKey" placement="bottom">
+                                        <td>API Alias: </td>
+                                    </Tooltip>
+                                    <Tooltip title="Alternate GraphQL APIKey" placement="bottom">
+                                        <td>{apiAlias}</td>
+                                    </Tooltip>
+                                    <Tooltip title="Alternate GraphQL APIKey" placement="bottom">
+                                        <td>
+                                            <Button variant="outlined" onClick={() => showEditPane("apialias")}>edit</Button>
+                                        </td>
+                                    </Tooltip>
+                                </tr>
+                                <tr>
+                                    <Tooltip title="Limits the number of API calls per second. Leave at 1 per second unless you have a premium account with finnhub.io" placement="bottom">
+                                        <td>API Rate Limit: </td>
+                                    </Tooltip>
+                                    <Tooltip title="Limits the number of API calls per second. Leave at 1 per second unless you have a premium account with finnhub.io" placement="bottom">
+                                        <td>{rateLimit} per second</td>
+                                    </Tooltip>
+                                    <Tooltip title="Limits the number of API calls per second. Leave at 1 per second unless you have a premium account with finnhub.io" placement="bottom">
+                                        <td>
+                                            <Button variant="outlined" onClick={() => showEditPane("ratelimit")}>edit</Button>
+                                        </td>
+                                    </Tooltip>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: '5px'
+                        }}>
+                            <Button variant="outlined" onClick={() => navigate('/exchangeMenu')}>Manage Exchanges</Button>
+                            <Button variant="outlined" onClick={() => navigate('/widgetMenu')}>Manage Widgets</Button>
+                        </div>
+                        {serverMessage !== "" && (
+                            <div style={messageStyle}><b >{serverMessage}</b></div>
+                        )}
+                    </div></div>
+            </>
             )}
             {editToggle === 1 && (
                 <table>
