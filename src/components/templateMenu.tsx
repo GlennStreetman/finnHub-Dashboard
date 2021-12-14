@@ -1,11 +1,44 @@
 
 import { useState, useEffect, useRef } from "react";
 import { useAppSelector } from 'src/hooks';
+import Table from '@material-ui/core/Table';
+import TableBody from '@material-ui/core/TableBody';
+import TableCell from '@material-ui/core/TableCell';
+import TableContainer from '@material-ui/core/TableContainer';
+import TableHead from '@material-ui/core/TableHead';
+import TableRow from '@material-ui/core/TableRow';
+import { Button } from '@material-ui/core/';
+import { Grid, Paper, Box, Typography } from '@material-ui/core/';
+import { styled } from '@material-ui/core/styles';
+
+const MyPaper = styled(Paper)({ color: "#1d69ab", variant: "outlined", borderRadius: 20, padding: 25 });
 
 const useSelector = useAppSelector
 
 interface checkObject {
     [key: string]: boolean
+}
+
+const divRoot = {
+    width: '100%',
+    display: 'flex',
+    justifyContent: 'center',
+    padding: '15px',
+
+}
+
+const divOutline = {
+    border: '5px solid',
+    borderRadius: '10px',
+    backgroundColor: 'white',
+    padding: '5px',
+    borderColor: '#1d69ab',
+    maxWidth: '400px'
+}
+
+const tHeadStyle = {
+    paddingLeft: '10px',
+    paddingRight: '10px',
 }
 
 export default function TemplateMenu(p: 'pass', ref: any) {
@@ -88,57 +121,58 @@ export default function TemplateMenu(p: 'pass', ref: any) {
     function templateTable(tempList: string[][]) {
         const keySwitch = apiAlias ? apiAlias : apiKey
         return tempList.map((el) => (
-            <tr key={el[0] + 'tr'}>
-                <td key={el[0] + 'td1'}>{el[0]}</td>
-                <td key={el[0] + 'td2'}><a href='#template' onClick={(e) => { runTemplate(e, keySwitch, el[1], el[0]) }}>{`/runTemplate?key=${keySwitch}&template=${el[1]}&multi=${isChecked(el[0])}`}</a></td>
-                <td key={el[0] + 'td3'}>
+            <TableRow key={el[0] + 'tr'}>
+                <TableCell key={el[0] + 'td1'}>{el[0].replace('.xlsx', '')}</TableCell>
+                <TableCell key={el[0] + 'td2'}><a href='#template' onClick={(e) => { runTemplate(e, keySwitch, el[1], el[0]) }}>{`/runTemplate?key=${keySwitch}&template=${el[1]}&multi=${isChecked(el[0])}`}</a></TableCell>
+                <TableCell key={el[0] + 'td3'}>
                     <input key={el[0] + 'mark'}
                         type="checkbox"
                         onChange={() => check(el[0])}
                         checked={isChecked(el[0])}
                     />
-                </td>
-                <td key={el[0] + 'td4'}><button onClick={() => deleteFile(el[0])}><i className="fa fa-times" aria-hidden="true"></i></button></td>
-            </tr>
+                </TableCell>
+                <TableCell key={el[0] + 'td4'}><button onClick={() => deleteFile(el[0])}><i className="fa fa-times" aria-hidden="true"></i></button></TableCell>
+            </TableRow>
         ))
     }
 
-    const divOutline = {
-        border: '5px solid',
-        borderRadius: '10px',
-        backgroundColor: 'white',
-        padding: '5px',
-        borderColor: '#1d69ab',
-    }
-
-    const tHeadStyle = {
-        paddingLeft: '10px',
-        paddingRight: '10px',
-    }
-
     return (<>
-        <div style={divOutline}>
-            <b>Excel Templates:</b>
-            <table>
-                <thead>
-                    <tr>
-                        <td style={tHeadStyle}>Name</td>
-                        <td style={tHeadStyle}>Link</td>
-                        <td style={tHeadStyle}>Multi</td>
-                        <td style={tHeadStyle}>Delete</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {templateTable(templateList)}
-                </tbody>
-            </table>
-            <div>
-                <input type="file" hidden ref={inputReference} onChange={uploadNewTemplate} />
-                <button className="ui button" onClick={fileUploadAction}>
-                    Upload New Template
-                </button>
-            </div>
-        </div>
+        <Grid container justifyContent="center">
+            <Grid item sm={2} md={3} lg={4} xl={4} />
+            <Grid item xs={12} sm={8} md={6} lg={4} xl={4} >
+                <Box pt={2}>
+                    <MyPaper elevation={6}>
+                        <Box component="span"><Typography>Manage Excel Templates:</Typography></Box>
+                        <TableContainer>
+                            <Table size="small">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell style={tHeadStyle}>Name</TableCell>
+                                        <TableCell style={tHeadStyle}>Link</TableCell>
+                                        <TableCell style={tHeadStyle}>Multi</TableCell>
+                                        <TableCell style={tHeadStyle}>Delete</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {templateTable(templateList)}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                        <div style={{
+                            display: 'flex',
+                            justifyContent: 'center',
+                            gap: '5px'
+                        }}>
+                            <input type="file" hidden ref={inputReference} onChange={uploadNewTemplate} />
+                            <Button variant="outlined" onClick={fileUploadAction}>
+                                Upload New Template
+                            </Button>
+                        </div>
+                    </MyPaper>
+                </Box>
+            </Grid>
+            <Grid item sm={2} md={3} lg={4} xl={4} />
+        </Grid>
         {serverMessage !== "" && (
             <div>
                 <b >{serverMessage}</b>
@@ -146,9 +180,3 @@ export default function TemplateMenu(p: 'pass', ref: any) {
         )}
     </>)
 }
-
-// export function templateMenuProps(that: AppState) {
-//     let propList = {
-//     };
-//     return propList;
-// }
