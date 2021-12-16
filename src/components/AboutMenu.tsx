@@ -88,9 +88,9 @@ function AboutMenu() {
         0: intro,
         1: widgets,
         2: dashboards,
-        3: <>WIP</>,
-        4: <>WIP</>,
-        5: <>WIP</>,
+        3: <>WIP graphQL</>,
+        4: <>WIP Excel</>,
+        5: <>WIP Learn More / Register</>,
         6: <>WIP</>,
     }
 
