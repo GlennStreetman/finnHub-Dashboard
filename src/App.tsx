@@ -3,6 +3,7 @@ import { useState, useEffect, useMemo } from "react";
 import { BrowserRouter, Route, Routes, Navigate, Outlet } from "react-router-dom";
 import queryString from "query-string";
 import { createTheme, ThemeProvider } from '@material-ui/core/styles'
+import Splash from 'src/components/Splash'
 
 //app functions
 import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
@@ -46,7 +47,6 @@ const outerTheme = createTheme({
             xl: 2400, //2
         },
     },
-
 });
 
 const useDispatch = useAppDispatch
@@ -164,7 +164,7 @@ export default function App() {
                     setNavigate('dashboard')
                     finnHubQueue.updateInterval(data.ratelimit)
                 } else {
-                    setNavigate('login')
+                    setNavigate('splash')
                 }
             })
     }, [])
@@ -233,17 +233,21 @@ export default function App() {
         <Outlet />
     </>
 
+    // const splash = <Splash />
+
+    // const rootElement = login === 1 ? topNav : splash
+
     return (
         <ThemeProvider theme={outerTheme}>
             <BrowserRouter>
                 <Routes>
                     <Route path="/" element={topNav}>
-                        {/*  */}
                         <Route path="dashboard" element={dashboard} />
                         <Route path="login" element={loginComp} />
                         <Route path="manageAccount" element={React.createElement(AccountMenu, accountMenuProps(appState))} />
                         <Route path="widgetMenu" element={React.createElement(WidgetMenu, widgetMenuProps(appState))} />
                         <Route path="about" element={React.createElement(AboutMenu, {})} />
+                        <Route path="splash" element={React.createElement(Splash, {})} />
                         <Route path="exchangeMenu" element={React.createElement(ExchangeMenu, exchangeMenuProps(appState))} />
                         <Route path="templates" element={React.createElement(TemplateMenu)} />
                         <Route path="manageWidgets" element={React.createElement(ManageWidgets)} />

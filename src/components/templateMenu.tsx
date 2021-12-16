@@ -19,23 +19,6 @@ interface checkObject {
     [key: string]: boolean
 }
 
-const divRoot = {
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    padding: '15px',
-
-}
-
-const divOutline = {
-    border: '5px solid',
-    borderRadius: '10px',
-    backgroundColor: 'white',
-    padding: '5px',
-    borderColor: '#1d69ab',
-    maxWidth: '400px'
-}
-
 const tHeadStyle = {
     paddingLeft: '10px',
     paddingRight: '10px',
@@ -45,7 +28,6 @@ export default function TemplateMenu(p: 'pass', ref: any) {
 
     const apiKey = useSelector((state) => { return state.apiKey })
     const apiAlias = useSelector((state) => { return state.apiAlias })
-
     const [templateFlag, setTemplateFlag] = useState(true) //if true, retrieve template list.
     const [templateList, setTemplateList] = useState([]) //list of templates that have previously been uploaded
     const [serverMessage] = useState('') //if true, retrieve template list. 
@@ -165,9 +147,6 @@ export default function TemplateMenu(p: 'pass', ref: any) {
                             gap: '5px'
                         }}>
                             <input type="file" hidden ref={inputReference} onChange={uploadNewTemplate} />
-
-
-
                             <Box pt={1} alignItems='center' display='flex' justifyContent='center'>
                                 <Button color="primary" onClick={fileUploadAction}>
                                     Upload New Template

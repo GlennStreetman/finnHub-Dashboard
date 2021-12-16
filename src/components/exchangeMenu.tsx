@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { rUpdateExchangeList } from '../slices/sliceExchangeList'
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 
@@ -10,7 +10,8 @@ import TableHead from '@material-ui/core/TableHead';
 import TablePagination from '@material-ui/core/TablePagination';
 import TableRow from '@material-ui/core/TableRow';
 import { useNavigate } from "react-router-dom";
-import { Grid, Paper, Box, Typography, Button } from '@material-ui/core/';
+import { Grid, Box, Typography, Button } from '@material-ui/core/';
+
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
