@@ -20,8 +20,8 @@ import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
 import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
 import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
 import { useResetPagination } from './../../widgetHooks/useResetPagination'
-
 import { useStartingFilters } from './../../widgetHooks/useStartingFilters'
+import { Typography } from '@material-ui/core/';
 
 
 const useDispatch = useAppDispatch
@@ -120,7 +120,7 @@ function EstimatesEarningsCalendar(p: widgetProps, ref: any) {
         if (state.dataModel !== undefined &&
             state.dataModel.created !== 'false' &&
             state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData: FinnHubAPIDataArray = showDataSelector(state)
+            const showData: FinnHubAPIData[] = showDataSelector(state)
             return (showData)
         }
     })
@@ -137,12 +137,15 @@ function EstimatesEarningsCalendar(p: widgetProps, ref: any) {
         return [p?.config?.targetSecurity]
     }, [p.config.targetSecurity])
 
+    // console.log('widgetStocks', stockList)
+
     useDragCopy(ref, { pagination: pagination, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.
     useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
-    useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
     useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, dashboardData, currentDashboard, dispatch, apiKey, p.finnHubQueue)
     useResetPagination(p.config.targetSecurity, setPagination)
+    useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
+
 
     function changePagination(e) {
         const newIncrement = pagination + e;
@@ -221,6 +224,7 @@ function EstimatesEarningsCalendar(p: widgetProps, ref: any) {
                         </thead>
                         <tbody>{stockTable()}</tbody>
                     </table>
+                    {rShowData && rShowData.length === 0 ? <Typography>No data available, review widget dates. Limited data availble in API free tier.</Typography> : <></>}
                 </div>
             </>
         );

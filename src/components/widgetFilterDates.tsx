@@ -1,4 +1,3 @@
-import ToolTip from './toolTip.js'
 import { dashBoardData } from 'src/App'
 import { UpdateWidgetFilters } from 'src/appFunctions/appImport/widgetLogic'
 import { useAppDispatch } from 'src/hooks';
@@ -10,6 +9,7 @@ import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/picker
 import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import useWindowDimensions from 'src/appFunctions/hooks/windowDimensions'
+
 
 interface props {
     start: string,
@@ -28,7 +28,7 @@ const filterTheme = createTheme({
     overrides: {
         MuiTextField: {
             root: {
-                color: 'white',
+                color: 'black',
                 width: '150px',
                 marginRight: '5px',
                 marginLeft: '5px',
@@ -37,22 +37,24 @@ const filterTheme = createTheme({
         },
         MuiInputBase: {
             root: {
-                color: 'white'
-
+                color: 'black',
+                backgroundColor: "white",
+                borderRadius: 10,
+                outlineRadius: 10,
             },
         },
         MuiFormLabel: {
             root: {
                 color: 'white',
                 '&$focused': {
-                    color: 'white'
+                    color: 'black'
                 },
             },
         },
 
         MuiFormHelperText: {
             root: {
-                color: 'white'
+                color: 'black'
             }
         }
     }
@@ -92,6 +94,7 @@ export default function WidgetFilterDates(p: props) {
     const widgetFraction = (width / columns - 20) / 12
 
     function updateStartDate(date) {
+        console.log('update', date)
         p.setStart(date)
     }
 
@@ -121,7 +124,9 @@ export default function WidgetFilterDates(p: props) {
     const thisStyle = {
         display: 'flex',
         justifyContent: 'center',
+        backgroundColor: '#1d69ab',
     }
+
 
     return (
         <div style={thisStyle}>
@@ -134,7 +139,7 @@ export default function WidgetFilterDates(p: props) {
                         variant="inline"
                         format="MM/dd/yyyy"
                         margin="normal"
-                        id="date-picker-inline"
+                        id="date-picker-inline-Start"
                         label="Start Date:"
                         value={p.start}
                         onChange={updateStartDate}
@@ -150,7 +155,7 @@ export default function WidgetFilterDates(p: props) {
                         variant="inline"
                         format="MM/dd/yyyy"
                         margin="normal"
-                        id="date-picker-inline"
+                        id="date-picker-inline-End"
                         label="End Date:"
                         value={p.end}
                         onChange={updateEndDate}

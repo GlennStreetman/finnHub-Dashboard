@@ -3,15 +3,16 @@ import { tChangeWidgetName } from 'src/thunks/thunkChangeWidgetName'
 import { tUpdateWidgetFilters } from 'src/thunks/thunkUpdateWidgetFilters'
 import { tSyncGlobalStocklist } from 'src/thunks/thunkSyncGlobalStockList'
 import { tAddNewWidgetContainer } from 'src/thunks/thunkAddNewWidgetContainer'
+import { tAddStock } from 'src/thunks/thunkAddWidgetSecurity'
 
-function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
-    const testName = iterator === 0 ? widgetName : widgetName + iterator
-    if (nameList.includes(testName)) {
-        return uniqueName(widgetName, nameList, iterator + 1)
-    } else {
-        return testName
-    }
-}
+// function uniqueName(widgetName: string, nameList: string[], iterator = 0) {
+//     const testName = iterator === 0 ? widgetName : widgetName + iterator
+//     if (nameList.includes(testName)) {
+//         return uniqueName(widgetName, nameList, iterator + 1)
+//     } else {
+//         return testName
+//     }
+// }
 
 export interface stock {
     currency: string,
@@ -201,8 +202,9 @@ const dashboardData = createSlice({
         },
         rSetWidgetStockList: (state: sliceDashboardData, action: PayloadAction<setWidgetStockList>) => {
             const ap = action.payload
-            const trackedStocks: stockList = state[ap.currentDashboard].widgetlist[ap.widgetId]["trackedStocks"]; //copy target widgets stock object
+            let trackedStocks: stockList = state[ap.currentDashboard].widgetlist[ap.widgetId]["trackedStocks"]; //copy target widgets stock object
             if (Object.keys(trackedStocks).indexOf(ap.symbol) === -1 && ap.stockObj) { //add
+                trackedStocks = { ...trackedStocks }
                 trackedStocks[ap.symbol] = ap.stockObj
             } else { //remove
                 delete trackedStocks[ap.symbol]
@@ -289,7 +291,18 @@ const dashboardData = createSlice({
             const widgetName = newWidget.widgetID
             state[currentDashboard].widgetlist[widgetName] = newWidget
             return state
+        },
+        [tAddStock.fulfilled.toString()]: (state, action) => {
+            const ap = action.payload
+            const trackedStocks: stockList = state[ap.currentDashboard].widgetlist[ap.widgetId]["trackedStocks"]; //copy target widgets stock object
+            if (Object.keys(trackedStocks).indexOf(ap.symbol) === -1 && ap.stockObj) { //add
+                trackedStocks[ap.symbol] = ap.stockObj
+            } else { //remove
+                delete trackedStocks[ap.symbol]
+            }
+            return state
         }
+
     }
 })
 

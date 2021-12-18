@@ -2,16 +2,19 @@
 
 // import ToolTip from './toolTip.js'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
-import { rSetGlobalStockList, rSetWidgetStockList } from 'src/slices/sliceDashboardData'
+import { rSetGlobalStockList } from 'src/slices/sliceDashboardData'
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { rSetDefaultExchange } from 'src/slices/sliceDefaultExchange'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 import SecuritySearch from 'src/components/searchSecurity'
-import { Button, Container, Select, FormControl } from '@material-ui/core/';
+import { Button, Select, FormControl } from '@material-ui/core/';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import useWindowDimensions from 'src/appFunctions/hooks/windowDimensions'
-// import Tooltip from '@material-ui/core/Tooltip'
+import { tAddStock } from 'src/thunks/thunkAddWidgetSecurity'
 import { createTheme, ThemeProvider } from '@material-ui/core/styles'
+import { rSetUpdateStatus } from "src/slices/sliceDataModel"; //sliceDataModel, rRebuildTargetDashboardModel 
+import { tGetFinnhubData } from "src/thunks/thunkFetchFinnhub";
+
 
 const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -27,9 +30,11 @@ interface props {
 
 function StockSearchPane(p: props) {
 
+    // const apiKey = useSelector((state) => { return state.apiKey })
     const defaultExchange = useSelector((state) => { return state.defaultExchange })
     const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
     const currentDashboard = useSelector((state) => { return state.currentDashboard })
+    const dashboardData = useSelector((state) => { return state.dashboardData })
     const rUpdateStock = useSelector((state) => {
         const thisExchange = state.exchangeData.e?.data
         const inputSymbol = p.searchText.slice(0, p.searchText.indexOf(":"))
@@ -129,19 +134,18 @@ function StockSearchPane(p: props) {
     const exchangeOptions = exchangeList.map((el) =>
         <option key={el + 'ex'} value={el}>{el}</option>
     )
-    const helpText = <>
-        Select exchange to be used in "Add Security" search. <br />
-        Click manage account to update exchange list.<br />
-    </>
+    // const helpText = <>
+    //     Select exchange to be used in "Add Security" search. <br />
+    //     Click manage account to update exchange list.<br />
+    // </>
 
-    const submit = function (e) { //submit stock to be added/removed from global & widget stocklist.
+    const submit = async function (e) { //submit stock to be added/removed from global & widget stocklist.
         console.log('submit')
         e.preventDefault();
         if (rUpdateStock !== undefined && widgetKey === 'watchListMenu') {
             console.log('update global')
             const thisStock = rUpdateStock
             const stockKey = thisStock.key
-            dispatch(rSetGlobalStockList)
             dispatch(rSetGlobalStockList({
                 stockRef: stockKey,
                 currentDashboard: currentDashboard,
@@ -152,20 +156,25 @@ function StockSearchPane(p: props) {
             const thisStock = rUpdateStock
             const stockKey = thisStock.key
 
-            dispatch(rSetWidgetStockList({
+            await dispatch(tAddStock({
                 widgetId: widgetKey,
                 symbol: stockKey,
                 currentDashboard: currentDashboard,
                 stockObj: thisStock
             })) //consider updating data model on remove?
-
+            dispatch(tGetFinnhubData({
+                dashboardID: dashboardData[currentDashboard].id,
+                targetDashBoard: currentDashboard,
+                widgetList: [widgetKey],
+                finnHubQueue: p.finnHubQueue,
+                rSetUpdateStatus: rSetUpdateStatus,
+                dispatch: dispatch
+            }))
             dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
         } else {
             console.log(`invalid stock selection:`, rUpdateStock, p.searchText, typeof widgetKey);
         }
     }
-
-    //className="stockSearch"
     return (
         <div data-testid={`stockSearchPane-${p.widgetType}`} style={{ backgroundColor: '#1d69ab', display: 'flex', justifyContent: 'center' }}>
             <FormControl

@@ -6,6 +6,7 @@ import { dashBoardData } from './../App'
 import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB'
 import { tGetSavedDashboards } from '../thunks/thunkGetSavedDashboards'
 import { tAddNewWidgetContainer } from 'src/thunks/thunkAddNewWidgetContainer'
+import { tAddStock, tAddStockRes } from 'src/thunks/thunkAddWidgetSecurity'
 
 interface dataStatus {
     [key: number]: number, //dashboard data setup status: count of open api requests.
@@ -63,6 +64,14 @@ export interface rebuildTargetWidgetPayload {
     targetWidget: string,
 }
 
+export interface rebuildTargetWidgetSecurity {
+    apiKey: string,
+    dashBoardData: dashBoardData,
+    targetDashboard: string,
+    targetWidget: string,
+    security: string,
+}
+
 export interface rRebuildTargetDashboardPayload {
     apiKey: string,
     dashBoardData: dashBoardData,
@@ -111,7 +120,7 @@ const dataModel = createSlice({
                         const filters: Object = widgetList[w].filters
                         const widgetDescription: string = widgetList[w].widgetHeader
                         const widgetType: string = widgetList[w].widgetType
-                        const config: Object = widgetList[w].config
+                        // const config: Object = widgetList[w].config
                         const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
                         const trackedStocks = widgetList[w].trackedStocks
                         const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, ap.apiKey)
@@ -123,7 +132,7 @@ const dataModel = createSlice({
                                 widgetName: widgetDescription,
                                 dashboard: dashboardName,
                                 widgetType: widgetType,
-                                config: config,
+                                // config: config,
                             }
                         }
                     }
@@ -147,7 +156,7 @@ const dataModel = createSlice({
                     const filters: Object = widgetList[w].filters
                     const widgetDescription: string = widgetList[w].widgetHeader
                     const widgetType: string = widgetList[w].widgetType
-                    const config: Object = widgetList[w].config
+                    // const config: Object = widgetList[w].config
                     const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
                     const trackedStocks = widgetList[w].trackedStocks
                     const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, ap.apiKey)
@@ -159,7 +168,7 @@ const dataModel = createSlice({
                             widgetName: widgetDescription,
                             dashboard: dashboardName,
                             widgetType: widgetType,
-                            config: config,
+                            // config: config,
                         }
                     }
                 }
@@ -167,6 +176,7 @@ const dataModel = createSlice({
             state.dataSet[dashboardName] = newDashboardModel
         },
         rRebuildTargetWidgetModel: (state: sliceDataModel, action) => {
+            console.log('rebuilding widget model slice')
             const ap: rebuildTargetWidgetPayload = action.payload
             const apD: dashBoardData = ap.dashBoardData
             const dashboardName: string = ap.targetDashboard
@@ -179,7 +189,7 @@ const dataModel = createSlice({
                 const filters: Object = targetWidget.filters
                 const widgetDescription: string = targetWidget.widgetHeader
                 const widgetType: string = targetWidget.widgetType
-                const config: Object = targetWidget.config
+                // const config: Object = targetWidget.config
                 const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
                 const trackedStocks = targetWidget.trackedStocks
                 const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, ap.apiKey)
@@ -191,7 +201,7 @@ const dataModel = createSlice({
                         widgetName: widgetDescription,
                         dashboard: dashboardName,
                         widgetType: widgetType,
-                        config: config,
+                        // config: config,
                     }
                 }
             }
@@ -314,7 +324,7 @@ const dataModel = createSlice({
                         const filters: Object = widgetList[w].filters
                         const widgetDescription: string = widgetList[w].widgetHeader
                         const widgetType: string = widgetList[w].widgetType
-                        const config: Object = widgetList[w].config
+                        // const config: Object = widgetList[w].config
                         const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
                         const trackedStocks = widgetList[w].trackedStocks
                         const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, ap.apiKey)
@@ -326,7 +336,7 @@ const dataModel = createSlice({
                                 widgetName: widgetDescription,
                                 dashboard: dashboardName,
                                 widgetType: widgetType,
-                                config: config,
+                                // config: config,
                             }
                         }
                     }
@@ -348,7 +358,7 @@ const dataModel = createSlice({
             const filters: Object = newWidget.filters
             const widgetDescription: string = newWidget.widgetHeader
             const widgetType: string = newWidget.widgetType
-            const config: Object = newWidget.config
+            // const config: Object = newWidget.config
             const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
             const trackedStocks = newWidget.trackedStocks
             const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, apiKey)
@@ -360,13 +370,32 @@ const dataModel = createSlice({
                     widgetName: widgetDescription,
                     dashboard: targetDashboard,
                     widgetType: widgetType,
-                    config: config,
+                    // config: config,
                 }
             }
 
             state.dataSet[targetDashboard][widgetName] = dataModel
 
             return state
+        },
+        [tAddStock.fulfilled.toString()]: (state, action) => {
+            const ap: tAddStockRes = action.payload
+            const targetWidget = ap.widgetObj
+            const endPoint: string = targetWidget.widgetType
+            const filters: Object = targetWidget.filters
+            const widgetDescription: string = targetWidget.widgetHeader
+            const widgetType: string = targetWidget.widgetType
+            const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
+            const endPointData: EndPointObj = endPointFunction([ap.stockObj], filters, ap.apiKey)
+            delete endPointData.undefined
+            console.log('new stock', endPointData, ap.stockObj)
+            state.dataSet[ap.currentDashboard][ap.widgetId][ap.symbol] = {
+                apiString: endPointData[ap.symbol],
+                widgetName: widgetDescription,
+                dashboard: ap.currentDashboard,
+                widgetType: widgetType,
+                // config: config,
+            }
         }
     }
 })
