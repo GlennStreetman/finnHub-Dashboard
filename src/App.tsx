@@ -33,6 +33,7 @@ import { rUpdateQuotePriceStream } from 'src/slices/sliceQuotePrice'
 import { tProcessLogin } from 'src/thunks/thunkProcessLogin'
 
 const outerTheme = createTheme({
+
     palette: {
         primary: {
             main: '#1d69ab',
