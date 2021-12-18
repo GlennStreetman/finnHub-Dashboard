@@ -21,6 +21,7 @@ import { tSyncGlobalStocklist } from 'src/thunks/thunkSyncGlobalStockList'
 import { tGetFinnhubData, tgetFinnHubDataReq } from "src/thunks/thunkFetchFinnhub";
 import { rSetUpdateStatus } from "src/slices/sliceDataModel";
 import { reqObj, tGetSymbolList } from 'src/slices/sliceExchangeData'
+import { rRebuildTargetDashboardModel } from 'src/slices/sliceDataModel'
 
 interface props {
     showEditPane: number,
@@ -251,12 +252,17 @@ function WatchListMenu(p: props, ref: any) {
                                 <td>
                                     <button className="ui button" onClick={async () => {
                                         const [focus, newDashboard] = await newGlobalStockList(dashboardData, currentDashboard)
-                                        console.log('HERE', focus)
-
+                                        dispatch(rRebuildTargetDashboardModel({
+                                            apiKey: apiKey,
+                                            dashBoardData: newDashboard,
+                                            targetDashboard: currentDashboard,
+                                        }))
                                         await dispatch(tSyncGlobalStocklist({
                                             dashboardData: newDashboard,
                                             targetSecurity: focus,
                                         }))
+
+
 
                                         dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
                                         const payload: tgetFinnHubDataReq = {

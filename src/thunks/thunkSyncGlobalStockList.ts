@@ -13,8 +13,6 @@ export const tSyncGlobalStocklist = createAsyncThunk(
         const currentDashboard = thunkAPI.getState().currentDashboard
         const globalStockList = Object.keys(req.dashboardData[currentDashboard].globalstocklist)
 
-        console.log('currentDashboard', currentDashboard, 'globalStockList', globalStockList, 'dashboardData', req.dashboardData, 'targetSecurity', req.targetSecurity)
-
         return {
             dashboardData: req.dashboardData,
             targetSecurity: req.targetSecurity,
