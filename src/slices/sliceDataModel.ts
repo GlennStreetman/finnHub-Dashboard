@@ -7,6 +7,7 @@ import { tSearchMongoDB } from '../thunks/thunkSearchMongoDB'
 import { tGetSavedDashboards } from '../thunks/thunkGetSavedDashboards'
 import { tAddNewWidgetContainer } from 'src/thunks/thunkAddNewWidgetContainer'
 import { tAddStock, tAddStockRes } from 'src/thunks/thunkAddWidgetSecurity'
+import { tSyncGlobalStocklist, syncReturn } from 'src/thunks/thunkSyncGlobalStockList'
 
 interface dataStatus {
     [key: number]: number, //dashboard data setup status: count of open api requests.
@@ -76,7 +77,6 @@ export interface rRebuildTargetDashboardPayload {
     apiKey: string,
     dashBoardData: dashBoardData,
     targetDashboard: string,
-
 }
 
 export interface rRemoveDashboardPayload {
@@ -396,8 +396,44 @@ const dataModel = createSlice({
                 widgetType: widgetType,
                 // config: config,
             }
-        }
-    }
+        },
+        [tSyncGlobalStocklist.fulfilled.toString()]: (state, action) => {
+            const ap: syncReturn = action.payload
+            const dashboardName: string = ap.currentDashboard
+            const targetDashboard = ap.dashboardData[dashboardName]
+
+            console.log('rebuilding model', ap)
+
+            const newDashboardModel = {}
+            const widgetList = targetDashboard.widgetlist
+            for (const w in widgetList) {  //for each widget
+                const widgetName: string = w
+                if (w !== null && w !== 'null') {
+                    const endPoint: string = widgetList[w].widgetType
+                    const filters: Object = widgetList[w].filters
+                    const widgetDescription: string = widgetList[w].widgetHeader
+                    const widgetType: string = widgetList[w].widgetType
+                    // const config: Object = widgetList[w].config
+                    const endPointFunction: Function = widgetDict[endPoint] //returns function that generates finnhub API strings
+                    const trackedStocks = widgetList[w].trackedStocks
+                    const endPointData: EndPointObj = endPointFunction(trackedStocks, filters, ap.apiKey)
+                    delete endPointData.undefined
+                    newDashboardModel[widgetName] = {}
+                    for (const stock in endPointData) {
+                        newDashboardModel[widgetName][`${stock}`] = {
+                            apiString: endPointData[stock],
+                            widgetName: widgetDescription,
+                            dashboard: dashboardName,
+                            widgetType: widgetType,
+                            // config: config,
+                        }
+                    }
+                }
+            }
+            state.dataSet[dashboardName] = newDashboardModel
+        },
+    },
+
 })
 
 export const {

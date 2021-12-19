@@ -185,17 +185,14 @@ function WatchListMenu(p: props, ref: any) {
     }
 
     function fileUploadAction() {
-        console.log('file upload action')
         if (inputReference.current !== null) inputReference.current.click();
     }
 
     function resetUploadList() {
-        console.log("List Uploaded", uploadList)
         setUploadList([])
     }
 
     function fileUploadInputChange(e) {
-        // const that = this
         Papa.parse(e.target.files[0], {
             complete: function (results: { data: any }) {
                 const newStockList: string[] = []
@@ -205,7 +202,6 @@ function WatchListMenu(p: props, ref: any) {
                         newStockList.push(thisStock)
                     }
                 }
-                console.log('newStockList', newStockList)
                 setUploadList(newStockList)
             }
         });
@@ -252,19 +248,10 @@ function WatchListMenu(p: props, ref: any) {
                                 <td>
                                     <button className="ui button" onClick={async () => {
                                         const [focus, newDashboard] = await newGlobalStockList(dashboardData, currentDashboard)
-                                        dispatch(rRebuildTargetDashboardModel({
-                                            apiKey: apiKey,
-                                            dashBoardData: newDashboard,
-                                            targetDashboard: currentDashboard,
-                                        }))
                                         await dispatch(tSyncGlobalStocklist({
                                             dashboardData: newDashboard,
                                             targetSecurity: focus,
                                         }))
-
-
-
-                                        dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
                                         const payload: tgetFinnHubDataReq = {
                                             dashboardID: dashboardData[currentDashboard].id,
                                             targetDashBoard: currentDashboard,
@@ -273,7 +260,8 @@ function WatchListMenu(p: props, ref: any) {
                                             rSetUpdateStatus: rSetUpdateStatus,
                                             dispatch: dispatch,
                                         }
-                                        dispatch(tGetFinnhubData(payload))
+                                        // dispatch(tGetFinnhubData(payload))
+                                        dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
 
                                     }}>
                                         Sync

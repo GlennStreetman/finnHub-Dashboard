@@ -40,7 +40,7 @@ export default function CsvUpload(p: props) {
             }))
             const focus = rUpdateObj[Object.keys(rUpdateObj)[0]] ? rUpdateObj[Object.keys(rUpdateObj)[0]].key : ''
 
-            dispatch(rSetTargetSecurity(focus))
+            // dispatch(rSetTargetSecurity(focus))
             p.resetUploadList()
             tSaveDashboard({ dashboardName: currentDashboard })
         }

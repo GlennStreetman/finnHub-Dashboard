@@ -2,7 +2,7 @@ import produce from "immer"
 
 import { dashBoardData } from './../../App'
 
-export const newGlobalStockList = async function (dashBoardData: dashBoardData, currentDashboard: string) {
+export const newGlobalStockList = async function (dashBoardData: dashBoardData, currentDashboard: string): Promise<[string, dashBoardData]> {
     //sets current dashboards widgets security list to match global list. Drops data from mongo.
     const globalStockList = dashBoardData[currentDashboard].globalstocklist
     const newFocus: string = globalStockList && Object.keys(globalStockList)[0] ? Object.keys(globalStockList)[0] : ''
