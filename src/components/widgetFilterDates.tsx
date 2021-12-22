@@ -33,7 +33,7 @@ const filterTheme = createTheme({
         MuiTextField: {
             styleOverrides: {
                 root: {
-                    color: 'black',
+                    // color: 'black',
                     width: '150px',
                     marginRight: '5px',
                     marginLeft: '5px',
@@ -48,28 +48,28 @@ const filterTheme = createTheme({
                     backgroundColor: "white",
                     borderRadius: 10,
                     outlineRadius: 10,
+                    height: '35px',
                 },
             }
         },
-        MuiFormLabel: {
+        MuiInputLabel: {
             styleOverrides: {
                 root: {
                     color: 'white',
-                    '&$focused': {
-                        color: 'black'
-                    },
+                    top: '-5px',
+
                 },
+
             }
         },
-
-        MuiFormHelperText: {
-            styleOverrides: {
-                root: {
-                    color: 'black'
-                }
-            }
+    },
+    palette: {
+        primary: {
+            main: '#ffffff',
+            light: '#ffffff',
+            dark: '#ffffff',
         }
-    }
+    },
 });
 
 
@@ -138,6 +138,7 @@ export default function WidgetFilterDates(p: props) {
         display: 'flex',
         justifyContent: 'center',
         backgroundColor: '#1d69ab',
+        padding: '8px'
     }
 
 

@@ -14,6 +14,7 @@ import useWindowDimensions from 'src/appFunctions/hooks/windowDimensions'
 import { tAddStock } from 'src/thunks/thunkAddWidgetSecurity'
 import { rSetUpdateStatus } from "src/slices/sliceDataModel"; //sliceDataModel, rRebuildTargetDashboardModel 
 import { tGetFinnhubData } from "src/thunks/thunkFetchFinnhub";
+import MenuItem from '@mui/material/MenuItem';
 
 
 const useDispatch = useAppDispatch
@@ -93,6 +94,11 @@ function StockSearchPane(p: props) {
                 backgroundColor: "white",
                 borderRadius: 10,
                 height: '35px',
+                color: 'black',
+                '&:hover': {
+                    backgroundColor: '#0069d9',
+
+                }
             }
         }),
     );
@@ -134,7 +140,7 @@ function StockSearchPane(p: props) {
 
     let widgetKey = p.widgetKey;
     const exchangeOptions = exchangeList.map((el) =>
-        <option key={el + 'ex'} value={el}>{el}</option>
+        <MenuItem key={el + 'ex'} value={el}>{el}</MenuItem>
     )
     // const helpText = <>
     //     Select exchange to be used in "Add Security" search. <br />
@@ -178,7 +184,7 @@ function StockSearchPane(p: props) {
         }
     }
     return (
-        <div data-testid={`stockSearchPane-${p.widgetType}`} style={{ backgroundColor: '#1d69ab', display: 'flex', justifyContent: 'center' }}>
+        <div data-testid={`stockSearchPane-${p.widgetType}`} style={{ backgroundColor: '#1d69ab', display: 'flex', justifyContent: 'center', padding: '5px' }}>
             <FormControl
                 className={classes.formControl}
             >
@@ -187,7 +193,7 @@ function StockSearchPane(p: props) {
                 {exchangeList.length > 1 &&
                     // <Tooltip title={helpText} >
                     <ThemeProvider theme={oneOffTheme}>
-                        <Select variant="outlined" className={classes.exchange} value={defaultExchange} name='exchangeList' onChange={changeDefault}>
+                        <Select variant="outlined" label='select-security-exchange' className={classes.exchange} value={defaultExchange} onChange={changeDefault}>
                             {exchangeOptions}
                         </Select>
                     </ThemeProvider>

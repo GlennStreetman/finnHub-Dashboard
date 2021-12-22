@@ -37,26 +37,14 @@ const oneOffTheme = createTheme({
                 },
             }
         },
-        MuiFormLabel: {
-            styleOverrides: {
-                root: {
-                    padding: '0px',
-                    lineHeight: 0,
-                    color: 'black',
-                    '&$focused': {
-                        color: 'black'
-                    },
-                },
-            }
-        },
-        MuiFormHelperText: {
-            styleOverrides: {
-                root: {
-                    color: 'black'
-                }
-            }
+    },
+    palette: {
+        primary: {
+            main: '#ffffff',
+            light: '#ffffff',
+            dark: '#ffffff',
         }
-    }
+    },
 });
 
 interface props {
