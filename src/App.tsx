@@ -2,7 +2,7 @@ import React from "react";
 import { useState, useEffect, useMemo } from "react";
 import { BrowserRouter, Route, Routes, Navigate, Outlet } from "react-router-dom";
 import queryString from "query-string";
-import { createTheme, ThemeProvider } from '@material-ui/core/styles'
+import { createTheme, ThemeProvider } from '@mui/material/styles'
 
 
 //app functions
@@ -34,27 +34,6 @@ import { rUpdateQuotePriceStream } from 'src/slices/sliceQuotePrice'
 import { tProcessLogin } from 'src/thunks/thunkProcessLogin'
 
 const outerTheme = createTheme({
-    typography: {
-        htmlFontSize: 16,
-        h1: {
-            fontSize: 'clamp(2.14rem, 1.74rem + 1.99vw, 3.16rem)'
-        },
-        h2: {
-            fontSize: 'clamp(1.71rem, 1.45rem + 1.29vw, 2.37rem)'
-        },
-        h3: {
-            fontSize: 'clamp(1.37rem, 1.21rem + 0.8vw, 1.78rem)'
-        },
-        h4: {
-            fontSize: 'clamp(1.09rem, 1rem + 9.47vw, 1.33re)'
-        },
-        h5: {
-            fontSize: 'clamp(0.88rem, 0.83rem + 0.24vw, 1rem)'
-        },
-        h6: {
-            fontSize: 'clamp(0.7rem, 0.66rem + 0.2vw, 0.8rem)'
-        },
-    },
     palette: {
         primary: {
             main: '#1d69ab',

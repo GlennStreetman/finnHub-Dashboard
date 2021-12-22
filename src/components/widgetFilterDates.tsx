@@ -2,12 +2,16 @@ import { dashBoardData } from 'src/App'
 import { UpdateWidgetFilters } from 'src/appFunctions/appImport/widgetLogic'
 import { useAppDispatch } from 'src/hooks';
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
+import TextField from '@mui/material/TextField';
 
-import 'date-fns';
-import DateFnsUtils from '@date-io/date-fns';
-import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
-import { createTheme, ThemeProvider } from '@material-ui/core/styles'
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+// import 'date-fns';
+// import DateFnsUtils from '@date-io/date-fns';
+// import { MuiPickersUtilsProvider, KeyboardDatePicker } from '@material-ui/pickers';
+import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import DatePicker from '@mui/lab/DatePicker';
+import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { makeStyles } from '@mui/styles';
 import useWindowDimensions from 'src/appFunctions/hooks/windowDimensions'
 
 
@@ -25,36 +29,44 @@ interface props {
 }
 
 const filterTheme = createTheme({
-    overrides: {
+    components: {
         MuiTextField: {
-            root: {
-                color: 'black',
-                width: '150px',
-                marginRight: '5px',
-                marginLeft: '5px',
+            styleOverrides: {
+                root: {
+                    color: 'black',
+                    width: '150px',
+                    marginRight: '5px',
+                    marginLeft: '5px',
 
+                }
             },
         },
         MuiInputBase: {
-            root: {
-                color: 'black',
-                backgroundColor: "white",
-                borderRadius: 10,
-                outlineRadius: 10,
-            },
+            styleOverrides: {
+                root: {
+                    color: 'black',
+                    backgroundColor: "white",
+                    borderRadius: 10,
+                    outlineRadius: 10,
+                },
+            }
         },
         MuiFormLabel: {
-            root: {
-                color: 'white',
-                '&$focused': {
-                    color: 'black'
+            styleOverrides: {
+                root: {
+                    color: 'white',
+                    '&$focused': {
+                        color: 'black'
+                    },
                 },
-            },
+            }
         },
 
         MuiFormHelperText: {
-            root: {
-                color: 'black'
+            styleOverrides: {
+                root: {
+                    color: 'black'
+                }
             }
         }
     }
@@ -112,12 +124,13 @@ export default function WidgetFilterDates(p: props) {
         }
     }
 
-    const useStyles = makeStyles((theme: Theme) =>
-        createStyles({
-            getTime: {
-                width: Math.round(widgetFraction * 5.5),
-            },
-        }))
+    const useStyles = makeStyles({
+        getTime: {
+            width: Math.round(widgetFraction * 5.5),
+        },
+
+    });
+
 
     const classes = useStyles();
 
@@ -131,42 +144,44 @@ export default function WidgetFilterDates(p: props) {
     return (
         <div style={thisStyle}>
             <ThemeProvider theme={filterTheme}>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
                     {/* <span> */}
-                    <KeyboardDatePicker
+                    <DatePicker
                         className={classes.getTime}
-                        disableToolbar
-                        variant="inline"
-                        format="MM/dd/yyyy"
-                        margin="normal"
-                        id="date-picker-inline-Start"
+                        // disableToolbar
+                        // variant="inline"
+                        // format="MM/dd/yyyy"
+                        // margin="normal"
+                        // id="date-picker-inline-Start"
                         label="Start Date:"
                         value={p.start}
                         onChange={updateStartDate}
-                        onBlur={(date) => { updateFilter(date, 'startDate') }}
+                        // onBlur={(date) => { updateFilter(date, 'startDate') }}
                         onAccept={(date) => { updateFilter(date, 'startDate') }}
-                        KeyboardButtonProps={{
-                            'aria-label': 'change date',
-                        }}
+                        // KeyboardButtonProps={{
+                        //     'aria-label': 'change date',
+                        // }}
+                        renderInput={(params) => <TextField {...params} />}
                     />
-                    <KeyboardDatePicker
+                    <DatePicker
                         className={classes.getTime}
-                        disableToolbar
-                        variant="inline"
-                        format="MM/dd/yyyy"
-                        margin="normal"
-                        id="date-picker-inline-End"
+                        // disableToolbar
+                        // variant="inline"
+                        // format="MM/dd/yyyy"
+                        // margin="normal"
+                        // id="date-picker-inline-End"
                         label="End Date:"
                         value={p.end}
                         onChange={updateEndDate}
-                        onBlur={(date) => { updateFilter(date, 'endDate') }}
+                        // onBlur={(date) => { updateFilter(date, 'endDate') }}
                         onAccept={(date) => { updateFilter(date, 'startDate') }}
-                        KeyboardButtonProps={{
-                            'aria-label': 'change date',
-                        }}
+                        renderInput={(params) => <TextField {...params} />}
+                    // KeyboardButtonProps={{
+                    //     'aria-label': 'change date',
+                    // }}
                     />
                     {/* </span> */}
-                </MuiPickersUtilsProvider>
+                </LocalizationProvider>
 
             </ThemeProvider>
         </div>

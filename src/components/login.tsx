@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 
 import { useAppDispatch } from 'src/hooks';
 import { widgetSetup } from 'src/App'
-import { styled } from '@material-ui/core/styles';
-import { Grid, Paper, Button, TextField, Box, Typography } from '@material-ui/core/';
+import { styled } from '@mui/material/styles';
+import { Grid, Paper, Button, TextField, Box, Typography } from '@mui/material/';
 
 import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
 import { checkPassword } from "../appFunctions/client/checkPassword";

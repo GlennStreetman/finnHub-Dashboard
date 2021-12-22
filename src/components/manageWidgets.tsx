@@ -1,24 +1,22 @@
 import { useState, } from "react";
-import Tabs from '@material-ui/core/Tabs';
-import Tab from '@material-ui/core/Tab';
-import Select from '@material-ui/core/Select';
-import MenuItem from '@material-ui/core/MenuItem';
+import Tabs from '@mui/material/Tabs';
+import Tab from '@mui/material/Tab';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
 import { estimateOptions, fundamentalsOptions, priceOptions, widgetDescriptions } from '../registers/topNavReg'
 import { useAppSelector } from 'src/hooks';
-import FormControl from '@material-ui/core/FormControl';
-import Card from '@material-ui/core/Card';
-import FormHelperText from '@material-ui/core/FormHelperText';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
-import Button from '@material-ui/core/Button';
+import FormControl from '@mui/material/FormControl';
+import Card from '@mui/material/Card';
+import FormHelperText from '@mui/material/FormHelperText';
+import CardContent from '@mui/material/CardContent';
+import Typography from '@mui/material/Typography';
+import Button from '@mui/material/Button';
 import { tAddNewWidgetContainer } from 'src/thunks/thunkAddNewWidgetContainer'
 import { filters, widget } from 'src/App'
 import { useAppDispatch } from 'src/hooks';
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 import { rChangeWidgetColumnOrder } from 'src/slices/sliceDashboardData'
-
-import { makeStyles } from '@material-ui/core/styles';
-
+import { makeStyles } from '@mui/styles';
 
 // const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -68,29 +66,25 @@ const cardStyle = {
     'maxWidth': '400px',
 }
 
-const useStyles = () => {
+const useStyles = makeStyles({
+    root: {
+        width: '100%',
+        position: 'fixed',
+        bottom: 0,
+        justifyContent: 'center'
+    },
+    MuiButtonBase: {
+        position: 'inherit'
+    }
+})
 
-    return makeStyles({
-        root: {
-            width: '100%',
-            position: 'fixed',
-            bottom: 0,
-            justifyContent: 'center'
-            // background: 'transparent'
-        },
-        MuiButtonBase: {
-
-            position: 'inherit'
-        }
-    })
-};
 
 function ManageWidgets() {
 
     const useDispatch = useAppDispatch
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
-    const classes = useStyles()();
+    const classes = useStyles();
     const dashboardData = useSelector((state) => { return state.dashboardData })
     const currentDashboard = useSelector((state) => { return state.currentDashboard })
     const dashboardList = Object.keys(dashboardData)
@@ -99,19 +93,19 @@ function ManageWidgets() {
     const [dashboard, setDashboard] = useState(currentDashboard)
     const [widgetHeading, setWidgetHeading] = useState('Stock Estimates')
 
-    const handleChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+    const handleChange = () => {
         setToggle(toggle === 0 ? 1 : 0);
     };
 
-    const handDashboardChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const handDashboardChange = (event: SelectChangeEvent) => {
         setDashboard(event.target.value as string);
     };
 
-    const handleHeadingChange = (event: React.ChangeEvent<{ value: unknown }>) => {
+    const handleHeadingChange = (event: SelectChangeEvent) => {
         setWidgetHeading(event.target.value as string);
     };
 
-    const handleColumnChange = (e: React.ChangeEvent<{ value: any }>, dashboard, widgetId) => {
+    const handleColumnChange = (e: SelectChangeEvent<string | number>, dashboard, widgetId) => {
         dispatch(rChangeWidgetColumnOrder({
             dashboard: dashboard,
             widgetId: widgetId,
@@ -120,7 +114,7 @@ function ManageWidgets() {
         }))
     };
 
-    const handleOrderChange = (e: React.ChangeEvent<{ value: any }>, dashboard, widgetId, column) => {
+    const handleOrderChange = (e: SelectChangeEvent<string | number>, dashboard, widgetId, column) => {
         dispatch(rChangeWidgetColumnOrder({
             dashboard: dashboard,
             widgetId: widgetId,

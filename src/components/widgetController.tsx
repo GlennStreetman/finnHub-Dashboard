@@ -6,7 +6,7 @@ import useWindowDimensions from '../appFunctions/hooks/windowDimensions'
 import BottomNav from "./bottomNav";
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 import { widget } from 'src/App'
-import { Grid } from '@material-ui/core/';
+import { Grid } from '@mui/material/';
 import { useAppSelector } from '../hooks';
 
 

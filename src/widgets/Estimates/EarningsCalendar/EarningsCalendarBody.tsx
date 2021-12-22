@@ -21,7 +21,7 @@ import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
 import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
 import { useResetPagination } from './../../widgetHooks/useResetPagination'
 import { useStartingFilters } from './../../widgetHooks/useStartingFilters'
-import { Typography } from '@material-ui/core/';
+import { Typography } from '@mui/material/';
 
 
 const useDispatch = useAppDispatch

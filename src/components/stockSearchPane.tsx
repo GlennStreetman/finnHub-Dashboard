@@ -7,11 +7,11 @@ import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { rSetDefaultExchange } from 'src/slices/sliceDefaultExchange'
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 import SecuritySearch from 'src/components/searchSecurity'
-import { Button, Select, FormControl } from '@material-ui/core/';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
+import { Button, Select, FormControl } from '@mui/material/';
+import { createStyles, makeStyles } from '@mui/styles';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
 import useWindowDimensions from 'src/appFunctions/hooks/windowDimensions'
 import { tAddStock } from 'src/thunks/thunkAddWidgetSecurity'
-import { createTheme, ThemeProvider } from '@material-ui/core/styles'
 import { rSetUpdateStatus } from "src/slices/sliceDataModel"; //sliceDataModel, rRebuildTargetDashboardModel 
 import { tGetFinnhubData } from "src/thunks/thunkFetchFinnhub";
 
@@ -67,10 +67,10 @@ function StockSearchPane(p: props) {
 
     const widgetFraction = (width / columns - 20) / 12
 
-    const useStyles = makeStyles((theme: Theme) =>
+    const useStyles = makeStyles((theme) =>
         createStyles({
             formControl: {
-                margin: theme.spacing(.5),
+                margin: .5,
                 flexDirection: 'row',
             },
             securitySearch: {
@@ -98,11 +98,13 @@ function StockSearchPane(p: props) {
     );
 
     const oneOffTheme = createTheme({
-        overrides: {
+        components: {
             MuiSelect: {
-                iconOutlined: {
-                    right: '0px',
-                },
+                styleOverrides: {
+                    iconOutlined: {
+                        right: '0px',
+                    },
+                }
             }
         }
     })

@@ -5,13 +5,13 @@ import { useNavigate } from "react-router-dom";
 import { rSetApiKey } from 'src/slices/sliceAPIKey'
 import { rSetApiAlias } from 'src/slices/sliceAPIAlias'
 import { useAppDispatch, useAppSelector } from 'src/hooks';
-import { Tooltip } from '@material-ui/core/';
-import { Button } from '@material-ui/core/';
-import TextField from '@material-ui/core/TextField';
-import { Grid, Paper, Box, Typography } from '@material-ui/core/';
-import { styled } from '@material-ui/core/styles';
-import IconButton from '@material-ui/core/IconButton';
-import SaveIcon from '@material-ui/icons/Save';
+import { Tooltip } from '@mui/material/';
+import { Button } from '@mui/material/';
+import TextField from '@mui/material/TextField';
+import { Grid, Paper, Box, Typography } from '@mui/material/';
+import { styled } from '@mui/material/styles';
+import IconButton from '@mui/material/IconButton';
+import SaveIcon from '@mui/icons-material/Save';
 
 const MyPaper = styled(Paper)({ color: "#1d69ab", variant: "outlined", borderRadius: 20, padding: 25 });
 

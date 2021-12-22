@@ -4,19 +4,19 @@ import { useState } from 'react';
 import { estimateOptions, fundamentalsOptions, priceOptions } from '../registers/topNavReg'
 import { widgetSetup } from 'src/App'
 import { updateWidgetSetup } from 'src/appFunctions/appImport/updateWidgetSetup'
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TableRow from '@material-ui/core/TableRow';
-import { Button } from '@material-ui/core/';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TableRow from '@mui/material/TableRow';
+import { Button } from '@mui/material/';
 import { useNavigate } from "react-router-dom";
-import { Tooltip } from '@material-ui/core/';
-import IconButton from '@material-ui/core/IconButton';
-import KeyboardArrowDownIcon from '@material-ui/icons/KeyboardArrowDown';
-import KeyboardArrowUpIcon from '@material-ui/icons/KeyboardArrowUp';
-import { Grid, Box } from '@material-ui/core/';
+import { Tooltip } from '@mui/material/';
+import IconButton from '@mui/material/IconButton';
+import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
+import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { Grid, Box } from '@mui/material/';
 
 
 interface props {

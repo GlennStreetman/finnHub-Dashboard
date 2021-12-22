@@ -2,15 +2,15 @@ import { useState } from 'react';
 import { rUpdateExchangeList } from '../slices/sliceExchangeList'
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
-import TableCell from '@material-ui/core/TableCell';
-import TableContainer from '@material-ui/core/TableContainer';
-import TableHead from '@material-ui/core/TableHead';
-import TablePagination from '@material-ui/core/TablePagination';
-import TableRow from '@material-ui/core/TableRow';
+import Table from '@mui/material/Table';
+import TableBody from '@mui/material/TableBody';
+import TableCell from '@mui/material/TableCell';
+import TableContainer from '@mui/material/TableContainer';
+import TableHead from '@mui/material/TableHead';
+import TablePagination from '@mui/material/TablePagination';
+import TableRow from '@mui/material/TableRow';
 import { useNavigate } from "react-router-dom";
-import { Grid, Box, Typography, Button } from '@material-ui/core/';
+import { Grid, Box, Typography, Button } from '@mui/material/';
 
 
 const useDispatch = useAppDispatch

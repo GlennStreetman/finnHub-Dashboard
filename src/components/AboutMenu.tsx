@@ -1,12 +1,13 @@
-import { Grid, Box, Typography } from '@material-ui/core/';
-import { makeStyles, useTheme } from '@material-ui/core/styles';
-import MobileStepper from '@material-ui/core/MobileStepper';
-import Button from '@material-ui/core/Button';
-import KeyboardArrowLeft from '@material-ui/icons/KeyboardArrowLeft';
-import KeyboardArrowRight from '@material-ui/icons/KeyboardArrowRight';
+import { Grid, Box, Typography } from '@mui/material/';
+import { useTheme } from '@mui/material/styles';
+import MobileStepper from '@mui/material/MobileStepper';
+import Button from '@mui/material/Button';
+import KeyboardArrowLeft from '@mui/icons-material/KeyboardArrowLeft';
+import KeyboardArrowRight from '@mui/icons-material/KeyboardArrowRight';
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { createTheme, ThemeProvider } from '@material-ui/core/styles'
+import { createTheme, ThemeProvider } from '@mui/material/styles'
+import { makeStyles } from '@mui/styles';
 
 
 

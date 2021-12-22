@@ -1,12 +1,12 @@
 
-import { BottomNavigation, BottomNavigationAction } from '@material-ui/core/';
+import { BottomNavigation, BottomNavigationAction } from '@mui/material/';
 import { useState } from "react";
 
-import { makeStyles } from '@material-ui/core/styles';
+import { makeStyles } from '@mui/styles';
 
-import CenterFocusStrongSharpIcon from '@material-ui/icons/CenterFocusStrongSharp';
-import ArrowForwardIcon from '@material-ui/icons/ArrowForward';
-import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import CenterFocusStrongSharpIcon from '@mui/icons-material/CenterFocusStrongSharp';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 
 const useStyles = (width) => {
     const thisWidth = width > 800 ? 'auto' : '100%'
@@ -29,7 +29,7 @@ interface props {
 }
 
 export default function BottomNav(p: props) {
-    const classes = useStyles(p.width)();
+    const classes: any = useStyles(p.width);
     const [column, setColumn] = useState('0');
 
     const handleChange = (event, newValue) => {

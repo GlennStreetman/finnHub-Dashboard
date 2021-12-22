@@ -1,5 +1,5 @@
-import { Grid, Button, Box, Typography } from '@material-ui/core/';
-import { makeStyles } from '@material-ui/core/styles';
+import { Grid, Button, Box, Typography } from '@mui/material/';
+import { makeStyles } from '@mui/styles';
 import { useNavigate } from "react-router-dom";
 
 const useStyles = makeStyles({

@@ -118,8 +118,8 @@ export interface addWidget {
 export interface changeWidgetOrder {
     dashboard: string,
     widgetId: string | number,
-    newPlacement: number,
-    column: number,
+    newPlacement: string | number,
+    column: string | number,
 }
 
 const initialState: sliceDashboardData = {}
@@ -237,7 +237,7 @@ const dashboardData = createSlice({
                     return 0
                 }
             })
-            reOrderList.splice(ap.newPlacement, 0, targetWidget) // add moved widget into list
+            reOrderList.splice(Number(ap.newPlacement), 0, targetWidget) // add moved widget into list
             reOrderList.forEach((el, i) => { //reorder based on index locaiton of reOrderList
                 if (el.columnOrder !== i) {
                     widgetList[el.widgetID].columnOrder = i

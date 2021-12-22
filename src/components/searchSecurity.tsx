@@ -5,47 +5,55 @@ import { useState, useEffect } from "react";
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 import { reqObj } from 'src/slices/sliceExchangeData'
 import { tGetSymbolList } from "../slices/sliceExchangeData";
-import TextField from '@material-ui/core/TextField';
-import Autocomplete from '@material-ui/lab/Autocomplete';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 
-import { createTheme, ThemeProvider } from '@material-ui/core/styles'
+import { createTheme, ThemeProvider } from '@mui/material/styles'
 const oneOffTheme = createTheme({
-    overrides: {
+    components: {
         MuiTextField: {
-            root: {
-                color: 'black',
-                input: {
-                    paddingTop: '14.5px',
-                    paddingBottom: '14.5px',
+            styleOverrides: {
+                root: {
+                    color: 'black',
+                    input: {
+                        paddingTop: '14.5px',
+                        paddingBottom: '14.5px',
+                    },
+                    label: {
+                        top: '-9px'
+                    }
                 },
-                label: {
-                    top: '-9px'
-                }
-            },
+            }
         },
         MuiInputBase: {
-            root: {
-                height: '35px',
+            styleOverrides: {
+                root: {
+                    height: '35px',
 
-            },
-            input: {
-                position: 'relative',
-                top: '-8px',
-            },
+                },
+                input: {
+                    position: 'relative',
+                    top: '-8px',
+                },
+            }
         },
         MuiFormLabel: {
-            root: {
-                padding: '0px',
-                lineHeight: 0,
-                color: 'black',
-                '&$focused': {
-                    color: 'black'
+            styleOverrides: {
+                root: {
+                    padding: '0px',
+                    lineHeight: 0,
+                    color: 'black',
+                    '&$focused': {
+                        color: 'black'
+                    },
                 },
-            },
+            }
         },
         MuiFormHelperText: {
-            root: {
-                color: 'black'
+            styleOverrides: {
+                root: {
+                    color: 'black'
+                }
             }
         }
     }

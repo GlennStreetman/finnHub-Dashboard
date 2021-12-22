@@ -2,16 +2,16 @@
 import { useNavigate, useLocation } from "react-router-dom";
 import { widgetSetup, dashBoardData } from 'src/App'
 import { finnHubQueue, createFunctionQueueObject } from "src/appFunctions/appImport/throttleQueueAPI";
-import { AppBar, Toolbar, Tooltip } from '@material-ui/core/';
-import WidgetsIcon from '@material-ui/icons/Widgets';
-import TableChartIcon from '@material-ui/icons/TableChart';
-import AccountBoxIcon from '@material-ui/icons/AccountBox';
-import InfoIcon from '@material-ui/icons/Info';
-import LockRoundedIcon from '@material-ui/icons/LockRounded';
-import LockOpenRoundedIcon from '@material-ui/icons/LockOpenRounded';
-import AppsIcon from '@material-ui/icons/Apps';
-import Button from '@material-ui/core/Button';
-import IconButton from '@material-ui/core/IconButton';
+import { AppBar, Toolbar, Tooltip } from '@mui/material/';
+import WidgetsIcon from '@mui/icons-material/Widgets';
+import TableChartIcon from '@mui/icons-material/TableChart';
+import AccountBoxIcon from '@mui/icons-material/AccountBox';
+import InfoIcon from '@mui/icons-material/Info';
+import LockRoundedIcon from '@mui/icons-material/LockRounded';
+import LockOpenRoundedIcon from '@mui/icons-material/LockOpenRounded';
+import AppsIcon from '@mui/icons-material/Apps';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
 import { useAppDispatch } from 'src/hooks';
 import { rDataModelLogout } from "src/slices/sliceDataModel"
 import { rExchangeDataLogout } from "src/slices/sliceExchangeData";
@@ -34,7 +34,7 @@ function TopNav(p: topNavProps) {
     let location = useLocation();
     const useDispatch = useAppDispatch
     const dispatch = useDispatch(); //allows widget to run redux actions.
-    const width = useWindowDimensions().width //also returns height
+    // const width = useWindowDimensions().width //also returns height
 
     async function logout() {
         console.log('logout')
@@ -77,13 +77,17 @@ function TopNav(p: topNavProps) {
                         {showDashBoardButtons()}
                         {location.pathname !== '/dashboard' ? (
                             <IconButton onClick={() => { navigate('/dashboard') }}>
-                                <Tooltip title="Show Dashboards" placement="bottom"><AppsIcon style={{ fill: 'white' }} /></Tooltip>
+                                <Tooltip title="Show Dashboards" placement="bottom">
+                                    <AppsIcon style={{ fill: 'white' }} />
+                                </Tooltip>
                             </IconButton>
                         ) : <></>}
 
                         {location.pathname !== '/templates' ? (
                             <IconButton onClick={() => { navigate('/templates') }}>
-                                <Tooltip title="Excel Templates" placement="bottom"><TableChartIcon style={{ fill: 'white' }} /></Tooltip>
+                                <Tooltip title="Excel Templates" placement="bottom">
+                                    <TableChartIcon style={{ fill: 'white' }} />
+                                </Tooltip>
                             </IconButton>
                         ) : <></>}
 
