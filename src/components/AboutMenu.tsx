@@ -65,7 +65,7 @@ function AboutMenu() {
 
     const intro = <>
         <Box className={classes.center}>
-            <Typography variant="h4" gutterBottom>Welcome to Finndash! </Typography>
+            <Typography style={{ 'fontSize': 'size-300' }} variant="h4" gutterBottom>Welcome to Finndash! </Typography>
             <Typography variant="h5" gutterBottom>Finndash is a data specification, collaboration, and productivity tool. </Typography>
             <Typography variant="h6" gutterBottom>Finndash consumes, formats, displays, and repackages your Finnhub.io API data. </Typography>
         </Box>

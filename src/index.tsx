@@ -9,7 +9,8 @@ import "./css/login.css";
 import "./css/topNav.css";
 import "./css/widgetBody.css";
 import "./css/loader.css";
-import "./css/tables.css"
+import "./css/tables.css";
+
 
 
 import App from "./App";

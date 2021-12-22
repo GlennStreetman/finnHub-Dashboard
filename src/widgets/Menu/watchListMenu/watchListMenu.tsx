@@ -143,8 +143,6 @@ function WatchListMenu(p: props, ref: any) {
                             <td className="leftTE" key={el + 'desc'}>
                                 {g[el].description}
                             </td>
-
-
                         </>
                     }
                     {p.showEditPane === 1 &&
@@ -252,14 +250,14 @@ function WatchListMenu(p: props, ref: any) {
                                             dashboardData: newDashboard,
                                             targetSecurity: focus,
                                         }))
-                                        const payload: tgetFinnHubDataReq = {
-                                            dashboardID: dashboardData[currentDashboard].id,
-                                            targetDashBoard: currentDashboard,
-                                            widgetList: Object.keys(dashboardData[currentDashboard].widgetlist),
-                                            finnHubQueue: p.finnHubQueue,
-                                            rSetUpdateStatus: rSetUpdateStatus,
-                                            dispatch: dispatch,
-                                        }
+                                        // const payload: tgetFinnHubDataReq = {
+                                        //     dashboardID: dashboardData[currentDashboard].id,
+                                        //     targetDashBoard: currentDashboard,
+                                        //     widgetList: Object.keys(dashboardData[currentDashboard].widgetlist),
+                                        //     finnHubQueue: p.finnHubQueue,
+                                        //     rSetUpdateStatus: rSetUpdateStatus,
+                                        //     dispatch: dispatch,
+                                        // }
                                         // dispatch(tGetFinnhubData(payload))
                                         dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
 
