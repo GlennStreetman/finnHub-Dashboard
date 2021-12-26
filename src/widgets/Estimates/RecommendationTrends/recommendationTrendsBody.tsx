@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useState, useEffect, forwardRef, useRef, useMemo } from "react";
-import RecTrendChart from "./recTrendChart";
+import RecTrendChart from "./recTrendsChart";
 import { widget } from 'src/App'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
@@ -58,6 +58,12 @@ interface widgetProps {
     widgetType: string,
 }
 
+interface chartGroup {
+    label: string,
+    data: number[],
+    backgroundColor: string
+}
+
 function EstimatesRecommendationTrends(p: widgetProps, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
 
@@ -71,7 +77,7 @@ function EstimatesRecommendationTrends(p: widgetProps, ref: any) {
 
 
     const [widgetCopy] = useState(startingWidgetCoptyRef())
-    const [chartOptions, setchartOptions] = useState({})
+    const [chartData, setChartData] = useState<false | object>(false)
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const showDataSelector = createSelector(
@@ -100,73 +106,68 @@ function EstimatesRecommendationTrends(p: widgetProps, ref: any) {
     const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : -1
 
 
-    useDragCopy(ref, { chartOptions: chartOptions })// stockData: JSON.parse(JSON.stringify(stockData)),   useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useDragCopy(ref, { chartData: chartData })// stockData: JSON.parse(JSON.stringify(stockData)),   useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.	
     useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
 
     useEffect(() => {//create chart data
+
+        const labels: string[] = []
         const sOptions = ['strongSell', 'sell', 'hold', 'buy', 'strongBuy']
-        const chartData: DataChartObject = { strongSell: {}, sell: {}, hold: {}, buy: {}, strongBuy: {} }
-        for (const i in sOptions) {
-            chartData[sOptions[i]] = {
-                type: "stackedColumn",
-                name: sOptions[i],
-                showInLegend: "true",
-                xValueFormatString: "DD, MMM",
-                yValueFormatString: "#,##0",
-                dataPoints: [] //populated by loop below
-            }
-        }
-        const listSixData = Array.isArray(rShowData) === true ? rShowData.slice(0, 12) : []
-        const rawData = listSixData
-        for (const i in rawData) {
-            const node = rawData[i]
-            for (const d in sOptions) {
-                const dataPoint = node[sOptions[d]]
-                const dataTime = node['period']
-                const dataObject = { label: dataTime, y: dataPoint }
-                chartData[sOptions[d]]['dataPoints'].unshift(dataObject)
-            }
+
+        const strongSell: chartGroup = {
+            label: 'Strong Sell',
+            data: [],
+            backgroundColor: '#FF333C'
         }
 
-        const dataArray: DataChartObject[] = []
-
-        const options = {
-            width: 400,
-            height: 200,
-            animationEnabled: true,
-            exportEnabled: true,
-            theme: "light1",
-            title: {
-                text: `Recommendation Trends: ${p.config.targetSecurity}`,
-                fontFamily: "verdana"
-            },
-            axisY: {
-                title: "",
-                includeZero: true,
-                prefix: "",
-                suffix: ""
-            },
-            toolTip: {
-                shared: true,
-                reversed: true
-            },
-            legend: {
-                verticalAlign: "center",
-                horizontalAlign: "right",
-                reversed: true,
-                cursor: "pointer",
-                // itemclick: toggleDataSeries
-            },
-            data: dataArray
+        const sell: chartGroup = {
+            label: 'Sell',
+            data: [],
+            backgroundColor: '#FF3396'
         }
 
-        for (const x in chartData) {
-            options.data.push(chartData[x])
+        const hold: chartGroup = {
+            label: 'hold',
+            data: [],
+            backgroundColor: '#F0FF33'
         }
 
-        setchartOptions(options)
+        const buy: chartGroup = {
+            label: 'Buy',
+            data: [],
+            backgroundColor: '#33E0FF'
+        }
+
+        const strongBuy: chartGroup = {
+            label: 'Strong Buy',
+            data: [],
+            backgroundColor: '#3342FF'
+        }
+
+        const rawData = Array.isArray(rShowData) === true ? rShowData.slice(0, 12) : [] //limit to 12 recommendations.
+        rawData.forEach((el: FinnHubAPIData) => {
+            labels.unshift(el.period)
+            strongSell.data.unshift(el.strongSell)
+            sell.data.unshift(el.sell)
+            hold.data.unshift(el.hold)
+            buy.data.unshift(el.buy)
+            strongBuy.data.unshift(el.strongBuy)
+        })
+
+        const data = {
+            labels: labels,
+            datasets: [
+                strongSell,
+                sell,
+                hold,
+                buy,
+                strongBuy
+            ]
+        }
+
+        setChartData(data)
 
     }, [rShowData, p.config.targetSecurity])
 
@@ -200,9 +201,9 @@ function EstimatesRecommendationTrends(p: widgetProps, ref: any) {
                         enableDrag={p.enableDrag}
                     />
                 </div>
-                <div className="graphDiv">
-                    <RecTrendChart chartOptions={chartOptions} targetSecurity={p.config.targetSecurity} />
-                </div>
+                {/* <div className="graphDiv"> */}
+                <RecTrendChart chartData={chartData} />
+                {/* </div> */}
             </div>
         );
         return chartBody;

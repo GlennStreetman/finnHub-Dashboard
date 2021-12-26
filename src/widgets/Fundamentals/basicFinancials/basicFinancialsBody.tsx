@@ -702,7 +702,7 @@ function FundamentalsBasicFinancials(p: widgetProps, ref: any) {
                             {seriesListOptions}
                         </select>
                     }
-                    <CreateTimeSeriesChart candleData={options} testid={`chart-${p.config.targetSecurity}`} />
+                    {/* <CreateTimeSeriesChart candleData={options} testid={`chart-${p.config.targetSecurity}`} /> */}
                 </div>
             )
             return buildChartSelection;

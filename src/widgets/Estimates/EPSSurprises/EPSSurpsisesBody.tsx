@@ -1,6 +1,6 @@
 import * as React from "react"
 import { useState, useEffect, forwardRef, useRef, useMemo } from "react";
-import ReactChart from "./reactChart";
+import EPSChart from "./EPSChart";
 
 import { widget } from 'src/App'
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
@@ -67,7 +67,7 @@ function EstimatesEPSSurprises(p: widgetProps, ref: any) {
         } else { return 0 }
     }
 
-    const [chartOptions, setChartOptions] = useState({})
+    const [chartData, setChartData] = useState<false | object>(false)
     const [widgetCopy] = useState(startingWidgetCoptyRef())
     const apiKey = useSelector((state) => { return state.apiKey })
     const currentDashboard = useSelector((state) => { return state.currentDashboard })
@@ -94,7 +94,7 @@ function EstimatesEPSSurprises(p: widgetProps, ref: any) {
         return [p?.config?.targetSecurity]
     }, [p?.config?.targetSecurity])
 
-    useDragCopy(ref, { chartOptions: chartOptions, }) //useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useDragCopy(ref, { chartData: chartData, }) //useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.
     useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
@@ -109,48 +109,21 @@ function EstimatesEPSSurprises(p: widgetProps, ref: any) {
         }
 
         const chartData = {
-            actual: actualList,
-            estimate: estimateList,
+            datasets: [
+                {
+                    label: 'Expected',
+                    data: actualList,
+                    backgroundColor: 'rgba(255, 99, 132, 1)',
+                },
+                {
+                    label: 'Actual',
+                    data: estimateList,
+                    backgroundColor: 'rgba(100, 50, 182, 1)',
+                },
+            ]
         }
 
-        const options = {
-            width: 400,
-            height: 200,
-            theme: "light2",
-            animationEnabled: true,
-            exportEnabled: true,
-            title: {
-                text: `${p.config.targetSecurity}: EPS Surprises`
-            },
-            axisX: {
-                title: ""
-            },
-            axisY: {
-                title: "Quarterly EPS",
-                suffix: ""
-            },
-            legend: {
-                cursor: "pointer",
-                itemclick: 'toggleDataSeries'
-            },
-            data: [{
-                type: "scatter",
-                name: "Actual",
-                markerType: "circle",
-                showInLegend: true,
-                // toolTipContent: "<span style=\"color:#4F81BC \">{name}</span><br>Active Users: {x}<br>CPU Utilization: {y}%",
-                dataPoints: chartData.actual
-            },
-            {
-                type: "scatter",
-                name: "Estimate",
-                markerType: "cross",
-                showInLegend: true,
-                // toolTipContent: "<span style=\"color:#4F81BC \">{name}</span><br>Active Users: {x}<br>CPU Utilization: {y}%",
-                dataPoints: chartData.estimate
-            }]
-        }
-        setChartOptions(options);
+        setChartData(chartData);
 
     }, [rShowData, p.config.targetSecurity])
 
@@ -184,9 +157,11 @@ function EstimatesEPSSurprises(p: widgetProps, ref: any) {
                         enableDrag={p.enableDrag}
                     />
                 </div>
-                <div className="graphDiv" data-testid={`EPSChart`}>
-                    <ReactChart chartOptions={chartOptions} testid={`chart-${p.widgetType}`} />
-                </div>
+                {/* <div className="graphDiv" data-testid={`EPSChart`}> */}
+                {/* @ts-ignore */}
+                <EPSChart chartData={chartData} />
+                {/* <ReactChart chartOptions={chartOptions} testid={`chart-${p.widgetType}`} /> */}
+                {/* </div> */}
             </>
         );
         return chartBody;
