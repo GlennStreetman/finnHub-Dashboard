@@ -702,7 +702,7 @@ function FundamentalsBasicFinancials(p: widgetProps, ref: any) {
                             {seriesListOptions}
                         </select>
                     }
-                    {/* <CreateTimeSeriesChart candleData={options} testid={`chart-${p.config.targetSecurity}`} /> */}
+                    <CreateTimeSeriesChart chartData={options} />
                 </div>
             )
             return buildChartSelection;
@@ -726,15 +726,6 @@ export default forwardRef(FundamentalsBasicFinancials)
 
 export function metricsProps(that, key = "newWidgetNameProps") {
     let propList = {
-        // apiKey: that.props.apiKey,
-        // defaultExchange: that.props.defaultExchange,
-        // exchangeList: that.props.exchangeList,
-        // filters: that.props.widgetList[key]["filters"],
-        // targetSecurity: that.props.targetSecurity,
-        // trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        // widgetKey: key,
-        // dashBoardData: that.props.dashBoardData,
-        // currentDashBoard: that.props.currentDashBoard
     };
     return propList;
 }
