@@ -1,9 +1,12 @@
+//@ts-nocheck
 import React from "react";
+import PropTypes from 'prop-types';
+
 
 export default class ErrorBoundary extends React.Component {
     constructor(props) {
         super(props);
-        this.state = { 
+        this.state = {
             hasError: false,
             errorMessage: false,
             didLog: false,
@@ -13,7 +16,7 @@ export default class ErrorBoundary extends React.Component {
     static getDerivedStateFromError(error) {
         // Update state so the next render will show the fallback UI.
         console.log("ERROR BOUNDARY ACTIVATED", error)
-        return { 
+        return {
             hasError: true,
         };
     }
@@ -23,7 +26,7 @@ export default class ErrorBoundary extends React.Component {
             errorMessage: errorInfo
         })
 
-        const data = {
+        const data = { // @ts-ignore
             widget: this.props.widgetType,
             errorMessage: errorInfo,
         };
@@ -33,29 +36,30 @@ export default class ErrorBoundary extends React.Component {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
         };
-        
+
         fetch("/logUiError", options)
-        .then((response) => response.json())
-        .then((data) => {
-            if (data === true) {
-                this.setState({didLog: true})
-            }
-        })
-    
+            .then((response) => response.json())
+            .then((data) => {
+                if (data === true) {
+                    this.setState({ didLog: true })
+                }
+            })
+
     }
 
     render() {
         // const p = this.props
-        const s = this.state
+        const s = this.state // @ts-ignore
         if (this.state.hasError) {
-        // Add logic for development mode vs live.
-        return <div>
-        <b>Error rendering: {this.props.widgetType} </b><br />
-        {this.state.errorMessage !== false ? s.errorMessage.componentStack : <></>}
-        {s.didLog === true ? <><br /><b>"Error succesfuly logged by server."</b></> : <></>}
-        </div>
+            // Add logic for development mode vs live.
+            return <div>
+                <b>Error rendering: {this.props.widgetType} </b><br />
+                {this.state.errorMessage !== false ? s.errorMessage.componentStack : <></>}
+                {s.didLog === true ? <><br /><b>"Error succesfuly logged by server."</b></> : <></>}
+            </div>
         }
 
-        return this.props.children; 
+        return this.props.children;
     }
 }
+

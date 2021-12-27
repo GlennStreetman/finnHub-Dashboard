@@ -1,6 +1,7 @@
 import React from "react";
 import EndPointData from './endPointData'
 import { convertCamelToProper } from './../appFunctions/stringFunctions'
+import PropTypes from 'prop-types';
 
 export default class EndPointNode extends React.PureComponent {
 
@@ -155,4 +156,9 @@ export default class EndPointNode extends React.PureComponent {
         );
         
     }
+}
+
+EndPointNode.propTypes = {
+    nodeData: any,
+    
 }

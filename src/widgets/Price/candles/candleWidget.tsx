@@ -9,7 +9,7 @@ import { useAppDispatch, useAppSelector } from '../../../hooks';
 
 import CreateCandleStickChart from "./createCandleStickChart";
 import WidgetFilterDates from '../../../components/widgetFilterDates'
-import ToolTip from './../../../components/toolTip.js'
+import ToolTip from '../../../components/toolTip'
 
 import { useDragCopy } from './../../widgetHooks/useDragCopy'
 
@@ -58,28 +58,6 @@ function isCandleData(arg: any): arg is FinnHubCandleData { //defined shape of c
 function PriceCandles(p: widgetProps, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
 
-    const startingCandleData = () => {
-        if (isInitialMount.current === true) {
-            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-                const stockData = JSON.parse(JSON.stringify(p.widgetCopy.chartData))
-                return (stockData)
-            } else if (p?.config?.targetSecurity) {
-                return (p?.config?.targetSecurity)
-            } else {
-                return ('')
-            }
-        }
-    }
-
-    const startingOptions = () => {
-        if (isInitialMount.current === true) {
-            if (p.widgetCopy && p.widgetCopy.widgetID === p.widgetKey) {
-                const options = JSON.parse(JSON.stringify(p.widgetCopy.options))
-                return (options)
-            } else { return ({}) }
-        }
-    }
-
     const startingWidgetCoptyRef = () => {
         if (isInitialMount.current === true) {
             if (p.widgetCopy !== undefined && typeof p.widgetCopy.widgetID === 'number') {
@@ -107,8 +85,8 @@ function PriceCandles(p: widgetProps, ref: any) {
 
 
     const [widgetCopy] = useState(startingWidgetCoptyRef())
-    const [chartData, setChartData] = useState(startingCandleData())
-    const [options, setOptions] = useState(startingOptions())
+    const [chartData, setChartData] = useState<false | object>(false)
+    // const [options, setOptions] = useState(startingOptions())
     const [start, setStart] = useState(startingStartDate())
     const [end, setEnd] = useState(startingEndDate())
     const dispatch = useDispatch()
@@ -142,7 +120,7 @@ function PriceCandles(p: widgetProps, ref: any) {
         return [p?.config?.targetSecurity]
     }, [p?.config?.targetSecurity])
 
-    useDragCopy(ref, { chartData: chartData, options: options, })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useDragCopy(ref, { chartData: chartData })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
     useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.	
     useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
     useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
@@ -155,56 +133,49 @@ function PriceCandles(p: widgetProps, ref: any) {
 
     useEffect(() => {//CREATE CANDLE DATA
         if (rShowData !== undefined && Object.keys(rShowData).length > 0) {
-            const data: any = rShowData //returned from finnHub API
-            if (isCandleData(data)) {
-                const nodeCount: number = data["c"].length;
-                const chartData: Object[] = []
-                for (let nodei = 0; nodei < nodeCount; nodei++) {
-                    const yData: number[] = [
-                        data["o"][nodei],
-                        data["h"][nodei],
-                        data["l"][nodei],
-                        data["c"][nodei]
-                    ]
-                    const newNode: ChartNode = {
-                        x: new Date(data["t"][nodei] * 1000),
-                        y: yData, //open, high, low, close
-                    };
-                    chartData.push(newNode)
-                    setChartData(chartData)
-                }
 
-                const options: Object = {
-                    // width: 400,
-                    height: 200,
-                    theme: "light2", // "light1", "light2", "dark1", "dark2"
-                    animationEnabled: true,
-                    exportEnabled: true,
-                    title: {
-                        text: `Price Candles: ${p.config.targetSecurity}`,
-                    },
-                    axisX: {
-                        valueFormatString: "YYYY-MM-DD",
-                    },
-                    axisY: {
-                        prefix: "$",
-                        title: "Price (in USD)",
-                    },
-                    data: [
-                        {
-                            type: "candlestick",
-                            showInLegend: true,
-                            name: p.config.targetSecurity,
-                            yValueFormatString: "$###0.00",
-                            xValueFormatString: "YYYY-MM-DD",
-                            dataPoints: chartData,
-                        },
-                    ],
-                };
-                setOptions(options)
-                // }
-            } else { console.log("Failed candle data type guard:", data) }
-        }
+            const high = {
+                type: 'scatter' as const,
+                label: 'High',
+                data: rShowData.h.map((el) => {
+                    return ({ x: el, y: el })
+                }),
+                backgroundColor: 'rgba(255, 99, 132, 1)',
+            }
+            const low = {
+                type: 'scatter' as const,
+                label: 'Low',
+                data: rShowData.l.map((el) => {
+                    return ({ x: el, y: el })
+                }),
+                backgroundColor: 'rgba(155, 59, 102, 1)',
+            }
+            const OC = { //open/close bar data
+                type: 'bar' as const,
+                label: 'Open/Close',
+                backgroundColor: 'rgb(75, 192, 192)',
+                data: rShowData.o.map((el, i) => {
+                    return ([el, rShowData.c[i]])
+                }),
+                borderColor: 'white',
+                borderWidth: 2,
+            }
+
+            const newChartData = {
+                labels: rShowData.t.map(el => new Date(el * 1000).toISOString().split('T')[0]), // new Date(el).toISOString().split('T')[0])
+                datasets: [
+                    OC,
+                    high,
+                    low,
+                ]
+            }
+
+            console.log('newChartData', newChartData)
+
+            setChartData(newChartData)
+
+        } else { console.log("Failed candle data type guard:", rShowData) }
+
     }, [p.config.targetSecurity, rShowData, p.filters.endDate, p.filters.startDate, start, end])
 
     function editCandleListForm() {
@@ -215,7 +186,6 @@ function PriceCandles(p: widgetProps, ref: any) {
                 exchangeList={exchangeList}
                 dashBoardData={dashboardData}
                 currentDashboard={currentDashboard}
-
                 apiKey={apiKey}
             />
         );
@@ -254,9 +224,9 @@ function PriceCandles(p: widgetProps, ref: any) {
                         enableDrag={p.enableDrag}
                     />
                 </div>
-                <div data-testid={`${resText} Price Candles: ${p.config.targetSecurity}`} className="graphDiv">
-                    <CreateCandleStickChart candleData={options} />
-                </div>
+                {/* <div data-testid={`${resText} Price Candles: ${p.config.targetSecurity}`} className="graphDiv"> */}
+                <CreateCandleStickChart chartData={chartData} />
+                {/* </div> */}
             </>
         );
         return symbolSelectorDropDown;
@@ -279,14 +249,6 @@ function PriceCandles(p: widgetProps, ref: any) {
                     <div className="searchPane">
                         {React.createElement(StockSearchPane, searchPaneProps(p))}
                         <div className="stockSearch">
-                            {/* <form className="form-inline">
-                                <label htmlFor="start">Start date:</label>
-                                <input className="btn" id="start" type="date" name="startDate" onChange={updateStartDate} onBlur={updateFilterDate} value={start}></input>
-                                <p>
-                                    <label htmlFor="end">End date:</label>
-                                    <input className="btn" id="end" type="date" name="endDate" onChange={updateEndDate} onBlur={updateFilterDate} value={end}></input>
-                                </p>
-                                <p> */}
                             <WidgetFilterDates
                                 start={start}
                                 end={end}
@@ -298,7 +260,6 @@ function PriceCandles(p: widgetProps, ref: any) {
                                 currentDashboard={currentDashboard}
                                 apiKey={apiKey}
                                 finnHubQueue={p.finnHubQueue}
-
                             />
                             <table>
                                 <tbody>
@@ -315,8 +276,7 @@ function PriceCandles(p: widgetProps, ref: any) {
                                     </tr>
                                 </tbody>
                             </table>
-                            {/* </p>
-                            </form> */}
+
                         </div>
                     </div>
                     <div>{Object.keys(p.trackedStocks).length > 0 ? editCandleListForm() : <></>}</div>
@@ -333,15 +293,6 @@ export default forwardRef(PriceCandles)
 
 export function candleWidgetProps(that, key = "Candles") {
     let propList = {
-        // apiKey: that.props.apiKey,
-        // defaultExchange: that.props.defaultExchange,
-        // exchangeList: that.props.exchangeList,
-        // filters: that.props.widgetList[key]["filters"],
-        // trackedStocks: that.props.widgetList[key]["trackedStocks"],
-        // widgetKey: key,
-        // targetSecurity: that.props.targetSecurity,
-        // dashBoardData: that.props.dashBoardData,
-        // currentDashBoard: that.props.currentDashBoard,
     };
     return propList;
 }

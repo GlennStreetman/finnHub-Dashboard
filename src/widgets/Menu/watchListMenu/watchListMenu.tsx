@@ -7,7 +7,7 @@ import { dashBoardData } from 'src/App'
 import Papa from 'papaparse'
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPane";
 import CsvUpload from './csvUpload'
-import ToolTip from '../../../components/toolTip.js'
+import ToolTip from '../../../components/toolTip'
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { dStock } from '../../../appFunctions/formatStockSymbols'
 

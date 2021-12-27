@@ -2,18 +2,18 @@
 
 export function convertCamelToProper(text) {
     if (text) {
-        const result = text.replace( /([A-Z])/g, " $1" );
+        const result = text.replace(/([A-Z])/g, " $1");
         const finalResult = result.charAt(0).toUpperCase() + result.slice(1);
         return finalResult
-    } else {return ''}
+    } else { return '' }
 }
 
-export function findByString(searchObj, searchList){ //find value in nested object
+export function findByString(searchObj, searchList) { //find value in nested object
     if (searchList.length === 1) {
         let ret = searchObj[searchList]
-        if (Array.isArray(ret)) {return ([...ret])}
-        else if (typeof ret === 'object') {return {...ret}}
-        else {return ret}
+        if (Array.isArray(ret)) { return ([...ret]) }
+        else if (typeof ret === 'object') { return { ...ret } }
+        else { return ret }
     } else {
         let searchTerm = searchList.shift()
         if (searchObj[searchTerm]) {
@@ -21,12 +21,12 @@ export function findByString(searchObj, searchList){ //find value in nested obje
             return findByString(foundObj, searchList)
         } else {
             // console.log('FILTER NOT FOUND:', searchList)
-            return({})
+            return ({})
         }
     }
 }
 
-export function mergeByString(searchObj, searchList, payload){ //recursively merge in obj.
+export function mergeByString(searchObj, searchList, payload) { //recursively merge in obj.
     if (searchList.length === 1) {
         return searchObj[searchList[0]] = payload
     } else {
@@ -41,13 +41,13 @@ export function mergeByString(searchObj, searchList, payload){ //recursively mer
     }
 }
 
-export function uniqueObjectnName(newName, reviewObject){
+export function uniqueObjectnName(newName, reviewObject) {
     let iterator = 0
     if (reviewObject[newName]) {
         console.log('newname taken: ', newName)
-        return uniqueObjectnName(newName+'*', reviewObject, iterator+1)
+        return uniqueObjectnName(newName + '*', reviewObject)
     } else {
-        if (iterator === 0){
+        if (iterator === 0) {
             return newName
         } else {
             return `${newName}${iterator}`

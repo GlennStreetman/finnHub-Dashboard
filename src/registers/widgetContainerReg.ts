@@ -39,9 +39,9 @@ export let widgetLookUp = {
     FundamentalsIPOCalendar: FundamentalsIPOCalendar,
     PriceQuote: PriceQuote,
     PriceCandles: PriceCandles,
-    PriceSplits:PriceSplits,
+    PriceSplits: PriceSplits,
     dashBoardMenu: DashBoardMenu,
     watchListMenu: WatchListMenu,
     GQLMenu: GQLMenu,
-}; 
+};
 

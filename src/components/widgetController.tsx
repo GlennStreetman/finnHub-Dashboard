@@ -1,7 +1,7 @@
 import React from "react";
 import { useState } from "react";
 import WidgetContainer from "./widgetContainer";
-import { returnExtraProps } from "../registers/widgetControllerReg.js"
+import { returnExtraProps } from "../registers/widgetControllerReg"
 import useWindowDimensions from '../appFunctions/hooks/windowDimensions'
 import BottomNav from "./bottomNav";
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";

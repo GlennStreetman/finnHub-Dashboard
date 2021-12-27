@@ -1,11 +1,11 @@
 import React from "react";
 import { useState, useEffect } from "react";
 
-import ToolTip from './toolTip.js'
+import ToolTip from './toolTip'
 import ErrorBoundary from './widgetErrorBoundary';
 import { useAppDispatch, useAppSelector } from 'src/hooks';
 import { widget } from 'src/App'
-import { widgetLookUp } from '../registers/widgetContainerReg.js'
+import { widgetLookUp } from '../registers/widgetContainerReg'
 import { excelRegister, excelRegister_singleSecurity } from '../registers/excelButtonRegister'
 
 import { rUnmountWidget } from '../slices/sliceShowData'
@@ -244,7 +244,7 @@ function WidgetContainer(p: containerProps) {
             </div>
             {p.widgetList.showBody !== false ? (
                 <div className='widgetBody' >
-
+                    {/* @ts-ignore */}
                     <ErrorBoundary widgetType={p.widgetList["widgetType"]}>
                         {React.createElement(widgetLookUp[p.widgetList["widgetType"]], { ref: widgetRef, ...widgetProps })}
                     </ErrorBoundary>
