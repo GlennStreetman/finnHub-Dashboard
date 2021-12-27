@@ -63,6 +63,9 @@ module.exports = {
   globals: {
     'ts-jest': {
       isolatedModules: true,
+      diagnostics: false,
+      warnOnly: true,
+
     },
   },
 
@@ -71,7 +74,7 @@ module.exports = {
 
   // An array of directory names to be searched recursively up from the requiring module's location
   moduleDirectories: [
-    "node_modules", "."
+    '.', 'src', 'node_modules'
   ],
 
   // An array of file extensions your modules use
@@ -135,10 +138,12 @@ module.exports = {
   // setupFilesAfterEnv: ["./setupTests"],
 
   // The number of seconds after which a test is considered as slow and reported as such in the results.
-  // slowTestThreshold: 5,
+  slowTestThreshold: 10,
 
   // A list of paths to snapshot serializer modules Jest should use for snapshot testing
-  // snapshotSerializers: [],
+  snapshotSerializers: [
+    '@emotion/jest/serializer'
+  ],
 
   // The test environment that will be used for testing
   testEnvironment: "node",

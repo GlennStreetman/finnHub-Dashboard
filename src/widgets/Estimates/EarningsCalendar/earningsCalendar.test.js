@@ -40,6 +40,8 @@ import { changeFilter } from '../../testFunctions/action_ChangeFilter'
 //test procedures
 import {testBodyRender} from '../../testFunctions/test_bodyRender'
 
+console.error = jest.fn()
+
 jest.mock('./../../../appFunctions/appImport/setupDashboard')
 //mock service worker for all http requests
 const mockHTTPServer = setupServer(
@@ -96,6 +98,8 @@ afterEach( async ()=>{
         await expect(screen.queryByTestId(body)).toBe(null)
     })
 })
+
+
 
 it(`Test ${widgetType} Widget: Change focus renders body change. `, async (done) => {
 
