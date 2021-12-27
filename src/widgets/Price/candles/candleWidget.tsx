@@ -140,7 +140,7 @@ function PriceCandles(p: widgetProps, ref: any) {
                 data: rShowData.h.map((el) => {
                     return ({ x: el, y: el })
                 }),
-                backgroundColor: 'rgba(255, 99, 132, 1)',
+                backgroundColor: '#0066ff',
             }
             const low = {
                 type: 'scatter' as const,
@@ -148,12 +148,14 @@ function PriceCandles(p: widgetProps, ref: any) {
                 data: rShowData.l.map((el) => {
                     return ({ x: el, y: el })
                 }),
-                backgroundColor: 'rgba(155, 59, 102, 1)',
+                backgroundColor: '#ff0000',
             }
             const OC = { //open/close bar data
                 type: 'bar' as const,
                 label: 'Open/Close',
-                backgroundColor: 'rgb(75, 192, 192)',
+                backgroundColor: rShowData.o.map((el, i) => {
+                    if (el > rShowData.c[i]) { return ('#ff0000') } else { return ('#0066ff') }
+                }),
                 data: rShowData.o.map((el, i) => {
                     return ([el, rShowData.c[i]])
                 }),
