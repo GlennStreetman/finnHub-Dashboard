@@ -18,7 +18,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(cookieParser());
 
-console.log('session', session)
 const FileStore = sessionFileStore(session)
 
 const fileStoreOptions = {};
@@ -83,7 +82,7 @@ test("Valid new login post/register", (done) => {
         // .set('Accept', 'application/json')
         .expect("Content-Type", /json/)
         .expect({
-            message: "new user created",
+            message: "Thank you for registering. You can now login.",
         })
         .expect(200, done);
 });
@@ -208,6 +207,5 @@ test("Email already taken post/register", (done) => {
         .expect({message: "Username or email already taken"})
         .expect(400, done);
 });
-
 
 
