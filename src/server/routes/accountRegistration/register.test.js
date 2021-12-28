@@ -9,17 +9,17 @@ import request from 'supertest';
 import sessionFileStore from 'session-file-store';
 import db from '../../db/databaseLocalPG.js';
 import register from './register.js';
-import { assert } from 'console';
-
+console.log('setting up express test')
 const app = express();
 dotenv.config()
-const FileStore = sessionFileStore(session);
+
 app.use(express.static(path.join(__dirname, 'build')));
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // support json encoded bodies
-
 app.use(cookieParser());
 
+console.log('session', session)
+const FileStore = sessionFileStore(session)
 
 const fileStoreOptions = {};
 app.use(
@@ -47,7 +47,7 @@ beforeAll((done) => {
     VALUES (	
         'registertest_taken',	'registertest_taken@test.com',	'735a2320bac0f32172023078b2d3ae56',	'hello',	
         '69faab6268350295550de7d587bc323d',	'',	'',	'071e3afe81e12ff2cebcd41164a7a295',	
-        '1',	'US',	'US',	1	
+        '1',	'US',	'US',	30	
     )
     ON CONFLICT
     DO NOTHING
@@ -71,8 +71,6 @@ afterAll((done)=>{
 
 test("Valid new login post/register", (done) => {
 
-    const messageList = ['Thank you for registering, please check your email and follow the confirmation link.', 'new user created']
-
     request(app)
         .post("/register")
         .send({
@@ -82,11 +80,12 @@ test("Valid new login post/register", (done) => {
             secretQuestion: "hellotest",
             secretAnswer: "goodbye",
         })
+        // .set('Accept', 'application/json')
         .expect("Content-Type", /json/)
-        .then(res=>{
-            assert(messageList.includes(res.body.message, true))
+        .expect({
+            message: "new user created",
         })
-        done()
+        .expect(200, done);
 });
 
 test("Invalid email post/register", (done) => {
@@ -209,7 +208,6 @@ test("Email already taken post/register", (done) => {
         .expect({message: "Username or email already taken"})
         .expect(400, done);
 });
-
 
 
 

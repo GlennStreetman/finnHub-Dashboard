@@ -11,7 +11,7 @@ module.exports = {
   // bail: 0,
 
   // The directory where Jest should store its cached dependency information
-  // cacheDirectory: "C:\\Users\\Glenns\\AppData\\Local\\Temp\\jest",
+  // cacheDirectory:
 
   // Automatically clear mock calls and instances between every test
   clearMocks: true,
@@ -74,7 +74,7 @@ module.exports = {
 
   // An array of directory names to be searched recursively up from the requiring module's location
   moduleDirectories: [
-    '.', 'src', 'node_modules'
+    '.', 'node_modules'
   ],
 
   // An array of file extensions your modules use
@@ -135,15 +135,15 @@ module.exports = {
   setupFiles: ["jest-canvas-mock"],
 
   // A list of paths to modules that run some code to configure or set up the testing framework before each test
-  // setupFilesAfterEnv: ["./setupTests"],
+  setupFilesAfterEnv: ["./setupTests"],
 
   // The number of seconds after which a test is considered as slow and reported as such in the results.
   slowTestThreshold: 10,
 
   // A list of paths to snapshot serializer modules Jest should use for snapshot testing
-  snapshotSerializers: [
-    '@emotion/jest/serializer'
-  ],
+  // snapshotSerializers: [
+  //   '@emotion/jest/serializer'
+  // ],
 
   // The test environment that will be used for testing
   testEnvironment: "node",
