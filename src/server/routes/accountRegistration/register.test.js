@@ -9,7 +9,7 @@ import request from "supertest";
 import sessionFileStore from "session-file-store";
 import db from "../../db/databaseLocalPG.js";
 import register from "./register.js";
-import sha512 from "./../../db/sha512";
+import sha512 from "./../../db/sha512.js";
 console.log("setting up express test");
 const app = express();
 dotenv.config();

@@ -10,7 +10,7 @@ import sessionFileStore from "session-file-store";
 import db from "../../db/databaseLocalPG.js";
 import accountData from "./accountData.js";
 import login from "./../loginRoutes/login.js";
-import sha512 from "./../../db/sha512";
+import sha512 from "./../../db/sha512.js";
 
 const app = express();
 dotenv.config();

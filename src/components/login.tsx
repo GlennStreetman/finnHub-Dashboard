@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
 
-import { useAppDispatch } from 'src/hooks';
-import { widgetSetup } from 'src/App'
-import { styled } from '@mui/material/styles';
-import { Grid, Paper, Button, TextField, Box, Typography } from '@mui/material/';
+import { useAppDispatch } from "src/hooks";
+import { widgetSetup } from "src/App";
+import { styled } from "@mui/material/styles";
+import { Grid, Paper, Button, TextField, Box, Typography } from "@mui/material/";
 
 import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
 import { checkPassword } from "../appFunctions/client/checkPassword";
@@ -11,15 +11,15 @@ import { forgotLogin } from "../appFunctions/client/forgotLogin";
 import { secretQuestion } from "../appFunctions/client/secretQuestion";
 import { newPW } from "../appFunctions/client/newPW";
 import { registerAccount } from "../appFunctions/client/registerAccount";
-import { tProcessLogin } from 'src/thunks/thunkProcessLogin'
+import { tProcessLogin } from "src/thunks/thunkProcessLogin";
 
 interface loginProps {
-    queryData: any,
-    updateAppState: Object,
-    finnHubQueue: finnHubQueue,
+    queryData: any;
+    updateAppState: Object;
+    finnHubQueue: finnHubQueue;
 }
 
-const useDispatch = useAppDispatch
+const useDispatch = useAppDispatch;
 
 const MyPaper = styled(Paper)({ color: "#1d69ab", variant: "outlined", borderRadius: 20, padding: 25 });
 
@@ -59,7 +59,7 @@ export default function Login(p: loginProps) {
         warn4: warn4,
         warn5: warn5,
         warn6: warn6,
-    }
+    };
 
     const setTextLookup = {
         text0: setText0,
@@ -76,20 +76,20 @@ export default function Login(p: loginProps) {
         warn4: setWarn4,
         warn5: setWarn5,
         warn6: setWarn6,
-    }
+    };
 
     useEffect(() => {
-        if (p.queryData.reset === '1') {
-            const user = p.queryData.users
+        if (p.queryData.reset === "1") {
+            const user = p.queryData.users;
             fetch(`/findSecret?user=${user}`)
                 .then((response) => response.json())
                 .then((data) => {
                     if (data) {
-                        setShowMenu(3)
-                        setText6(data.question)
-                        setUserName(data.user)
+                        setShowMenu(3);
+                        setText6(data.question);
+                        setUserName(data.user);
                     } else {
-                        console.log("No response from server")
+                        console.log("No response from server");
                     }
                 })
                 .catch((error) => {
@@ -99,52 +99,51 @@ export default function Login(p: loginProps) {
     }, [p]);
 
     useEffect(() => {
-        if (p.queryData.message === '1') {
-            setMessage("Thank you for registering. Please login.")
+        if (p.queryData.message === "1") {
+            setMessage("Thank you for registering. Please login.");
         }
-        if (p.queryData.message === '2') {
-            setMessage("Problem validating email address.")
+        if (p.queryData.message === "2") {
+            setMessage("Problem validating email address.");
         }
-        if (p.queryData.message !== '1' && p.queryData.message !== '2' && p.queryData.message) {
-            setMessage(p.queryData.message.replaceAll("%", " "))
+        if (p.queryData.message !== "1" && p.queryData.message !== "2" && p.queryData.message) {
+            setMessage(p.queryData.message.replaceAll("%", " "));
         }
-    }, [p.queryData.message])
+    }, [p.queryData.message]);
 
     function emailIsValid(email) {
         return /\S+@\S+\.\S+/.test(email);
-    };
+    }
 
     function handleChange(e) {
-        const updater = setTextLookup[e.target.name]
+        const updater = setTextLookup[e.target.name];
         updater(e.target.value);
-    };
+    }
 
     function clearText(showMenuRef) {
-        console.log('reseting')
-        setText0("")
-        setText1("")
-        setText2("")
-        setText3("")
-        setText4("")
-        setText5("")
-        setText6("")
-        setWarn0("")
-        setWarn1("")
-        setWarn2("")
-        setWarn3("")
-        setWarn4("")
-        setWarn5("")
-        setWarn6("")
-        setShowMenu(showMenuRef)
-        window.history.pushState({ message: "" }, "", "/")
-        setMessage("")
-        return true
-
+        console.log("reseting");
+        setText0("");
+        setText1("");
+        setText2("");
+        setText3("");
+        setText4("");
+        setText5("");
+        setText6("");
+        setWarn0("");
+        setWarn1("");
+        setWarn2("");
+        setWarn3("");
+        setWarn4("");
+        setWarn5("");
+        setWarn6("");
+        setShowMenu(showMenuRef);
+        window.history.pushState({ message: "" }, "", "/");
+        setMessage("");
+        return true;
     }
 
     function handleEnterKeyPress(e, keyFunction) {
         if (e.key === "Enter") {
-            keyFunction()
+            keyFunction();
         }
     }
 
@@ -152,101 +151,105 @@ export default function Login(p: loginProps) {
         0: () => {
             checkPassword(text0, text1)
                 .then(async (data) => {
-                    console.log('data', data)
+                    console.log("data", data);
                     if (data.status === 200) {
-                        console.log('200')
-                        setMessage("")
-                        const parseSetup: widgetSetup = JSON.parse(data.widgetsetup) //ex string
+                        console.log("200");
+                        setMessage("");
+                        const parseSetup: widgetSetup = JSON.parse(data.widgetsetup); //ex string
                         const newList: string[] = data.exchangelist.split(",");
-                        console.log('process login')
-                        await dispatch(tProcessLogin({
-                            defaultexchange: data.defaultexchange,
-                            apiKey: data.key,
-                            apiAlias: data.apiAlias,
-                            exchangelist: newList
-                        }))
-                        console.log('process login complete')
-                        p.updateAppState['login'](1)
-                        p.updateAppState['navigate']('/dashboard')
-                        p.updateAppState['widgetSetup'](parseSetup)
-                        p.finnHubQueue.updateInterval(data['ratelimit'])
-
+                        console.log("process login");
+                        await dispatch(
+                            tProcessLogin({
+                                defaultexchange: data.defaultexchange,
+                                apiKey: data.key,
+                                apiAlias: data.apiAlias,
+                                exchangelist: newList,
+                            })
+                        );
+                        console.log("process login complete");
+                        p.updateAppState["login"](1);
+                        p.updateAppState["navigate"]("/dashboard");
+                        p.updateAppState["widgetSetup"](parseSetup);
+                        p.finnHubQueue.updateInterval(data["ratelimit"]);
                     } else {
-                        console.log('not awaiting')
-                        setMessage(data.message)
+                        console.log("not awaiting");
+                        setMessage(data.message);
                     }
                 })
                 .catch((err) => {
-                    console.log('problem', err)
-                    setMessage("No response from server. Check network connection.")
-                })
+                    console.log("problem", err);
+                    setMessage("No response from server. Check network connection.");
+                });
         },
         1: () => {
             if (emailIsValid(text0)) {
                 forgotLogin(text0)
                     .then((data) => {
-                        setMessage(data.message)
+                        setMessage(data.message);
                     })
                     .catch(() => {
-                        setMessage("No response from server. Check network connection.")
-                    })
+                        setMessage("No response from server. Check network connection.");
+                    });
             } else {
-                setWarn0("Please enter a valid email.")
+                setWarn0("Please enter a valid email.");
             }
         },
         2: () => {
             registerAccount(text0, text1, text2, text3, text4, text5, emailIsValid)
                 .then((data) => {
-                    // console.log('data', data)
-                    if (data.message === 'Please review warnings') {
-                        setMessage(data.message)
+                    console.log("data", data);
+                    if (data.message === "Please review warnings") {
+                        setMessage(data.message);
                         Object.keys(data).forEach((el) => {
-                            if (el !== 'message') {
-                                const updater = setTextLookup[el]
-                                updater(data[el])
+                            if (el !== "message") {
+                                const updater = setTextLookup[el];
+                                updater(data[el]);
                             }
-                        })
+                        });
                     } else if (data.status === 200) {
-                        setMessage(data.message)
-                        setShowMenu(0)
-                        clearText(0)
+                        console.log("registration succesful!!!!");
+                        setShowMenu(0);
+                        clearText(0);
+                        setMessage(data.message);
+                        console.log("showing login menu?");
                     } else {
-                        setMessage(data.message)
+                        console.log("message set, not 200");
+                        setMessage(data.message);
                     }
                 })
                 .catch(() => {
-                    setMessage("No response from server. Check network connection.")
-                })
+                    setMessage("No response from server. Check network connection.");
+                });
         },
         3: () => {
             secretQuestion(text0, userName)
                 .then((data) => {
                     if (data.message === "correct") {
-                        setMessage("")
-                        setText0(data["question"])
-                        clearText(4)
+                        setMessage("");
+                        setText0(data["question"]);
+                        clearText(4);
                     } else {
                         setMessage("Wrong answer, try again.");
                     }
                 })
                 .catch(() => {
-                    setMessage("No response from server. Check network connection.")
-                })
+                    setMessage("No response from server. Check network connection.");
+                });
         },
         4: () => {
             newPW(text0, text1)
                 .then((data) => {
                     // console.log("update login response: ", data.message)
-                    if (data.message === '' || data.message === true) {
-                        setMessage("Password Updated. Please login with your new password")
-                        clearText(0)
+                    if (data.message === "" || data.message === true) {
+                        setMessage("Password Updated. Please login with your new password");
+                        clearText(0);
                     } else {
-                        setMessage("Problem updating password. Please restart process.")
+                        setMessage("Problem updating password. Please restart process.");
                     }
                 })
                 .catch(() => {
-                    setMessage("No response from server. Check network connection.")
-                })
+                    setMessage("No response from server. Check network connection.");
+                });
         },
     };
     const formSetup = {
@@ -254,39 +257,38 @@ export default function Login(p: loginProps) {
             title: "Login to FinnDash",
             inputs: ["UserName", "Password"],
             linkNames: ["Forgot Login", "Register"],
-            linkFunctions: [() => clearText(1), () => clearText(2)]
+            linkFunctions: [() => clearText(1), () => clearText(2)],
         },
         1: {
             title: "Recover login name",
             inputs: ["Enter Email"],
             linkNames: ["Back", "Register"],
-            linkFunctions: [() => clearText(0), () => clearText(2)]
+            linkFunctions: [() => clearText(0), () => clearText(2)],
         },
         2: {
             title: "Register Finndash Account",
             inputs: ["UserName", "Password", "Re-Enter Password", "Email", "Secret Question", "Secret Answer"],
             linkNames: ["Back", "Forgot Login"],
-            linkFunctions: [() => clearText(0), () => clearText(1)]
+            linkFunctions: [() => clearText(0), () => clearText(1)],
         },
         3: {
             title: "Answer Secret Question:",
             inputs: [`Recovery Question: ${text6}`],
             linkNames: ["Back", "Register"],
-            linkFunctions: [() => clearText(0), () => clearText(2)]
+            linkFunctions: [() => clearText(0), () => clearText(2)],
         },
         4: {
             title: "New Password",
             inputs: ["Enter New Password", "Re-Enter Password"],
             linkNames: ["Back", "Register"],
-            linkFunctions: [() => clearText(0), () => clearText(2)]
+            linkFunctions: [() => clearText(0), () => clearText(2)],
         },
-    }
+    };
 
-    const thisForm = formSetup[showMenu]
-    const renderInputs = thisForm.inputs.map((el, index) =>
+    const thisForm = formSetup[showMenu];
+    const renderInputs = thisForm.inputs.map((el, index) => (
         <div key={el + index + showMenu}>
-            <div className="login-div" key={el + "div"}>
-            </div>
+            <div className="login-div" key={el + "div"}></div>
             <div className="login-div" key={el + "div2"}>
                 <TextField
                     id={el + "txt"}
@@ -300,55 +302,50 @@ export default function Login(p: loginProps) {
                 />
             </div>
         </div>
-    )
+    ));
 
-    return (<>
-        <Grid container onKeyDown={(e) => handleEnterKeyPress(e, submitFunctionLookup[showMenu])}>
-            <Grid item xs={1} sm={2} md={4} lg={4} xl={4} />
-            {/*
+    return (
+        <>
+            <Grid container onKeyDown={(e) => handleEnterKeyPress(e, submitFunctionLookup[showMenu])}>
+                <Grid item xs={1} sm={2} md={4} lg={4} xl={4} />
+                {/*
  // @ts-ignore*/}
-            <Grid item xs={10} sm={8} md={4} lg={4} xl={4} align="center">
-                <Box pt={2}>
-                    <MyPaper elevation={6} >
-                        <img src="logo.png" alt="logo"></img>
-                        {renderInputs}
-                        <Box pt={1}>
-                            <Button
-                                variant="contained"
-                                href='#home'
-                                className="loginBtn"
-                                type="submit"
-                                onClick={submitFunctionLookup[showMenu]}
-                                color="primary"
-                            >
-                                Submit
-                            </Button>
-                        </Box>
-                        <Box pt={1} pb={2}>
-                            <Button
-                                onClick={thisForm.linkFunctions[0]}
-                                color="primary"
-                            >
-                                {thisForm.linkNames[0]}
-                            </Button>
-                            <Button
-                                onClick={thisForm.linkFunctions[1]}
-                                color="primary"
-                            >
-                                {thisForm.linkNames[1]}
-                            </Button>
-                        </Box>
-                    </MyPaper>
-                </Box>
-                <Box pt={2}>
-                    <Typography variant="h6" color="secondary">{message}</Typography>
-                </Box>
+                <Grid item xs={10} sm={8} md={4} lg={4} xl={4} align="center">
+                    <Box pt={2}>
+                        <MyPaper elevation={6}>
+                            <img src="logo.png" alt="logo"></img>
+                            {renderInputs}
+                            <Box pt={1}>
+                                <Button
+                                    variant="contained"
+                                    // href="#home"
+                                    className="loginBtn"
+                                    type="submit"
+                                    onClick={submitFunctionLookup[showMenu]}
+                                    color="primary"
+                                >
+                                    Submit
+                                </Button>
+                            </Box>
+                            <Box pt={1} pb={2}>
+                                <Button onClick={thisForm.linkFunctions[0]} color="primary">
+                                    {thisForm.linkNames[0]}
+                                </Button>
+                                <Button onClick={thisForm.linkFunctions[1]} color="primary">
+                                    {thisForm.linkNames[1]}
+                                </Button>
+                            </Box>
+                        </MyPaper>
+                    </Box>
+                    <Box pt={2}>
+                        <Typography variant="h6" color="secondary">
+                            {message}
+                        </Typography>
+                    </Box>
+                </Grid>
+
+                <Grid item xs={1} sm={2} md={4} lg={4} xl={4} />
             </Grid>
-
-            <Grid item xs={1} sm={2} md={4} lg={4} xl={4} />
-
-        </Grid >
-    </>
+        </>
     );
 }
-

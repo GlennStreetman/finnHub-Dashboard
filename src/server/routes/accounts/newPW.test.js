@@ -10,7 +10,7 @@ import db from "../../db/databaseLocalPG.js";
 import bodyParser from "body-parser";
 import newPW from "./newPW.js";
 import secretQuestion from "./../accountRegistration/secretQuestion.js";
-import sha512 from "./../../db/sha512";
+import sha512 from "./../../db/sha512.js";
 
 const app = express();
 dotenv.config();

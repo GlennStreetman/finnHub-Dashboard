@@ -1,7 +1,7 @@
 import express from "express";
 import format from "pg-format";
 import cryptoRandomString from "crypto-random-string";
-import sha512 from "./../../db/sha512";
+import sha512 from "./../../db/sha512.js";
 import postgresDB from "../../db/databaseLocalPG.js";
 import mailgun from "mailgun-js";
 

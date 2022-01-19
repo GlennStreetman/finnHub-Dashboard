@@ -6,7 +6,7 @@ import bodyParser from "body-parser";
 import request from "supertest";
 import db from "../../db/databaseLocalPG.js";
 import forgot from "./forgot.js";
-import sha512 from "./../../db/sha512";
+import sha512 from "./../../db/sha512.js";
 
 const app = express();
 dotenv.config();
