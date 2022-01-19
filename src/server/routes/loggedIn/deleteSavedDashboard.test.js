@@ -1,19 +1,20 @@
 //setup express
-import express from 'express';
-import dotenv from 'dotenv'; 
-import path from 'path';
-import bodyParser from 'body-parser';
-import cookieParser from 'cookie-parser';
-import session from 'express-session';
-import request from 'supertest';
-import sessionFileStore from 'session-file-store';
-import db from '../../db/databaseLocalPG.js';
+import express from "express";
+import dotenv from "dotenv";
+import path from "path";
+import bodyParser from "body-parser";
+import cookieParser from "cookie-parser";
+import session from "express-session";
+import request from "supertest";
+import sessionFileStore from "session-file-store";
+import db from "../../db/databaseLocalPG.js";
 import deleteSavedDashboard from "./deleteSavedDashboard.js";
 import login from "../loginRoutes/login.js";
+import sha512 from "./../../db/sha512";
 
 const app = express();
-dotenv.config()
-app.use(express.static(path.join(__dirname, 'build')));
+dotenv.config();
+app.use(express.static(path.join(__dirname, "build")));
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // support json encoded bodies
 app.use(cookieParser());
@@ -22,21 +23,20 @@ const FileStore = sessionFileStore(session);
 const fileStoreOptions = {};
 app.use(
     session({
-    store: new FileStore(fileStoreOptions),
-    secret: process.env.session_secret,
-    resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false, sameSite: true },
+        store: new FileStore(fileStoreOptions),
+        secret: process.env.session_secret,
+        resave: false,
+        saveUninitialized: true,
+        cookie: { secure: false, sameSite: true },
     })
-)
+);
 
-
-app.use('/', deleteSavedDashboard) //route to be tested needs to be bound to the router.
-app.use('/', login) //needed fo all routes that require login.
-let testDash = -1
+app.use("/", deleteSavedDashboard); //route to be tested needs to be bound to the router.
+app.use("/", login); //needed fo all routes that require login.
+let testDash = -1;
 
 beforeAll((done) => {
-    global.sessionStorage = {}
+    global.sessionStorage = {};
 
     const setupDB = `
     INSERT INTO users (
@@ -45,8 +45,8 @@ beforeAll((done) => {
         passwordconfirmed, exchangelist, defaultexchange, ratelimit
     )
     VALUES (	
-        'accountDeleteDashboardTest',	'accountDeleteDashboardTest@test.com',	'735a2320bac0f32172023078b2d3ae56',	'hello',	
-        '69faab6268350295550de7d587bc323d',	'',	'',	'1',	
+        'accountDeleteDashboardTest',	'accountDeleteDashboardTest@test.com',	'${sha512("testpw")}',	'hello',	
+        '${sha512("goodbye")}',	'',	'',	'1',	
         '1',	'US',	'US',	30	
     )
 
@@ -120,72 +120,72 @@ beforeAll((done) => {
     SELECT id FROM dashboard 
     WHERE userid = (SELECT id FROM users where loginname = 'accountDeleteDashboardTest') 
         AND dashboardname = 'TEST'
-    `
+    `;
     // console.log(setupDB)
-    db.connect()
+    db.connect();
     db.query(setupDB, (err, res) => {
         if (err) {
             console.log("accountData setup error.");
         } else {
-            testDash = res[5].rows[0].id
-            console.log(testDash)
-            done()
+            testDash = res[5].rows[0].id;
+            console.log(testDash);
+            done();
         }
-    })
-
+    });
 });
 
-afterAll((done)=>{
-    db.end(done())
-})
+afterAll((done) => {
+    db.end(done());
+});
 
-test("Check not logged in: get/deleteSavedDashboard", (done) => {       
+test("Check not logged in: get/deleteSavedDashboard", (done) => {
     request(app)
         .get("/deleteSavedDashboard")
         .expect("Content-Type", /json/)
         .expect({
-            message: "Not logged in."
+            message: "Not logged in.",
         })
         .expect(401)
-        .end(done)
-    })
+        .end(done);
+});
 
-    describe('Get login cookie:', ()=>{
-        //TEST GET ROUTE
-        let cookieJar = ''
-        beforeEach(function (done) {
-            request(app)
-                .get("/login?loginText=accountDeleteDashboardTest&pwText=testpw")
-                .then(res => {
-                    cookieJar = res.header['set-cookie']
-                    expect(200)
-                    done()
-                })
+describe("Get login cookie:", () => {
+    //TEST GET ROUTE
+    let cookieJar = "";
+    beforeEach(function (done) {
+        request(app)
+            .get("/login?loginText=accountDeleteDashboardTest&pwText=testpw")
+            .then((res) => {
+                cookieJar = res.header["set-cookie"];
+                expect(200);
+                done();
             });
-    
-        test("Success delete dashboard get/deleteSavedDashboard", (done) => {       
-            request(app)
-                .get(`/deleteSavedDashboard?dashID=${testDash}`)
-                .set('Cookie', cookieJar)
-                .expect("Content-Type", /json/)
-                .expect({message: "Dashboard deleted"})
-                .expect(200)
-            .then(()=>{
+    });
+
+    test("Success delete dashboard get/deleteSavedDashboard", (done) => {
+        request(app)
+            .get(`/deleteSavedDashboard?dashID=${testDash}`)
+            .set("Cookie", cookieJar)
+            .expect("Content-Type", /json/)
+            .expect({ message: "Dashboard deleted" })
+            .expect(200)
+            .then(() => {
                 request(app)
-                .get("/logOut")
-                .set('Cookie', cookieJar)
-                .expect({message: "Logged Out"})
-                .expect(200)    
-            .then(()=>{
-                request(app).get(`/deleteSavedDashboard?dashID=${testDash}`)
-                .set('Cookie', cookieJar)
-                // .expect("Content-Type", /json/)
-                .expect({
-                    message: "Not logged in."
-                })
-                .expect(401)
-                .end(done)
-            })     
-            })
-            })
-    })
+                    .get("/logOut")
+                    .set("Cookie", cookieJar)
+                    .expect({ message: "Logged Out" })
+                    .expect(200)
+                    .then(() => {
+                        request(app)
+                            .get(`/deleteSavedDashboard?dashID=${testDash}`)
+                            .set("Cookie", cookieJar)
+                            // .expect("Content-Type", /json/)
+                            .expect({
+                                message: "Not logged in.",
+                            })
+                            .expect(401)
+                            .end(done);
+                    });
+            });
+    });
+});

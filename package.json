@@ -50,7 +50,6 @@
     "jest-canvas-mock": "^2.3.1",
     "jest-emotion": "^11.0.0",
     "mailgun-js": "^0.6.7",
-    "md5": "^2.3.0",
     "mongodb": "^3.6.4",
     "morgan": "^1.10.0",
     "node-fetch": "^2.6.1",
