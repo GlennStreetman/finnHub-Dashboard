@@ -5,7 +5,7 @@ import { finnHub, throttleResObj as queResObj, finnHubQueue, throttleApiReqObj }
 //If data is not fresh dispatch finnHub api request to throttleQueue.
 //Returns finnhub data to mongoDB AND updates slice/ShowData.
 export interface tgetFinnHubDataReq {
-    dashboardID: number,
+    dashboardID: number | false,
     targetDashBoard: string,
     widgetList: any[], //should be string or number.
     finnHubQueue: finnHubQueue,

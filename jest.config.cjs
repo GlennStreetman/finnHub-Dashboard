@@ -70,9 +70,9 @@ module.exports = {
   // maxWorkers: "50%",
 
   // An array of directory names to be searched recursively up from the requiring module's location
-  // moduleDirectories: [
-  //   '.', 'node_modules'
-  // ],
+  moduleDirectories: [
+    'node_modules', 
+  ],
 
   // An array of file extensions your modules use
   // moduleFileExtensions: [
@@ -85,7 +85,12 @@ module.exports = {
   // ],
 
   // A map from regular expressions to module names or to arrays of module names that allow to stub out resources with a single module
-  // moduleNameMapper: {},
+  moduleNameMapper: {
+    'src/(.*)': '<rootDir>/src/$1',
+    'tests/(.*)': '<rootDir>/__tests__/$1',
+  },
+
+  //https://til.hashrocket.com/posts/lmnsdtce3y-import-absolute-paths-in-typescript-jest-tests
 
   // An array of regexp pattern strings, matched against all module paths before considered 'visible' to the module loader
   // modulePathIgnorePatterns: [],
@@ -135,7 +140,7 @@ module.exports = {
   setupFilesAfterEnv: ["./setupTests"],
 
   // The number of seconds after which a test is considered as slow and reported as such in the results.
-  slowTestThreshold: 10,
+  slowTestThreshold: 5,
 
   // A list of paths to snapshot serializer modules Jest should use for snapshot testing
   // snapshotSerializers: [

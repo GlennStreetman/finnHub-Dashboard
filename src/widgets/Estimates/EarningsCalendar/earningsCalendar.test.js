@@ -2,6 +2,8 @@
  * @jest-environment jsdom
  */
 
+
+
 import 'whatwg-fetch';
 import React from "react";
 import '@testing-library/jest-dom/extend-expect'
@@ -40,7 +42,7 @@ import { changeFilter } from '../../testFunctions/action_ChangeFilter'
 //test procedures
 import {testBodyRender} from '../../testFunctions/test_bodyRender'
 
-console.error = jest.fn()
+// console.error = jest.fn()
 
 jest.mock('./../../../appFunctions/appImport/setupDashboard')
 //mock service worker for all http requests
@@ -62,6 +64,8 @@ const mockHTTPServer = setupServer(
 
     configure({
         getElementError: (message, container) => {
+            // console.log('ERROR', message)
+            // console.log(prettyDOM(screen.getByTestId(body), 30000))
             const error = new Error(`${message}`); //Debug Node: ${prettyDOM(screen.getByTestId(body), 30000)}
             error.name = 'TestingLibraryElementError';
             error.stack = null;
@@ -70,7 +74,7 @@ const mockHTTPServer = setupServer(
     });
 
 const widgetType = 'EstimatesEarningsCalendar'
-const body = 'earningsCalendarBody'
+const body = 'container-EstimatesEarningsCalendar'
 
 beforeAll(() => {mockHTTPServer.listen({
     onUnhandledRequest: 'warn',
@@ -86,39 +90,32 @@ beforeEach( async ()=>{
     await waitFor(() => {
         expect(screen.getByTestId('dashboardMenu')).toBeInTheDocument()
     })
-    
-    await addWidget('estimatesDropdown', 'Estimate', 'Earnings Calendar') //mount widget to be tested.
+    await addWidget( 'Stock Estimates', 'Earnings Calendar', 'container-EstimatesEarningsCalendar') //mount widget to be tested.
 })
 
-afterEach( async ()=>{
-    //unmount widget 
-    expect(screen.getByTestId(`removeWidget-${widgetType}`)).toBeInTheDocument() 
+it(`Test ${widgetType} Widget: Change focus renders body change. `, async () => {
+    await testBodyRender([ //test that widget body renders api data.
+        ['getByTestId', body], 
+        ['getByText', 'Quarter:'], 
+        ['getByText','1.11']
+    ]) 
+    await setSecurityFocus(widgetType, 'US-COST') //select new target security for widget.
+    await testBodyRender([ //test that widget body renders api data on change to widget security focus
+        ['getByText', 'Quarter:'], 
+        ['getByText','3.31']
+    ])
+})
+
+it(`TestWidget unmounts`, async()=>{
+    await toggleEditPane(widgetType)
+    expect(screen.getByTestId(`removeWidget-${widgetType}`)).toBeInTheDocument()
     fireEvent.click(screen.getByTestId(`removeWidget-${widgetType}`))
     await waitFor(async () => {
         await expect(screen.queryByTestId(body)).toBe(null)
     })
 })
 
-
-
-it(`Test ${widgetType} Widget: Change focus renders body change. `, async (done) => {
-
-    await testBodyRender([ //test that widget body renders api data.
-        ['getByTestId', body], 
-        ['getByText', 'Quarter:'], 
-        ['getByText','1.11']
-    ]) 
-
-    await setSecurityFocus(widgetType, 'US-COST') //select new target security for widget.
-    await testBodyRender([ //test that widget body renders api data on change to widget security focus
-        ['getByText', 'Quarter:'], 
-        ['getByText','3.31']
-    ])
-    await toggleEditPane(widgetType)
-        done()
-})
-
-it(`Test ${widgetType} Widget: Change pagination.`, async (done) => { //needs numbers udpated and maybe a change focus resets pagination?
+it(`Test ${widgetType} Widget: Change pagination.`, async () => { //needs numbers udpated and maybe a change focus resets pagination?
     //test pagination
     await testBodyRender([ //test that widget body renders api data on change to widget security focus
         ['getByText', 'Quarter:'], 
@@ -140,42 +137,41 @@ it(`Test ${widgetType} Widget: Change pagination.`, async (done) => { //needs nu
         ['getByText','4.41']
     ]) 
     await toggleEditPane(widgetType)
-    done()
+
 })
 
-it(`Test ${widgetType} Widget: Toggle Button shows config screen.`, async (done) => { 
+it(`Test ${widgetType} Widget: Toggle Button shows config screen.`, async () => { 
     //toggle to testing edit pane
     await toggleEditPane(widgetType)
     await waitFor(() => { //test setup screen loaded.
         expect(screen.getByText('Remove')).toBeInTheDocument()
         expect(screen.getByTestId('remove-US-WMT')).toBeInTheDocument()
         expect(screen.getByTestId('remove-US-COST')).toBeInTheDocument()
-        expect(screen.getByText('From date:')).toBeInTheDocument()
     })
-    done()
+
 })
 
 
-it(`Test ${widgetType} Widget: Rename widget works.`, async (done) => { 
+it(`Test ${widgetType} Widget: Rename widget works.`, async () => { 
     await toggleEditPane(widgetType) //toggle to edit pane
     await newWidgetName(widgetType, ['test', 'Test', 'Test!', 'test!$', 'test,', 'renameTookEffect']) //rename widget multiple times
     await toggleEditPane(widgetType) //toggle to data pane.
     expect(screen.getByText('renameTookEffect')).toBeInTheDocument()
     await toggleEditPane(widgetType) //toggle to data pane.
-    done()
+
 })
 
-it(`Test ${widgetType} Widget: Add security from widget config screen works.`, async (done) => { 
+it(`Test ${widgetType} Widget: Add security from widget config screen works.`, async () => { 
     await toggleEditPane(widgetType) //toggle to edit pane
     await addSecurity(widgetType, [['TSLA', 'US-TSLA: TESLA INC'], ['AAPL', 'US-AAPL: APPLE INC']]) //add security to widget with search bar
     await waitFor(() => {
         expect(screen.getByTestId('remove-US-TSLA')).toBeInTheDocument()
         expect(screen.getByTestId('remove-US-AAPL')).toBeInTheDocument()
     })
-    done()
+
 })
 
-it(`Test ${widgetType} Widget: Test that changing filters fetches new data.`, async (done) => { 
+it(`Test ${widgetType} Widget: Test that changing filters fetches new data.`, async () => { 
     await toggleEditPane(widgetType) //toggle to edit pane
     mockHTTPServer.use(mockFinnHubData_toggle) //toggle retrieval data so that we can test that updating filters pulls new data.
     await changeFilter(widgetType, '1999-01-01')
@@ -185,16 +181,16 @@ it(`Test ${widgetType} Widget: Test that changing filters fetches new data.`, as
         ['getByText','5.55']
     ]) 
     await toggleEditPane(widgetType) //toggle to edit pane
-    done()
+
 })
 
-it(`Test ${widgetType} Widget: Test that removing securities from edit pane works.`, async (done) => { 
+it(`Test ${widgetType} Widget: Test that removing securities from edit pane works.`, async () => { 
     await toggleEditPane(widgetType) //toggle to edit pane
     await fireEvent.click(screen.getByTestId('remove-US-WMT'))    //remove target stock
     await waitFor(async () => {
         await expect(screen.queryByTestId('remove-US-WMT')).toBe(null)
         expect(screen.getByTestId('remove-US-COST')).toBeInTheDocument()
     })
-    done()
+
 })
 

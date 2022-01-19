@@ -256,6 +256,7 @@ function WidgetContainer(p: containerProps) {
                         <button
                             onClick={async () => {
                                 if (p.stateRef === "stockWidget" || p.stateRef === 'marketWidget') {
+
                                     const payload: removeWidgetPayload = {
                                         widgetKey: p.widgetKey,
                                         dashboardName: currentDashboard,

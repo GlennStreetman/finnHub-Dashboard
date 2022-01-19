@@ -10,14 +10,12 @@ import InfoIcon from '@mui/icons-material/Info';
 import LockRoundedIcon from '@mui/icons-material/LockRounded';
 import LockOpenRoundedIcon from '@mui/icons-material/LockOpenRounded';
 import AppsIcon from '@mui/icons-material/Apps';
-import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import { useAppDispatch } from 'src/hooks';
 import { rDataModelLogout } from "src/slices/sliceDataModel"
 import { rExchangeDataLogout } from "src/slices/sliceExchangeData";
 import { rExchangeListLogout } from "src/slices/sliceExchangeList";
 import { rTargetDashboardLogout } from "src/slices/sliceShowData";
-import useWindowDimensions from '../appFunctions/hooks/windowDimensions'
 
 interface topNavProps {
     login: number,
@@ -58,9 +56,9 @@ function TopNav(p: topNavProps) {
         if (location.pathname === '/dashboard') {
             return (<>
                 <Tooltip title="Add Widget" placement="bottom">
-                    <Button onClick={() => { navigate('/manageWidgets') }} data-testid="widgetsDropdown">
+                    <IconButton onClick={() => { navigate('/manageWidgets') }} data-testid="showWidgetManagementMenu">
                         <WidgetsIcon style={{ fill: 'white' }} />
-                    </Button>
+                    </IconButton>
                 </Tooltip>
             </>
             )
@@ -76,7 +74,7 @@ function TopNav(p: topNavProps) {
                     <div className="navItemEnd">
                         {showDashBoardButtons()}
                         {location.pathname !== '/dashboard' ? (
-                            <IconButton onClick={() => { navigate('/dashboard') }}>
+                            <IconButton onClick={() => { navigate('/dashboard') }} data-testid="showDashboardMenu">
                                 <Tooltip title="Show Dashboards" placement="bottom">
                                     <AppsIcon style={{ fill: 'white' }} />
                                 </Tooltip>

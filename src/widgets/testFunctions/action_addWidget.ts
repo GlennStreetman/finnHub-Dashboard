@@ -2,20 +2,30 @@
 import { screen, waitFor, fireEvent, prettyDOM } from '@testing-library/react'
 
 
-const addWidget = async function (category: string, categoryText: string, widgetText: string) { //testFunction(same name), Category, Category text, widget Text
+const addWidget = async function (categoryText: string, widgetName: string, widgetContainer: string) { //testFunction(same name), Category, Category text, widget Text
     //add widget to dashboard
 
-    fireEvent.mouseOver(screen.getByTestId('widgetsDropdown'));
+    fireEvent.click(screen.getByTestId('showWidgetManagementMenu')); //open widget menu
     await waitFor(() => {
-        expect(screen.getByTestId(category)).toBeInTheDocument() //estimatesDropDown, fundamentalsDropdown, priceDropDown
+        expect(screen.getByTestId('manageWidgets-SelectWidgetGroup')).toBeInTheDocument() //wait for widget grouping menu to load
     })
-    fireEvent.mouseOver(screen.getByText(categoryText)); //Estimate, Fundamental, Price
-    // console.log(prettyDOM(screen.getByTestId('widgetDropDown')))
+    const dropdown = await screen.findByLabelText('API Heading')
+    fireEvent.mouseDown(dropdown); //open dropdown selection
     await waitFor(() => {
-        expect(screen.getByTestId(widgetText)).toBeInTheDocument() //copy submenu text
+        expect(screen.getByTestId(`${categoryText}-selection`)).toBeInTheDocument() //wait for widget grouping menu to load
     })
-    expect(screen.getByTestId(widgetText)).toBeInTheDocument()
-    fireEvent.click(screen.getByTestId(widgetText)) //copy submenu text
+
+    fireEvent.click(screen.getByTestId(`${categoryText}-selection`)); //select correct grouping
+    await waitFor(() => {
+        expect(screen.getByTestId(widgetName)).toBeInTheDocument() //wait for correct widget to be in document
+    })
+
+    fireEvent.click(screen.getByTestId(widgetName)); //load widget
+    fireEvent.click(screen.getByTestId('showDashboardMenu')); //load dashboard screen.
+
+    await waitFor(() => {
+        expect(screen.getByTestId(widgetContainer)).toBeInTheDocument() //wait for correct widget to be in document
+    })
     return true
 }
 

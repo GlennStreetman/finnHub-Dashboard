@@ -107,8 +107,8 @@ export default function App() {
         try {
             const data: any = await dispatch(tGetSavedDashboards({ apiKey: apiKey })).unwrap()
 
-            const lCurrentDash = data.currentDashBoard
-            const lDashboardData = data.dashBoardData
+            const lCurrentDash: string = data.currentDashBoard
+            const lDashboardData: dashBoardData = data.dashBoardData
 
             dispatch(rUpdateCurrentDashboard(lCurrentDash)) //set current dashboard
             dispatch(rSetMenuList(data.menuList)) //build menu widgets
@@ -234,10 +234,6 @@ export default function App() {
         <Outlet />
     </>
 
-    // const splash = <Splash />
-
-    // const rootElement = login === 1 ? topNav : splash
-
     return (
         <ThemeProvider theme={outerTheme}>
             <BrowserRouter>
@@ -310,7 +306,7 @@ export interface widgetList {
 export interface dashboard {
     dashboardname: string,
     globalstocklist: globalStockList,
-    id: number,
+    id: number | false,
     widgetlist: widgetList
 }
 

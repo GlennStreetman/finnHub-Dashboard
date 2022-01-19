@@ -9,7 +9,7 @@ import { rUnmountWidget } from 'src/slices/sliceShowData'
 import { rRemoveDashboardDataModel, rRenameModelName, rAddNewDashboard } from 'src/slices/sliceDataModel'
 import { rSetTargetDashboard } from 'src/slices/sliceShowData'
 import { tCopyDashboard } from "src/thunks/thunkCopyDashboard";
-import { tGetSavedDashboards } from 'src/thunks/thunkGetSavedDashboards'
+import { tGetSavedDashboards, tGetSavedDashBoardsRes } from 'src/thunks/thunkGetSavedDashboards'
 import { uniqueObjectnName } from 'src/appFunctions/stringFunctions'
 import { tGetMongoDB } from 'src/thunks/thunkGetMongoDB'
 import { tGetFinnhubData, tgetFinnHubDataReq } from 'src/thunks/thunkFetchFinnhub'

@@ -17,6 +17,7 @@ import { useAppDispatch } from 'src/hooks';
 import { tSaveDashboard } from 'src/thunks/thunkSaveDashboard'
 import { rChangeWidgetColumnOrder } from 'src/slices/sliceDashboardData'
 import { makeStyles } from '@mui/styles';
+import InputLabel from '@mui/material/InputLabel';
 
 // const useDispatch = useAppDispatch
 const useSelector = useAppSelector
@@ -90,7 +91,7 @@ function ManageWidgets() {
     const dashboardList = Object.keys(dashboardData)
 
     const [toggle, setToggle] = useState(0) //true is add widget, false is manage widget
-    const [dashboard, setDashboard] = useState(currentDashboard)
+    const [dashboard, setDashboard] = useState(currentDashboard) //current dashboard selection for widget management menu select
     const [widgetHeading, setWidgetHeading] = useState('Stock Estimates')
 
     const handleChange = () => {
@@ -149,7 +150,8 @@ function ManageWidgets() {
         dispatch(tSaveDashboard({ dashboardName: currentDashboard }))
     }
 
-    const widgetHeadings = Object.keys(widgetLookup).map((el) => <MenuItem value={el} key={el + 'headerSelect'}>{el}</MenuItem>)
+    const widgetHeadings = Object.keys(widgetLookup).map((el) => <MenuItem data-testid={`${el}-selection`} value={el} key={el + 'headerSelect'}>{el}</MenuItem>)
+
 
     const addWidgets = () => {
 
@@ -172,8 +174,12 @@ function ManageWidgets() {
                             <Typography><b>{el[1]}:</b> {widgetDescriptions[el[0]]}</Typography>
                             {/* @ts-ignore */}
                             <div style={cardContainer}>
-                                <div style={cardStyle}><Typography>Widget Count: {thisCount}</Typography></div>
-                                <div style={cardStyle}><Button className={classes.MuiButtonBase} variant="contained" onClick={() => addWIdget(el, currentDashboard)}>Add</Button></div>
+                                <div style={cardStyle}>
+                                    <Typography>Widget Count: {thisCount}</Typography>
+                                </div>
+                                <div style={cardStyle}>
+                                    <Button data-testid={el[1]} className={classes.MuiButtonBase} variant="contained" onClick={() => addWIdget(el, currentDashboard)}>Add</Button>
+                                </div>
                             </div>
                         </CardContent>
                     </Card>
@@ -265,20 +271,28 @@ function ManageWidgets() {
             {/* @ts-ignore */}
             <div style={flexInline}>
                 <FormControl variant="outlined">
+                    <InputLabel id="Dashboard-Label">Dashboard</InputLabel>
                     <Select
+                        labelId="Dashboard-Label"
                         value={dashboard}
-                        onChange={handDashboardChange}>
+                        onChange={handDashboardChange}
+                        data-testid="manageWidgets-SelectDashboard"
+                    >
                         {dashboardSelections}
                     </Select>
-                    <FormHelperText>Select Dashboard</FormHelperText>
                 </FormControl>
-                <FormControl variant="outlined">
+                <FormControl variant="outlined" >
+                    {/* <FormHelperText>API Heading</FormHelperText> */}
+                    <InputLabel id="API-Heading-Label">API Heading</InputLabel>
                     <Select
+                        labelId="API-Heading-Label"
                         value={widgetHeading}
-                        onChange={handleHeadingChange}>
+                        onChange={handleHeadingChange}
+                        data-testid="manageWidgets-SelectWidgetGroup"
+                    >
                         {widgetHeadings}
                     </Select>
-                    <FormHelperText>API Heading</FormHelperText>
+
                 </FormControl>
             </div>
             {/* @ts-ignore */}
