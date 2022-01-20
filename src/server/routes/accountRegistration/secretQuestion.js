@@ -1,6 +1,6 @@
 import express from "express";
 import postgresDB from "./../../db/databaseLocalPG.js";
-import sha512 from "./../../db/sha512";
+import sha512 from "./../../db/sha512.js";
 
 const router = express.Router();
 
