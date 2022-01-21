@@ -16,3 +16,8 @@ export function Bar() {
     // console.log("returning mock Bar chart");
     return <div>MOCK SCATTER CHART</div>;
 }
+
+export function Line() {
+    // console.log("returning mock Bar chart");
+    return <div>MOCK SCATTER CHART</div>;
+}
