@@ -1,131 +1,145 @@
-import * as React from "react"
+import * as React from "react";
 import { useState, useEffect, forwardRef, useRef, useMemo } from "react";
 import EPSChart from "./EPSChart";
 
-import { widget } from 'src/App'
+import { widget } from "src/App";
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 //redux
-import { createSelector } from 'reselect'
-import { storeState } from './../../../store'
-import { useAppDispatch, useAppSelector } from '../../../hooks';
+import { createSelector } from "reselect";
+import { storeState } from "./../../../store";
+import { useAppDispatch, useAppSelector } from "../../../hooks";
 
 //hooks
-import { useDragCopy } from '../../widgetHooks/useDragCopy'
-import { useSearchMongoDb } from '../../widgetHooks/useSearchMongoDB'
-import { useBuildVisableData } from '../../widgetHooks/useBuildVisableData'
-import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
+import { useDragCopy } from "../../widgetHooks/useDragCopy";
+import { useSearchMongoDb } from "../../widgetHooks/useSearchMongoDB";
+import { useBuildVisableData } from "../../widgetHooks/useBuildVisableData";
+import { useUpdateFocus } from "./../../widgetHooks/useUpdateFocus";
 
 //widget components
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPane";
-import WidgetFocus from '../../../components/widgetFocus'
-import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
+import WidgetFocus from "../../../components/widgetFocus";
+import WidgetRemoveSecurityTable from "../../../components/widgetRemoveSecurityTable";
 
-const useDispatch = useAppDispatch
-const useSelector = useAppSelector
+const useDispatch = useAppDispatch;
+const useSelector = useAppSelector;
 
-interface FinnHubAPIData { //rename
-    actual: number,
-    estimate: number,
-    period: string, //YYYY-MM-DD
-    symbol: string,
+interface FinnHubAPIData {
+    //rename
+    actual: number;
+    estimate: number;
+    period: string; //YYYY-MM-DD
+    symbol: string;
 }
 
 export interface FinnHubAPIDataArray {
-    [index: number]: FinnHubAPIData
+    [index: number]: FinnHubAPIData;
 }
 
 interface dataListObject {
-    x: Date,
-    y: string
+    x: Date;
+    y: string;
 }
 
 interface widgetProps {
-    config: any,
-    enableDrag: boolean,
-    filters: any,
-    finnHubQueue: finnHubQueue,
-    pagination: number,
-    showEditPane: number,
-    trackedStocks: any,
-    widgetCopy: widget,
-    widgetKey: string | number,
-    widgetType: string,
+    config: any;
+    enableDrag: boolean;
+    filters: any;
+    finnHubQueue: finnHubQueue;
+    pagination: number;
+    showEditPane: number;
+    trackedStocks: any;
+    widgetCopy: widget;
+    widgetKey: string | number;
+    widgetType: string;
 }
 
 function EstimatesEPSSurprises(p: widgetProps, ref: any) {
-
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     const isInitialMount = useRef(true); //update to false after first render.
 
     const startingWidgetCoptyRef = () => {
         if (isInitialMount.current === true) {
-            if (p.widgetCopy !== undefined && typeof p.widgetCopy.widgetID === 'number') {
-                return p.widgetCopy.widgetID
-            } else { return 0 }
-        } else { return 0 }
-    }
+            if (p.widgetCopy !== undefined && typeof p.widgetCopy.widgetID === "number") {
+                return p.widgetCopy.widgetID;
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
+        }
+    };
 
-    const [chartData, setChartData] = useState<false | object>(false)
-    const [widgetCopy] = useState(startingWidgetCoptyRef())
-    const apiKey = useSelector((state) => { return state.apiKey })
-    const currentDashboard = useSelector((state) => { return state.currentDashboard })
-    const dashboardData = useSelector((state) => { return state.dashboardData })
-    const targetSecurity = useSelector((state) => { return state.targetSecurity })
-    const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
-    const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : -1
+    const [chartData, setChartData] = useState<false | object>(false);
+    const [widgetCopy] = useState(startingWidgetCoptyRef());
+    const apiKey = useSelector((state) => {
+        return state.apiKey;
+    });
+    const currentDashboard = useSelector((state) => {
+        return state.currentDashboard;
+    });
+    const dashboardData = useSelector((state) => {
+        return state.dashboardData;
+    });
+    const targetSecurity = useSelector((state) => {
+        return state.targetSecurity;
+    });
+    const exchangeList = useSelector((state) => {
+        return state.exchangeList.exchangeList;
+    });
+    const dashboardID = dashboardData?.[currentDashboard]?.["id"] ? dashboardData[currentDashboard]["id"] : -1;
 
     const showDataSelector = createSelector(
         (state: storeState) => state.showData.dataSet[p.widgetKey][p.config.targetSecurity],
-        returnValue => returnValue
-    )
+        (returnValue) => returnValue
+    );
 
-    const rShowData = useSelector((state) => { //REDUX Data associated with this widget.
-        if (state.dataModel !== undefined &&
-            state.dataModel.created !== 'false' &&
-            state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData: object = showDataSelector(state)
-            return (showData)
+    const rShowData = useSelector((state) => {
+        //REDUX Data associated with this widget.
+        if (state.dataModel !== undefined && state.dataModel.created !== "false" && state.showData.dataSet[p.widgetKey] !== undefined) {
+            const showData: object = showDataSelector(state);
+            return showData;
         }
-    })
+    });
 
-    const focusSecurityList = useMemo(() => { //remove if all securities should stay in focus.
-        return [p?.config?.targetSecurity]
-    }, [p?.config?.targetSecurity])
+    const focusSecurityList = useMemo(() => {
+        //remove if all securities should stay in focus.
+        return [p?.config?.targetSecurity];
+    }, [p?.config?.targetSecurity]);
 
-    useDragCopy(ref, { chartData: chartData, }) //useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.
-    useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
-    useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
+    useDragCopy(ref, { chartData: chartData }); //useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch); //sets security focus in config. Used for redux.visable data and widget excel templating.
+    useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID); //on change to target security retrieve fresh data from mongoDB
+    useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount); //rebuild visable data on update to target security
 
-    useEffect(() => { //create data chart
-        const actualList: dataListObject[] = []
-        const estimateList: dataListObject[] = []
+    useEffect(() => {
+        //create data chart
+        const actualList: dataListObject[] = [];
+        const estimateList: dataListObject[] = [];
 
         for (const i in rShowData) {
-            actualList.push({ 'x': new Date(rShowData[i]['period']), 'y': rShowData[i]['actual'] })
-            estimateList.push({ 'x': new Date(rShowData[i]['period']), 'y': rShowData[i]['estimate'] })
+            actualList.push({ x: new Date(rShowData[i]["period"]), y: rShowData[i]["actual"] });
+            estimateList.push({ x: new Date(rShowData[i]["period"]), y: rShowData[i]["estimate"] });
         }
 
         const chartData = {
             datasets: [
                 {
-                    label: 'Expected',
+                    label: "Expected",
                     data: actualList,
-                    backgroundColor: 'rgba(255, 99, 132, 1)',
+                    backgroundColor: "rgba(255, 99, 132, 1)",
                 },
                 {
-                    label: 'Actual',
+                    label: "Actual",
                     data: estimateList,
-                    backgroundColor: 'rgba(100, 50, 182, 1)',
+                    backgroundColor: "rgba(100, 50, 182, 1)",
                 },
-            ]
-        }
+            ],
+        };
 
         setChartData(chartData);
-
-    }, [rShowData, p.config.targetSecurity])
+    }, [rShowData, p.config.targetSecurity]);
 
     function renderSearchPane() {
         let stockTable = (
@@ -138,14 +152,13 @@ function EstimatesEPSSurprises(p: widgetProps, ref: any) {
                 apiKey={apiKey}
             />
         );
-        return stockTable
+        return stockTable;
     }
 
     function renderStockData() {
-
         let chartBody = (
             <>
-                <div data-testid="SelectionLabel" className="div-stack" >
+                <div data-testid="SelectionLabel" className="div-stack">
                     <WidgetFocus
                         widgetType={p.widgetType}
                         widgetKey={p.widgetKey}
@@ -157,11 +170,8 @@ function EstimatesEPSSurprises(p: widgetProps, ref: any) {
                         enableDrag={p.enableDrag}
                     />
                 </div>
-                {/* <div className="graphDiv" data-testid={`EPSChart`}> */}
-                {/* @ts-ignore */}
-                <EPSChart chartData={chartData} />
-                {/* <ReactChart chartOptions={chartOptions} testid={`chart-${p.widgetType}`} /> */}
-                {/* </div> */}
+
+                <EPSChart testid={`chart-${p.widgetType}`} chartData={chartData} />
             </>
         );
         return chartBody;
@@ -174,16 +184,12 @@ function EstimatesEPSSurprises(p: widgetProps, ref: any) {
                     {renderSearchPane()}
                 </>
             )}
-            {p.showEditPane === 0 && (
-                <>
-                    {renderStockData()}
-                </>
-            )}
+            {p.showEditPane === 0 && <>{renderStockData()}</>}
         </div>
-    )
+    );
 }
 
-export default forwardRef(EstimatesEPSSurprises)
+export default forwardRef(EstimatesEPSSurprises);
 
 export function EPSSurprisesProps(that, key = "newWidgetNameProps") {
     let propList = {

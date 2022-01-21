@@ -84,6 +84,8 @@ afterAll(() => {
 });
 
 beforeEach(async () => {
+    jest.mock("throttleQueueAPI");
+    jest.mock("setupDashboard");
     const { debug } = render(
         <Provider store={store}>
             <App />
@@ -168,11 +170,8 @@ it(`Test ${widgetType} Widget: Rename widget works.`, async () => {
 });
 
 it(`Test ${widgetType} Widget: Add security from widget config screen works.`, async () => {
-    console.log("starting test");
     await toggleEditPane(widgetType); //toggle to edit pane
-    console.log("edit pane toggled");
     await addSecurity(widgetType, [["TSLA", "US-TSLA: TESLA INC"]]); //add security to widget with search bar
-
     await waitFor(() => {
         expect(screen.getByTestId("remove-US-TSLA")).toBeInTheDocument();
     });
