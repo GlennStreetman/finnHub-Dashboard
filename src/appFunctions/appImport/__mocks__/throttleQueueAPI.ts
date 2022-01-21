@@ -34,13 +34,13 @@ export const createFunctionQueueObject = function (maxRequestPerInterval: number
 
             // Adjust the timer if it was called too early
             if (now < threshold) {
-                setTimeout(() => this.dequeue(), threshold - now);
+                setTimeout(() => this.dequeue(), 0);
                 return;
             } else if (now < this.suspend) {
-                setTimeout(() => this.dequeue(), this.suspend - now);
+                setTimeout(() => this.dequeue(), 0);
                 return;
             } else if (this.openRequests >= this.maxRequestPerInterval) {
-                setTimeout(() => this.dequeue(), 100);
+                setTimeout(() => this.dequeue(), 0);
                 return;
             } else {
                 //max requests should default to 1 if evenly spaced.
@@ -52,7 +52,7 @@ export const createFunctionQueueObject = function (maxRequestPerInterval: number
                 }
                 this.lastCalled = Date.now();
                 if (this.queue.length) {
-                    setTimeout(() => this.dequeue(), this.interval);
+                    setTimeout(() => this.dequeue(), 0);
                 } else {
                     this.running = 0;
                 }

@@ -179,7 +179,7 @@ const dataModel = createSlice({
             state.dataSet[dashboardName] = newDashboardModel;
         },
         rRebuildTargetWidgetModel: (state: sliceDataModel, action) => {
-            console.log("rebuilding widget model slice");
+            // console.log("rebuilding widget model slice");
             const ap: rebuildTargetWidgetPayload = action.payload;
             const apD: dashBoardData = ap.dashBoardData;
             const dashboardName: string = ap.targetDashboard;

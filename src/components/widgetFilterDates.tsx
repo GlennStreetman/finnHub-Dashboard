@@ -110,7 +110,7 @@ export default function WidgetFilterDates(p: props) {
     }
 
     function updateFilter(date, filterName) {
-        console.log("updating filters", filterName);
+        // console.log("updating filters", filterName);
         if (isNaN(new Date(date).getTime()) === false) {
             const now = Date.now();
             const target = new Date(date).getTime();
