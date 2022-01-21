@@ -198,5 +198,3 @@ it(`Test ${widgetType} Widget: Test that removing securities from edit pane work
         expect(screen.getByTestId("remove-US-COST")).toBeInTheDocument();
     });
 });
-
-//thunkFetchFinnhub not mocked? /postFinnDashDataMongo
