@@ -122,6 +122,9 @@ function FundamentalsCompanyProfile2(p: widgetProps, ref: any) {
     }
 
     function renderStockData() {
+        console.log(rShowData, p.config.targetSecurit);
+        const stockData = rShowData === undefined ? `No data availabole for ${p.config.targetSecurity}` : mapStockData();
+
         const stockTable = (
             <>
                 <WidgetFocus
@@ -142,10 +145,11 @@ function FundamentalsCompanyProfile2(p: widgetProps, ref: any) {
                             <td>Value</td>
                         </tr>
                     </thead>
-                    <tbody>{mapStockData()}</tbody>
+                    <tbody>{stockData}</tbody>
                 </table>
             </>
         );
+
         return stockTable;
     }
 
