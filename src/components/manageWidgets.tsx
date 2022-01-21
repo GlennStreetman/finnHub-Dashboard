@@ -105,7 +105,6 @@ function ManageWidgets() {
     };
 
     const handleHeadingChange = (event: SelectChangeEvent) => {
-        console.log("set widget heading", event.target.value);
         setWidgetHeading(event.target.value as string);
     };
 

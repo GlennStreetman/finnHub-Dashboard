@@ -90,7 +90,7 @@ beforeEach(async () => {
         expect(screen.getByTestId("dashboardMenu")).toBeInTheDocument();
     });
 
-    await addWidget("estimatesDropdown", "Fundamentals", "Company News"); //mount widget to be tested.
+    await addWidget("Stock Fundamentals", "Company News", body); //mount widget to be tested.
 });
 
 // afterEach( async ()=>{
@@ -151,7 +151,6 @@ it(`Test ${widgetType} Widget: Toggle Button shows config screen.`, async () => 
         expect(screen.getByText("Remove")).toBeInTheDocument();
         expect(screen.getByTestId("remove-US-WMT")).toBeInTheDocument();
         expect(screen.getByTestId("remove-US-COST")).toBeInTheDocument();
-        expect(screen.getByText("From date:")).toBeInTheDocument();
     });
 });
 
@@ -165,13 +164,9 @@ it(`Test ${widgetType} Widget: Rename widget works.`, async () => {
 
 it(`Test ${widgetType} Widget: Add security from widget config screen works.`, async () => {
     toggleEditPane(widgetType); //toggle to edit pane
-    await addSecurity(widgetType, [
-        ["TSLA", "US-TSLA: TESLA INC"],
-        ["AAPL", "US-AAPL: APPLE INC"],
-    ]); //add security to widget with search bar
+    await addSecurity(widgetType, [["TSLA", "US-TSLA: TESLA INC"]]); //add security to widget with search bar
     await waitFor(() => {
         expect(screen.getByTestId("remove-US-TSLA")).toBeInTheDocument();
-        expect(screen.getByTestId("remove-US-AAPL")).toBeInTheDocument();
     });
 });
 

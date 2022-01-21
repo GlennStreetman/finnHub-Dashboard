@@ -136,10 +136,10 @@ function FundamentalsCompanyNews(p: widgetProps, ref: any) {
         return [p?.config?.targetSecurity];
     }, [p?.config?.targetSecurity]);
 
-    // useDragCopy(ref, { newsIncrementor: newsIncrementor }); //useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    // useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch); //sets security focus in config. Used for redux.visable data and widget excel templating.
-    // useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID); //on change to target security retrieve fresh data from mongoDB
-    // useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount); //rebuild visable data on update to target security
+    useDragCopy(ref, { newsIncrementor: newsIncrementor }); //useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch); //sets security focus in config. Used for redux.visable data and widget excel templating.
+    useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID); //on change to target security retrieve fresh data from mongoDB
+    useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount); //rebuild visable data on update to target security
     // useStartingFilters(p.filters["startDate"], updateFilterMemo, p.widgetKey, dashboardData, currentDashboard, dispatch, apiKey, p.finnHubQueue);
 
     function formatSourceName(source) {
