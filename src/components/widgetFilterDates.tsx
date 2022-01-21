@@ -135,7 +135,7 @@ export default function WidgetFilterDates(p: props) {
     };
 
     return (
-        <div style={thisStyle}>
+        <div data-testid="filterDatesID" style={thisStyle}>
             <ThemeProvider theme={filterTheme}>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                     {/* <span> */}
