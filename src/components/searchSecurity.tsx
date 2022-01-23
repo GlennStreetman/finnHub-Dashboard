@@ -93,7 +93,7 @@ export default function SecuritySearch(p: props) {
 
     useEffect(() => {
         if (queUpdate === "ready" && p.searchText !== "") {
-            console.log("searching--", p.searchText);
+            // console.log("searching--", p.searchText);
             const thisExchange = stockList;
             const newFilteredList: string[] = [];
             if (thisExchange !== undefined) {
@@ -120,14 +120,13 @@ export default function SecuritySearch(p: props) {
         if (queUpdate === "idle" && p.searchText.length > 2) {
             setQueUpdate("updating");
             setTimeout(() => {
-                console.log("setting ready");
+                // console.log("setting ready");
                 setQueUpdate("ready");
             }, 1000);
             // return () => clearTimeout(timer);
         }
     }, [p.searchText]);
 
-    console.log("rendering searchSecurity");
     return (
         <Autocomplete
             // filterOptions={(x) => x}
