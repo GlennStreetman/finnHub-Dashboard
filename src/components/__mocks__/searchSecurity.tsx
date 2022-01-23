@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "src/hooks";
 import { useState, useEffect } from "react";
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 import { reqObj } from "src/slices/sliceExchangeData";
-import { tGetSymbolList } from "../slices/sliceExchangeData";
+import { tGetSymbolList } from "../../slices/sliceExchangeData";
 import TextField from "@mui/material/TextField";
 import Autocomplete from "@mui/material/Autocomplete";
 import Box from "@mui/material/Box";
@@ -58,7 +58,7 @@ interface props {
 const useDispatch = useAppDispatch;
 const useSelector = useAppSelector;
 
-export default function SearchSecurity(p: props) {
+export default function SecuritySearch(p: props) {
     const dispatch = useDispatch(); //allows widget to run redux actions.
     const [loading, setLoading] = useState<any>(undefined);
     const apiKey = useSelector((state) => state.apiKey);
@@ -121,10 +121,11 @@ export default function SearchSecurity(p: props) {
             setTimeout(() => {
                 // console.log("setting ready");
                 setQueUpdate("ready");
-            }, 1000);
+            }, 100);
             // return () => clearTimeout(timer);
         }
     }, [p.searchText]);
+
     return (
         <Autocomplete
             // filterOptions={(x) => x}
@@ -135,7 +136,7 @@ export default function SearchSecurity(p: props) {
                 return true;
             }}
             renderOption={(props, option) => {
-                // console.log("NEW TAG", `tag-${option.title}`);
+                console.log(`tag-${option.title}`);
                 return (
                     <Box key={option.title} component="li" {...props}>
                         <div data-testid={`tag-${option.title}`}>{option.title}</div>

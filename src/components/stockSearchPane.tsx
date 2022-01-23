@@ -125,7 +125,7 @@ function StockSearchPane(p: props) {
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     function handleChange(e) {
-        // console.log("handleChange");
+        // console.log("handleChange", e.target.value);
         p.changeSearchText(e.target.value.toUpperCase());
     }
 
