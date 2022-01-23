@@ -66,8 +66,10 @@ export default function SecuritySearch(p: props) {
     const stockDataExchange = useSelector((state) => state.exchangeData.e.ex);
     const stockList = useSelector((state) => state.exchangeData.e?.data);
     const [dataList, setDataList] = useState<any[]>([]);
+    const [queUpdate, setQueUpdate] = useState("idle"); //idle, updating, ready
 
     useEffect(() => {
+        // console.log("set loading");
         if (stockList === undefined) {
             setLoading(true);
         } else {
@@ -78,6 +80,7 @@ export default function SecuritySearch(p: props) {
     useEffect(() => {
         //update exchange data if not updating, on user input.
         if (apiKey !== "" && p.searchText.length >= 1 && defaultExchange !== stockDataExchange && stockDataExchange !== "updating") {
+            console.log("----updating search---");
             const tGetSymbolObj: reqObj = {
                 exchange: defaultExchange,
                 apiKey: apiKey,
@@ -89,32 +92,53 @@ export default function SecuritySearch(p: props) {
     }, [apiKey, defaultExchange, p.searchText, stockDataExchange]);
 
     useEffect(() => {
-        const thisExchange = stockList;
-        const newFilteredList: string[] = [];
-        if (thisExchange !== undefined) {
-            const availableStockCount = Object.keys(thisExchange).length;
-            const exchangeKeys = Object.keys(thisExchange); //list
-            for (let resultCount = 0, filteredCount = 0; resultCount < 20 && filteredCount < availableStockCount; filteredCount++) {
-                const thisKey = exchangeKeys[filteredCount];
-                const thisSearchPhrase = `${thisExchange[thisKey].key}: ${thisExchange[thisKey].description}`;
-                if (thisSearchPhrase.includes(p.searchText) === true) {
-                    resultCount = resultCount;
-                    newFilteredList.push(thisSearchPhrase);
+        if (queUpdate === "ready" && p.searchText !== "") {
+            console.log("searching--", p.searchText);
+            const thisExchange = stockList;
+            const newFilteredList: string[] = [];
+            if (thisExchange !== undefined) {
+                const availableStockCount = Object.keys(thisExchange).length;
+                const exchangeKeys = Object.keys(thisExchange); //list
+                for (let resultCount = 0, filteredCount = 0; resultCount < 20 && filteredCount < availableStockCount; filteredCount++) {
+                    const thisKey = exchangeKeys[filteredCount];
+                    const thisSearchPhrase = `${thisExchange[thisKey].key}: ${thisExchange[thisKey].description}`;
+                    if (thisSearchPhrase.includes(p.searchText) === true) {
+                        resultCount = resultCount;
+                        newFilteredList.push(thisSearchPhrase);
+                    }
                 }
             }
+
+            const stockListKey = newFilteredList.map((el) => ({ title: el }));
+            // console.log("done with update");
+            setDataList(stockListKey);
+            setQueUpdate("idle");
         }
+    }, [queUpdate]);
 
-        const stockListKey = newFilteredList.map((el) => ({ title: el }));
-        setDataList(stockListKey);
-    }, [stockList]);
+    useEffect(() => {
+        if (queUpdate === "idle" && p.searchText.length > 2) {
+            setQueUpdate("updating");
+            setTimeout(() => {
+                console.log("setting ready");
+                setQueUpdate("ready");
+            }, 1000);
+            // return () => clearTimeout(timer);
+        }
+    }, [p.searchText]);
 
+    console.log("rendering searchSecurity");
     return (
         <Autocomplete
+            // filterOptions={(x) => x}
             data-testid={`searchPaneValue-${p.widgetType}`}
-            id="autocomplete"
+            id={`autocomplete-${p.widgetType}`}
             options={dataList}
+            isOptionEqualToValue={(option, value) => {
+                return true;
+            }}
             renderOption={(props, option) => (
-                <Box component="li" {...props}>
+                <Box key={option.title} component="li" {...props}>
                     <div data-testid={`tag-${option.title}`}>{option.title}</div>
                 </Box>
             )}

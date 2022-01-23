@@ -40,6 +40,7 @@ function StockSearchPane(p: props) {
         return state.dashboardData;
     });
     const rUpdateStock = useSelector((state) => {
+        // console.log("getting rUpdateStock");
         const thisExchange = state.exchangeData.e?.data;
         const inputSymbol = p.searchText.slice(0, p.searchText.indexOf(":"));
         const updateStock: any = thisExchange !== undefined ? thisExchange[inputSymbol] : {};
@@ -124,11 +125,12 @@ function StockSearchPane(p: props) {
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     function handleChange(e) {
+        // console.log("handleChange");
         p.changeSearchText(e.target.value.toUpperCase());
-        e.preventDefault();
     }
 
     function handleChangeTag(e, v) {
+        // console.log("handleCHangeTag");
         if (v) {
             p.changeSearchText(v.title);
         } else {
@@ -195,6 +197,7 @@ function StockSearchPane(p: props) {
             // console.log(`invalid stock selection:`, rUpdateStock, p.searchText, typeof widgetKey);
         }
     };
+    // console.log("running stock search");
     return (
         <div data-testid={`stockSearchPane-${p.widgetType}`} style={{ backgroundColor: "#1d69ab", display: "flex", justifyContent: "center", padding: "5px" }}>
             <FormControl className={classes.formControl}>
