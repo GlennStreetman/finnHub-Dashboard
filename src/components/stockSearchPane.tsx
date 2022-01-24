@@ -125,18 +125,21 @@ function StockSearchPane(p: props) {
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
     function handleChange(e) {
-        // console.log("handleChange", e.target.value);
-        p.changeSearchText(e.target.value.toUpperCase());
-    }
-
-    function handleChangeTag(e, v) {
-        // console.log("handleCHangeTag");
-        if (v) {
-            p.changeSearchText(v.title);
-        } else {
-            p.changeSearchText("");
+        e.preventDefault();
+        if (e.target.value && e.target.value !== null) {
+            console.log("updating ", e.target.value);
+            p.changeSearchText(e.target.value.toUpperCase());
         }
     }
+
+    // function handleChangeTag(e, v) {
+    //     e.preventDefault();
+    //     if (v && v !== null) {
+    //         p.changeSearchText(v.title);
+    //     } else {
+    //         p.changeSearchText("");
+    //     }
+    // }
 
     function changeDefault(event) {
         event.preventDefault();
@@ -224,7 +227,7 @@ function StockSearchPane(p: props) {
                     searchText={p.searchText}
                     finnHubQueue={p.finnHubQueue}
                     handleChange={handleChange}
-                    handleChangeTag={handleChangeTag}
+                    // handleChangeTag={handleChangeTag}
                     style={classes.securitySearch}
                     widgetType={p.widgetType}
                 />
