@@ -91,14 +91,6 @@ beforeEach(async () => {
     await addWidget("Stock Fundamentals", "Basic Financials", body); //mount widget to be tested.
 });
 
-// afterEach(async () => {
-//     //unmount widget
-//     fireEvent.click(screen.getByTestId(`removeWidget-${widgetType}`));
-//     await waitFor(async () => {
-//         await expect(screen.queryByTestId(body)).toBe(null);
-//     });
-// });
-
 test(`Test ${widgetType} Widget: Select metrics. Check data renders.`, async () => {
     await toggleEditPane(widgetType); //show widget config menu. Configure. Test API data renders.
 

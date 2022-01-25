@@ -349,7 +349,6 @@ const dataModel = createSlice({
             state.created = flag;
         },
         [tAddNewWidgetContainer.fulfilled.toString()]: (state, action) => {
-            console.log("new widget slice");
             const newWidget = action.payload.newWidget;
             const targetDashboard = action.payload.currentDashboard;
             const widgetName = newWidget.widgetID;
