@@ -2,6 +2,10 @@
  * @jest-environment jsdom
  */
 
+jest.mock("../../../appFunctions/appImport/throttleQueueAPI"); //throttleQueueAPI
+jest.mock("../../../appFunctions/appImport/setupDashboard");
+jest.mock("../../../components/searchSecurity");
+
 import "whatwg-fetch";
 import React from "react";
 import "@testing-library/jest-dom/extend-expect";
@@ -71,9 +75,6 @@ const widgetType = "FundamentalsIPOCalendar";
 const body = "ipoCalendarBody";
 
 beforeAll(() => {
-    jest.mock("throttleQueueAPI");
-    jest.mock("setupDashboard");
-
     mockHTTPServer.listen({
         onUnhandledRequest: "warn",
     });
@@ -95,7 +96,7 @@ beforeEach(async () => {
     await addWidget("Stock Fundamentals", "IPO Calendar", body); //mount widget to be tested.
 });
 
-it(`Test ${widgetType} Widget: Change pagination.`, async () => {
+test(`Test ${widgetType} Widget: Change pagination.`, async () => {
     //needs numbers udpated and maybe a change focus resets pagination?
     //test pagination
     await testBodyRender([
@@ -112,7 +113,7 @@ it(`Test ${widgetType} Widget: Change pagination.`, async () => {
     await toggleEditPane(widgetType);
 });
 
-it(`Test ${widgetType} Widget: Toggle Button shows config screen.`, async () => {
+test(`Test ${widgetType} Widget: Toggle Button shows config screen.`, async () => {
     //toggle to testing edit pane
     await toggleEditPane(widgetType);
     await testBodyRender([
@@ -121,7 +122,7 @@ it(`Test ${widgetType} Widget: Toggle Button shows config screen.`, async () => 
     ]);
 });
 
-it(`Test ${widgetType} Widget: Test that changing filters fetches new data.`, async () => {
+test(`Test ${widgetType} Widget: Test that changing filters fetches new data.`, async () => {
     await toggleEditPane(widgetType); //toggle to edit pane
     mockHTTPServer.use(mockFinnHubData_toggle); //toggle retrieval data so that we can test that updating filters pulls new data.
     await changeFilter(widgetType, "2005-01-01");

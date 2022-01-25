@@ -150,6 +150,7 @@ function ManageWidgets() {
 
     const addWIdget = async (el: [string, string, string, string, filters | undefined, string], currentDashboard: string) => {
         let [widgetDescription, widgetHeader, widgetConfig, d, defaultFilters] = el;
+        // console.log("adding widget container");
         await dispatch(
             tAddNewWidgetContainer({
                 widgetDescription: widgetDescription, //a

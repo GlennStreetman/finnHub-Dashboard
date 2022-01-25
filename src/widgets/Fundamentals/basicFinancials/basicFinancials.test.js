@@ -2,6 +2,10 @@
  * @jest-environment jsdom
  */
 
+jest.mock("../../../appFunctions/appImport/throttleQueueAPI"); //throttleQueueAPI
+jest.mock("../../../appFunctions/appImport/setupDashboard");
+jest.mock("../../../components/searchSecurity");
+
 import "whatwg-fetch";
 import React from "react";
 import "@testing-library/jest-dom/extend-expect";
@@ -75,9 +79,6 @@ afterAll(() => {
 });
 
 beforeEach(async () => {
-    jest.mock("throttleQueueAPI");
-    jest.mock("setupDashboard");
-
     const { debug } = render(
         <Provider store={store}>
             <App />
@@ -98,7 +99,7 @@ beforeEach(async () => {
 //     });
 // });
 
-it(`Test ${widgetType} Widget: Select metrics. Check data renders.`, async () => {
+test(`Test ${widgetType} Widget: Select metrics. Check data renders.`, async () => {
     await toggleEditPane(widgetType); //show widget config menu. Configure. Test API data renders.
 
     await testBodyRender([
@@ -153,7 +154,7 @@ it(`Test ${widgetType} Widget: Select metrics. Check data renders.`, async () =>
     ]);
 });
 
-it(`Test ${widgetType} Widget: Rename widget works.`, async () => {
+test(`Test ${widgetType} Widget: Rename widget works.`, async () => {
     await toggleEditPane(widgetType); //toggle to edit pane
     await newWidgetName(widgetType, ["test", "Test", "Test!", "test!$", "test,", "renameTookEffect"]); //rename widget multiple times
     await toggleEditPane(widgetType); //toggle to data pane.
@@ -161,19 +162,19 @@ it(`Test ${widgetType} Widget: Rename widget works.`, async () => {
     await toggleEditPane(widgetType); //toggle to data pane.
 });
 
-it(`Test ${widgetType} Widget: Add security from widget config screen works.`, async () => {
-    await toggleEditPane(widgetType); //toggle to edit pane
-    fireEvent.click(screen.getByTestId(`symbolViewSelector`));
-    await addSecurity(widgetType, [["TSLA", "US-TSLA: TESLA INC"]]); //add security to widget with search bar. Tests change took effect on each iteration.
-    await waitFor(() => {
-        expect(screen.getByTestId("symbolViewSelector")).toBeInTheDocument();
-    });
-    await waitFor(() => {
-        expect(screen.getByTestId("remove-US-TSLA")).toBeInTheDocument();
-    });
-});
+// test(`Test ${widgetType} Widget: Add security from widget config screen works.`, async () => {
+//     await toggleEditPane(widgetType); //toggle to edit pane
+//     fireEvent.click(screen.getByTestId(`symbolViewSelector`));
+//     await addSecurity(widgetType, [["TSLA", "US-TSLA: TESLA INC"]]); //add security to widget with search bar. Tests change took effect on each iteration.
+//     await waitFor(() => {
+//         expect(screen.getByTestId("symbolViewSelector")).toBeInTheDocument();
+//     });
+//     await waitFor(() => {
+//         expect(screen.getByTestId("remove-US-TSLA")).toBeInTheDocument();
+//     });
+// });
 
-it(`Test ${widgetType} Widget: Test that removing securities from edit pane works.`, async () => {
+test(`Test ${widgetType} Widget: Test that removing securities from edit pane works.`, async () => {
     await toggleEditPane(widgetType); //toggle to edit pane
     fireEvent.click(screen.getByTestId(`symbolViewSelector`));
     await fireEvent.click(screen.getByTestId("remove-US-WMT")); //remove target stock

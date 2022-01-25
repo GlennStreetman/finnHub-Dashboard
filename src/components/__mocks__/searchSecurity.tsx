@@ -50,7 +50,6 @@ interface props {
     searchText: string;
     finnHubQueue: finnHubQueue;
     handleChange: Function;
-    handleChangeTag: Function;
     style: any;
     widgetType?: string;
 }
@@ -58,7 +57,7 @@ interface props {
 const useDispatch = useAppDispatch;
 const useSelector = useAppSelector;
 
-export default function SecuritySearch(p: props) {
+export default function SearchSecurity(p: props) {
     const dispatch = useDispatch(); //allows widget to run redux actions.
     const [loading, setLoading] = useState<any>(undefined);
     const apiKey = useSelector((state) => state.apiKey);
@@ -121,50 +120,54 @@ export default function SecuritySearch(p: props) {
             setTimeout(() => {
                 // console.log("setting ready");
                 setQueUpdate("ready");
-            }, 100);
+            }, 1);
             // return () => clearTimeout(timer);
         }
     }, [p.searchText]);
 
+    const x = p.searchText.length;
+
     return (
-        <Autocomplete
-            // filterOptions={(x) => x}
-            data-testid={`searchPaneValue-${p.widgetType}`}
-            id={`autocomplete-${p.widgetType}`}
-            options={dataList}
-            isOptionEqualToValue={(option, value) => {
-                return true;
-            }}
-            renderOption={(props, option) => {
-                console.log(`tag-${option.title}`);
-                return (
-                    <Box key={option.title} component="li" {...props}>
-                        <div data-testid={`tag-${option.title}`}>{option.title}</div>
-                    </Box>
-                );
-            }}
-            getOptionLabel={(option) => option.title}
-            onChange={(e, v) => {
-                p.handleChangeTag(e, v);
-            }}
-            loading={loading}
-            loadingText="...getting list of securities"
-            renderInput={(params) => {
-                return (
-                    <ThemeProvider theme={oneOffTheme}>
-                        <TextField
-                            data-testid={`searchPaneTextField-${p.widgetType}`}
-                            {...params}
-                            className={p.style}
-                            label="Add Security"
-                            variant="outlined"
-                            onChange={(e) => {
-                                p.handleChange(e);
-                            }}
-                        />
-                    </ThemeProvider>
-                );
-            }}
-        />
+        <>
+            <Autocomplete
+                // filterOptions={(x) => x}
+                data-testid={`searchPaneValue-${p.widgetType}`}
+                id={`autocomplete-${p.widgetType}`}
+                options={p.searchText.length > 0 ? dataList : [{ title: "Getting Securities", key: "placeholder" }]}
+                isOptionEqualToValue={(option, value) => {
+                    return true;
+                }}
+                renderOption={(props, option) => {
+                    // if (p.searchText.length > 0) {
+                    return (
+                        <Box key={option.title} component="li" {...props}>
+                            <div key={option.title} data-testid={`tag-${option.title}`}>
+                                {option.title}
+                            </div>
+                        </Box>
+                    );
+                    // }
+                }}
+                getOptionLabel={(option) => option.title}
+                loading={loading}
+                loadingText="...getting list of securities"
+                renderInput={(params) => {
+                    return (
+                        <ThemeProvider theme={oneOffTheme}>
+                            <TextField
+                                data-testid={`searchPaneTextField-${p.widgetType}`}
+                                {...params}
+                                className={p.style}
+                                label="Add Security"
+                                variant="outlined"
+                                onChange={(e) => {
+                                    p.handleChange(e);
+                                }}
+                            />
+                        </ThemeProvider>
+                    );
+                }}
+            />
+        </>
     );
 }

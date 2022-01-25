@@ -12,7 +12,7 @@ const addSecurity = async function (widgetType: string, addSecuritys: string[]) 
 
         await renameField.focus();
         await userEvent.type(renameField, addSecuritys[x][1]); //type text
-        console.log("finding", `tag-${addSecuritys[x][1]}`);
+        // console.log("finding", `tag-${addSecuritys[x][1]}`);
         await waitFor(() => {
             expect(screen.getByTestId(`tag-${addSecuritys[x][1]}`)).toBeInTheDocument();
         });

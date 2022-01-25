@@ -1,58 +1,55 @@
-import * as React from "react"
+import * as React from "react";
 import { useState, useEffect, useMemo, forwardRef, useRef } from "react";
-import { widget } from 'src/App'
+import { widget } from "src/App";
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
-
-
-
-import { useAppDispatch, useAppSelector } from '../../../hooks';
+import { useAppDispatch, useAppSelector } from "../../../hooks";
 
 import CreateCandleStickChart from "./createCandleStickChart";
-import WidgetFilterDates from '../../../components/widgetFilterDates'
-import ToolTip from '../../../components/toolTip'
+import WidgetFilterDates from "../../../components/widgetFilterDates";
+import ToolTip from "../../../components/toolTip";
 
-import { useDragCopy } from './../../widgetHooks/useDragCopy'
+import { useDragCopy } from "./../../widgetHooks/useDragCopy";
 
-import { useSearchMongoDb } from './../../widgetHooks/useSearchMongoDB'
-import { useBuildVisableData } from './../../widgetHooks/useBuildVisableData'
-import { useStartingFilters } from './../../widgetHooks/useStartingFilters'
-import { useUpdateFocus } from './../../widgetHooks/useUpdateFocus'
+import { useSearchMongoDb } from "./../../widgetHooks/useSearchMongoDB";
+import { useBuildVisableData } from "./../../widgetHooks/useBuildVisableData";
+import { useStartingFilters } from "./../../widgetHooks/useStartingFilters";
+import { useUpdateFocus } from "./../../widgetHooks/useUpdateFocus";
 
-import WidgetFocus from '../../../components/widgetFocus'
-import WidgetRemoveSecurityTable from '../../../components/widgetRemoveSecurityTable'
+import WidgetFocus from "../../../components/widgetFocus";
+import WidgetRemoveSecurityTable from "../../../components/widgetRemoveSecurityTable";
 import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPane";
 
-import { UpdateWidgetFilters } from 'src/appFunctions/appImport/widgetLogic'
+import { UpdateWidgetFilters } from "src/appFunctions/appImport/widgetLogic";
 
-
-const useDispatch = useAppDispatch
-const useSelector = useAppSelector
+const useDispatch = useAppDispatch;
+const useSelector = useAppSelector;
 
 export interface FinnHubCandleData {
-    c: number[],
-    h: number[],
-    l: number[],
-    o: number[],
-    s: string,
-    t: number[],
-    v: number[],
+    c: number[];
+    h: number[];
+    l: number[];
+    o: number[];
+    s: string;
+    t: number[];
+    v: number[];
 }
 
 interface widgetProps {
-    config: any,
-    enableDrag: boolean,
-    filters: any,
-    finnHubQueue: finnHubQueue,
-    pagination: number,
-    showEditPane: number,
-    trackedStocks: any,
-    widgetCopy: any,
-    widgetKey: string | number,
-    widgetType: string,
+    config: any;
+    enableDrag: boolean;
+    filters: any;
+    finnHubQueue: finnHubQueue;
+    pagination: number;
+    showEditPane: number;
+    trackedStocks: any;
+    widgetCopy: any;
+    widgetKey: string | number;
+    widgetType: string;
 }
 
-function isCandleData(arg: any): arg is FinnHubCandleData { //defined shape of candle data. CHeck used before rendering.
-    return arg.c !== undefined
+function isCandleData(arg: any): arg is FinnHubCandleData {
+    //defined shape of candle data. CHeck used before rendering.
+    return arg.c !== undefined;
 }
 
 function PriceCandles(p: widgetProps, ref: any) {
@@ -60,125 +57,137 @@ function PriceCandles(p: widgetProps, ref: any) {
 
     const startingWidgetCoptyRef = () => {
         if (isInitialMount.current === true) {
-            if (p.widgetCopy !== undefined && typeof p.widgetCopy.widgetID === 'number') {
-                return p.widgetCopy.widgetID
-            } else { return 0 }
-        } else { return 0 }
-    }
-
-
-    const startingStartDate = () => { //save dates as offsets from now
-        const now = Date.now()
-        const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000 * 52
-        const startUnix = now + startUnixOffset
-        const startDate = new Date(startUnix).toISOString().slice(0, 10);
-        return startDate
-    }
-
-    const startingEndDate = () => { //save dates as offsets from now
-        const now = Date.now()
-        const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0
-        const endUnix = now + endUnixOffset
-        const endDate = new Date(endUnix).toISOString().slice(0, 10);
-        return endDate
-    }
-
-
-    const [widgetCopy] = useState(startingWidgetCoptyRef())
-    const [chartData, setChartData] = useState<false | object>(false)
-    // const [options, setOptions] = useState(startingOptions())
-    const [start, setStart] = useState(startingStartDate())
-    const [end, setEnd] = useState(startingEndDate())
-    const dispatch = useDispatch()
-    const apiKey = useSelector((state) => { return state.apiKey })
-    const currentDashboard = useSelector((state) => { return state.currentDashboard })
-    const dashboardData = useSelector((state) => { return state.dashboardData })
-    const targetSecurity = useSelector((state) => { return state.targetSecurity })
-    const exchangeList = useSelector((state) => { return state.exchangeList.exchangeList })
-    const dashboardID = dashboardData?.[currentDashboard]?.['id'] ? dashboardData[currentDashboard]['id'] : -1
-
-
-    const rShowData = useSelector((state) => {     //finnhub data stored in redux
-        if (state.dataModel !== undefined &&
-            state.dataModel.created !== 'false' &&
-            state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData = state?.showData?.dataSet?.[p.widgetKey]?.[p.config.targetSecurity]
-            return (showData)
+            if (p.widgetCopy !== undefined && typeof p.widgetCopy.widgetID === "number") {
+                return p.widgetCopy.widgetID;
+            } else {
+                return 0;
+            }
+        } else {
+            return 0;
         }
-    })
+    };
 
-    const updateFilterMemo = useMemo(() => { //used inst useStartingFilters Hook.
+    const startingStartDate = () => {
+        //save dates as offsets from now
+        const now = Date.now();
+        const startUnixOffset = p.filters.startDate !== undefined ? p.filters.startDate : -604800 * 1000 * 52;
+        const startUnix = now + startUnixOffset;
+        const startDate = new Date(startUnix).toISOString().slice(0, 10);
+        return startDate;
+    };
+
+    const startingEndDate = () => {
+        //save dates as offsets from now
+        const now = Date.now();
+        const endUnixOffset = p.filters.startDate !== undefined ? p.filters.endDate : 0;
+        const endUnix = now + endUnixOffset;
+        const endDate = new Date(endUnix).toISOString().slice(0, 10);
+        return endDate;
+    };
+
+    const [widgetCopy] = useState(startingWidgetCoptyRef());
+    const [chartData, setChartData] = useState<false | object>(false);
+    // const [options, setOptions] = useState(startingOptions())
+    const [start, setStart] = useState(startingStartDate());
+    const [end, setEnd] = useState(startingEndDate());
+    const dispatch = useDispatch();
+    const apiKey = useSelector((state) => {
+        return state.apiKey;
+    });
+    const currentDashboard = useSelector((state) => {
+        return state.currentDashboard;
+    });
+    const dashboardData = useSelector((state) => {
+        return state.dashboardData;
+    });
+    const targetSecurity = useSelector((state) => {
+        return state.targetSecurity;
+    });
+    const exchangeList = useSelector((state) => {
+        return state.exchangeList.exchangeList;
+    });
+    const dashboardID = dashboardData?.[currentDashboard]?.["id"] ? dashboardData[currentDashboard]["id"] : -1;
+
+    const rShowData = useSelector((state) => {
+        //finnhub data stored in redux
+        if (state.dataModel !== undefined && state.dataModel.created !== "false" && state.showData.dataSet[p.widgetKey] !== undefined) {
+            const showData = state?.showData?.dataSet?.[p.widgetKey]?.[p.config.targetSecurity];
+            return showData;
+        }
+    });
+
+    const updateFilterMemo = useMemo(() => {
+        //used inst useStartingFilters Hook.
         return {
-            resolution: 'W',
+            resolution: "W",
             startDate: start,
             endDate: end,
-            Description: 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
-        }
-    }, [start, end,])
+            Description: "Date numbers are millisecond offset from now. Used for Unix timestamp calculations.",
+        };
+    }, [start, end]);
 
     const focusSecurityList = useMemo(() => {
-        return [p?.config?.targetSecurity]
-    }, [p?.config?.targetSecurity])
+        return [p?.config?.targetSecurity];
+    }, [p?.config?.targetSecurity]);
 
-    useDragCopy(ref, { chartData: chartData })//useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch) //sets security focus in config. Used for redux.visable data and widget excel templating.	
-    useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID) //on change to target security retrieve fresh data from mongoDB
-    useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount) //rebuild visable data on update to target security
-    useStartingFilters(p.filters['startDate'], updateFilterMemo, p.widgetKey, dashboardData, currentDashboard, dispatch, apiKey, p.finnHubQueue)
+    useDragCopy(ref, { chartData: chartData }); //useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
+    useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch); //sets security focus in config. Used for redux.visable data and widget excel templating.
+    useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID); //on change to target security retrieve fresh data from mongoDB
+    useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount); //rebuild visable data on update to target security
+    useStartingFilters(p.filters["startDate"], updateFilterMemo, p.widgetKey, dashboardData, currentDashboard, dispatch, apiKey, p.finnHubQueue);
 
     interface ChartNode {
-        x: Date,
-        y: number[],
+        x: Date;
+        y: number[];
     }
 
-    useEffect(() => {//CREATE CANDLE DATA
+    useEffect(() => {
+        //CREATE CANDLE DATA
         if (rShowData !== undefined && Object.keys(rShowData).length > 0) {
-
             const high = {
-                type: 'scatter' as const,
-                label: 'High',
+                type: "scatter" as const,
+                label: "High",
                 data: rShowData.h.map((el) => {
-                    return ({ x: el, y: el })
+                    return { x: el, y: el };
                 }),
-                backgroundColor: '#0066ff',
-            }
+                backgroundColor: "#0066ff",
+            };
             const low = {
-                type: 'scatter' as const,
-                label: 'Low',
+                type: "scatter" as const,
+                label: "Low",
                 data: rShowData.l.map((el) => {
-                    return ({ x: el, y: el })
+                    return { x: el, y: el };
                 }),
-                backgroundColor: '#ff0000',
-            }
-            const OC = { //open/close bar data
-                type: 'bar' as const,
-                label: 'Open/Close',
+                backgroundColor: "#ff0000",
+            };
+            const OC = {
+                //open/close bar data
+                type: "bar" as const,
+                label: "Open/Close",
                 backgroundColor: rShowData.o.map((el, i) => {
-                    if (el > rShowData.c[i]) { return ('#ff0000') } else { return ('#0066ff') }
+                    if (el > rShowData.c[i]) {
+                        return "#ff0000";
+                    } else {
+                        return "#0066ff";
+                    }
                 }),
                 data: rShowData.o.map((el, i) => {
-                    return ([el, rShowData.c[i]])
+                    return [el, rShowData.c[i]];
                 }),
-                borderColor: 'white',
+                borderColor: "white",
                 borderWidth: 2,
-            }
+            };
 
             const newChartData = {
-                labels: rShowData.t.map(el => new Date(el * 1000).toISOString().split('T')[0]), // new Date(el).toISOString().split('T')[0])
-                datasets: [
-                    OC,
-                    high,
-                    low,
-                ]
-            }
+                labels: rShowData.t.map((el) => new Date(el * 1000).toISOString().split("T")[0]), // new Date(el).toISOString().split('T')[0])
+                datasets: [OC, high, low],
+            };
 
-            console.log('newChartData', newChartData)
-
-            setChartData(newChartData)
-
-        } else { console.log("Failed candle data type guard:", rShowData) }
-
-    }, [p.config.targetSecurity, rShowData, p.filters.endDate, p.filters.startDate, start, end])
+            setChartData(newChartData);
+        } else {
+            // console.log("Failed candle data type guard:", rShowData);
+        }
+    }, [p.config.targetSecurity, rShowData, p.filters.endDate, p.filters.startDate, start, end]);
 
     function editCandleListForm() {
         let securityList = (
@@ -195,36 +204,41 @@ function PriceCandles(p: widgetProps, ref: any) {
     }
 
     function updateFilterResolution(e) {
-        UpdateWidgetFilters(p.widgetKey, { [e.target.name]: e.target.value }, dashboardData, currentDashboard, dispatch, apiKey, p.finnHubQueue)
+        UpdateWidgetFilters(p.widgetKey, { [e.target.name]: e.target.value }, dashboardData, currentDashboard, dispatch, apiKey, p.finnHubQueue);
     }
 
     function displayCandleGraph() {
-
         const resObj = {
-            1: 'Daily',
-            5: '5 Day',
-            15: '15 Day',
-            30: '30 Day',
-            D: 'Daily',
-            W: 'Weekly',
-            M: 'Monthly',
-        }
+            1: "Daily",
+            5: "5 Day",
+            15: "15 Day",
+            30: "30 Day",
+            D: "Daily",
+            W: "Weekly",
+            M: "Monthly",
+        };
 
-        const resText = resObj[p.filters.resolution]
+        const resText = resObj[p.filters.resolution];
 
         let symbolSelectorDropDown = (
             <>
-                <div className="div-stack">
-                    <WidgetFocus
-                        widgetType={p.widgetType}
-                        widgetKey={p.widgetKey}
-                        trackedStocks={p.trackedStocks}
-                        exchangeList={exchangeList}
-                        config={p.config}
-                        dashBoardData={dashboardData}
-                        currentDashboard={currentDashboard}
-                        enableDrag={p.enableDrag}
-                    />
+                <div style={{ display: "flex" }}>
+                    <div className="div-stack">
+                        <WidgetFocus
+                            widgetType={p.widgetType}
+                            widgetKey={p.widgetKey}
+                            trackedStocks={p.trackedStocks}
+                            exchangeList={exchangeList}
+                            config={p.config}
+                            dashBoardData={dashboardData}
+                            currentDashboard={currentDashboard}
+                            enableDrag={p.enableDrag}
+                        />
+                    </div>
+                    <div
+                        key={`${p.config.targetSecurity}-description`}
+                        style={{ marginTop: "auto", marginBottom: "auto" }}
+                    >{`${p.config.targetSecurity}: ${resText} Candle Data`}</div>
                 </div>
                 {/* <div data-testid={`${resText} Price Candles: ${p.config.targetSecurity}`} className="graphDiv"> */}
                 <CreateCandleStickChart chartData={chartData} />
@@ -234,18 +248,20 @@ function PriceCandles(p: widgetProps, ref: any) {
         return symbolSelectorDropDown;
     }
 
-    let resolutionList = ['1', '5', '15', '30', '60', "D", "W", "M"].map((el) => (
+    let resolutionList = ["1", "5", "15", "30", "60", "D", "W", "M"].map((el) => (
         <option key={el + "rsl"} value={el}>
             {el}
         </option>
     ));
 
-    const helpText = <>
-        Select data resulotion for candle chart. <br />
-    </>
+    const helpText = (
+        <>
+            Select data resulotion for candle chart. <br />
+        </>
+    );
 
     return (
-        <div data-testid='candleBody'>
+        <div data-testid="container-candleBody">
             {p.showEditPane === 1 && (
                 <>
                     <div className="searchPane">
@@ -267,45 +283,46 @@ function PriceCandles(p: widgetProps, ref: any) {
                                 <tbody>
                                     <tr>
                                         <td>
-                                            <ToolTip textFragment={helpText} hintName='candeRes' />
+                                            <ToolTip textFragment={helpText} hintName="candeRes" />
                                         </td>
-                                        <td style={{ color: 'white' }} className='rightTE'><label htmlFor="resBtn">Resolution:</label></td>
+                                        <td style={{ color: "white" }} className="rightTE">
+                                            <label htmlFor="resBtn">Resolution:</label>
+                                        </td>
                                         <td>
-                                            <select data-testid='candleResolutionSelect' id="resBtn" className="btn" name='resolution' value={p.filters.resolution} onChange={updateFilterResolution}>
+                                            <select
+                                                data-testid="candleResolutionSelect"
+                                                id="resBtn"
+                                                className="btn"
+                                                name="resolution"
+                                                value={p.filters.resolution}
+                                                onChange={updateFilterResolution}
+                                            >
                                                 {resolutionList}
                                             </select>
                                         </td>
                                     </tr>
                                 </tbody>
                             </table>
-
                         </div>
                     </div>
                     <div>{Object.keys(p.trackedStocks).length > 0 ? editCandleListForm() : <></>}</div>
                 </>
             )}
-            {p.showEditPane === 0 && (
-                Object.keys(p.trackedStocks).length > 0 ? displayCandleGraph() : <></>
-            )}
+            {p.showEditPane === 0 && (Object.keys(p.trackedStocks).length > 0 ? displayCandleGraph() : <></>)}
         </div>
     );
 }
 
-export default forwardRef(PriceCandles)
+export default forwardRef(PriceCandles);
 
 export function candleWidgetProps(that, key = "Candles") {
-    let propList = {
-    };
+    let propList = {};
     return propList;
 }
 
 export const candleWidgetFilters: object = {
-    resolution: 'W',
-    startDate: -31536000000,
-    "endDate": 0,
-    "Description": 'Date numbers are millisecond offset from now. Used for Unix timestamp calculations.'
-}
-
-
-
-
+    resolution: "W",
+    startDate: -5184000 * 1000,
+    endDate: 0,
+    Description: "Date numbers are millisecond offset from now. Used for Unix timestamp calculations.",
+};

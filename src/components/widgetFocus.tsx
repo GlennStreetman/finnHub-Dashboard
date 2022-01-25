@@ -1,20 +1,20 @@
-import React, { ReactElement } from 'react'
-import { dStock } from '../appFunctions/formatStockSymbols'
-import { stockList, config } from '../App'
-import { updateWidgetConfig } from 'src/appFunctions/appImport/widgetLogic'
-import { dashBoardData } from 'src/App'
-import { useAppDispatch } from '../hooks';
+import React, { ReactElement } from "react";
+import { dStock } from "../appFunctions/formatStockSymbols";
+import { stockList, config } from "../App";
+import { updateWidgetConfig } from "src/appFunctions/appImport/widgetLogic";
+import { dashBoardData } from "src/App";
+import { useAppDispatch } from "../hooks";
 
 interface props {
-    widgetType: string,
-    widgetKey: string | number,
-    trackedStocks: stockList,
-    exchangeList: string[],
-    config: config,
-    callback?: Function | false //any additional logic that needs to be run on change to focus. Reset pagination?
-    dashBoardData: dashBoardData
-    currentDashboard: string,
-    enableDrag: boolean,
+    widgetType: string;
+    widgetKey: string | number;
+    trackedStocks: stockList;
+    exchangeList: string[];
+    config: config;
+    callback?: Function | false; //any additional logic that needs to be run on change to focus. Reset pagination?
+    dashBoardData: dashBoardData;
+    currentDashboard: string;
+    enableDrag: boolean;
 }
 
 export default function WidgetFocus(p: props): ReactElement {
@@ -22,26 +22,21 @@ export default function WidgetFocus(p: props): ReactElement {
     const dispatch = useAppDispatch(); //allows widget to run redux actions.
     function changeStockSelection(e) {
         const target = e.target.value;
-        updateWidgetConfig(
-            p.widgetKey,
-            { ...p.config, ...{ targetSecurity: target } },
-            p.dashBoardData,
-            p.currentDashboard,
-            p.enableDrag,
-            dispatch,
-        )
-        if (p.callback) { p.callback() }
+        updateWidgetConfig(p.widgetKey, { ...p.config, ...{ targetSecurity: target } }, p.dashBoardData, p.currentDashboard, p.enableDrag, dispatch);
+        if (p.callback) {
+            p.callback();
+        }
     }
 
     let newStockList = Object.keys(p.trackedStocks).map((el) => (
-        <option key={el + "ddl"} value={el} data-testid={`select-${el}`} >
+        <option key={el + "ddl"} value={el} data-testid={`select-${el}`}>
             {dStock(p.trackedStocks[el], p.exchangeList)}
         </option>
-    ))
+    ));
 
     return (
         <select data-testid={`focus-${p.widgetType}`} className="btn" value={p.config.targetSecurity} onChange={changeStockSelection}>
             {newStockList}
         </select>
-    )
+    );
 }

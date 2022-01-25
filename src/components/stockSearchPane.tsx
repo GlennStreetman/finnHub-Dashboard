@@ -13,6 +13,7 @@ import { tAddStock } from "src/thunks/thunkAddWidgetSecurity";
 import { rSetUpdateStatus } from "src/slices/sliceDataModel"; //sliceDataModel, rRebuildTargetDashboardModel
 import { tGetFinnhubData } from "src/thunks/thunkFetchFinnhub";
 import MenuItem from "@mui/material/MenuItem";
+import { useState } from "react";
 
 const useDispatch = useAppDispatch;
 const useSelector = useAppSelector;
@@ -27,6 +28,8 @@ interface props {
 }
 
 function StockSearchPane(p: props) {
+    const [securitySelection, setSecuritySelection] = useState("");
+
     const defaultExchange = useSelector((state) => {
         return state.defaultExchange;
     });
@@ -40,10 +43,10 @@ function StockSearchPane(p: props) {
         return state.dashboardData;
     });
     const rUpdateStock = useSelector((state) => {
-        // console.log("getting rUpdateStock");
         const thisExchange = state.exchangeData.e?.data;
-        const inputSymbol = p.searchText.slice(0, p.searchText.indexOf(":"));
+        const inputSymbol = securitySelection.slice(0, securitySelection.indexOf(":"));
         const updateStock: any = thisExchange !== undefined ? thisExchange[inputSymbol] : {};
+        // console.log("getting rUpdateStock", inputSymbol, updateStock);
         return updateStock;
     });
 
@@ -127,19 +130,20 @@ function StockSearchPane(p: props) {
     function handleChange(e) {
         e.preventDefault();
         if (e.target.value && e.target.value !== null) {
-            console.log("updating ", e.target.value);
+            // console.log("updating ", e.target.value);
             p.changeSearchText(e.target.value.toUpperCase());
         }
     }
 
-    // function handleChangeTag(e, v) {
-    //     e.preventDefault();
-    //     if (v && v !== null) {
-    //         p.changeSearchText(v.title);
-    //     } else {
-    //         p.changeSearchText("");
-    //     }
-    // }
+    function handleChangeTag(v) {
+        // console.log("v", v);
+        if (v && v !== null) {
+            setSecuritySelection(v);
+        }
+        // else {
+        //     p.changeSearchText("");
+        // }
+    }
 
     function changeDefault(event) {
         event.preventDefault();
@@ -227,7 +231,7 @@ function StockSearchPane(p: props) {
                     searchText={p.searchText}
                     finnHubQueue={p.finnHubQueue}
                     handleChange={handleChange}
-                    // handleChangeTag={handleChangeTag}
+                    handleChangeTag={handleChangeTag}
                     style={classes.securitySearch}
                     widgetType={p.widgetType}
                 />

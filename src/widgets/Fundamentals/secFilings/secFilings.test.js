@@ -99,7 +99,7 @@ beforeEach(async () => {
     await addWidget("Stock Fundamentals", "SEC Filings", body); //mount widget to be tested.
 });
 
-it(`Test ${widgetType} Widget: Change focus renders body change. `, async () => {
+test(`Test ${widgetType} Widget: Change focus renders body change. `, async () => {
     await testBodyRender([
         //test that widget body renders api data.
         ["getByTestId", body],
@@ -114,7 +114,7 @@ it(`Test ${widgetType} Widget: Change focus renders body change. `, async () => 
     await toggleEditPane(widgetType);
 });
 
-it(`Test ${widgetType} Widget: Change pagination.`, async () => {
+test(`Test ${widgetType} Widget: Change pagination.`, async () => {
     //needs numbers udpated and maybe a change focus resets pagination?
     //test pagination
     await testBodyRender([
@@ -139,7 +139,7 @@ it(`Test ${widgetType} Widget: Change pagination.`, async () => {
     await toggleEditPane(widgetType);
 });
 
-it(`Test ${widgetType} Widget: Toggle Button shows config screen.`, async () => {
+test(`Test ${widgetType} Widget: Toggle Button shows config screen.`, async () => {
     //toggle to testing edit pane
     await toggleEditPane(widgetType);
     await waitFor(() => {
@@ -150,7 +150,7 @@ it(`Test ${widgetType} Widget: Toggle Button shows config screen.`, async () => 
     });
 });
 
-it(`Test ${widgetType} Widget: Rename widget works.`, async () => {
+test(`Test ${widgetType} Widget: Rename widget works.`, async () => {
     await toggleEditPane(widgetType); //toggle to edit pane
     await newWidgetName(widgetType, ["test", "Test", "Test!", "test!$", "test,", "renameTookEffect"]); //rename widget multiple times
     await toggleEditPane(widgetType); //toggle to data pane.
@@ -158,23 +158,23 @@ it(`Test ${widgetType} Widget: Rename widget works.`, async () => {
     await toggleEditPane(widgetType); //toggle to data pane.
 });
 
-it(`Test ${widgetType} Widget: Add security from widget config screen works.`, async () => {
-    await toggleEditPane(widgetType); //toggle to edit pane
-    await addSecurity(widgetType, [
-        ["TSLA", "US-TSLA: TESLA INC"],
-        // ["AAPL", "US-AAPL: APPLE INC"],
-    ]); //add security to widget with search bar
-    await waitFor(() => {
-        expect(screen.getByTestId("remove-US-TSLA")).toBeInTheDocument();
-        // expect(screen.getByTestId("remove-US-AAPL")).toBeInTheDocument();
-    });
-});
-
-// it(`Test ${widgetType} Widget: Test that removing securities from edit pane works.`, async () => {
+// test(`Test ${widgetType} Widget: Add security from widget config screen works.`, async () => {
 //     await toggleEditPane(widgetType); //toggle to edit pane
-//     await fireEvent.click(screen.getByTestId("remove-US-WMT")); //remove target stock
-//     await waitFor(async () => {
-//         await expect(screen.queryByTestId("remove-US-WMT")).toBe(null);
-//         expect(screen.getByTestId("remove-US-COST")).toBeInTheDocument();
+//     await addSecurity(widgetType, [
+//         ["TSLA", "US-TSLA: TESLA INC"],
+//         // ["AAPL", "US-AAPL: APPLE INC"],
+//     ]); //add security to widget with search bar
+//     await waitFor(() => {
+//         expect(screen.getByTestId("remove-US-TSLA")).toBeInTheDocument();
+//         // expect(screen.getByTestId("remove-US-AAPL")).toBeInTheDocument();
 //     });
 // });
+
+it(`Test ${widgetType} Widget: Test that removing securities from edit pane works.`, async () => {
+    await toggleEditPane(widgetType); //toggle to edit pane
+    await fireEvent.click(screen.getByTestId("remove-US-WMT")); //remove target stock
+    await waitFor(async () => {
+        await expect(screen.queryByTestId("remove-US-WMT")).toBe(null);
+        expect(screen.getByTestId("remove-US-COST")).toBeInTheDocument();
+    });
+});

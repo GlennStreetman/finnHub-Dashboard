@@ -52,6 +52,7 @@ interface props {
     handleChange: Function;
     style: any;
     widgetType?: string;
+    handleChangeTag: Function;
 }
 
 const useDispatch = useAppDispatch;
@@ -136,6 +137,11 @@ export default function SearchSecurity(p: props) {
                 options={p.searchText.length > 0 ? dataList : [{ title: "Getting Securities", key: "placeholder" }]}
                 isOptionEqualToValue={(option, value) => {
                     return true;
+                }}
+                onChange={(e) => {
+                    //@ts-ignore
+                    p.handleChangeTag(e.target.textContent);
+                    // console.log("SELECTION: ", e.target, e.target.textContent);
                 }}
                 renderOption={(props, option) => {
                     // if (p.searchText.length > 0) {

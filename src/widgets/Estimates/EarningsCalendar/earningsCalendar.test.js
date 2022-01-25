@@ -169,13 +169,13 @@ it(`Test ${widgetType} Widget: Rename widget works.`, async () => {
     await toggleEditPane(widgetType); //toggle to data pane.
 });
 
-it(`Test ${widgetType} Widget: Add security from widget config screen works.`, async () => {
-    await toggleEditPane(widgetType); //toggle to edit pane
-    await addSecurity(widgetType, [["TSLA", "US-TSLA: TESLA INC"]]); //add security to widget with search bar
-    await waitFor(() => {
-        expect(screen.getByTestId("remove-US-TSLA")).toBeInTheDocument();
-    });
-});
+// it(`Test ${widgetType} Widget: Add security from widget config screen works.`, async () => {
+//     await toggleEditPane(widgetType); //toggle to edit pane
+//     await addSecurity(widgetType, [["TSLA", "US-TSLA: TESLA INC"]]); //add security to widget with search bar
+//     await waitFor(() => {
+//         expect(screen.getByTestId("remove-US-TSLA")).toBeInTheDocument();
+//     });
+// });
 
 it(`Test ${widgetType} Widget: Test that changing filters fetches new data.`, async () => {
     await toggleEditPane(widgetType); //toggle to edit pane
