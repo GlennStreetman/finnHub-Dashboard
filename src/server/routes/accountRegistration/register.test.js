@@ -2,7 +2,6 @@
 import express from "express";
 import path from "path";
 import session from "express-session";
-import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import request from "supertest";
@@ -17,7 +16,6 @@ dotenv.config();
 app.use(express.static(path.join(__dirname, "build")));
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // support json encoded bodies
-app.use(cookieParser());
 
 const FileStore = sessionFileStore(session);
 

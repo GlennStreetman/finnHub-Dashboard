@@ -7,7 +7,6 @@ import session from "express-session";
 import sessionFileStore from "session-file-store";
 import bodyParser from "body-parser";
 import db from "../../db/databaseLocalPG.js";
-import cookieParser from "cookie-parser";
 import secretQuestion from "./secretQuestion.js";
 import login from "./../loginRoutes/login.js";
 import sha512 from "./../../db/sha512.js";
@@ -18,10 +17,7 @@ dotenv.config();
 
 app.use(express.static(path.join(__dirname, "build")));
 app.use(express.urlencoded({ extended: false }));
-
 app.use(bodyParser.json()); // support json encoded bodies
-
-app.use(cookieParser());
 
 const FileStore = sessionFileStore(session);
 const fileStoreOptions = {};
