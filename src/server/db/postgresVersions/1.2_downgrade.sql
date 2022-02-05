@@ -1,0 +1,2 @@
+DROP TABLE session;
+UPDATE VERSION SET version='1.1';
