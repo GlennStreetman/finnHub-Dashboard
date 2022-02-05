@@ -6,10 +6,8 @@ const router = express.Router();
 
 router.get("/dashboard", (req, res, next) => {
     //returns requested dashboard to user.
-    console.log("CHECKING SESSION", req.session);
     const db = postgresDB;
     if (req.session.login === true) {
-        console.log("----LOGIN IS TRUE----");
         const getSavedDashBoards = `
             SELECT *
             FROM dashBoard AS d
@@ -69,7 +67,6 @@ router.get("/dashboard", (req, res, next) => {
                         const result = rows.rows;
                         if (rows.rows[0] !== undefined) {
                             r.default = rows.rows[0].defaultmenu;
-                            console.log("MENUSETUPROWS", rows.rows);
                             for (const row in result) {
                                 const thisRow = result[row];
                                 r.menuSetup[thisRow["widgetid"]] = {
@@ -83,8 +80,6 @@ router.get("/dashboard", (req, res, next) => {
                                     yAxis: thisRow.yaxis,
                                 };
                             }
-                            console.log("dashboard DATA: ", "-------------------------------------->", r.savedDashBoards.TEST.widgetlist);
-                            console.log("--------------------WIDGETS----------------", r);
                             res.status(200).json(r);
                         } else {
                             res.status(401).json({ message: "No dashboards retrieved" });
@@ -249,7 +244,6 @@ router.post("/renameDashboard", (req, res, next) => {
             UPDATE dashboard
             SET dashboardname = ${newName}
             WHERE userid = ${req.session.uID} AND id = ${dbID}`;
-        console.log("renameDashboard", getSavedDashBoards);
         db.query(getSavedDashBoards, (err, rows) => {
             if (err) {
                 res.status(401).json({ message: "Dashboard name update failed." });
