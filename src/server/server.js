@@ -3,11 +3,14 @@ import helmet from "helmet";
 
 import eg from "express-graphql";
 import dotenv from "dotenv";
+
 import session from "express-session";
+import pgSimple from "connect-pg-simple";
+
 import bodyParser from "body-parser";
 import path from "path";
 import morgan from "morgan"; //request logger middleware.
-import sessionFileStore from "session-file-store";
+// import sessionFileStore from "session-file-store";
 import { connectPostgres } from "./db/databaseLocalPG.js";
 import { dirname } from "path";
 import { fileURLToPath } from "url";
@@ -72,8 +75,9 @@ app.use(
 
 dotenv.config();
 const port = process.env.NODE_ENV || 5000;
-const FileStore = sessionFileStore(session);
-const fileStoreOptions = {};
+
+// const FileStore = sessionFileStore(session);
+// const fileStoreOptions = {};
 
 app.use(morgan("dev"));
 app.use(
@@ -89,9 +93,13 @@ app.use(
     })
 );
 
+const pgSession = new pgSimple(session);
 app.use(
     session({
-        store: new FileStore(fileStoreOptions),
+        // store: new FileStore(fileStoreOptions),
+        store: new pgSession({
+            conString: process.env.authConnString,
+        }),
         secret: process.env.session_secret,
         resave: false,
         saveUninitialized: true,
