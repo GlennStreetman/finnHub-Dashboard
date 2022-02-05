@@ -76,9 +76,6 @@ app.use(
 dotenv.config();
 const port = process.env.NODE_ENV || 5000;
 
-// const FileStore = sessionFileStore(session);
-// const fileStoreOptions = {};
-
 app.use(morgan("dev"));
 app.use(
     bodyParser.json({
@@ -92,7 +89,7 @@ app.use(
         extended: true,
     })
 );
-
+console.log("creating postgress session");
 const pgSession = new pgSimple(session);
 app.use(
     session({
@@ -106,14 +103,18 @@ app.use(
         cookie: { secure: false, sameSite: true },
     })
 );
+
 app.listen(port, function () {
     console.log(`serving the direcotry @ http`);
 });
 console.log("dev path ", path.join(__dirname, "../../build/"));
 app.use(express.static(path.join(__dirname, "../../build/"))); //static asset directories are automaticaly served.
+console.log("connecting to postgres");
 connectPostgres(); //if postgres connection fails it retries every 5 seconds.
 connectMongo((err) => {
-    console.log("Connected1", err);
+    if (err & (err !== null)) {
+        console.log("2---FAILED TO CONNECT TO MONGODB-----", err);
+    }
 });
 
 app.use("/", login);
