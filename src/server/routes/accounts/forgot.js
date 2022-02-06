@@ -7,7 +7,7 @@ import cryptoRandomString from "crypto-random-string";
 const router = express.Router();
 
 router.get("/forgot", (req, res, next) => {
-    console.log("RESET REQUEST RECEIVED", req.query);
+    // console.log("RESET REQUEST RECEIVED", req.query);
     const API_KEY = process.env.API_KEY || 1;
     const DOMAIN = process.env.DOMAIN_KEY || 1;
     const mailgun = new mGun({ apiKey: API_KEY, domain: DOMAIN });
@@ -30,13 +30,14 @@ router.get("/forgot", (req, res, next) => {
                 subject: "finnDash Credential Recovery",
                 text: `You are receiving this email because you indictated that your lost your login password for your Finndash Financial Dashboard.  
                     Please visit the temporary login link below and remember to update your password from the account management screen.
-                    ${URL}/reset?id=${validateKey}&email=${login.email} `,
+                    ${URL}/tempLogin?id=${validateKey}`,
             };
             const resetPasswordCode = `
                 UPDATE users 
-                SET resetpasswordlink = '${validateKey}'
+                SET resetpasswordlink = '${validateKey}', templogin = '${Date.now()}'
                 WHERE id = ${login.id} 
             `;
+            console.log("resetPasswordCode", resetPasswordCode);
             db.query(resetPasswordCode, (err, rows) => {
                 if (err) {
                     console.log("Error on password reset /forgot:", err);

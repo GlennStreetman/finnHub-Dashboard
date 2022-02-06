@@ -37,7 +37,6 @@ router.get("/login", (req, res, next) => {
             info["defaultexchange"] = rows.rows[0]["defaultexchange"];
             info["widgetsetup"] = rows.rows[0]["widgetsetup"];
             req.session.uID = login.id;
-            req.session.userName = rows.rows[0]["loginname"];
             req.session.login = true;
             res.status(200).json(info);
         } else if (rows.rowCount === 1 && login.emailconfirmed !== true) {
