@@ -2,15 +2,14 @@ import express from "express";
 import format from "pg-format";
 import sha512 from "./../../db/sha512.js";
 import postgresDB from "../../db/databaseLocalPG.js";
-
 const router = express.Router();
 
 router.get("/login", (req, res, next) => {
     const db = postgresDB;
-    let loginText = format("%L", req.query["loginText"]);
+    let loginEmail = format("%L", req.query["email"]);
     let pwText = format("%L", req.query["pwText"]);
-    let loginQuery = `SELECT id, loginname, apikey, apialias, ratelimit, emailconfirmed, exchangelist, defaultexchange, widgetsetup
-        FROM users WHERE loginName =${loginText} 
+    let loginQuery = `SELECT id, email, apikey, apialias, ratelimit, emailconfirmed, exchangelist, defaultexchange, widgetsetup
+        FROM users WHERE email =${loginEmail} 
         AND password = '${sha512(pwText)}'`;
     console.log("loginQuery", loginQuery);
     let info = {
@@ -23,7 +22,6 @@ router.get("/login", (req, res, next) => {
         defaultexchange: "",
         widgetsetup: "",
     };
-
     db.query(loginQuery, (err, rows) => {
         const login = rows.rows[0];
         if (err) {
@@ -51,12 +49,11 @@ router.get("/login", (req, res, next) => {
         }
     });
 });
-
 router.get("/logOut", (req, res, next) => {
     if (req.session) {
         req.session.login = false;
     }
     res.status(200).json({ message: "Logged Out" });
 });
-
 export default router;
+//# sourceMappingURL=login.js.map

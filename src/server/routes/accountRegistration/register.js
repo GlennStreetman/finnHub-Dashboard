@@ -15,25 +15,26 @@ const DOMAIN = process.env.DOMAIN_KEY || 1;
 
 const mg = new mailgun({ apiKey: API_KEY, domain: DOMAIN });
 
+function emailIsValid(email) {
+    return /\S+@\S+\.\S+/.test(email);
+}
+
+const passwordIsValid = function (password) {
+    //Minimum eight characters, at least one letter, one number and one special character:
+    console.log("testing pw", password);
+    return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(password);
+};
+
 router.post("/register", (req, res) => {
-    // console.log(req.body)
-    const loginText = format("%L", req.body.loginText);
     const pwText = format("%L", req.body.pwText);
     const emailText = format("%L", req.body.emailText);
-    const secretQuestion = format("%L", req.body.secretQuestion);
-    const secretAnswer = format("%L", req.body.secretAnswer);
-    // console.log(loginText, pwText, emailText, secretQuestion, secretAnswer)
     const validateKey = process.env.EMAIL === "true" ? cryptoRandomString({ length: 32 }) : "pass";
-    const checkUser = `SELECT loginName FROM users WHERE loginName = ${loginText}`;
     const checkEmail = `SELECT email FROM users WHERE email = ${emailText}`;
     const requireConfirm = process.env.EMAIL === "true" ? false : true; //if EMAIL set to false, insert true into db so that confirmation email is not necesarry.
     const createUser = `
     INSERT INTO users (
-        loginName, 
         password, 
         email, 
-        secretQuestion, 
-        secretAnswer, 
         confirmemaillink, 
         resetpasswordlink,
         exchangelist,
@@ -44,11 +45,8 @@ router.post("/register", (req, res) => {
         emailconfirmed
         ) 
     VALUES (
-        ${loginText},
         '${sha512(pwText)}',
         ${emailText},
-        ${secretQuestion},
-        '${sha512(secretAnswer)}', 
         '${validateKey}', 
         '0',
         'US',
@@ -59,41 +57,6 @@ router.post("/register", (req, res) => {
         ${requireConfirm}
     )
         RETURNING *`;
-
-    function emailIsValid(email) {
-        return /\S+@\S+\.\S+/.test(email);
-    }
-
-    function validateInfo() {
-        if (
-            loginText.length >= 3 &&
-            pwText.length >= 6 &&
-            emailText.length >= 1 && //validated in next step.
-            secretQuestion.length >= 8 &&
-            secretAnswer.length >= 4
-        ) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-
-    const checkUserStatus = () => {
-        // console.log(checkUser)
-        return new Promise((resolve, reject) => {
-            db.query(checkUser, (err, rows) => {
-                if (err) {
-                    console.log("user check error");
-                    reject("User check error");
-                } else if (rows.rowCount !== 0) {
-                    // console.log("User name already taken. REJECTING");
-                    reject("User Name Already Taken");
-                } else {
-                    resolve("User Name Available");
-                }
-            });
-        });
-    };
 
     const checkEmailUnique = () => {
         // console.log(checkEmail)
@@ -114,7 +77,7 @@ router.post("/register", (req, res) => {
         return new Promise((resolve, reject) => {
             db.query(createUser, (err, res) => {
                 if (res !== undefined) {
-                    if (process.env.EMAIL) {
+                    if (process.env.EMAIL === "true") {
                         const data = {
                             from: "Glenn Streetman <glennstreetman@gmail.com>",
                             to: req.body.emailText,
@@ -124,7 +87,7 @@ router.post("/register", (req, res) => {
                         if (req.body.emailText.indexOf("@test.com") === -1) {
                             mg.messages().send(data, (error) => {
                                 if (error) {
-                                    console.log("register error", error);
+                                    console.log("mailgun register error", error);
                                 }
                             });
                         }
@@ -137,13 +100,9 @@ router.post("/register", (req, res) => {
         });
     };
 
-    if (emailIsValid(emailText) === true && validateInfo() === true) {
-        checkUserStatus()
+    if (emailIsValid(req.body.emailText) === true && passwordIsValid(req.body.pwText) === true) {
+        checkEmailUnique()
             .then((data) => {
-                return checkEmailUnique();
-            })
-            .then((data) => {
-                // console.log(data)
                 return createNewUser();
             })
             .then((data) => {
@@ -151,7 +110,6 @@ router.post("/register", (req, res) => {
                     process.env.EMAIL === "true"
                         ? "Thank you for registering, please check your email and follow the confirmation link."
                         : "Thank you for registering. You can now login.";
-                console.log(process.env.EMAIL, registrationMessage);
                 res.status(200).json({ message: registrationMessage });
             })
             .catch((err) => {
