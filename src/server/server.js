@@ -21,6 +21,7 @@ import { connectMongo } from "./db/mongoLocal.js";
 //SETUP ROUTES
 import def from "./routes/default.js";
 import login from "./routes/loginRoutes/login.js";
+import tempLogin from "./routes/loginRoutes/loginTemp.js";
 import checkLogin from "./routes/loginRoutes/checkLogin.js";
 //accountRegistration
 import register from "./routes/accountRegistration/register.js";
@@ -30,7 +31,6 @@ import verifyChange from "./routes/accountRegistration/verifyChange.js";
 import findSecret from "./routes/accounts/findSecret.js";
 import forgot from "./routes/accounts/forgot.js";
 import newPW from "./routes/accounts/newPW.js";
-import reset from "./routes/accounts/reset.js";
 
 import uploadTemplate from "./routes/excelTemplates/uploadTemplate.js";
 import runTemplate from "./routes/excelTemplates/runTemplate.js";
@@ -117,6 +117,7 @@ connectMongo((err) => {
 });
 
 app.use("/", login);
+app.use("/", tempLogin);
 app.use("/", checkLogin);
 //accountRegistration
 app.use("/", register);
@@ -126,7 +127,6 @@ app.use("/", verifyChange);
 app.use("/", findSecret);
 app.use("/", forgot);
 app.use("/", newPW);
-app.use("/", reset);
 
 app.use("/", logUIError);
 //loggin
