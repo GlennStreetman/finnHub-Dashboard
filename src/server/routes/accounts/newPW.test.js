@@ -3,23 +3,27 @@ import express from "express";
 import dotenv from "dotenv";
 import path from "path";
 import session from "express-session";
+import pgSimple from "connect-pg-simple";
 import request from "supertest";
-import sessionFileStore from "session-file-store";
 import db from "../../db/databaseLocalPG.js";
 import bodyParser from "body-parser";
 import newPW from "./newPW.js";
 import sha512 from "./../../db/sha512.js";
+import login from "./../loginRoutes/login.js";
 
 const app = express();
 dotenv.config();
 app.use(express.static(path.join(__dirname, "build")));
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // support json encoded bodies
-const FileStore = sessionFileStore(session);
-const fileStoreOptions = {};
+
+const pgSession = new pgSimple(session);
 app.use(
     session({
-        store: new FileStore(fileStoreOptions),
+        // store: new FileStore(fileStoreOptions),
+        store: new pgSession({
+            conString: process.env.authConnString,
+        }),
         secret: process.env.session_secret,
         resave: false,
         saveUninitialized: true,
@@ -28,27 +32,28 @@ app.use(
 );
 
 app.use("/", newPW); //route to be tested needs to be bound to the router.
+app.use("/", login); //needed fo all routes that require login.
 
 beforeAll((done) => {
     const setupDB = `
     INSERT INTO users (
-        loginname, email, password,	
+        email, password,	
         apikey, webhook, confirmemaillink, 
-        passwordconfirmed, exchangelist, defaultexchange, ratelimit,
+        exchangelist, defaultexchange, ratelimit,
         resetpasswordlink
     )
     VALUES (	
-        'newPWTest', 'newPWTest@test.com', '${sha512("testpw")}',	
+        'newPWTest@test.com', '${sha512("Testpw123!")}',	
         '',	'',	'',	
-        true,	'US',	'US',	30,
+        'US',	'US',	30,
         'testpasswordlink'
     )
     ON CONFLICT
     DO NOTHING
     ;
     UPDATE users 
-    SET passwordconfirmed = true,  resetpasswordlink = 'testpasswordlink, password=${sha512("testpw")},
-    WHERE loginname = 'newPWTest'
+    SET resetpasswordlink = 'testpasswordlink', password='${sha512("Testpw123!")}'
+    WHERE email = 'newPWTest@test.com'
 `;
 
     global.sessionStorage = {};
@@ -71,35 +76,49 @@ afterAll((done) => {
     db.end(done());
 });
 
-test("Fail to set new password get/newPW", (done) => {
-    request(app).get(`/newPW?newPassword=testpw`).expect({ message: "Password not updated, restart process." }).expect(401, done);
+test("Not Logged In", (done) => {
+    request(app)
+        .post("/newPW")
+        .send({
+            newPassword: "Testpw123!",
+        })
+        .expect({ message: "Not logged in." })
+        .expect(401, done);
 });
 
 describe("Get login cookie:", () => {
     let cookieJar = "";
-    beforeAll(function (done) {
+    beforeEach(function (done) {
         request(app)
-            .get("/secretQuestion?loginText=goodbye&user=newPWTest")
+            .get("/login?email=newPWTest@test.com&pwText=Testpw123!")
             .then((res) => {
-                console.log("SECRET RESPONSE", res.statusCode);
                 cookieJar = res.header["set-cookie"];
-                console.log("cookiejar", cookieJar);
+                expect(200);
                 done();
             });
     });
 
     test("Set new password get/newPW", (done) => {
         request(app)
-            .get(`/newPW?newPassword=testpw`)
+            .post("/newPW")
+            .send({
+                newPassword: "NewTestpw1!",
+            })
             .set("Cookie", cookieJar)
-            .expect({ message: "true" })
-            .expect(200)
-            .then(() => {
-                request(app)
-                    .get(`/newPW?newPassword=testpw`)
-                    .set("Cookie", cookieJar)
-                    .expect({ message: "Password not updated, restart process." })
-                    .expect(401, done);
-            });
+            .expect({ message: "Password Updated" })
+            .expect(200);
+        done();
+    });
+
+    test("Set new BAD password get/newPW", (done) => {
+        request(app)
+            .post("/newPW")
+            .send({
+                newPassword: "badpassword",
+            })
+            .set("Cookie", cookieJar)
+            .expect({ message: "Password must be >7 characters, 1 upper, 1 special." })
+            .expect(401);
+        done();
     });
 });

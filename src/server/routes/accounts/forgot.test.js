@@ -51,17 +51,6 @@ afterAll((done) => {
     db.end(done());
 });
 
-//good verify link
-test("Get secret question get/forgot", (done) => {
-    request(app)
-        .get(`/forgot?loginText=forgotTest@test.com`)
-        .expect("Content-Type", /json/)
-        .expect({
-            message: "Please check email for recovery instructions.",
-        })
-        .expect(200, done);
-});
-
 test("bad email get/forgot", (done) => {
     request(app).get(`/forgot?loginText=badEmail@gmail.com`).expect("Content-Type", /json/).expect({ message: "Email not found." }).expect(401, done);
 });
