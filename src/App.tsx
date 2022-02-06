@@ -12,6 +12,7 @@ import { useAppDispatch, useAppSelector } from "src/hooks";
 //component imports
 import TopNav from "./components/topNav";
 import Login from "./components/login";
+import TempLogin from "./components/tempLogin";
 import RegisterAccount from "./components/registerAccount";
 import ForgotPassword from "./components/forgotPassword";
 import AboutMenu from "./components/AboutMenu";
@@ -164,15 +165,10 @@ export default function App() {
     }
 
     useEffect(() => {
-        console.log("start check login");
-        console.log("querydata", quaryData);
-        const tempLogin = quaryData.id ? `/?reset=${quaryData.id}` : "";
-        const route = `/checkLogin` + tempLogin;
-        console.log("login login", route);
+        const route = `/checkLogin`;
         fetch(route)
             .then((response) => response.json())
             .then(async (data) => {
-                console.log("login data", data);
                 if (data.login === 1) {
                     const parseSetup: widgetSetup = JSON.parse(data.widgetsetup);
                     const newList: string[] = data.exchangelist.split(",");
@@ -232,6 +228,7 @@ export default function App() {
     const loginComp = <Login queryData={quaryData} finnHubQueue={finnHubQueue} updateAppState={updateAppState} />;
     const registerComp = <RegisterAccount queryData={quaryData} finnHubQueue={finnHubQueue} updateAppState={updateAppState} />;
     const forgotComp = <ForgotPassword queryData={quaryData} finnHubQueue={finnHubQueue} updateAppState={updateAppState} />;
+    const tempLogin = <TempLogin queryData={quaryData} finnHubQueue={finnHubQueue} updateAppState={updateAppState} />;
 
     const dashboard = (
         <WidgetController enableDrag={enableDrag} finnHubQueue={finnHubQueue} login={login} widgetCopy={widgetCopy} updateAppState={updateAppState} />
@@ -259,6 +256,7 @@ export default function App() {
                     <Route path="/" element={topNav}>
                         <Route path="dashboard" element={dashboard} />
                         <Route path="login" element={loginComp} />
+                        <Route path="tempLogin" element={tempLogin} />
                         <Route path="registerAccount" element={registerComp} />
                         <Route path="forgot" element={forgotComp} />
                         <Route path="manageAccount" element={React.createElement(AccountMenu, accountMenuProps(appState))} />
