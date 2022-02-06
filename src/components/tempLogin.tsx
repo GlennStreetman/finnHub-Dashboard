@@ -27,7 +27,6 @@ export default function TempLogin(p: loginProps) {
     const [password, setPassword] = useState("");
 
     const quaryData = queryString.parse(window.location.search);
-    console.log("quaryData", quaryData);
 
     useEffect(() => {
         //@ts-ignore

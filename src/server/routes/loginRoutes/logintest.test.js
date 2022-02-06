@@ -38,13 +38,13 @@ beforeAll((done) => {
     INSERT INTO users (
         email, password, 
         apikey, webhook, emailconfirmed, 
-        passwordconfirmed, exchangelist, defaultexchange, ratelimit,
+        exchangelist, defaultexchange, ratelimit,
         widgetsetup, apialias
     )
     VALUES (	
         'loginTest@test.com', '${sha512("testpw")}',
         '',	'',	true, 
-        true,	'US',	'US',	1,
+        'US',	'US',	1,
         '{"PriceSplits":false}',
         'testalias'	
     )
@@ -55,13 +55,13 @@ beforeAll((done) => {
     INSERT INTO users (
         email, password,	
         apikey, webhook, emailconfirmed, 
-        passwordconfirmed, exchangelist, defaultexchange, ratelimit,
+        exchangelist, defaultexchange, ratelimit,
         widgetsetup, apialias
     )
     VALUES (	
         'loginTest_notVerified.com', '${sha512("testpw")}',
         '',	'',	false,	
-        true,	'US',	'US',	1, 
+        'US',	'US',	1, 
         '{"PriceSplits":false}',
         'testAlias2'
     )

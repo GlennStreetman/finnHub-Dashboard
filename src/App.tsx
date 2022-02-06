@@ -58,7 +58,6 @@ const useSelector = useAppSelector;
 export default function App() {
     const dispatch = useDispatch(); //allows widget to run redux actions.
     const quaryData = queryString.parse(window.location.search);
-    console.log("quaryData", quaryData);
 
     const [login, setLogin] = useState(0); //login state. 0 logged out, 1 logged in.
     const [navigate, setNavigate] = useState<string | null>(null);

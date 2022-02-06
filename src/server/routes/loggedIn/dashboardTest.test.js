@@ -39,12 +39,12 @@ beforeAll((done) => {
     INSERT INTO users (
         email, password,
         apikey, webhook, emailconfirmed, 
-        passwordconfirmed, exchangelist, defaultexchange, ratelimit
+        exchangelist, defaultexchange, ratelimit
     )
     VALUES (	
         'accountDashboardTest@test.com','${sha512("testpw")}',
         '',	'',	true,	
-        true,	'US',	'US',	30	
+        'US',	'US',	30	
     )
 
     ON CONFLICT
