@@ -19,13 +19,12 @@ app.use("/", forgot); //route to be tested needs to be bound to the router.
 beforeAll((done) => {
     const setupDB = `
         INSERT INTO users (
-            loginname, email, password,	secretquestion,	
-            secretanswer, apikey, webhook, confirmemaillink, 
+            loginname, email, password,	
+            apikey, webhook, confirmemaillink, 
             passwordconfirmed, exchangelist, defaultexchange, ratelimit
         )
         VALUES (	
-            'forgotTest',	'forgotTest@test.com',	'${sha512("testpw")}',	'hello',	
-            '${sha512("goodbye")}',	'',	'',	'verifyChange12345',	
+            'forgotTest',	'forgotTest@test.com',	'${sha512("testpw")}',	'',	'',	'verifyChange12345',	
             '1',	'US',	'US',	30	
         )
         ON CONFLICT

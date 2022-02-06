@@ -4,8 +4,8 @@ import dotenv from "dotenv";
 import path from "path";
 import bodyParser from "body-parser";
 import session from "express-session";
+import pgSimple from "connect-pg-simple";
 import request from "supertest";
-import sessionFileStore from "session-file-store";
 import db from "../../db/databaseLocalPG.js";
 import deleteSavedDashboard from "./deleteSavedDashboard.js";
 import login from "../loginRoutes/login.js";
@@ -17,11 +17,13 @@ app.use(express.static(path.join(__dirname, "build")));
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // support json encoded bodies
 
-const FileStore = sessionFileStore(session);
-const fileStoreOptions = {};
+const pgSession = new pgSimple(session);
 app.use(
     session({
-        store: new FileStore(fileStoreOptions),
+        // store: new FileStore(fileStoreOptions),
+        store: new pgSession({
+            conString: process.env.authConnString,
+        }),
         secret: process.env.session_secret,
         resave: false,
         saveUninitialized: true,
@@ -38,14 +40,14 @@ beforeAll((done) => {
 
     const setupDB = `
     INSERT INTO users (
-        loginname, email, password,	secretquestion,	
-        secretanswer, apikey, webhook, emailconfirmed, 
+        email, password,
+        apikey, webhook, emailconfirmed, 
         passwordconfirmed, exchangelist, defaultexchange, ratelimit
     )
     VALUES (	
-        'accountDeleteDashboardTest',	'accountDeleteDashboardTest@test.com',	'${sha512("testpw")}',	'hello',	
-        '${sha512("goodbye")}',	'',	'',	'1',	
-        '1',	'US',	'US',	30	
+        	'accountDeleteDashboardTest@test.com',	'${sha512("testpw")}',
+        '',	'',	true,	
+        true,	'US',	'US',	30	
     )
 
     ON CONFLICT
@@ -55,7 +57,7 @@ beforeAll((done) => {
         userid, dashboardname, globalstocklist
     )
     VALUES (
-        (SELECT id FROM users WHERE loginname = 'accountDeleteDashboardTest'),
+        (SELECT id FROM users WHERE email = 'accountDeleteDashboardTest@test.com'),
         'TEST', 
         '{"US-TSLA":{"currency":"USD","description":"TESLA INC","displaySymbol":"TSLA","figi":"BBG000N9P426","mic":"XNGS","symbol":"TSLA","type":"Common Stock","exchange":"US","key":"US-TSLA"},"US-F":{"currency":"USD","description":"FORD MOTOR CO","displaySymbol":"F","figi":"BBG000BQPFG1","mic":"XNYS","symbol":"F","type":"Common Stock","exchange":"US","key":"US-F"},"US-GM":{"currency":"USD","description":"GENERAL MOTORS CO","displaySymbol":"GM","figi":"BBG0014WFHK6","mic":"XNYS","symbol":"GM","type":"Common Stock","exchange":"US","key":"US-GM"},"US-HNDAF":{"currency":"USD","description":"HONDA MOTOR CO LTD","displaySymbol":"HNDAF","figi":"BBG000G0ZHK3","mic":"OTCM","symbol":"HNDAF","type":"Common Stock","exchange":"US","key":"US-HNDAF"},"US-TM":{"currency":"USD","description":"TOYOTA MOTOR CORP -SPON ADR","displaySymbol":"TM","figi":"BBG000BPH4N9","mic":"XNYS","symbol":"TM","type":"ADR","exchange":"US","key":"US-TM"},"US-PRCH":{"currency":"USD","description":"PORCH GROUP INC","displaySymbol":"PRCH","figi":"BBG00RC9HCX6","mic":"XNCM","symbol":"PRCH","type":"Common Stock","exchange":"US","key":"US-PRCH"},"US-STLA":{"currency":"USD","description":"STELLANTIS NV","displaySymbol":"STLA","figi":"BBG00790SJJ2","mic":"XNYS","symbol":"STLA","type":"Common Stock","exchange":"US","key":"US-STLA"}}'
     )
@@ -72,7 +74,7 @@ beforeAll((done) => {
         widgettype, xaxis, yaxis
         )
     VALUES (
-            (SELECT id FROM dashboard WHERE userid = (SELECT id FROM users where loginname = 'accountDeleteDashboardTest') AND dashboardname = 'TEST' )
+            (SELECT id FROM dashboard WHERE userid = (SELECT id FROM users where email = 'accountDeleteDashboardTest@test.com') AND dashboardname = 'TEST' )
             , 1 , 0 , '{"startDate":-31449600000,"endDate":0,"Description":"Date numbers are millisecond offset from now. Used for Unix timestamp calculations."}',
             '{"US-TSLA":{"currency":"USD","description":"TESLA INC","displaySymbol":"TSLA","figi":"BBG000N9P426","mic":"XNGS","symbol":"TSLA","type":"Common Stock","exchange":"US","key":"US-TSLA"},"US-F":{"currency":"USD","description":"FORD MOTOR CO","displaySymbol":"F","figi":"BBG000BQPFG1","mic":"XNYS","symbol":"F","type":"Common Stock","exchange":"US","key":"US-F"},"US-GM":{"currency":"USD","description":"GENERAL MOTORS CO","displaySymbol":"GM","figi":"BBG0014WFHK6","mic":"XNYS","symbol":"GM","type":"Common Stock","exchange":"US","key":"US-GM"},"US-HNDAF":{"currency":"USD","description":"HONDA MOTOR CO LTD","displaySymbol":"HNDAF","figi":"BBG000G0ZHK3","mic":"OTCM","symbol":"HNDAF","type":"Common Stock","exchange":"US","key":"US-HNDAF"},"US-TM":{"currency":"USD","description":"TOYOTA MOTOR CORP -SPON ADR","displaySymbol":"TM","figi":"BBG000BPH4N9","mic":"XNYS","symbol":"TM","type":"ADR","exchange":"US","key":"US-TM"},"US-PRCH":{"currency":"USD","description":"PORCH GROUP INC","displaySymbol":"PRCH","figi":"BBG00RC9HCX6","mic":"XNCM","symbol":"PRCH","type":"Common Stock","exchange":"US","key":"US-PRCH"},"US-STLA":{"currency":"USD","description":"STELLANTIS NV","displaySymbol":"STLA","figi":"BBG00790SJJ2","mic":"XNYS","symbol":"STLA","type":"Common Stock","exchange":"US","key":"US-STLA"}}',
             'stockWidget', 'Earnings Calendar: ',  '1614017865836', 
@@ -80,7 +82,7 @@ beforeAll((done) => {
 
         )
         ,(
-            (SELECT id FROM dashboard WHERE userid = (SELECT id FROM users where loginname = 'accountDeleteDashboardTest') AND dashboardname = 'TEST' )
+            (SELECT id FROM dashboard WHERE userid = (SELECT id FROM users where email = 'accountDeleteDashboardTest@test.com') AND dashboardname = 'TEST' )
             ,1,2,'{}',
             '{"US-TSLA":{"currency":"USD","description":"TESLA INC","displaySymbol":"TSLA","figi":"BBG000N9P426","mic":"XNGS","symbol":"TSLA","type":"Common Stock","exchange":"US","key":"US-TSLA"},"US-F":{"currency":"USD","description":"FORD MOTOR CO","displaySymbol":"F","figi":"BBG000BQPFG1","mic":"XNYS","symbol":"F","type":"Common Stock","exchange":"US","key":"US-F"},"US-GM":{"currency":"USD","description":"GENERAL MOTORS CO","displaySymbol":"GM","figi":"BBG0014WFHK6","mic":"XNYS","symbol":"GM","type":"Common Stock","exchange":"US","key":"US-GM"},"US-HNDAF":{"currency":"USD","description":"HONDA MOTOR CO LTD","displaySymbol":"HNDAF","figi":"BBG000G0ZHK3","mic":"OTCM","symbol":"HNDAF","type":"Common Stock","exchange":"US","key":"US-HNDAF"},"US-TM":{"currency":"USD","description":"TOYOTA MOTOR CORP -SPON ADR","displaySymbol":"TM","figi":"BBG000BPH4N9","mic":"XNYS","symbol":"TM","type":"ADR","exchange":"US","key":"US-TM"},"US-PRCH":{"currency":"USD","description":"PORCH GROUP INC","displaySymbol":"PRCH","figi":"BBG00RC9HCX6","mic":"XNCM","symbol":"PRCH","type":"Common Stock","exchange":"US","key":"US-PRCH"},"US-STLA":{"currency":"USD","description":"STELLANTIS NV","displaySymbol":"STLA","figi":"BBG00790SJJ2","mic":"XNYS","symbol":"STLA","type":"Common Stock","exchange":"US","key":"US-STLA"}}',
             'stockWidget', 'EPS Surprises: ', '1614017869054', 'EstimatesEPSSurprises', 440, 155
@@ -92,7 +94,7 @@ beforeAll((done) => {
         userid, defaultmenu
     )
     VALUES(
-        (SELECT id FROM users WHERE loginname = 'accountDeleteDashboardTest'),
+        (SELECT id FROM users WHERE email = 'accountDeleteDashboardTest@test.com'),
         'TEST'
     )
     ON CONFLICT
@@ -104,11 +106,11 @@ beforeAll((done) => {
         widgettype, xaxis, yaxis
     )
     VALUES (
-        (SELECT id FROM menuSetup WHERE userid = (SELECT id FROM users WHERE loginname = 'accountDeleteDashboardTest')),
+        (SELECT id FROM menuSetup WHERE userid = (SELECT id FROM users WHERE email = 'accountDeleteDashboardTest@test.com')),
         0,-1,'menuWidget', 'saved Dashboards', 'DashBoardMenu',
         'DashBoardMenu','5rem', '5rem'
         ),
-        ((SELECT id FROM menuSetup WHERE userid = (SELECT id FROM users WHERE loginname = 'accountDeleteDashboardTest')),
+        ((SELECT id FROM menuSetup WHERE userid = (SELECT id FROM users WHERE email = 'accountDeleteDashboardTest@test.com')),
         0,-1,'menuWidget', 'WatchList', 'WatchListMenu',
         'WatchListMenu','5rem', '5rem')
     
@@ -116,7 +118,7 @@ beforeAll((done) => {
     DO NOTHING
     ;
     SELECT id FROM dashboard 
-    WHERE userid = (SELECT id FROM users where loginname = 'accountDeleteDashboardTest') 
+    WHERE userid = (SELECT id FROM users where email = 'accountDeleteDashboardTest@test.com') 
         AND dashboardname = 'TEST'
     `;
     // console.log(setupDB)
@@ -152,7 +154,7 @@ describe("Get login cookie:", () => {
     let cookieJar = "";
     beforeEach(function (done) {
         request(app)
-            .get("/login?loginText=accountDeleteDashboardTest&pwText=testpw")
+            .get("/login?email=accountDeleteDashboardTest@test.com&pwText=testpw")
             .then((res) => {
                 cookieJar = res.header["set-cookie"];
                 expect(200);

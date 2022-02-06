@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import path from "path";
 import bodyParser from "body-parser";
 import session from "express-session";
-import sessionFileStore from "session-file-store";
+import pgSimple from "connect-pg-simple";
 import login from "./login.js";
 import db from "../../db/databaseLocalPG.js";
 import sha512 from "./../../db/sha512.js";
@@ -15,11 +15,14 @@ dotenv.config();
 app.use(express.static(path.join(__dirname, "build")));
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // support json encoded bodies
-const FileStore = sessionFileStore(session);
-const fileStoreOptions = {};
+
+const pgSession = new pgSimple(session);
 app.use(
     session({
-        store: new FileStore(fileStoreOptions),
+        // store: new FileStore(fileStoreOptions),
+        store: new pgSession({
+            conString: process.env.authConnString,
+        }),
         secret: process.env.session_secret,
         resave: false,
         saveUninitialized: true,
@@ -33,15 +36,15 @@ beforeAll((done) => {
     global.sessionStorage = {};
     const setupDB = `
     INSERT INTO users (
-        loginname, email, password,	secretquestion,	
-        secretanswer, apikey, webhook, emailconfirmed, 
+        email, password, 
+        apikey, webhook, emailconfirmed, 
         passwordconfirmed, exchangelist, defaultexchange, ratelimit,
         widgetsetup, apialias
     )
     VALUES (	
-        'loginTest',	'loginTest@test.com', '${sha512("testpw")}',	'hello',	
-        '${sha512("goodbye")}',	'',	'',	'1',	
-        '1',	'US',	'US',	1,
+        'loginTest@test.com', '${sha512("testpw")}',
+        '',	'',	true, 
+        true,	'US',	'US',	1,
         '{"PriceSplits":false}',
         'testalias'	
     )
@@ -50,15 +53,15 @@ beforeAll((done) => {
     ;
 
     INSERT INTO users (
-        loginname, email, password,	secretquestion,	
-        secretanswer, apikey, webhook, emailconfirmed, 
+        email, password,	
+        apikey, webhook, emailconfirmed, 
         passwordconfirmed, exchangelist, defaultexchange, ratelimit,
         widgetsetup, apialias
     )
     VALUES (	
-        'loginTest_notVerified',	'loginTest_notVerified.com', '${sha512("testpw")}',	'hello',	
-        '${sha512("goodbye")}',	'',	'',	'0',	
-        '1',	'US',	'US',	1, 
+        'loginTest_notVerified.com', '${sha512("testpw")}',
+        '',	'',	false,	
+        true,	'US',	'US',	1, 
         '{"PriceSplits":false}',
         'testAlias2'
     )
@@ -66,11 +69,8 @@ beforeAll((done) => {
     DO NOTHING
     ;
 
-    UPDATE users 
-    SET confirmemaillink = '071e3afe81e12ff2cebcd41164a7a295', emailconfirmed = '0'
-    WHERE loginname = 'verifyEmailTest';
     `;
-
+    console.log(setupDB);
     db.connect();
     db.query(setupDB, (err) => {
         if (err) {
@@ -89,7 +89,7 @@ afterAll((done) => {
 //good login
 test("Good login get/login", (done) => {
     request(app)
-        .get("/login?loginText=loginTest&pwText=testpw")
+        .get("/login?email=loginTest@test.com&pwText=testpw")
         .expect("Content-Type", /json/)
         .expect({
             key: "",
@@ -106,7 +106,7 @@ test("Good login get/login", (done) => {
 //bad user name
 test("Wrong login name get/login", (done) => {
     request(app)
-        .get("/login?loginText=badUserName&pwText=testpw")
+        .get("/login?email=badUserName@bad.com&pwText=testpw")
         .expect("Content-Type", /json/)
         .expect({
             message: "Login and Password did not match.",
@@ -117,7 +117,7 @@ test("Wrong login name get/login", (done) => {
 //bad pw
 test("Wrong pw get/login", (done) => {
     request(app)
-        .get("/login?loginText=loginTest&pwText=badPw")
+        .get("/login?email=loginTest@test.com&pwText=badPw")
         .expect("Content-Type", /json/)
         .expect({
             message: "Login and Password did not match.",
@@ -128,7 +128,7 @@ test("Wrong pw get/login", (done) => {
 //missing paramaters.
 test("Missing paramaters get/login", (done) => {
     request(app)
-        .get("/login?loginText=&pwText=")
+        .get("/login?email=&pwText=")
         .expect("Content-Type", /json/)
         .expect({
             message: "Login and Password did not match.",
@@ -139,7 +139,7 @@ test("Missing paramaters get/login", (done) => {
 //confirm email.
 test("Email not confirmed get/login", (done) => {
     request(app)
-        .get("/login?loginText=loginTest_notVerified&pwText=testpw")
+        .get("/login?email=loginTest_notVerified.com&pwText=testpw")
         .expect("Content-Type", /json/)
         .expect({
             message: "Email not confirmed. Please check email for confirmation message.",
@@ -150,7 +150,7 @@ test("Email not confirmed get/login", (done) => {
 // bad data
 test("Check missing paramaters get/login", (done) => {
     request(app)
-        .get("/login?loginText=SELECT%*%FROM%USERS&pwText=")
+        .get("/login?email=SELECT%*%FROM%USERS&pwText=")
         .expect("Content-Type", /json/)
         .expect({
             message: "Login and Password did not match.",

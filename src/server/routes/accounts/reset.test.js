@@ -4,8 +4,8 @@ import dotenv from "dotenv";
 import path from "path";
 import bodyParser from "body-parser";
 import session from "express-session";
+import pgSimple from "connect-pg-simple";
 import request from "supertest";
-import sessionFileStore from "session-file-store";
 import db from "../../db/databaseLocalPG.js";
 import reset from "./reset.js";
 import login from "./../loginRoutes/login.js";
@@ -17,31 +17,31 @@ app.use(express.static(path.join(__dirname, "build")));
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // support json encoded bodies
 
-const FileStore = sessionFileStore(session);
-const fileStoreOptions = {};
+const pgSession = new pgSimple(session);
 app.use(
     session({
-        store: new FileStore(fileStoreOptions),
+        // store: new FileStore(fileStoreOptions),
+        store: new pgSession({
+            conString: process.env.authConnString,
+        }),
         secret: process.env.session_secret,
         resave: false,
         saveUninitialized: true,
         cookie: { secure: false, sameSite: true },
     })
 );
-
 app.use("/", reset); //route to be tested needs to be bound to the router.
 app.use("/", login); //needed fo all routes that require login.
 
 beforeAll((done) => {
     const setupDB = `
         INSERT INTO users (
-            loginname, email, password,	secretquestion,	
-            secretanswer, apikey, webhook, emailconfirmed, 
+            email, password apikey, webhook, emailconfirmed, 
             resetpasswordlink, exchangelist, defaultexchange, ratelimit
         )
         VALUES (	
-            'resetTest',	'resetTest@test.com',	'${sha512("testPW")}',	'hello',	
-            '${sha512("goodbye")}',	'',	'',	true,	
+            'resetTest@test.com',	'${sha512("testPW")}',
+            '',	'',	true,	
             'testResetLink',	'US',	'US',	30	
         )
         ON CONFLICT
@@ -50,7 +50,7 @@ beforeAll((done) => {
 
         UPDATE users 
         SET resetpasswordlink = 'testResetLink'
-        WHERE loginname = 'resetTest'
+        WHERE email = 'resetTest@test.com'
         ;
     `;
     // console.log(setupDB)
@@ -72,7 +72,7 @@ beforeEach((done) => {
     const setup = ` 
     UPDATE users 
     SET resetpasswordlink = 'testResetLink'
-    WHERE loginname = 'resetTest'
+    WHERE email = 'resetTest@test.com'
     ;`;
     db.query(setup, (err) => {
         if (err) {

@@ -4,8 +4,8 @@ import dotenv from "dotenv";
 import path from "path";
 import bodyParser from "body-parser";
 import session from "express-session";
+import pgSimple from "connect-pg-simple";
 import request from "supertest";
-import sessionFileStore from "session-file-store";
 import db from "../../db/databaseLocalPG.js";
 import checkLogin from "./checkLogin.js";
 import login from "./login.js";
@@ -17,11 +17,13 @@ app.use(express.static(path.join(__dirname, "build")));
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // support json encoded bodies
 
-const FileStore = sessionFileStore(session);
-const fileStoreOptions = {};
+const pgSession = new pgSimple(session);
 app.use(
     session({
-        store: new FileStore(fileStoreOptions),
+        // store: new FileStore(fileStoreOptions),
+        store: new pgSession({
+            conString: process.env.authConnString,
+        }),
         secret: process.env.session_secret,
         resave: false,
         saveUninitialized: true,
@@ -30,20 +32,20 @@ app.use(
 );
 
 app.use("/", checkLogin); //route to be tested needs to be bound to the router.
-app.use("/", login); //needed fo all routes that require login.
+app.use("/", login); //needed for all routes that require login.
 
 beforeAll((done) => {
     global.sessionStorage = {};
 
     const setupDB = `
     INSERT INTO users (
-        loginname, email, password,	secretquestion,	
-        secretanswer, apikey, webhook, emailconfirmed, 
+        email, password,
+        apikey, webhook, emailconfirmed, 
         passwordconfirmed, exchangelist, defaultexchange, ratelimit
     )
     VALUES (	
-        'loginCheck',	'loginCheck@test.com',	'${sha512("testpw")}',	'hello',	
-        '${sha512("goodbye")}',	'',	'',	'1',	
+        'loginCheck@test.com',	'${sha512("testpw")}',
+        '',	'',	'1',	
         '1',	'US',	'US',	1	
     )
     ON CONFLICT
@@ -73,8 +75,9 @@ describe("Get login cookie:", () => {
     let cookieJar = "";
     beforeEach(function (done) {
         request(app)
-            .get("/login?loginText=loginCheck&pwText=testpw")
+            .get("/login?email=loginCheck@test.com&pwText=testpw")
             .then((res) => {
+                console.log("res", res);
                 cookieJar = res.header["set-cookie"];
                 done();
             });

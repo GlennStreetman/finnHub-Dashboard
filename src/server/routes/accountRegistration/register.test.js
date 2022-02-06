@@ -38,19 +38,18 @@ beforeAll((done) => {
     global.sessionStorage = {};
     const setupDB = `
     ;INSERT INTO users (
-        loginname, email, password,	secretquestion,	
-        secretanswer, apikey, webhook, confirmemaillink, 
+        email, password, apikey, webhook, confirmemaillink, 
         resetpasswordlink, exchangelist, defaultexchange, ratelimit
     )
     VALUES (	
-        'registertest_taken',	'registertest_taken@test.com',	'${sha512("testpw")}',	'hello',	
-        '${sha512("goodbye")}',	'',	'',	'071e3afe81e12ff2cebcd41164a7a295',	
+        'registertest_taken@test.com',	'${sha512("testpw")}',
+        '',	'',	'071e3afe81e12ff2cebcd41164a7a295',	
         '1',	'US',	'US',	30	
     )
     ON CONFLICT
     DO NOTHING
     
-    ;DELETE FROM users WHERE loginname = 'registerTest'`;
+    ;DELETE FROM users WHERE email = 'registertest_taken@test.com'`;
 
     db.connect();
     db.query(setupDB, (err) => {
@@ -62,10 +61,6 @@ beforeAll((done) => {
     });
 });
 
-// afterAll((done)=>{
-//     db.end(done())
-// })
-
 test("Valid new login post/register", (done) => {
     request(app)
         .post("/register")
@@ -73,8 +68,6 @@ test("Valid new login post/register", (done) => {
             loginText: "registerTest",
             pwText: "testpw",
             emailText: "registerTest@test.com",
-            secretQuestion: "hellotest",
-            secretAnswer: "goodbye",
         })
         // .set('Accept', 'application/json')
         .expect("Content-Type", /json/)
@@ -91,8 +84,6 @@ test("Invalid email post/register", (done) => {
             loginText: "test3",
             pwText: "dontlogin",
             emailText: "testtest.com",
-            secretQuestion: "hellotest",
-            secretAnswer: "goodbye",
         })
         .expect({ message: "Enter a valid email address & check other info." })
         .expect(401, done);
@@ -105,8 +96,6 @@ test("No email post/register", (done) => {
             loginText: "test3",
             pwText: "dontlogin",
             emailText: "",
-            secretQuestion: "testquestion",
-            secretAnswer: "testquestion",
         })
         .expect({ message: "Enter a valid email address & check other info." })
         .expect(401, done);
@@ -119,8 +108,6 @@ test("No user post/register", (done) => {
             loginText: "",
             pwText: "dontlogin",
             emailText: "test@test.com",
-            secretQuestion: "testquestion",
-            secretAnswer: "testquestion",
         })
         .expect({ message: "Enter a valid email address & check other info." })
         .expect(401, done);
@@ -133,36 +120,6 @@ test("No password post/register", (done) => {
             loginText: "test3",
             pwText: "",
             emailText: "test@test.com",
-            secretQuestion: "testquestion",
-            secretAnswer: "testquestion",
-        })
-        .expect({ message: "Enter a valid email address & check other info." })
-        .expect(401, done);
-});
-
-test("No secret question post/register", (done) => {
-    request(app)
-        .post("/register")
-        .send({
-            loginText: "test3",
-            pwText: "dontlogin",
-            emailText: "test@test.com",
-            secretQuestion: "",
-            secretAnswer: "testquestion",
-        })
-        .expect({ message: "Enter a valid email address & check other info." })
-        .expect(401, done);
-});
-
-test("No secret answer post/register", (done) => {
-    request(app)
-        .post("/register")
-        .send({
-            loginText: "test3",
-            pwText: "dontlogin",
-            emailText: "test@test.com",
-            secretQuestion: "testquestion",
-            secretAnswer: "",
         })
         .expect({ message: "Enter a valid email address & check other info." })
         .expect(401, done);
@@ -175,8 +132,6 @@ test("User name already taken post/register", (done) => {
             loginText: "registertest_taken",
             pwText: "testPW",
             emailText: "registertest_taken@test.com",
-            secretQuestion: "testquestion",
-            secretAnswer: "testanswer",
         })
         .expect({ message: "Username or email already taken" })
         .expect(400, done);
@@ -189,8 +144,6 @@ test("Email already taken post/register", (done) => {
             loginText: "registertest_taken_emailTaken",
             pwText: "testPW",
             emailText: "registertest_taken@test.com",
-            secretQuestion: "testquestion",
-            secretAnswer: "testanswer",
         })
         .expect({ message: "Username or email already taken" })
         .expect(400, done);

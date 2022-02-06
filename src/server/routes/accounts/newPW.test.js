@@ -8,7 +8,6 @@ import sessionFileStore from "session-file-store";
 import db from "../../db/databaseLocalPG.js";
 import bodyParser from "body-parser";
 import newPW from "./newPW.js";
-import secretQuestion from "./../accountRegistration/secretQuestion.js";
 import sha512 from "./../../db/sha512.js";
 
 const app = express();
@@ -29,19 +28,18 @@ app.use(
 );
 
 app.use("/", newPW); //route to be tested needs to be bound to the router.
-app.use("/", secretQuestion); //needed for all routes that require login.
 
 beforeAll((done) => {
     const setupDB = `
     INSERT INTO users (
-        loginname, email, password,	secretquestion,	
-        secretanswer, apikey, webhook, confirmemaillink, 
+        loginname, email, password,	
+        apikey, webhook, confirmemaillink, 
         passwordconfirmed, exchangelist, defaultexchange, ratelimit,
         resetpasswordlink
     )
     VALUES (	
-        'newPWTest', 'newPWTest@test.com', '${sha512("testpw")}', 'hello',	
-        '${sha512("goodbye")}',	'',	'',	'',	
+        'newPWTest', 'newPWTest@test.com', '${sha512("testpw")}',	
+        '',	'',	'',	
         true,	'US',	'US',	30,
         'testpasswordlink'
     )
@@ -49,7 +47,7 @@ beforeAll((done) => {
     DO NOTHING
     ;
     UPDATE users 
-    SET passwordconfirmed = true,  resetpasswordlink = 'testpasswordlink, password=${sha512("testpw")}, secretanswer=${sha512("goodbye")}'
+    SET passwordconfirmed = true,  resetpasswordlink = 'testpasswordlink, password=${sha512("testpw")},
     WHERE loginname = 'newPWTest'
 `;
 
