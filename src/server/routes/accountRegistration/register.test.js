@@ -1,11 +1,9 @@
 //setup express
 import express from "express";
 import path from "path";
-import session from "express-session";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 import request from "supertest";
-import sessionFileStore from "session-file-store";
 import db from "../../db/databaseLocalPG.js";
 import register from "./register.js";
 import sha512 from "./../../db/sha512.js";
@@ -16,21 +14,6 @@ dotenv.config();
 app.use(express.static(path.join(__dirname, "build")));
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // support json encoded bodies
-
-const FileStore = sessionFileStore(session);
-
-const fileStoreOptions = {};
-app.use(
-    session({
-        store: new FileStore(fileStoreOptions),
-        secret: process.env.session_secret,
-        resave: false,
-        saveUninitialized: true,
-        cookie: { secure: false, sameSite: true },
-    })
-);
-
-//postgres test db.
 
 app.use("/", register); //route to be tested needs to be bound to the router.
 
