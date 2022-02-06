@@ -21,7 +21,6 @@ function emailIsValid(email) {
 
 const passwordIsValid = function (password) {
     //Minimum eight characters, at least one letter, one number and one special character:
-    console.log("testing pw", password);
     return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(password);
 };
 
@@ -59,13 +58,12 @@ router.post("/register", (req, res) => {
         RETURNING *`;
 
     const checkEmailUnique = () => {
-        // console.log(checkEmail)
         return new Promise((resolve, reject) => {
             db.query(checkEmail, (err, rows) => {
                 if (err) {
-                    reject("email check error");
+                    reject("Error Registering email. Check formatting.");
                 } else if (rows.rowCount !== 0) {
-                    reject("Email already taken");
+                    reject("Email already registered");
                 } else {
                     resolve("Email Available.");
                 }
@@ -102,19 +100,18 @@ router.post("/register", (req, res) => {
 
     if (emailIsValid(req.body.emailText) === true && passwordIsValid(req.body.pwText) === true) {
         checkEmailUnique()
-            .then((data) => {
+            .then(() => {
                 return createNewUser();
             })
-            .then((data) => {
+            .then(() => {
                 const registrationMessage =
                     process.env.EMAIL === "true"
                         ? "Thank you for registering, please check your email and follow the confirmation link."
                         : "Thank you for registering. You can now login.";
                 res.status(200).json({ message: registrationMessage });
             })
-            .catch((err) => {
-                console.log("EMAIL VALIDATION ERROR:", err);
-                res.status(400).json({ message: "Username or email already taken" });
+            .catch(() => {
+                res.status(400).json({ message: "Email already registered" });
             });
     } else {
         res.status(401).json({ message: "Enter a valid email address & check other info." });

@@ -49,7 +49,7 @@ beforeAll((done) => {
     ON CONFLICT
     DO NOTHING
     
-    ;DELETE FROM users WHERE email = 'registertest_taken@test.com'`;
+    ;DELETE FROM users WHERE email = 'registerTest@test.com'`;
 
     db.connect();
     db.query(setupDB, (err) => {
@@ -65,8 +65,7 @@ test("Valid new login post/register", (done) => {
     request(app)
         .post("/register")
         .send({
-            loginText: "registerTest",
-            pwText: "testpw",
+            pwText: "Testpw123!",
             emailText: "registerTest@test.com",
         })
         // .set('Accept', 'application/json')
@@ -81,7 +80,6 @@ test("Invalid email post/register", (done) => {
     request(app)
         .post("/register")
         .send({
-            loginText: "test3",
             pwText: "dontlogin",
             emailText: "testtest.com",
         })
@@ -93,7 +91,6 @@ test("No email post/register", (done) => {
     request(app)
         .post("/register")
         .send({
-            loginText: "test3",
             pwText: "dontlogin",
             emailText: "",
         })
@@ -105,7 +102,6 @@ test("No user post/register", (done) => {
     request(app)
         .post("/register")
         .send({
-            loginText: "",
             pwText: "dontlogin",
             emailText: "test@test.com",
         })
@@ -117,7 +113,6 @@ test("No password post/register", (done) => {
     request(app)
         .post("/register")
         .send({
-            loginText: "test3",
             pwText: "",
             emailText: "test@test.com",
         })
@@ -125,26 +120,13 @@ test("No password post/register", (done) => {
         .expect(401, done);
 });
 
-test("User name already taken post/register", (done) => {
-    request(app)
-        .post("/register")
-        .send({
-            loginText: "registertest_taken",
-            pwText: "testPW",
-            emailText: "registertest_taken@test.com",
-        })
-        .expect({ message: "Username or email already taken" })
-        .expect(400, done);
-});
-
 test("Email already taken post/register", (done) => {
     request(app)
         .post("/register")
         .send({
-            loginText: "registertest_taken_emailTaken",
-            pwText: "testPW",
+            pwText: "Testpw123!",
             emailText: "registertest_taken@test.com",
         })
-        .expect({ message: "Username or email already taken" })
+        .expect({ message: "Email already registered" })
         .expect(400, done);
 });
