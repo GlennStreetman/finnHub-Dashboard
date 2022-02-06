@@ -4,12 +4,12 @@ import { useAppDispatch } from "src/hooks";
 import { widgetSetup } from "src/App";
 import { styled } from "@mui/material/styles";
 import { Grid, Paper, Button, TextField, Box, Typography } from "@mui/material/";
-import queryString from "query-string";
 
 import { finnHubQueue } from "./../appFunctions/appImport/throttleQueueAPI";
-import { checkPassword } from "../appFunctions/client/checkPassword";
+import { forgotLogin } from "../appFunctions/client/forgotLogin";
+
 import { tProcessLogin } from "src/thunks/thunkProcessLogin";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 interface loginProps {
     queryData: any;
@@ -20,58 +20,34 @@ interface loginProps {
 const useDispatch = useAppDispatch;
 const MyPaper = styled(Paper)({ color: "#1d69ab", variant: "outlined", borderRadius: 20, padding: 25 });
 
-export default function Login(p: loginProps) {
+export default function Forgot(p: loginProps) {
     let navigate = useNavigate();
     const dispatch = useDispatch(); //allows widget to run redux actions.
     const [message, setMessage] = useState(""); //message from server
     const [emailAddress, setEmailAddress] = useState("");
-    const [password, setPassword] = useState("");
+    const [warn, setWarn] = useState("");
 
-    const quaryData = queryString.parse(window.location.search);
+    function emailIsValid(email) {
+        return /\S+@\S+\.\S+/.test(email);
+    }
 
-    useEffect(() => {
-        // @ts-ignore
-        if (quaryData.message) setMessage(quaryData.message);
-    }, []);
-
-    function checkLoginCredentials(e) {
+    function resetRequest(e) {
         e.preventDefault();
-        checkPassword(emailAddress, password)
-            .then(async (data) => {
-                console.log("data", data);
-                if (data.status === 200) {
-                    const parseSetup: widgetSetup = JSON.parse(data.widgetsetup); //ex string
-                    const newList: string[] = data.exchangelist.split(",");
-                    await dispatch(
-                        tProcessLogin({
-                            defaultexchange: data.defaultexchange,
-                            apiKey: data.key,
-                            apiAlias: data.apiAlias,
-                            exchangelist: newList,
-                        })
-                    );
-                    console.log("process login complete");
-                    p.updateAppState["login"](1);
-                    p.updateAppState["navigate"]("/dashboard");
-                    p.updateAppState["widgetSetup"](parseSetup);
-                    p.finnHubQueue.updateInterval(data["ratelimit"]);
-                } else {
-                    console.log("not awaiting");
+        if (emailIsValid(emailAddress)) {
+            forgotLogin(emailAddress)
+                .then((data) => {
                     setMessage(data.message);
-                }
-            })
-            .catch((err) => {
-                console.log("problem", err);
-                setMessage("No response from server. Check network connection.");
-            });
+                })
+                .catch(() => {
+                    setMessage("No response from server. Check network connection.");
+                });
+        } else {
+            setWarn("Please enter a valid email.");
+        }
     }
 
     function handeEmailChange(e) {
         setEmailAddress(e.target.value);
-    }
-
-    function handlePasswordChange(e) {
-        setPassword(e.target.value);
     }
 
     return (
@@ -85,30 +61,23 @@ export default function Login(p: loginProps) {
                             <img src="logo.png" alt="logo"></img>
 
                             <div className="login-div">
+                                <Typography>Reset Password</Typography>
                                 <TextField id={"loginEmail"} type="text" label="email" name={"emailField"} value={emailAddress} onChange={handeEmailChange} />
-                                <TextField
-                                    id={"loginPassword"}
-                                    type="password"
-                                    label="password"
-                                    name="passwordText"
-                                    value={password}
-                                    onChange={handlePasswordChange}
-                                />
                             </div>
 
                             <Box pt={1}>
-                                <Button variant="contained" className="loginBtn" type="submit" onClick={checkLoginCredentials} color="primary">
+                                <Button variant="contained" className="loginBtn" type="submit" onClick={resetRequest} color="primary">
                                     Submit
                                 </Button>
                             </Box>
                             <Box pt={1} pb={2}>
                                 <Button
                                     onClick={() => {
-                                        navigate("/forgot");
+                                        navigate("/login");
                                     }}
                                     color="primary"
                                 >
-                                    Forgot Password
+                                    Login
                                 </Button>
                                 <Button
                                     onClick={() => {
