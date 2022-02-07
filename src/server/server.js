@@ -86,7 +86,6 @@ app.use(
         extended: true,
     })
 );
-console.log("creating postgress session");
 const pgSession = new pgSimple(session);
 app.use(
     session({
@@ -104,9 +103,7 @@ app.use(
 app.listen(port, function () {
     console.log(`serving the direcotry @ http`);
 });
-console.log("dev path ", path.join(__dirname, "../../build/"));
 app.use(express.static(path.join(__dirname, "../../build/"))); //static asset directories are automaticaly served.
-console.log("connecting to postgres");
 connectPostgres(); //if postgres connection fails it retries every 5 seconds.
 connectMongo((err) => {
     if (err & (err !== null)) {

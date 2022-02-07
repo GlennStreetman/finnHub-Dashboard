@@ -1,6 +1,5 @@
 import express from "express";
 import postgresDB from "../../db/databaseLocalPG.js";
-import format from "pg-format";
 
 const router = express.Router();
 
@@ -15,12 +14,14 @@ router.get("/checkLogin", (req, res, next) => {
         WHERE id = ${uID}
     `; //add a timeout to the WHERE clause on resetpasswordlink using templogin timestamp
     const retrieveAPIKeys = () => {
+        console.log("checking login status", apiKeysQuery);
         return new Promise((resolve, reject) => {
             db.query(apiKeysQuery, (err, rows) => {
                 if (err) {
                     console.log("error retrieving apiKeys");
                     reject(resData);
                 } else {
+                    console.log("getting user data");
                     resData.apiKey = rows.rows[0].apikey;
                     resData.apiAlias = rows.rows[0].apialias;
                     resData.exchangelist = rows.rows[0].exchangelist;
@@ -28,6 +29,7 @@ router.get("/checkLogin", (req, res, next) => {
                     resData.login = 1;
                     resData.ratelimit = rows.rows[0].ratelimit;
                     resData.widgetsetup = rows.rows[0].widgetsetup;
+                    console.log("returning user data", resData);
                     resolve(resData);
                 }
             });

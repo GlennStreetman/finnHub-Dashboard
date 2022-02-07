@@ -38,23 +38,20 @@ const getVersion = async (db) => {
                 await runUpdateQuery(updateQuery, "1.0", db);
                 version = "1.0";
             } else {
-                console.log(`getVersion ${rows.rows[0].version}`, rows.rows);
+                // console.log(`getVersion ${rows.rows[0].version}`, rows.rows);
                 version = typeof rows.rows[0].version === "string" ? rows.rows[0].version : 0;
             }
-            console.log("version found", version);
+            // console.log("version found", version);
             resolve(version);
         });
     });
 };
 
 const versionControl = async function (db, arg) {
-    // const __dirname = dirname(fileURLToPath(import.meta.url));
-    console.log("!checking postgres version:", process.env.version);
     const envVersionString = process.env.version ? process.env.version : "1.0";
     const envVersion = parseFloat(envVersionString);
     const dbVersionString = await getVersion(db);
     const dbVersion = typeof dbVersionString === "string" ? parseFloat(dbVersionString) : false;
-    console.log("Checking Version: ", envVersion, dbVersion, dbVersionString);
     if (envVersion && envVersion === dbVersion) {
         //base case: DB up to date.
         console.log(`database schema up to date. v${dbVersion}`);
