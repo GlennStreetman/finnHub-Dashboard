@@ -32,7 +32,7 @@ router.get("/accountData", (req, res, next) => {
 
 router.post("/accountData", (req, res) => {
     const db = postgresDB;
-    console.log("---------------", req.body);
+    // console.log("---------------", req.body);
 
     const field = format(req.body.field);
     const newValue = format(req.body.newValue);

@@ -4,9 +4,6 @@ import helmet from "helmet";
 import eg from "express-graphql";
 import dotenv from "dotenv";
 
-import session from "express-session";
-import pgSimple from "connect-pg-simple";
-
 import bodyParser from "body-parser";
 import path from "path";
 import morgan from "morgan"; //request logger middleware.
@@ -86,25 +83,12 @@ app.use(
         extended: true,
     })
 );
-const pgSession = new pgSimple(session);
-app.use(
-    session({
-        // store: new FileStore(fileStoreOptions),
-        store: new pgSession({
-            conString: process.env.authConnString,
-        }),
-        secret: process.env.session_secret,
-        resave: false,
-        saveUninitialized: true,
-        cookie: { secure: false, sameSite: true },
-    })
-);
 
 app.listen(port, function () {
     console.log(`serving the direcotry @ http`);
 });
 app.use(express.static(path.join(__dirname, "../../build/"))); //static asset directories are automaticaly served.
-connectPostgres(); //if postgres connection fails it retries every 5 seconds.
+connectPostgres(false, app); //if postgres connection fails it retries every 5 seconds.
 connectMongo((err) => {
     if (err & (err !== null)) {
         console.log("2---FAILED TO CONNECT TO MONGODB-----", err);

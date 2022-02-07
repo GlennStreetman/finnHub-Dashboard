@@ -1,12 +1,11 @@
-
-version: '3.9'
+version: "3.9"
 services:
     dashboard:
-        build: 
+        build:
             context: .
             dockerfile: Dockerfile-prod
         volumes:
             - ./.env:/app/.env
         ports:
-        - 5000:5000
-        command: npm run start 
+            - 5000:5000
+        command: npm run start
