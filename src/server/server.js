@@ -26,9 +26,7 @@ import checkLogin from "./routes/loginRoutes/checkLogin.js";
 //accountRegistration
 import register from "./routes/accountRegistration/register.js";
 import verifyEmail from "./routes/accountRegistration/verifyEmail.js";
-import verifyChange from "./routes/accountRegistration/verifyChange.js";
 //account
-import findSecret from "./routes/accounts/findSecret.js";
 import forgot from "./routes/accounts/forgot.js";
 import newPW from "./routes/accounts/newPW.js";
 
@@ -122,9 +120,7 @@ app.use("/", checkLogin);
 //accountRegistration
 app.use("/", register);
 app.use("/", verifyEmail);
-app.use("/", verifyChange);
 //account
-app.use("/", findSecret);
 app.use("/", forgot);
 app.use("/", newPW);
 
