@@ -158,30 +158,4 @@ describe("Get login cookie POST:", () => {
             })
             .expect(200, done);
     });
-
-    test("Check update data, good email post/accountData", (done) => {
-        request(app)
-            .post("/accountData")
-            .send({
-                field: "email",
-                newValue: "testgoodemail@test.com",
-            })
-            .set("Cookie", cookieJar)
-            .expect("Content-Type", /json/)
-            .expect({ message: `Please check email to verify change.` })
-            .expect(200, done);
-    });
-
-    test("Check update data, bad email post/accountData", (done) => {
-        request(app)
-            .post("/accountData")
-            .send({
-                field: "email",
-                newValue: "testgoodemailtest.com",
-            })
-            .set("Cookie", cookieJar)
-            .expect("Content-Type", /json/)
-            .expect({ message: `email not valid` })
-            .expect(401, done);
-    });
 });
