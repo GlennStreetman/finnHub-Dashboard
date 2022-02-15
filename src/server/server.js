@@ -49,7 +49,6 @@ import graphQLRedirect from "./routes/graphQL.js";
 import { schema } from "./routes/graphQL/graphQL.js";
 import Client from "pg";
 import session from "express-session";
-import pg from "pg";
 import pgSimple from "connect-pg-simple";
 
 const app = express();
