@@ -13,7 +13,6 @@ router.get("/login", (req, res, next) => {
         AND password = '${sha512(pwText)}'`;
     console.log("loginQuery", loginQuery);
     let info = {
-        //return object.
         key: "",
         login: 0,
         ratelimit: 25,
@@ -23,28 +22,31 @@ router.get("/login", (req, res, next) => {
         widgetsetup: "",
     };
     db.query(loginQuery, (err, rows) => {
-        const login = rows.rows[0];
-        if (err) {
-            console.log("LOGIN ERROR:", err);
-            res.status(400).json({ message: "Login error" });
-        } else if (rows.rowCount === 1 && login.emailconfirmed === true) {
-            info["key"] = login.apikey;
-            info["apiAlias"] = login.apialias;
-            info["ratelimit"] = login.ratelimit;
-            info["login"] = 1;
-            info["response"] = "success";
-            info["exchangelist"] = rows.rows[0]["exchangelist"];
-            info["defaultexchange"] = rows.rows[0]["defaultexchange"];
-            info["widgetsetup"] = rows.rows[0]["widgetsetup"];
-            req.session.uID = login.id;
-            req.session.login = true;
-            res.status(200).json(info);
-        } else if (rows.rowCount === 1 && login.emailconfirmed !== true) {
-            // console.log("Email not confirmed")
-            res.status(401).json({ message: `Email not confirmed. Please check email for confirmation message.` });
-        } else {
-            // console.log("Login and password did not match.")
-            res.status(401).json({ message: `Login and Password did not match.` });
+        try {
+            const login = rows.rows[0];
+            if (err) {
+                console.log("LOGIN ERROR:", err);
+                res.status(400).json({ message: "Login error" });
+            } else if (rows.rowCount === 1 && login.emailconfirmed === true) {
+                if (req.session === undefined) throw new Error("Login request not associated with session.");
+                info["key"] = login.apikey;
+                info["apiAlias"] = login.apialias;
+                info["ratelimit"] = login.ratelimit;
+                info["login"] = 1;
+                info["response"] = "success";
+                info["exchangelist"] = rows.rows[0]["exchangelist"];
+                info["defaultexchange"] = rows.rows[0]["defaultexchange"];
+                info["widgetsetup"] = rows.rows[0]["widgetsetup"];
+                req.session.uID = login.id;
+                req.session.login = true;
+                res.status(200).json(info);
+            } else if (rows.rowCount === 1 && login.emailconfirmed !== true) {
+                res.status(401).json({ message: `Email not confirmed. Please check email for confirmation message.` });
+            } else {
+                res.status(401).json({ message: `Login and Password did not match.` });
+            }
+        } catch (error) {
+            next(error);
         }
     });
 });
