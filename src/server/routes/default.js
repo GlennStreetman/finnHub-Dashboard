@@ -7,11 +7,8 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const router = express.Router();
 
-//Recieves widget key as a paramater. Deletes corresponding records. req.query['user']
 router.get("/*", (req, res) => {
-    console.log("Servering react app");
-    // const x = fs.existsSync((path.join(__dirname, '../../../build/index.html')))
-    // console.log(path.join(__dirname, '../../../build'), x )
+    console.log("Servering react app /*");
     res.sendFile(path.resolve(path.join(__dirname, "../../../build/index.html")));
 });
 
