@@ -12,33 +12,37 @@ const passwordIsValid = function (password) {
 };
 
 router.post("/newPW", (req, res, next) => {
-    console.log("register new pw");
-    if (req.session.login === true) {
-        if (passwordIsValid(req.body.newPassword)) {
-            const db = postgresDB;
-            const newPW = format("%L", req.body.newPassword);
-            const id = format("%L", req.session.uID);
-            console.log("new pw request", newPW, id);
-            const newQuery = `
+    try {
+        if (req.session === undefined) throw new Error("Request not associated with session.");
+        if (req.session.login === true) {
+            if (passwordIsValid(req.body.newPassword)) {
+                const db = postgresDB;
+                const newPW = format("%L", req.body.newPassword);
+                const id = format("%L", req.session.uID);
+                console.log("new pw request", newPW, id);
+                const newQuery = `
     UPDATE users 
     SET password = '${sha512(newPW)}'
     WHERE id = ${id}`;
-            db.query(newQuery, (err, rows) => {
-                if (err) {
-                    res.status(400).json({ message: "Password not updated, contact support." });
-                } else if (rows.rowCount === 1) {
-                    res.status(200).json({ message: "Password Updated" });
-                } else {
-                    console.log();
-                    res.status(401).json({ message: "Password not updated, contact support." });
-                }
-            });
+                db.query(newQuery, (err, rows) => {
+                    if (err) {
+                        res.status(400).json({ message: "Password not updated, contact support." });
+                    } else if (rows.rowCount === 1) {
+                        res.status(200).json({ message: "Password Updated" });
+                    } else {
+                        console.log();
+                        res.status(401).json({ message: "Password not updated, contact support." });
+                    }
+                });
+            } else {
+                res.status(401).json({ message: "Password must be >7 characters, 1 upper, 1 special." });
+            }
         } else {
-            res.status(401).json({ message: "Password must be >7 characters, 1 upper, 1 special." });
+            console.log("not logged in");
+            res.status(401).json({ message: "Not logged in." });
         }
-    } else {
-        console.log("not logged in");
-        res.status(401).json({ message: "Not logged in." });
+    } catch (error) {
+        next(error);
     }
 });
 

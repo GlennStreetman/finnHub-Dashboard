@@ -4,29 +4,33 @@ import postgresDB from "./../../db/databaseLocalPG.js";
 const router = express.Router();
 
 router.get("/accountData", (req, res, next) => {
-    const db = postgresDB;
-    // thisRequest = req.query;
-    if (req.session.login === true) {
-        const accountDataQuery = `
+    try {
+        if (req.session === undefined) throw new Error("Request not associated with session.");
+        const db = postgresDB;
+        if (req.session.login === true) {
+            const accountDataQuery = `
         SELECT email, apiKey, webHook, ratelimit, apialias, widgetsetup 
         FROM users 
         WHERE id =$1`;
-        const queryValues = [req.session.uID];
-        const resultSet = {};
-        console.log(accountDataQuery);
-        db.query(accountDataQuery, queryValues, (err, rows) => {
-            const result = rows.rows[0];
-            // console.log(result)
-            if (err) {
-                console.log("/accountData ERROR:", err);
-                res.status(400).json({ message: "Could not retrieve user data" });
-            } else {
-                resultSet["userData"] = result;
-                res.status(200).json(resultSet);
-            }
-        });
-    } else {
-        res.status(401).json({ message: "Not logged in." });
+            const queryValues = [req.session.uID];
+            const resultSet = {};
+            console.log(accountDataQuery);
+            db.query(accountDataQuery, queryValues, (err, rows) => {
+                const result = rows.rows[0];
+                // console.log(result)
+                if (err) {
+                    console.log("/accountData ERROR:", err);
+                    res.status(400).json({ message: "Could not retrieve user data" });
+                } else {
+                    resultSet["userData"] = result;
+                    res.status(200).json(resultSet);
+                }
+            });
+        } else {
+            res.status(401).json({ message: "Not logged in." });
+        }
+    } catch (error) {
+        next(error);
     }
 });
 

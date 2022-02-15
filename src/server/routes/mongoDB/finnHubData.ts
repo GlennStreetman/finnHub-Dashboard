@@ -16,8 +16,10 @@ interface finnDashDataReq extends Request {
 const router = express.Router();
 
 //gets user, none stale, finnhub data. This process deletes stale records.
-router.get("/getFinnDashDataMongo", async (req: finnDashDataReq, res: any) => {
+//@ts-ignore
+router.get("/getFinnDashDataMongo", async (req: finnDashDataReq, res: any, next) => {
     try {
+        if (req.session === undefined) throw new Error("Request not associated with session.");
         const client = getDB();
         const database = client.db("finnDash");
         const dataSet = database.collection("dataSet");
@@ -38,56 +40,62 @@ router.get("/getFinnDashDataMongo", async (req: finnDashDataReq, res: any) => {
             resList.push(data);
         });
         res.status(200).json({ resList });
-    } catch (err) {
-        res.status(500).json({ message: `Problem finding user dataset.` });
+    } catch (error) {
+        next(error);
     }
 });
 
-router.post("/postFinnDashDataMongo", async (req: finnDashDataReq, res: any) => {
+//@ts-ignore
+router.post("/postFinnDashDataMongo", async (req: finnDashDataReq, res: any, next) => {
     //updates MongoDB finnDash.dataset with finnhub data.
-    if (req.session.login === true) {
-        try {
-            const client = getDB();
-            const database = client.db("finnDash");
-            const dataSet = database.collection("dataSet");
+    try {
+        if (req.session === undefined) throw new Error("Request not associated with session.");
+        if (req.session.login === true) {
+            try {
+                const client = getDB();
+                const database = client.db("finnDash");
+                const dataSet = database.collection("dataSet");
 
-            const updateData = req.body;
-            for (const record in updateData) {
-                const u = updateData[record];
+                const updateData = req.body;
+                for (const record in updateData) {
+                    const u = updateData[record];
 
-                const filters = {
-                    userID: req.session.uID,
-                    key: record,
-                };
-                const update = {
-                    $set: {
+                    const filters = {
                         userID: req.session.uID,
                         key: record,
-                        widget: u.widget,
-                        dashboard: u.dashboard,
-                        dashboardID: u.dashboardID,
-                        widgetName: u.widgetName,
-                        retrieved: u.updated,
-                        stale: u.updated + 1000 * 60 * 60 * 3, //stale after 3 hours, consider setting up user defined variable.
-                        data: u.data,
-                        apiString: u.apiString,
-                        security: u.security,
-                        widgetType: u.widgetType,
-                        config: u.config,
-                    },
-                };
-                const options = {
-                    upsert: true,
-                };
-                await dataSet.updateOne(filters, update, options).catch((err) => {
-                    console.log("Problem updating dataset", err);
-                });
+                    };
+                    const update = {
+                        $set: {
+                            userID: req.session.uID,
+                            key: record,
+                            widget: u.widget,
+                            dashboard: u.dashboard,
+                            dashboardID: u.dashboardID,
+                            widgetName: u.widgetName,
+                            retrieved: u.updated,
+                            stale: u.updated + 1000 * 60 * 60 * 3, //stale after 3 hours, consider setting up user defined variable.
+                            data: u.data,
+                            apiString: u.apiString,
+                            security: u.security,
+                            widgetType: u.widgetType,
+                            config: u.config,
+                        },
+                    };
+                    const options = {
+                        upsert: true,
+                    };
+                    await dataSet.updateOne(filters, update, options).catch((err) => {
+                        console.log("Problem updating dataset", err);
+                    });
+                }
+                res.status(200).json({ message: `Updates Complete` });
+            } catch (err) {
+                console.log("finnHubData: Problem updating finnHub dataset:", err);
+                res.status(500).json({ message: `Problem updating finnHub dataset` });
             }
-            res.status(200).json({ message: `Updates Complete` });
-        } catch (err) {
-            console.log("finnHubData: Problem updating finnHub dataset:", err);
-            res.status(500).json({ message: `Problem updating finnHub dataset` });
         }
+    } catch (error) {
+        next(error);
     }
 });
 

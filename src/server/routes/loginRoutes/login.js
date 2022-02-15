@@ -11,7 +11,6 @@ router.get("/login", (req, res, next) => {
     let loginQuery = `SELECT id, email, apikey, apialias, ratelimit, emailconfirmed, exchangelist, defaultexchange, widgetsetup
         FROM users WHERE email =${loginEmail} 
         AND password = '${sha512(pwText)}'`;
-    console.log("loginQuery", loginQuery);
     let info = {
         key: "",
         login: 0,
@@ -28,7 +27,7 @@ router.get("/login", (req, res, next) => {
                 console.log("LOGIN ERROR:", err);
                 res.status(400).json({ message: "Login error" });
             } else if (rows.rowCount === 1 && login.emailconfirmed === true) {
-                if (req.session === undefined) throw new Error("Login request not associated with session.");
+                if (req.session === undefined) throw new Error("Request not associated with session.");
                 info["key"] = login.apikey;
                 info["apiAlias"] = login.apialias;
                 info["ratelimit"] = login.ratelimit;
@@ -51,10 +50,13 @@ router.get("/login", (req, res, next) => {
     });
 });
 router.get("/logOut", (req, res, next) => {
-    if (req.session) {
+    try {
+        if (req.session === undefined) throw new Error("Request not associated with session.");
         req.session.login = false;
+        res.status(200).json({ message: "Logged Out" });
+    } catch (error) {
+        next(error);
     }
-    res.status(200).json({ message: "Logged Out" });
 });
 export default router;
 //# sourceMappingURL=login.js.map
