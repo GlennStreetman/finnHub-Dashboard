@@ -47,12 +47,14 @@ import renameDashboardMongo from "./routes/mongoDB/renameDashboardMongo.js";
 import graphQLRedirect from "./routes/graphQL.js";
 //graphQL
 import { schema } from "./routes/graphQL/graphQL.js";
+import Client from "pg";
+import session from "express-session";
+import pg from "pg";
+import pgSimple from "connect-pg-simple";
 
 const app = express();
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-
-if (process.env.echo) console.log(process.env.echo);
 
 app.use(
     helmet({
@@ -89,6 +91,32 @@ app.listen(port, function () {
 });
 app.use(express.static(path.join(__dirname, "../../build/"))); //static asset directories are automaticaly served.
 connectPostgres(false, app); //if postgres connection fails it retries every 5 seconds.
+
+const pgPool = new Client.Pool({
+    database: process.env.pgdatabase,
+    user: process.env.pguser,
+    password: process.env.pgpassword,
+    port: 5432,
+    ssl: false,
+    max: 20, // set pool max size to 20
+    idleTimeoutMillis: 1000, // close idle clients after 1 second
+    connectionTimeoutMillis: 1000, // return an error after 1 second if connection could not be established
+    maxUses: 7500, // close (and replace) a connection after it has been used 7500 times (see below for discussion)
+});
+
+const pgSession = new pgSimple(session);
+app.use(
+    session({
+        store: new pgSession({
+            pool: pgPool,
+        }),
+        secret: process.env.session_secret,
+        resave: false,
+        saveUninitialized: true,
+        cookie: { secure: false, sameSite: true },
+    })
+);
+
 connectMongo((err) => {
     if (err & (err !== null)) {
         console.log("2---FAILED TO CONNECT TO MONGODB-----", err);

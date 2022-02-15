@@ -20,3 +20,4 @@ cert
 *.env*
 /uploads/*
 /uploads/*/*
+/src/server/sessions/*
