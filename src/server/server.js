@@ -50,6 +50,7 @@ import { schema } from "./routes/graphQL/graphQL.js";
 import Client from "pg";
 import session from "express-session";
 import pgSimple from "connect-pg-simple";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
@@ -115,6 +116,7 @@ app.use(
         cookie: { secure: false, sameSite: true },
     })
 );
+app.use(cookieParser());
 
 connectMongo((err) => {
     if (err & (err !== null)) {
