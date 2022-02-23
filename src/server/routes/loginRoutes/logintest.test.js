@@ -21,7 +21,7 @@ var pgPool = new pg.Pool({
     database: process.env.pgdatabase,
     user: process.env.pguser,
     password: process.env.pgpassword,
-    port: 5432,
+    port: process.env.pgport,
     ssl: false,
     max: 20, // set pool max size to 20
     idleTimeoutMillis: 1000, // close idle clients after 1 second
