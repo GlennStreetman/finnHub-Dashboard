@@ -22,24 +22,7 @@ create the .env file, shown below, in the project folder.
 
 ## Create .env file
 
-EMAIL = false #set to true if you want to use email verification for site registration.
-API_KEY = mailgun api key  
-DOMAIN_KEY = mailgun domain key  
-session_secret = supersecretkey  
-pguser = postgres  
-pgpassword = example  
-pghost = postgresdocker  
-pgdatabase = postgres  
-pgport = 5432  
-ssl = allow  
-mongo = mongodb://root:example@mongo:27017/ #root is usename, example is password.
-mongoUser = root  
-mongoPassword = example  
-URL = http://localhost:5000  
-version = 1.0  
-legacyWatch=true  
-CHOKIDAR_USEPOLLING=true
-shaHashKey=secretString
+rename env.example to .env and update all secret keys.
 
 ### If default user or passwords are changed in the .env file make sure to reflect the changes in the corresponding .yaml files.
 
