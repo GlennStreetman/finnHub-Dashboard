@@ -5,6 +5,7 @@ import postgresDB from "../../db/databaseLocalPG.js";
 const router = express.Router();
 
 router.get("/login", (req, res, next) => {
+    // console.log("--Cookies--", req.cookies);
     const db = postgresDB;
     let loginEmail = format("%L", req.query["email"]);
     let pwText = format("%L", req.query["pwText"]);
