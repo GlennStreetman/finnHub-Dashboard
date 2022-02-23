@@ -54,6 +54,7 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 
+
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 app.use(
@@ -93,10 +94,11 @@ app.use(express.static(path.join(__dirname, "../../build/"))); //static asset di
 connectPostgres(false, app); //if postgres connection fails it retries every 5 seconds.
 
 const pgPool = new Client.Pool({
-    database: process.env.pgdatabase,
     user: process.env.pguser,
     password: process.env.pgpassword,
-    port: 5432,
+    host: process.env.pghost,
+    port: process.env.pgport,
+    database: process.env.pgdatabase,
     ssl: false,
     max: 20, // set pool max size to 20
     idleTimeoutMillis: 1000, // close idle clients after 1 second
