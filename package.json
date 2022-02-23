@@ -1,9 +1,10 @@
 {
-    "proxy": "http://localhost:5000",
+    "proxy": "https://finndash.gstreet.test",
     "name": "dashboard",
     "version": "0.1.0",
     "private": true,
     "scripts": {
+        "pretty": "npm run format",
         "copy-files": "copyfiles ./src/server/db/postgresVersions/* ./build/server/db/postgresVersions/ -f",
         "tsc": "npx tsc -p src/server/tsconfig.json",
         "tscd": "npx tsc -w -p src/server/tsconfig.json",
