@@ -262,7 +262,11 @@ router.post("/renameDashboard", (req, res, next) => {
             const getSavedDashBoards = `
             UPDATE dashboard
             SET dashboardname = ${newName}
-            WHERE userid = ${req.session.uID} AND id = ${dbID}`;
+            WHERE userid = ${req.session.uID} AND id = ${dbID};
+            UPDATE menusetup
+            SET defaultmenu = ${newName}
+            WHERE userid = ${req.session.uID};
+            `;
             db.query(getSavedDashBoards, (err, rows) => {
                 if (err) {
                     res.status(401).json({ message: "Dashboard name update failed." });
