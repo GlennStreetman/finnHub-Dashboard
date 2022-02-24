@@ -174,6 +174,14 @@ router.post("/dashboard", (req, res, next) => {
                     let saveMenuSetupQuery = `INSERT INTO menuSetup 
             (userID, defaultMenu)
             VALUES (${data}, ${dashBoardName}) 
+
+            SELECT userid, dashboardname FROM (
+                SELECT userid, dashboardname FROM dashboard WHERE userid = ${data} AND dashboardname= ${dashBoardName} 
+                UNION
+                SELECT userid, dashboardname FROM dashboard WHERE userid = ${data}
+            ) as foo
+            limit 1
+
             ON CONFLICT (userID) 
             DO UPDATE SET defaultMenu = EXCLUDED.defaultMenu
             RETURNING ID
