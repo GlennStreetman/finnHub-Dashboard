@@ -46,7 +46,9 @@ services:
             - ./build:/app/build
             - ./nodemon.json:/app/nodemon.json
             - ./.env:/app/.env
-        command: npm run dev
+            - ./node_modules:/app/node_modules/
+            - ./package.json:/app/package.json
+        command: npm run devd
 volumes:
     mongo-data:
         driver: local
