@@ -51,10 +51,12 @@ function Splash() {
                         <Button variant="contained" color="primary" onClick={() => navigate('/about')}>
                             <Typography variant="h6" className={classes.splashButton}>Explore</Typography>
                         </Button>
-
-                        <Button variant="contained" color="primary" onClick={() => navigate('/login')}>
-                            <Typography variant="h6" className={classes.splashButton}>Login</Typography>
+                        
+                        <Button variant="contained" color="primary">
+                        {/* <Button variant="contained" color="primary" onClick={() => navigate('/login')}> */}
+                        <a href='/login'><Typography variant="h6" className={classes.splashButton}>Login</Typography></a>
                         </Button>
+                        
                     </div>
 
                 </Grid>
