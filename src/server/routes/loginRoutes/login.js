@@ -2,6 +2,9 @@ import express from "express";
 import format from "pg-format";
 import sha512 from "./../../db/sha512.js";
 import postgresDB from "../../db/databaseLocalPG.js";
+import axios from 'axios'
+
+
 const router = express.Router();
 
 router.get("/login", (req, res, next) => {
@@ -50,7 +53,11 @@ router.get("/login", (req, res, next) => {
         }
     });
 });
-router.get("/logOut", (req, res, next) => {
+router.get("/logOut", async (req, res, next) => {
+    console.log('logout time')
+    const copyCookies = req.header('cookie')
+    console.log('cookie', copyCookies)
+    await axios('http://gstreet.test/api/remoteLogout', {method: 'GET', mode: '*', headers: {Cookie: copyCookies}}).catch((err)=>{console.log('axios err logout')})
     try {
         if (req.session === undefined) throw new Error("Request not associated with session.");
         req.session.login = false;
