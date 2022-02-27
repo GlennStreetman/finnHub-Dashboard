@@ -52,12 +52,10 @@ router.get("/login", (req, res, next) => {
             next(error);
         }
     });
-});
+}); 
 router.get("/logOut", async (req, res, next) => {
-    console.log('logout time')
     const copyCookies = req.header('cookie')
-    console.log('cookie', copyCookies)
-    await axios('http://gstreet.test/api/remoteLogout', {method: 'GET', mode: '*', headers: {Cookie: copyCookies}}).catch((err)=>{console.log('axios err logout')})
+    if (process.env.useRemoteLogin === true) await axios(process.env.remoteLogoutUrl, {method: 'GET', mode: '*', headers: {Cookie: copyCookies}}).catch((err)=>{console.log('axios err logout', next(err))})
     try {
         if (req.session === undefined) throw new Error("Request not associated with session.");
         req.session.login = false;

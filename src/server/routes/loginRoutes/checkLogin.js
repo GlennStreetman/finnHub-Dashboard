@@ -79,18 +79,20 @@ const retrieveAPIKeysEmail = (req, email, next) => {
 
 //checks login status when site is initialy loaded.
 router.get("/checkLogin", async (req, res, next) => {  
-
+    console.log('remote login', process.env.useRemoteLogin)
     if (req.session && req.session.login === true) {
+        //if user has logged in session.
         console.log('getting local login') 
         const apiKeys = await retrieveAPIKeys(req, next)
         res.status(200).json(apiKeys);
-    } else {
+    } else if (process.env.useRemoteLogin == 'true') {
+        //if user does not have logged in sesion, check remote
         console.log('checking remote login')
         const copyCookies = req.header('cookie')
-        // console.log(copyCookies)
-        const axiosRes = await axios('http://gstreet.test/api/remoteLogin', {method: 'GET', mode: '*', headers: {Cookie: copyCookies}}).catch((err)=>{console.log('axios err', err)}) 
+
+        const axiosRes = await axios(process.env.remoteLoginUrl, {method: 'GET', mode: '*', headers: {Cookie: copyCookies}}).catch((err)=>{console.log('axios err', next(err))}) 
         const loginStatus = axiosRes.data 
-        // console.log('axiosRes', loginStatus)      
+        console.log('axiosRes', loginStatus)      
         if (loginStatus.login === 1) {
             const apiKeys = await retrieveAPIKeysEmail(req, loginStatus.email, next)
             console.log('remote api keys', apiKeys)
@@ -98,8 +100,10 @@ router.get("/checkLogin", async (req, res, next) => {
         } else {
             res.status(401).json({ login: 0 });
         }
+    } else {
+        console.log('not logged in, no remote login')
+        res.status(401).json({ login: 0 });
     }
-    
-});
+}); 
 
 export default router;
