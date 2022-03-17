@@ -54,7 +54,7 @@ function Splash() {
                         
                         <Button variant="contained" color="primary">
                         {/* <Button variant="contained" color="primary" onClick={() => navigate('/login')}> */}
-                        <a href='/login'><Typography variant="h6" className={classes.splashButton}>Login</Typography></a>
+                        <a href='/login?redirect=finndash'><Typography variant="h6" className={classes.splashButton}>Login</Typography></a>
                         </Button>
                         
                     </div>
