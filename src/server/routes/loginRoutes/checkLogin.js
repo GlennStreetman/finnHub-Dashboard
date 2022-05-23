@@ -31,7 +31,10 @@ const retrieveAPIKeys = (req, next) => {
                     resData.login = 1;
                     resData.ratelimit = rows.rows[0].ratelimit;
                     resData.widgetsetup = rows.rows[0].widgetsetup;
-                    console.log("returning user data", resData);
+                    console.log(
+                        "retrieveAPIKeys: returning user data",
+                        resData
+                    );
                     resolve(resData);
                 }
             });
@@ -69,7 +72,10 @@ const retrieveAPIKeysEmail = (req, email, next) => {
                     resData.login = 1;
                     resData.ratelimit = rows.rows[0].ratelimit;
                     resData.widgetsetup = rows.rows[0].widgetsetup;
-                    console.log("returning user data", resData);
+                    console.log(
+                        "retrieveAPIKeysEmail returning user data ",
+                        resData
+                    );
                     resolve(resData);
                 }
             });
@@ -86,9 +92,10 @@ const registerRemoteUser = (email, next) => {
         const db = postgresDB;
         const tryRegister = `
             INSERT INTO users
-            (email)
-            VALUES (${email})
+            (email, exchangelist, defaultexchange, ratelimit , emailconfirmed)
+            VALUES ('${email}', 'US', 'US', 1,, 'true')
         `;
+        console.log("tryRegister", tryRegister);
         db.query(tryRegister, (err, rows) => {
             if (err) {
                 console.log(`${email} already registered`);

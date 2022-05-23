@@ -1,11 +1,20 @@
 import React from "react";
 import { useState, useEffect, useMemo } from "react";
-import { BrowserRouter, Route, Routes, Navigate, Outlet } from "react-router-dom";
+import {
+    BrowserRouter,
+    Route,
+    Routes,
+    Navigate,
+    Outlet,
+} from "react-router-dom";
 import queryString from "query-string";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 
 //app functions
-import { createFunctionQueueObject, finnHubQueue } from "./appFunctions/appImport/throttleQueueAPI";
+import {
+    createFunctionQueueObject,
+    finnHubQueue,
+} from "./appFunctions/appImport/throttleQueueAPI";
 import { LoadTickerSocket } from "./appFunctions/socketData";
 import { useAppDispatch, useAppSelector } from "src/hooks";
 
@@ -61,7 +70,9 @@ export default function App() {
 
     const [login, setLogin] = useState(0); //login state. 0 logged out, 1 logged in.
     const [navigate, setNavigate] = useState<string | null>(null);
-    const [finnHubQueue, setFinnHubQueue] = useState(createFunctionQueueObject(1, 1000, true));
+    const [finnHubQueue, setFinnHubQueue] = useState(
+        createFunctionQueueObject(1, 1000, true)
+    );
     const [enableDrag, setEnableDrag] = useState(false);
     const [socket, setSocket] = useState(""); //socket connection for streaming stock data.
     const [socketUpdate, setSocketUpdate] = useState(Date.now());
@@ -106,8 +117,12 @@ export default function App() {
         return state.dashboardData;
     });
     const globalStockList = useSelector((state) => {
-        if (state.dashboardData?.[state.currentDashboard]?.["globalstocklist"]) {
-            return state.dashboardData[state.currentDashboard]["globalstocklist"];
+        if (
+            state.dashboardData?.[state.currentDashboard]?.["globalstocklist"]
+        ) {
+            return state.dashboardData[state.currentDashboard][
+                "globalstocklist"
+            ];
         } else {
             return {};
         }
@@ -116,7 +131,9 @@ export default function App() {
     async function buildDashboardState() {
         //fetches dashboard data, then updates p.dashboardData, then builds redux model.
         try {
-            const data: any = await dispatch(tGetSavedDashboards({ apiKey: apiKey })).unwrap();
+            const data: any = await dispatch(
+                tGetSavedDashboards({ apiKey: apiKey })
+            ).unwrap();
 
             const lCurrentDash: string = data.currentDashBoard;
             const lDashboardData: dashBoardData = data.dashBoardData;
@@ -127,7 +144,10 @@ export default function App() {
             dispatch(rResetUpdateFlag()); //sets all dashboards status to updating in redux store.
             await dispatch(tGetMongoDB()); //get cached data from mongo.
             //For current dashboard: get data from finnhub, if not returned by mongo db.
-            const targetDash: string[] = lDashboardData?.[lCurrentDash]?.widgetlist ? Object.keys(lDashboardData?.[lCurrentDash]?.widgetlist) : [];
+            const targetDash: string[] = lDashboardData?.[lCurrentDash]
+                ?.widgetlist
+                ? Object.keys(lDashboardData?.[lCurrentDash]?.widgetlist)
+                : [];
             for (const widget in targetDash) {
                 dispatch(
                     tGetFinnhubData({
@@ -150,7 +170,9 @@ export default function App() {
                             //run in background, do not await.
                             dashboardID: lDashboardData[dash].id,
                             targetDashBoard: dash,
-                            widgetList: Object.keys(lDashboardData[dash].widgetlist),
+                            widgetList: Object.keys(
+                                lDashboardData[dash].widgetlist
+                            ),
                             finnHubQueue: finnHubQueue,
                             rSetUpdateStatus: rSetUpdateStatus,
                             dispatch: dispatch,
@@ -169,8 +191,13 @@ export default function App() {
             .then((response) => response.json())
             .then(async (data) => {
                 if (data.login === 1) {
-                    const parseSetup: widgetSetup = JSON.parse(data.widgetsetup);
-                    const newList: string[] = data.exchangelist.split(",");
+                    const parseSetup: widgetSetup = JSON.parse(
+                        data.widgetsetup
+                    );
+                    const newList: string[] = data.exchangelist
+                        ? data.exchangelist.split(",")
+                        : ["US"];
+                    console.log("processing login");
                     await dispatch(
                         tProcessLogin({
                             defaultexchange: data.defaultexchange,
@@ -203,9 +230,21 @@ export default function App() {
     }, [navigate]);
 
     useEffect(() => {
-        if (Object.keys(globalStockList).length > 0 && login === 1 && apiKey !== "") {
+        if (
+            Object.keys(globalStockList).length > 0 &&
+            login === 1 &&
+            apiKey !== ""
+        ) {
             //price data for watchlist, including socket data.
-            LoadTickerSocket(globalStockList, socket, apiKey, socketUpdate, updateAppState, rUpdateQuotePriceStream, dispatch);
+            LoadTickerSocket(
+                globalStockList,
+                socket,
+                apiKey,
+                socketUpdate,
+                updateAppState,
+                rUpdateQuotePriceStream,
+                dispatch
+            );
         }
     }, [globalStockList, login]);
 
@@ -224,13 +263,43 @@ export default function App() {
         }
     };
 
-    const loginComp = <Login queryData={quaryData} finnHubQueue={finnHubQueue} updateAppState={updateAppState} />;
-    const registerComp = <RegisterAccount queryData={quaryData} finnHubQueue={finnHubQueue} updateAppState={updateAppState} />;
-    const forgotComp = <ForgotPassword queryData={quaryData} finnHubQueue={finnHubQueue} updateAppState={updateAppState} />;
-    const tempLogin = <TempLogin queryData={quaryData} finnHubQueue={finnHubQueue} updateAppState={updateAppState} />;
+    const loginComp = (
+        <Login
+            queryData={quaryData}
+            finnHubQueue={finnHubQueue}
+            updateAppState={updateAppState}
+        />
+    );
+    const registerComp = (
+        <RegisterAccount
+            queryData={quaryData}
+            finnHubQueue={finnHubQueue}
+            updateAppState={updateAppState}
+        />
+    );
+    const forgotComp = (
+        <ForgotPassword
+            queryData={quaryData}
+            finnHubQueue={finnHubQueue}
+            updateAppState={updateAppState}
+        />
+    );
+    const tempLogin = (
+        <TempLogin
+            queryData={quaryData}
+            finnHubQueue={finnHubQueue}
+            updateAppState={updateAppState}
+        />
+    );
 
     const dashboard = (
-        <WidgetController enableDrag={enableDrag} finnHubQueue={finnHubQueue} login={login} widgetCopy={widgetCopy} updateAppState={updateAppState} />
+        <WidgetController
+            enableDrag={enableDrag}
+            finnHubQueue={finnHubQueue}
+            login={login}
+            widgetCopy={widgetCopy}
+            updateAppState={updateAppState}
+        />
     );
 
     const topNav = (
@@ -258,13 +327,43 @@ export default function App() {
                         <Route path="tempLogin" element={tempLogin} />
                         <Route path="registerAccount" element={registerComp} />
                         <Route path="forgot" element={forgotComp} />
-                        <Route path="manageAccount" element={React.createElement(AccountMenu, accountMenuProps(appState))} />
-                        <Route path="widgetMenu" element={React.createElement(WidgetMenu, widgetMenuProps(appState))} />
-                        <Route path="about" element={React.createElement(AboutMenu, {})} />
-                        <Route path="splash" element={React.createElement(Splash, {})} />
-                        <Route path="exchangeMenu" element={React.createElement(ExchangeMenu, exchangeMenuProps(appState))} />
-                        <Route path="templates" element={React.createElement(TemplateMenu)} />
-                        <Route path="manageWidgets" element={React.createElement(ManageWidgets)} />
+                        <Route
+                            path="manageAccount"
+                            element={React.createElement(
+                                AccountMenu,
+                                accountMenuProps(appState)
+                            )}
+                        />
+                        <Route
+                            path="widgetMenu"
+                            element={React.createElement(
+                                WidgetMenu,
+                                widgetMenuProps(appState)
+                            )}
+                        />
+                        <Route
+                            path="about"
+                            element={React.createElement(AboutMenu, {})}
+                        />
+                        <Route
+                            path="splash"
+                            element={React.createElement(Splash, {})}
+                        />
+                        <Route
+                            path="exchangeMenu"
+                            element={React.createElement(
+                                ExchangeMenu,
+                                exchangeMenuProps(appState)
+                            )}
+                        />
+                        <Route
+                            path="templates"
+                            element={React.createElement(TemplateMenu)}
+                        />
+                        <Route
+                            path="manageWidgets"
+                            element={React.createElement(ManageWidgets)}
+                        />
                     </Route>
                 </Routes>
                 {navigateComp()}
