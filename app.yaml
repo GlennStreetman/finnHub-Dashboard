@@ -10,15 +10,15 @@ services:
             - 27017:27017
         volumes:
             - mongo-data:/data/db
-    # mongo-express:
-    #     image: mongo-express
-    #     restart: always
-    #     ports:
-    #         - 8081:8081
-    #     environment:
-    #         ME_CONFIG_MONGODB_ADMINUSERNAME: "${mongoUser}"
-    #         ME_CONFIG_MONGODB_ADMINPASSWORD: "${mongoPassword}"
-    #         ME_CONFIG_MONGODB_URL: "${mongo}"
+    mongo-express:
+        image: mongo-express
+        restart: always
+        ports:
+            - 8081:8081
+        environment:
+            ME_CONFIG_MONGODB_ADMINUSERNAME: "${mongoUser}"
+            ME_CONFIG_MONGODB_ADMINPASSWORD: "${mongoPassword}"
+            ME_CONFIG_MONGODB_URL: "${mongo}"
     postgresdockerdashboard:
         image: postgres
         restart: always
@@ -29,11 +29,13 @@ services:
             - 5432:5432
         volumes:
             - postgres-data:/var/lib/postgresql/data
-    # adminer:
-    #     image: adminer
-    #     restart: always
-    #     ports:
-    #         - 8080:8080
+    adminer:
+        image: adminer
+        restart: always
+        ports:
+            - 8080:8080
+        links:
+            - postgresdockerdashboard
     dashboard:
         build:
             context: .
