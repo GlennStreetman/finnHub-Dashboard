@@ -93,7 +93,7 @@ const registerRemoteUser = (email, next) => {
         const tryRegister = `
             INSERT INTO users
             (email, exchangelist, defaultexchange, ratelimit , emailconfirmed)
-            VALUES ('${email}', 'US', 'US', 1,, 'true')
+            VALUES ('${email}', 'US', 'US', 1, 'true')
         `;
         console.log("tryRegister", tryRegister);
         db.query(tryRegister, (err, rows) => {
