@@ -1,7 +1,7 @@
 down:
 	docker-compose down
 dev:
-	npm run copy-files; docker-compose -f app.yaml up
+	docker-compose -f app.yaml up
 sdev: #silent
 	npm run copy-files; docker-compose -f  app.yaml up -d
 prod-build:

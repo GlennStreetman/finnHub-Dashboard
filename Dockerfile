@@ -1,8 +1,11 @@
 FROM node:14-alpine AS dev
-RUN npm install pm2 -g
+# RUN npm install pm2 -g
 RUN apk add --no-cache bash
 WORKDIR /app
 COPY package*.json ./
-RUN npm ci
-COPY . ./
+COPY package-lock.json ./
+RUN npm install
+COPY build ./build
+COPY ./src/server/db/postgresVersions/* ./build/server/db/postgresVersions/*
 EXPOSE 5000
+CMD ["npm", "run", "devd"]

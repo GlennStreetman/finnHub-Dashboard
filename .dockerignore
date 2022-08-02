@@ -1,5 +1,8 @@
-node_modules
-.dockerignore
 Dockerfile
-app.yaml
-app.prod.yaml
+.dockerignore
+node_modules
+npm-debug.log
+README.md
+.git
+__mocks__
+build

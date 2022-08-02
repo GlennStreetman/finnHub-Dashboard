@@ -29,13 +29,6 @@ services:
             - 5432:5432
         volumes:
             - postgres-data:/var/lib/postgresql/data
-    adminer:
-        image: adminer
-        restart: always
-        ports:
-            - 8080:8080
-        links:
-            - postgresdockerdashboard
     dashboard:
         build:
             context: .
@@ -47,12 +40,13 @@ services:
             - ./src:/app/src
             - ./build:/app/build
             - ./nodemon.json:/app/nodemon.json
-            - ./.env:/app/.env
-            - ./node_modules:/app/node_modules/
-            - ./package.json:/app/package.json
-        command: npm run devd
+        command: npm run devd --reload
 volumes:
     mongo-data:
         driver: local
     postgres-data:
         driver: local
+networks:
+    default:
+        external:
+            name: gstreet
