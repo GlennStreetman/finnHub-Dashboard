@@ -6,10 +6,13 @@ const router = express.Router();
 
 router.get("/dashboard", (req, res, next) => {
     //returns requested dashboard to user.
+    // console.log("--getDashboard--,", req.session.login);
     try {
-        if (req.session === undefined) throw new Error("Request not associated with session.");
+        if (req.session === undefined)
+            throw new Error("Request not associated with session.");
         const db = postgresDB;
         if (req.session.login === true) {
+            console.log("login session is true");
             const getSavedDashBoards = `
             SELECT *
             FROM dashBoard AS d
@@ -27,15 +30,20 @@ router.get("/dashboard", (req, res, next) => {
                 default: "",
                 message: "",
             };
+            // console.log("getDashboard", getSavedDashBoards, getMenuSetup);
             db.query(getSavedDashBoards, (err, rows, next) => {
                 if (err) {
-                    console.log(err);
+                    console.log("getSavedDashboard Error: ", err);
                     res.json({ message: "Failed to retrieve dashboards" });
                 } else {
                     const result = rows.rows;
+                    // console.log("--rows--", rows.rows);
                     for (const row in result) {
                         //For each widget in dashboard
-                        if (r.savedDashBoards[result[row].dashboardname] === undefined) {
+                        if (
+                            r.savedDashBoards[result[row].dashboardname] ===
+                            undefined
+                        ) {
                             r.savedDashBoards[result[row].dashboardname] = {
                                 dashboardname: result[row].dashboardname,
                                 globalstocklist: result[row].globalstocklist,
@@ -58,13 +66,17 @@ router.get("/dashboard", (req, res, next) => {
                             xAxis: result[row].xaxis,
                             showBody: result[row].showbody,
                         };
-                        r.savedDashBoards[resultKey].widgetlist[newObject.widgetID] = newObject;
+                        r.savedDashBoards[resultKey].widgetlist[
+                            newObject.widgetID
+                        ] = newObject;
                     }
 
                     db.query(getMenuSetup, (err, rows) => {
                         if (err) {
                             console.log(err);
-                            res.json({ message: "Failed to retrieve menu setup." });
+                            res.json({
+                                message: "Failed to retrieve menu setup.",
+                            });
                         } else {
                             const result = rows.rows;
                             if (rows.rows[0] !== undefined) {
@@ -84,7 +96,9 @@ router.get("/dashboard", (req, res, next) => {
                                 }
                                 res.status(200).json(r);
                             } else {
-                                res.status(401).json({ message: "No dashboards retrieved" });
+                                res.status(401).json({
+                                    message: "No dashboards retrieved",
+                                });
                             }
                         }
                     });
@@ -101,22 +115,28 @@ router.get("/dashboard", (req, res, next) => {
 
 router.post("/dashboard", (req, res, next) => {
     //saves users dashboard
+    // console.log("SAVING DASHBOARD", req.body);
     try {
-        if (req.session === undefined) throw new Error("Request not associated with session.");
+        if (req.session === undefined)
+            throw new Error("Request not associated with session.");
         const db = postgresDB;
         if (req.session.login === true) {
             let dashBoardName = format("%L", req.body.dashBoardName);
-            let globalStockList = format("%L", JSON.stringify(req.body.globalStockList));
+            let globalStockList = format(
+                "%L",
+                JSON.stringify(req.body.globalStockList)
+            );
             const saveDashBoardSetup = (userID) => {
                 return new Promise((resolve, reject) => {
                     const saveDashBoardSetupQuery = `
-        INSERT INTO dashboard 
-        (userID, dashBoardName, globalStockList) 
-        VALUES (${userID}, ${dashBoardName},${globalStockList})
-        ON CONFLICT (userID, dashboardname) 
-        DO UPDATE SET globalstocklist = EXCLUDED.globalstocklist
-        RETURNING ID
-        `;
+                        INSERT INTO dashboard 
+                        (userID, dashBoardName, globalStockList) 
+                        VALUES (${userID}, ${dashBoardName},${globalStockList})
+                        ON CONFLICT (userID, dashboardname) 
+                        DO UPDATE SET globalstocklist = EXCLUDED.globalstocklist
+                        RETURNING ID
+                        `;
+                    // console.log("save dashboard query",saveDashBoardSetupQuery);
                     db.query(saveDashBoardSetupQuery, (err, rows) => {
                         if (err) {
                             reject("Failed to save dashboard", err);
@@ -127,7 +147,9 @@ router.post("/dashboard", (req, res, next) => {
                             for (const widget in widgetList) {
                                 const w = widgetList[widget];
                                 const thisFilter = JSON.stringify(w.filters);
-                                const trackedStocks = JSON.stringify(w.trackedStocks);
+                                const trackedStocks = JSON.stringify(
+                                    w.trackedStocks
+                                );
                                 const saveWidget = `
                 INSERT INTO widgets
                 (dashboardkey, columnid, columnorder, config, filters, trackedstocks, widgetconfig, widgetheader, widgetid, widgettype, xaxis, yaxis, showBody)
@@ -173,7 +195,11 @@ router.post("/dashboard", (req, res, next) => {
                 return new Promise((resolve, reject) => {
                     let saveMenuSetupQuery = `INSERT INTO menuSetup 
             (userID, defaultMenu)
-            VALUES (${data}, ${dashBoardName}) 
+            VALUES (${data}, ${dashBoardName})
+
+            ON CONFLICT (userID) 
+            DO UPDATE SET defaultMenu = EXCLUDED.defaultMenu
+            RETURNING ID;
 
             SELECT userid, dashboardname FROM (
                 SELECT userid, dashboardname FROM dashboard WHERE userid = ${data} AND dashboardname= ${dashBoardName} 
@@ -182,9 +208,7 @@ router.post("/dashboard", (req, res, next) => {
             ) as foo
             limit 1
 
-            ON CONFLICT (userID) 
-            DO UPDATE SET defaultMenu = EXCLUDED.defaultMenu
-            RETURNING ID
+
             `;
                     // console.log("SAVE MENUSETUP:", saveMenuSetupQuery)
 
@@ -192,15 +216,17 @@ router.post("/dashboard", (req, res, next) => {
                         if (err) {
                             reject("Failed to save menu setup", err);
                         } else {
+                            // console.log("delete Rows-->1", rows[0].rows[0].id);
                             const menuList = req.body.menuList;
-                            let queryList = `DELETE FROM menus WHERE menukey = ${rows.rows[0].id};`; //upsert for each widget in widgetlist
+                            let queryList = `DELETE FROM menus WHERE menukey = ${rows[0].rows[0].id};`; //upsert for each widget in widgetlist
+                            // console.log("query list-->", queryList);
                             for (const widget in menuList) {
                                 const w = menuList[widget];
                                 const saveMenu = `
                 INSERT INTO menus
                 (menukey, columnid, columnorder, widgetconfig, widgetheader, widgetid, widgettype, xaxis, yaxis)
                 VALUES(
-                ${format("%L", rows.rows[0].id)}, 
+                ${format("%L", rows[0].rows[0].id)}, 
                 ${format("%L", w.column)}, 
                 ${format("%L", w.columnOrder)},  
                 ${format("%L", w.widgetConfig)}, 
@@ -241,8 +267,13 @@ router.post("/dashboard", (req, res, next) => {
                     res.status(200).json({ message: "Save Complete" });
                 })
                 .catch((err) => {
-                    console.log("/dashboard post error, updateMenuSetup: ", err);
-                    res.status(400).json({ message: "Problem saving dashboard." });
+                    console.log(
+                        "/dashboard post error, updateMenuSetup: ",
+                        err
+                    );
+                    res.status(400).json({
+                        message: "Problem saving dashboard.",
+                    });
                 });
         } else {
             res.status(401).json({ message: "Not logged in." });
@@ -254,7 +285,8 @@ router.post("/dashboard", (req, res, next) => {
 
 router.post("/renameDashboard", (req, res, next) => {
     try {
-        if (req.session === undefined) throw new Error("Request not associated with session.");
+        if (req.session === undefined)
+            throw new Error("Request not associated with session.");
         const db = postgresDB;
         if (req.session.login === true) {
             let newName = format("%L", req.body.newName);
@@ -269,7 +301,9 @@ router.post("/renameDashboard", (req, res, next) => {
             `;
             db.query(getSavedDashBoards, (err, rows) => {
                 if (err) {
-                    res.status(401).json({ message: "Dashboard name update failed." });
+                    res.status(401).json({
+                        message: "Dashboard name update failed.",
+                    });
                     console.log("Dashboard name update failed:", err);
                 } else {
                     res.status(200).json({ message: "name update success." });
