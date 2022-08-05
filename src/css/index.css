@@ -1,60 +1,70 @@
-
+html,
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto",
+        "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
+        "Helvetica Neue", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    height: 100%;
+}
+
+html,
+body,
+#root,
+.App {
+    height: 100%;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+    font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+        monospace;
 }
 
 .form-inline {
-  display: flex;
-  flex-flow: row wrap;
-  align-items: center;
-  padding: 2px;
-  margin-inline: 2px;
-  color: white;
+    display: flex;
+    flex-flow: row wrap;
+    align-items: center;
+    padding: 2px;
+    margin-inline: 2px;
+    color: white;
 }
 
 .form-stack {
-  /* display: flex; */
-  align-items: center;
-  padding: 2px;
-  margin-inline: 2px;
-  color: white;
+    /* display: flex; */
+    align-items: center;
+    padding: 2px;
+    margin-inline: 2px;
+    color: white;
 }
 
 .div-inline {
-  display: flex;
-  /* flex-grow: auto; */
-  flex-flow: row wrap;
-  align-items: center;
-  padding: 10px;
-  margin-inline: 25px;
+    display: flex;
+    /* flex-grow: auto; */
+    flex-flow: row wrap;
+    align-items: center;
+    padding: 10px;
+    margin-inline: 25px;
 }
 
 .div-side {
-  display: flex;
-  /* flex-flow: row wrap; */
-  /* align-items: center; */
-  /* padding: 10px; */
-  margin-inline: 2px;
+    display: flex;
+    /* flex-flow: row wrap; */
+    /* align-items: center; */
+    /* padding: 10px; */
+    margin-inline: 2px;
 }
 
 .btn {
-  margin: 5px;
+    margin: 5px;
 }
 
 label {
-  padding-inline: 10px;
+    padding-inline: 10px;
 }
 
 /* Style page content */
 .main {
-  margin-left: 160px; /* Same as the width of the sidebar */
-  padding: 0px 10px;
+    margin-left: 160px; /* Same as the width of the sidebar */
+    padding: 0px 10px;
 }
-
