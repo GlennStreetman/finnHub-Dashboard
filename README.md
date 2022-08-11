@@ -61,3 +61,15 @@ sets up integration testing environment
 runs integration tests
 
 > make test
+
+### NGINX
+
+GraphQL requests need to be routed to port 5000
+
+    location /graphQL {
+        proxy_pass http://127.0.0.1:5000;
+    }
+
+    location /qGraphQL {
+        proxy_pass http://127.0.0.1:5000;
+    }
