@@ -1,4 +1,4 @@
-down:
+down: 
 	docker-compose down
 dev:
 	docker-compose -f app.yaml up

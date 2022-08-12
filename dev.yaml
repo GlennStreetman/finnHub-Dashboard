@@ -32,7 +32,7 @@ services:
     dashboard:
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: dev.Dockerfile
         ports:
             - 5000:5000
             - 3002:3000

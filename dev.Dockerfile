@@ -5,7 +5,6 @@ WORKDIR /app
 COPY package*.json ./
 COPY package-lock.json ./
 RUN npm install
-COPY build ./build
 COPY ./src/server/db/postgresVersions/* ./build/server/db/postgresVersions/*
 EXPOSE 5000
-CMD ["npm", "run", "devd"]
+CMD ["npm", "run", "dev"]

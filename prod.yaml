@@ -3,7 +3,7 @@ services:
     dashboard:
         build:
             context: .
-            dockerfile: Dockerfile-prod
+            dockerfile: build.Dockerfile
         volumes:
             - ./.env:/app/.env
         ports:

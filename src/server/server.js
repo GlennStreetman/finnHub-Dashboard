@@ -54,7 +54,6 @@ import cookieParser from "cookie-parser";
 
 const app = express();
 
-
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 app.use(
@@ -151,7 +150,7 @@ app.use("/", generateTemplate);
 app.use("/", renameDashboardMongo);
 app.use("/", graphQLRedirect);
 app.use(
-    "/graphql",
+    "/graphQL",
     eg.graphqlHTTP({
         schema: schema,
         graphiql: true,
@@ -159,7 +158,7 @@ app.use(
     })
 );
 app.use(
-    "/qGraphql",
+    "/qGraphQL",
     eg.graphqlHTTP({
         schema: schema,
         pretty: true,
