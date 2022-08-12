@@ -8,4 +8,5 @@ services:
             - ./.env:/app/.env
         ports:
             - 5000:5000
-        command: npm run start
+            - 3002:3000
+        command: concurrently "npx serve -s build" "node ./build/server/server.js"

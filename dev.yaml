@@ -40,7 +40,7 @@ services:
             - ./src:/app/src
             - ./build:/app/build
             - ./nodemon.json:/app/nodemon.json
-        command: npm run devd --reload
+        command: npm run dev --reload
 volumes:
     mongo-data:
         driver: local
