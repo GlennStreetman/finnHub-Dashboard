@@ -5,7 +5,7 @@
     "private": true,
     "scripts": {
         "copy-files": "copyfiles ./src/server/db/postgresVersions/* ./build/server/db/postgresVersions/ -f",
-        "dUp": "cp test.env .env && docker-compose -f dev.yaml up",
+        "dUp": "cp dev.env .env && docker-compose -f dev.yaml up",
         "pBuild": "cp prod.env .env && npm run copy-files && docker-compose -f  dev.yaml -f prod.yaml up --build",
         "pUp": "cp prod.env .env && npm run copy-files && docker-compose -f  dev.yaml -f prod.yaml up",
         "tsc": "npx tsc -p src/server/tsconfig.json",
