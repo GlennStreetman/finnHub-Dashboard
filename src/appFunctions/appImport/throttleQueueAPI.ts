@@ -16,7 +16,11 @@ export interface finnHubQueue {
     updateInterval: Function;
 }
 
-export const createFunctionQueueObject = function (maxRequestPerInterval: number, interval: number, evenlySpaced: boolean) {
+export const createFunctionQueueObject = function (
+    maxRequestPerInterval: number,
+    interval: number,
+    evenlySpaced: boolean
+) {
     //interval = 1000 equals 1 second interval.
     let que: finnHubQueue = {
         maxRequestPerInterval: maxRequestPerInterval,
@@ -44,7 +48,10 @@ export const createFunctionQueueObject = function (maxRequestPerInterval: number
                 return;
             } else {
                 //max requests should default to 1 if evenly spaced.
-                let callbacks = this.queue.splice(0, this.maxRequestPerInterval);
+                let callbacks = this.queue.splice(
+                    0,
+                    this.maxRequestPerInterval
+                );
                 for (let x = 0; x < callbacks.length; x++) {
                     callbacks[x]();
                     this.openRequests = this.openRequests + 1;
@@ -129,8 +136,7 @@ export interface throttleApiReqObj {
 export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
     return new Promise((resolve) => {
         throttle.enqueue(function () {
-            // console.log(`running: ${new Date()} ${reqObj.apiString}`)
-            fetch(reqObj.apiString) //, { 'Access-Control-Allow-Origin': '*' }
+            fetch(`${reqObj.apiString}`) //, { 'Access-Control-Allow-Origin': '*' }
                 .then((response: any) => {
                     if (response.status === 429) {
                         console.log("--429 rate limit--");
@@ -139,7 +145,11 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                     } else if (response.status === 200) {
                         return response.json();
                     } else if (response.status === 403) {
-                        console.log("Response other than 429/200", response.status, response);
+                        console.log(
+                            "Response other than 429/200",
+                            response.status,
+                            response
+                        );
                         return {
                             status: 403,
                             // response: { message: '403: Access not granted to finnhub API premium route.' }
@@ -153,7 +163,10 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                     }
                 })
                 .then((data: any) => {
-                    if (reqObj.rSetUpdateStatus) reqObj.dispatch(reqObj.rSetUpdateStatus({ [reqObj.dashboard]: -1 }));
+                    if (reqObj.rSetUpdateStatus)
+                        reqObj.dispatch(
+                            reqObj.rSetUpdateStatus({ [reqObj.dashboard]: -1 })
+                        );
                     if (data.status === 429) {
                         const resObj: throttleResObj = {
                             dashboardID: reqObj.dashboardID,
@@ -194,7 +207,10 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                             security: reqObj.security,
                             widget: reqObj.widget,
                             apiString: reqObj.apiString,
-                            data: { message: "403: Access not granted by FinnhubAPI. Review account status & permissions." },
+                            data: {
+                                message:
+                                    "403: Access not granted by FinnhubAPI. Review account status & permissions.",
+                            },
                             dashboard: reqObj.dashboard,
                             widgetName: reqObj.widgetName,
                             widgetType: reqObj.widgetType,
@@ -226,7 +242,10 @@ export const finnHub = (throttle: finnHubQueue, reqObj: throttleApiReqObj) => {
                 })
                 .catch((error: any) => {
                     // console.log("finnHub error:", error.message, reqObj)
-                    if (reqObj.rSetUpdateStatus && reqObj.dashboard !== "pass") reqObj.dispatch(reqObj.rSetUpdateStatus({ [reqObj.dashboard]: -1 }));
+                    if (reqObj.rSetUpdateStatus && reqObj.dashboard !== "pass")
+                        reqObj.dispatch(
+                            reqObj.rSetUpdateStatus({ [reqObj.dashboard]: -1 })
+                        );
                     // console.log('request complete')
                     throttle.openRequests = throttle.openRequests -= 1;
                     const thisError: throttleResObj = {

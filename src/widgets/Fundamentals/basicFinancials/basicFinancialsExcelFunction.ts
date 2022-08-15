@@ -1,36 +1,39 @@
-import { convertCamelToProper } from '../../../appFunctions/stringFunctions'
+import { convertCamelToProper } from "../../../appFunctions/stringFunctions";
 
-export const basicFinancialsExcel = function (apiKey, currentDashBoard, widgetHeader, security, config) {
-
+export const basicFinancialsExcel = function (
+    apiKey,
+    currentDashBoard,
+    widgetHeader,
+    security,
+    config
+) {
     const columnKeys = function () {
-        if (config.toggleMode === 'metrics') {
-            const returnList: any[] = []
+        if (config.toggleMode === "metrics") {
+            const returnList: any[] = [];
             for (const x in config.metricSelection) {
-                let name = convertCamelToProper(config.metricSelection[x])
+                let name = convertCamelToProper(config.metricSelection[x]);
                 const addReturnList = {
-                    [name]: config.metricSelection[x]
-                }
-                returnList.push(addReturnList)
+                    [name]: config.metricSelection[x],
+                };
+                returnList.push(addReturnList);
             }
-            return returnList
-        } else { //time series
-            let name = convertCamelToProper(config.targetSeries)
-            const returnList = [
-                { Period: `period` },
-                { [name]: `v` },
-            ]
-            return returnList
+            return returnList;
+        } else {
+            //time series
+            let name = convertCamelToProper(config.targetSeries);
+            const returnList = [{ Period: `period` }, { [name]: `v` }];
+            return returnList;
         }
-    }
+    };
 
     const data = {
         apiKey: apiKey,
         dashboard: currentDashBoard,
         widget: widgetHeader,
-        columnKeys: columnKeys()
+        columnKeys: columnKeys(),
     };
     //@ts-ignore
-    if (security) data.security = security
+    if (security) data.security = security;
 
     const options = {
         method: "POST",
@@ -38,11 +41,10 @@ export const basicFinancialsExcel = function (apiKey, currentDashBoard, widgetHe
         body: JSON.stringify(data),
     };
 
-    fetch("/generateTemplate", options)
-        .then(response => response.blob())
-        .then(blob => {
+    fetch("/api/generateTemplate", options)
+        .then((response) => response.blob())
+        .then((blob) => {
             var file = window.URL.createObjectURL(blob);
             window.location.assign(file);
-        })
-}
-
+        });
+};

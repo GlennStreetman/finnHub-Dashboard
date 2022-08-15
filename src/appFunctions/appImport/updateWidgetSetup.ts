@@ -1,8 +1,12 @@
-import { AppState, widgetSetup } from './../../App'
+import { AppState, widgetSetup } from "./../../App";
 
-export const updateWidgetSetup = function (el: widgetSetup, widgetSetup: widgetSetup) { //widget ref, true/false
+export const updateWidgetSetup = function (
+    el: widgetSetup,
+    widgetSetup: widgetSetup
+) {
+    //widget ref, true/false
     //saved widet setup in postgres
-    const newWidgetSetup: widgetSetup = { ...widgetSetup, ...el }
+    const newWidgetSetup: widgetSetup = { ...widgetSetup, ...el };
 
     const data = {
         field: "widgetsetup",
@@ -15,11 +19,11 @@ export const updateWidgetSetup = function (el: widgetSetup, widgetSetup: widgetS
         body: JSON.stringify(data),
     };
 
-    fetch("/accountData", options)
+    fetch("/api/accountData", options)
         .then((response) => response.json())
         .then((data) => {
-            console.log(data.message)
+            console.log(data.message);
         });
 
-    return newWidgetSetup
-}
+    return newWidgetSetup;
+};

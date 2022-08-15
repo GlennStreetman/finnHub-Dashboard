@@ -4,7 +4,7 @@ import postgresDB from "./../../db/databaseLocalPG.js";
 
 const router = express.Router();
 
-router.get("/dashboard", (req, res, next) => {
+router.get("/api/dashboard", (req, res, next) => {
     //returns requested dashboard to user.
     // console.log("--getDashboard--,", req.session.login);
     try {
@@ -113,7 +113,7 @@ router.get("/dashboard", (req, res, next) => {
     }
 });
 
-router.post("/dashboard", (req, res, next) => {
+router.post("/api/dashboard", (req, res, next) => {
     //saves users dashboard
     // console.log("SAVING DASHBOARD", req.body);
     try {
@@ -283,7 +283,7 @@ router.post("/dashboard", (req, res, next) => {
     }
 });
 
-router.post("/renameDashboard", (req, res, next) => {
+router.post("/api/renameDashboard", (req, res, next) => {
     try {
         if (req.session === undefined)
             throw new Error("Request not associated with session.");

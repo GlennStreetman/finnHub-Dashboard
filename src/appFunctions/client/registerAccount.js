@@ -4,12 +4,22 @@ function emailIsValid(email) {
 
 const passwordIsValid = function (password) {
     //Minimum eight characters, at least one letter, one number and one special character:
-    return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(password);
+    return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(
+        password
+    );
 };
 
-export const registerAccount = async function registerAccount(email, password, password2) {
+export const registerAccount = async function registerAccount(
+    email,
+    password,
+    password2
+) {
     console.log("attempting registration", email, password, password2);
-    if (emailIsValid(email) === true && password === password2 && passwordIsValid(password)) {
+    if (
+        emailIsValid(email) === true &&
+        password === password2 &&
+        passwordIsValid(password)
+    ) {
         console.log("is Valid");
         const reqObj = {
             pwText: password,
@@ -22,7 +32,7 @@ export const registerAccount = async function registerAccount(email, password, p
             body: JSON.stringify(reqObj),
         };
         console.log("fetching");
-        let res = await fetch("/register", options);
+        let res = await fetch("/api/register", options);
         console.log("registration status: ", res.status);
         if (res.status === 500) {
             console.log("error registering 500");

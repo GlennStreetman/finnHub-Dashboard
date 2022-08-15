@@ -1,10 +1,9 @@
-import express from 'express';
-const router =  express.Router();
+import express from "express";
+const router = express.Router();
 
-router.get('/graphQLRediirect', (req, res) => {
-    console.log("Redirect to graphiQL")
-    res.status(302).redirect('/graphQL');
-})
+router.get("/api/graphQLRediirect", (req, res) => {
+    console.log("Redirect to graphiQL");
+    res.status(302).redirect("/graphQL");
+});
 
-export default router
-
+export default router;

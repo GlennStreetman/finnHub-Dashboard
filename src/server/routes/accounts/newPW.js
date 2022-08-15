@@ -8,12 +8,15 @@ const router = express.Router();
 const passwordIsValid = function (password) {
     //Minimum eight characters, at least one letter, one number and one special character:
     console.log("testing pw", password);
-    return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(password);
+    return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(
+        password
+    );
 };
 
-router.post("/newPW", (req, res, next) => {
+router.post("/api/newPW", (req, res, next) => {
     try {
-        if (req.session === undefined) throw new Error("Request not associated with session.");
+        if (req.session === undefined)
+            throw new Error("Request not associated with session.");
         if (req.session.login === true) {
             if (passwordIsValid(req.body.newPassword)) {
                 const db = postgresDB;
@@ -26,16 +29,23 @@ router.post("/newPW", (req, res, next) => {
     WHERE id = ${id}`;
                 db.query(newQuery, (err, rows) => {
                     if (err) {
-                        res.status(400).json({ message: "Password not updated, contact support." });
+                        res.status(400).json({
+                            message: "Password not updated, contact support.",
+                        });
                     } else if (rows.rowCount === 1) {
                         res.status(200).json({ message: "Password Updated" });
                     } else {
                         console.log();
-                        res.status(401).json({ message: "Password not updated, contact support." });
+                        res.status(401).json({
+                            message: "Password not updated, contact support.",
+                        });
                     }
                 });
             } else {
-                res.status(401).json({ message: "Password must be >7 characters, 1 upper, 1 special." });
+                res.status(401).json({
+                    message:
+                        "Password must be >7 characters, 1 upper, 1 special.",
+                });
             }
         } else {
             console.log("not logged in");

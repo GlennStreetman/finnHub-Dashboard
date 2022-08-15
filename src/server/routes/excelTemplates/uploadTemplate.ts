@@ -16,9 +16,10 @@ interface uploadTemplate extends Request {
 }
 
 //@ts-ignore
-router.get("/uploadTemplate", (req: uploadTemplate, res: any, next) => {
+router.get("/api/uploadTemplate", (req: uploadTemplate, res: any, next) => {
     try {
-        if (req.session === undefined) throw new Error("Request not associated with session.");
+        if (req.session === undefined)
+            throw new Error("Request not associated with session.");
         if (req.session.login === true) {
             const userDirecotry = `${appRootPath}/uploads/${req.session.uID}/`;
             // let directory_name = "example_dir";
@@ -40,44 +41,58 @@ router.get("/uploadTemplate", (req: uploadTemplate, res: any, next) => {
         next(error);
     }
 });
-//@ts-ignore
-router.post("/uploadTemplate", async (req: uploadTemplate, res: any, next) => {
-    try {
-        if (req.session === undefined) throw new Error("Login request not associated with session.");
-        if (req.session.login === true) {
-            const userID = req.session.uID;
 
-            const uploadsFolder = `${appRootPath}/uploads/`;
-            const tempFolder = `${appRootPath}/uploads/${userID}/`;
-            makeTempDir(uploadsFolder);
-            makeTempDir(tempFolder);
+router.post(
+    "/api/uploadTemplate",
+    //@ts-ignore
+    async (req: uploadTemplate, res: any, next) => {
+        try {
+            if (req.session === undefined)
+                throw new Error("Login request not associated with session.");
+            if (req.session.login === true) {
+                const userID = req.session.uID;
 
-            try {
-                if (!req.files) {
-                    res.status(500).send({
-                        status: false,
-                        message: "No file uploaded",
-                    });
-                } else {
-                    let uploadFile = req.files.file;
-                    const uploadName = uploadFile.name.replace("xlsx", ".xlsx").replace("xlsm", ".xlsm");
-                    if (uploadName.includes(".xlsx") || uploadName.includes(".xlsm")) {
-                        uploadFile.mv(`./uploads/${userID}/${uploadFile.name.replace("xlsx", ".xlsx").replace("xlsm", ".xlsm")}`);
+                const uploadsFolder = `${appRootPath}/uploads/`;
+                const tempFolder = `${appRootPath}/uploads/${userID}/`;
+                makeTempDir(uploadsFolder);
+                makeTempDir(tempFolder);
+
+                try {
+                    if (!req.files) {
+                        res.status(500).send({
+                            status: false,
+                            message: "No file uploaded",
+                        });
+                    } else {
+                        let uploadFile = req.files.file;
+                        const uploadName = uploadFile.name
+                            .replace("xlsx", ".xlsx")
+                            .replace("xlsm", ".xlsm");
+                        if (
+                            uploadName.includes(".xlsx") ||
+                            uploadName.includes(".xlsm")
+                        ) {
+                            uploadFile.mv(
+                                `./uploads/${userID}/${uploadFile.name
+                                    .replace("xlsx", ".xlsx")
+                                    .replace("xlsm", ".xlsm")}`
+                            );
+                        }
+                        res.status(200).send({
+                            message: "File is uploaded",
+                        });
                     }
-                    res.status(200).send({
-                        message: "File is uploaded",
-                    });
+                } catch (err) {
+                    console.log(err);
+                    res.status(500).send({ message: err });
                 }
-            } catch (err) {
-                console.log(err);
-                res.status(500).send({ message: err });
+            } else {
+                res.status(500).send({ message: "Not logged in." });
             }
-        } else {
-            res.status(500).send({ message: "Not logged in." });
+        } catch (error) {
+            next(error);
         }
-    } catch (error) {
-        next(error);
     }
-});
+);
 
 export default router;

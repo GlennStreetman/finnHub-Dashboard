@@ -1,21 +1,15 @@
-import { rest } from 'msw'
+import { rest } from "msw";
 
-export const getFinnDashData_noData =     //auto login check rejected.
-    rest.get("/getFinnDashDataMongo", (req, res, ctx) => {
+export const getFinnDashData_noData = //auto login check rejected.
+    rest.get("/api/getFinnDashDataMongo", (req, res, ctx) => {
         // console.log('get finnDashData no data returned')
-        const resList: any[] = []
+        const resList: any[] = [];
         // console.log('/finnDashDataReturning blank data')
-        return res(
-            ctx.status(200),
-            ctx.json({ resList })
-        )
-    })
+        return res(ctx.status(200), ctx.json({ resList }));
+    });
 
-export const postFinnDashData_noSave =     //auto login check rejected.
-    rest.post("/postFinnDashDataMongo", (req, res, ctx) => {
+export const postFinnDashData_noSave = //auto login check rejected.
+    rest.post("/api/postFinnDashDataMongo", (req, res, ctx) => {
         // console.log('post finnDashData no data saved')
-        return res(
-            ctx.status(200),
-            ctx.json({ message: `Updates Complete` })
-        )
-    })
+        return res(ctx.status(200), ctx.json({ message: `Updates Complete` }));
+    });

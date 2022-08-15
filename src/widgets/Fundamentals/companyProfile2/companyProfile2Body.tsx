@@ -6,7 +6,9 @@ import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 
 import WidgetFocus from "../../../components/widgetFocus";
 import WidgetRemoveSecurityTable from "../../../components/widgetRemoveSecurityTable";
-import StockSearchPane, { searchPaneProps } from "../../../components/stockSearchPane";
+import StockSearchPane, {
+    searchPaneProps,
+} from "../../../components/stockSearchPane";
 
 import { convertCamelToProper } from "../../../appFunctions/stringFunctions";
 
@@ -35,9 +37,12 @@ function FundamentalsCompanyProfile2(p: widgetProps, ref: any) {
     const isInitialMount = useRef(true); //update to false after first render.
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
-    const startingWidgetCoptyRef = () => {
+    const startingWidgetCopyRef = () => {
         if (isInitialMount.current === true) {
-            if (p.widgetCopy !== undefined && typeof p.widgetCopy.widgetID === "number") {
+            if (
+                p.widgetCopy !== undefined &&
+                typeof p.widgetCopy.widgetID === "number"
+            ) {
                 return p.widgetCopy.widgetID;
             } else {
                 return 0;
@@ -47,7 +52,7 @@ function FundamentalsCompanyProfile2(p: widgetProps, ref: any) {
         }
     };
 
-    const [widgetCopy] = useState(startingWidgetCoptyRef());
+    const [widgetCopy] = useState(startingWidgetCopyRef());
     const apiKey = useSelector((state) => {
         return state.apiKey;
     });
@@ -63,12 +68,21 @@ function FundamentalsCompanyProfile2(p: widgetProps, ref: any) {
     const exchangeList = useSelector((state) => {
         return state.exchangeList.exchangeList;
     });
-    const dashboardID = dashboardData?.[currentDashboard]?.["id"] ? dashboardData[currentDashboard]["id"] : -1;
+    const dashboardID = dashboardData?.[currentDashboard]?.["id"]
+        ? dashboardData[currentDashboard]["id"]
+        : -1;
 
     const rShowData = useSelector((state) => {
         //REDUX Data associated with this widget.
-        if (state.dataModel !== undefined && state.dataModel.created !== "false" && state.showData.dataSet[p.widgetKey] !== undefined) {
-            const showData: object = state?.showData?.dataSet?.[p.widgetKey]?.[p.config.targetSecurity];
+        if (
+            state.dataModel !== undefined &&
+            state.dataModel.created !== "false" &&
+            state.showData.dataSet[p.widgetKey] !== undefined
+        ) {
+            const showData: object =
+                state?.showData?.dataSet?.[p.widgetKey]?.[
+                    p.config.targetSecurity
+                ];
             return showData;
         }
     });
@@ -79,9 +93,32 @@ function FundamentalsCompanyProfile2(p: widgetProps, ref: any) {
     }, [p?.config?.targetSecurity]);
 
     useDragCopy(ref, {}); //useImperativeHandle. Saves state on drag. Dragging widget pops widget out of component array causing re-render as new component.
-    useUpdateFocus(targetSecurity, p.widgetKey, p.config, dashboardData, currentDashboard, p.enableDrag, dispatch); //sets security focus in config. Used for redux.visable data and widget excel templating.
-    useSearchMongoDb(currentDashboard, p.finnHubQueue, p.config.targetSecurity, p.widgetKey, widgetCopy, dispatch, isInitialMount, dashboardID); //on change to target security retrieve fresh data from mongoDB
-    useBuildVisableData(focusSecurityList, p.widgetKey, widgetCopy, dispatch, isInitialMount); //rebuild visable data on update to target security
+    useUpdateFocus(
+        targetSecurity,
+        p.widgetKey,
+        p.config,
+        dashboardData,
+        currentDashboard,
+        p.enableDrag,
+        dispatch
+    ); //sets security focus in config. Used for redux.visable data and widget excel templating.
+    useSearchMongoDb(
+        currentDashboard,
+        p.finnHubQueue,
+        p.config.targetSecurity,
+        p.widgetKey,
+        widgetCopy,
+        dispatch,
+        isInitialMount,
+        dashboardID
+    ); //on change to target security retrieve fresh data from mongoDB
+    useBuildVisableData(
+        focusSecurityList,
+        p.widgetKey,
+        widgetCopy,
+        dispatch,
+        isInitialMount
+    ); //rebuild visable data on update to target security
 
     function stockListForm() {
         let stockListTable = (
@@ -101,10 +138,17 @@ function FundamentalsCompanyProfile2(p: widgetProps, ref: any) {
         const rows = rShowData ? (
             Object.keys(rShowData).map((key) => (
                 <tr key={rShowData?.[key + "tr"] + key}>
-                    <td key={rShowData?.[key + "td"]}>{`${convertCamelToProper(key)}: `}</td>
+                    <td key={rShowData?.[key + "td"]}>{`${convertCamelToProper(
+                        key
+                    )}: `}</td>
                     <td key={rShowData?.[key + "td2"] + key}>
                         {key === "logo" ? (
-                            <img key={rShowData?.[key + "pic"] + key} width="25%" src={rShowData?.[key]} alt={rShowData?.[key]}></img>
+                            <img
+                                key={rShowData?.[key + "pic"] + key}
+                                width="25%"
+                                src={rShowData?.[key]}
+                                alt={rShowData?.[key]}
+                            ></img>
                         ) : (
                             rShowData?.[key]
                         )}
@@ -112,7 +156,7 @@ function FundamentalsCompanyProfile2(p: widgetProps, ref: any) {
                 </tr>
             ))
         ) : (
-            <></>
+            <tr></tr>
         );
         return rows;
     }
@@ -123,7 +167,14 @@ function FundamentalsCompanyProfile2(p: widgetProps, ref: any) {
 
     function renderStockData() {
         // console.log(rShowData, p.config.targetSecurit);
-        const stockData = rShowData === undefined ? `No data availabole for ${p.config.targetSecurity}` : mapStockData();
+        const stockData =
+            rShowData === undefined ? (
+                <tr>
+                    <td>`No data availabole for ${p.config.targetSecurity}`</td>
+                </tr>
+            ) : (
+                mapStockData()
+            );
 
         const stockTable = (
             <>
@@ -155,13 +206,15 @@ function FundamentalsCompanyProfile2(p: widgetProps, ref: any) {
 
     return (
         <div data-testid="body-companyProfile2Body">
-            {p.showEditPane === 1 && (
+            {p.showEditPane === 1 ? (
                 <>
                     {React.createElement(StockSearchPane, searchPaneProps(p))}
                     {renderSearchPane()}
                 </>
+            ) : (
+                <></>
             )}
-            {p.showEditPane === 0 && <>{renderStockData()}</>}
+            {p.showEditPane === 0 ? <>{renderStockData()}</> : <></>}
         </div>
     );
 }

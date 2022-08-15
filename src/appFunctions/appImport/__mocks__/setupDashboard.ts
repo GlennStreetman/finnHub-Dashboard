@@ -5,7 +5,10 @@ export const saveDashboard = async function (dashboardName: string) {
     if (this.state.enableDrag === true) {
         await new Promise((resolve) => setTimeout(resolve, 0));
         return this.saveDashboard(dashboardName); //try again
-    } else if (this.state.saveDashboardFlag === false && now - this.state.saveDashboardThrottle > 5000) {
+    } else if (
+        this.state.saveDashboardFlag === false &&
+        now - this.state.saveDashboardThrottle > 5000
+    ) {
         this.setState(
             {
                 saveDashboardThrottle: now,
@@ -18,8 +21,14 @@ export const saveDashboard = async function (dashboardName: string) {
                     if (this.state.login === 1) {
                         const data = {
                             dashBoardName: dashboardName,
-                            globalStockList: this.state.dashBoardData[this.props.currentDashboard].globalstocklist,
-                            widgetList: this.state.dashBoardData[this.props.currentDashboard].widgetlist,
+                            globalStockList:
+                                this.state.dashBoardData[
+                                    this.props.currentDashboard
+                                ].globalstocklist,
+                            widgetList:
+                                this.state.dashBoardData[
+                                    this.props.currentDashboard
+                                ].widgetlist,
                             menuList: this.props.menuList,
                         };
                         const options = {
@@ -27,7 +36,7 @@ export const saveDashboard = async function (dashboardName: string) {
                             headers: { "Content-Type": "application/json" },
                             body: JSON.stringify(data),
                         };
-                        fetch("/dashBoard", options) //posts that data to be saved.
+                        fetch("/api/dashBoard", options) //posts that data to be saved.
                             .then((res) => res.json())
                             .then((data) => {
                                 res(true);
@@ -41,10 +50,16 @@ export const saveDashboard = async function (dashboardName: string) {
                 return status;
             }
         );
-    } else if (this.state.saveDashboardFlag === false && now - this.state.saveDashboardThrottle < 5000) {
+    } else if (
+        this.state.saveDashboardFlag === false &&
+        now - this.state.saveDashboardThrottle < 5000
+    ) {
         //if not updating but flag not set to true, suspend save and try again after timer.
 
-        const waitPeriod = 5000 - (now - this.state.saveDashboardThrottle) > 0 ? 5000 - (now - this.state.saveDashboardThrottle) : 1000;
+        const waitPeriod =
+            5000 - (now - this.state.saveDashboardThrottle) > 0
+                ? 5000 - (now - this.state.saveDashboardThrottle)
+                : 1000;
         await new Promise((resolve) => setTimeout(resolve, 0));
         return this.saveDashboard(dashboardName); //try again
     } else {

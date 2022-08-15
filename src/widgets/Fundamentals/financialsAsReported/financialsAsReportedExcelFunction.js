@@ -1,32 +1,34 @@
-
-export const financialsAsReportedExcel = function (apiKey, currentDashBoard, widgetHeader, security) {
-
+export const financialsAsReportedExcel = function (
+    apiKey,
+    currentDashBoard,
+    widgetHeader,
+    security
+) {
     const columnKeys = [
-        {AccessNumber: 'accessNumber'},
-        {Symbol: 'symbol'},
-        {CIK: 'cik'},
-        {Year: 'year'},
-        {Quarter: 'quarter'},
-        {Form: 'form'},
-        {StartDate: 'startDate'},
-        {EndDate: 'endDate'},
-        {FiledDate: 'filedDate'},
-        {AcceptedDate: 'acceptedDate'},
-        {Unit: 'unit'},
-        {Label: 'label'},
-        {Concept: 'concept'},
-        {Value: 'value'},
-    ]
+        { AccessNumber: "accessNumber" },
+        { Symbol: "symbol" },
+        { CIK: "cik" },
+        { Year: "year" },
+        { Quarter: "quarter" },
+        { Form: "form" },
+        { StartDate: "startDate" },
+        { EndDate: "endDate" },
+        { FiledDate: "filedDate" },
+        { AcceptedDate: "acceptedDate" },
+        { Unit: "unit" },
+        { Label: "label" },
+        { Concept: "concept" },
+        { Value: "value" },
+    ];
 
-    
-    const data = { 
+    const data = {
         apiKey: apiKey,
         dashboard: currentDashBoard,
         widget: widgetHeader,
-        columnKeys: columnKeys
+        columnKeys: columnKeys,
     };
 
-    if (security) data.security = security
+    if (security) data.security = security;
 
     const options = {
         method: "POST",
@@ -34,10 +36,10 @@ export const financialsAsReportedExcel = function (apiKey, currentDashBoard, wid
         body: JSON.stringify(data),
     };
 
-    fetch("/generateTemplate", options)
-        .then(response => response.blob())
-        .then(blob => {
+    fetch("/api/generateTemplate", options)
+        .then((response) => response.blob())
+        .then((blob) => {
             var file = window.URL.createObjectURL(blob);
             window.location.assign(file);
-        })
-}
+        });
+};

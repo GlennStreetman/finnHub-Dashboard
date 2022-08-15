@@ -20,9 +20,10 @@ interface resObj {
 }
 
 //@ts-ignore
-router.get("/deleteTemplate", (req: uploadTemplatePost, res: any, next) => {
+router.get("/api/deleteTemplate", (req: uploadTemplatePost, res: any, next) => {
     try {
-        if (req.session === undefined) throw new Error("Login request not associated with session.");
+        if (req.session === undefined)
+            throw new Error("Login request not associated with session.");
         if (req.session.login === true) {
             const template = req.query["template"];
             const userDirecotry: string = `${appRootPath}/uploads/${req.session.uID}/`;

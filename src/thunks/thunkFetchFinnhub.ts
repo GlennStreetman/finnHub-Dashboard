@@ -1,5 +1,10 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
-import { finnHub, throttleResObj as queResObj, finnHubQueue, throttleApiReqObj } from "../appFunctions/appImport/throttleQueueAPI";
+import {
+    finnHub,
+    throttleResObj as queResObj,
+    finnHubQueue,
+    throttleApiReqObj,
+} from "../appFunctions/appImport/throttleQueueAPI";
 
 //Receives list of widgets and checks stale dates in slice/datamodel to see if updates are needed.
 //If data is not fresh dispatch finnHub api request to throttleQueue.
@@ -24,7 +29,8 @@ export const tGetFinnhubData = createAsyncThunk(
     (req: tgetFinnHubDataReq, thunkAPI: any) => {
         //{dashboard: string, widgetList: []} //receives list of widgets from a dashboard to update.
         const finnQueue = req.finnHubQueue;
-        const dataModel = thunkAPI.getState().dataModel.dataSet[req.targetDashBoard]; //finnHubData
+        const dataModel =
+            thunkAPI.getState().dataModel.dataSet[req.targetDashBoard]; //finnHubData
         const getWidgets = req.widgetList;
         let requestList: Promise<any>[] = [];
         for (const w of getWidgets) {
@@ -52,7 +58,9 @@ export const tGetFinnhubData = createAsyncThunk(
                     countQueue = countQueue + 1;
                 }
             }
-            req.dispatch(req.rSetUpdateStatus({ [req.targetDashBoard]: countQueue }));
+            req.dispatch(
+                req.rSetUpdateStatus({ [req.targetDashBoard]: countQueue })
+            );
         }
         return Promise.all(requestList) //return value for thunk
             .then((res) => {
@@ -67,7 +75,7 @@ export const tGetFinnhubData = createAsyncThunk(
                     body: JSON.stringify(resObj),
                 };
                 if (Object.keys(resObj).length > 0) {
-                    fetch("/postFinnDashDataMongo", options) //cache finnnDash data to mongoDB.
+                    fetch("/api/postFinnDashDataMongo", options) //cache finnnDash data to mongoDB.
                         .then((response) => {
                             return response.json();
                         })

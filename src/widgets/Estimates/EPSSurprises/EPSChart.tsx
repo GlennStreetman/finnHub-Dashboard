@@ -26,8 +26,12 @@ const options = {
         tooltip: {
             callbacks: {
                 label: function (label) {
-                    console.log(label);
-                    return new Date(label.parsed.x).toISOString().slice(0, 10) + ": " + label.parsed.y;
+                    // console.log(label);
+                    return (
+                        new Date(label.parsed.x).toISOString().slice(0, 10) +
+                        ": " +
+                        label.parsed.y
+                    );
                 },
             },
         },
@@ -42,8 +46,16 @@ interface props {
 export default function EPSChart(p: props) {
     const chart = p.chartData ? (
         <>
-            <div data-testid={p.testid} style={{ height: "auto", width: "100%" }}>
-                <Scatter height="auto" width="inherit" options={options} data={p.chartData} />
+            <div
+                data-testid={p.testid}
+                style={{ height: "auto", width: "100%" }}
+            >
+                <Scatter
+                    height="auto"
+                    width="inherit"
+                    options={options}
+                    data={p.chartData}
+                />
             </div>{" "}
         </>
     ) : (

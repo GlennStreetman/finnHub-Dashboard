@@ -21,13 +21,18 @@ function emailIsValid(email) {
 
 const passwordIsValid = function (password) {
     //Minimum eight characters, at least one letter, one number and one special character:
-    return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(password);
+    return /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/.test(
+        password
+    );
 };
 
-router.post("/register", (req, res) => {
+router.post("/api/register", (req, res) => {
     const pwText = format("%L", req.body.pwText);
     const emailText = format("%L", req.body.emailText);
-    const validateKey = process.env.EMAIL === "true" ? cryptoRandomString({ length: 32 }) : "pass";
+    const validateKey =
+        process.env.EMAIL === "true"
+            ? cryptoRandomString({ length: 32 })
+            : "pass";
     const checkEmail = `SELECT email FROM users WHERE email = ${emailText}`;
     const requireConfirm = process.env.EMAIL === "true" ? false : true; //if EMAIL set to false, insert true into db so that confirmation email is not necesarry.
     const createUser = `
@@ -85,7 +90,10 @@ router.post("/register", (req, res) => {
                         if (req.body.emailText.indexOf("@test.com") === -1) {
                             mg.messages().send(data, (error) => {
                                 if (error) {
-                                    console.log("mailgun register error", error);
+                                    console.log(
+                                        "mailgun register error",
+                                        error
+                                    );
                                 }
                             });
                         }
@@ -98,7 +106,10 @@ router.post("/register", (req, res) => {
         });
     };
 
-    if (emailIsValid(req.body.emailText) === true && passwordIsValid(req.body.pwText) === true) {
+    if (
+        emailIsValid(req.body.emailText) === true &&
+        passwordIsValid(req.body.pwText) === true
+    ) {
         checkEmailUnique()
             .then(() => {
                 return createNewUser();
@@ -114,7 +125,9 @@ router.post("/register", (req, res) => {
                 res.status(400).json({ message: "Email already registered" });
             });
     } else {
-        res.status(401).json({ message: "Enter a valid email address & check other info." });
+        res.status(401).json({
+            message: "Enter a valid email address & check other info.",
+        });
     }
 });
 

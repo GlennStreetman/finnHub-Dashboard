@@ -186,8 +186,7 @@ export default function App() {
     }
 
     useEffect(() => {
-        const route = `/checkLogin`;
-        fetch(route)
+        fetch("/api/checkLogin")
             .then((response) => response.json())
             .then(async (data) => {
                 if (data.login === 1) {
@@ -233,7 +232,8 @@ export default function App() {
         if (
             Object.keys(globalStockList).length > 0 &&
             login === 1 &&
-            apiKey !== ""
+            apiKey !== "" &&
+            !apiKey.includes("sandbox")
         ) {
             //price data for watchlist, including socket data.
             LoadTickerSocket(
@@ -246,7 +246,7 @@ export default function App() {
                 dispatch
             );
         }
-    }, [globalStockList, login]);
+    }, [globalStockList, login, apiKey]);
 
     useEffect(() => {
         const globalKeys = globalStockList ? Object.keys(globalStockList) : [];

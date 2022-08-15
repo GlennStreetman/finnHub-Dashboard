@@ -1,86 +1,129 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { menuList, dashBoardData } from 'src/App'
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { menuList, dashBoardData } from "src/App";
 
-interface serverData { //replace after route is converted to typescript
-    savedDashBoards: any,
-    menuSetup: any,
-    default: any,
-    message: string,
-    apiKey: string,
+interface serverData {
+    //replace after route is converted to typescript
+    savedDashBoards: any;
+    menuSetup: any;
+    default: any;
+    message: string;
+    apiKey: string;
 }
 
 export interface tGetSavedDashBoardsRes {
-    dashBoardData: dashBoardData | Partial<dashBoardData>
-    currentDashBoard: string
-    menuList: menuList | Partial<menuList>
-    message?: string
+    dashBoardData: dashBoardData | Partial<dashBoardData>;
+    currentDashBoard: string;
+    menuList: menuList | Partial<menuList>;
+    message?: string;
 }
 
 const blankDashboard: tGetSavedDashBoardsRes = {
     dashBoardData: {
         NEW: {
-            dashboardname: 'NEW',
+            dashboardname: "NEW",
             globalstocklist: {},
             widgetlist: {},
             id: false,
-        }
+        },
     },
-    currentDashBoard: 'NEW',
+    currentDashBoard: "NEW",
     menuList: {
-        watchListMenu: { column: 0, columnOrder: -3, widgetConfig: "menuWidget", widgetHeader: "WatchList", widgetID: "watchListMenu", widgetType: "watchListMenu", xAxis: "5rem", yAxis: "5rem", showBody: true },
-        dashBoardMenu: { column: 0, columnOrder: -2, widgetConfig: "menuWidget", widgetHeader: "Saved Dashboards", widgetID: "dashBoardMenu", widgetType: "dashBoardMenu", xAxis: "5rem", yAxis: "5rem", showBody: true },
-        GQLMenu: { column: 0, columnOrder: -1, widgetConfig: "menuWidget", widgetHeader: "Graph QL", widgetID: "GQLMenu", widgetType: "GQLMenu", "xAxis": "5rem", yAxis: "5rem", showBody: true },
+        watchListMenu: {
+            column: 0,
+            columnOrder: -3,
+            widgetConfig: "menuWidget",
+            widgetHeader: "WatchList",
+            widgetID: "watchListMenu",
+            widgetType: "watchListMenu",
+            xAxis: "5rem",
+            yAxis: "5rem",
+            showBody: true,
+        },
+        dashBoardMenu: {
+            column: 0,
+            columnOrder: -2,
+            widgetConfig: "menuWidget",
+            widgetHeader: "Saved Dashboards",
+            widgetID: "dashBoardMenu",
+            widgetType: "dashBoardMenu",
+            xAxis: "5rem",
+            yAxis: "5rem",
+            showBody: true,
+        },
+        GQLMenu: {
+            column: 0,
+            columnOrder: -1,
+            widgetConfig: "menuWidget",
+            widgetHeader: "Graph QL",
+            widgetID: "GQLMenu",
+            widgetType: "GQLMenu",
+            xAxis: "5rem",
+            yAxis: "5rem",
+            showBody: true,
+        },
     },
-    message: 'No saved dashboards'
-}
+    message: "No saved dashboards",
+};
 
 export const tGetSavedDashboards = createAsyncThunk(
-    'tGetSavedDashboards',
+    "tGetSavedDashboards",
     (req: { apiKey: string }) => {
-        return new Promise((async (resolve: any,) => {
+        return new Promise(async (resolve: any) => {
             try {
-                const res = await fetch("/dashBoard")
-                const data = await res.json()
+                const res = await fetch("/api/dashBoard");
+                const data = await res.json();
                 if (res.status === 200) {
-                    let parseDashBoard = data.savedDashBoards
-                    for (const dash in parseDashBoard) { //parse fields that are returned as strings.
-                        parseDashBoard[dash].globalstocklist = JSON.parse(parseDashBoard[dash].globalstocklist)
-                        const thisDash = parseDashBoard[dash].widgetlist
+                    let parseDashBoard = data.savedDashBoards;
+                    for (const dash in parseDashBoard) {
+                        //parse fields that are returned as strings.
+                        parseDashBoard[dash].globalstocklist = JSON.parse(
+                            parseDashBoard[dash].globalstocklist
+                        );
+                        const thisDash = parseDashBoard[dash].widgetlist;
                         for (const widget in thisDash) {
-                            thisDash[widget].filters = JSON.parse(thisDash[widget].filters)
-                            thisDash[widget].trackedStocks = JSON.parse(thisDash[widget].trackedStocks)
-                            thisDash[widget].config = JSON.parse(thisDash[widget].config)
+                            thisDash[widget].filters = JSON.parse(
+                                thisDash[widget].filters
+                            );
+                            thisDash[widget].trackedStocks = JSON.parse(
+                                thisDash[widget].trackedStocks
+                            );
+                            thisDash[widget].config = JSON.parse(
+                                thisDash[widget].config
+                            );
                         }
-                        delete parseDashBoard[dash].widgetlist['null']
+                        delete parseDashBoard[dash].widgetlist["null"];
                     }
-                    const menuList: menuList = {}
+                    const menuList: menuList = {};
                     for (const menu in data.menuSetup) {
-                        menuList[menu] = data.menuSetup[menu]
+                        menuList[menu] = data.menuSetup[menu];
                     }
 
-                    const noDashboards = Object.keys(parseDashBoard).length === 0 ? true : false
-                    const defaultDash = parseDashBoard[data.default] ? data.default : parseDashBoard[Object.keys(parseDashBoard)[0]]
+                    const noDashboards =
+                        Object.keys(parseDashBoard).length === 0 ? true : false;
+                    const defaultDash = parseDashBoard[data.default]
+                        ? data.default
+                        : parseDashBoard[Object.keys(parseDashBoard)[0]];
 
-                    const GetSavedDashboardsRes = noDashboards ? blankDashboard['apiKey'] = req.apiKey : {
-                        dashBoardData: parseDashBoard,
-                        currentDashBoard: defaultDash,
-                        menuList: menuList,
-                        message: 'ok',
-                        apiKey: req.apiKey,
-                    }
-                    resolve(GetSavedDashboardsRes)
-
+                    const GetSavedDashboardsRes = noDashboards
+                        ? (blankDashboard["apiKey"] = req.apiKey)
+                        : {
+                              dashBoardData: parseDashBoard,
+                              currentDashBoard: defaultDash,
+                              menuList: menuList,
+                              message: "ok",
+                              apiKey: req.apiKey,
+                          };
+                    resolve(GetSavedDashboardsRes);
                 } else if (res.status === 401) {
-                    console.log(401)
-                    resolve(blankDashboard)
+                    console.log(401);
+                    resolve(blankDashboard);
                 } else {
-                    resolve(blankDashboard)
+                    resolve(blankDashboard);
                 }
+            } catch (err) {
+                console.log("Error fetching dashboard data", err);
+                resolve(blankDashboard);
             }
-            catch (err) {
-                console.log('Error fetching dashboard data', err)
-                resolve(blankDashboard)
-            }
-        }))
+        });
     }
-)
+);

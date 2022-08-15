@@ -9,7 +9,9 @@ const router = express.Router();
 
 router.get("/*", (req, res) => {
     console.log("Servering react app /*");
-    res.sendFile(path.resolve(path.join(__dirname, "../../../build/index.html")));
+    res.sendFile(
+        path.resolve(path.join(__dirname, "../../../build/index.html"))
+    );
 });
 
 export default router;

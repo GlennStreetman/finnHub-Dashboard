@@ -4,9 +4,10 @@ import postgresDB from "./../../db/databaseLocalPG.js";
 
 const router = express.Router();
 
-router.get("/deleteSavedDashboard", (req, res, next) => {
+router.get("/api/deleteSavedDashboard", (req, res, next) => {
     try {
-        if (req.session === undefined) throw new Error("Request not associated with session.");
+        if (req.session === undefined)
+            throw new Error("Request not associated with session.");
         const db = postgresDB;
         if (req.session.login === true) {
             const uId = req.session["uID"];
@@ -51,7 +52,9 @@ router.get("/deleteSavedDashboard", (req, res, next) => {
                             reject("Error on checking default dash");
                         } else {
                             // console.log(rows.rows[0].id, deleteDash);
-                            rows.rows[0].defaultmenu === undefined ? resolve("success") : reject("Updating default not needed");
+                            rows.rows[0].defaultmenu === undefined
+                                ? resolve("success")
+                                : reject("Updating default not needed");
                         }
                     });
                 });
@@ -85,7 +88,9 @@ router.get("/deleteSavedDashboard", (req, res, next) => {
                 })
                 .catch((err) => {
                     console.log("ERROR:", err);
-                    res.status(400).json({ message: "Problem deleting dashboard." });
+                    res.status(400).json({
+                        message: "Problem deleting dashboard.",
+                    });
                 });
         } else {
             console.log("NOT LOGGED IN");

@@ -3,9 +3,10 @@ import format from "pg-format";
 import postgresDB from "../../db/databaseLocalPG.js";
 const router = express.Router();
 
-router.get("/tempLogin", (req, res, next) => {
+router.get("/api/tempLogin", (req, res, next) => {
     try {
-        if (req.session === undefined) throw new Error("Request not associated with session.");
+        if (req.session === undefined)
+            throw new Error("Request not associated with session.");
         const db = postgresDB;
         let pwText = format("%L", req.query["pwText"]);
         let loginQuery = `SELECT id, email, apikey, apialias, ratelimit, emailconfirmed, exchangelist, defaultexchange, widgetsetup, templogin
@@ -28,7 +29,11 @@ router.get("/tempLogin", (req, res, next) => {
             if (err) {
                 console.log("LOGIN ERROR:", err);
                 res.status(400).json({ message: "Login error" });
-            } else if (rows.rowCount === 1 && login.emailconfirmed === true && timeElapsed < 900000) {
+            } else if (
+                rows.rowCount === 1 &&
+                login.emailconfirmed === true &&
+                timeElapsed < 900000
+            ) {
                 info["key"] = login.apikey;
                 info["apiAlias"] = login.apialias;
                 info["ratelimit"] = login.ratelimit;
@@ -40,14 +45,24 @@ router.get("/tempLogin", (req, res, next) => {
                 req.session.uID = login.id;
                 req.session.login = true;
                 res.status(200).json(info);
-            } else if (rows.rowCount === 1 && login.emailconfirmed === true && timeElapsed >= 900000) {
-                res.status(401).json({ message: `Temporary login is expired.` });
+            } else if (
+                rows.rowCount === 1 &&
+                login.emailconfirmed === true &&
+                timeElapsed >= 900000
+            ) {
+                res.status(401).json({
+                    message: `Temporary login is expired.`,
+                });
             } else if (rows.rowCount === 1 && login.emailconfirmed !== true) {
                 // console.log("Email not confirmed")
-                res.status(401).json({ message: `Email not confirmed. Please check email for confirmation message.` });
+                res.status(401).json({
+                    message: `Email not confirmed. Please check email for confirmation message.`,
+                });
             } else {
                 // console.log("Login and password did not match.")
-                res.status(401).json({ message: `Login and Password did not match.` });
+                res.status(401).json({
+                    message: `Login and Password did not match.`,
+                });
             }
         });
     } catch (error) {
@@ -55,7 +70,7 @@ router.get("/tempLogin", (req, res, next) => {
     }
 });
 
-router.get("/logOut", (req, res, next) => {
+router.get("/api/logOut", (req, res, next) => {
     if (req.session) {
         req.session.login = false;
     }

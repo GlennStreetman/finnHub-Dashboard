@@ -109,18 +109,18 @@ const registerRemoteUser = (email, next) => {
 };
 
 //checks login status when site is initialy loaded.
-router.get("/checkLogin", async (req, res, next) => {
-    console.log("remote login", process.env.useRemoteLogin);
+router.get("/api/checkLogin", async (req, res, next) => {
+    // console.log("remote login", process.env.useRemoteLogin);
     if (req.session && req.session.login === true) {
         //if user has logged in session.
-        console.log("getting local login");
+        console.log("getting local login:");
         const apiKeys = await retrieveAPIKeys(req, next);
         res.status(200).json(apiKeys);
     } else if (process.env.useRemoteLogin == "true") {
         //if user does not have logged in sesion, check remote
-        console.log("checking remote login");
+        console.log("checking remote login5:", process.env.remoteLoginUrl);
         const copyCookies = req.header("cookie");
-
+        console.log("remote login url", process.env.remoteLoginUrl);
         const axiosRes = await axios(process.env.remoteLoginUrl, {
             method: "GET",
             mode: "*",
@@ -128,7 +128,7 @@ router.get("/checkLogin", async (req, res, next) => {
         }).catch((err) => {
             console.log("axios err", next(err));
         });
-        const loginStatus = axiosRes.data;
+        const loginStatus = axiosRes?.data ? axiosRes.data : "no data";
         console.log("axiosRes", loginStatus);
         if (loginStatus.login === 1) {
             //register remote user

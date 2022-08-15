@@ -1,5 +1,5 @@
 export const checkPassword = async function (email, pwText) {
-    let res = await fetch(`/login?email=${email}&pwText=${pwText}`);
+    let res = await fetch(`/api/login?email=${email}&pwText=${pwText}`);
     if (res.status === 500) {
         console.log("No Response from server");
         throw new Error("Problem with server");
@@ -10,7 +10,7 @@ export const checkPassword = async function (email, pwText) {
 };
 
 export const checkTempPassword = async function (pwText) {
-    let res = await fetch(`/tempLogin?pwText=${pwText}`);
+    let res = await fetch(`/api/tempLogin?pwText=${pwText}`);
     if (res.status === 500) {
         console.log("No Response from server");
         throw new Error("Problem with server");

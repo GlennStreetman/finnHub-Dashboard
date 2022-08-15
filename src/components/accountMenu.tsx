@@ -13,7 +13,12 @@ import { styled } from "@mui/material/styles";
 import IconButton from "@mui/material/IconButton";
 import SaveIcon from "@mui/icons-material/Save";
 
-const MyPaper = styled(Paper)({ color: "#1d69ab", variant: "outlined", borderRadius: 20, padding: 25 });
+const MyPaper = styled(Paper)({
+    color: "#1d69ab",
+    variant: "outlined",
+    borderRadius: 20,
+    padding: 25,
+});
 
 const useSelector = useAppSelector;
 
@@ -45,11 +50,12 @@ function AccountMenu(p: accountMenuProp) {
     }, []);
 
     function getAccountData() {
-        fetch(`/accountData`)
+        fetch("/api/accountData")
             .then((response) => response.json())
             .then((data) => {
                 const dataSet = data["userData"];
-                const rateLimit = dataSet.ratelimit !== null ? dataSet.ratelimit : 25;
+                const rateLimit =
+                    dataSet.ratelimit !== null ? dataSet.ratelimit : 25;
 
                 setRateLimit(rateLimit);
                 dispatch(rSetApiAlias(dataSet["apialias"]));
@@ -81,7 +87,7 @@ function AccountMenu(p: accountMenuProp) {
         if (changeField === "ratelimit") {
             p.finnHubQueue.updateInterval(newValue);
         }
-        fetch("/accountData", options)
+        fetch("/api/accountData", options)
             .then((response) => response.json())
             .then((data) => {
                 getAccountData();
@@ -98,7 +104,7 @@ function AccountMenu(p: accountMenuProp) {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),
         };
-        fetch("/newPW", options)
+        fetch("/api/newPW", options)
             .then((response) => response.json())
             .then((data) => {
                 getAccountData();
@@ -116,11 +122,22 @@ function AccountMenu(p: accountMenuProp) {
             <Grid item xs={12} sm={8} md={6} lg={4} xl={4}>
                 <Box pt={2}>
                     <MyPaper elevation={6}>
-                        <Box alignItems="center" display="flex" justifyContent="center">
-                            <Typography variant="h6">Account Management</Typography>
+                        <Box
+                            alignItems="center"
+                            display="flex"
+                            justifyContent="center"
+                        >
+                            <Typography variant="h6">
+                                Account Management
+                            </Typography>
                         </Box>
 
-                        <Box pt={1} alignItems="left" display="flex" justifyContent="left">
+                        <Box
+                            pt={1}
+                            alignItems="left"
+                            display="flex"
+                            justifyContent="left"
+                        >
                             <TextField
                                 fullWidth
                                 label="Password"
@@ -139,8 +156,16 @@ function AccountMenu(p: accountMenuProp) {
                             )}
                         </Box>
 
-                        <Box pt={1} alignItems="left" display="flex" justifyContent="left">
-                            <Tooltip title="Get your API Key at finnhub.io/dashboard" placement="bottom">
+                        <Box
+                            pt={1}
+                            alignItems="left"
+                            display="flex"
+                            justifyContent="left"
+                        >
+                            <Tooltip
+                                title="Get your API Key at finnhub.io/dashboard"
+                                placement="bottom"
+                            >
                                 <TextField
                                     fullWidth
                                     label="API Key"
@@ -151,7 +176,11 @@ function AccountMenu(p: accountMenuProp) {
                                 />
                             </Tooltip>
                             {newApiKey !== apiKey ? (
-                                <IconButton onClick={() => changeAccountData("apikey", newApiKey)}>
+                                <IconButton
+                                    onClick={() =>
+                                        changeAccountData("apikey", newApiKey)
+                                    }
+                                >
                                     <SaveIcon />
                                 </IconButton>
                             ) : (
@@ -159,8 +188,16 @@ function AccountMenu(p: accountMenuProp) {
                             )}
                         </Box>
 
-                        <Box pt={1} alignItems="left" display="flex" justifyContent="left">
-                            <Tooltip title="Alternate GraphQL APIKey" placement="bottom">
+                        <Box
+                            pt={1}
+                            alignItems="left"
+                            display="flex"
+                            justifyContent="left"
+                        >
+                            <Tooltip
+                                title="Alternate GraphQL APIKey"
+                                placement="bottom"
+                            >
                                 <TextField
                                     fullWidth
                                     label="API Alias"
@@ -171,7 +208,14 @@ function AccountMenu(p: accountMenuProp) {
                                 />
                             </Tooltip>
                             {newApiAlias !== apiAlias ? (
-                                <IconButton onClick={() => changeAccountData("apialias", newApiAlias)}>
+                                <IconButton
+                                    onClick={() =>
+                                        changeAccountData(
+                                            "apialias",
+                                            newApiAlias
+                                        )
+                                    }
+                                >
                                     <SaveIcon />
                                 </IconButton>
                             ) : (
@@ -179,7 +223,12 @@ function AccountMenu(p: accountMenuProp) {
                             )}
                         </Box>
 
-                        <Box pt={1} alignItems="left" display="flex" justifyContent="left">
+                        <Box
+                            pt={1}
+                            alignItems="left"
+                            display="flex"
+                            justifyContent="left"
+                        >
                             <Tooltip
                                 title="Limits the number of API calls per second. Leave at 1 per second unless you have a premium account with finnhub.io"
                                 placement="bottom"
@@ -194,7 +243,14 @@ function AccountMenu(p: accountMenuProp) {
                                 />
                             </Tooltip>
                             {newRateLimit !== rateLimit ? (
-                                <IconButton onClick={() => changeAccountData("ratelimit", newRateLimit)}>
+                                <IconButton
+                                    onClick={() =>
+                                        changeAccountData(
+                                            "ratelimit",
+                                            newRateLimit
+                                        )
+                                    }
+                                >
                                     <SaveIcon />
                                 </IconButton>
                             ) : (
@@ -202,11 +258,22 @@ function AccountMenu(p: accountMenuProp) {
                             )}
                         </Box>
 
-                        <Box pt={1} alignItems="center" display="flex" justifyContent="center">
-                            <Button color="primary" onClick={() => navigate("/exchangeMenu")}>
+                        <Box
+                            pt={1}
+                            alignItems="center"
+                            display="flex"
+                            justifyContent="center"
+                        >
+                            <Button
+                                color="primary"
+                                onClick={() => navigate("/exchangeMenu")}
+                            >
                                 Manage Exchanges
                             </Button>
-                            <Button color="primary" onClick={() => navigate("/widgetMenu")}>
+                            <Button
+                                color="primary"
+                                onClick={() => navigate("/widgetMenu")}
+                            >
                                 Manage Widgets
                             </Button>
                         </Box>

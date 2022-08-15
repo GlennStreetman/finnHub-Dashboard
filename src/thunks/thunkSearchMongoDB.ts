@@ -1,34 +1,42 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import { reqObj, resObj } from '../server/routes/mongoDB/findMongoData'
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import { reqObj, resObj } from "../server/routes/mongoDB/findMongoData";
 //receives list of strings to search for. WidgetKey-targetSecurity
 //pushes returned string to visableData in redux.
 
 export interface tSearchMongoDBReq {
-    searchList: string[],
-    dashboardID: number | string,
+    searchList: string[];
+    dashboardID: number | string;
 }
 
-export const tSearchMongoDB = createAsyncThunk( //{ [widgetKey-securityList]}
-    'tSearch',
-    (req: tSearchMongoDBReq, thunkAPI: any) => { //{list of securities}
-        //if stale pop from list 
+export const tSearchMongoDB = createAsyncThunk(
+    //{ [widgetKey-securityList]}
+    "tSearch",
+    (req: tSearchMongoDBReq, thunkAPI: any) => {
+        //{list of securities}
+        //if stale pop from list
         // const dashboard = thunkAPI.getState().showData.targetDashboard
         const reqData: reqObj = {
             searchList: req.searchList, //list of widget keys that need to be found in mongoDB. widgetKey-Security. ex: "1626322988025-US-AAPL"
-            dashboard: req.dashboardID
-        }
+            dashboard: req.dashboardID,
+        };
         try {
             const options = {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify(reqData),
             };
-            const getData = fetch('/findMongoData', options)
-                .then(data => data.json())
-                .then(resData => {
-                    const res = req.searchList.reduce((acc, curr) => ({ ...acc, [`${req.dashboardID}-${curr}`]: '' }), {});
+            const getData = fetch("/api/findMongoData", options)
+                .then((data) => data.json())
+                .then((resData) => {
+                    const res = req.searchList.reduce(
+                        (acc, curr) => ({
+                            ...acc,
+                            [`${req.dashboardID}-${curr}`]: "",
+                        }),
+                        {}
+                    );
                     for (const x in resData) {
-                        const mongo: resObj = resData[x]
+                        const mongo: resObj = resData[x];
                         res[mongo.key] = {
                             updated: mongo.retrieved,
                             stale: mongo.stale,
@@ -38,12 +46,13 @@ export const tSearchMongoDB = createAsyncThunk( //{ [widgetKey-securityList]}
                             widget: mongo.widget,
                             security: mongo.security,
                             widgetType: mongo.widgetType,
-                        }
+                        };
                     }
-                    return res
-                })
-            return (getData)
+                    return res;
+                });
+            return getData;
         } catch (err) {
-            console.log('tSearch: Error retrieving mongoDB', err)
+            console.log("tSearch: Error retrieving mongoDB", err);
         }
-    })
+    }
+);

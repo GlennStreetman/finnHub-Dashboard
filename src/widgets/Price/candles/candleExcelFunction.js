@@ -1,21 +1,24 @@
-export const candleExcel = async function (apiKey, currentDashBoard, widgetHeader, security) {
-    
+export const candleExcel = async function (
+    apiKey,
+    currentDashBoard,
+    widgetHeader,
+    security
+) {
     const data = {
         apiKey: apiKey,
         dashboard: currentDashBoard,
         widget: widgetHeader,
         columnKeys: [
-            { Date: 'date'},
-            { Time: 't' }, 
-            { Open: 'c' }, 
-            { High: 'h' }, 
-            { Low: 'l' }, 
-            { Close: 'c' },
-        ]
-            
+            { Date: "date" },
+            { Time: "t" },
+            { Open: "c" },
+            { High: "h" },
+            { Low: "l" },
+            { Close: "c" },
+        ],
     };
 
-    if (security) data.security = security
+    if (security) data.security = security;
 
     const options = {
         method: "POST",
@@ -23,14 +26,12 @@ export const candleExcel = async function (apiKey, currentDashBoard, widgetHeade
         body: JSON.stringify(data),
     };
 
-    let res = await fetch("/generateTemplate", options)
+    let res = await fetch("/api/generateTemplate", options);
     if (res.status === 200) {
-        let fileData = await res.blob()
-        let file = window.URL.createObjectURL(fileData)
-        window.location.assign(file)
+        let fileData = await res.blob();
+        let file = window.URL.createObjectURL(fileData);
+        window.location.assign(file);
     } else {
-        console.log('Problem running excel template', res.body.message)
+        console.log("Problem running excel template", res.body.message);
     }
-}
-
-
+};

@@ -6,18 +6,31 @@ import ErrorBoundary from "./widgetErrorBoundary";
 import { useAppDispatch, useAppSelector } from "src/hooks";
 import { widget } from "src/App";
 import { widgetLookUp } from "../registers/widgetContainerReg";
-import { excelRegister, excelRegister_singleSecurity } from "../registers/excelButtonRegister";
+import {
+    excelRegister,
+    excelRegister_singleSecurity,
+} from "../registers/excelButtonRegister";
 
 import { rUnmountWidget } from "../slices/sliceShowData";
 import { rRemoveWidgetDataModel } from "../slices/sliceDataModel";
 import { rSetMenuList } from "src/slices/sliceMenuList";
-import { rSetDashboardData, rRemoveWidget, removeWidgetPayload } from "src/slices/sliceDashboardData";
+import {
+    rSetDashboardData,
+    rRemoveWidget,
+    removeWidgetPayload,
+} from "src/slices/sliceDashboardData";
 import { tSaveDashboard } from "src/thunks/thunkSaveDashboard";
 import { tChangeWidgetName } from "src/thunks/thunkChangeWidgetName";
 
 import { finnHubQueue } from "src/appFunctions/appImport/throttleQueueAPI";
 import { toggleWidgetBody } from "src/appFunctions/appImport/widgetLogic";
-import { setDragWidget, setDragMenu, SnapWidget, moveStockWidget, moveMenu } from "src/appFunctions/appImport/widgetGrid";
+import {
+    setDragWidget,
+    setDragMenu,
+    SnapWidget,
+    moveStockWidget,
+    moveMenu,
+} from "src/appFunctions/appImport/widgetGrid";
 
 interface containerProps {
     enableDrag: boolean;
@@ -39,7 +52,9 @@ function WidgetContainer(p: containerProps) {
     const useSelector = useAppSelector;
     const dispatch = useDispatch(); //allows widget to run redux actions.
 
-    const [renderHeader, setRenderHeader] = useState<"menuWIdget" | "widgetList" | "marketWidget" | string>("");
+    const [renderHeader, setRenderHeader] = useState<
+        "menuWIdget" | "widgetList" | "marketWidget" | string
+    >("");
     const [showEditPane, setShowEditPane] = useState(0); //0: Hide, 1: Show
     const [searchText, setSearchText] = useState("");
     const widgetRef = React.createRef();
@@ -95,7 +110,9 @@ function WidgetContainer(p: containerProps) {
     }
 
     function dragElement() {
-        const widgetState: any = widgetRef?.current ? widgetRef.current : { state: {} };
+        const widgetState: any = widgetRef?.current
+            ? widgetRef.current
+            : { state: {} };
         if (widgetState && widgetState?.state === undefined) {
             widgetState.state = {};
         }
@@ -103,7 +120,8 @@ function WidgetContainer(p: containerProps) {
         let xAxis = 0;
         let yAxis = 0;
         //@ts-ignore
-        document.getElementById(p.widgetList["widgetID"]).onmousedown = dragMouseDown;
+        document.getElementById(p.widgetList["widgetID"]).onmousedown =
+            dragMouseDown;
         let widgetWidth = p.widgetWidth;
         let widgetCenter = widgetWidth / 2;
 
@@ -113,12 +131,21 @@ function WidgetContainer(p: containerProps) {
             xAxis = e.clientX + window.scrollX;
             yAxis = e.clientY;
             if (p.stateRef !== "menuWidget") {
-                const [newDrag, widgets] = await setDragWidget(currentDashboard, dashboardData, p.widgetKey, widgetState.state);
+                const [newDrag, widgets] = await setDragWidget(
+                    currentDashboard,
+                    dashboardData,
+                    p.widgetKey,
+                    widgetState.state
+                );
                 p.updateAppState["enableDrag"](true);
                 p.updateAppState["widgetCopy"](newDrag.widgetCopy);
                 dispatch(rSetDashboardData(widgets));
             } else {
-                const [newDrag, menu] = await setDragMenu(menuList, p.widgetKey, widgetState.state);
+                const [newDrag, menu] = await setDragMenu(
+                    menuList,
+                    p.widgetKey,
+                    widgetState.state
+                );
                 p.updateAppState["enableDrag"](true);
                 p.updateAppState["widgetCopy"](newDrag.widgetCopy);
                 dispatch(rSetMenuList(menu));
@@ -134,10 +161,17 @@ function WidgetContainer(p: containerProps) {
             xAxis = e.clientX + window.scrollX;
             yAxis = e.clientY + window.scrollY;
 
-            let newX = xAxis - widgetCenter + 25 >= 5 ? xAxis - widgetCenter + 25 : 5;
+            let newX =
+                xAxis - widgetCenter + 25 >= 5 ? xAxis - widgetCenter + 25 : 5;
             let newY = yAxis - 25 >= 60 ? yAxis - 25 : 60;
             if (p.stateRef !== "menuWidget") {
-                const payload = moveStockWidget(dashboardData, currentDashboard, p.widgetKey, newX, newY);
+                const payload = moveStockWidget(
+                    dashboardData,
+                    currentDashboard,
+                    p.widgetKey,
+                    newX,
+                    newY
+                );
                 dispatch(rSetDashboardData(payload));
             } else {
                 const payload = moveMenu(menuList, p.widgetKey, newX, newY);
@@ -150,13 +184,20 @@ function WidgetContainer(p: containerProps) {
             p.updateAppState["enableDrag"](false);
             xAxis = e.clientX + window.scrollX; //pointer x location
             yAxis = e.clientY + window.scrollY; //pointer y location
-            let dragX = xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5;
+            let dragX =
+                xAxis - widgetWidth + 25 >= 5 ? xAxis - widgetWidth + 25 : 5;
             let dragY = yAxis - 25 >= 60 ? yAxis - 25 : 60;
             document.onmouseup = null;
             document.onmousemove = null;
 
             if (p.stateRef !== "menuWidget") {
-                const payload = moveStockWidget(dashboardData, currentDashboard, p.widgetKey, dragX, dragY);
+                const payload = moveStockWidget(
+                    dashboardData,
+                    currentDashboard,
+                    p.widgetKey,
+                    dragX,
+                    dragY
+                );
                 const [dashboard, menu] = await SnapWidget(
                     p.widgetList["widgetConfig"],
                     p.widgetKey,
@@ -234,12 +275,21 @@ function WidgetContainer(p: containerProps) {
             data-testid={`container-${p.widgetList.widgetType}`}
         >
             <div
-                data-testid={p.stateRef === "menuWidget" ? "menuHeader" : "widgetHeader"}
-                className={p.stateRef === "menuWidget" ? "menuHeader" : "widgetHeader"}
+                data-testid={
+                    p.stateRef === "menuWidget" ? "menuHeader" : "widgetHeader"
+                }
+                className={
+                    p.stateRef === "menuWidget" ? "menuHeader" : "widgetHeader"
+                }
             >
                 {showEditPane === 0 ? (
                     <>
-                        {widgetProps["helpText"] !== undefined && <ToolTip textFragment={widgetProps["helpText"][0]} hintName={widgetProps["helpText"][1]} />}
+                        {widgetProps["helpText"] !== undefined && (
+                            <ToolTip
+                                textFragment={widgetProps["helpText"][0]}
+                                hintName={widgetProps["helpText"][1]}
+                            />
+                        )}
                         {renderHeader}
                     </>
                 ) : (
@@ -266,19 +316,35 @@ function WidgetContainer(p: containerProps) {
                     <button
                         className="widgetButtonHead"
                         onClick={() => {
-                            const toggled = toggleWidgetBody(p.widgetKey, p.stateRef, dashboardData, menuList, currentDashboard);
+                            const toggled = toggleWidgetBody(
+                                p.widgetKey,
+                                p.stateRef,
+                                dashboardData,
+                                menuList,
+                                currentDashboard
+                            );
                             if (p.stateRef === "stockWidget") {
                                 dispatch(rSetDashboardData(toggled));
                             } else {
                                 dispatch(rSetMenuList(toggled));
                             }
-                            dispatch(tSaveDashboard({ dashboardName: currentDashboard }));
+                            dispatch(
+                                tSaveDashboard({
+                                    dashboardName: currentDashboard,
+                                })
+                            );
                         }}
                     >
                         {p.widgetList.showBody !== false ? (
-                            <i className="fa fa-caret-square-o-down" aria-hidden="true" />
+                            <i
+                                className="fa fa-caret-square-o-down"
+                                aria-hidden="true"
+                            />
                         ) : (
-                            <i className="fa fa-caret-square-o-right" aria-hidden="true" />
+                            <i
+                                className="fa fa-caret-square-o-right"
+                                aria-hidden="true"
+                            />
                         )}
                     </button>
 
@@ -289,7 +355,10 @@ function WidgetContainer(p: containerProps) {
                             showPane(setShowEditPane, -1);
                         }}
                     >
-                        <i className="fa fa-pencil-square-o" aria-hidden="true" />
+                        <i
+                            className="fa fa-pencil-square-o"
+                            aria-hidden="true"
+                        />
                     </button>
                 </>
             </div>
@@ -297,7 +366,10 @@ function WidgetContainer(p: containerProps) {
                 <div className="widgetBody">
                     {/* @ts-ignore */}
                     <ErrorBoundary widgetType={p.widgetList["widgetType"]}>
-                        {React.createElement(widgetLookUp[p.widgetList["widgetType"]], { ref: widgetRef, ...widgetProps })}
+                        {React.createElement(
+                            widgetLookUp[p.widgetList["widgetType"]],
+                            { ref: widgetRef, ...widgetProps }
+                        )}
                     </ErrorBoundary>
                 </div>
             ) : (
@@ -310,7 +382,10 @@ function WidgetContainer(p: containerProps) {
                     (p.stateRef !== "menuWidget" ? (
                         <button
                             onClick={async () => {
-                                if (p.stateRef === "stockWidget" || p.stateRef === "marketWidget") {
+                                if (
+                                    p.stateRef === "stockWidget" ||
+                                    p.stateRef === "marketWidget"
+                                ) {
                                     const payload: removeWidgetPayload = {
                                         widgetKey: p.widgetKey,
                                         dashboardName: currentDashboard,
@@ -318,12 +393,22 @@ function WidgetContainer(p: containerProps) {
                                     dispatch(rRemoveWidget(payload));
                                     dispatch(rUnmountWidget(payload));
                                     dispatch(rRemoveWidgetDataModel(payload));
-                                    dispatch(tSaveDashboard({ dashboardName: currentDashboard }));
-                                    fetch(`/deleteFinnDashData?widgetID=${p.widgetKey}`); //delete from mongo.
+                                    dispatch(
+                                        tSaveDashboard({
+                                            dashboardName: currentDashboard,
+                                        })
+                                    );
+                                    fetch(
+                                        `/api/deleteFinnDashData?widgetID=${p.widgetKey}`
+                                    ); //delete from mongo.
                                 }
                             }}
                         >
-                            <i className="fa fa-times" aria-hidden="true" data-testid={`removeWidget-${p.widgetList["widgetType"]}`}></i>
+                            <i
+                                className="fa fa-times"
+                                aria-hidden="true"
+                                data-testid={`removeWidget-${p.widgetList["widgetType"]}`}
+                            ></i>
                         </button>
                     ) : (
                         <></>
@@ -335,10 +420,20 @@ function WidgetContainer(p: containerProps) {
                         <button
                             className="widgetButtonFoot"
                             onClick={() => {
-                                excelFunction(apiKey, currentDashboard, p.widgetList.widgetHeader, p.widgetList.config.targetSecurity, p.widgetList.config);
+                                excelFunction(
+                                    apiKey,
+                                    currentDashboard,
+                                    p.widgetList.widgetHeader,
+                                    p.widgetList.config.targetSecurity,
+                                    p.widgetList.config
+                                );
                             }}
                         >
-                            <i className="fa fa-file-excel-o" aria-hidden="true" data-testid={`excelButton-${p.widgetList["widgetType"]}`}></i>
+                            <i
+                                className="fa fa-file-excel-o"
+                                aria-hidden="true"
+                                data-testid={`excelButton-${p.widgetList["widgetType"]}`}
+                            ></i>
                         </button>
                     )}
 
@@ -348,10 +443,20 @@ function WidgetContainer(p: containerProps) {
                         <button
                             className="widgetButtonFoot"
                             onClick={() => {
-                                excelFunction(apiKey, currentDashboard, p.widgetList.widgetHeader, false, p.widgetList.config);
+                                excelFunction(
+                                    apiKey,
+                                    currentDashboard,
+                                    p.widgetList.widgetHeader,
+                                    false,
+                                    p.widgetList.config
+                                );
                             }}
                         >
-                            <i className="fa fa-list" aria-hidden="true" data-testid={`excelButton-${p.widgetList["widgetType"]}`}></i>
+                            <i
+                                className="fa fa-list"
+                                aria-hidden="true"
+                                data-testid={`excelButton-${p.widgetList["widgetType"]}`}
+                            ></i>
                         </button>
                     )}
             </div>

@@ -3,9 +3,10 @@ import format from "pg-format";
 import postgresDB from "./../../db/databaseLocalPG.js";
 const router = express.Router();
 
-router.get("/accountData", (req, res, next) => {
+router.get("/api/accountData", (req, res, next) => {
     try {
-        if (req.session === undefined) throw new Error("Request not associated with session.");
+        if (req.session === undefined)
+            throw new Error("Request not associated with session.");
         const db = postgresDB;
         if (req.session.login === true) {
             const accountDataQuery = `
@@ -20,7 +21,9 @@ router.get("/accountData", (req, res, next) => {
                 // console.log(result)
                 if (err) {
                     console.log("/accountData ERROR:", err);
-                    res.status(400).json({ message: "Could not retrieve user data" });
+                    res.status(400).json({
+                        message: "Could not retrieve user data",
+                    });
                 } else {
                     resultSet["userData"] = result;
                     res.status(200).json(resultSet);
@@ -34,7 +37,7 @@ router.get("/accountData", (req, res, next) => {
     }
 });
 
-router.post("/accountData", (req, res) => {
+router.post("/api/accountData", (req, res) => {
     const db = postgresDB;
     // console.log("---------------", req.body);
 
@@ -44,15 +47,34 @@ router.post("/accountData", (req, res) => {
     console.log("field", field, "newValue", newValue);
 
     if (req.session.login === true) {
-        if (field !== "email" && ["loginname", "ratelimit", "webhook", "apikey", "exchangelist", "email", "apialias", "widgetsetup"].includes(field)) {
+        if (
+            field !== "email" &&
+            [
+                "loginname",
+                "ratelimit",
+                "webhook",
+                "apikey",
+                "exchangelist",
+                "email",
+                "apialias",
+                "widgetsetup",
+            ].includes(field)
+        ) {
             console.log("updating account data");
-            const updateQuery = format("UPDATE users SET %I = %L WHERE id=%L", field, newValue, req.session.uID);
+            const updateQuery = format(
+                "UPDATE users SET %I = %L WHERE id=%L",
+                field,
+                newValue,
+                req.session.uID
+            );
             console.log("updateQuery", updateQuery);
             // let queryValues = [updateField, newValue, req.session.uID]
             db.query(updateQuery, (err) => {
                 if (err) {
                     console.log("/accountData update query error: ", err);
-                    res.status(400).json({ message: `Failed to update ${field}` });
+                    res.status(400).json({
+                        message: `Failed to update ${field}`,
+                    });
                 } else {
                     res.status(200).json({
                         message: `${field} updated`,
@@ -61,7 +83,9 @@ router.post("/accountData", (req, res) => {
                 }
             });
         } else {
-            res.status(401).json({ message: `Error processing request Field: ${req.body.field}` });
+            res.status(401).json({
+                message: `Error processing request Field: ${req.body.field}`,
+            });
         }
     } else {
         res.json({ message: "Not logged in." });

@@ -2,12 +2,11 @@ import express from "express";
 import format from "pg-format";
 import sha512 from "./../../db/sha512.js";
 import postgresDB from "../../db/databaseLocalPG.js";
-import axios from 'axios'
-
+import axios from "axios";
 
 const router = express.Router();
 
-router.get("/login", (req, res, next) => {
+router.get("/api/login", (req, res, next) => {
     // console.log("--Cookies--", req.cookies);
     const db = postgresDB;
     let loginEmail = format("%L", req.query["email"]);
@@ -31,7 +30,8 @@ router.get("/login", (req, res, next) => {
                 console.log("LOGIN ERROR:", err);
                 res.status(400).json({ message: "Login error" });
             } else if (rows.rowCount === 1 && login.emailconfirmed === true) {
-                if (req.session === undefined) throw new Error("Request not associated with session.");
+                if (req.session === undefined)
+                    throw new Error("Request not associated with session.");
                 info["key"] = login.apikey;
                 info["apiAlias"] = login.apialias;
                 info["ratelimit"] = login.ratelimit;
@@ -44,21 +44,33 @@ router.get("/login", (req, res, next) => {
                 req.session.login = true;
                 res.status(200).json(info);
             } else if (rows.rowCount === 1 && login.emailconfirmed !== true) {
-                res.status(401).json({ message: `Email not confirmed. Please check email for confirmation message.` });
+                res.status(401).json({
+                    message: `Email not confirmed. Please check email for confirmation message.`,
+                });
             } else {
-                res.status(401).json({ message: `Login and Password did not match.` });
+                res.status(401).json({
+                    message: `Login and Password did not match.`,
+                });
             }
         } catch (error) {
             next(error);
         }
     });
-}); 
-router.get("/logOut", async (req, res, next) => {
-    console.log('--running logout procedure--')
-    const copyCookies = req.header('cookie', process.env.useRemoteLogin)
-    if (process.env.useRemoteLogin) await axios(process.env.remoteLogoutUrl, {method: 'GET', mode: '*', headers: {Cookie: copyCookies}}).catch((err)=>{console.log('axios err logout', next(err))})
+});
+router.get("/api/logOut", async (req, res, next) => {
+    console.log("--running logout procedure--");
+    const copyCookies = req.header("cookie", process.env.useRemoteLogin);
+    if (process.env.useRemoteLogin)
+        await axios(process.env.remoteLogoutUrl, {
+            method: "GET",
+            mode: "*",
+            headers: { Cookie: copyCookies },
+        }).catch((err) => {
+            console.log("axios err logout", next(err));
+        });
     try {
-        if (req.session === undefined) throw new Error("Request not associated with session.");
+        if (req.session === undefined)
+            throw new Error("Request not associated with session.");
         req.session.login = false;
         res.status(200).json({ message: "Logged Out" });
     } catch (error) {
