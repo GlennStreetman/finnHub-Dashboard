@@ -6,5 +6,6 @@ COPY package*.json ./
 COPY package-lock.json ./
 RUN npm install
 COPY ./src/server/db/postgresVersions/* ./build/server/db/postgresVersions/
+COPY .env /.env
 EXPOSE 5000
-CMD ["npm", "run", "dev"]
+CMD ["npm", "run", "start"]

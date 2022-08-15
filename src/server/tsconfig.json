@@ -1,7 +1,7 @@
 {
     "extends": "./../../tsconfig.json",
     "compilerOptions": {
-        "watch": true,
+        "watch": false,
         "allowSyntheticDefaultImports": true,
         "outDir": "../../build",
         "allowJs": true,
@@ -13,5 +13,10 @@
         "moduleResolution": "node"
     },
     "include": ["."],
-    "exclude": ["../src", "**/*.test.js"]
+    "exclude": [
+        "../src",
+        "**/*.test.js",
+        "./db/oistgresVersions/*",
+        "./defaultTemplates/*"
+    ]
 }

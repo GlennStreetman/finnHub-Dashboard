@@ -37,9 +37,7 @@ services:
             - 5000:5000
             - 3002:3000
         volumes:
-            - ./src:/app/src
-            - ./build:/app/build
-            - ./nodemon.json:/app/nodemon.json
+            - .:/app/
         command: npm run dev --reload
 volumes:
     mongo-data:
