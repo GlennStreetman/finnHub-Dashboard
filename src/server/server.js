@@ -92,7 +92,7 @@ app.listen(port, function () {
 app.use(express.static(path.join(__dirname, "../../build/"))); //static asset directories are automaticaly served.
 connectPostgres(false, app); //if postgres connection fails it retries every 5 seconds.
 
-console.log("Connecting pg11", process.env.pguser, process.env.pgport);
+console.log("Connecting pg", process.env.pguser, process.env.pgport);
 
 const pgPool = new Client.Pool({
     user: process.env.pguser,

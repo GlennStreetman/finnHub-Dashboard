@@ -174,18 +174,20 @@ function TopNav(p: topNavProps) {
                     <div className="navItemEnd">
                         {location.pathname === "/about" ? (
                             <IconButton
-                                id="aboutButton"
-                                onClick={() => {
-                                    navigate("/login");
-                                }}
+                                id="loginButton"
+                                // onClick={() => {
+                                //     navigate("/login");
+                                // }}
                             >
                                 <Tooltip
                                     title="Login/Register"
                                     placement="bottom"
                                 >
-                                    <LockOpenRoundedIcon
-                                        style={{ fill: "white" }}
-                                    />
+                                    <a href={process.env.REACT_APP_LOGIN_LINK}>
+                                        <LockOpenRoundedIcon
+                                            style={{ fill: "white" }}
+                                        />
+                                    </a>
                                 </Tooltip>
                             </IconButton>
                         ) : (

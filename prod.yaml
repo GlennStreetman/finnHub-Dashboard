@@ -3,10 +3,19 @@ services:
     dashboard:
         build:
             context: .
-            dockerfile: build.Dockerfile
+            dockerfile: prod.Dockerfile
         volumes:
             - ./.env:/app/.env
         ports:
             - 5000:5000
             - 3002:3000
-        command: concurrently "npx serve -s build" "node ./build/server/server.js"
+        command: npx serve -s build
+    # dashboard-express:
+    #     build:
+    #         context: .
+    #         dockerfile: prod.Dockerfile
+    #     volumes:
+    #         - ./.env:/app/.env
+    #     ports:
+    #         - 5000:5000
+    #     command: node ./build/server/server.js
