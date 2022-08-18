@@ -27,7 +27,7 @@ Remember to rerun build after any changes to an env file
 ## Dev mode
 
 > npm run dev-build
-> npm run dev
+> npm run dUp
 > npm run tsc
 
 On slower systems changes to server take a few seconds transpile and nodemon is too fast. Save twice for server changes to reflect.
@@ -36,14 +36,9 @@ On slower systems changes to server take a few seconds transpile and nodemon is 
 
 ## Build for production
 
+> npm run prod-build
+> npm run pUp
+
+Use nginx, or favored reverse proxy, to send requests to port 5000
+
 ### NGINX
-
-GraphQL requests need to be routed to port 5000
-
-    location /graphQL {
-        proxy_pass http://127.0.0.1:5000;
-    }
-
-    location /qGraphQL {
-        proxy_pass http://127.0.0.1:5000;
-    }

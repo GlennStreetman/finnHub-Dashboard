@@ -53,7 +53,6 @@ import pgSimple from "connect-pg-simple";
 import cookieParser from "cookie-parser";
 
 const app = express();
-
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 app.use(
@@ -169,6 +168,12 @@ app.use(
 app.use("/", uploadTemplate);
 app.use("/", deleteTemplate);
 app.use("/", def); // all other routes.
+
+
+
+app.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+});
 
 app.use((error, req, res, next) => {
     //ALL NEXT
