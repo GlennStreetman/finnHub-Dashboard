@@ -26,7 +26,12 @@ export const candleExcel = async function (
         body: JSON.stringify(data),
     };
 
-    let res = await fetch("/api/generateTemplate", options);
+    let res = await etch(
+        `${process.env.REACT_APP_BASEURL}/api/generateTemplate"`,
+        options
+    ).catch((err) => {
+        console.log("error generating excel template", err);
+    });
     if (res.status === 200) {
         let fileData = await res.blob();
         let file = window.URL.createObjectURL(fileData);

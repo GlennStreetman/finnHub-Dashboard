@@ -25,10 +25,13 @@ export const epsSuprisesExcel = function (
         body: JSON.stringify(data),
     };
 
-    fetch("/api/generateTemplate", options)
+    fetch(`${process.env.REACT_APP_BASEURL}/api/generateTemplate`, options)
         .then((response) => response.blob())
         .then((blob) => {
             var file = window.URL.createObjectURL(blob);
             window.location.assign(file);
+        })
+        .catch((err) => {
+            console.log("error generating excel template", err);
         });
 };

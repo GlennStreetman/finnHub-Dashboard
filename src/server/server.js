@@ -159,7 +159,22 @@ app.use(
     })
 );
 app.use(
+    "/api/graphQL",
+    eg.graphqlHTTP({
+        schema: schema,
+        graphiql: true,
+        pretty: true,
+    })
+);
+app.use(
     "/qGraphQL",
+    eg.graphqlHTTP({
+        schema: schema,
+        pretty: true,
+    })
+);
+app.use(
+    "/api/qGraphQL",
     eg.graphqlHTTP({
         schema: schema,
         pretty: true,
@@ -169,10 +184,8 @@ app.use("/", uploadTemplate);
 app.use("/", deleteTemplate);
 app.use("/", def); // all other routes.
 
-
-
-app.get('/', function (req, res) {
-  res.sendFile(path.join(__dirname, 'build', 'index.html'));
+app.get("/", function (req, res) {
+    res.sendFile(path.join(__dirname, "build", "index.html"));
 });
 
 app.use((error, req, res, next) => {

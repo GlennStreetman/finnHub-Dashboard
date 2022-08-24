@@ -132,12 +132,12 @@ router.post("/api/generateTemplate", async (req, res) => {
     //  write/overwrite user dataTemplate
     await newTemplate.xlsx.writeFile(workBookName);
     const promiseList = await buildQueryList(workBookName); //List of promises built from excel templates query sheet  reqData.reducers
+
     const promiseData = await Promise.all(promiseList) //after promises run process promise data {keys: [], data: {}} FROM mongoDB
         .then((res) => {
             return processPromiseData(res);
         });
     const templateData = await buildTemplateData(promiseData, workBookName); //{...sheetName {...row:{data:{}, writeRows: number, keyColumns: {}}}} from Template File
-    console.log("templateData", templateData);
     const newWorkbook: any = new Excel.Workbook();
     await newWorkbook.xlsx.readFile(workBookName);
     for (const dataNode in templateData) {

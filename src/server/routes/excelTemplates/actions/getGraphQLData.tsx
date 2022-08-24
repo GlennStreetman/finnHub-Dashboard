@@ -1,5 +1,4 @@
 import fetch from "node-fetch";
-const rootURL = process.env.URL;
 
 interface dataNode {
     dashboard: string;
@@ -13,10 +12,6 @@ interface widget {
     widget: dataNode[];
 }
 
-// interface gqlObj {
-//     data: widget,
-// }
-
 export interface GQLReqObj {
     n: string; //data name
     q: string; //query string
@@ -27,9 +22,11 @@ export const getGraphQLData = (reqObj: GQLReqObj): Promise<GQLReqObj> => {
     //queries mongo database and attached returned data to request obj, then returns. hello
     return new Promise((resolve, reject) => {
         let queryParams = reqObj.q;
-        const getAPIData = `/api/${rootURL}/qGraphQL?query=${queryParams}`;
+        const getAPIData = `${process.env.REACT_APP_BASEURL}/api/qGraphQL?query=${queryParams}`;
         fetch(getAPIData)
-            .then((r) => r.json())
+            .then((res) => {
+                return res.json();
+            })
             .then((data) => {
                 for (const x in data) {
                     reqObj.data = data[x];
