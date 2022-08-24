@@ -26,7 +26,7 @@ export const candleExcel = async function (
         body: JSON.stringify(data),
     };
 
-    let res = await etch(
+    let res = await fetch(
         `${process.env.REACT_APP_BASEURL}/api/generateTemplate"`,
         options
     ).catch((err) => {
