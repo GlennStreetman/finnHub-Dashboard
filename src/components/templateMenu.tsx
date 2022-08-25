@@ -151,8 +151,8 @@ export default function TemplateMenu(p: "pass", ref: any) {
     return (
         <>
             <Grid container justifyContent="center">
-                <Grid item sm={2} md={3} lg={4} xl={4} />
-                <Grid item xs={12} sm={8} md={6} lg={4} xl={4}>
+                <Grid item sm={2} md={2} lg={2} xl={2} />
+                <Grid item xs={12} sm={8} md={8} lg={8} xl={8}>
                     <Box pt={2}>
                         <MyPaper elevation={6}>
                             <Box
@@ -218,7 +218,7 @@ export default function TemplateMenu(p: "pass", ref: any) {
                         </MyPaper>
                     </Box>
                 </Grid>
-                <Grid item sm={2} md={3} lg={4} xl={4} />
+                <Grid item sm={2} md={2} lg={2} xl={2} />
             </Grid>
             {serverMessage !== "" && (
                 <div>
