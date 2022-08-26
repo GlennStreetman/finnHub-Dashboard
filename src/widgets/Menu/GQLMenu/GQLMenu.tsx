@@ -23,20 +23,15 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
     const globalStockList = useSelector((state) => {
         //finnhub data stored in redux
         if (state.dashboardData?.[state.currentDashboard]) {
-            const globalStockList =
-                state.dashboardData[state.currentDashboard].globalstocklist;
+            const globalStockList = state.dashboardData[state.currentDashboard].globalstocklist;
             return globalStockList;
         } else {
             return {};
         }
     });
 
-    const [targetDashboard, setTargetDashboard] = useState(
-        currentDashboard ? currentDashboard : ""
-    );
-    const [securityFocus, setSecurityFocus] = useState(
-        targetSecurity ? targetSecurity : ""
-    );
+    const [targetDashboard, setTargetDashboard] = useState(currentDashboard ? currentDashboard : "");
+    const [securityFocus, setSecurityFocus] = useState(targetSecurity ? targetSecurity : "");
     const [toggleView, setToggleView] = useState("widget"); //widget or security
 
     useImperativeHandle(ref, () => ({ state: {} }));
@@ -83,9 +78,8 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
             </>
         );
 
-    const FocusDashboard = dashboardData?.[targetDashboard]?.widgetlist
-        ? dashboardData[targetDashboard].widgetlist
-        : {};
+    const FocusDashboard = dashboardData?.[targetDashboard]?.widgetlist ? dashboardData[targetDashboard].widgetlist : {};
+
     const showBodyWidget = Object.keys(FocusDashboard).map((el) => {
         const apiToggle = apiAlias ? apiAlias : apiKey;
         const queryPropsAll = `(key: "${apiToggle}" dashboard: "${targetDashboard}" widget: "${FocusDashboard[el].widgetHeader}")`;
@@ -103,7 +97,7 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
                             <tr>
                                 <td>
                                     <a
-                                        href={`${window.location.origin}/graphQL?query=${thisQueryAll}`}
+                                        href={`${process.env.REACT_APP_BASEURL}/graphQL?query=${thisQueryAll}`}
                                         target="_blank"
                                         rel="noreferrer"
                                     >
@@ -112,7 +106,7 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
                                 </td>
                                 <td>
                                     <a
-                                        href={`${window.location.origin}/qGraphQL?query=${thisQueryAll}`}
+                                        href={`${process.env.REACT_APP_BASEURL}/qGraphQL?query=${thisQueryAll}`}
                                         target="_blank"
                                         rel="noreferrer"
                                     >
@@ -130,7 +124,7 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
                             <tr>
                                 <td>
                                     <a
-                                        href={`${window.location.origin}/graphQL?query=${thisQuerySecurity}`}
+                                        href={`${process.env.REACT_APP_BASEURL}/graphQL?query=${thisQuerySecurity}`}
                                         target="_blank"
                                         rel="noreferrer"
                                     >
@@ -139,7 +133,7 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
                                 </td>
                                 <td>
                                     <a
-                                        href={`${window.location.origin}/qGraphQL?query=${thisQuerySecurity}`}
+                                        href={`${process.env.REACT_APP_BASEURL}/qGraphQL?query=${thisQuerySecurity}`}
                                         target="_blank"
                                         rel="noreferrer"
                                     >
@@ -163,11 +157,7 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
             <tr key={el + "showSec"}>
                 <td key={el + "showSec2"}>{FocusDashboard[el].widgetHeader}</td>
                 <td key={el + "showSec3"}>
-                    <a
-                        href={`finndash.gstreet.test/graphQL?query=${thisQuerySecurity}`}
-                        target="_blank"
-                        rel="noreferrer"
-                    >
+                    <a href={`${process.env.REACT_APP_BASEURL}/graphQL?query=${thisQuerySecurity}`} target="_blank" rel="noreferrer">
                         Data
                     </a>
                 </td>
@@ -185,27 +175,18 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
                                 View:
                             </td>
                             <td>
-                                <select
-                                    value={toggleView}
-                                    onChange={changeToggleView}
-                                >
+                                <select value={toggleView} onChange={changeToggleView}>
                                     <option value="widget">widget</option>
                                     <option value="security">security</option>
                                 </select>
                             </td>
                             {toggleView === "widget" ? (
                                 <>
-                                    <td
-                                        style={{ color: "white" }}
-                                        className="rightTE"
-                                    >
+                                    <td style={{ color: "white" }} className="rightTE">
                                         Focus:
                                     </td>
                                     <td>
-                                        <select
-                                            value={securityFocus}
-                                            onChange={changeSecurityFocus}
-                                        >
+                                        <select value={securityFocus} onChange={changeSecurityFocus}>
                                             {securityOptionsList}
                                         </select>
                                     </td>
@@ -222,15 +203,11 @@ function EndPointMenu(p: endPointMenuProps, ref: any) {
                     <thead>
                         <tr>{showDataHeadings}</tr>
                     </thead>
-                    <tbody>
-                        {toggleView === "widget"
-                            ? showBodyWidget
-                            : showBodySecurity}
-                    </tbody>
+                    <tbody>{toggleView === "widget" ? showBodyWidget : showBodySecurity}</tbody>
                 </table>
                 <a
                     style={{ margin: "5px" }}
-                    href={`${window.location.origin}/graphQL?query=${defaultQuery}`}
+                    href={`${process.env.REACT_APP_BASEURL}/graphQL?query=${defaultQuery}`}
                     target="_blank"
                     rel="noreferrer"
                 >
