@@ -58,27 +58,33 @@ router.post(
                     const body: reqObj = req.body;
                     const searchList = body.searchList;
                     const dashboard = body.dashboard;
-                    const client = await getDB();
-                    const database = client.db("finnDash");
-                    const dataSet = database.collection("dataSet");
-                    const findList: any[] = [];
-                    for (const key in searchList) {
-                        const thisKey = dashboard + "-" + searchList[key];
-                        findList.push({
-                            key: thisKey,
+                    if (searchList.length > 0) {
+                        const client = await getDB();
+                        const database = client.db("finnDash");
+                        const dataSet = database.collection("dataSet");
+                        const findList: any[] = [];
+                        for (const key in searchList) {
+                            const thisKey = dashboard + "-" + searchList[key];
+                            findList.push({
+                                key: thisKey,
+                            });
+                        }
+                        const options: queryOptions = {
+                            userID: req.session.uID,
+                            $or: findList,
+                        };
+                        const findDataSet = await dataSet.find(options);
+                        const resList: resObj[] = [];
+                        await findDataSet.forEach((data: resObj) => {
+                            //map this
+                            resList.push(data);
+                        });
+                        res.status(200).json(resList); //returns list of objects.
+                    } else {
+                        res.status(200).json({
+                            message: "No data stored in mongo",
                         });
                     }
-                    const options: queryOptions = {
-                        userID: req.session.uID,
-                        $or: findList,
-                    };
-                    const findDataSet = await dataSet.find(options);
-                    const resList: resObj[] = [];
-                    await findDataSet.forEach((data: resObj) => {
-                        //map this
-                        resList.push(data);
-                    });
-                    res.status(200).json(resList); //returns list of objects.
                 } catch (err) {
                     console.log(err);
                     res.status(500).json({
