@@ -74,13 +74,13 @@ const port = process.env.NODE_ENV || 5000;
 app.use(morgan("dev"));
 app.use(
     bodyParser.json({
-        limit: 52428800,
+        limit: "50mb",
     })
 ); // support json encoded bodies
 app.use(
     bodyParser.urlencoded({
         parameterLimit: 100000,
-        limit: 52428800,
+        limit: "50mb",
         extended: true,
     })
 );
