@@ -63,6 +63,8 @@ export interface chartSheetObj {
 }
 
 router.get("/api/runTemplate", async (req: uploadTemplate, res: any) => {
+    // console.log("running template 1");
+
     //run user configured excel template and return result.
     const db = postgresDB;
     const apiKey = format("%L", req.query["key"]);
@@ -84,12 +86,17 @@ router.get("/api/runTemplate", async (req: uploadTemplate, res: any) => {
     );
     const tempFile = `${appRootPath}/uploads/${user}/temp/${trimFileName}${Date.now()}.xlsx`; //path for output file.
 
+    // console.log("running template 2");
+
     if (!fs.existsSync(dumpFolder)) makeTempDir(dumpFolder); //location of xmls.
     if (!fs.existsSync(tempFolder)) makeTempDir(tempFolder); //location of output worksheets.
+
+    // console.log("running template 3");
 
     try {
         //begin running template request.
         if (fs.existsSync(workBookPath)) {
+            // console.log("running template 4");
             //if template name provided by get requests exists
 
             const chartSheetsMap: chartSheetObj = {};
@@ -103,11 +110,13 @@ router.get("/api/runTemplate", async (req: uploadTemplate, res: any) => {
                 promiseData,
                 workBookPath
             ); //reads template file, returns {source:{write rows, outputSheets}}
-
+            // console.log("running template 5");
             // console.log('templateData: ', util.inspect(templateData, { showHidden: false, depth: null, colors: true }))
             // console.log('templateData', templateData)
             const workbook = new Excel.Workbook(); //file description, used to create return excel file.
             await workbook.xlsx.readFile(workBookPath);
+
+            // console.log("running template 6");
 
             for (const dataNode in templateData) {
                 //for each entry
@@ -147,11 +156,15 @@ router.get("/api/runTemplate", async (req: uploadTemplate, res: any) => {
                 }
             }
 
+            // console.log("running template 7");
+
             //delete the query sheet
             const deleteSheet = workbook.getWorksheet("Query")
                 ? workbook.getWorksheet("Query")
                 : workbook.getWorksheet("query");
-            if (deleteSheet.id) workbook.removeWorksheet(deleteSheet.id);
+            if (deleteSheet?.id) workbook.removeWorksheet(deleteSheet.id);
+
+            // console.log("running template 8");
 
             await workbook.xlsx.writeFile(tempFile); //source temp file.
             const outputFileName = await copyCharts(
@@ -164,16 +177,14 @@ router.get("/api/runTemplate", async (req: uploadTemplate, res: any) => {
                 multiSheet
             );
 
+            // console.log("running template 9");
             res.status(200).sendFile(outputFileName, () => {
                 // fs.unlinkSync(tempFile)
             });
         }
     } catch (error) {
         console.log("get/runTemplate error running excel template file", error);
-        res.status(400).json(
-            { message: "Error running excel template" },
-            error
-        );
+        res.status(400).json({ message: "Error running excel template" });
     }
 });
 
