@@ -4,44 +4,30 @@ import dotenv from "dotenv";
 import path from "path";
 import bodyParser from "body-parser";
 import session from "express-session";
-import pgSimple from "connect-pg-simple";
 import login from "./login.js";
 import db from "../../db/databaseLocalPG.js";
 import sha512 from "./../../db/sha512.js";
-import pg from "pg";
+
+import sessionFileStore from "session-file-store";
 
 const app = express();
 dotenv.config();
-
 app.use(express.static(path.join(__dirname, "build")));
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // support json encoded bodies
 
-var pgPool = new pg.Pool({
-    database: process.env.pgdatabase,
-    user: process.env.pguser,
-    password: process.env.pgpassword,
-    port: process.env.pgport,
-    ssl: false,
-    max: 20, // set pool max size to 20
-    idleTimeoutMillis: 1000, // close idle clients after 1 second
-    connectionTimeoutMillis: 1000, // return an error after 1 second if connection could not be established
-    maxUses: 7500, // close (and replace) a connection after it has been used 7500 times (see below for discussion)
-});
-
-const pgSession = new pgSimple(session);
+const FileStore = sessionFileStore(session);
+const fileStoreOptions = {};
 app.use(
     session({
-        // store: new FileStore(fileStoreOptions),
-        store: new pgSession({
-            pool: pgPool,
-        }),
+        store: new FileStore(fileStoreOptions),
         secret: process.env.session_secret,
         resave: false,
         saveUninitialized: true,
         cookie: { secure: false, sameSite: true },
     })
 );
+
 app.use("/", login); //route to be tested needs to be bound to the router.
 
 beforeAll((done) => {
@@ -101,7 +87,7 @@ afterAll((done) => {
 //good login
 test("Good login get/login", (done) => {
     request(app)
-        .get("/login?email=loginTest@test.com&pwText=testpw")
+        .get("/api/login?email=loginTest@test.com&pwText=testpw")
         .expect("Content-Type", /json/)
         .expect({
             key: "",
@@ -118,7 +104,7 @@ test("Good login get/login", (done) => {
 //bad user name
 test("Wrong login name get/login", (done) => {
     request(app)
-        .get("/login?email=badUserName@bad.com&pwText=testpw")
+        .get("/api/login?email=badUserName@bad.com&pwText=testpw")
         .expect("Content-Type", /json/)
         .expect({
             message: "Login and Password did not match.",
@@ -129,7 +115,7 @@ test("Wrong login name get/login", (done) => {
 //bad pw
 test("Wrong pw get/login", (done) => {
     request(app)
-        .get("/login?email=loginTest@test.com&pwText=badPw")
+        .get("/api/login?email=loginTest@test.com&pwText=badPw")
         .expect("Content-Type", /json/)
         .expect({
             message: "Login and Password did not match.",
@@ -140,7 +126,7 @@ test("Wrong pw get/login", (done) => {
 //missing paramaters.
 test("Missing paramaters get/login", (done) => {
     request(app)
-        .get("/login?email=&pwText=")
+        .get("/api/login?email=&pwText=")
         .expect("Content-Type", /json/)
         .expect({
             message: "Login and Password did not match.",
@@ -151,7 +137,7 @@ test("Missing paramaters get/login", (done) => {
 //confirm email.
 test("Email not confirmed get/login", (done) => {
     request(app)
-        .get("/login?email=loginTest_notVerified.com&pwText=testpw")
+        .get("/api/login?email=loginTest_notVerified.com&pwText=testpw")
         .expect("Content-Type", /json/)
         .expect({
             message: "Email not confirmed. Please check email for confirmation message.",
@@ -162,7 +148,7 @@ test("Email not confirmed get/login", (done) => {
 // bad data
 test("Check missing paramaters get/login", (done) => {
     request(app)
-        .get("/login?email=SELECT%*%FROM%USERS&pwText=")
+        .get("/api/login?email=SELECT%*%FROM%USERS&pwText=")
         .expect("Content-Type", /json/)
         .expect({
             message: "Login and Password did not match.",

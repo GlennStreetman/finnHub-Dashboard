@@ -5,8 +5,7 @@ import path from "path";
 import bodyParser from "body-parser";
 import session from "express-session";
 import request from "supertest";
-import pgSimple from "connect-pg-simple";
-import pg from "pg";
+import sessionFileStore from "session-file-store";
 import db from "../../db/databaseLocalPG.js";
 import accountData from "./accountData.js";
 import login from "./../loginRoutes/login.js";
@@ -18,25 +17,11 @@ app.use(express.static(path.join(__dirname, "build")));
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // support json encoded bodies
 
-var pgPool = new pg.Pool({
-    database: process.env.pgdatabase,
-    user: process.env.pguser,
-    password: process.env.pgpassword,
-    port: process.env.pgport,
-    ssl: false,
-    max: 20, // set pool max size to 20
-    idleTimeoutMillis: 1000, // close idle clients after 1 second
-    connectionTimeoutMillis: 1000, // return an error after 1 second if connection could not be established
-    maxUses: 7500, // close (and replace) a connection after it has been used 7500 times (see below for discussion)
-});
-
-const pgSession = new pgSimple(session);
+const FileStore = sessionFileStore(session);
+const fileStoreOptions = {};
 app.use(
     session({
-        // store: new FileStore(fileStoreOptions),
-        store: new pgSession({
-            pool: pgPool,
-        }),
+        store: new FileStore(fileStoreOptions),
         secret: process.env.session_secret,
         resave: false,
         saveUninitialized: true,
@@ -70,8 +55,6 @@ beforeAll((done) => {
     DO NOTHING
     `;
 
-    console.log(setupDB);
-
     db.connect();
     db.query(setupDB, (err) => {
         if (err) {
@@ -88,13 +71,13 @@ afterAll((done) => {
 
 test("Check not logged in: get/accountData", (done) => {
     request(app)
-        .get("/accountData")
+        .get("/api/accountData")
         .expect("Content-Type", /json/)
         .expect({
             message: "Not logged in.",
         })
-        .expect(401)
-        .end(done);
+        .expect(401, done);
+    // .end(done);
 });
 
 describe("Get login cookie:", () => {
@@ -102,7 +85,7 @@ describe("Get login cookie:", () => {
     let cookieJar = "";
     beforeEach(function (done) {
         request(app)
-            .get("/login?email=accountDataTest@test.com&pwText=testpw")
+            .get("/api/login?email=accountDataTest@test.com&pwText=testpw")
             .then((res) => {
                 cookieJar = res.header["set-cookie"];
                 expect(200);
@@ -112,7 +95,7 @@ describe("Get login cookie:", () => {
 
     test("Check get data: get/accountData", (done) => {
         request(app)
-            .get("/accountData")
+            .get("/api/accountData")
             .set("Cookie", cookieJar)
             .expect("Content-Type", /json/)
             .expect({
@@ -127,18 +110,18 @@ describe("Get login cookie:", () => {
             })
             .expect(200)
             .then(() => {
-                request(app).get("/logOut");
+                request(app).get("/api/logOut");
             })
             .then(() => {
                 //check that logging out returns correct result.
                 request(app)
-                    .get("/accountData")
+                    .get("/api/accountData")
                     .expect("Content-Type", /json/)
                     .expect({
                         message: "Not logged in.",
                     })
-                    .expect(401)
-                    .end(done);
+                    .expect(401, done);
+                // .end(done);
             });
     });
 });
@@ -148,7 +131,7 @@ describe("Get login cookie POST:", () => {
     let cookieJar = "";
     beforeAll(function (done) {
         request(app)
-            .get("/login?email=accountDataPOSTTest@test.com&pwText=testpw")
+            .get("/api/login?email=accountDataPOSTTest@test.com&pwText=testpw")
             .then((res) => {
                 cookieJar = res.header["set-cookie"];
                 expect(200);
@@ -158,7 +141,7 @@ describe("Get login cookie POST:", () => {
 
     test("Check update data, good field: post/accountData", (done) => {
         request(app)
-            .post("/accountData")
+            .post("/api/accountData")
             .send({
                 field: "ratelimit",
                 newValue: "29",

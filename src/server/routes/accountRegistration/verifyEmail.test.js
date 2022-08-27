@@ -53,7 +53,7 @@ afterAll((done) => {
 //good verify link
 test("Verify email get/verifyEmail", (done) => {
     request(app)
-        .get(`/verifyEmail?id=testConfirmEmail`)
+        .get(`/api/verifyEmail?id=testConfirmEmail`)
         .expect("Content-Type", /text\/plain/)
         .expect(302)
         .then(() => {
@@ -74,7 +74,7 @@ test("Verify email get/verifyEmail", (done) => {
 //bad verify link
 test("Verify email get/verifyEmail", (done) => {
     request(app)
-        .get(`/verifyEmail?id=badVerifyLink`)
+        .get(`/api/verifyEmail?id=badVerifyLink`)
         .expect("Content-Type", /text\/plain/)
         .expect({ message: "Failed to verify new email address." })
         .expect(401);
@@ -84,7 +84,7 @@ test("Verify email get/verifyEmail", (done) => {
 //missing param verify link
 test("Verify email get/verifyEmail", (done) => {
     request(app)
-        .get(`/verifyEmail?id=`)
+        .get(`/api/verifyEmail?id=`)
         .expect("Content-Type", /text\/plain/)
         .expect({ message: "Failed to verify new email address." })
         .expect(401);

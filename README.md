@@ -41,4 +41,13 @@ On slower systems changes to server take a few seconds transpile and nodemon is 
 
 Use nginx, or favored reverse proxy, to send requests to port 5000
 
-### NGINX
+### TESTS
+
+Test need to have useRemoteLogin set to false in test.env file.
+
+> npm run test-build
+> npm run newTestBuild
+> npm run testDeploy
+> npm run testServer
+> docker exec -it 'serverContainerName' /bin/bash
+> npm run test 'testname'

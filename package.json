@@ -14,10 +14,11 @@
         "server": "concurrently \"nodemon ./build/server/server.js\" \"npx tsc -w -p src/server/tsconfig.json\" ",
         "client": "concurrently \"set PORT=3000 && react-scripts start\" \"npx tsc -w -p src/server/tsconfig.json\" ",
         "start": "react-scripts start",
-        "start1": "pm2-runtime ./build/server/server.js",
         "test": "cp test.env .env && node mockdb && jest",
-        "testci": "pghost=testPostgres jest --ci --runInBand",
-        "test-f": "jest",
+        "test-build": "cp test.env .env && react-scripts build  && npx tsc --project src/server/tsconfig.json && npm run copy-files",
+        "newTestBuild": "cp test.env .env  && docker-compose -f test.build.yaml up --build",
+        "testDeploy": "docker-compose -f testDeploy.yaml up",
+        "testServer": "cp test.env .env &&  docker-compose -f test.yaml up",
         "pretty": "npm run format"
     },
     "dependencies": {

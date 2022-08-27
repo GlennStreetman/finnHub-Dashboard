@@ -52,17 +52,21 @@ afterAll((done) => {
 });
 
 test("bad email get/forgot", (done) => {
-    request(app).get(`/forgot?loginText=badEmail@gmail.com`).expect("Content-Type", /json/).expect({ message: "Email not found." }).expect(401, done);
+    request(app)
+        .get(`/api/forgot?loginText=badEmail@gmail.com`)
+        .expect("Content-Type", /json/)
+        .expect({ message: "Email not found." })
+        .expect(401, done);
 });
 
 test("no email get/forgot", (done) => {
-    request(app).get(`/forgot?loginText=`).expect("Content-Type", /json/).expect({ message: "Email not found." }).expect(401, done);
+    request(app).get(`/api/forgot?loginText=`).expect("Content-Type", /json/).expect({ message: "Email not found." }).expect(401, done);
 });
 
 test("bad param get/forgot", (done) => {
-    request(app).get(`/forgot?badParam=`).expect("Content-Type", /json/).expect({ message: "Email not found." }).expect(401, done);
+    request(app).get(`/api/forgot?badParam=`).expect("Content-Type", /json/).expect({ message: "Email not found." }).expect(401, done);
 });
 
 test("missing param get/forgot", (done) => {
-    request(app).get(`/forgot`).expect("Content-Type", /json/).expect({ message: "Email not found." }).expect(401, done);
+    request(app).get(`/api/forgot`).expect("Content-Type", /json/).expect({ message: "Email not found." }).expect(401, done);
 });

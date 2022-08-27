@@ -3,14 +3,14 @@ import express from "express";
 import dotenv from "dotenv";
 import path from "path";
 import session from "express-session";
-import pgSimple from "connect-pg-simple";
 import request from "supertest";
 import db from "../../db/databaseLocalPG.js";
 import bodyParser from "body-parser";
 import newPW from "./newPW.js";
 import sha512 from "./../../db/sha512.js";
 import login from "./../loginRoutes/login.js";
-import pg from "pg";
+
+import sessionFileStore from "session-file-store";
 
 const app = express();
 dotenv.config();
@@ -18,31 +18,18 @@ app.use(express.static(path.join(__dirname, "build")));
 app.use(express.urlencoded({ extended: false }));
 app.use(bodyParser.json()); // support json encoded bodies
 
-var pgPool = new pg.Pool({
-    database: process.env.pgdatabase,
-    user: process.env.pguser,
-    password: process.env.pgpassword,
-    port: process.env.pgport,
-    ssl: false,
-    max: 20, // set pool max size to 20
-    idleTimeoutMillis: 1000, // close idle clients after 1 second
-    connectionTimeoutMillis: 1000, // return an error after 1 second if connection could not be established
-    maxUses: 7500, // close (and replace) a connection after it has been used 7500 times (see below for discussion)
-});
-
-const pgSession = new pgSimple(session);
+const FileStore = sessionFileStore(session);
+const fileStoreOptions = {};
 app.use(
     session({
-        // store: new FileStore(fileStoreOptions),
-        store: new pgSession({
-            pool: pgPool,
-        }),
+        store: new FileStore(fileStoreOptions),
         secret: process.env.session_secret,
         resave: false,
         saveUninitialized: true,
         cookie: { secure: false, sameSite: true },
     })
 );
+
 app.use("/", newPW); //route to be tested needs to be bound to the router.
 app.use("/", login); //needed fo all routes that require login.
 
@@ -90,7 +77,7 @@ afterAll((done) => {
 
 test("Not Logged In", (done) => {
     request(app)
-        .post("/newPW")
+        .post("/api/newPW")
         .send({
             newPassword: "Testpw123!",
         })
@@ -102,7 +89,7 @@ describe("Get login cookie:", () => {
     let cookieJar = "";
     beforeEach(function (done) {
         request(app)
-            .get("/login?email=newPWTest@test.com&pwText=Testpw123!")
+            .get("/api//login?email=newPWTest@test.com&pwText=Testpw123!")
             .then((res) => {
                 cookieJar = res.header["set-cookie"];
                 expect(200);
@@ -112,7 +99,7 @@ describe("Get login cookie:", () => {
 
     test("Set new password get/newPW", (done) => {
         request(app)
-            .post("/newPW")
+            .post("/api/newPW")
             .send({
                 newPassword: "NewTestpw1!",
             })
@@ -124,7 +111,7 @@ describe("Get login cookie:", () => {
 
     test("Set new BAD password get/newPW", (done) => {
         request(app)
-            .post("/newPW")
+            .post("/api/newPW")
             .send({
                 newPassword: "badpassword",
             })

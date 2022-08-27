@@ -16,15 +16,6 @@ services:
             MONGO_INITDB_ROOT_PASSWORD: "${mongoPassword}"
         ports:
             - 27017:27017
-    testdashboard:
-        build:
-            context: .
-            dockerfile: test.Dockerfile
-        ports:
-            - 5000:5000
-        volumes:
-            - .:/app/
-        command: node ./build/server/server.js
 networks:
     default:
         external:

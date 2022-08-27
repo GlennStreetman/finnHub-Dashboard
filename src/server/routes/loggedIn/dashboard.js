@@ -6,10 +6,9 @@ const router = express.Router();
 
 router.get("/api/dashboard", (req, res, next) => {
     //returns requested dashboard to user.
-    // console.log("--getDashboard--,", req.session.login);
+    console.log("--getDashboard--,", req.session.login);
     try {
-        if (req.session === undefined)
-            throw new Error("Request not associated with session.");
+        if (req.session === undefined) throw new Error("Request not associated with session.");
         const db = postgresDB;
         if (req.session.login === true) {
             console.log("login session is true");
@@ -40,10 +39,7 @@ router.get("/api/dashboard", (req, res, next) => {
                     // console.log("--rows--", rows.rows);
                     for (const row in result) {
                         //For each widget in dashboard
-                        if (
-                            r.savedDashBoards[result[row].dashboardname] ===
-                            undefined
-                        ) {
+                        if (r.savedDashBoards[result[row].dashboardname] === undefined) {
                             r.savedDashBoards[result[row].dashboardname] = {
                                 dashboardname: result[row].dashboardname,
                                 globalstocklist: result[row].globalstocklist,
@@ -66,9 +62,7 @@ router.get("/api/dashboard", (req, res, next) => {
                             xAxis: result[row].xaxis,
                             showBody: result[row].showbody,
                         };
-                        r.savedDashBoards[resultKey].widgetlist[
-                            newObject.widgetID
-                        ] = newObject;
+                        r.savedDashBoards[resultKey].widgetlist[newObject.widgetID] = newObject;
                     }
 
                     db.query(getMenuSetup, (err, rows) => {
@@ -117,15 +111,11 @@ router.post("/api/dashboard", (req, res, next) => {
     //saves users dashboard
     // console.log("SAVING DASHBOARD", req.body);
     try {
-        if (req.session === undefined)
-            throw new Error("Request not associated with session.");
+        if (req.session === undefined) throw new Error("Request not associated with session.");
         const db = postgresDB;
         if (req.session.login === true) {
             let dashBoardName = format("%L", req.body.dashBoardName);
-            let globalStockList = format(
-                "%L",
-                JSON.stringify(req.body.globalStockList)
-            );
+            let globalStockList = format("%L", JSON.stringify(req.body.globalStockList));
             const saveDashBoardSetup = (userID) => {
                 return new Promise((resolve, reject) => {
                     const saveDashBoardSetupQuery = `
@@ -147,9 +137,7 @@ router.post("/api/dashboard", (req, res, next) => {
                             for (const widget in widgetList) {
                                 const w = widgetList[widget];
                                 const thisFilter = JSON.stringify(w.filters);
-                                const trackedStocks = JSON.stringify(
-                                    w.trackedStocks
-                                );
+                                const trackedStocks = JSON.stringify(w.trackedStocks);
                                 const saveWidget = `
                 INSERT INTO widgets
                 (dashboardkey, columnid, columnorder, config, filters, trackedstocks, widgetconfig, widgetheader, widgetid, widgettype, xaxis, yaxis, showBody)
@@ -267,10 +255,7 @@ router.post("/api/dashboard", (req, res, next) => {
                     res.status(200).json({ message: "Save Complete" });
                 })
                 .catch((err) => {
-                    console.log(
-                        "/dashboard post error, updateMenuSetup: ",
-                        err
-                    );
+                    console.log("/dashboard post error, updateMenuSetup: ", err);
                     res.status(400).json({
                         message: "Problem saving dashboard.",
                     });
@@ -285,8 +270,7 @@ router.post("/api/dashboard", (req, res, next) => {
 
 router.post("/api/renameDashboard", (req, res, next) => {
     try {
-        if (req.session === undefined)
-            throw new Error("Request not associated with session.");
+        if (req.session === undefined) throw new Error("Request not associated with session.");
         const db = postgresDB;
         if (req.session.login === true) {
             let newName = format("%L", req.body.newName);

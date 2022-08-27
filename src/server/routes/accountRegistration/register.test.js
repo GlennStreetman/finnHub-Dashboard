@@ -13,7 +13,18 @@ dotenv.config();
 
 app.use(express.static(path.join(__dirname, "build")));
 app.use(express.urlencoded({ extended: false }));
-app.use(bodyParser.json()); // support json encoded bodies
+app.use(
+    bodyParser.json({
+        limit: "50mb",
+    })
+); // support json encoded bodies
+app.use(
+    bodyParser.urlencoded({
+        parameterLimit: 100000,
+        limit: "50mb",
+        extended: true,
+    })
+);
 
 app.use("/", register); //route to be tested needs to be bound to the router.
 
@@ -39,6 +50,7 @@ beforeAll((done) => {
         if (err) {
             console.log("verifyEmail beforeAll setup error.");
         } else {
+            console.log("db setup complete");
             done();
         }
     });
@@ -46,7 +58,7 @@ beforeAll((done) => {
 
 test("Valid new login post/register", (done) => {
     request(app)
-        .post("/register")
+        .post("/api/register")
         .send({
             pwText: "Testpw123!",
             emailText: "registerTest@test.com",
@@ -61,7 +73,7 @@ test("Valid new login post/register", (done) => {
 
 test("Invalid email post/register", (done) => {
     request(app)
-        .post("/register")
+        .post("/api/register")
         .send({
             pwText: "dontlogin",
             emailText: "testtest.com",
@@ -72,7 +84,7 @@ test("Invalid email post/register", (done) => {
 
 test("No email post/register", (done) => {
     request(app)
-        .post("/register")
+        .post("/api/register")
         .send({
             pwText: "dontlogin",
             emailText: "",
@@ -83,7 +95,7 @@ test("No email post/register", (done) => {
 
 test("No user post/register", (done) => {
     request(app)
-        .post("/register")
+        .post("/api/register")
         .send({
             pwText: "dontlogin",
             emailText: "test@test.com",
@@ -94,7 +106,7 @@ test("No user post/register", (done) => {
 
 test("No password post/register", (done) => {
     request(app)
-        .post("/register")
+        .post("/api/register")
         .send({
             pwText: "",
             emailText: "test@test.com",
@@ -105,7 +117,7 @@ test("No password post/register", (done) => {
 
 test("Email already taken post/register", (done) => {
     request(app)
-        .post("/register")
+        .post("/api/register")
         .send({
             pwText: "Testpw123!",
             emailText: "registertest_taken@test.com",

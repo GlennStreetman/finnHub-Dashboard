@@ -1,16 +1,14 @@
-
-version: '3.9'
+version: "3.9"
 services:
     testdashboard:
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: test.Dockerfile
         ports:
-        - 5000:5000
+            - 5000:5000
         volumes:
-            - ./src:/app/src
-            - ./build:/app/build
-            - ./nodemon.json:/app/nodemon.json
-            - ./mockdb.js:/app/mockdb.js
-            - ./package.json:/app/package.json
-        command: npm run testci
+            - .:/app/
+networks:
+    default:
+        external:
+            name: gstreet-test

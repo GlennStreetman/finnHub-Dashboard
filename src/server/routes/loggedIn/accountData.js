@@ -5,8 +5,8 @@ const router = express.Router();
 
 router.get("/api/accountData", (req, res, next) => {
     try {
-        if (req.session === undefined)
-            throw new Error("Request not associated with session.");
+        console.log("getting account data");
+        if (req.session === undefined) throw new Error("Request not associated with session.");
         const db = postgresDB;
         if (req.session.login === true) {
             const accountDataQuery = `
@@ -15,7 +15,7 @@ router.get("/api/accountData", (req, res, next) => {
         WHERE id =$1`;
             const queryValues = [req.session.uID];
             const resultSet = {};
-            console.log(accountDataQuery);
+            // console.log(accountDataQuery);
             db.query(accountDataQuery, queryValues, (err, rows) => {
                 const result = rows.rows[0];
                 // console.log(result)
@@ -26,6 +26,7 @@ router.get("/api/accountData", (req, res, next) => {
                     });
                 } else {
                     resultSet["userData"] = result;
+                    console.log("returning account data", resultSet);
                     res.status(200).json(resultSet);
                 }
             });
@@ -33,6 +34,7 @@ router.get("/api/accountData", (req, res, next) => {
             res.status(401).json({ message: "Not logged in." });
         }
     } catch (error) {
+        console.log("error getting account data");
         next(error);
     }
 });
@@ -49,24 +51,10 @@ router.post("/api/accountData", (req, res) => {
     if (req.session.login === true) {
         if (
             field !== "email" &&
-            [
-                "loginname",
-                "ratelimit",
-                "webhook",
-                "apikey",
-                "exchangelist",
-                "email",
-                "apialias",
-                "widgetsetup",
-            ].includes(field)
+            ["loginname", "ratelimit", "webhook", "apikey", "exchangelist", "email", "apialias", "widgetsetup"].includes(field)
         ) {
             console.log("updating account data");
-            const updateQuery = format(
-                "UPDATE users SET %I = %L WHERE id=%L",
-                field,
-                newValue,
-                req.session.uID
-            );
+            const updateQuery = format("UPDATE users SET %I = %L WHERE id=%L", field, newValue, req.session.uID);
             console.log("updateQuery", updateQuery);
             // let queryValues = [updateField, newValue, req.session.uID]
             db.query(updateQuery, (err) => {

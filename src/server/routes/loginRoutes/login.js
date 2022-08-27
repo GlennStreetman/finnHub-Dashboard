@@ -30,8 +30,7 @@ router.get("/api/login", (req, res, next) => {
                 console.log("LOGIN ERROR:", err);
                 res.status(400).json({ message: "Login error" });
             } else if (rows.rowCount === 1 && login.emailconfirmed === true) {
-                if (req.session === undefined)
-                    throw new Error("Request not associated with session.");
+                if (req.session === undefined) throw new Error("Request not associated with session.");
                 info["key"] = login.apikey;
                 info["apiAlias"] = login.apialias;
                 info["ratelimit"] = login.ratelimit;
@@ -42,12 +41,15 @@ router.get("/api/login", (req, res, next) => {
                 info["widgetsetup"] = rows.rows[0]["widgetsetup"];
                 req.session.uID = login.id;
                 req.session.login = true;
+                // console.log("login success");
                 res.status(200).json(info);
             } else if (rows.rowCount === 1 && login.emailconfirmed !== true) {
+                console.log("login Fail");
                 res.status(401).json({
                     message: `Email not confirmed. Please check email for confirmation message.`,
                 });
             } else {
+                console.log("login Fail");
                 res.status(401).json({
                     message: `Login and Password did not match.`,
                 });
@@ -58,9 +60,9 @@ router.get("/api/login", (req, res, next) => {
     });
 });
 router.get("/api/logOut", async (req, res, next) => {
-    console.log("--running logout procedure--");
+    // console.log("--running logout procedure--", process.env.useRemoteLogin);
     const copyCookies = req.header("cookie", process.env.useRemoteLogin);
-    if (process.env.useRemoteLogin)
+    if (process.env.useRemoteLogin === true)
         await axios(process.env.remoteLogoutUrl, {
             method: "GET",
             mode: "*",
@@ -69,8 +71,7 @@ router.get("/api/logOut", async (req, res, next) => {
             console.log("axios err logout", next(err));
         });
     try {
-        if (req.session === undefined)
-            throw new Error("Request not associated with session.");
+        if (req.session === undefined) throw new Error("Request not associated with session.");
         req.session.login = false;
         res.status(200).json({ message: "Logged Out" });
     } catch (error) {

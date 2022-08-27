@@ -132,7 +132,7 @@ afterAll((done) => {
 
 test("Check not logged in: get/dashboard", (done) => {
     request(app)
-        .get("/dashboard")
+        .get("/api/dashboard")
         .expect("Content-Type", /json/)
         .expect({
             message: "Not logged in.",
@@ -146,7 +146,7 @@ describe("Get login cookie:", () => {
     let cookieJar = "";
     beforeEach(function (done) {
         request(app)
-            .get("/login?email=accountDashboardTest@test.com&pwText=testpw")
+            .get("/api/login?email=accountDashboardTest@test.com&pwText=testpw")
             .then((res) => {
                 cookieJar = res.header["set-cookie"];
                 expect(200);
@@ -156,41 +156,40 @@ describe("Get login cookie:", () => {
 
     test("Check get data: get/dashboard", (done) => {
         request(app)
-            .get("/dashboard")
+            .get("/api/dashboard")
             .set("Cookie", cookieJar)
             .expect("Content-Type", /json/)
             .expect(function (res) {
-                // console.log("res", res.body);
                 const testObj = res.body.savedDashBoards.TEST;
                 expect(testObj).not.toBeUndefined();
             })
             .expect(200)
             .then(() => {
                 request(app)
-                    .get("/logOut")
+                    .get("/api/logOut")
                     .set("Cookie", cookieJar)
                     .then((res) => {
                         // cookieJar = res.header['set-cookie']
+                        // console.log("logged out", res);
                         expect({ message: "Logged Out" });
                         expect(200);
                     })
                     .then(() => {
                         request(app)
-                            .get("/dashboard")
+                            .get("/api/dashboard")
                             .set("Cookie", cookieJar)
                             .expect("Content-Type", /json/)
                             .expect({
                                 message: "Not logged in.",
                             })
-                            .expect(401)
-                            .end(done);
+                            .expect(401, done);
                     });
             });
     });
 
     test("Save dashboard data: post/dashboard", (done) => {
         request(app)
-            .post("/dashboard")
+            .post("/api/dashboard")
             .set("Cookie", cookieJar)
             .send({
                 dashBoardName: "saveTestDashboard",
@@ -487,7 +486,7 @@ describe("Get login cookie:", () => {
             .expect(200)
             .then(() => {
                 request(app)
-                    .get("/logOut")
+                    .get("/api/logOut")
                     .set("Cookie", cookieJar)
                     .then((res) => {
                         // cookieJar = res.header['set-cookie']
@@ -496,7 +495,7 @@ describe("Get login cookie:", () => {
                     })
                     .then(() => {
                         request(app)
-                            .post("/dashboard")
+                            .post("/api/dashboard")
                             .set("Cookie", cookieJar)
                             .send({
                                 dashBoardName: "saveTestDashboard",
@@ -586,7 +585,8 @@ describe("Get login cookie:", () => {
                                         filters: {
                                             startDate: -31449600000,
                                             endDate: 0,
-                                            Description: "Date numbers are millisecond offset from now. Used for Unix timestamp calculations.",
+                                            Description:
+                                                "Date numbers are millisecond offset from now. Used for Unix timestamp calculations.",
                                         },
                                         trackedStocks: {
                                             "US-TSLA": {
@@ -792,8 +792,7 @@ describe("Get login cookie:", () => {
                             .expect({
                                 message: "Not logged in.",
                             })
-                            .expect(401)
-                            .end(done);
+                            .expect(401, done);
                     });
             });
     });
