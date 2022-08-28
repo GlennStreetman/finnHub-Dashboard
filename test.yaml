@@ -1,11 +1,13 @@
 version: "3.9"
 services:
     testdashboard:
+        image: testbuild
         build:
             context: .
             dockerfile: test.Dockerfile
         ports:
             - 5000:5000
+            - 9229:9229
         volumes:
             - .:/app/
 networks:

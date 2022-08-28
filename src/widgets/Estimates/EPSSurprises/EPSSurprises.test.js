@@ -61,7 +61,9 @@ const body = "container-EstimatesEPSSurprises";
 
 configure({
     getElementError: (message, container) => {
-        const error = new Error(`Debug Node: ${prettyDOM(screen.getByTestId(body), 30000)} ${message}`); //Debug Node: ${prettyDOM(screen.getByTestId(body), 30000)}
+        // console.log('ERROR', message)
+        // console.log(prettyDOM(screen.getByTestId(body), 30000))
+        const error = new Error(`${message}`); //Debug Node: ${prettyDOM(screen.getByTestId(body), 30000)}
         error.name = "TestingLibraryElementError";
         error.stack = null;
         return error;

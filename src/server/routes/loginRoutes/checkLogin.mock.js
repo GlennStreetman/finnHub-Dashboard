@@ -1,7 +1,7 @@
 import { rest } from 'msw'
 
 export const getCheckLogin_fail =     //auto login check rejected.
-rest.get("/checkLogin", (req, res, ctx) =>{
+rest.get("/api/checkLogin", (req, res, ctx) =>{
     // console.log('get/CheckLogin Fail, returning login 0')
     return res(
         ctx.status(200),
@@ -12,7 +12,7 @@ rest.get("/checkLogin", (req, res, ctx) =>{
 
 
 export const getCheckLogin_success =     //auto login check rejected.
-rest.get("/checkLogin", (req, res, ctx) =>{
+rest.get("/api/checkLogin", (req, res, ctx) =>{
     // console.log('get/CheckLogin success, returning login 1')
     return res(
         ctx.status(200),

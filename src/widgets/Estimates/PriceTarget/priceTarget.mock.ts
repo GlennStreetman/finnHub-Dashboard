@@ -37,7 +37,7 @@ const testDashboard = {
     message: "",
 };
 
-export const getDashboard_success = rest.get("/dashboard", (req, res, ctx) => {
+export const getDashboard_success = rest.get("/api/dashboard", (req, res, ctx) => {
     //auto login check rejected.
     const resObj = testDashboard;
     // console.log('RETURNING DASHBOARD DATA MOCK')
@@ -70,7 +70,7 @@ export const mockFinnHubData = rest.get("https://finnhub.io/api/v1/stock/price-t
     return res(ctx.status(200), ctx.json(resData));
 });
 
-export const getCheckLogin_success = rest.get("/checkLogin", (req, res, ctx) => {
+export const getCheckLogin_success = rest.get("/api/checkLogin", (req, res, ctx) => {
     //auto login check rejected.
     // console.log('check login')
     return res(

@@ -37,9 +37,9 @@ const testDashboard = {
     message: "",
 };
 
-export const getDashboard_success = rest.get("/dashboard", (req, res, ctx) => { //auto login check rejected.
+export const getDashboard_success = rest.get("/api/dashboard", (req, res, ctx) => { //auto login check rejected.
     const resObj = testDashboard;
-    // console.log('RETURNING DASHBOARD DATA MOCK')
+    console.log('RETURNING DASHBOARD DATA MOCK')
     return res(ctx.status(200), ctx.json(resObj));
 });
 
@@ -85,7 +85,7 @@ const resData_WMT = {
         "52WeekLow": 1.13,
         "52WeekLowDate": "2019-01-14",
         "52WeekPriceReturnDaily": 1.14,
-        beta: 1.15,
+        "beta": 1.15,
     },
     metricType: "all",
     symbol: "WMT",
@@ -132,7 +132,7 @@ const resData_COST = {
         "52WeekLow": 2.13,
         "52WeekLowDate": "2019-01-14",
         "52WeekPriceReturnDaily": 2.14,
-        beta: 2.15,
+        "beta": 2.15,
     },
     metricType: "all",
     symbol: "COST",
@@ -142,11 +142,12 @@ export const mockFinnHubData = rest.get("https://finnhub.io/api/v1/stock/metric*
     // console.log('Returning data!!!!!!!!!!')
     const symbol = req.url.searchParams.get("symbol");
     let resData = symbol === "WMT" ? resData_WMT : resData_COST;
+    // console.log('SYMBOL111:', symbol, resData)
     return res(ctx.status(200), ctx.json(resData));
 });
 
-export const getCheckLogin_success = rest.get("/checkLogin", (req, res, ctx) => { //auto login check rejected.
-    console.log("get/CheckLogin success, returning login 1");
+export const getCheckLogin_success = rest.get("/api/checkLogin", (req, res, ctx) => { //auto login check rejected.
+    // console.log("get/CheckLogin success, returning login 1");
     return res(
         ctx.status(200),
         ctx.json({
@@ -161,7 +162,7 @@ export const getCheckLogin_success = rest.get("/checkLogin", (req, res, ctx) => 
     );
 });
 
-export const postFindMongoData_success_noData = rest.post("/findMongoData", (req, res, ctx) => {
+export const postFindMongoData_success_noData = rest.post("/api/findMongoData", (req, res, ctx) => {
     console.log("post/CheckLogin success, no data");
     return res(ctx.status(200), ctx.json({}));
 });
@@ -195,7 +196,7 @@ export const mockExchangeData = rest.get("https://finnhub.io/api/v1/stock/symbol
     return res(ctx.status(200), ctx.json(exchangeData));
 });
 
-export const finalUpdateToWidgetSetup = rest.post("/findMongoData", (req: any, res, ctx) => {
+export const finalUpdateToWidgetSetup = rest.post("/api/findMongoData", (req: any, res, ctx) => {
     // console.log('sending final response')
     const searchList = req.body.searchList;
     const dashboard = req.body.dashboard;

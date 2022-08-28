@@ -196,7 +196,7 @@ export default function App() {
                     const newList: string[] = data.exchangelist
                         ? data.exchangelist.split(",")
                         : ["US"];
-                    console.log("processing login");
+                    // console.log("processing login");
                     await dispatch(
                         tProcessLogin({
                             defaultexchange: data.defaultexchange,

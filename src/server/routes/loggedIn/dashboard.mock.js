@@ -24,7 +24,7 @@ const menuList = {
 }
 
 export const getDashboard_success_noWidgets =     //auto login check rejected.
-rest.get("/dashboard", (req, res, ctx) =>{
+rest.get("/api/dashboard", (req, res, ctx) =>{
     const resObj = {    
         savedDashBoards: {},
         default: '',
@@ -39,7 +39,7 @@ rest.get("/dashboard", (req, res, ctx) =>{
 })
 
 export const postDashboard_success_noWidgets =     //auto login check rejected.
-rest.post("/dashboard", (req, res, ctx) =>{
+rest.post("/api/dashboard", (req, res, ctx) =>{
 
     return res(
         ctx.status(200),

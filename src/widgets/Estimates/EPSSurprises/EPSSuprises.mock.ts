@@ -37,7 +37,7 @@ const testDashboard = {
     message: "",
 };
 
-export const getDashboard_success = rest.get("/dashboard", (req, res, ctx) => {
+export const getDashboard_success = rest.get("/api/dashboard", (req, res, ctx) => {
     //auto login check rejected.
     const resObj = testDashboard;
     // console.log('RETURNING DASHBOARD DATA MOCK')

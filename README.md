@@ -48,6 +48,5 @@ Test need to have useRemoteLogin set to false in test.env file.
 > npm run test-build
 > npm run newTestBuild
 > npm run testDeploy
-> npm run testServer
-> docker exec -it 'serverContainerName' /bin/bash
+> npm run connect
 > npm run test 'testname'

@@ -14,11 +14,15 @@
         "server": "concurrently \"nodemon ./build/server/server.js\" \"npx tsc -w -p src/server/tsconfig.json\" ",
         "client": "concurrently \"set PORT=3000 && react-scripts start\" \"npx tsc -w -p src/server/tsconfig.json\" ",
         "start": "react-scripts start",
-        "test": "cp test.env .env && node mockdb && jest",
+        "testOLD": "node mockdb && jest",
+        "test": "jest",
+        "test-debug": "node --inspect-brk=0.0.0.0 ./node_modules/jest/bin/jest.js --runInBand",
+        "test-watch": "jest --watchAll",
+        "test-watch-debug": "node --inspect-brk=0.0.0.0 ./node_modules/jest/bin/jest.js --watchAll --runInBand",
         "test-build": "cp test.env .env && react-scripts build  && npx tsc --project src/server/tsconfig.json && npm run copy-files",
         "newTestBuild": "cp test.env .env  && docker-compose -f test.build.yaml up --build",
-        "testDeploy": "docker-compose -f testDeploy.yaml up",
-        "testServer": "cp test.env .env &&  docker-compose -f test.yaml up",
+        "testDeploy": "docker-compose -f test.yaml -f testDeploy.yaml up",
+        "connect": "docker exec -it $(docker ps | grep testd | awk '{print $1}') /bin/bash",
         "pretty": "npm run format"
     },
     "dependencies": {
