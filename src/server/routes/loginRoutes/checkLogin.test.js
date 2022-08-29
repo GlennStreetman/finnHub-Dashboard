@@ -76,7 +76,7 @@ describe("Get login cookie:", () => {
         request(app)
             .get("/api/login?email=loginCheck@test.com&pwText=testpw")
             .then((res) => {
-                console.log("res", res);
+                // console.log("res", res);
                 cookieJar = res.header["set-cookie"];
                 done();
             });

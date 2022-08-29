@@ -93,60 +93,60 @@ beforeEach(async () => {
     await addWidget("Stock Fundamentals", "Basic Financials", body); //mount widget to be tested.
 });
 
-test(`Test ${widgetType} Widget: Select metrics. Check data renders.`, async () => {
-    await toggleEditPane(widgetType); //show widget config menu. Configure. Test API data renders.
+// test(`Test ${widgetType} Widget: Select metrics. Check data renders.`, async () => {
+//     await toggleEditPane(widgetType); //show widget config menu. Configure. Test API data renders.
 
-    await testBodyRender([
-        //test that widget body renders api data.
-        ["getByText", "10 Day"],
-        ["getByTestId", "0bfSelectMetric"],
-    ]);
-    mockHTTPServer.use(finalUpdateToWidgetSetup);
-    clickRadioButton("0bfSelectMetric"); //select first metric
-    clickRadioButton("1bfSelectMetric"); //select second metric
-    clickRadioButton("2bfSelectMetric"); //select third metric
+//     await testBodyRender([
+//         //test that widget body renders api data.
+//         ["getByText", "10 Day"],
+//         ["getByTestId", "0bfSelectMetric"],
+//     ]);
+//     mockHTTPServer.use(finalUpdateToWidgetSetup);
+//     clickRadioButton("0bfSelectMetric"); //select first metric
+//     clickRadioButton("1bfSelectMetric"); //select second metric
+//     clickRadioButton("2bfSelectMetric"); //select third metric
 
-    await clickRadioButton("bfSelectSeries"); //switch to series view
-    await testBodyRender([
-        //test that widget body renders api data.
-        ["getByText", "Current Ratio"],
-    ]);
+//     await clickRadioButton("bfSelectSeries"); //switch to series view
+//     await testBodyRender([
+//         //test that widget body renders api data.
+//         ["getByText", "Current Ratio"],
+//     ]);
 
-    clickRadioButton("0bfSelectSeries"); //select first series
-    clickRadioButton("1bfSelectSeries"); //select second series
-    clickRadioButton("2bfSelectSeries"); //select third series
+//     clickRadioButton("0bfSelectSeries"); //select first series
+//     clickRadioButton("1bfSelectSeries"); //select second series
+//     clickRadioButton("2bfSelectSeries"); //select third series
 
-    await clickRadioButton("bfSelectMetrics"); //switch back to metrics view
-    await toggleEditPane(widgetType); //return to widget data screen
-    await testBodyRender([
-        //test that widget body renders api data.
-        // ["getByText", "1.11"],
-        ["getByText", "US-WMT:"],
-    ]);
+//     await clickRadioButton("bfSelectMetrics"); //switch back to metrics view
+//     await toggleEditPane(widgetType); //return to widget data screen
+//     await testBodyRender([
+//         //test that widget body renders api data.
+//         // ["getByText", "1.11"],
+//         ["getByText", "US-WMT:"],
+//     ]);
 
-    await setButtonOptionSelection("modeSelector", "series");
-    await testBodyRender([
-        //does a chart render?
-        ["getByText", "Show:"],
-        ["getByTestId", "chart-US-WMT"],
-    ]);
+//     await setButtonOptionSelection("modeSelector", "series");
+//     await testBodyRender([
+//         //does a chart render?
+//         ["getByText", "Show:"],
+//         ["getByTestId", "chart-US-WMT"],
+//     ]);
 
-    await setButtonOptionSelection("selectStock", "US-COST"); //switch focus
-    await testBodyRender([
-        //does a chart render?
-        ["getByText", "Show:"],
-        ["getByTestId", "chart-US-COST"],
-    ]);
+//     await setButtonOptionSelection("selectStock", "US-COST"); //switch focus
+//     await testBodyRender([
+//         //does a chart render?
+//         ["getByText", "Show:"],
+//         ["getByTestId", "chart-US-COST"],
+//     ]);
 
-    await setButtonOptionSelection("modeSelector", "metrics");
+//     await setButtonOptionSelection("modeSelector", "metrics");
 
-    await toggleEditPane(widgetType); //show widget config menu.
-    await testBodyRender([
-        //test that widget body renders api data.
-        ["getByText", "10 Day Average Trading Volume"],
-        ["getByTestId", "0bfSelectMetric"],
-    ]);
-});
+//     await toggleEditPane(widgetType); //show widget config menu.
+//     await testBodyRender([
+//         //test that widget body renders api data.
+//         ["getByText", "10 Day Average Trading Volume"],
+//         ["getByTestId", "0bfSelectMetric"],
+//     ]);
+// });
 
 test(`Test ${widgetType} Widget: Rename widget works.`, async () => {
     await toggleEditPane(widgetType); //toggle to edit pane
