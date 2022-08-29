@@ -4,13 +4,11 @@ A web deployable applicaiton that allows you to quickly design and visualize you
 Each dashboard then becomes its own API endpoint that you can query using graphQL.  
 After you are done designing your dashboards you can push your data to Excel.
 
-[Working Example](https://finn-dash.herokuapp.com/) requires going through registration process and working Finnhub.io API Key.
+[Working Example](https://finndash.gstreet.dev) requires going through registration process and working Finnhub.io API Key.
 
 ## Deployed using [Docker](https://www.docker.com/) & [Docker Compose](https://docs.docker.com/compose/)
-
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app)  
-The user registration process can use email registration. Recommend Mailgun
-Register a [Mailgun Account](https://www.mailgun.com/) and add your apikeys to the .env setup below
+
 
 ## Setup
 
@@ -23,6 +21,7 @@ Navigate to desired project folder.
 
 rename env.example to dev.env for dev mode and prod.env for production.
 Remember to rerun build after any changes to an env file
+Login requires [Mailgun Account](https://www.mailgun.com/). Remember to add your apikeys to the .env file.
 
 ## Dev mode
 
@@ -46,7 +45,19 @@ Use nginx, or favored reverse proxy, to send requests to port 5000
 Test need to have useRemoteLogin set to false in test.env file.
 
 > npm run test-build
-> npm run newTestBuild
+> test-buildEnv
 > npm run testDeploy
 > npm run connect
 > npm run test 'testname'
+
+### Debugging Tests
+
+Use break points with the test-debug command, shown below, to debug
+
+> npm run test-debug 'testname'
+
+After running test-debug, with the test you want to debug appended to the end of the command go
+into chrome and navigate to:
+
+>chrome://inspect
+
