@@ -6,10 +6,10 @@
     "scripts": {
         "copy-files": "copyfiles ./src/server/db/postgresVersions/* ./build/server/db/postgresVersions/ -f",
         "dev-build": "cp dev.env .env && react-scripts build  && npx tsc --project src/server/tsconfig.json && npm run copy-files",
-        "dUp": "cp dev.env .env && docker-compose -f dev.yaml up",
+        "dUp": "cp dev.env .env && docker-compose -f compose.dev.yaml up",
         "tsc": "npx tsc --watch --project src/server/tsconfig.json",
         "prod-build": "cp prod.env .env && react-scripts build && npx tsc --project src/server/tsconfig.json && npm run copy-files",
-        "pUp": "docker-compose -f dev.yaml -f prod.yaml up",
+        "pUp": "docker-compose -f compose.dev.yaml -f prod.yaml up",
         "dev": "concurrently  \"nodemon ./build/server/server.js\" \"set PORT=3000 && react-scripts start\"",
         "server": "concurrently \"nodemon ./build/server/server.js\" \"npx tsc -w -p src/server/tsconfig.json\" ",
         "client": "concurrently \"set PORT=3000 && react-scripts start\" \"npx tsc -w -p src/server/tsconfig.json\" ",
@@ -19,8 +19,8 @@
         "test-debug": "node --inspect-brk=0.0.0.0 ./node_modules/jest/bin/jest.js",
         "test-watch": "jest --watchAll",
         "test-build": "cp test.env .env && react-scripts build  && npx tsc --project src/server/tsconfig.json && npm run copy-files",
-        "test-buildEnv": "cp test.env .env  && docker-compose -f test.build.yaml up --build",
-        "testDeploy": "docker-compose -f test.yaml -f testDeploy.yaml up",
+        "test-buildEnv": "cp test.env .env  && docker-compose -f compose.test.build.yaml up --build",
+        "testDeploy": "docker-compose -f compose.test.yaml -f compose.testDeploy.yaml up",
         "connect": "docker exec -it $(docker ps | grep testd | awk '{print $1}') /bin/bash",
         "pretty": "npm run format"
     },
