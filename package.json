@@ -9,7 +9,7 @@
         "dUp": "cp dev.env .env && docker-compose -f compose.dev.yaml up",
         "tsc": "npx tsc --watch --project src/server/tsconfig.json",
         "prod-build": "cp prod.env .env && react-scripts build && npx tsc --project src/server/tsconfig.json && npm run copy-files",
-        "pUp": "docker-compose -f compose.dev.yaml -f prod.yaml up",
+        "pUp": "docker-compose -f compose.dev.yaml -f compose.prod.yaml up",
         "dev": "concurrently  \"nodemon ./build/server/server.js\" \"set PORT=3000 && react-scripts start\"",
         "server": "concurrently \"nodemon ./build/server/server.js\" \"npx tsc -w -p src/server/tsconfig.json\" ",
         "client": "concurrently \"set PORT=3000 && react-scripts start\" \"npx tsc -w -p src/server/tsconfig.json\" ",
